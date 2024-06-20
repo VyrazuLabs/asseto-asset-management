@@ -1,0 +1,116 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Asset Details</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Assets</li>
+                        <li class="breadcrumb-item active" aria-current="page">Asset Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-pc-display"></i>
+                    <span>Asset Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Asset Name</th>
+                                <td>{{asset.name}}</td>
+                                <th scope="row">Vendor</th>
+                                <td>{{asset.vendor}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Product</th>
+                                <td>{{asset.product}}</td>
+                                <th scope="row">Product Type</th>
+                                <td>{{asset.product.product_type}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Product Category</th>
+                                <td>{{asset.product.product_category}}</td>
+                                <th scope="row">Serial No.</th>
+                                <td>{{asset.serial_no}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Price</th>
+                                <td>{{asset.price}}</td>
+                                <th scope="row">Office Location</th>
+                                <td>{{asset.location}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Purchase Date</th>
+                                <td>{{asset.purchase_date}}</td>
+                                <th scope="row">Warranty Expiry Date</th>
+                                <td>{{asset.warranty_expiry_date}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Description</th>
+                                <td colspan="3">{{asset.description|urlize}}</td>
+                            </tr>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
+                            Asset Specifications
+                        </button>
+                      </h2>
+                      <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Specification Name</th>
+                                            <th>Specification Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if assetSpecifications %}
+                                            {% for assetSpecification in assetSpecifications %}
+                                        <tr>
+                                            <th scope="row">
+                                                {{assetSpecification.name}}
+                                            </th>
+                                            <td>
+                                                {{assetSpecification.value}}
+                                            </td>
+                                        </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content%}

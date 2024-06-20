@@ -1,0 +1,6 @@
+{% autoescape off %}
+Hi, {{user.full_name}}
+Please click on the link to confirm your new email address,
+<a href="{{ url }}{% url 'authentication:activate' uidb64=uid token=token %}"
+target="_blank" rel="noopener noreferrer">Activation Link</a>
+{% endautoescape %}

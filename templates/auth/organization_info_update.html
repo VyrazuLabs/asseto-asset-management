@@ -1,0 +1,80 @@
+{% load static %}
+<div class="modal-content">
+    <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white w-100" id="myModalLabel160">Update Organization</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+    <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="first-name-column">Company Name</label>
+                        {{organization_form.name}}
+                        {% for error in organization_form.name.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="last-name-column">Company Email</label>
+                        {{organization_form.email}}
+                        {% for error in organization_form.email.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="company-column">Company Phone</label>
+                        {{organization_form.phone}}
+                        {% for error in organization_form.phone.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="company-column">Company Website</label>
+                        {{organization_form.website}}
+                        {% for error in organization_form.website.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="company-column">Company Currency</label>
+                        {{organization_form.currency}}
+                        {% for error in organization_form.currency.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-light-secondary"
+                data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+            </button>
+            <button type="submit" class="btn btn-sm btn-info ml-1" 
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"> 
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Save</span>
+            </button>
+        </div>
+    </form>
+<script>
+htmx.on("htmx:beforeSwap", (e) => {
+    if (e.detail.target.id == "update-organization-modal-content" && !e.detail.xhr.response) {
+        location.reload()
+    }
+})
+</script>
+</div>

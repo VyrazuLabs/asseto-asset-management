@@ -1,0 +1,60 @@
+{% autoescape off %}
+<style>
+    th,
+    td {
+        text-align: center;
+        width: 100%;
+        padding: 3px;
+        background-color: #d6eeee;
+        border-bottom: 2px solid white;
+    }
+    th {
+        background-color: rgb(65, 65, 192);
+        color: white;
+    }
+    @page {
+        size: letter landscape;
+        margin: 0.5cm;
+    }
+</style>
+<table style="width: 100%">
+    <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Designation</th>
+            <th>Department</th>
+            <th>Address</th>
+            <th>Office Location</th>
+        </tr>
+    </thead>
+    {% if users %}
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td style="width: 50%">{{forloop.counter}}</td>
+            <td>
+                {% if user.profile_pic %}
+                <img src="{{user.profile_pic.path}}" width="100" height="80" />
+                {% else %} Not Uploaded {% endif %}
+            </td>
+            <td>{{user.full_name}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.phone}}</td>
+            <td>{{user.role.related_name}}</td>
+            <td>{{user.department.name}}</td>
+            <td>{{user.address}}</td>
+            <td>{{user.location}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% else %}
+    <tr>
+        <td colspan="9">No record available!</td>
+    </tr>
+    {% endif %}
+</table>
+{% endautoescape %}

@@ -1,0 +1,30 @@
+{% if page_object %}
+    {% for user_notification in page_object %}
+    <tr>
+        <td>
+            {% if page_object.start_index %}
+                {{page_object.start_index|add:forloop.counter0}}
+            {% else %}
+                {{forloop.counter}}
+            {% endif %}
+        </td>
+        <td><i class='bi {{user_notification.notification.icon}} bi-sub fs-4 text-muted'></i></td>
+        <td>{{user_notification.notification.notification_title | title}}</td>
+        <td>{{user_notification.notification.notification_text}}</td>
+        <td>{{user_notification.notification.created_at}}</td>
+        <td>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                {% if user_notification.notification.link is not None %}
+                    <a class="btn btn-success" href="{{user_notification.notification.link}}" class="btn btn-success" ><i class="bi bi-eye-fill"></i></a>
+                {% else %}
+                    <button class="btn btn-danger" ><i class="bi bi-eye-fill"></i></button>
+                {% endif %}
+                
+            </div>
+        </td>
+        <td>{{user_notification.last_login}}</td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <td colspan="8" class="text-center"> No record found related to your search keyword</td>
+{% endif %}

@@ -1,0 +1,183 @@
+{% load static %}
+<div class="modal-content">
+    <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white w-100" id="myModalLabel160">Update User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+    <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="first-name-column">Name</label>
+                        {{form.full_name}}
+                        {% for error in form.full_name.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="last-name-column">Email</label>
+                        {{form.email}}
+                        {% for error in form.email.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="company-column">Phone</label>
+                        {{form.phone}}
+                        {% for error in form.phone.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="company-column">Department</label>
+                        {{form.department}}
+                        {% for error in form.department.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="company-column">Role</label>
+                        {{form.role}}
+                        {% for error in form.role.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label for="company-column">Access Level</label>
+                        {{form.access_level}}
+                        {% for error in form.access_level.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Address Line 1</label>
+                        {{address_form.address_line_one}}
+                        {% for error in address_form.address_line_one.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Address Line 2</label>
+                        {{address_form.address_line_two}}
+                        {% for error in address_form.address_line_two.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>Country</label>
+                        {{address_form.country}}
+                        {% for error in address_form.country.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>State</label>
+                        {{address_form.state}}
+                        {% for error in address_form.state.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>City</label>
+                        {{address_form.city}}
+                        {% for error in address_form.city.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="form-group">
+                        <label>Zip Code</label>
+                        {{address_form.pin_code}}
+                        {% for error in address_form.pin_code.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-8 col-12">
+                    <div class="form-group">
+                        <label for="company-column">Office Location</label>
+                        {{form.location}}
+                        {% for error in form.location.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>             
+                </div>
+                <div class="col-md-8 col-12 d-flex justify-content-between">
+                    <div class="form-group">
+                        <label for="company-column">Profile Picture</label>
+                        {{form.profile_pic}}
+                        {% for error in form.profile_pic.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group rounded" id="imagePreview">
+                        {% if user.profile_pic %}
+                            <img src="{{user.profile_pic.url}}" class="rounded" width="100" height="80" onerror="this.parentElement.innerHTML = '';"/>
+                        {% else %}
+                            <img src="{% static 'assets/images/faces/1.jpg' %}" class="rounded" width="100" height="80"/>
+                        {% endif %}
+                    </div>                    
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-light-secondary"
+                data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+            </button>
+            <button type="submit" class="btn btn-sm btn-info ml-1" 
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"> 
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Save</span>
+            </button>
+        </div>
+    </form>
+<script>
+htmx.on("htmx:beforeSwap", (e) => {
+    if (e.detail.target.id == "update-user-modal-content" && !e.detail.xhr.response) {
+        location.reload()
+    }
+})
+
+function filePreview(input){
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#imagePreview + img').remove();
+            $('#imagePreview').after('<img src="'+e.target.result+'" class="rounded" width="100" height="80"/>');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+$("#inputFile").change(function () {
+    $('#imagePreview img').remove();
+    filePreview(this);
+});
+</script>
+</div>

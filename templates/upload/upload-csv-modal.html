@@ -1,0 +1,34 @@
+<div class="modal-content">
+    <div class="modal-header bg-dark white">
+        <span class="modal-title w-100 text-center" id="myModalLabel150">Upload {{page}}</span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+    <form action="{{request.path}}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="modal-body">
+        <div class="card">
+            <div class="card-content  py-0">
+                <br class="card-body py-0 pt-2">
+                    <input class="form-control" type="file" id="formFile" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    <small>* Please choose a CSV File.</small> </br>
+                    <small>* Data should be in proper format.</small> </br>
+                    <small>* Data should not cross 100 lines.</small>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-light-secondary"
+                data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+            </button>
+            <button type="submit" class="btn btn-sm btn-info ml-1"
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Uploading...`;"> 
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Upload</span>
+            </button>
+        </div>
+    </form>
+</div>

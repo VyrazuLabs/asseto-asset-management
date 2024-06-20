@@ -1,0 +1,40 @@
+<div class="modal-header bg-dark text-center">
+    <h5 class="modal-title white w-100" id="myModalLabel160">Reassign Asset</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"
+        aria-label="Close">
+    </button>
+</div>
+<form hx-post='{{request.path}}' novalidate>
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group">
+                <label for="last-name-column">Assign To</label>
+                {{form.user}}
+                {% for error in form.user.errors %}
+                    <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-light-secondary"
+            data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Close</span>
+        </button>
+        <button type="submit" class="btn btn-sm btn-info ml-1"
+            onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
+        > 
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Save</span>
+        </button>
+    </div>
+</form>
+<script>
+    htmx.on("htmx:beforeSwap", (e) => {
+        if ((e.detail.target.id == "reassign-asset-modal-content") && !e.detail.xhr.response) {
+            location.reload()
+        }
+    })
+</script>

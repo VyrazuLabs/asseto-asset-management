@@ -1,0 +1,128 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Update Location</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item">Locations</li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Location</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'dashboard:locations' %}" class="btn btn-sm btn-outline-info my-3">Back to Location List</a>
+        </div>
+        <form class="form row" action="{% url 'dashboard:update_location' location.id %}" method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Office Name</label>
+                                {{location_form.office_name}}
+                                {% for error in location_form.office_name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Contact Person Name</label>
+                                {{location_form.contact_person_name}}
+                                {% for error in location_form.contact_person_name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Contact Person Email</label>
+                                {{location_form.contact_person_email}}
+                                {% for error in location_form.contact_person_email.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Contact Person Phone</label>
+                                {{location_form.contact_person_phone}}
+                                {% for error in location_form.contact_person_phone.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Address Line 1</label>
+                                {{address_form.address_line_one}}
+                                {% for error in address_form.address_line_one.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Address Line 2</label>
+                                {{address_form.address_line_two}}
+                                {% for error in address_form.address_line_two.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Country</label>
+                                {{address_form.country}}
+                                {% for error in address_form.country.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>State</label>
+                                {{address_form.state}}
+                                {% for error in address_form.state.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>City</label>
+                                {{address_form.city}}
+                                {% for error in address_form.city.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Zip Code</label>
+                                {{address_form.pin_code}}
+                                {% for error in address_form.pin_code.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                            </div>
+                </div>
+                <div class="card-header">
+                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock content%}

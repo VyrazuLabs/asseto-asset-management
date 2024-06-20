@@ -1,0 +1,85 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Locations</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item">Upload</li>
+                        <li class="breadcrumb-item active" aria-current="page">Locations</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <!-- upload Modal -->
+                <div class="modal fade text-left" id="upload-locations-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel160" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div id="upload-locations-modal-content" class="modal-content" hx-target="this"></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 gap-2">
+                    <a
+                        type="button"
+                        class="btn btn-secondary rounded"
+                        class="btn-space"
+                        href="{% url 'upload:export_locations_csv' %}"
+                        ><i class="bi bi-download"></i> Sample File
+                    </a>
+                    <button
+                        type="button"
+                        class="btn btn-secondary rounded"
+                        hx-get="{% url 'upload:import_locations_csv' %}"
+                        hx-target="#upload-locations-modal-content"
+                        data-bs-target="#upload-locations-modal"
+                        data-bs-toggle="modal"
+                    >
+                    <i class="bi bi-upload"></i> Upload
+                    </button>
+                </div>
+                <table class="table table-hover" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Office Name</th>
+                            <th>Contact Person Name</th>
+                            <th>State</th>
+                            <th>City</th>
+                            <th>Zip Code</th>
+                        </tr>
+                    </thead>
+                    {% if page_object %}
+                    <tbody>
+                          {% for location in page_object %}
+                        <tr>
+                            <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                            <td>{{location.office_name}}</td>
+                            <td>{{location.contact_person_name}}</td>
+                            <td>{{location.address.state}}</td>
+                            <td>{{location.address.city}}</td>
+                            <td>{{location.address.pin_code}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        No record available!
+                    </div>
+                  {% endif %}
+                </table>
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content%}

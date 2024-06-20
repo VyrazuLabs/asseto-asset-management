@@ -1,0 +1,24 @@
+<footer>
+    <div class="footer clearfix mb-0 text-muted">
+        <div class="float-start">
+            <p>{% now 'Y' %} &copy; Asset Management</p>
+        </div>
+        <div class="float-end">
+            <p>
+                Powered by
+                <a href="https://vyrazu.com">Vyrazu Labs</a>
+            </p>
+        </div>
+    </div>
+</footer>
+</div>
+</div>
+<script>
+    $(".modal").on("hidden.bs.modal", function () {
+        document.querySelectorAll(".modal-content").forEach((e)=>{
+            e.innerHTML = ""
+        })
+    });
+</script>
+</body>
+</html>

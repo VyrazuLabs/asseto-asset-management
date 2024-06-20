@@ -1,0 +1,41 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Product Type Details</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Product Types</li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Type Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'dashboard:product_type_list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product Type List</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Product Type Name</th>
+                            <td>{{product_type.name}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content%}

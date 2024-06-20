@@ -1,0 +1,438 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <h3>Dashboard</h3>
+</div>
+<div class="page-content">
+    <section class="row">
+        <div class="col-12 col-lg-12">
+            <div class="row">
+            {% if perms.authentication.view_asset or perms.authentication.add_asset or perms.authentication.edit_asset or perms.authentication.delete_asset %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon green">
+                                       <i class="bi bi-pc-display"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Assets</h6>
+
+                                    {% if asset_count %}
+                                        <h6 class="font-extrabold mb-0">{{asset_count}}</h6>
+                                    {% else %}
+                                        <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon purple">
+                                        <i class="bi bi-person-workspace"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Assigned Assets</h6>
+
+                                      {% if assign_assets_counts %}
+                                          <h6 class="font-extrabold mb-0">{{assign_assets_counts}}</h6>
+                                      {% else %}
+                                          <h6 class="font-extrabold mb-0">0</h6>
+                                      {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon blue">
+                                        <i class="bi bi-window-stack"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Unassigned Assets</h6>
+
+                                        {% if unassign_assets_count %}
+                                           <h6 class="font-extrabold mb-0">{{unassign_assets_count}}</h6>
+                                        {% else %}
+                                           <h6 class="font-extrabold mb-0">0</h6>
+                                        {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon red">
+                                        <i class="bi bi-person-badge"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Vendors</h6>
+
+                                    {% if vendor_count %}
+                                        <h6 class="font-extrabold mb-0">{{vendor_count}}</h6>
+                                    {% else %}
+                                        <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if perms.authentication.view_location or perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon blue">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Locations</h6>
+                                    {% if location_count %}
+                                       <h6 class="font-extrabold mb-0">{{location_count}}</h6>
+                                    {% else %}
+                                       <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if perms.authentication.view_product or perms.authentication.add_product or perms.authentication.edit_product or perms.authentication.delete_product %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon green">
+                                        <i class="bi bi-display"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Products</h6>
+                                    {% if product_count %}
+                                       <h6 class="font-extrabold mb-0">{{product_count}}</h6>
+                                    {% else %}
+                                       <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if request.user.is_superuser %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon red">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+
+                                    <h6 class="text-muted font-semibold">Users</h6>
+                                       {% if users_count %}
+                                    <h6 class="font-extrabold mb-0">{{users_count}}</h6>
+                                       {% else %}
+                                    <h6 class="font-extrabold mb-0">0</h6>
+                                       {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if perms.authentication.view_asset or perms.authentication.add_asset or perms.authentication.edit_asset or perms.authentication.delete_asset %}
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon purple">
+                                        <i class="bi bi-currency-exchange"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Total Asset Cost</h6>
+                                    {% if all_asset_cost %}
+                                       <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                    {% else %}
+                                       <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
+            <div class="row">
+                <div class="page-heading">
+                    <h3>Upcoming Warranty Expiries</h3>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Assets</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No.</th>
+                                            <th>Name</th>
+                                            <th>Current State</th>
+                                            <th>Warranty Expiry Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for asset  in expiring_assets %}
+                                            <tr>
+                                                <td class="col-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                       {{asset.name}} 
+                                                    </p>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {% if asset.is_assigned %}
+                                                            In Use
+                                                        {% else %}
+                                                            In Store
+                                                        {% endif %}
+                                                    </p>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{asset.warranty_expiry_date}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="page-heading">
+                    <h3>Recent Activities</h3>
+                </div>
+                {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Vendors</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No.</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for vendor in latest_vendor_list %}
+                                            <tr>
+                                                <td class="col-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{vendor.name}}
+                                                    </p>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{vendor.created_at.date}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                         {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if perms.authentication.view_product or perms.authentication.add_product or perms.authentication.edit_product or perms.authentication.delete_product %}
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Products</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No.</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in latest_product_list %}
+                                            <tr>
+                                                <td class="col-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                    {{product.name}}
+                                                    </p>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{product.created_at.date}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if perms.authentication.view_location or perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location %}
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Locations</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No.</th>
+                                            <th>Address</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for location in all_location_list %}
+                                            <tr>
+                                                <td class="col-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{location.address}}
+                                                </td>                                
+                                                <td class="col-auto">
+                                                    <p class="mb-0">
+                                                        {{location.created_at.date}}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if request.user.is_superuser %}
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Users</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-lg">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl No.</th>
+                                            <th>Name</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for users in latest_users_list %}
+                                        <tr>
+                                            <td class="col-3">
+                                                <div class="d-flex align-items-center">
+                                                    <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
+                                                </div>
+                                            </td>
+                                            <td class="col-auto">
+                                                <p class="mb-0">
+                                                    {{users.full_name}}
+                                                </p>
+                                            </td>
+                                            <td class="col-auto">
+                                                <p class="mb-0">
+                                                    {{users.created_at.date}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}

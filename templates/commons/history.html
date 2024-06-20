@@ -1,0 +1,59 @@
+{% if page_object and request.user.is_superuser %}
+<div class="col-12 col-xl-12">
+    <div class="card">
+        <div class="card-header">
+            <h4>History</h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-lg">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Description</th>
+                            <th>Datetime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for history in page_object %}
+                            <tr>
+                                <td class="col-3">
+                                    <div class="d-flex align-items-center">
+                                        <p class="font-bold ms-3 mb-0">{{page_object.start_index|add:forloop.counter0}}</p>
+                                    </div>
+                                </td>
+                                <td class="col-auto">
+                                    <p class="mb-0">
+                                        {% if history.history_type == "+" %}
+                                            Inserted
+                                        {% elif history.history_type == "^" %}
+                                            Restored
+                                        {% elif history.history_type == "-" %}
+                                            Deleted
+                                        {% else %}
+                                            {% if history.status != history.prev_record.status %}
+                                                {% if history.status %} Enabled {% else %} Disabled {% endif %}
+                                            {% elif history.is_assigned != history.prev_record.is_assigned %}
+                                                {% if history.is_assigned %} Assigned {% else %} Unassigned {% endif %}
+                                            {% else %}
+                                                Updated
+                                            {% endif %}
+                                        {% endif %}
+                                        by {{history.history_user.full_name}}                                                                                    
+                                    </p>
+                                </td>
+                                <td class="col-auto">
+                                    <p class="mb-0">
+                                        {{history.history_date}} 
+                                    </p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+                </table>
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

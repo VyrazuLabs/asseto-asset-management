@@ -1,0 +1,226 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Update Asset</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item">Assets</li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Asset</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+        </div>
+        <form class="form row" method="POST" action="{{request.path}}" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-header">
+                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="city-column">Product</label>
+                                {{form.product}}
+                                {% for error in form.product.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="country-floating">Vendor</label>
+                                {{form.vendor}}
+                                {% for error in form.vendor.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Office Location</label>
+                                {{form.location}}
+                                {% for error in form.location.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="company-column">Asset Name</label>
+                                {{form.name}}
+                                {% for error in form.name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Serial No.</label>
+                                {{form.serial_no}}
+                                {% for error in form.serial_no.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Price</label>
+                                {{form.price}}
+                                {% for error in form.price.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="country-floating">Purchase Type</label>
+                                {{form.purchase_type}}
+                                {% for error in form.purchase_type.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Purchase Date</label>
+                                {{form.purchase_date}}
+                                {% for error in form.purchase_date.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Warranty Expiry Date</label>
+                                {{form.warranty_expiry_date}}
+                                {% for error in form.warranty_expiry_date.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Description</label>
+                                {{form.description}}
+                                {% for error in form.description.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">Asset Specifications</div>
+                <div class="card-body" id="container">
+                {% if assetSpecifications %}
+                    {% for assetSpecification in assetSpecifications %}
+                        <div class="row rmsection">
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <!-- <label for="first-name-column">Specification Name</label> -->
+                                    <input type="text" id="first-name-column" class="form-control"
+                                        placeholder="Specification Name" name="specifications_name" autocomplete="off" value="{{assetSpecification.name}}">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <!-- <label for="last-name-column">Specification Value</label> -->
+                                    <input type="text" id="last-name-column" class="form-control"
+                                        placeholder="Specification Value" name="specifications_value" autocomplete="off" value="{{assetSpecification.value}}">
+                                </div>
+                            </div>
+                            {% if forloop.counter == 1 %}
+                            <div class="col-auto">
+                                <div class="form-group">
+                                    <button type="button" id="newsectionbtn" class="btn btn-sm btn-info"><i class="bi bi-plus-lg"></i></button>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-auto">
+                                <div class="form-group">
+                                    <button type="button" onclick="remove(this)" class="btn btn-sm btn-danger"><i class="bi bi-dash-lg"></i></button>
+                                </div>
+                            </div>                            
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="form-group">
+                                <!-- <label for="first-name-column">Specification Name</label> -->
+                                <input type="text" id="first-name-column" class="form-control"
+                                    placeholder="Specification Name" name="specifications_name" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="form-group">
+                                <!-- <label for="last-name-column">Specification Value</label> -->
+                                <input type="text" id="last-name-column" class="form-control"
+                                    placeholder="Specification Value" name="specifications_value" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="form-group">
+                                <button type="button" id="newsectionbtn" class="btn btn-sm btn-info"><i class="bi bi-plus-lg"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                    <div style="display:none">
+                        <div class="row rmsection" id="mainsection">
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <!-- <label for="first-name-column">Specification Name</label> -->
+                                    <input type="text" id="first-name-column" class="form-control"
+                                        placeholder="Specification Name" name="specifications_name" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <!-- <label for="last-name-column">Specification Value</label> -->
+                                    <input type="text" id="last-name-column" class="form-control"
+                                        placeholder="Specification Value" name="specifications_value" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-group">
+                                    <button type="button" onclick="remove(this)" class="btn btn-sm btn-danger"><i class="bi bi-dash-lg"></i></button>
+                                </div>
+                            </div>   
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+<script>
+  document.getElementById("newsectionbtn").onclick = function() {
+    var container = document.getElementById("container");
+    var section = document.getElementById("mainsection");
+    container.appendChild(section.cloneNode(true));
+}
+
+function remove(el) {
+  var element = el;
+  element.closest(".rmsection").remove()
+}
+
+</script>
+{% endblock content%}

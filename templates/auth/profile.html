@@ -1,0 +1,195 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block content %}
+<div class="page-heading">
+    <h3>Profile</h3>
+</div>
+<div class="page-content">
+    <section class="row">
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row gallery">
+                        <div class="col-12 mb-2 py-2 px-2 border">
+                        {% if user.profile_pic %}
+                            <img class="w-100 active" src="{{request.user.profile_pic.url}}">               
+                        {% else %}
+                            <img class="w-100 active" src="{% static 'assets/images/faces/1.jpg' %}">
+                        {% endif %}
+                        </div>
+                        <h6 class="my-3">
+                            <i class="bi bi-person-badge"></i>
+                            <span>Contact Information</span>
+                        </h6>
+                        <p><i class="bi bi-telephone-fill"></i>&nbsp; {{request.user.phone}}</p>
+                        <p><i class="bi bi-envelope-fill"></i>&nbsp; {{request.user.email}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- update basic details modal -->
+        <div class="modal fade text-left" id="update-basic-modal" tabindex="-1" role="dialog"
+            aria-labelledby="myModalLabel160" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div id="update-basic-modal-content" class="modal-content" hx-target="this"></div>
+            </div>
+        </div>
+        <!-- update organization details modal -->
+        <div class="modal fade text-left" id="update-organization-modal" tabindex="-1" role="dialog"
+            aria-labelledby="myModalLabel160" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div id="update-organization-modal-content" class="modal-content" hx-target="this"></div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="my-3">
+                        <i class="bi bi-person-fill"></i>
+                        <span>Basic Information</span>          
+                        <button type="button" class="btn float-end" data-bs-toggle="modal" 
+                            hx-get="{% url 'authentication:profile_basic_info_update' %}" hx-target="#update-basic-modal-content"
+                            data-bs-toggle="modal" data-bs-target="#update-basic-modal"
+                        ><i class="bi bi-pencil-fill"></i> </button>             
+                    </h6>
+                    <table class="table table-borderless">
+
+                        <tr>
+                            <td><b>Full Name</b></td>
+                            <td>{{request.user.full_name}}</td>
+                        </tr>
+
+                        {% if request.user.username %}
+                            <tr>
+                                <td><b>Username</b></td>
+                                <td>{{request.user.username}}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if request.user.is_superuser %}
+                            <tr>
+                                <td><b>Designation</b></td>
+                                <td>Administrator</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td><b>Designation</b></td>
+                                <td>{{request.user.role}}</td>
+                            </tr>
+                        {% endif %}
+
+                        {% if request.user.address %}
+                            <tr>
+                                <td><b>Address</b></td>
+                                <td>{{request.user.address}}</td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            {% if request.user.department %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-person-video3"></i>
+                            <span>Department Information</span>          
+                        </h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><b>Department</b></td>
+                                <td>{{request.user.department}}</td>
+                            </tr>
+            
+                            <tr>
+                                <td><b>Contact Person Name</b></td>
+                                <td>{{request.user.department.contact_person_name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Contact Person Number</b></td>
+                                <td>{{request.user.department.contact_person_phone}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Contact Person Email</b></td>
+                                <td>{{request.user.department.contact_person_email}}</td>
+                            </tr>   
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if request.user.is_superuser %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-building"></i>
+                            <span>Organization Information</span>
+                            <button type="button" class="btn float-end" 
+                                hx-get="{% url 'authentication:organization_info_update' %}" hx-target="#update-organization-modal-content"
+                                data-bs-toggle="modal" data-bs-target="#update-organization-modal"
+                            > <i class="bi bi-pencil-fill"></i> </button>             
+                        </h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><b>Organization Name</b></td>
+                                <td>{{request.user.organization.name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Organization Website</b></td>
+                                <td>{{request.user.organization.website|urlize}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Organization Email</b></td>
+                                <td>{{request.user.organization.email}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Organization Phone</b></td>
+                                <td>{{request.user.organization.phone}}</td>
+                            </tr>
+    
+                            <tr>
+                                <td><b>Organization Currency</b></td>
+                                <td>{{request.user.organization.currency}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if not request.user.is_superuser %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-building"></i>
+                            <span>Company Information</span>
+                        </h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><b>Company Name</b></td>
+                                <td>{{request.user.location.office_name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Company Address</b></td>
+                                <td>{{request.user.location.address}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Contact Person Name</b></td>
+                                <td>{{request.user.location.contact_person_name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Contact Person Number</b></td>
+                                <td>{{request.user.location.contact_person_phone}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Contact Person Email</b></td>
+                                <td>{{request.user.location.contact_person_email}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+</div>
+{% endblock content %}

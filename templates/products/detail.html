@@ -1,0 +1,86 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Product Details</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Products</li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+<div>
+    <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
+</div>
+<div class="page-content">
+    <section class="row">
+        {% if product.product_picture %}
+            <div class="col-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row gallery">
+                            <div class="col-12 mb-2 py-2 px-2 border">
+                                <img class="w-100 active" src="{{product.product_picture.url}}">               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="col-12 {% if product.product_picture %} col-lg-8 {% endif %}">
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="my-3">
+                        <i class="bi bi-display-fill"></i>
+                        <span>Product Information</span>                       
+                    </h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><b>Product Name</b></td>
+                            <td>{{product.name}}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Product Type</b></td>
+                            <td>{{product.product_type}}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Product Category</b></td>
+                            <td>{{product.product_category}}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Manufacturer</b></td>
+                            <td>{{product.manufacturer}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            {% if product.description %}
+                {% if product.description|length > 700 %} </div> {% endif %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-card-text"></i>
+                            <span>Product Description</span>                       
+                        </h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td>{{product.description|urlize}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content %}

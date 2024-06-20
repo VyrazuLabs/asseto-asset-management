@@ -1,0 +1,77 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Product Types</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item">Upload</li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Types</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <!-- upload Modal -->
+                <div class="modal fade text-left" id="upload-product-types-modal" tabindex="-1" role="dialog"
+                   aria-labelledby="myModalLabel160" aria-hidden="true">
+                   <div class="modal-dialog modal-dialog-centered" role="document">
+                       <div id="upload-product-types-modal-content" class="modal-content" hx-target="this"></div>
+                   </div>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 gap-2">
+                    <a
+                        type="button"
+                        class="btn btn-secondary rounded"
+                        class="btn-space"
+                        href="{% url 'upload:export_product_types_csv' %}"
+                        ><i class="bi bi-download"></i> Sample File
+                    </a>
+                    <button
+                        type="button"
+                        class="btn btn-secondary rounded"
+                        hx-get="{% url 'upload:import_product_types_csv' %}"
+                        hx-target="#upload-product-types-modal-content"
+                        data-bs-target="#upload-product-types-modal"
+                        data-bs-toggle="modal"
+                    >
+                    <i class="bi bi-upload"></i> Upload
+                    </button>
+                </div>
+                <table class="table table-hover" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Type Name</th>
+                        </tr>
+                    </thead>
+                        {% if page_object %}
+                    <tbody>
+                        {% for product_type in page_object %}
+                            <tr>
+                                <td width="50%">{{page_object.start_index|add:forloop.counter0}}</td>
+                                <td width="50%">{{product_type.name}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        No record available!
+                    </div>
+                  {% endif %}
+                </table>
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content%}

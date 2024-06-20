@@ -1,0 +1,813 @@
+<div class="modal-header bg-dark">
+    <h5 class="modal-title white w-100 text-center" id="myModalLabel160">Update Role
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"
+        aria-label="Close">
+    </button>
+</div>
+
+<form hx-post="{{request.path}}" novalidate>
+    {% csrf_token %}
+    <div class="modal-body">
+        <div class="row">
+            <div class="form-group">
+                <label for="name" class="form-label">Role</label>
+                {{form.related_name}}
+                {% for error in form.related_name.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <h6 class="my-3">Assign Permission to Roles</h6>
+                <table class="table mb-0" id="dataTable-1">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle checkbox_middle form-check-input"
+                                    name="checkallfield"
+                                    id="checkallfield"
+                                />
+                            </th>
+                            <th>Module</th>
+                            <th>Permissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Vendors"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Vendors"
+                                    >Vendors</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Vendors"
+                                            id="view_vendor"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="view_vendor"
+                                            {% if 'view_vendor' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="view_vendor"
+                                            class="form-label font-weight-500"
+                                            >View</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Vendors"
+                                            id="add_vendor"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_vendor"
+                                            {% if 'add_vendor' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_vendor"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Vendors"
+                                            id="edit_vendor"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_vendor"
+                                            {% if 'edit_vendor' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_vendor"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Vendors"
+                                            id="delete_vendor"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_vendor"
+                                            {% if 'delete_vendor' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_vendor"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Products"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Products"
+                                    >Products</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Products"
+                                            id="view_product"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="view_product"
+                                            {% if 'view_product' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="view_product"
+                                            class="form-label font-weight-500"
+                                            >View</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Products"
+                                            id="add_product"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_product"
+                                            {% if 'add_product' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_product"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Products"
+                                            id="edit_product"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_product"
+                                            {% if 'edit_product' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_product"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Products"
+                                            id="delete_product"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_product"
+                                            {% if 'delete_product' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_product"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="users"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="users"
+                                    >Users</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_users"
+                                            id="view_users"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="view_users"
+                                            {% if 'view_users' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="view_users"
+                                            class="form-label font-weight-500"
+                                            >View</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_users"
+                                            id="add_users"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_users"
+                                            {% if 'add_users' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_users"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_users"
+                                            id="edit_users"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_users"
+                                            {% if 'edit_users' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_users"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_users"
+                                            id="delete_users"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_users"
+                                            {% if 'delete_users' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_users"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Assets"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Assets"
+                                    >Assets</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assets"
+                                            id="view_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="view_asset"
+                                            {% if 'view_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="view_asset"
+                                            class="form-label font-weight-500"
+                                            >View</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assets"
+                                            id="add_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_asset"
+                                            {% if 'add_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_asset"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assets"
+                                            id="edit_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_asset"
+                                            {% if 'edit_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_asset"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assets"
+                                            id="delete_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_asset"
+                                            {% if 'delete_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_asset"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>  
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Assign_Assets"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Assign_Assets"
+                                    >Assign Assets</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assign_Assets"
+                                            id="add_assign_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_assign_asset"
+                                            {% if 'add_assign_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_assign_asset"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assign_Assets"
+                                            id="reassign_assign_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="reassign_assign_asset"
+                                            {% if 'reassign_assign_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="reassign_assign_asset"
+                                            class="form-label font-weight-500"
+                                            >Reassign</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Assign_Assets"
+                                            id="delete_assign_asset"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_assign_asset"
+                                            {% if 'delete_assign_asset' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_assign_asset"
+                                            class="form-label font-weight-500"
+                                            >Unassign</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>     
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Locations"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Locations"
+                                    >Locations</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Locations"
+                                            id="view_location"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="view_location"
+                                            {% if 'view_location' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="view_location"
+                                            class="form-label font-weight-500"
+                                            >View</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Locations"
+                                            id="add_location"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_location"
+                                            {% if 'add_location' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_location"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Locations"
+                                            id="edit_location"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_location"
+                                            {% if 'edit_location' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_location"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Locations"
+                                            id="delete_location"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_location"
+                                            {% if 'delete_location' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_location"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Departments"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Departments"
+                                    >Departments</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Departments"
+                                            id="add_department"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_department"
+                                            {% if 'add_department' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_department"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Departments"
+                                            id="edit_department"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_department"
+                                            {% if 'edit_department' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_department"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Departments"
+                                            id="delete_department"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_department"
+                                            {% if 'delete_department' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_department"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Product_type"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Product_type"
+                                    >Product Types</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_type"
+                                            id="add_product_type"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_product_type"
+                                            {% if 'add_product_type' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_product_type"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_type"
+                                            id="edit_product_type"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_product_type"
+                                            {% if 'edit_product_type' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_product_type"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_type"
+                                            id="delete_product_type"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_product_type"
+                                            {% if 'delete_product_type' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_product_type"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="align-middle ischeck form-check-input"
+                                    name="checkall"
+                                    data-id="Product_category"
+                                />
+                            </td>
+                            <td>
+                                <label
+                                    class="ischeck form-label"
+                                    data-id="Product_category"
+                                    >Product Categories</label
+                                >
+                            </td>
+                            <td>
+                                <div class="row">
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_category"
+                                            id="add_product_category"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="add_product_category"
+                                            {% if 'add_product_category' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="add_product_category"
+                                            class="form-label font-weight-500"
+                                            >Add</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_category"
+                                            id="edit_product_category"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="edit_product_category"
+                                            {% if 'edit_product_category' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="edit_product_category"
+                                            class="form-label font-weight-500"
+                                            >Edit</label
+                                        ><br />
+                                    </div>
+                                    <div
+                                        class="col-md-3 custom-control custom-checkbox"
+                                    >
+                                        <input
+                                            class="form-check-input isscheck isscheck_Product_category"
+                                            id="delete_product_category"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="delete_product_category"
+                                            {% if 'delete_product_category' in permissions %} checked {% endif %}
+                                        />
+                                        <label
+                                            for="delete_product_category"
+                                            class="form-label font-weight-500"
+                                            >Delete</label
+                                        ><br />
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button
+            type="button"
+            class="btn btn-sm btn-light-secondary"
+            data-bs-dismiss="modal"
+        >
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Close</span>
+        </button>
+        <button type="submit" class="btn btn-sm btn-info ml-1"
+            onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
+        >
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Save</span>
+        </button>
+    </div>
+</form>
+<script>
+    htmx.on("htmx:beforeSwap", (e) => {
+        if (e.detail.target.id == "update-role-modal-content" && !e.detail.xhr.response) {
+            location.reload()
+        }
+    })
+
+    $(document).ready(function () {
+        $("#checkallfield").click(function () {
+            $("input:checkbox")
+                .not(this)
+                .prop("checked", this.checked);
+        });
+        $(".ischeck").click(function () {
+            var ischeck = $(this).data("id");
+            $(".isscheck_" + ischeck).prop("checked", this.checked);
+        });
+    });
+</script>

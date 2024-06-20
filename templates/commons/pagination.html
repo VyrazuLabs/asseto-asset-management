@@ -1,0 +1,29 @@
+<div class='dataTable-bottom'>Showing {{page_object.start_index}} to {{page_object.end_index}} of {{page_object.paginator.count }} entries</div>
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-primary  justify-content-end">
+        <li class="page-item  {% if not page_object.has_previous %} disabled {% endif %}">
+            <a class="page-link" {% if page_object.has_previous %} href="?page={{page_object.previous_page_number}}" {% endif %} tabindex="-1" aria-disabled="true">« Previous</a>
+        </li>
+        {% if page_object.previous_page_number >= 2 %}
+            <li class="page-item"><a class="page-link" href="?page=1">1 </a></li>
+            <li class="page-item disabled"><a class="page-link" href="?page={{ page_object.paginator.num_pages }}">...</a></li>
+        {% endif %}
+        {% if page_object.has_previous  %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_object.previous_page_number }}">{{ page_object.previous_page_number }} </a></li>
+        {% endif %}
+        
+        {% for i in page_object.paginator.page_range %}
+            {% if page_object.number == i %}
+                <li class="page-item active"><a class="page-link" href="?page={{ i }}">{{ i}} </a></li>
+            {% elif i == page_object.next_page_number  %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }} </a></li>
+            {% elif i == page_object.paginator.num_pages %}
+                <li class="page-item disabled"><a class="page-link" href="?page={{ page_object.paginator.num_pages }}">...</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_object.paginator.num_pages }}">{{ page_object.paginator.num_pages }} </a></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not page_object.has_next %} disabled {% endif %}">
+            <a class="page-link" {% if page_object.has_next %} href="?page={{page_object.next_page_number}}" {% endif %} >Next »</a>
+        </li>
+    </ul>
+</nav>

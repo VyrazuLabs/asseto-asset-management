@@ -1,0 +1,48 @@
+{% if notifications %}
+    <li class="d-flex justify-content-between px-4 py-1 ">
+        <a href="{% url 'notifications:list' %}" class="btn btn-sm btn-primary">See All</a>
+        <a 
+            class="btn btn-sm btn-danger"
+            hx-post="{% url 'notifications:clear' %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            hx-trigger="click"
+        >Clear All</a>
+    </li>
+{% endif %}
+
+{% if notifications %}
+
+    {% for user_notification in notifications %}
+        <li class="m-2 rounded">
+            <div class="dropdown-item d-flex p-2 alert alert-dismissible show fade" style="cursor: pointer;">
+                <div><i class="bi {{user_notification.notification.icon}} fs-2 text-muted"></i></div>
+                <div  
+                    class="justify-content-between px-3"
+                    {% if user_notification.notification.link is not None %}
+                        onclick="location.href='{{user_notification.notification.link}}';" 
+                        hx-post="{% url 'notifications:seen' user_notification.id %}"
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                        hx-trigger="click"
+                    {% endif %}
+                >
+                    <div class="d-flex flex-start gap-3">
+                        <strong class="fs-6" >{{user_notification.notification.notification_title}}</strong>
+                        <small>{{user_notification.notification.created_at}}</small>
+                    </div>
+                    <small>{{user_notification.notification.notification_text}}</small> 
+                </div>
+                <button 
+                    hx-post="{% url 'notifications:seen' user_notification.id %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-trigger="click"
+                    class="btn-close btn-sm p-1 m-2"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+                </button>
+            </div>
+        </li>
+    {% endfor %}
+    
+{% else %}
+    <li><a class="dropdown-item">No notification available</a></li>
+{% endif %}

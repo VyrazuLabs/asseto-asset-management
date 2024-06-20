@@ -1,0 +1,67 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Vendor Details</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Vendors</li>
+                        <li class="breadcrumb-item active" aria-current="page">Vendor Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'vendors:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Vendor List</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Vendor Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Vendor Name</th>
+                            <td> {{vendor.name}} </td>
+                            <th scope="row">Email</th>
+                            <td> {{vendor.email}} </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Phone</th>
+                            <td> {{vendor.phone}} </td>
+                            <th scope="row">Contact Person</th>
+                            <td> {{vendor.contact_person}} </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Designation</th>
+                            <td>{{vendor.designation}}</td>
+                            <th scope="row">GSTIN Number</th>
+                            <td>{{vendor.gstin_number}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Address</th>
+                            <td colspan="3">{{vendor.address}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Description</th>
+                            <td colspan="3">{{vendor.description|urlize}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content%}

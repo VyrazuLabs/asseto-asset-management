@@ -1,0 +1,56 @@
+{% autoescape off %}
+<style>
+    th,
+    td {
+        text-align: center;
+        width: 100%;
+        padding: 3px;
+        background-color: #d6eeee;
+        border-bottom: 2px solid white;
+    }
+    th {
+        background-color: rgb(65, 65, 192);
+        color: white;
+    }
+    @page {
+        size: letter landscape;
+        margin: 0.5cm;
+    }
+</style>
+<table style="width: 100%">
+    <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Contact Person</th>
+            <th>Designation</th>
+            <th>GSTIN No.</th>
+            <th>Address</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    {% if vendors %}
+    <tbody>
+        {% for vendor in vendors %}
+        <tr>
+            <td style="width: 50%">{{forloop.counter}}</td>
+            <td style="width: 70%">{{vendor.name}}</td>
+            <td>{{vendor.email}}</td>
+            <td style="width: 70%">{{vendor.phone}}</td>
+            <td style="width: 70%">{{vendor.contact_person}}</td>
+            <td>{{vendor.designation}}</td>
+            <td>{{vendor.gstin_number}}</td>
+            <td>{{vendor.address}}</td>
+            <td>{{vendor.description}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% else %}
+    <tr>
+        <td colspan="9">No record available!</td>
+    </tr>
+    {% endif %}
+</table>
+{% endautoescape %}

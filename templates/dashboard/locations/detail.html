@@ -1,0 +1,73 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Location Details</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Locations</li>
+                        <li class="breadcrumb-item active" aria-current="page">Location Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'dashboard:locations' %}" class="btn btn-sm btn-outline-info my-3">Back to Location List</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>Location Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Office Name</th>
+                                <td>{{location.office_name}}</td>
+                                <th scope="row">Contact Person Name</th>
+                                <td>{{location.contact_person_name}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Contact Person Email</th>
+                                <td>{{location.contact_person_email}}</td>
+                                <th scope="row">Contact Person Number</th>
+                                <td>{{location.contact_person_phone}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Country</th>
+                                <td>{{location.address.country}}</td>
+                                <th scope="row">State</th>
+                                <td>{{location.address.state}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">City</th>
+                                <td>{{location.address.city}}</td>
+                                <th scope="row">Zip Code</th>
+                                <td>{{location.address.pin_code}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Address Line 1</th>
+                                <td colspan="3">{{location.address.address_line_one}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Address Line 2</th>
+                                <td colspan="3">{{location.address.address_line_two}}</td>
+                            </tr>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content%}

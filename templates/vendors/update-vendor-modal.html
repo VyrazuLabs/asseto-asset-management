@@ -1,0 +1,155 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Update Vendor</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item">Vendors</li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Vendor</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <section class="section">
+        <div>
+            <a href="{% url 'vendors:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Vendor List</a>
+        </div>
+        <form class="form row" action="{{request.path}}" method="post" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Vendor</label>
+                                {{vendor_form.name}}
+                                {% for error in vendor_form.name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Email</label>
+                                {{vendor_form.email}}
+                                {% for error in vendor_form.email.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Phone</label>
+                                {{vendor_form.phone}}
+                                {% for error in vendor_form.phone.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Contact Person</label>
+                                {{vendor_form.contact_person}}
+                                {% for error in vendor_form.contact_person.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Designation</label>
+                                {{vendor_form.designation}}
+                                {% for error in vendor_form.designation.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>GSTIN Number</label>
+                                {{vendor_form.gstin_number}}
+                                {% for error in vendor_form.gstin_number.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Address Line 1</label>
+                                {{address_form.address_line_one}}
+                                {% for error in address_form.address_line_one.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Address Line 2</label>
+                                {{address_form.address_line_two}}
+                                {% for error in address_form.address_line_two.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Country</label>
+                                {{address_form.country}}
+                                {% for error in address_form.country.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>State</label>
+                                {{address_form.state}}
+                                {% for error in address_form.state.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>City</label>
+                                {{address_form.city}}
+                                {% for error in address_form.city.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Zip Code</label>
+                                {{address_form.pin_code}}
+                                {% for error in address_form.pin_code.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-12">
+                            <div class="form-group">
+                                <label>Description</label>
+                                {{vendor_form.description}}
+                                {% for error in vendor_form.description.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header">
+                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock content%}

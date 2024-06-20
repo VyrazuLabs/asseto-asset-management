@@ -1,0 +1,127 @@
+<div class="modal-content">
+    <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white w-100" id="myModalLabel160">Add Location
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+    <form hx-post="{{request.path}}" novalidate>
+        {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Office Name</label>
+                        {{location_form.office_name}}
+                        {% for error in location_form.office_name.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Contact Person Name</label>
+                        {{location_form.contact_person_name}}
+                        {% for error in location_form.contact_person_name.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Contact Person Email</label>
+                        {{location_form.contact_person_email}}
+                        {% for error in location_form.contact_person_email.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Contact Person Phone</label>
+                        {{location_form.contact_person_phone}}
+                        {% for error in location_form.contact_person_phone.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Address Line 1</label>
+                        {{address_form.address_line_one}}
+                        {% for error in address_form.address_line_one.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Address Line 2</label>
+                        {{address_form.address_line_two}}
+                        {% for error in address_form.address_line_two.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Country</label>
+                        {{address_form.country}}
+                        {% for error in address_form.country.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>State</label>
+                        {{address_form.state}}
+                        {% for error in address_form.state.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>City</label>
+                        {{address_form.city}}
+                        {% for error in address_form.city.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label>Zip Code</label>
+                        {{address_form.pin_code}}
+                        {% for error in address_form.pin_code.errors %}
+                        <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light-secondary"
+                data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+            </button>
+            <button type="submit" class="btn btn-info ml-1"
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
+            >
+                <i class="bx bx-check d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Save</span>
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    htmx.on("htmx:beforeSwap", (e) => {
+        if (
+            e.detail.target.id == "add-location-modal-content" && !e.detail.xhr.response){
+            location.reload();
+        }
+    });
+</script>

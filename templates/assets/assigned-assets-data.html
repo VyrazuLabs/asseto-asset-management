@@ -1,0 +1,40 @@
+{% if page_object %}
+    {% for assign_asset in page_object %}
+    <tr>
+        <td>
+            {% if page_object.start_index %}
+                {{page_object.start_index|add:forloop.counter0}}
+            {% else %}
+                {{forloop.counter}}
+            {% endif %}
+        </td>
+        <td>{{assign_asset.asset.name}}</td>
+        <td>{{assign_asset.asset.serial_no}}</td>
+        <td>
+            {{assign_asset.user.full_name}}
+            {% if assign_asset.user.is_deleted %}
+                <i class="bi bi-exclamation-triangle text-warning" title="User is deleted, please update."></i>
+            {% endif %}
+        </td>
+        <td>{{assign_asset.user.department.name}}</td>
+        <td>
+            {% if perms.authentication.reassign_assign_asset %}
+                <button type="button" class="btn btn-info btn-sm" 
+                    hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
+                    data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
+                >Reassign</button>
+            {% endif %}
+            {% if perms.authentication.delete_assign_asset %}
+                <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                    <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
+                        {% csrf_token %}
+                        <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                    </form>
+                </div>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <td colspan="9" class="text-center"> No record found related to your search keyword</td>
+{% endif %}

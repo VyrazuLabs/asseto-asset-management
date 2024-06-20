@@ -1,0 +1,10 @@
+{% if not_authenticated %}
+    <script>location.reload()</script>
+{% endif %}
+
+{% if notification_count %}
+    <span class="badge bg-danger text-white position-absolute d-flex align-items-center justify-content-center rounded-circle" 
+    style="top:10px; right:22px; height:1.2rem; width:1.2rem; font-size: 10px;">
+        {{notification_count}}
+    </span>
+{% endif %}

@@ -1,0 +1,56 @@
+{% autoescape off %}
+<style>
+    th,
+    td {
+        text-align: center;
+        width: 100%;
+        padding: 3px;
+        background-color: #d6eeee;
+        border-bottom: 2px solid white;
+    }
+    th {
+        background-color: rgb(65, 65, 192);
+        color: white;
+    }
+    @page {
+        size: letter landscape;
+        margin: 0.5cm;
+    }
+</style>
+<table style="width: 100%">
+    <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Manufacturer</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    {% if products %}
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td style="width: 50%">{{forloop.counter}}</td>
+            <td>
+                {% if product.product_picture %} 
+                    <img src="{{product.product_picture.path}}" width="100" height="80" />
+                {% else %} Not Uploaded {% endif %}
+            </td>
+            <td>{{product.name}}</td>
+            <td>{{product.product_category.name}}</td>
+            <td>{{product.product_type.name}}</td>
+            <td>{{product.manufacturer}}</td>
+            <td>{{product.description}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% else %}
+    <tr>
+        <td colspan="7">No record available!</td>
+    </tr>
+    {% endif %}
+</table>
+{% endautoescape %}

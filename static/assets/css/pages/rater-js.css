@@ -1,0 +1,34 @@
+.star-rating {
+    width: 0;
+    position: relative;
+    display:inline-block;
+    background-image: url(../../../assets/images/vendor/rater-js/lib/star_0.svg?494b2810cf2dc00c305ba4fc0de9f1c2);
+    background-position: 0 0;
+    background-repeat: repeat-x;
+    cursor: pointer;
+}
+
+.star-rating .star-value {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: url(../../../assets/images/vendor/rater-js/lib/star_1.svg?896e7fa54a15637c49aec0f0faff59be) ;
+    background-repeat: repeat-x;
+}
+
+.star-rating.disabled {
+    cursor: default;
+}
+
+.star-rating.is-busy {
+    cursor: wait;
+}
+
+.star-rating .star-value.rtl {
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+    right: 0;
+    left: auto;
+}
+
