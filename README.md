@@ -38,7 +38,7 @@ The Asset Management Project is a comprehensive solution designed to help organi
 1. Clone the repository:
     ```sh
     git clone https://github.com/yourusername/assetmanagement.git
-    cd Assetmanagement
+    cd asseto-asset-management
     ```
 
 2. Create and activate a virtual environment:
@@ -78,6 +78,15 @@ The Asset Management Project is a comprehensive solution designed to help organi
 
 ## Usage
 
+#### Try This Project with a Demo Account
+You can use this project before downloading.
+The project is hosted [here](https://asset-management-hg2x.onrender.com/login?next=/).\
+\
+Credentials:\
+&nbsp;&nbsp;&nbsp;&nbsp; email: asset-management@demo.com \
+&nbsp;&nbsp;&nbsp;&nbsp; password: DM4g476ZmQ$U
+
+Log in with this credential and use the below features
 
 ### Admin
 
