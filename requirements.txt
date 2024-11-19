@@ -52,7 +52,7 @@ tqdm==4.64.1
 tzdata==2024.2
 tzlocal==4.2
 uritools==4.0.0
-urllib3==1.26.12
+urllib3==1.26.19
 webencodings==0.5.1
 whitenoise==6.1.0
 xhtml2pdf==0.2.8
