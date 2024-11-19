@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from authentication.forms import (
     UserRegisterForm, OrganizationForm, UserPasswordChangeForm, UserLoginForm, UserUpdateForm, OrganizationUpdateForm)
 from authentication.decorators import unauthenticated_user
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
@@ -143,7 +143,7 @@ def user_register(request):
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
