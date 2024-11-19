@@ -89,50 +89,62 @@ Credentials:\
 Log in with this credential and use the below features
 
 ### Admin
+<img src="static/assets/images/006-Locations.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Admin" section.
 2. Admin Consists of Five Sections Locations,Departments, Product Types, Product Categories and Roles.
 3. Each section have their own functionalities where you may perform according to our needs.(Add/Edit/Delete/View) 
+<br><br>
 
 ### Vendors
+<img src="static/assets/images/002-Vendors.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Vendors" section.
 2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
 3. Fill in the vendors detail and click save.
 4. Searching of the vendors and downloading of details are also available. 
+<br><br>
 
 ### Products
+<img src="static/assets/images/003-Products.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Products" section.
 2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
 3. Fill in the Products detail and click save.
 4. Searching of the Products and downloading of details are also available. 
+<br><br>
 
 ### Users
+<img src="static/assets/images/004-Users.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Users" section.
 2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
 3. Fill in the users detail and click save.
 4. Searching of the Users and downloading of details are also available. 
-
+<br><br>
 
 ### Assets
+<img src="static/assets/images/005-Assigned_assets.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Assets" section.
 2. Click on the buttons as per your need. (Add/Edit/Delete/View assets).
 3. Fill in the assets detail and click save.
 4. Assigned Assets also contains a list of all the assets assigned to different individuals with search functionalities and Reassign/Unassign features.
+<br><br>
 
 ### Upload
+<img src="static/assets/images/012-uploads.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Upload" section.
 2. Upload Consists of Five Sections Locations,Departments, Product Types, Product Categories and Vendors.
 3. Each section have their own functionalities where you may either upload the data or get to download a sample.
-
+<br><br>
 
 ### Recycle Bin
+<img src="static/assets/images/013-recycle_bin.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Contains all the previously deleted files by the admin and also has functionality to restore them divided in each category
+<br><br>
 
 ## Configuration
 
