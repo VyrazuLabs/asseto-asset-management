@@ -105,13 +105,13 @@ def asset_delete_notification(sender, instance, *args,  **kwargs):
 def remember_state_asset(sender, instance, **kwargs):
     instance.previous_user = instance.user
 
+def expiring_asset(days):
+    # checking if table exists
+    all_tables = connection.introspection.table_names()
 
-# checking if table exists
-all_tables = connection.introspection.table_names()
+    # Asset Expires Notification
+    if 'assets_assignasset' in all_tables:
 
-# Asset Expires Notification
-if 'assets_assignasset' in all_tables:
-    def expiring_asset(days):
         time_threshold = datetime.now() + timedelta(days=days)
         expiring_assets = AssignAsset.objects.filter(
             asset__warranty_expiry_date=time_threshold)
@@ -136,8 +136,8 @@ if 'assets_assignasset' in all_tables:
                     notification=notification
                 )
 
-    @receiver(connection_created)
-    def conn_db(sender, connection, **kwargs):
-        expiring_asset(15)
-        expiring_asset(7)
-        expiring_asset(0)
+@receiver(connection_created)
+def conn_db(sender, connection, **kwargs):
+    expiring_asset(15)
+    expiring_asset(7)
+    expiring_asset(0)
