@@ -78,10 +78,10 @@ class User_Test(TestCase):
             city = "Kolkata",
             pin_code = "700018"
         )
-        self.edit_user_role=Role.objects.create(
-            related_name= "Role 2",
-            organization=self.edit_user_organization,
-        )
+        # self.edit_user_role=Role.objects.create(
+        #     related_name= "Role 2",
+        #     organization=self.edit_user_organization,
+        # )
         self.edit_user_location=Location.objects.create(
             office_name = "Office 2",
             address = self.edit_user_address,

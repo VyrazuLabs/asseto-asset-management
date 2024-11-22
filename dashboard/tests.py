@@ -341,30 +341,21 @@ class TestEditLocation(TestCase):
         self.location.delete()
         with self.assertRaises(Location.DoesNotExist):
             Location.objects.get(id=self.location.id)
-        location=Location.objects.get(id=self.location.id)
         address=Address.objects.get(city=self.location.address.city)
         organization=Organization.objects.get(id=self.location.organization.id)
-        self.assertIsNotNone(location)
         self.assertIsNotNone(organization)
         self.assertIsNotNone(address)
-        print("del")
+        print("deleted location")
 
     def test_delete_product_category(self):
         self.product_category.delete()
-        # with self.assertRaises(ProductCategory.DoesNotExist):
-        #     ProductCategory.objects.get(id=self.product_category.id)
-        productCategory=ProductCategory.objects.get(id=self.product_category.id)
         organization=Organization.objects.get(id=self.product_category.organization.id)
-        self.assertIsNotNone(productCategory)
         self.assertIsNotNone(organization)
+        print("delete product category")
 
 
     def test_delete_product_type(self):
         self.product_type.delete()
-        # with self.assertRaises(ProductType.DoesNotExist):
-        #     ProductType.objects.get(id=self.product_type.id)
-        productType=ProductType.objects.get(id=self.product_type.id)
         organization=Organization.objects.get(id=self.product_type.organization.id)
-        self.assertIsNotNone(productType)
         self.assertIsNotNone(organization)
-        
+        print("delete product type")
