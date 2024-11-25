@@ -9,6 +9,7 @@ The Asset Management Project is a comprehensive solution designed to help organi
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Unit Testing](#unit-testing)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
@@ -16,14 +17,14 @@ The Asset Management Project is a comprehensive solution designed to help organi
 
 ## Features
 
-- **Admin**: Maintain detailed records of all Assigned Users, Locations, Departments ,Product Types ,Product Categories ,Roles. 
-- **Dashboard**: Displays information like Assets, Assigned/Unassigned Assets, Vendors ,Locations ,Products ,Users and Total Asset Cost in a tabular format along with      Upcoming Warranty Expiries and Recent Activities Performed in the dashboard.
-- **Assets**:Assign people to assets by adding them and a list to display all the assigned peoples with their respective assets.
+- **Admin**: Maintain detailed records of all Assigned Users, Locations, Departments, Product Types, Product Categories, and Roles. 
+- **Dashboard**: Displays information like Assets, Assigned/Unassigned Assets, Vendors, Locations, Products, Users, and Total Asset Cost in a tabular format along with Upcoming Warranty Expiries and Recent Activities Performed in the dashboard.
+- **Assets**: Assign people to assets by adding them and a list to display all the assigned people with their respective assets.
 - **Upload**: To generate a sample file or upload them for all the displayed data of Vendors, Locations, Departments, Product Types, Product Categories.
 - **Reporting and Analytics**: Generate reports on asset performance, utilization, and maintenance history.
 - **User Management**: Role-based access control to secure sensitive asset information.
 - **Integration**: API support for integrating with other enterprise systems.
-- **Recycle Bin**:Contains all the previously deleted files by the admin and also has functionality to restore them.
+- **Recycle Bin**: Contains all the previously deleted files by the admin and also has functionality to restore them.
 
 ## Installation
 
@@ -71,10 +72,9 @@ The Asset Management Project is a comprehensive solution designed to help organi
 7. Open your browser and navigate to `http://localhost:8000`.
 
 8. Create a superuser if necessary:
-    ``` sh
+    ```sh
     python manage.py createsuperuser
     ```
-
 
 ## Usage
 
@@ -92,67 +92,98 @@ Log in with this credential and use the below features
 <img src="static/assets/images/006-Locations.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Admin" section.
-2. Admin Consists of Five Sections Locations,Departments, Product Types, Product Categories and Roles.
-3. Each section have their own functionalities where you may perform according to our needs.(Add/Edit/Delete/View) 
-<br><br>
+2. Admin consists of five sections: Locations, Departments, Product Types, Product Categories, and Roles.
+3. Each section has its own functionalities where you can perform operations such as Add/Edit/Delete/View. 
 
 ### Vendors
-<img src="static/assets/images/002-Vendors.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/002-Vendors.png" alt="Vendors Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Vendors" section.
-2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
-3. Fill in the vendors detail and click save.
-4. Searching of the vendors and downloading of details are also available. 
-<br><br>
+2. Click the buttons as per your needs (Add/Edit/Delete/View vendors).
+3. Fill in the vendor details and click Save.
+4. Searching and downloading vendor details are also available. 
 
 ### Products
-<img src="static/assets/images/003-Products.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/003-Products.png" alt="Products Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Products" section.
-2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
-3. Fill in the Products detail and click save.
-4. Searching of the Products and downloading of details are also available. 
-<br><br>
+2. Click the buttons as per your needs (Add/Edit/Delete/View products).
+3. Fill in the product details and click Save.
+4. Searching and downloading product details are also available.
 
 ### Users
-<img src="static/assets/images/004-Users.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/004-Users.png" alt="Users Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Users" section.
-2. Click on the buttons as per your need. (Add/Edit/Delete/View venders).
-3. Fill in the users detail and click save.
-4. Searching of the Users and downloading of details are also available. 
-<br><br>
+2. Click the buttons as per your needs (Add/Edit/Delete/View users).
+3. Fill in the user details and click Save.
+4. Searching and downloading user details are also available. 
 
 ### Assets
-<img src="static/assets/images/005-Assigned_assets.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/005-Assigned_assets.png" alt="Assets Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Assets" section.
-2. Click on the buttons as per your need. (Add/Edit/Delete/View assets).
-3. Fill in the assets detail and click save.
-4. Assigned Assets also contains a list of all the assets assigned to different individuals with search functionalities and Reassign/Unassign features.
-<br><br>
+2. Click the buttons as per your needs (Add/Edit/Delete/View assets).
+3. Fill in the asset details and click Save.
+4. Assigned Assets also contain a list of all the assets assigned to different individuals with search functionalities and Reassign/Unassign features.
 
 ### Upload
-<img src="static/assets/images/012-uploads.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/012-uploads.png" alt="Upload Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Upload" section.
-2. Upload Consists of Five Sections Locations,Departments, Product Types, Product Categories and Vendors.
-3. Each section have their own functionalities where you may either upload the data or get to download a sample.
-<br><br>
+2. Upload consists of five sections: Locations, Departments, Product Types, Product Categories, and Vendors.
+3. Each section has its own functionalities where you may either upload the data or download a sample.
 
 ### Recycle Bin
-<img src="static/assets/images/013-recycle_bin.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/assets/images/013-recycle_bin.png" alt="Recycle Bin Section" style="border-radius: 15px;" width="900" height="450"/>
 
-1. Contains all the previously deleted files by the admin and also has functionality to restore them divided in each category
-<br><br>
+1. The Recycle Bin contains all the previously deleted files by the admin and also has functionality to restore them, divided by category.
+
+## Unit Testing
+
+To ensure the quality and reliability of the system, unit tests are written to test various functionalities of the project. You can run the tests to verify that the project works as expected.
+
+### Running Unit Tests
+
+1. **Activate your virtual environment** (if not already activated):
+    ```sh
+    source env/bin/activate  # On Windows use `env\Scripts\activate`
+    ```
+
+2. **Run tests**:
+    ```sh
+    python manage.py test
+    ```
+    This will run all the tests across the project.
+
+3. **Run tests for a specific app**:
+    If you want to run tests from a specific app, use the app name:
+    ```sh
+    python manage.py test assets
+    ```
+
+4. **Verbose Output**:
+    For more detailed output while running the tests, use the `-v` flag:
+    ```sh
+    python manage.py test -v 2
+    ```
+
+### Other Useful Commands
+
+- **Show test results without resetting the database**:
+    ```sh
+    python manage.py test --keepdb
+    ```
 
 ## Configuration
 
 Configuration options are managed via the `.env` file. Key settings include:
 
-Copy the settings from .env.example file
+- Database credentials
+- SMTP server credentias
+- Other service configurations
 
-
+Copy the settings from `.env.example` to `.env` and modify as needed.
 
 ## Contributing
 
