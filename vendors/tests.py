@@ -165,7 +165,7 @@ class Asseto_test(TestCase):
 
         # Check if the address and organization objects are not affected
         address = Address.objects.get(id=self.vendor.address.id)
-        organization = Organization.objects.get(id=self.vendor.organization.name)
+        organization = Organization.objects.get(id=self.vendor.organization.id)
         self.assertIsNotNone(address)
         self.assertIsNotNone(organization)
         print('Vendor Deleted Successfull\n')
