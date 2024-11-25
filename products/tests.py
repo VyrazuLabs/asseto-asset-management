@@ -48,10 +48,9 @@ class Asseto_test(TestCase):
             product_type = self.updated_product_type,
             organization = self.user_organization
         )
-        print("Product setup")
 
     def test_product(self):
-        print("testing product.......")
+        print("Product Testing Start")
         # self.assertEqual(product.name, "Vendor 1")
         # self.assertEqual(address.email, "vendor1@asseto.com")
         self.assertEqual(self.product.product_picture,"test.jpg")
@@ -65,7 +64,7 @@ class Asseto_test(TestCase):
         # self.assertEqual(self.product.product_type.name, "Type 1")
         # self.assertEqual(self.product.product_type.name, "Type 1")
         # self.assertEqual(self.product.product_type.name, "Type 1")
-
+        print("Product Testing Successful\n")
 # class DeleteProduct(TestCase):
 #     def setUp(self):
 #         user_organization = Organization.objects.create(
@@ -97,6 +96,7 @@ class Asseto_test(TestCase):
 #         self.product.save()
 #         print("Delete setup")
     def test_edit_porduct(self):
+        print("Product Edit Testing Start")
         self.product.name='Product 2'
         self.product.product_picture='test2.jpg'
         self.product.manufacturer="Manufacturer 2"
@@ -112,9 +112,10 @@ class Asseto_test(TestCase):
         self.assertEqual(self.product.description,"Description 2")
         self.assertEqual(self.product.product_category.name,"Category 2")
         self.assertEqual(self.product.product_type.name,"Type 2")   
-        print("edit")    
+        print("Product Edit Testing Successful\n")    
     
     def del_product(self):
+        print("Product Delete Testing Start")
         self.product.delete()
 
         with self.assertRaises(Product.DoesNotExist):
@@ -126,4 +127,4 @@ class Asseto_test(TestCase):
         self.assertIsNotNone(product_category)
         self.assertIsNotNone(product_type)
         self.assertIsNotNone(organization)
-        print("del")
+        print("Product Delete Testing Successful\n")
