@@ -44,6 +44,7 @@ def manage_access(user):
 def vendor_list(request):
     vendors_list = Vendor.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
+    print(vendors_list.values('address'))
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
