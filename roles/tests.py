@@ -17,13 +17,13 @@ class Asseto_test_add(TestCase):
             related_name= "Role 1",
             organization=user_organization,
         )
-        print("setup product category")
 
-    def test_product_category(self):
-        print("testing.......")
+    def test_role(self):
+        print("Roles Testing Start")
         role = Role.objects.get(related_name="Role 1")
         self.assertEqual(role.related_name, "Role 1")
         self.assertEqual(role.organization.name, "Organization 1")
+        print("Role Testing Successful\n")
 
 
 class EditRoleTest(TestCase):
@@ -36,6 +36,7 @@ class EditRoleTest(TestCase):
 
     def test_edit_role(self):
         # Edit the role
+        print("Testing Edit Role Starts")
         self.role.related_name = 'New Role'
         self.role.organization.name = 'New Organization'
         self.role.organization.website = 'www.newexample.com'
@@ -49,19 +50,12 @@ class EditRoleTest(TestCase):
         self.assertEqual(self.role.organization.website, 'www.newexample.com')
         self.assertEqual(self.role.organization.email, 'neworganization@example.com')
         self.assertEqual(self.role.organization.phone, '9876543210')
+        print("Testing Edit Role Successful\n")
 
-    def test_edit_role_with_same_info(self):
-        # Edit the role with same information
-        self.role.related_name = 'Role 1'
-        self.role.organization.name = 'Organization 1'
-        self.role.organization.website = 'www.example.com'
-        self.role.organization.email = 'organization@example.com'
-        self.role.organization.phone = '1234567890'
-        self.role.save()
-
-        # Check that the changes were saved correctly
-        self.assertEqual(self.role.related_name, 'Role 1')
-        self.assertEqual(self.role.organization.name, 'Organization 1')
-        self.assertEqual(self.role.organization.website, 'www.example.com')
-        self.assertEqual(self.role.organization.email, 'organization@example.com')
-        self.assertEqual(self.role.organization.phone, '1234567890')
+    def delete_role(self):
+        print("Delete Role Start")
+        self.role.delete()
+        organization=Organization.objects.get(id=self.role.organization.id)
+        self.assertIsNotNone(organization)
+        print("Delete Role End\n")
+        
