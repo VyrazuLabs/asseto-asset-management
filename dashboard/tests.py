@@ -14,10 +14,10 @@ class Asseto_test_address(TestCase):
         )
 
     def test_product_category(self):
-        print("testing.......")
+        print("Address Testing Start")
         address = Address.objects.get(country="India")
         self.assertEqual(address.state, "Rajasthan")
-    
+        print("Address Testing Successful\n")
 
 class Asseto_test_location(TestCase):
     def setUp(self):
