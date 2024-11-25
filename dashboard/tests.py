@@ -12,7 +12,6 @@ class Asseto_test_address(TestCase):
             city = "Jaipur",
             pin_code = "302001"
         )
-        print("setup address")
 
     def test_product_category(self):
         print("testing.......")
@@ -47,7 +46,6 @@ class Asseto_test_location(TestCase):
             contact_person_phone = "1234567890",
             organization = self.user_organization,
         )
-        print("setup location")
         self.location.save()
 
         self.edit_address=Address.objects.create(
@@ -77,7 +75,7 @@ class Asseto_test_location(TestCase):
         )
 
     def test_location(self):
-        print("testing location.......")
+        print("Location Testing Start")
         # location = Location.objects.get(office_name="Office 1")
         self.assertEqual(self.location.contact_person_name, "Person 1")
         self.assertEqual(self.location.contact_person_email, "person1@asseto.com")
@@ -89,6 +87,7 @@ class Asseto_test_location(TestCase):
         self.assertEqual(self.location.address.state,'West Bengal')
         self.assertEqual(self.location.address.city,'Kolkata')
         self.assertEqual(self.location.address.pin_code,'700018')
+        print("Location Testing Successful\n")
 
 class Asseto_test_producttype(TestCase):
     def setUp(self):
@@ -105,13 +104,13 @@ class Asseto_test_producttype(TestCase):
             name="Type 1",
             organization=user_organization,
         )
-        print("setup product type")
 
-    def test_product_category(self):
-        print("testing.......")
+    def test_product_type(self):
+        print("Product Type Testing Start")
         type = ProductType.objects.get(name="Type 1")
         self.assertEqual(type.name, "Type 1")
         # self.assertEqual(type.organization.name, "Organization 1")
+        print("Product Category Testing Successful\n")
 
 class Asseto_test_four(TestCase):
     def setUp(self):
@@ -128,13 +127,13 @@ class Asseto_test_four(TestCase):
             name="Category 1",
             organization=user_organization,
         )
-        print("setup product category")
 
     def test_product_category(self):
-        print("testing.......")
+        print("Testing Product Category Start")
         category = ProductCategory.objects.get(name="Category 1")
         self.assertEqual(category.name, "Category 1")
         self.assertEqual(category.organization.name, "Organization 1")
+        print("Product Category Testing Successful\n")
 
 class Asseto_test_five(TestCase):
     def setUp(self):
@@ -154,17 +153,17 @@ class Asseto_test_five(TestCase):
             contact_person_email = "person1@asseto.com",
             contact_person_phone = "1234567890",
         )
-        print("setup product category")
+        # print("setup product category")
 
     def test_product_category(self):
-        print("testing.......")
+        print("Testing Product Category Start")
         department = Department.objects.get(name="Department 1")
         self.assertEqual(department.name, "Department 1")
         self.assertEqual(department.organization.name, "Organization 1")
         self.assertEqual(department.contact_person_name, "Person 1")
         self.assertEqual(department.contact_person_email, "person1@asseto.com")
         self.assertEqual(department.contact_person_phone, "1234567890")
-
+        print("Testing Product Category Successful\n")
 
 class EditDepartmentTest(TestCase):
     def setUp(self):
@@ -174,6 +173,7 @@ contact_person_phone='1112223333', organization=self.organization)
 
     def test_edit_department(self):
         # Edit the department
+        print("Testing Edit Department Start")
         self.department.name = 'New Department'
         self.department.contact_person_name = 'New Contact Person'
         self.department.contact_person_email = 'newcontactperson@example.com'
@@ -186,6 +186,7 @@ contact_person_phone='1112223333', organization=self.organization)
         self.assertEqual(self.department.contact_person_name, 'New Contact Person')
         self.assertEqual(self.department.contact_person_email, 'newcontactperson@example.com')
         self.assertEqual(self.department.contact_person_phone, '4445556666')
+        print("Testing Edit Department Successful\n")
 
     # def test_edit_department_with_same_info(self):
     #     # Edit the department with same information
@@ -204,20 +205,17 @@ contact_person_phone='1112223333', organization=self.organization)
 
     def test_edit_department_organization(self):
         # Edit the organization of the department
+        print("Testing Deapartment Organization Start")
         new_organization = Organization.objects.create(name='New Organization', website='www.newexample.com', email='neworganization@example.com', phone='5556667777')
         self.department.organization = new_organization
         self.department.save()
 
         # Check that the changes were saved correctly
         self.assertEqual(self.department.organization.name, 'New Organization')
-
-    def test_edit_department_with_new_name_and_same_organization(self):
-        # Edit the department with a new name and same organization
-        self.department.name = 'New Department Name'
-        self.department.save()
-
-        # Check that the changes were saved correctly
-        self.assertEqual(self.department.name, 'New Department Name')
+        self.assertEqual(self.department.organization.website, 'www.newexample.com')
+        self.assertEqual(self.department.organization.email, 'neworganization@example.com')
+        self.assertEqual(self.department.organization.phone, '5556667777')
+        print("Testing Deapartment Organization Successful\n")
 
 class EditProductTypeTest(TestCase):
     def setUp(self):
@@ -226,12 +224,13 @@ class EditProductTypeTest(TestCase):
 
     def test_edit_product_type(self):
         # Edit the product type
+        print("Testing Product Type Start")
         self.product_type.name = 'New Product Type'
         self.product_type.save()
 
         # Check that the changes were saved correctly
         self.assertEqual(self.product_type.name, 'New Product Type')
-
+        print("Testing Product Type Successful\n")
     # def test_edit_product_type_with_same_info(self):
     #     # Edit the product type with same information
     #     self.product_type.name = 'Product Type 1'
@@ -249,12 +248,13 @@ class EditProductCategoryTest(TestCase):
         self.product_category = ProductCategory.objects.create(name='Product Category 1', organization=self.organization)
 
     def test_edit_product_category(self):
-        # Edit the product type
+        print("Testing Product Category Start")
         self.product_category.name = 'New Product category'
         self.product_category.save()
 
         # Check that the changes were saved correctly
         self.assertEqual(self.product_category.name, 'New Product category')
+        print("Testing Product Category Successful\n")
 
     # def test_edit_product_type_with_same_info(self):
     #     # Edit the product type with same information
@@ -298,6 +298,7 @@ class TestEditLocation(TestCase):
 
     def test_edit_location(self):
         # Test editing the office name
+        print("Testing Edit Location Start")
         self.location.office_name = "New Office Name"
         self.location.contact_person_name = "Jane Doe"
         self.location.contact_person_email = "johndoe@example.com"  
@@ -329,7 +330,7 @@ class TestEditLocation(TestCase):
         self.assertEqual(self.location.organization.website, "www.newexample.com")
         self.assertEqual(self.location.organization.email, "neworganization@example.com")
         self.assertEqual(self.location.organization.phone, "5556667777")
-        
+        print("Testing Edit Location Successful\n")
     
     # def test_edit_location_invalid_data(self):
     #     # Test that editing with invalid data raises a ValidationError
@@ -338,6 +339,7 @@ class TestEditLocation(TestCase):
     #         self.location.office_name = new_office_name
     #         self.location.save()
     def test_delete_location(self):
+        print("Testing Delete Location Start")
         self.location.delete()
         with self.assertRaises(Location.DoesNotExist):
             Location.objects.get(id=self.location.id)
@@ -345,17 +347,19 @@ class TestEditLocation(TestCase):
         organization=Organization.objects.get(id=self.location.organization.id)
         self.assertIsNotNone(organization)
         self.assertIsNotNone(address)
-        print("deleted location")
+        print("Testing Delete Location Successful\n")
 
     def test_delete_product_category(self):
+        print("Testing Delete Product Category Start")
         self.product_category.delete()
         organization=Organization.objects.get(id=self.product_category.organization.id)
         self.assertIsNotNone(organization)
-        print("delete product category")
+        print("Testing Delete Product Category Successful\n")
 
 
     def test_delete_product_type(self):
+        print("Testing Delete Product Type Start")
         self.product_type.delete()
         organization=Organization.objects.get(id=self.product_type.organization.id)
         self.assertIsNotNone(organization)
-        print("delete product type")
+        print("Testing Delete Product Type Successful\n")

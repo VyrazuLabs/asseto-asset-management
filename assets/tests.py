@@ -73,10 +73,9 @@ class Asseto_test(TestCase):
             purchase_type = "Warranty",
             is_assigned = False,
         )
-        print("setup product category")
 
     def test_asset(self):
-        print("testing.......")
+        print("Asset Testing Start")
         asset = Asset.objects.get(name="Asset 1")
         self.assertEqual(asset.name, "Asset 1")
         self.assertEqual(asset.serial_no, "1234567890")
@@ -109,9 +108,11 @@ class Asseto_test(TestCase):
         self.assertEqual(asset.vendor.designation, "Designation 1")
         self.assertEqual(asset.vendor.gstin_number, "1234567890")
         self.assertEqual(asset.vendor.description, "Description 1")
+        print("Asset Testing Successful\n")
 
 
     def edit_asset(self):
+        print("Asset Edit Testing Start")
         self.asset.name = "Asset 2"
         self.asset.serial_no = "1234567892"
         self.asset.description = "Description 2"
@@ -175,10 +176,11 @@ class Asseto_test(TestCase):
         self.assertEqual(self.asset.warranty_expiry_date, "2021-01-02")
         self.assertEqual(self.asset.purchase_type, "Warranty")
         self.assertEqual(self.asset.is_assigned, False)
-        print("edit")
+        print("Asset Edit Testing Successful\n")
 
 
     def delete_asset(self):
+        print("Asset Delete Testing Start")
         self.asset.delete()
         with self.assertRaises(Asset.DoesNotExist):
             Asset.objects.get(id=self.asset.id)
@@ -190,4 +192,4 @@ class Asseto_test(TestCase):
         self.assertIsNotNone(organization)
         self.assertIsNotNone(vendor)
         self.assertIsNotNone(product)
-        print("del")
+        print("Asset Delete Testing Successful\n")
