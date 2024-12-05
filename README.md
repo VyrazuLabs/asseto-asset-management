@@ -41,19 +41,33 @@ The Asset Management Project is a comprehensive solution designed to help organi
     git clone https://github.com/yourusername/assetmanagement.git
     cd asseto-asset-management
     ```
+2. If docker is present, built the containers:
+    ```sh
+    sudo docker compose up --build #When running first time to build the app
+    ```
+3. If container is already built:
+    ```sh
+    sudo docker compose up         #to run already built app
+    sudo docker compose down       #to remove the created containers
+    sudo docker compose down -v    #remove any persisting volumes
+    sudo docker container start mycontainer #start a running container
+    sudo docker container stop mycontainer #stop a running container
+    sudo docker stop $(docker ps -q) #to stop all running container
+    sudo docker rm -f mycontainer  #remove a container
+     ```
 
-2. Create and activate a virtual environment:
+3. Create and activate a virtual environment:
     ```sh
     python -m venv env
-    source env/bin/activate  # On Windows use `env\Scripts\activate`
+    source env/bin/activate        # On Windows use `env\Scripts\activate`
     ```
 
-3. Install dependencies:
+4. Install dependencies:
     ```sh
     pip install -r requirements.txt
     ```
 
-4. Set up environment variables:
+5. Set up environment variables:
     ```sh
     cp .env.example .env
     ```

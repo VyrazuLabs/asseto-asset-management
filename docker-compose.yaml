@@ -1,0 +1,51 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    container_name: asetto_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      # MYSQL_USER: ${DB_USERNAME}
+      # MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_HOST: ${DB_HOST}
+      MYSQL_PORT: ${DB_PORT}
+    ports:
+      - "3307:3307"
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:80"
+  
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: Asetto_backend
+    command: sh -c "python3 manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+volumes:
+  data:
