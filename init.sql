@@ -1,8 +1,8 @@
 -- Create the user if not exists (using backticks for username)
-CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'asdf1234';
+CREATE USER IF NOT EXISTS $DB_USERNAME@ % IDENTIFIED BY $DB_PASSWORD;
 
 -- Grant all privileges to the user for the specific database (not global)
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+GRANT ALL PRIVILEGES ON *.* TO $DB_USERNAME @ '%';
 
 -- Ensure privileges are flushed so they take effect
 FLUSH PRIVILEGES;
