@@ -7,8 +7,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
-      # MYSQL_USER: ${DB_USERNAME}
-      # MYSQL_PASSWORD: ${DB_PASSWORD}
+      #For adding user other than root
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_HOST: ${DB_HOST}
       MYSQL_PORT: ${DB_PORT}
     ports:
