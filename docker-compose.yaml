@@ -5,7 +5,7 @@ services:
     container_name: asetto_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       #For adding user other than root
       MYSQL_USER: ${DB_USERNAME}
@@ -15,7 +15,7 @@ services:
     ports:
       - "3307:3307"
     healthcheck:
-      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}", "-e", "SELECT 1"]
       timeout: 20s
       retries: 10
     volumes:
