@@ -32,42 +32,50 @@ The Asset Management Project is a comprehensive solution designed to help organi
 
 - [Python 3.9+](https://www.python.org/)
 - [Mysql](https://www.mysql.com/) (Can be replaced by your preferred database)
-- [Docker](https://www.docker.com/) (optional, for containerized deployment)
+- [Docker](https://www.docker.com/) (highly recomended, for containerized deployment)
 
-### Steps
+### Using Docker
 
 1. Clone the repository:
     ```sh
     git clone https://github.com/yourusername/assetmanagement.git
     cd asseto-asset-management
     ```
-2. If docker is present, built the containers:
+2. Build and Run the containers:
     ```sh
-    sudo docker compose up --build #When running first time to build the app
+    sudo docker compose up --build
     ```
-3. If container is already built:
+3. Other docker commands:
     ```sh
-    sudo docker compose up         #to run already built app
-    sudo docker compose down       #to remove the created containers
-    sudo docker compose down -v    #remove any persisting volumes
-    sudo docker container start mycontainer #start a running container
-    sudo docker container stop mycontainer #stop a running container
-    sudo docker stop $(docker ps -q) #to stop all running container
-    sudo docker rm -f mycontainer  #remove a container
+    sudo docker compose up                          #to run already built app
+    sudo docker compose down                        #to remove the created containers
+    sudo docker compose down -v                     #remove any persisting volumes
+    sudo docker container start mycontainer         #start a container
+    sudo docker container stop mycontainer          #stop a running container
+    sudo docker rm -f mycontainer or myimage        #remove a container or image
      ```
 
-3. Create and activate a virtual environment:
+
+### Using the Traditional Way
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/yourusername/assetmanagement.git
+    cd asseto-asset-management
+    ```
+
+2. Create and activate a virtual environment:
     ```sh
     python -m venv env
     source env/bin/activate        # On Windows use `env\Scripts\activate`
     ```
 
-4. Install dependencies:
+3. Install dependencies:
     ```sh
     pip install -r requirements.txt
     ```
 
-5. Set up environment variables:
+4. Set up environment variables:
     ```sh
     cp .env.example .env
     ```
