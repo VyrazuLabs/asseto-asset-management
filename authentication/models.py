@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Permission
+from django.contrib.contenttypes.models import ContentType
 from dashboard.models import Organization, Location, Address, Department, TimeStampModel, SoftDeleteModel
 from django.conf import settings
 from roles.models import Role
@@ -32,8 +33,31 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, full_name, username, phone, password):
-        user = self.create_user(email, full_name, username, phone, password)
+    def create_superuser(self, email, full_name, username, phone, password, **extra_fields):
+        user = self.create_user(email, full_name, username, phone, password, is_active = True, access_level=True, **extra_fields)
+        
+        # Create or get the Superuser default
+        organization = Organization.objects.filter(name='DjangoSuperUserOrganization').first()
+        if not organization:
+            organization = Organization.objects.create(name='DjangoSuperUserOrganization')
+        
+
+        role = Role.objects.filter(related_name='Superuser', organization=organization).first()
+        if not role:
+            role = Role.objects.create(
+                name = "all_permissions",
+                related_name='Superuser',
+                organization=organization
+            )
+
+        if role.permissions.count() == 0:
+            all_permisisons = Permission.objects.all()
+            for permission in all_permisisons:
+                role.permissions.add(permission)
+        role.save()
+
+
+        user.role = role
         user.save(using=self._db)
 
         return user
@@ -60,7 +84,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name', 'phone', 'access_level', 'role']
+    REQUIRED_FIELDS = ['full_name', 'phone', 'username']
 
 
     def __str__(self):
