@@ -6,8 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from dashboard.models import Address
 
 
-class UserForm(UserCreationForm):
-
+class UserForm(forms.ModelForm):
     full_name = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'class': 'form-control',
                'placeholder': 'Name', 'autocomplete': 'off'}
@@ -22,7 +21,7 @@ class UserForm(UserCreationForm):
     ))
 
     access_level = forms.ChoiceField(
-        required=True,
+        required=False,
         choices=(
             ("False", "Only Assigned"),
             ("True", "All"),
@@ -32,7 +31,7 @@ class UserForm(UserCreationForm):
         ))
 
     role = forms.ModelChoiceField(
-        required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -40,7 +39,7 @@ class UserForm(UserCreationForm):
         ))
 
     location = forms.ModelChoiceField(
-        required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -48,7 +47,7 @@ class UserForm(UserCreationForm):
         ))
 
     department = forms.ModelChoiceField(
-        required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -59,7 +58,24 @@ class UserForm(UserCreationForm):
         required=False,
         widget=forms.FileInput(
             attrs={'class': 'form-control', 'id': 'inputFile'}
-        ))
+    ))
+    
+    password1=forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Name', 'autocomplete': 'off'}
+    )
+    )
+
+    password2=forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+        attrs={'class': 'form-control',
+               'placeholder': 'Name', 'autocomplete': 'off'}
+    )
+    )
+
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
@@ -67,14 +83,19 @@ class UserForm(UserCreationForm):
 
         self.fields['password1'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Password'})
+        self.fields['password1'].required = False
         self.fields['password2'].widget.attrs.update(
             {'class': 'form-control', 'placeholder': 'Repeat password'})
+        self.fields['password2'].required = False
         self.fields['department'].queryset = Department.undeleted_objects.filter(
             organization=self._organization, status=True)
+        self.fields['department'].required=False
         self.fields['location'].queryset = Location.undeleted_objects.filter(
             organization=self._organization, status=True)
+        self.fields['role'].required=False
         self.fields['role'].queryset = Role.objects.filter(
             organization=self._organization, status=True)
+        self.fields['role'].required=False
 
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
@@ -85,7 +106,20 @@ class UserForm(UserCreationForm):
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')
         return full_name.title()
+    
+    # def clean_password1(self):
+    #     password1=self.data.get('password1')
+    #     if password1 in ("", None):
+    #         return password1
+    #     else:
+    #         return password1
 
+    # def clean_password2(self):
+    #     password2=self.data.get('password2')
+    #     if password2 in ("", None):
+    #         return password2
+    #     else:
+    #         return password2
     class Meta:
         model = User
         fields = ['full_name', 'email', 'phone', 'access_level',
@@ -108,7 +142,7 @@ class UserUpdateForm(UserChangeForm):
     ))
 
     access_level = forms.ChoiceField(
-        required=True,
+        # required=True,
         choices=(
             ("False", "Only Assigned"),
             ("True", "All"),
@@ -118,7 +152,7 @@ class UserUpdateForm(UserChangeForm):
         ))
 
     role = forms.ModelChoiceField(
-        required=True,
+        # required=True,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -126,7 +160,7 @@ class UserUpdateForm(UserChangeForm):
         ))
 
     location = forms.ModelChoiceField(
-        required=True,
+        # required=True,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -134,7 +168,7 @@ class UserUpdateForm(UserChangeForm):
         ))
 
     department = forms.ModelChoiceField(
-        required=True,
+        # required=True,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -173,17 +207,17 @@ class UserUpdateForm(UserChangeForm):
 
 
 class AddressForm(forms.ModelForm):
-    address_line_one = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_one = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2', 'placeholder': 'Address Line 1'}))
-    address_line_two = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_two = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2', 'placeholder': 'Address Line 2'}))
-    country = forms.CharField(required=True, widget=forms.TextInput(
+    country = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Country', 'class': 'form-control'}))
-    state = forms.CharField(required=True, widget=forms.TextInput(
+    state = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'State', 'class': 'form-control'}))
-    city = forms.CharField(required=True, widget=forms.TextInput(
+    city = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'City', 'class': 'form-control'}))
-    pin_code = forms.CharField(required=True, widget=forms.TextInput(
+    pin_code = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Zip Code', 'class': 'form-control'}))
 
     def clean_country(self):
