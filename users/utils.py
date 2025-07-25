@@ -2,6 +2,7 @@
 from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
+from assets.models import AssignAsset
 
 PERMISSION_LIST = [
     # products
@@ -72,3 +73,23 @@ def create_all_perm_role():
         permission, created = Permission.objects.get_or_create(
             codename=cname, name=f'Can {name}', content_type=content_type)
         all_perms.permissions.add(permission)
+
+def make_fields_optional(form, fields=None):
+    """
+    Mark specified fields as not required.
+    If fields is None, applies to all fields.
+    """
+    if fields is None:
+        fields = form.fields.keys()
+    for field_name in fields:
+        if field_name in form.fields:
+            print(field_name, type(form.fields[field_name]))
+            form.fields[field_name].required = False
+
+def get_asset_by_users(id):
+    get_user=User.objects.filter(id=id).first()
+    get_asset=AssignAsset.objects.filter(user=get_user)
+    print(get_asset)
+    return get_asset
+
+    

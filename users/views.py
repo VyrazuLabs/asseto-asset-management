@@ -91,6 +91,7 @@ def add(request):
         create_all_perm_role()
         form = UserForm(request.POST, request.FILES,
                         organization=request.user.organization)
+        print("user",form.data)
         address_form = AddressForm(request.POST)
 
         if form.is_valid() and address_form.is_valid():
@@ -99,7 +100,7 @@ def add(request):
             user.organization = request.user.organization
             user.address = address
             user.save()
-            form.instance.role.user_set.add(form.instance)
+            # form.instance.role.user_set.add(form.instance)
             messages.success(
                 request, 'User added successfully and Verification email sent to the user')
 
