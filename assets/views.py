@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 
-PAGE_SIZE = 10
+PAGE_SIZE = 5
 ORPHANS = 1
 
 

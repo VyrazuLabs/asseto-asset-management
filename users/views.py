@@ -15,6 +15,7 @@ from vendors.utils import render_to_csv, render_to_pdf
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required
 from datetime import date
+from .utils import make_fields_optional,get_asset_by_users
 today = date.today()
 
 PAGE_SIZE = 10
@@ -43,17 +44,19 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
+    users_list = User.objects.filter(organization=request.user.organization, is_superuser=False).exclude(
         pk=request.user.id).order_by('-created_at')
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    print("userlisttttttt",users_list)
     if request.method == "POST":
         messages.success(
             request, 'User added successfully and Verification email sent to the user')
 
         return redirect(request.META.get('HTTP_REFERER'))
+    # get_user_id=User.objects.filter(id=)
+    # get_asset=get_asset_by_users()
 
     context = {'sidebar': 'users',
                'page_object': page_object, 'title': 'Users'}
@@ -91,18 +94,23 @@ def add(request):
         create_all_perm_role()
         form = UserForm(request.POST, request.FILES,
                         organization=request.user.organization)
+        print(form.data)
         address_form = AddressForm(request.POST)
+
+        # make_fields_optional(form, fields=['password1', 'password2', 'department', 'role'])
+        # make_fields_optional(address_form, fields=[])
 
         if form.is_valid() and address_form.is_valid():
             user = form.save(commit=False)
+            print("user1",user)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
+            print("user",user)
             user.save()
-            form.instance.role.user_set.add(form.instance)
+            # form.instance.role.user_set.add(form.instance)
             messages.success(
                 request, 'User added successfully and Verification email sent to the user')
-
             all_perms, created = Group.objects.get_or_create(
                 name='all_perms')
 
@@ -112,7 +120,8 @@ def add(request):
                 all_perms.user_set.remove(form.instance)
 
             return HttpResponse(status=204)
-
+        print(form.errors)
+        print(address_form.errors)
     context = {
         'form': form,
         'address_form': address_form

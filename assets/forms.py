@@ -106,7 +106,7 @@ class AssignedAssetForm(forms.ModelForm):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['asset'].queryset = Asset.undeleted_objects.filter(is_assigned=False, status=True, organization=self._organization)
-        self.fields['user'].queryset = User.undeleted_objects.filter(is_active=True, organization=self._organization).exclude(is_superuser=True)
+        self.fields['user'].queryset = User.objects.filter(is_active=True, organization=self._organization).exclude(is_superuser=True)
         
     
     class Meta:

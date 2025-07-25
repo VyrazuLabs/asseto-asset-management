@@ -1,7 +1,7 @@
 <div class='dataTable-bottom'>Showing {{page_object.start_index}} to {{page_object.end_index}} of {{page_object.paginator.count }} entries</div>
 <nav aria-label="Page navigation example">
     <ul class="pagination pagination-primary  justify-content-end">
-        <li class="page-item  {% if not page_object.has_previous %} disabled {% endif %}">
+        <li class="page-item  {% if not page_object.has_previous %}  {% endif %}">
             <a class="page-link" {% if page_object.has_previous %} href="?page={{page_object.previous_page_number}}" {% endif %} tabindex="-1" aria-disabled="true">« Previous</a>
         </li>
         {% if page_object.previous_page_number >= 2 %}
@@ -22,7 +22,7 @@
                 <li class="page-item"><a class="page-link" href="?page={{ page_object.paginator.num_pages }}">{{ page_object.paginator.num_pages }} </a></li>
             {% endif %}
         {% endfor %}
-        <li class="page-item {% if not page_object.has_next %} disabled {% endif %}">
+        <li class="page-item {% if not page_object.has_next %}  {% endif %}">
             <a class="page-link" {% if page_object.has_next %} href="?page={{page_object.next_page_number}}" {% endif %} >Next »</a>
         </li>
     </ul>
