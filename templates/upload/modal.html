@@ -1,0 +1,347 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Modal with File and User Fields</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Button to open Modal -->
+<!-- Modal -->
+<div class="modal fade" id="fileUserModal" tabindex="-1" aria-labelledby="fileUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fileUserModalLabel">File Fields and User Fields</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" id="fileUserForm">
+        {% csrf_token %}
+        <div style="display: flex;">
+          <div class="col-md-6">
+            <div class="col-md-6">
+              <h6>File Fields</h6>
+              {% for it in header %}
+                {% if it == "Department Name" %}
+                    <div class="mb-3">
+                      <label for="fileName" class="form-label">Department Name</label>
+                      <select id="fileName" name="file_name" class="form-select">
+                        <option value="" selected disabled>Select Name</option>
+                        <option value="{{ it }}">{{ it }}</option>
+                      </select>
+                    </div>
+                {% endif %}
+                {% if it == "Name" %}
+                  <div class="mb-3">
+                    <label for="fileName" class="form-label">Name</label>
+                    <select id="fileName" name="file_name" class="form-select">
+                      <option value="" selected disabled>Select Name</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Phone Number" %}
+                  <div class="mb-3">
+                    <label for="filePhone" class="form-label">Phone Number</label>
+                    <select id="filePhone" name="file_phone" class="form-select">
+                      <option value="" selected disabled>Select Phone Number</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Email" %}
+                  <div class="mb-3">
+                    <label for="fileEmail" class="form-label">Email</label>
+                    <select id="fileEmail" name="file_email" class="form-select">
+                      <option value="" selected disabled>Select Email</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Contact Person Name" %}
+                  <div class="mb-3">
+                    <label for="fileContactPerson" class="form-label">Contact Person Name</label>
+                    <select id="fileContactPerson" name="file_contact_person" class="form-select">
+                      <option value="" selected disabled>Select Contact Person Name</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Contact Person Email" %}
+                  <div class="mb-3">
+                    <label for="fileContactPersonEmail" class="form-label">Contact Person Email</label>
+                    <select id="fileContactPersonEmail" name="file_contact_person_email" class="form-select">
+                      <option value="" selected disabled>Select Contact Person Email</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Contact Person Phone" %}
+                  <div class="mb-3">
+                    <label for="fileContactPersonPhone" class="form-label">Contact Person Phone</label>
+                    <select id="fileContactPersonPhone" name="file_contact_person_phone" class="form-select">
+                      <option value="" selected disabled>Select Contact Person Phone</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Phone Number" %}
+                  <div class="mb-3">
+                    <label for="fileGstinNumber" class="form-label">GSTIN Number</label>
+                    <select id="fileGstinNumber" name="file_gstin_number" class="form-select">
+                      <option value="" selected disabled>Select GSTIN Number</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Description" %}
+                  <div class="mb-3">
+                    <label for="fileDescription" class="form-label">Description</label>
+                    <select id="fileDescription" name="file_description" class="form-select">
+                      <option value="" selected disabled>Select Description</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+                {% if it == "Designation" %}
+                  <div class="mb-3">
+                    <label for="fileDesignation" class="form-label">Designation</label>
+                    <select id="fileDesignation" name="file_designation" class="form-select">
+                      <option value="" selected disabled>Select Designation</option>
+                      <option value="{{ it }}">{{ it }}</option>
+                    </select>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>     
+          </div>     
+          <div class="col-md-6">
+            <h6>User Fields</h6>
+              {% for it in arr %}
+                {% if forloop.counter < 2 %}
+                  {% if it.name %} 
+                    <div class="mb-3">
+                      <label for="userName" class="form-label">Name</label>
+                      <select id="userName" name="user_name" class="form-select">
+                        <option value="" selected disabled>Select Name</option>
+                        {% for it in arr %}
+                        <option value="{{ it.name }}">{{ it.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.phone %}
+                    <div class="mb-3">
+                      <label for="userPhone" class="form-label">Phone Number</label>
+                      <select id="userPhone" name="user_phone" class="form-select">
+                        <option value="" selected disabled>Select Phone Number</option>
+                        {% for it in arr %}
+                        <option value="{{ ph }}">{{ it.phone }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.email %}
+                    <div class="mb-3">
+                      <label for="userEmail" class="form-label">Email</label>
+                      <select id="userEmail" name="user_email" class="form-select">
+                        <option value="" selected disabled>Select Email</option>
+                        {% for it in arr %}
+                        <option value="{{ it.email }}">{{ it.email }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.contact_person_name %}
+                    <div class="mb-3">
+                      <label for="userContactPerson" class="form-label">Contact Person Name</label>
+                      <select id="userContactPerson" name="user_contact_person" class="form-select">
+                        <option value="" selected disabled>Select Contact Person</option>
+                        {% for it in arr %}
+                        <option value="{{ it.contact_person_name }}">{{ it.contact_person_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.contact_person_email %}
+                    <div class="mb-3">
+                      <label for="userContactPersonEmail" class="form-label">Contact Person Email</label>
+                      <select id="userContactPersonEmail" name="user_contact_person_email" class="form-select">
+                        <option value="" selected disabled>Select Contact Person Email</option>
+                        {% for it in arr %}
+                        <option value="{{ it.contact_person_email }}">{{ it.contact_person_email }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.contact_person_phone %}
+                    <div class="mb-3">
+                      <label for="userContactPersonPhone" class="form-label">Contact Person Phone</label>
+                      <select id="userContactPersonPhone" name="user_contact_person_phone" class="form-select">
+                        <option value="" selected disabled>Select Contact Person Phone</option>
+                        {% for it in arr %}
+                        <option value="{{ it.contact_person_phone }}">{{ it.contact_person_phone}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.gstin_number %}
+                    <div class="mb-3">
+                      <label for="userGstinNumber" class="form-label">GSTIN Number</label>
+                      <select id="userGstinNumber" name="user_gstin_number" class="form-select">
+                        <option value="" selected disabled>Select GSTIN Number</option>
+                        {% for it in arr %}
+                        <option value="{{ it.gstin_number }}">{{ it.gstin_number }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.description %}
+                    <div class="mb-3">
+                      <label for="userDescription" class="form-label">Description</label>
+                      <select id="userDescription" name="user_description" class="form-select">
+                        <option value="" selected disabled>Select Description</option>
+                        {% for it in arr %}
+                        <option value="{{ it.description }}">{{ it.description }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                  {% if it.designation %}
+                    <div class="mb-3">
+                      <label for="userDesignation" class="form-label">Designation</label>
+                      <select id="userDesignation" name="user_designation" class="form-select">
+                        <option value="" selected disabled>Select Designation</option>
+                        {% for it in arr %}
+                        <option value="{{ it.designation }}">{{ it.designation }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" id="submitModal">Submit</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel">Please Confirm</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <div class="modal-body">
+          Are you sure you want to proceed?
+        </div>
+  
+        <div class="modal-footer">
+          <button type="button" id="confirmProceedBtn" class="btn btn-primary">Proceed</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+  
+      </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle including Popper -->
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+    var fileUserModalEl = document.getElementById('fileUserModal');
+    var fileUserModal = new bootstrap.Modal(fileUserModalEl);
+    fileUserModal.show();
+});
+document.addEventListener("DOMContentLoaded", function() {
+    const submitBtn = document.getElementById('submitModal');
+    const confirmModalEl = document.getElementById('confirmModal');
+    const confirmModal = new bootstrap.Modal(confirmModalEl);
+
+    submitBtn.addEventListener('submit', function() {
+      e.preventDefault()
+      confirmModal.show();
+    });
+});
+    // Helper function to get CSRF token cookie for Django
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileUserForm = document.getElementById('fileUserForm');
+        const firstModalEl = document.getElementById('fileUserModal');
+        const firstModal = bootstrap.Modal.getOrCreateInstance(firstModalEl);
+
+        const confirmModalEl = document.getElementById('confirmModal');
+        const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+
+        // When submit button on first modal is clicked
+        fileUserForm.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the actual form submission
+
+            // Hide the first modal
+            firstModal.hide();
+
+            // Show the confirmation modal
+            confirmModal.show();
+        });
+      });
+    document.getElementById('confirmProceedBtn').addEventListener('click', function() {
+      const confirmModalEl = document.getElementById('confirmModal');
+      const confirmModal = bootstrap.Modal.getOrCreateInstance(confirmModalEl);
+      confirmModal.hide();
+
+          // Make your API call here - example using fetch()
+          // Customize URL and data as per your needs
+      const formData = new FormData(fileUserForm);
+      var arr = {% autoescape off %}{{ arr }}{% endautoescape %}
+      var model="{{ model }}"
+      console.log(arr,model)
+
+      fetch(`/upload/${model}`, {
+          method: 'POST',
+          body: JSON.stringify(arr),
+          headers: {
+              'X-CSRFToken': getCookie('csrftoken'),  // you may need this if CSRF is enabled
+          },
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Handle success response
+          alert('API call successful!');
+
+          // Optionally do something else - update UI, close modal, etc.
+      })
+      .catch(error => {
+          // Handle error
+          alert('API call failed!');
+          console.error('Error:', error);
+          console.log("error",error)
+      }) 
+    })
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

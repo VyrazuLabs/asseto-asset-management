@@ -1,14 +1,17 @@
 from django import forms
-from assets.models import Asset, AssignAsset
+from assets.models import Asset, AssignAsset,AssetImage
 from products.models import Product
 from vendors.models import Vendor
 from dashboard.models import Location
 from authentication.models import User
-
-
+from django.forms import ModelForm
 
 class AssetForm(forms.ModelForm):
-
+    # status = for
+    tag =  forms.CharField(required=True, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', 'class': 'form-control',
+               'placeholder': 'Enter Asset Tag'}
+    ))
     name = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Asset Name'}
@@ -66,7 +69,6 @@ class AssetForm(forms.ModelForm):
             attrs={'class': 'form-select'}
         ))
 
-
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
@@ -75,12 +77,36 @@ class AssetForm(forms.ModelForm):
         self.fields['location'].queryset = Location.undeleted_objects.filter(organization=self._organization, status=True)
         
         
-        
     class Meta:
         model = Asset
         fields = ['name', 'serial_no', 'price', 'purchase_date', 'warranty_expiry_date', 'description',
-                  'purchase_type', 'product', 'vendor', 'organization', 'location']
+                  'purchase_type', 'product', 'vendor', 'organization', 'location','tag']
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
 
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+class AssetImageForm(forms.ModelForm):
+    image = MultipleFileField(label='Select files', required=False)
+    class Meta:
+            model = AssetImage
+            fields = ['image', ]
+        
+    # def __init__(self, *args, **kwargs):
+    #         super().__init__(*args, **kwargs)
+    #         # Add the `multiple` attribute to allow selecting multiple files
+    #         self.fields["image"].widget.attrs.update({"multiple": "true"})
 
 class AssignedAssetForm(forms.ModelForm):
 
@@ -101,6 +127,7 @@ class AssignedAssetForm(forms.ModelForm):
             attrs={'class': 'form-select'}
         ))
     
+    image = MultipleFileField(label='Select files', required=False)
     
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
