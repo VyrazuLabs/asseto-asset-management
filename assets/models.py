@@ -7,10 +7,6 @@ from django.db.models import Sum
 from authentication.models import User
 from simple_history.models import HistoricalRecords
 
-# Create your models here.
-
-
-
 
 def path_and_rename(instance, filename):
     upload_to = 'asset_images/'
@@ -31,10 +27,13 @@ class Asset(TimeStampModel, SoftDeleteModel):
     STATUS_CHOICES = [
         (0, 'Assigned'),
         (1, 'Available'),
-        (2, 'Under Maitainance'),
-        (3, 'Decommissioned')
+        (2, 'Repair Required'),
+        (3, 'Lost/Stolen'),
+        (4, 'Broken'),
+        (5, 'Ready To Deploy'),
+        (6, 'Out for Repair')
     ]
-    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tag = models.CharField(max_length=255, blank=False, null=False)
     name = models.CharField(max_length=255, blank=True, null=True)
