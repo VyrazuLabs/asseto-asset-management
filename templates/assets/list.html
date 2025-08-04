@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -18,7 +19,7 @@
     </div>
     <section class="section">
         {% if perms.authentication.add_asset %}
-            <div>
+            <div>   
                 <a href="{% url 'assets:add' %}" class="btn btn-sm btn-outline-info my-3">Add Asset</a>
             </div>
         {% endif %}
@@ -34,6 +35,7 @@
                     <thead>
                         <tr>
                             <th>Sl No.</th>
+                            <th>Image</th>
                             <th>Asset Name</th>
                             <th>Serial No.</th>
                             <th>Product Type</th>
@@ -51,6 +53,15 @@
                           {% for asset in page_object %}
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                            <td>
+                                {% with img=asset_images|get_item:asset.id %}
+                                    {% if img %}
+                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
+                                    {% else %}
+                                        No Image
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
                             <td>{{asset.name}}</td>
                             <td>{{asset.serial_no}}</td>
                             <td>{{asset.product.product_type}}</td>
@@ -74,18 +85,25 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if request.user.is_superuser %}
-                                    <div class="form-check form-switch">
-                                        <input 
-                                            class="form-check-input"
-                                            hx-post="{% url 'assets:status' asset.id %}" 
-                                            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                            type="checkbox" {% if asset.status %} checked {% endif %}
-                                            style="cursor: pointer;"
-                                        >
-                                    </div>  
-                                {% else %}
-                                    {% if products.status %} Active {% else %} Inactive {% endif %}
+                                {{ asset.get_status_display }}
+                                {% if asset.get_status_display == "Out for Repair" %}
+                                    <form method="post" action="{% url 'assets:release' asset.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning btn-sm">Release</button>
+                                    </form>
+                                {% elif asset.get_status_display == "Ready To Deploy" %}
+                                    <form method="post" action="{% url 'assets:assign' asset.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <select name="user_id" class="form-select" required>
+                                                <option value="">Select User</option>
+                                                {% for user in active_users %}
+                                                    <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                                        </div>
+                                    </form>
                                 {% endif %}
                             </td>
                             <td>

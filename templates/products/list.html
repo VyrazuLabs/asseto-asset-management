@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -81,7 +82,15 @@
                          {% for products in page_object %}
                             <tr>
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>{% if products.product_picture %} <img src="{{products.product_picture.url}}" class="rounded" width="100" height="80" /> {% else %} Not Uploaded {% endif %}</td>
+                                <td>
+                                    {% with img=product_images|get_item:products.id %}
+                                        {% if img %}
+                                            <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
                                 <td>{{products.name}}</td>
                                 <td>
                                     {{products.product_type}}       
