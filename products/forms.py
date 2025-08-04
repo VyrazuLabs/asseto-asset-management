@@ -2,6 +2,7 @@ from dataclasses import fields
 from django import forms
 from .models import *
 from dashboard.models import ProductCategory, ProductType
+from assets.forms import MultipleFileField
 
 
 class AddProductsForm(forms.ModelForm):
@@ -47,3 +48,9 @@ class AddProductsForm(forms.ModelForm):
         model = Product
         fields = ['name', 'product_picture', 'manufacturer',
                   'description', 'product_category', 'product_type']
+
+class ProductImageForm(forms.ModelForm):
+    image = MultipleFileField(label='Select files', required=False)
+    class Meta:
+            model = ProductImage
+            fields = ['image', ]
