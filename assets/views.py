@@ -71,7 +71,8 @@ def list(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-
+    for it in asset_images:
+        print("here",it)
     context = {
         'sidebar': 'assets',
         'submenu': 'list',
@@ -90,8 +91,11 @@ def list(request):
 @permission_required('authentication.view_asset')
 def details(request, id):
 
-    asset = get_object_or_404(
-        Asset.undeleted_objects, pk=id, organization=request.user.organization)
+    asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
+    if asset is None:
+        assetSpecifications=AssignAsset.objects.filter(id=id).first()
+        asset=assetSpecifications.asset
+        print("asset",asset)
     print(asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     img_array=[]
@@ -246,7 +250,7 @@ def assigned_list(request):
     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    print("assigned",assign_asset_list)
     context = {
         'sidebar': 'assets',
         'submenu': 'assigned-assets',
