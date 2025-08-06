@@ -1,5 +1,4 @@
 {% extends 'layouts/main-layout.html' %}
-{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -53,7 +52,7 @@
                                 <th scope="row">Price</th>
                                 <td>{{asset.price}}</td>
                                 <th scope="row">Office Location</th>
-                                <td>{{asset.location.address.address_line_one}}</td>
+                                <td>{{asset.location}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Purchase Date</th>
@@ -67,35 +66,6 @@
                             </tr>
                             </tbody>
                     </table>
-                    <p ><b>Asset Images</b></p>
-                    <div style="display: flex;">
-                        {% for it in get_asset_img %}
-                            <div >
-                                <img
-                                src="{% get_media_prefix %}{{ it.image }}" 
-                                alt="Asset Image {{ forloop.counter }}"
-                                style="cursor: pointer; width: 150px;"
-                                class="clickable-image"
-                                data-image-src="{% get_media_prefix %}{{ it.image }}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#imageModal{{ forloop.counter }}"
-                                >
-                            </div>
-                            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
-                                    </div>
-                                </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
                 </div>
             </div>
         </div>
@@ -143,12 +113,4 @@
         {% include 'commons/history.html' %}
     </section>
 </div>
-<script>
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('hidden.bs.modal', () => {
-    window.location.reload();
-  });
-});
-</script>
-  
 {% endblock content%}

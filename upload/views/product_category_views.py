@@ -7,16 +7,14 @@ from django.core.paginator import Paginator
 from upload.utils import render_to_csv, csv_file_upload
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
-from ..utils import function_to_get_matching_objects_product_category
-import json
-from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
+
 
 @login_required
 @permission_required('authentication.add_product_category')
 def product_category_list(request):
 
-    product_category_list = ImportedUser.objects.filter(entity_type="ProductCategory",
-        organization=request.user.organization)
+    product_category_list = ProductCategory.undeleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(product_category_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -43,65 +41,23 @@ def export_product_categories_csv(request):
 @login_required
 @permission_required('authentication.add_product_category')
 def import_product_catagories_csv(request):
-    header_list = ['Product Category Name']
-    model="product-category"
     if request.method == "POST":
         try:
             file = request.FILES.get('file', None)
             file_path = csv_file_upload(request, file)
             df = pd.read_csv(file_path, delimiter=',')
             list_of_csv = [list(row) for row in df.values]
-            array=[]
+
             for l in list_of_csv:
-                obj={}
                 ProductCategory.objects.create(
                     name=l[0],
                     organization=request.user.organization
                 )
-                obj['name']=l[0]
-                obj['organization']=request.user.organization
-                array.append(obj)
-                arr=function_to_get_matching_objects_product_category(array)
-            request.session['arr'] = arr
-            request.session['header']=header_list
-            request.session['model']=model
+
             messages.success(
                 request, 'Product Catagories CSV file uploaded successfully')
-            return redirect('upload:compare_data')
         except:
             pass
         return redirect('upload:product_category_list')
     context = {'page': 'Product Catagories'}
     return render(request, 'upload/upload-csv-modal.html', context)
-
-def create_matched_data_from_csv_product_category(request):
-    if request.method == 'POST':
-        try:
-            # request.body is bytes, decode and parse JSON\
-            # body = request.POST.getlist("arr")
-            # print("Received body: ", body, type(body))
-
-            # data = json.loads(body)
-            data = json.loads(request.body.decode())
-            # Now 'data' is the python object sent from 'arr' (likely a list of dicts)
-            
-            # For example purposes:
-            print("Received data:", data, type(data))
-            for it in data:
-                #Create the the user which are mapped from the csv to databsae
-                obj=ImportedUser.objects.create(entity_type="ProductCategory",name=it.get('name'))
-                print("IMported user successfully", obj.name)
-
-                # get_user=Location.objects.filter(entity_type="Location",office_name=it.get("office_name"),contact_person_name=it.get("contact_person_name")).first()
-
-                # get_user.imported_user = obj.id
-                # get_user.save()
-
-            return JsonResponse({'status': 'success', 'received_items': len(data)})
-        except json.JSONDecodeError:
-            return HttpResponse('Invalid JSON')
-        except Exception as e:
-            return HttpResponse(f'Error processing request: {str(e)}')
-
-    return HttpResponse('Only POST method allowed')
-
