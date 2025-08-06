@@ -56,8 +56,9 @@ class UserForm(forms.ModelForm):
 
     profile_pic = forms.ImageField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={'allow_multiple_selected': True})
-    )
+        widget=forms.FileInput(
+            attrs={'class': 'form-control', 'id': 'inputFile'}
+    ))
     
     password1=forms.CharField(
         required=False,
