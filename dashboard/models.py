@@ -129,4 +129,4 @@ class Address(TimeStampModel):
     pin_code = models.CharField(max_length=255, blank=True, null=True)
 
     # def __str__(self):
-    #     return f'{self.address_line_one}, {self.address_line_two}, {self.country}, {self.state}, {self.city}, {self.pin_code}'    
+    #     return f'{self.address_line_one}, {self.address_line_two}, {self.country}, {self.state}, {self.city}, {self.pin_code}'   
