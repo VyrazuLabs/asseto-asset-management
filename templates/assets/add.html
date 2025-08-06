@@ -21,7 +21,7 @@
         <div>
             <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
         </div>
-        <form class="form row" action="{% url 'assets:add' %}" method="POST" novalidate enctype="multipart/form-data">
+        <form class="form row" action="{% url 'assets:add' %}" method="POST" novalidate>
             {% csrf_token %}
             <div class="card">
                 <div class="card-header">
@@ -29,15 +29,6 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="city-column">Tag</label>
-                                {{form.tag}}
-                                {% for error in form.tag.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="city-column">Product</label>
@@ -127,16 +118,6 @@
                                 <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
                             </div>
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <div class="form-group">
-                                <label for="company-column">Add Asset Image</label>
-                                {{image_form.image}}
-                                {% for error in image_form.image.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                            <div class="form-group rounded ml-2" id="imagePreview"></div>                    
                         </div>
                     </div>
                 </div>
