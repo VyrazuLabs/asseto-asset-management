@@ -18,6 +18,7 @@ class AssetSpecification(TimeStampModel):
 
 class Asset(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    tag = models.CharField(max_length=255, blank=False, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
