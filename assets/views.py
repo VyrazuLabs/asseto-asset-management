@@ -71,6 +71,17 @@ def list(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
+
+    # Gather the first image per asset in the current page
+    asset_ids_in_page = [asset.id for asset in page_object]
+    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('uploaded_at')
+    print(images_qs)
+    
+    # Map asset ID to its first image
+    asset_images = {}
+    for img in images_qs:
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
     for it in asset_images:
         print("here",it)
     context = {

@@ -8,6 +8,7 @@ from authentication.models import User
 from simple_history.models import HistoricalRecords
 
 
+
 def path_and_rename(instance, filename):
     upload_to = 'asset_images/'
     ext = filename.split('.')[-1]
@@ -35,7 +36,7 @@ class Asset(TimeStampModel, SoftDeleteModel):
     ]
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tag = models.CharField(max_length=255, blank=False, null=False)
+    tag = models.CharField(max_length=255, blank=False, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
