@@ -85,7 +85,26 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {{asset.get_status_display}}
+                                {{ asset.get_status_display }}
+                                {% if asset.get_status_display == "Out for Repair" %}
+                                    <form method="post" action="{% url 'assets:release' asset.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning btn-sm">Release</button>
+                                    </form>
+                                {% elif asset.get_status_display == "Ready To Deploy" %}
+                                    <form method="post" action="{% url 'assets:assign' asset.id %}">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <select name="user_id" class="form-select" required>
+                                                <option value="">Select User</option>
+                                                {% for user in active_users %}
+                                                    <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                                        </div>
+                                    </form>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
