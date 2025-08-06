@@ -24,7 +24,4 @@ urlpatterns = [
     path('departments', department_list, name = 'department_list' ),
     path('departments/export/csv', export_departments_csv , name='export_departments_csv'),
     path('departments/import/csv', import_departments_csv , name='import_departments_csv'),
-    path('compare-data', render_to_mapper_modal, name='compare_data'),
-    path('create-obj-department',create_matched_data_from_csv_department, name='create_data'),
-    path('create-obj-location',create_matched_data_from_csv_locations,name='create-location-data'),
 ]
