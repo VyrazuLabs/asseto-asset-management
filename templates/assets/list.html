@@ -98,13 +98,12 @@
                                     <button type="submit" class="btn btn-warning btn-sm">Release</button>
                                     </form>
                                 {% elif asset.status == 1 %}
-                                    <form method="post" action="{% url 'assets:assign' asset.id %}">
+                                    <form method="post" action="{% url 'assets:assigned' asset.id %}">
                                     {% csrf_token %}
                                     <div class="input-group">
                                         <select name="user_id" class="form-select" required>
                                             <option value="">Select User</option>
                                             {% for user in active_user %}
-                                                {{ user }}
                                                 <option value="{{ user.id }}">{{ user.full_name }}</option>
                                             {% endfor %}
                                         </select>
