@@ -40,21 +40,47 @@ from django.contrib.auth import get_user_model
 
 @login_required
 @permission_required('assets.change_asset', raise_exception=True)
-def assign_asset(request, id):
+def assign_assets(request, id):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
-        asset = get_object_or_404(Asset, pk=id)
-        # Assumes you have a field like asset.assigned_user (ManyToOne/User FK)
-        # User = get_user_model()
+        asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+        User = get_user_model()
         selected_user = get_object_or_404(User, pk=user_id, is_active=True)
-        asset.assigned_user = selected_user
-        get_assigned_asset=AssignAsset.objects.filter(asset=asset).first()
-        if get_assigned_asset is not None:
-            asset.status = 0  # Example: 0 for "Assigned"
-        asset.save()
-        messages.success(request, f"Asset '{asset.name}' assigned to {selected_user.get_full_name() or selected_user.username}.")
-    return redirect('assets:list')
+        
+        # Create or update the AssignAsset record
+        assign_obj, created = AssignAsset.objects.update_or_create(
+            asset=asset,
+            defaults={'user': selected_user},
+        )
 
+        # Mark asset as assigned
+        asset.is_assigned = True
+        asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
+        asset.save()
+
+        messages.success(request, f"Asset assigned to user.")
+        return redirect('assets:list')
+
+    # Optionally, for GET requests, you might want to show a form or a 404 error:
+    return redirect('assets:list')
+    # form = AssignedAssetForm(request.POST or None,
+    #                          organization=request.user.organization)
+    # image_form = AssetImageForm(request.POST, request.FILES)
+    # if request.method == 'POST':
+    #     if form.is_valid():
+    #         form.instance.asset.is_assigned = True
+    #         # form.instance.asset.status = 0
+    #         form.instance.asset.save()
+    #         form.save()
+    #         for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+    #             AssetImage.objects.create(asset=form.instance.asset, image=f)
+    #         messages.success(request, 'Asset assigned to user successfully')
+    #         return HttpResponse(status=204)
+    # else:
+    #     form = AssignedAssetForm()
+    #     image_form = AssetImageForm()
+    # context = {'form': form,'image_form':image_form}
+    # return render(request, 'assets/assign-asset-modal.html', context=context)
 
 PAGE_SIZE = 10
 ORPHANS = 1
