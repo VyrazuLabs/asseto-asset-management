@@ -18,5 +18,5 @@ urlpatterns = [
     path('assign_asset_search/<str:page>', views.assign_asset_search, name='assign_asset_search'),
     path('change-status/<str:id>/',views.change_status,name='change_status'),
     path('status-repair-to-release/<str:id>/',views.release_asset,name='release'),
-    path('status-ready-to-assign/<str:id>/',views.assign_asset,name='assign'),
+    path('status-ready-to-assign/<str:id>/',views.assign_assets,name='assigned'),
 ]
