@@ -4,7 +4,7 @@ from . import views
 app_name = 'assets'
 
 urlpatterns = [
-    path('list', views.list, name='list'),
+    path('list', views.listed, name='list'),
     path('details/<uuid:id>', views.details, name='details'),
     path('update/<uuid:id>', views.update, name='update'),
     path('delete/<uuid:id>', views.delete, name='delete'),
@@ -16,4 +16,7 @@ urlpatterns = [
     path('reassign-asset/<uuid:id>', views.reassign_asset, name='reassign_asset'),
     path('delete-assign/<uuid:id>', views.delete_assign, name='delete_assign'),
     path('assign_asset_search/<str:page>', views.assign_asset_search, name='assign_asset_search'),
+    path('change-status/<str:id>/',views.change_status,name='change_status'),
+    path('status-repair-to-release/<str:id>/',views.release_asset,name='release'),
+    path('status-ready-to-assign/<str:id>/',views.assign_asset,name='assign'),
 ]
