@@ -71,6 +71,8 @@
                             <th>Product Name</th>
                             <th>Product Type</th>
                             <th>Product Category</th>
+                            <th>Total Assets</th>
+                            <th>Avialable Assets</th>
                             <th>Status</th>
                             {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
                                 <th>Actions</th>
@@ -99,10 +101,17 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {{products.product_category}}
+                                    {{products.product_category.parent}}
                                     {% if products.product_category.is_deleted %}
                                         <i class="bi bi-exclamation-triangle text-warning" title="Product category is deleted, please update."></i>
                                     {% endif %}       
+                                </td>
+                                <td>
+                                    {{products.total_assets}}    
+                                </td>
+
+                                <td>
+                                    {{products.available_assets}}    
                                 </td>
                                 <td>
                                     {% if request.user.is_superuser %}

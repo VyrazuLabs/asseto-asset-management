@@ -68,15 +68,27 @@
                                     <td>{{products.name}}</td>
                                     <td>
                                         {% if request.user.is_superuser %}
-                                            <div class="form-check form-switch">
-                                                <input 
-                                                    class="form-check-input"
-                                                    hx-post="{% url 'dashboard:product_type_status' products.id %}" 
-                                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                                    type="checkbox" {% if products.status %} checked {% endif %}
-                                                    style="cursor: pointer;"
-                                                >
-                                            </div>  
+                                            {% if products.can_modify is False %}
+                                                <div class="form-check form-switch">
+                                                    <input 
+                                                        class="form-check-input"
+                                                        hx-post="{% url 'dashboard:product_type_status' products.id %}" 
+                                                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                                        type="checkbox" {% if products.status %} checked {% endif %}
+                                                        style="cursor: pointer;" disabled
+                                                    >
+                                                </div>
+                                            {% else %}
+                                                <div class="form-check form-switch">
+                                                    <input 
+                                                        class="form-check-input"
+                                                        hx-post="{% url 'dashboard:product_type_status' products.id %}" 
+                                                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                                        type="checkbox" {% if products.status %} checked {% endif %}
+                                                        style="cursor: pointer;"
+                                                    >
+                                                </div> 
+                                            {% endif %}  
                                         {% else %}
                                             {% if products.status %} Active {% else %} Inactive {% endif %}
                                         {% endif %}

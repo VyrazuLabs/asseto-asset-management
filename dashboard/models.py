@@ -102,6 +102,7 @@ class Organization(TimeStampModel):
 class ProductType(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
+    can_modify=models.BooleanField(default=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
@@ -112,6 +113,7 @@ class ProductType(TimeStampModel, SoftDeleteModel):
 class ProductCategory(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
+    parent=models.ForeignKey('self',related_name='subcategories',on_delete=models.CASCADE, null=True,blank=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
