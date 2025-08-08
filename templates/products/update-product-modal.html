@@ -14,9 +14,9 @@
         {% csrf_token %}
         <div class="modal-body">
             <div class="form-group">
-                <label>Product Category</label>
-                {{form.product_category}}
-                {% for error in form.product_category.errors %}
+                <label>Product Name</label>
+                {{form.name}}
+                {% for error in form.name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
@@ -29,11 +29,23 @@
                 {% endfor %}
             </div>
 
-            <div class="form-group">
-                <label>Product Name</label>
-                {{form.name}}
-                {% for error in form.name.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+
+
+            <!-- Product Category -->
+            <div class="form-group mb-2">
+                <label>Product Category</label>
+                {{ form.product_category }}
+                {% for error in form.product_category.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <!-- Product Sub Category -->
+            <div class="form-group mb-2">
+                <label>Product Sub Category</label>
+                {{ form.product_sub_category }}
+                {% for error in form.product_sub_category.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
 
@@ -44,6 +56,27 @@
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
+
+
+            <!-- Model -->
+            <div class="form-group mb-2">
+                <label>Model</label>
+                {{ form.model }}
+                {% for error in form.model.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <!-- Product EOL -->
+            <div class="form-group mb-2">
+                <label>Product EOL</label>
+                {{ form.eol }}
+                {% for error in form.eol.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+
 
             <div class="form-group">
                 <label>Description</label>
