@@ -22,6 +22,8 @@ class Product(TimeStampModel, SoftDeleteModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     product_picture = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
+    model=models.CharField(max_length=100,  blank=True, null=True)
+    eol=models.IntegerField(blank=True,null=True)
     description = models.TextField(blank=True, null=True)
     product_category = models.ForeignKey(ProductCategory, models.DO_NOTHING, blank=True, null=True)
     product_type = models.ForeignKey(ProductType, models.DO_NOTHING, blank=True, null=True)

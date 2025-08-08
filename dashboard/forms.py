@@ -156,3 +156,33 @@ class ProductCategoryForm(forms.ModelForm):
     class Meta:
         model = ProductCategory
         fields = ['name']
+
+
+class ProductSubCategoryForm(forms.ModelForm):
+    name = forms.CharField(required=True, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', 'class': 'form-control',
+               'placeholder': 'Category Name'}
+    ))
+
+    parent = forms.ModelChoiceField(
+        queryset=None,
+        empty_label="--SELECT--",
+        widget=forms.Select(
+            attrs={'class': 'form-select'}
+        ))
+
+    def __init__(self, *args, **kwargs):
+        self._organization = kwargs.pop('organization', None)
+        self._pk = kwargs.pop('pk', None)
+        super(ProductSubCategoryForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__isnull=True)
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if ProductCategory.undeleted_objects.filter(name__iexact=name, organization=self._organization).exclude(pk=self._pk).exists():
+            raise forms.ValidationError('Name must be unique!')
+        return name
+
+    class Meta:
+        model = ProductCategory
+        fields = ['name','parent']

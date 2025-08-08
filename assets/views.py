@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from .forms import AssetForm, AssignedAssetForm, ReassignedAssetForm,AssetImageForm
+from .forms import AssetForm, AssignedAssetForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.contrib import messages
-from .models import Asset, AssetSpecification, AssignAsset,AssetImage
+from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus
 from django.core.paginator import Paginator
 from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.decorators import permission_required
@@ -12,6 +12,10 @@ from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseBadRequest
 import json
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -118,6 +122,19 @@ def manage_access_for_assign_assets(user):
 
     return False
 
+def manage_access_for_assets_status(user):
+    permissions_list = [
+        'authentication.edit_asset_status',
+        'authentication.view_asset_status',
+        'authentication.delete_asset_status',
+        'authentication.add_asset_status',
+    ]
+
+    for permission in permissions_list:
+        if user.has_perm(permission):
+            return True
+
+    return False
 
 @login_required
 @user_passes_test(manage_access_for_assets)
@@ -171,6 +188,10 @@ def details(request, id):
     get_asset_img=AssetImage.objects.filter(asset=asset).values()
     for it in get_asset_img:
         img_array.append(it)
+
+    months_int=asset.product.eol
+    today=timezone.now().date()
+    eol_date= today+relativedelta(months=months_int)
 
     arr_size=len(img_array)
     history_list = asset.history.all()
@@ -422,3 +443,94 @@ def change_status(request, id):
         print("ERROR",str(e))
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
+
+@login_required
+@permission_required('authentication.add_asset_status')
+def add_asset_status(request):
+    form=AssetStatusForm(request.POST or None, request.user.organization)
+
+    if request.method=="POST":
+        if form.is_valid():
+            asset_status=form.save(commit=False)
+            asset_status.organization=request.user.organization
+            asset_status.save()
+            messages.success(request, "Status added sucessfully")
+            # return redirect('assets:asset_status_list')
+        
+            # For HTMX: return 204 No Content to indicate success
+            if request.headers.get('Hx-Request') == 'true':
+                return HttpResponse(status=204)
+            
+            # For regular requests fallback
+            return HttpResponseRedirect(reverse('assets:asset_status_list'))
+    context = {'form': form, "modal_title": "Add Asset Status"}  
+    return render(request,'assets/add_asset_status.html', context)
+
+@login_required
+@user_passes_test(manage_access_for_assets_status)
+def asset_status_list(request):
+    all_asset_status_list = AssetStatus.undeleted_objects.filter(
+    organization=request.user.organization).order_by('-created_at')
+    
+    paginator = Paginator(all_asset_status_list,
+        PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'admin',
+        'submenu': 'Asset_Status',
+        'page_object': page_object,
+        'title': 'Asset Status'
+    }
+    return render(request,'assets/asset_status_list.html',context=context)
+
+@login_required
+@permission_required('authentication.asset_status_details')
+def asset_status_details(request,id):
+    asset_status = get_object_or_404(
+    AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+
+    history_list = AssetStatus.history.all()
+    paginator = Paginator(history_list, 5, orphans=1)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {'sidebar': 'admin', 'page_object': page_object,
+               'submenu': 'asset_status', 'asset_status': asset_status, 'title': 'Asset_Status - Details'}
+    return render(request, 'assets/asset_status_details.html', context=context)
+
+@login_required
+@permission_required('authentication.edit_asset_status')
+def edit_asset_status(request,id):
+    asset_status = get_object_or_404(
+    AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+    form = AssetStatusForm(request.POST or None, instance=asset_status,
+                               organization=request.user.organization,  pk=asset_status.id)
+
+    if request.method == "POST":
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Asset Status updated successfully')
+            return HttpResponse(status=204)
+
+    context = {'form': form, "modal_title": "Update Asset Status"}
+    return render(request, 'assets/add_asset_status.html', context)
+
+@login_required
+@permission_required('authentication.delete_asset_status')
+def delete_asset_status(request,id):
+    if request.method == 'POST':
+        product_category = get_object_or_404(
+        AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+        product_category.status = False
+        product_category.soft_delete()
+        history_id = product_category.history.first().history_id
+        product_category.history.filter(pk=history_id).update(history_type='-')
+        messages.success(request, 'Asset Status deleted successfully')
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
