@@ -191,7 +191,7 @@ def details(request, id):
 
     months_int=asset.product.eol
     today=timezone.now().date()
-    eol_date= today+relativedelta(months=months_int)
+    eol_date= today+relativedelta(months=months_int) if months_int is not None else None
     arr_size=len(img_array)
     history_list = asset.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
