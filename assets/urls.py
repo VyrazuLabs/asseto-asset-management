@@ -19,4 +19,14 @@ urlpatterns = [
     path('change-status/<str:id>/',views.change_status,name='change_status'),
     path('status-repair-to-release/<str:id>/',views.release_asset,name='release'),
     path('status-ready-to-assign/<str:id>/',views.assign_assets,name='assigned'),
+
+
+
+    #Asset Staus--->
+
+    path('add_status',views.add_asset_status,name='add_asset_status'),
+    path('asset_status_list',views.asset_status_list,name='asset_status_list'),
+    path('asset_status_details/<uuid:id>',views.asset_status_details,name='asset_status_details'),
+    path('edit_asset_status/<uuid:id>',views.edit_asset_status,name='edit_asset_status'),
+    path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status')
 ]
