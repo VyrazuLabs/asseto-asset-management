@@ -45,6 +45,13 @@
                             </tr>
                             <tr>
                                 <th scope="row">Product Category</th>
+                                <td>{{asset.product.product_category.parent}}</td>
+                                <th scope="row">Serial No.</th>
+                                <td>{{asset.serial_no}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">Product Sub Category</th>
                                 <td>{{asset.product.product_category}}</td>
                                 <th scope="row">Serial No.</th>
                                 <td>{{asset.serial_no}}</td>
@@ -60,6 +67,11 @@
                                 <td>{{asset.purchase_date}}</td>
                                 <th scope="row">Warranty Expiry Date</th>
                                 <td>{{asset.warranty_expiry_date}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">End of Life</th>
+                                <td>{{eol_date}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Description</th>

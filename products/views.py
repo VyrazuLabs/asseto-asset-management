@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from vendors.utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q,Count
 
 
 from datetime import date
@@ -43,7 +43,11 @@ def manage_access(user):
 def list(request):
 
     product_list = Product.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+                organization=request.user.organization).annotate(
+            total_assets=Count('asset'),
+            available_assets=Count('asset', filter=Q(asset__is_assigned=False))
+        ).order_by('-created_at')
+    
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)

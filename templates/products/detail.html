@@ -40,10 +40,32 @@
                                 <td>{{product.product_type}}</td>
                             </tr>
                             <tr>
+                                <td><b>Product Category</b></td>
+                                <td>{{product.product_category.parent.name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Product Sub Category</b></td>
+                                <td>{{product.product_category.name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Manufacturer</b></td>
+                                <td>{{product.manufacturer}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Model Name</b></td>
+                                <td>{{product.model}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Product EOL</b></td>
+                                <td>{{ product.eol }} months</td>
+                                </tr>
+                            <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{product.description|urlize}}</td>
                             </tr>
-                            </tbody>
+                        </tbody>
                     </table>
                     <p ><b>Product Images</b></p>
                     <div style="display: flex;">
