@@ -192,7 +192,6 @@ def details(request, id):
     months_int=asset.product.eol
     today=timezone.now().date()
     eol_date= today+relativedelta(months=months_int)
-
     arr_size=len(img_array)
     history_list = asset.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
@@ -200,7 +199,7 @@ def details(request, id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array}
+               'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date}
     return render(request, 'assets/detail.html', context=context)
 
 
