@@ -23,6 +23,18 @@ class AssetSpecification(TimeStampModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     value = models.CharField(max_length=255, blank=True, null=True)
 
+
+
+class AssetStatus(TimeStampModel, SoftDeleteModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    can_modify=models.BooleanField(default=True)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
+
 class Asset(TimeStampModel, SoftDeleteModel):
     STATUS_CHOICES = [
         (0, 'Assigned'),
@@ -39,6 +51,7 @@ class Asset(TimeStampModel, SoftDeleteModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
+    asset_status=models.OneToOneField(AssetStatus, models.DO_NOTHING, null=True, blank=True)
     purchase_date = models.DateField(blank=True, null=True)
     warranty_expiry_date = models.DateField(blank=True, null=True)
     purchase_type = models.CharField(max_length=45, blank=True, null=True)

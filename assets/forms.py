@@ -1,5 +1,5 @@
 from django import forms
-from assets.models import Asset, AssignAsset,AssetImage
+from assets.models import Asset, AssignAsset,AssetImage,AssetStatus
 from products.models import Product
 from vendors.models import Vendor
 from dashboard.models import Location
@@ -183,4 +183,18 @@ class ReassignedAssetForm(forms.ModelForm):
     class Meta:
         model = AssignAsset
         fields = ['user']
+
+class AssetStatusForm(forms.ModelForm):
+    name=forms.CharField(required=True, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', 'class': 'form-control',
+               'placeholder': 'Asset Status Name'} ))
+    
+    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop('organization', None)
+        self.pk = kwargs.pop('pk', None)
+        super().__init__(*args, **kwargs)
+    
+    class Meta:
+        model=AssetStatus
+        fields=['name']
 
