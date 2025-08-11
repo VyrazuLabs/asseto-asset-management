@@ -101,7 +101,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{{ it.image.url }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
+                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
                                     </div>
                                 </div>
                                 </div>
