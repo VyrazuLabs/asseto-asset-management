@@ -1,3 +1,24 @@
+<style>
+    .pagination .page-link {
+        background-color: #111 !important;
+        border: none;
+        color: #ccc;
+    }
+    .pagination .page-link:hover {
+        background-color: #222 !important;
+        color: #fff;
+    }
+    .pagination .active .page-link {
+        background-color: #3b82f6 !important;  /* Tailwind blue-500 style */
+        color: white !important;
+        border: none;
+    }
+    .pagination .disabled .page-link {
+        color: #666 !important;
+        background-color: #111 !important;
+    }
+</style>
+
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
@@ -61,41 +82,93 @@
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-lg">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Asset</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for asset in assets_page_object %}
-                        <tr>
-                            <td class="col-3">
-                                <div class="d-flex align-items-center">
-                                    <p class="font-bold ms-3 mb-0">
-                                        {{ assets_page_object.start_index|add:forloop.counter0 }}
-                                    </p>
-                                </div>
-                            </td>
-                            <td class="col-auto">
 
-                                {{ asset.name|default:"Unnamed Asset" }}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2">No assets assigned to this vendor.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="card">
+            <div class="card-header">
+                <h4>Asset List</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-lg">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Asset</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asset in assets_page_object %}
+                            <tr>
+                                <td class="col-3">
+                                    <div class="d-flex align-items-center">
+                                        <p class="font-bold ms-3 mb-0">
+                                            {{ assets_page_object.start_index|add:forloop.counter0 }}
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="col-auto">
+                                    {{ asset.name|default:"Unnamed Asset" }}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2">No assets assigned to this vendor.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-                {% include 'commons/pagination.html' %}
+                    <!-- Explicit Pagination for assets_page_object -->
+                    {% if assets_page_object.has_other_pages %}
+                        <nav aria-label="Asset pagination">
+                            <ul class="pagination justify-content-end">
+
+                                <!-- Previous -->
+                                {% if assets_page_object.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.previous_page_number }}">
+                                        &laquo; Previous
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link bg-dark text-muted">
+                                        &laquo; Previous
+                                    </span>
+                                </li>
+                                {% endif %}
+
+                                <!-- Current Page -->
+                                <li class="page-item active">
+                                    <span class="page-link bg-primary text-white border-0">
+                                        {{ assets_page_object.number }}
+                                    </span>
+                                </li>
+
+                                <!-- Next -->
+                                {% if assets_page_object.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.next_page_number }}">
+                                        Next &raquo;
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link bg-dark text-muted">
+                                        Next &raquo;
+                                    </span>
+                                </li>
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    {% endif %}
+
+
+                </div>
             </div>
         </div>
+
         {% include 'commons/history.html' %}
     </section>
 </div>
