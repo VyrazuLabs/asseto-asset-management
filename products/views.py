@@ -81,7 +81,7 @@ def details_product(request, id):
         Product.undeleted_objects, pk=id, organization=request.user.organization)
 
     history_list = product.history.all()
-    paginator = Paginator(history_list, 5, orphans=1)
+    paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     get_product_img=ProductImage.objects.filter(product=product).values()
