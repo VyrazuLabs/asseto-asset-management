@@ -100,7 +100,7 @@ def details(request, id):
     assets=Asset.objects.filter(vendor=vendor)
     asset_page_param = 'asset_page'
     assets_paginator=Paginator(assets,10,orphans=1)
-    assets_page_number=request.GET.get('page')
+    assets_page_number=request.GET.get('asset_page')
     assets_page_object=assets_paginator.get_page(assets_page_number)
 
 
