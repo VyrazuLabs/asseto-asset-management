@@ -205,49 +205,95 @@ def details(request, id):
 
 @login_required
 @permission_required('authentication.edit_asset')
+# def update(request, id):
+#     # AssetImageForm
+#     asset = get_object_or_404(
+#         Asset.undeleted_objects, pk=id, organization=request.user.organization)
+#     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+#     form = AssetForm(request.POST or None, instance=asset,
+#                      organization=request.user.organization)
+#     image_form = AssetImageForm(request.POST or None, request.FILES)
+#     if request.method == "POST":
+
+#         if form.is_valid():
+
+#             assetSpecifications.delete()
+
+#             specifications_names = request.POST.getlist(
+#                 'specifications_name')
+
+#             specifications_values = request.POST.getlist(
+#                 'specifications_value')
+
+#             for name, value in zip(specifications_names, specifications_values):
+#                 if name != '' or value != '':
+#                     AssetSpecification.objects.create(
+#                         asset=asset, name=name, value=value)
+
+#             asset = form.save(commit=False)
+#             asset.organization = request.user.organization
+#             asset.save()
+#             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+#                 AssetImage.objects.create(asset=asset, image=f)
+
+#             messages.success(request, 'Asset updated successfully')
+#             return redirect('assets:list')
+
+#     context = {
+#         'sidebar': 'assets',
+#         'submenu': 'list',
+#         'image_form': image_form,
+#         'form': form,
+#         'asset': asset,
+#         'assetSpecifications': assetSpecifications,
+#         'title': 'Asset - Update'
+#     }
+#     return render(request, 'assets/update-assets.html', context=context)
+# from django.shortcuts import get_object_or_404, redirect, render
+# from .models import Asset, AssetImage
+# from .forms import AssetForm, AssetImageForm
+
 def update(request, id):
-
-    asset = get_object_or_404(
-        Asset.undeleted_objects, pk=id, organization=request.user.organization)
+    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+    asset_images = AssetImage.objects.filter(asset=asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-    form = AssetForm(request.POST or None, instance=asset,
-                     organization=request.user.organization)
-    image_form = AssetImageForm(request.POST or None, request.FILES)
-    if request.method == "POST":
-
-        if form.is_valid():
-
+    if request.method == 'POST':
+        form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
+        image_form = AssetImageForm(request.POST, request.FILES)
+        if form.is_valid() and image_form.is_valid():
+            form.save()
             assetSpecifications.delete()
+            # Handle image removals
+            delete_ids = request.POST.getlist('delete_image_ids')
+            if delete_ids:
+                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
 
-            specifications_names = request.POST.getlist(
-                'specifications_name')
-
-            specifications_values = request.POST.getlist(
-                'specifications_value')
-
-            for name, value in zip(specifications_names, specifications_values):
-                if name != '' or value != '':
-                    AssetSpecification.objects.create(
-                        asset=asset, name=name, value=value)
-
-            asset = form.save(commit=False)
-            asset.organization = request.user.organization
-            asset.save()
+            # Handle new images
+            # images = request.FILES.getlist('image')
+            # print("get_imagesssssssssssssss",images)
+            # for img_file in images:
+            #     print(img_file)
+            #     AssetImage.objects.create(asset=asset, image=img_file)
+            print("get_imagesssssssssssssss",request.FILES.getlist('image'))
             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
                 AssetImage.objects.create(asset=asset, image=f)
-
-            messages.success(request, 'Asset updated successfully')
+            # Success message and redirect
+            messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
-
+    else:
+        form = AssetForm(instance=asset, organization=request.user.organization)
+        image_form = AssetImageForm()
     context = {
         'sidebar': 'assets',
         'submenu': 'list',
+        'image_form': image_form,
+        'asset_images': asset_images,
         'form': form,
         'asset': asset,
         'assetSpecifications': assetSpecifications,
         'title': 'Asset - Update'
     }
-    return render(request, 'assets/update-assets.html', context=context)
+    return render(request, 'assets/update-assets.html', context)
 
 
 @login_required
@@ -396,6 +442,7 @@ def delete_assign(request, id):
             AssignAsset, pk=id, asset__organization=request.user.organization)
         assignAsset.delete()
         assignAsset.asset.is_assigned = False
+        assignAsset.asset.status = 1  # Assuming 1 is 'Available'
         assignAsset.asset.save()
         messages.success(request, 'Asset unassigned successfully')
     return redirect('assets:assigned_list')
@@ -436,6 +483,11 @@ def change_status(request, id):
                 return JsonResponse({'error': 'Invalid status'}, status=400)
 
             asset.status = new_status
+            if asset.status != 0:  # If status is 'Assigned'
+                asset.is_assigned = False
+                # delete the assigned asset from the asigned asset list
+                AssignAsset.objects.filter(asset=asset).delete()
+                print("Asset DELTED FROM ASSIGNED LIST")
             asset.save()
             return JsonResponse({'success': True, 'new_status': new_status})
     except Exception as e:
@@ -532,4 +584,41 @@ def delete_asset_status(request,id):
 
     return redirect(request.META.get('HTTP_REFERER'))
 
+@login_required
+@permission_required('authentication.edit_asset')
+def update_in_detail(request, id):
+    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+    asset_images = AssetImage.objects.filter(asset=asset)
+    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+    if request.method == 'POST':
+        form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
+        image_form = AssetImageForm(request.POST, request.FILES)
+        if form.is_valid() and image_form.is_valid():
+            form.save()
+            assetSpecifications.delete()
+            # Handle image removals
+            delete_ids = request.POST.getlist('delete_image_ids')
+            if delete_ids:
+                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
 
+            # Handle new images
+            images = request.FILES.getlist('image')
+            for img_file in images:
+                AssetImage.objects.create(asset=asset, image=img_file)
+            # Success message and redirect
+            messages.success(request, "Asset updated successfully.")
+            return redirect('assets:list')
+    else:
+        form = AssetForm(instance=asset, organization=request.user.organization)
+        image_form = AssetImageForm()
+    context = {
+        'sidebar': 'assets',
+        'submenu': 'list',
+        'image_form': image_form,
+        'asset_images': asset_images,
+        'form': form,
+        'asset': asset,
+        'assetSpecifications': assetSpecifications,
+        'title': 'Asset - Update'
+    }
+    return render(request, 'assets/update-assets-in-detail.html', context=context)
