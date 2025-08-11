@@ -22,6 +22,9 @@
         <div>
             <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
         </div>
+        <div>
+            <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+        </div>
         <div class="card">
             <div class="card-body">
                 <h6 class="my-3">
