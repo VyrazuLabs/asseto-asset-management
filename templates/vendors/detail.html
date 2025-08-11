@@ -61,6 +61,41 @@
                 </div>
             </div>
         </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-lg">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Asset</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in assets_page_object %}
+                        <tr>
+                            <td class="col-3">
+                                <div class="d-flex align-items-center">
+                                    <p class="font-bold ms-3 mb-0">
+                                        {{ assets_page_object.start_index|add:forloop.counter0 }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="col-auto">
+
+                                {{ asset.name|default:"Unnamed Asset" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No assets assigned to this vendor.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
         {% include 'commons/history.html' %}
     </section>
 </div>

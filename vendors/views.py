@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from .utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from assets.models import Asset
 
 from datetime import date
 today = date.today()
@@ -95,14 +96,21 @@ def details(request, id):
     vendor = get_object_or_404(
         Vendor.undeleted_objects, pk=id, organization=request.user.organization)
     address = Address.objects.get(id=vendor.address.id)
+    
+    assets=Asset.objects.filter(vendor=vendor)
+    asset_page_param = 'asset_page'
+    assets_paginator=Paginator(assets,10,orphans=1)
+    assets_page_number=request.GET.get('page')
+    assets_page_object=assets_paginator.get_page(assets_page_number)
+
 
     history_list = vendor.history.all()
-    paginator = Paginator(history_list, 5, orphans=1)
+    paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
-               'address': address, 'title': 'Vendor - Details'}
+    'address': address, 'title': 'Vendor - Details','assets_page_object':assets_page_object}
     return render(request, 'vendors/detail.html', context=context)
 
 
@@ -161,7 +169,7 @@ def export_vendors_csv(request):
     header_list = ['Vendor Name', 'Vendor Email', 'Phone', 'Contact Person Name', 'Designation', 'GSTIN Number',
                    'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Description']
     vendors_list = Vendor.undeleted_objects.filter(organization=request.user.organization).order_by('-created_at').values_list('name', 'email', 'phone', 'contact_person', 'designation',
-                                                                                                                               'gstin_number', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'description')
+    'gstin_number', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'description')
     context = {'header_list': header_list, 'rows': vendors_list}
     response = render_to_csv(context_dict=context)
     response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.csv"'
