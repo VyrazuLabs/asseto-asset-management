@@ -19,11 +19,13 @@
         </div>
     </div>
     <section class="section">
-        <div>
-            <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
-        </div>
-        <div>
-            <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+            </div>
+            <div>
+                <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+            </div>
         </div>
         <div class="card">
             <div class="card-body">
@@ -35,6 +37,8 @@
                     <table class="table table-borderless">
                         <tbody>
                             <tr>
+                                <th scope="row">Asset Tag</th>
+                                <td>{{asset.tag}}</td>
                                 <th scope="row">Asset Name</th>
                                 <td>{{asset.name}}</td>
                                 <th scope="row">Vendor</th>
