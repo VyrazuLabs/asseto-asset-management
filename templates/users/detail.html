@@ -122,34 +122,6 @@
                 </div>
             </div>
         </div>
-        <div>   
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Assigned Assets</span>                       
-                    </h6>
-                    {% if assigned_assets %}
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><b>Sl No.</b></td>
-                                <td><b>Asset Number</b></td>
-                                <td><b>Asset Name</b></td>
-                            </tr>
-                            {% for asset in assigned_assets %}
-                                <tr>
-                                    <td>{{forloop.counter}}</td>
-                                    <td>{{asset.serial_no}}</td>
-                                    <td>{{asset.asset_name}}</td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% else %}
-                        <p>No assets assigned to this user.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
         {% include 'commons/history.html' %}
     </section>
 </div>
