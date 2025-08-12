@@ -18,7 +18,7 @@ class AssetForm(forms.ModelForm):
         (6, 'Out for Repair')),
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    tag =  forms.CharField(required=True, widget=forms.TextInput(
+    tag =  forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Asset Tag'}
     ))
