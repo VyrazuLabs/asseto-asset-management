@@ -141,4 +141,58 @@
             filePreview(this);
         });
     </script>
+    <script>
+        // Image Preview
+        function filePreview(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#imagePreview + img").remove();
+                    $("#imagePreview").after(
+                        '<img src="' +
+                            e.target.result +
+                            '" class="rounded" width="100" height="80"/>'
+                    );
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+ 
+        $("#inputFile").change(function () {
+            $("#imagePreview img").remove();
+            filePreview(this);
+        });
+ 
+        // HTMX hook to reload page on successful form submission
+        htmx.on("htmx:beforeSwap", (e) => {
+            if (
+                e.detail.target.id == "add-product-modal-content" &&
+                !e.detail.xhr.response
+            ) {
+                location.reload();
+            }
+        });
+ 
+        // HTMX trigger on category change to fetch subcategories
+        document.querySelector('#id_product_category')?.addEventListener('change', function () {
+            const categoryId = this.value;
+            const subCatSelect = document.querySelector('#id_product_sub_category');
+ 
+            // Reset the subcategory dropdown
+            subCatSelect.innerHTML = '<option value="">Loading...</option>';
+ 
+            fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">--SELECT--</option>';
+                    data.forEach(function (item) {
+                        options += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    subCatSelect.innerHTML = options;
+                })
+                .catch(() => {
+                    subCatSelect.innerHTML = '<option value="">Error loading</option>';
+                });
+        });
+    </script>
 </div>
