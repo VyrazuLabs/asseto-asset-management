@@ -1,0 +1,10 @@
+<form action="{% url 'dashboard:global_search' %}" method="get" class="d-flex gap-2 my-2" style="width: 50%;">
+    <input
+        type="text"
+        name="search_text"
+        class="form-control"
+        placeholder="Search Products or Assets "
+        value="{{ request.GET.q|default:'' }}"
+    >
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+</form>
