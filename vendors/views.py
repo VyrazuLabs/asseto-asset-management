@@ -13,6 +13,7 @@ from .utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from assets.models import Asset
+from vendors.utils import get_count_of_assets
 
 from datetime import date
 today = date.today()
@@ -47,10 +48,14 @@ def vendor_list(request):
         organization=request.user.organization).order_by('-created_at')
     print(vendors_list.values_list("id"))
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+    count_array=[]
+    for it in vendors_list:
+        get_count=get_count_of_assets(request, it.id)
+        count_array.append(get_count)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
-    context = {'sidebar': 'vendors',
+    print("page_object",page_object)
+    context = {'sidebar': 'vendors','count_array': count_array,
                'page_object': page_object, 'title': 'Vendors'}
     return render(request, 'vendors/list.html', context=context)
 

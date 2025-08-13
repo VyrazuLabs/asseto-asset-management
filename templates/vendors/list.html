@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -63,6 +64,7 @@
                                 <th>GSTIN No.</th>
                                 <th>Phone No.</th>
                                 <th>Status</th>
+                                <th>Asset Count</th>
                                 {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
                                     <th>Actions</th>
                                 {% endif %}
@@ -94,6 +96,7 @@
                                         {% if vendors.status %} Active {% else %} Inactive {% endif %}
                                     {% endif %}
                                 </td>
+                                <td>{{ count_array|get_at_index:forloop.counter0 }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                         {% if perms.authentication.view_vendor %}
