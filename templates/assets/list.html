@@ -88,16 +88,17 @@
                             {{active_users}}
                             <td>
                                 <select class="status-select form-select" data-asset-id="{{ asset.id }}">
+                                    <option value="" disabled selected>{{ asset.asset_status.name }}</option>
                                     {% for value, label in asset_form.fields.status.choices %}
                                         <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
                                     {% endfor %}
                                 </select>
-                                {% if asset.status == 6 %}
+                                {% if asset.asset_status.name == "Ready To Deploy" %}
                                     <form method="post" action="{% url 'assets:release' asset.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-warning btn-sm">Release</button>
                                     </form>
-                                {% elif asset.status == 1 %}
+                                {% elif asset.asset_status.name == "Available" %}
                                     <form method="post" action="{% url 'assets:assigned' asset.id %}">
                                     {% csrf_token %}
                                     <div class="input-group">

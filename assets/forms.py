@@ -7,26 +7,25 @@ from authentication.models import User
 from django.forms import ModelForm
 
 class AssetForm(forms.ModelForm):
-    status = forms.ChoiceField(
-        required=False,
-        choices=((0, 'Assigned'),
-        (1, 'Available'),
-        (2, 'Repair Required'),
-        (3, 'Lost/Stolen'),
-        (4, 'Broken'),
-        (5, 'Ready To Deploy'),
-        (6, 'Out for Repair')),
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-    # status = forms.ModelChoiceField(
+    # status = forms.ChoiceField(
     #     required=False,
-    #     queryset=AssetStatus.objects.all().values_list('name', flat=True),
-    #     empty_label="--SELECT STATUS--",
-    #     widget=forms.Select(
-    #         attrs={'class': 'form-select'}
-    #     )
+    #     choices=((0, 'Assigned'),
+    #     (1, 'Available'),
+    #     (2, 'Repair Required'),
+    #     (3, 'Lost/Stolen'),
+    #     (4, 'Broken'),
+    #     (5, 'Ready To Deploy'),
+    #     (6, 'Out for Repair')),
+    #     widget=forms.Select(attrs={'class': 'form-select'})
     # )
-    tag =  forms.CharField(required=True, widget=forms.TextInput(
+    status = forms.ModelChoiceField(
+        required=False,
+        queryset=AssetStatus.objects.all().values_list('name', flat=True),
+        widget=forms.Select(
+            attrs={'class': 'form-select'}
+        )
+    )
+    tag =  forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Asset Tag'}
     ))
