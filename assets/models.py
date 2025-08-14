@@ -51,7 +51,7 @@ class Asset(TimeStampModel, SoftDeleteModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    asset_status=models.OneToOneField(AssetStatus, models.DO_NOTHING, null=True, blank=True)
+    asset_status=models.ForeignKey(AssetStatus, models.DO_NOTHING, null=True, blank=True)
     purchase_date = models.DateField(blank=True, null=True)
     warranty_expiry_date = models.DateField(blank=True, null=True)
     purchase_type = models.CharField(max_length=45, blank=True, null=True)
