@@ -62,7 +62,6 @@
                         <thead>
                             <tr>
                                 <th>Sl No.</th>
-                                <th>Product Image</th>
                                 <th>Product Name</th>
                                 <th>Product Type</th>
                                 <th>Product Category</th>
@@ -78,15 +77,6 @@
                             {% for product in products %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>
-                                    {% with img=product.image %}
-                                        {% if img %}
-                                            <img src="{{ img.url }}" alt="{{ product.name }}" style="max-height: 60px;">
-                                        {% else %}
-                                            No Image
-                                        {% endif %}
-                                    {% endwith %}
-                                </td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.product_type }}</td>
                                 <td>{{ product.product_category }}</td>
@@ -161,7 +151,6 @@
                         <thead>
                             <tr>
                                 <th>Sl No.</th>
-                                <th>Image</th>
                                 <th>Asset Name</th>
                                 <th>Serial No.</th>
                                 <th>Product Type</th>
@@ -177,15 +166,6 @@
                             {% for asset in assets %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>
-                                    {% with img=asset.image %}
-                                        {% if img %}
-                                            <img src="{{ img.url }}" alt="{{ asset.name }}" style="max-height: 60px;">
-                                        {% else %}
-                                            No Image
-                                        {% endif %}
-                                    {% endwith %}
-                                </td>
                                 <td>{{ asset.name }}</td>
                                 <td>{{ asset.serial_no }}</td>
                                 <td>{{ asset.product.product_type }}</td>
