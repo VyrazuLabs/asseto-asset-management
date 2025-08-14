@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -18,8 +19,13 @@
         </div>
     </div>
     <section class="section">
-        <div>
-            <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+            </div>
+            <div>
+                <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+            </div>
         </div>
         <div class="card">
             <div class="card-body">
@@ -31,10 +37,10 @@
                     <table class="table table-borderless">
                         <tbody>
                             <tr>
+                                <th scope="row">Asset Tag</th>
+                                <td>{{asset.tag}}</td>
                                 <th scope="row">Asset Name</th>
                                 <td>{{asset.name}}</td>
-                                <th scope="row">Vendor</th>
-                                <td>{{asset.vendor}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Product</th>
@@ -44,6 +50,13 @@
                             </tr>
                             <tr>
                                 <th scope="row">Product Category</th>
+                                <td>{{asset.product.product_category.parent}}</td>
+                                <th scope="row">Serial No.</th>
+                                <td>{{asset.serial_no}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">Product Sub Category</th>
                                 <td>{{asset.product.product_category}}</td>
                                 <th scope="row">Serial No.</th>
                                 <td>{{asset.serial_no}}</td>
@@ -52,7 +65,7 @@
                                 <th scope="row">Price</th>
                                 <td>{{asset.price}}</td>
                                 <th scope="row">Office Location</th>
-                                <td>{{asset.location}}</td>
+                                <td>{{asset.location.address.address_line_one}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Purchase Date</th>
@@ -60,12 +73,77 @@
                                 <th scope="row">Warranty Expiry Date</th>
                                 <td>{{asset.warranty_expiry_date}}</td>
                             </tr>
+                            
+                            <tr>
+                                <th scope="row">End of Life</th>
+                                <td>{{eol_date}}</td>
+                                <th scope="row">Vendor</th>
+                                <td>{{asset.vendor}}</td>
+                            </tr>
                             <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{asset.description|urlize}}</td>
                             </tr>
                             </tbody>
                     </table>
+                    <p ><b>Asset Images</b></p>
+                    <div style="display: flex;">
+                        {% for it in get_asset_img %}
+                            <div >
+                                <img
+                                src="{% get_media_prefix %}{{ it.image }}" 
+                                alt="Asset Image {{ forloop.counter }}"
+                                style="cursor: pointer; width: 150px;"
+                                class="clickable-image"
+                                data-image-src="{% get_media_prefix %}{{ it.image }}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#imageModal{{ forloop.counter }}"
+                                >
+                            </div>
+                            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if get_custom_data %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6>Custom Fields</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for cf in get_custom_data %}
+                                     <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <th >{{cf.field_name}}</th>
+                                                <td>{{cf.field_value}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th>{{ cf.field_name }}</th>
+                                <td>{{ cf.field_value }}</td>
+                            </tr>
+                        </tbody>
+                    </table> 
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -113,4 +191,12 @@
         {% include 'commons/history.html' %}
     </section>
 </div>
+<script>
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('hidden.bs.modal', () => {
+    window.location.reload();
+  });
+});
+</script>
+  
 {% endblock content%}

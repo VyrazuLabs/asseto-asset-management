@@ -13,6 +13,7 @@ class Vendor(TimeStampModel, SoftDeleteModel):
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     designation = models.CharField(max_length=255, blank=True, null=True)
     gstin_number = models.CharField(max_length=45, blank=True, null=True)
+
     description = models.TextField(blank=True, null=True)
     address = models.ForeignKey(
         Address, on_delete=models.CASCADE, blank=True, null=True)

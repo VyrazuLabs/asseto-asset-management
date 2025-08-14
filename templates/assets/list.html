@@ -1,6 +1,8 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
+    {% csrf_token %}
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
@@ -18,7 +20,7 @@
     </div>
     <section class="section">
         {% if perms.authentication.add_asset %}
-            <div>
+            <div>   
                 <a href="{% url 'assets:add' %}" class="btn btn-sm btn-outline-info my-3">Add Asset</a>
             </div>
         {% endif %}
@@ -34,6 +36,7 @@
                     <thead>
                         <tr>
                             <th>Sl No.</th>
+                            <th>Image</th>
                             <th>Asset Name</th>
                             <th>Serial No.</th>
                             <th>Product Type</th>
@@ -51,6 +54,15 @@
                           {% for asset in page_object %}
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                            <td>
+                                {% with img=asset_images|get_item:asset.id %}
+                                    {% if img %}
+                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
+                                    {% else %}
+                                        No Image
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
                             <td>{{asset.name}}</td>
                             <td>{{asset.serial_no}}</td>
                             <td>{{asset.product.product_type}}</td>
@@ -73,21 +85,35 @@
                                     In Store
                                 {% endif %}
                             </td>
+                            {{active_users}}
                             <td>
-                                {% if request.user.is_superuser %}
-                                    <div class="form-check form-switch">
-                                        <input 
-                                            class="form-check-input"
-                                            hx-post="{% url 'assets:status' asset.id %}" 
-                                            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                            type="checkbox" {% if asset.status %} checked {% endif %}
-                                            style="cursor: pointer;"
-                                        >
-                                    </div>  
-                                {% else %}
-                                    {% if products.status %} Active {% else %} Inactive {% endif %}
+                                <select class="status-select form-select" data-asset-id="{{ asset.id }}">
+                                    <option value="" disabled selected>{{ asset.asset_status.name }}</option>
+                                    {% for value, label in asset_form.fields.status.choices %}
+                                        <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if asset.asset_status.name == "Ready To Deploy" %}
+                                    <form method="post" action="{% url 'assets:release' asset.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning btn-sm">Release</button>
+                                    </form>
+                                {% elif asset.asset_status.name == "Available" %}
+                                    <form method="post" action="{% url 'assets:assigned' asset.id %}">
+                                    {% csrf_token %}
+                                    <div class="input-group">
+                                        <select name="user_id" class="form-select" required>
+                                            <option value="">Select User</option>
+                                            {% for user in active_user %}
+                                                <option value="{{ user.id }}">{{ user.full_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                                    </div>
+                                    </form>
                                 {% endif %}
                             </td>
+                            
                             <td>
                                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                     {% if perms.authentication.view_asset %}
@@ -118,4 +144,55 @@
         </div>
     </section>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.status-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const result= this.getAttribute('data-asset-id');
+                const assetId  = result.replace(/-/g, "");
+                console.log("assetid",assetId)
+                const statusValue = this.value;
+                console.log("statusValue",statusValue)
+    
+                fetch(`/assets/change-status/${assetId}/`, {
+                    method: 'POST',  // or POST/PUT depending on your API
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')  // CSRF for Django POST requests
+                    },
+                    body: JSON.stringify({status: statusValue})
+                }).then(response => {
+                    console.log("response",response)
+                    if (!response.ok) {
+                        alert('Failed to update status');
+                    }
+                    return response.json();
+                }).then(data => {
+                    // Optional: handle success, update UI/toast message
+                    console.log('Status updated', data);
+                    location.reload();
+                }).catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    
+        // CSRF helper function (standard Django pattern)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+    </script>
+    
 {% endblock content%}

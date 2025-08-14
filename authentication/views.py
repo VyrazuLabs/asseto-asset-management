@@ -16,11 +16,17 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
 from dashboard.forms import LocationForm, AddressForm
-from dashboard.models import Location, Address
+from dashboard.models import Location, Address,ProductType
 from django.contrib.auth import get_user_model
 from products.models import Product
 from vendors.models import Vendor
 from assets.models import *
+from django.db.models.signals import post_save 
+from django.dispatch import receiver
+from assets.seeders import seed_asset_statuses
+from assets.models import AssignAsset
+from django.views.decorators.cache import never_cache
+
 User = get_user_model()
 
 
@@ -95,24 +101,37 @@ def index(request):
 
 @unauthenticated_user
 def user_login(request):
+    try:
 
-    form = UserLoginForm()
-    if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(email=email, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request,  f'Welcome, {user.full_name}')
-                # redirecting to the requested url
-                if request.GET.get('next'):
-                    return redirect(request.GET.get('next'))
-                return redirect('/')
-            else:
-                messages.error(request, 'Invalid credentials!')
-    return render(request, 'auth/login.html', context={'form': form})
+        form = UserLoginForm()
+        if request.method == 'POST':
+            form = UserLoginForm(request.POST)
+            if form.is_valid():
+                email = form.cleaned_data['email']
+                password = form.cleaned_data['password']
+                user = authenticate(email=email, password=password)
+                asset = None
+                product = None
+                if user is not None:
+                    
+                    if not AssetStatus.objects.filter(can_modify=False).first():
+                        seed_asset_statuses(asset=True)
+                    if not ProductType.objects.filter(can_modify=False).first():
+                        seed_asset_statuses(product=True)
+
+                    login(request, user)
+                    messages.success(request,  f'Welcome, {user.full_name}')
+
+                    # redirecting to the requested url
+                    if request.GET.get('next'):
+                        return redirect(request.GET.get('next'))
+                    return redirect('/')
+                else:
+                    messages.error(request, 'Invalid credentials!')
+        return render(request, 'auth/login.html', context={'form': form})
+
+    except Exception as e:
+        print("\n",str(e),"\n")
 
 
 @unauthenticated_user
@@ -224,3 +243,9 @@ def organization_info_update(request):
     context = {'organization_form': organization_form,
                'organization': organization}
     return render(request, 'auth/organization_info_update.html', context=context)
+
+@never_cache
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('/')

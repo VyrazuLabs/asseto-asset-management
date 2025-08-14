@@ -102,6 +102,7 @@ class Organization(TimeStampModel):
 class ProductType(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
+    can_modify=models.BooleanField(default=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
@@ -112,6 +113,7 @@ class ProductType(TimeStampModel, SoftDeleteModel):
 class ProductCategory(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
+    parent=models.ForeignKey('self',related_name='subcategories',on_delete=models.CASCADE, null=True,blank=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
@@ -130,3 +132,19 @@ class Address(TimeStampModel):
 
     # def __str__(self):
     #     return f'{self.address_line_one}, {self.address_line_two}, {self.country}, {self.state}, {self.city}, {self.pin_code}'    
+
+class CustomField(models.Model):
+    ENTITY_CHOICES = [
+        ('asset', 'Asset'),
+        ('product', 'Product'),
+        ('vendor', 'Vendor'),
+    ]
+    entity_id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    object_id=models.UUIDField( default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    field_type = models.CharField(max_length=30)
+    field_name=models.CharField(max_length=255, blank=True, null=True)
+    field_value=models.CharField(max_length=255, blank=True, null=True)
+    entity_type = models.CharField(max_length=30, choices=ENTITY_CHOICES)
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE,null=True,blank=True)
+    required = models.BooleanField(default=False)

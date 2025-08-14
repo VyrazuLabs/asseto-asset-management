@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -10,77 +11,144 @@
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Products</li>
-                        <li class="breadcrumb-item active" aria-current="page">Product Details</li>
+                        <li class="breadcrumb-item" aria-current="page">Assets</li>
+                        <li class="breadcrumb-item active" aria-current="page">Asset Details</li>
                     </ol>
                 </nav>
             </div>
         </div>
     </div>
-<div>
-    <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
-</div>
-<div class="page-content">
-    <section class="row">
-        {% if product.product_picture %}
-            <div class="col-12 col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row gallery">
-                            <div class="col-12 mb-2 py-2 px-2 border">
-                                <img class="w-100 active" src="{{product.product_picture.url}}">               
+    <section class="section">
+        <div>
+            <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-pc-display"></i>
+                    <span>Product Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Product Name</th>
+                                <td>{{product.name}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Product Type</th>
+                                <td>{{product.product_type}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Product Category</b></td>
+                                <td>{{product.product_category.parent.name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Product Sub Category</b></td>
+                                <td>{{product.product_category.name}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Manufacturer</b></td>
+                                <td>{{product.manufacturer}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Model Name</b></td>
+                                <td>{{product.model}}</td>
+                            </tr>
+
+                            <tr>
+                                <td><b>Product EOL</b></td>
+                                <td>{{ product.eol }} months</td>
+                                </tr>
+                            <tr>
+                                <th scope="row">Description</th>
+                                <td colspan="3">{{product.description|urlize}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p ><b>Product Images</b></p>
+                    <div style="display: flex;">
+                        {% for it in img_array %}
+                            <div >
+                                <img
+                                src="{% get_media_prefix %}{{ it.image }}" 
+                                alt="Product Image {{ forloop.counter }}"
+                                style="cursor: pointer; width: 150px;"
+                                class="clickable-image"
+                                data-image-src="{% get_media_prefix %}{{ it.image }}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#imageModal{{ forloop.counter }}"
+                                >
+                            </div>
+                            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
+                            Product Specifications
+                        </button>
+                      </h2>
+                      <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Specification Name</th>
+                                            <th>Specification Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if assetSpecifications %}
+                                            {% for assetSpecification in assetSpecifications %}
+                                        <tr>
+                                            <th scope="row">
+                                                {{assetSpecification.name}}
+                                            </th>
+                                            <td>
+                                                {{assetSpecification.value}}
+                                            </td>
+                                        </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+                      </div>
                     </div>
                 </div>
             </div>
-        {% endif %}
-        <div class="col-12 {% if product.product_picture %} col-lg-8 {% endif %}">
-
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-display-fill"></i>
-                        <span>Product Information</span>                       
-                    </h6>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><b>Product Name</b></td>
-                            <td>{{product.name}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Product Type</b></td>
-                            <td>{{product.product_type}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Product Category</b></td>
-                            <td>{{product.product_category}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Manufacturer</b></td>
-                            <td>{{product.manufacturer}}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            {% if product.description %}
-                {% if product.description|length > 700 %} </div> {% endif %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-card-text"></i>
-                            <span>Product Description</span>                       
-                        </h6>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td>{{product.description|urlize}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            {% endif %}
         </div>
         {% include 'commons/history.html' %}
     </section>
 </div>
-{% endblock content %}
+<script>
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('hidden.bs.modal', () => {
+    window.location.reload();
+  });
+});
+</script>
+  
+{% endblock content%}

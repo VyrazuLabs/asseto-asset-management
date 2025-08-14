@@ -18,12 +18,20 @@
     </div>
     <section class="section">
         {% if perms.authentication.add_product_category %}
+        <div class="d-flex">
             <div>
                 <button type="button" class="btn btn-sm btn-outline-info my-3" 
                     hx-get="{% url 'dashboard:add_product_category' %}" hx-target="#add-product-category-modal-content"
                     data-bs-toggle="modal" data-bs-target="#add-product-category-modal"
                 >Add Product Category</i></button>
             </div>
+            
+            <div class="ps-4">
+                <a class="btn btn-sm btn-outline-info my-3" 
+                    href="{% url 'dashboard:product_sub_category_list' %}"
+                >Add Product sub Category</i></a>
+            </div>
+        </div>
         {% endif %}
         <!-- add modal -->
         <div class="modal fade text-left" id="add-product-category-modal" tabindex="-1" role="dialog"

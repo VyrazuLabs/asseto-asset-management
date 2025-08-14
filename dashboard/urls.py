@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
-
+from .views import product_sub_category_views
+from .views import global_search_views
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -40,4 +41,16 @@ urlpatterns = [
     path('product-categories/update/<uuid:id>', views.update_product_category, name='update_product_category'),
     path('product-categories/status/<uuid:id>', views.product_category_status, name='product_category_status'),
     path('product-categories/search/<str:page>', views.search_product_category, name='search_product_category'),
+
+
+    #product sub category urls
+    path('product-sub-categories/list', product_sub_category_views.product_sub_category_list, name='product_sub_category_list'),
+    path('product-sub-categories/add', product_sub_category_views.add_product_sub_category, name='add_product_sub_category'),
+    path('product-sub-categories/details/<uuid:id>', product_sub_category_views.product_sub_category_details, name='product_sub_category_details'),
+    path('product-sub-categories/delete/<uuid:id>', product_sub_category_views.delete_product_sub_category, name='delete_product_sub_category'),
+    path('product-sub-categories/update/<uuid:id>', product_sub_category_views.update_product_sub_category, name='update_product_sub_category'),
+    path('product-sub-categories/status/<uuid:id>', product_sub_category_views.product_sub_category_status, name='product_sub_category_status'),
+    path('product-sub-categories/search/<str:page>', product_sub_category_views.search_product_sub_category, name='search_product_sub_category'),
+    path('get-subcategories/',product_sub_category_views.get_subcategories, name='get_subcategories'),
+     path('global-search/', global_search_views.global_search, name='global_search'),
 ]
