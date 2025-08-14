@@ -44,6 +44,25 @@
 
         <div class="card">
             <div class="card-body">
+                {% if page_object %}
+                    <div class="d-flex justify-content-end my-2 gap-2">
+                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                            hx-get="{% url 'products:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                        {% if request.user.is_superuser %}
+                            <button
+                                type="button"
+                                class="btn btn-secondary rounded"
+                                data-bs-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                            ><i class="bi bi-download"></i></button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'products:export_products_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a>
+                                <a class="dropdown-item" href="{% url 'products:export_products_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
                 <table class="table table-hover" id="table1">
                     <thead>
                         <tr>
