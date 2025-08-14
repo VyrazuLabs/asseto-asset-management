@@ -18,10 +18,15 @@
         </div>
     </div>
     <section class="section">
-        <div>
-            <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
+            </div>
+            <div>
+                <a href="{% url 'assets:details' asset.id %}" class="btn btn-sm btn-outline-info my-3">Back to Asset Detail</a>
+            </div>
         </div>
-        <form class="form row" method="POST" action="{{request.path}}" novalidate>
+        <form class="form row" method="POST" action="{{request.path}}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
             <div class="card">
                 <div class="card-header">
@@ -120,6 +125,25 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                            <div class="col-md-12">
+                            <label>Update/Add Images</label>
+                            {{ image_form.image }}
+                            {% for error in image_form.image.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                {% for img in asset_images %}
+                  <div class="col-auto text-center">
+                    <img src="{{ img.image.url }}" style="width:100px;height:auto;margin-bottom:3px;" alt="Asset Image">
+                    <br>
+                    <input type="checkbox" name="delete_image_ids" value="{{ img.id }}">
+                    <label>Remove</label>
+                  </div>
+                {% endfor %}
+                </div>
                 </div>
             </div>
             <div class="card">
@@ -137,7 +161,7 @@
                             </div>
                             <div class="col-5">
                                 <div class="form-group">
-                                    <!-- <label for="last-name-column">Specification Value</label> -->
+                                    <!-- <label for="last-naimageme-column">Specification Value</label> -->
                                     <input type="text" id="last-name-column" class="form-control"
                                         placeholder="Specification Value" name="specifications_value" autocomplete="off" value="{{assetSpecification.value}}">
                                 </div>
@@ -203,8 +227,6 @@
                                 </div>
                             </div>   
                         </div>
-                    </div>
-
                 </div>
             </div>
         </form>

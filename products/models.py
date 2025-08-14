@@ -6,7 +6,6 @@ from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
 
-# Create your models here.
 
 def path_and_rename(instance, filename):
     upload_to =  'product/'
@@ -23,6 +22,8 @@ class Product(TimeStampModel, SoftDeleteModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     product_picture = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
+    model=models.CharField(max_length=100,  blank=True, null=True)
+    eol=models.IntegerField(blank=True,null=True)
     description = models.TextField(blank=True, null=True)
     product_category = models.ForeignKey(ProductCategory, models.DO_NOTHING, blank=True, null=True)
     product_type = models.ForeignKey(ProductType, models.DO_NOTHING, blank=True, null=True)
@@ -31,3 +32,8 @@ class Product(TimeStampModel, SoftDeleteModel):
 
     def __str__(self):
         return self.name
+
+class ProductImage(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)

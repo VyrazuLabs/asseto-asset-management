@@ -36,9 +36,12 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
-
+    print("here above ==>", request.user.organization)
     all_product_type_list = ProductType.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
+    print("here is product types",all_product_type_list.values_list("id", flat=True))
+
+
     paginator = Paginator(all_product_type_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)

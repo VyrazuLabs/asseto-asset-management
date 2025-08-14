@@ -17,10 +17,11 @@
     >
         {% csrf_token %}
         <div class="modal-body">
+
             <div class="form-group">
-                <label>Product Category</label>
-                {{form.product_category}} 
-                {% for error in form.product_category.errors %}
+                <label>Product Name</label>
+                {{form.name}} 
+                {% for error in form.name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
@@ -33,11 +34,21 @@
                 {% endfor %}
             </div>
 
-            <div class="form-group">
-                <label>Product Name</label>
-                {{form.name}} 
-                {% for error in form.name.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+            <!-- Product Category -->
+            <div class="form-group mb-2">
+                <label>Product Category</label>
+                {{ form.product_category }}
+                {% for error in form.product_category.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <!-- Product Sub Category -->
+            <div class="form-group mb-2">
+                <label>Product Sub Category</label>
+                {{ form.product_sub_category }}
+                {% for error in form.product_sub_category.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
 
@@ -49,6 +60,24 @@
                 {% endfor %}
             </div>
 
+            <!-- Model -->
+            <div class="form-group mb-2">
+                <label>Model</label>
+                {{ form.model }}
+                {% for error in form.model.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <!-- Product EOL -->
+            <div class="form-group mb-2">
+                <label>Product EOL</label>
+                {{ form.eol }}
+                {% for error in form.eol.errors %}
+                <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
+
             <div class="form-group">
                 <label>Description</label>
                 {{form.description}}
@@ -56,16 +85,15 @@
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
-
-            <div class="d-flex justify-content-between me-4">
-                <div class="form-group" style="width: 50%">
-                    <label>Product Image</label>
-                    {{form.product_picture}}
-                    {% for error in form.product_picture.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+            <div class="col-md-6 col-12">
+                <div class="form-group">
+                    <label for="company-column">Add Product Image</label>
+                    {{image_form.image}}
+                    {% for error in image_form.image.errors %}
+                    <small class="text-danger mb-3">{{ error }}</small>
                     {% endfor %}
                 </div>
-                <div class="form-group" id="imagePreview"></div>
+                <div class="form-group rounded ml-2" id="imagePreview"></div>                    
             </div>
         </div>
 
@@ -88,14 +116,7 @@
         </div>
     </form>
     <script>
-        htmx.on("htmx:beforeSwap", (e) => {
-            if (
-                e.detail.target.id == "add-product-modal-content" &&
-                !e.detail.xhr.response
-            ) {
-                location.reload();
-            }
-        });
+        // Image Preview
         function filePreview(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -110,9 +131,43 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
         $("#inputFile").change(function () {
             $("#imagePreview img").remove();
             filePreview(this);
         });
+
+        // HTMX hook to reload page on successful form submission
+        htmx.on("htmx:beforeSwap", (e) => {
+            if (
+                e.detail.target.id == "add-product-modal-content" &&
+                !e.detail.xhr.response
+            ) {
+                location.reload();
+            }
+        });
+
+        // HTMX trigger on category change to fetch subcategories
+        document.querySelector('#id_product_category')?.addEventListener('change', function () {
+            const categoryId = this.value;
+            const subCatSelect = document.querySelector('#id_product_sub_category');
+
+            // Reset the subcategory dropdown
+            subCatSelect.innerHTML = '<option value="">Loading...</option>';
+
+            fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">--SELECT--</option>';
+                    data.forEach(function (item) {
+                        options += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    subCatSelect.innerHTML = options;
+                })
+                .catch(() => {
+                    subCatSelect.innerHTML = '<option value="">Error loading</option>';
+                });
+        });
     </script>
+
 </div>

@@ -89,3 +89,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
 
     def __str__(self):
         return f'{self.full_name} ({self.role})'
+    
+
+class SeedFlag(models.Model):
+    seeded=models.BooleanField(default=False)
+
+    def __str__(self):
+        return "Seed already done" if self.seeded else "Seed not done yet"

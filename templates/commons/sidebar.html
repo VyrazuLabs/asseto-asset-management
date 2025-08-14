@@ -125,6 +125,13 @@
                                 <a href="{% url 'dashboard:product_category_list' %}">Product Categories</a>
                             </li>
                         {% endif %}
+
+                        {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
+                            <li class="submenu-item {% if submenu == 'Asset Status' %}active{% endif %}">
+                                <a href="{% url 'assets:asset_status_list' %}">Asset Status</a>
+                            </li>
+                        {% endif %}
+                        
                         {% if request.user.is_superuser %}
                             <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
                                 <a href="{% url 'roles:list' %}">Roles</a>

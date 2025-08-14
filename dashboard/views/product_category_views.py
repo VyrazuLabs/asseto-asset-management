@@ -38,7 +38,8 @@ def manage_access(user):
 def product_category_list(request):
 
     all_product_category_list = ProductCategory.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    organization=request.user.organization, parent__isnull=True).order_by('-created_at')
+    
     paginator = Paginator(all_product_category_list,
                           PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
