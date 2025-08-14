@@ -176,6 +176,7 @@
         // HTMX trigger on category change to fetch subcategories
         document.querySelector('#id_product_category')?.addEventListener('change', function () {
             const categoryId = this.value;
+            console.log('Selected category ID:', categoryId);
             const subCatSelect = document.querySelector('#id_product_sub_category');
  
             // Reset the subcategory dropdown

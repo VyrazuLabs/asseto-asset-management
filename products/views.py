@@ -164,7 +164,7 @@ def update_product(request, id):
 
     if request.method == "POST":
         form = AddProductsForm(request.POST, request.FILES,
-                               instance=product, organization=request.user.organization)
+        instance=product, organization=request.user.organization)
         if form.is_valid():
             form.save()
             messages.success(request, 'Product updated successfully')
