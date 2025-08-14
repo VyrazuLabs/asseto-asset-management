@@ -3,7 +3,7 @@ from django.http import HttpResponse
 import csv
 from io import BytesIO
 from xhtml2pdf import pisa
-
+from assets.models import Asset
 
 def render_to_csv(context_dict={}):
     response = HttpResponse(content_type='text/csv')
@@ -22,3 +22,11 @@ def render_to_pdf(template_src, context_dict={}):
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
+
+def get_count_of_assets(request,vendor_id):
+    """
+    Returns the count of assets for the given organization.
+    """
+    get_count=Asset.objects.filter(organization=request.user.organization,vendor=vendor_id, is_deleted=False).count()
+    print("get_count", get_count)
+    return get_count

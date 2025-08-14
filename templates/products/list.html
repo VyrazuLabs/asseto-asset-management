@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="page-title">
@@ -70,6 +71,8 @@
                             <th>Product Name</th>
                             <th>Product Type</th>
                             <th>Product Category</th>
+                            <th>Total Assets</th>
+                            <th>Avialable Assets</th>
                             <th>Status</th>
                             {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
                                 <th>Actions</th>
@@ -81,7 +84,15 @@
                          {% for products in page_object %}
                             <tr>
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>{% if products.product_picture %} <img src="{{products.product_picture.url}}" class="rounded" width="100" height="80" /> {% else %} Not Uploaded {% endif %}</td>
+                                <td>
+                                    {% with img=product_images|get_item:products.id %}
+                                        {% if img %}
+                                            <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
                                 <td>{{products.name}}</td>
                                 <td>
                                     {{products.product_type}}       
@@ -90,10 +101,17 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {{products.product_category}}
+                                    {{products.product_category.parent}}
                                     {% if products.product_category.is_deleted %}
                                         <i class="bi bi-exclamation-triangle text-warning" title="Product category is deleted, please update."></i>
                                     {% endif %}       
+                                </td>
+                                <td>
+                                    {{products.total_assets}}    
+                                </td>
+
+                                <td>
+                                    {{products.available_assets}}    
                                 </td>
                                 <td>
                                     {% if request.user.is_superuser %}

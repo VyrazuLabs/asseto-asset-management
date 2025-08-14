@@ -15,6 +15,7 @@ from vendors.utils import render_to_csv, render_to_pdf
 from django.db.models import Q
 from django.contrib.auth.decorators import permission_required
 from datetime import date
+from assets.models import Asset
 today = date.today()
 
 PAGE_SIZE = 10
@@ -68,7 +69,26 @@ def details(request, id):
         User.undeleted_objects, pk=id, organization=request.user.organization)
 
     history_list = User.history.all()
-    paginator = Paginator(history_list, 5, orphans=1)
+    paginator = Paginator(history_list, 5, orphans=1)   
+    assigned_assets=[]
+    get_assigned_assets = AssignAsset.objects.filter(user=user).values()
+    for it in get_assigned_assets:
+        get_obj={}
+        get_asset=Asset.objects.filter(id=it['asset_id']).values()
+        print("get_asset",get_asset.values())
+        # print("chc",get_asset[0]['name'])
+        # assigned_assets.append(get_asset[0]['name'])
+        for it in get_asset:
+            print("it",it)
+            get_obj['asset_name']=it['name']
+            get_obj['serial_no']=it['serial_no']
+            get_obj['id']=it['id']
+        assigned_assets.append(get_obj)
+    # if get_assigned_assets.exists():
+    #     assigned_assets.append(get_assigned_assets)
+    # else:
+    #     assigned_assets = None
+    print("-------------------------",assigned_assets)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
@@ -76,6 +96,7 @@ def details(request, id):
         'sidebar': 'users',
         'user': user,
         'page_object': page_object,
+        'assigned_assets': assigned_assets,
         'title': 'User - Details'
     }
     return render(request, 'users/detail.html', context)
