@@ -1,0 +1,240 @@
+<style>
+    .scrollable-table {
+        max-height: 900px;
+        overflow-y: auto;
+        display: block;
+    }
+
+    .scrollable-table table {
+        margin-bottom: 0;
+    }
+
+    .scrollable-table::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    .scrollable-table::-webkit-scrollbar-track {
+        background: #1a1a1a;
+        border-radius: 8px;
+    }
+
+    .scrollable-table::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #435ebe, #435ebe);
+        border-radius: 8px;
+        border: 2px solid #111;
+    }
+
+    .scrollable-table::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #435ebe, #435ebe);
+    }
+</style>
+
+{% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>Search Results</h3>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Search</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+
+        {% if products %}
+        <div class="card">
+            <div class="card-body">
+                <h4>Products</h4>
+                <div class="scrollable-table">
+                    <table class="table table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Product Name</th>
+                                <th>Product Type</th>
+                                <th>Product Category</th>
+                                <th>Total Assets</th>
+                                <th>Avialable Assets</th>
+                                <th>Status</th>
+                                {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
+                                <th>Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.product_type }}</td>
+                                <td>{{ product.product_category }}</td>
+                                <td>{{ product.total_assets }}</td>
+                                <td>{{ product.available_assets }}</td>
+                                <td>
+                                    {% if request.user.is_superuser %}
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input"
+                                               hx-post="{% url 'products:status' product.id %}" 
+                                               hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                               type="checkbox" 
+                                               {% if product.status %} checked {% endif %}
+                                               {{ products.status }}
+                                               style="cursor: pointer;">
+                                    </div>
+                                    {% else %}
+                                        {% if product.status %} Active {% else %} Inactive {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Actions">
+                                        {% if perms.authentication.view_product %}
+                                        <a href="{% url 'products:details_product' product.id %}" 
+                                           class="btn btn-success d-flex align-items-center justify-content-center"
+                                           style="width: 30px; height: 30px;">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if perms.authentication.edit_product %}
+                                        <button type="button" 
+                                                class="btn btn-info d-flex align-items-center justify-content-center"
+                                                hx-get="{% url 'products:update_product' product.id %}" 
+                                                hx-target="#update-product-modal-content"
+                                                data-bs-toggle="modal" data-bs-target="#update-product-modal"
+                                                style="width: 30px; height: 30px;">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+
+                                        {% endif %}
+
+                                        {% if perms.authentication.delete_product %}
+                                        <form action="{% url 'products:delete_product' product.id %}" method="post" 
+                                              onsubmit="return confirm('Are you sure you want to delete this?')"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="btn btn-danger d-flex align-items-center justify-content-center"
+                                                    style="width: 30px; height: 30px;">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if assets %}
+        <div class="card">
+            <div class="card-body">
+                <h4>Assets</h4>
+                <div class="scrollable-table">
+                    <table class="table pt-4 text-center">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Asset Name</th>
+                                <th>Serial No.</th>
+                                <th>Product Type</th>
+                                <th>Product</th>
+                                <th>Vendor</th>
+                                <th>Current State</th>
+                                {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
+                                <th>Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asset in assets %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ asset.name }}</td>
+                                <td>{{ asset.serial_no }}</td>
+                                <td>{{ asset.product.product_type }}</td>
+                                <td>{{ asset.product.name }}</td>
+                                <td>{{ asset.vendor.name }}</td>
+                                <td>
+                                    {% if asset.is_assigned %}
+                                        In Use
+                                    {% else %}
+                                        In Store
+                                    {% endif %}
+                                </td>
+                                {{ active_users }}
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="Asset Actions">
+                                        {% if perms.authentication.view_asset %}
+                                        <a href="{% url 'assets:details' asset.id %}" 
+                                           class="btn btn-success d-flex align-items-center justify-content-center"
+                                           style="width: 30px; height: 30px;">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if perms.authentication.edit_asset %}
+                                        <a href="{% url 'assets:update' asset.id %}" 
+                                           class="btn btn-info d-flex align-items-center justify-content-center"
+                                           style="width: 30px; height: 30px;">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        {% endif %}
+
+                                        {% if perms.authentication.delete_asset %}
+                                        <form action="{% url 'assets:delete' asset.id %}" method="post" 
+                                              onsubmit="return confirm('Are you sure you want to delete this?')"
+                                              style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="btn btn-danger d-flex align-items-center justify-content-center"
+                                                    style="width: 30px; height: 30px;">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not products and not assets %}
+        <div class="alert alert-warning" role="alert">
+            No matching results found.
+        </div>
+        {% endif %}
+
+    </section>
+</div>
+
+<div class="modal fade text-left" id="update-product-modal" tabindex="-1" role="dialog"
+     aria-labelledby="updateProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div id="update-product-modal-content" class="modal-content" hx-target="this">
+            <!-- HTMX will load the product update form here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
