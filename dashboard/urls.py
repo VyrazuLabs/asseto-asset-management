@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from .views import product_sub_category_views
-
+from .views import global_search_views
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -52,4 +52,5 @@ urlpatterns = [
     path('product-sub-categories/status/<uuid:id>', product_sub_category_views.product_sub_category_status, name='product_sub_category_status'),
     path('product-sub-categories/search/<str:page>', product_sub_category_views.search_product_sub_category, name='search_product_sub_category'),
     path('get-subcategories/',product_sub_category_views.get_subcategories, name='get_subcategories'),
+     path('global-search/', global_search_views.global_search, name='global_search'),
 ]
