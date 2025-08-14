@@ -3,7 +3,7 @@ from dashboard.models import ProductType
 from authentication.models import SeedFlag
 
 def seed_asset_statuses(organization=None):
-    default_statuses = ['Broken ', ' Ready To Deploy ', 'Assigned', 'Lost/Stolen','Repair Required','Out for Repair']
+    default_statuses = ['Broken ', ' Ready To Deploy ', 'Assigned', 'Lost/Stolen','Repair Required','Out for Repair','Available']
     default_types=['Consumeables','Accesories']
     for status in default_statuses:
             AssetStatus.objects.get_or_create(
@@ -26,7 +26,7 @@ def seed_asset_statuses(organization=None):
 
 
 def seed_asset_statuses(asset=None, product=None, organization=None):
-    default_statuses = ['Broken ', ' Ready To Deploy ', 'Assigned', 'Lost/Stolen','Repair Required','Out for Repair']
+    default_statuses = ['Broken ', ' Ready To Deploy ', 'Assigned', 'Lost/Stolen','Repair Required','Out for Repair','Available']
     default_types=['Consumeables','Accesories']
     if asset:
         for status in default_statuses:
