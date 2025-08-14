@@ -227,25 +227,6 @@
                                 </div>
                             </div>   
                         </div>
-                    </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                            <label>Update/Add Images</label>
-                            {{ image_form.image }}
-                            {% for error in image_form.image.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="row my-3">
-                {% for img in asset_images %}
-                  <div class="col-auto text-center">
-                    <img src="{{ img.image.url }}" style="width:100px;height:auto;margin-bottom:3px;" alt="Asset Image">
-                    <br>
-                    <input type="checkbox" name="delete_image_ids" value="{{ img.id }}">
-                    <label>Remove</label>
-                  </div>
-                {% endfor %}
                 </div>
             </div>
         </form>

@@ -16,6 +16,7 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from dashboard.models import CustomField
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -35,7 +36,9 @@ def release_asset(request, id):
     if request.method == 'POST':
         asset = get_object_or_404(Asset, pk=id)
         # Assumes status 3 means "Ready To Deploy"
-        asset.status = 1
+        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
+        asset.asset_status=set_asset
+        # asset.status = 1
         asset.save()
         messages.success(request, f"Asset '{asset.name}' has been released and is now Ready To Deploy.")
     return redirect('assets:list')
@@ -59,7 +62,10 @@ def assign_assets(request, id):
 
         # Mark asset as assigned
         asset.is_assigned = True
-        asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
+        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Assigned').first()
+        asset.asset_status=set_asset
+        print("set_asset",set_asset.id)
+        # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
 
         messages.success(request, f"Asset assigned to user.")
@@ -177,7 +183,6 @@ def listed(request):
 @login_required
 @permission_required('authentication.view_asset')
 def details(request, id):
-
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
@@ -197,9 +202,16 @@ def details(request, id):
     paginator = Paginator(history_list, 5, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    get_custom_data=[]
+    get_data=CustomField.objects.filter(object_id=asset.id)
+    for it in get_data:
+        obj={}
+        obj['field_name']=it.field_name
+        obj['field_value']=it.field_value
+        get_custom_data.append(obj)
+    print("get_custom_data",get_custom_data)
     context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date}
+               'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
     return render(request, 'assets/detail.html', context=context)
 
 
@@ -300,30 +312,79 @@ def update(request, id):
 @permission_required('authentication.add_asset')
 def add(request):
     if request.method == 'POST':
-        form = AssetForm(request.POST)
-
+        form = AssetForm(request.POST, organization=request.user.organization_id)
         image_form = AssetImageForm(request.POST, request.FILES)
+
         if form.is_valid() and image_form.is_valid():
+            # ------- Save asset -------
             asset = form.save(commit=False)
             asset.organization = request.user.organization
+            set_asset_status = AssetStatus.objects.filter(
+                organization=request.user.organization,
+                name='Available'
+            ).first()
+            asset.asset_status = set_asset_status
             asset.save()
-
             form.save_m2m()
-            # product = form.save()
-            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+
+            # ------- Save images -------
+            for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
+
+            # ------- Save values for predefined custom fields -------
+            for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip() != "":
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=asset.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        pass
+
+            # ------- Save newly created custom fields from dynamic add section -------
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            print(asset.id)
+
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=asset.id,
+                        field_type='text',  # Defaulting new ones as text unless field type select is added
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='asset',
+                        organization=request.user.organization
+                    )
+
             return redirect('assets:list')
+
     else:
         form = AssetForm(organization=request.user.organization_id)
         image_form = AssetImageForm()
 
+    # Fetch existing predefined custom fields for assets
+    custom_fields = CustomField.objects.filter(
+        entity_type='asset',
+        organization=request.user.organization
+    )
+
     context = {
         'form': form,
         'image_form': image_form,
+        'custom_fields': custom_fields,
         'title': 'Add Asset',
     }
     return render(request, 'assets/add.html', context)
-
 
 
 @login_required
@@ -442,7 +503,9 @@ def delete_assign(request, id):
             AssignAsset, pk=id, asset__organization=request.user.organization)
         assignAsset.delete()
         assignAsset.asset.is_assigned = False
-        assignAsset.asset.status = 1  # Assuming 1 is 'Available'
+        # assignAsset.asset.status = 1  # Assuming 1 is 'Available'
+        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
+        assignAsset.asset.asset_status=set_asset
         assignAsset.asset.save()
         messages.success(request, 'Asset unassigned successfully')
     return redirect('assets:assigned_list')
@@ -474,16 +537,19 @@ def change_status(request, id):
             except Asset.DoesNotExist:
                 return JsonResponse({'error': 'Asset not found'}, status=404)
             try:
+                print("Runing")
                 data = json.loads(request.body)
-                new_status = int(data.get('status'))
-            except (ValueError, KeyError, json.JSONDecodeError):
+                new_status = (data.get('status'))
+            except (ValueError, KeyError, json.JSONDecodeError)as e:
+                print("not woring")
+                print("Error", str(e))
                 return HttpResponseBadRequest('Invalid data')
 
-            if new_status not in dict(Asset.STATUS_CHOICES).keys():
-                return JsonResponse({'error': 'Invalid status'}, status=400)
-
-            asset.status = new_status
-            if asset.status != 0:  # If status is 'Assigned'
+            # if new_status not in dict(Asset.STATUS_CHOICES).keys():
+            #     return JsonResponse({'error': 'Invalid status'}, status=400)
+            get_status=AssetStatus.objects.filter(organization=request.user.organization, name=new_status).first()
+            asset.asset_status = get_status
+            if asset.asset_status != "Available":  # If status is 'Assigned'
                 asset.is_assigned = False
                 # delete the assigned asset from the asigned asset list
                 AssignAsset.objects.filter(asset=asset).delete()
