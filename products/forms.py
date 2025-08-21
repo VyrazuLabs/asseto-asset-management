@@ -55,7 +55,8 @@ class AddProductsForm(forms.ModelForm):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['product_category'].queryset = ProductCategory.undeleted_objects.filter(
-            organization=self._organization, status=True, parent__isnull=True)
+            organization=self._organization, status=True, parent__name='Root')
+        
         self.fields['product_type'].queryset = ProductType.undeleted_objects.filter(
             organization=self._organization, status=True)
         
