@@ -16,6 +16,13 @@
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
             </div>
+            <div class="form-group">
+                <label>Parent Name</label>
+                {{form.parent}} 
+                {% for error in form.parent.errors %}
+                    <small class="text-danger mb-3">{{ error }}</small>
+                {% endfor %}
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-sm btn-light-secondary"

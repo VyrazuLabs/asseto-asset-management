@@ -16,7 +16,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
 from dashboard.forms import LocationForm, AddressForm
-from dashboard.models import Location, Address,ProductType
+from dashboard.models import Location, Address,ProductType,ProductCategory
 from django.contrib.auth import get_user_model
 from products.models import Product
 from vendors.models import Vendor
@@ -26,6 +26,7 @@ from django.dispatch import receiver
 from assets.seeders import seed_asset_statuses
 from assets.models import AssignAsset
 from django.views.decorators.cache import never_cache
+from dashboard.views.seeders import seed_parent_category
 
 User = get_user_model()
 
@@ -118,6 +119,10 @@ def user_login(request):
                         seed_asset_statuses(asset=True)
                     if not ProductType.objects.filter(can_modify=False).first():
                         seed_asset_statuses(product=True)
+                    if not ProductCategory.objects.filter(name='Root').exists():
+                        seed_parent_category(category=True)
+                    else:
+                        print('seed fail for category')
 
                     login(request, user)
                     messages.success(request,  f'Welcome, {user.full_name}')
