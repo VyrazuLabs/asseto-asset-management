@@ -118,6 +118,8 @@ class ProductCategory(TimeStampModel, SoftDeleteModel):
     history = HistoricalRecords()
 
     def __str__(self):
+        if self.name is None:
+            return None
         return self.name
 
 

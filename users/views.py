@@ -69,7 +69,7 @@ def details(request, id):
         User.undeleted_objects, pk=id, organization=request.user.organization)
 
     history_list = User.history.all()
-    paginator = Paginator(history_list, 5, orphans=1)   
+    paginator = Paginator(history_list, 10, orphans=1)   
     assigned_assets=[]
     get_assigned_assets = AssignAsset.objects.filter(user=user).values()
     for it in get_assigned_assets:
