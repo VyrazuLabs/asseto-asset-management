@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-
+from django.http import JsonResponse
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -38,10 +38,10 @@ def manage_access(user):
 def product_category_list(request):
 
     all_product_category_list = ProductCategory.undeleted_objects.filter(
-    organization=request.user.organization, parent__isnull=True).order_by('-created_at')
+    organization=request.user.organization).order_by('-created_at').exclude(name='Root')
     
     paginator = Paginator(all_product_category_list,
-                          PAGE_SIZE, orphans=ORPHANS)
+    PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
@@ -115,7 +115,7 @@ def update_product_category(request, id):
     product_category = get_object_or_404(
         ProductCategory.undeleted_objects, pk=id, organization=request.user.organization)
     form = ProductCategoryForm(request.POST or None, instance=product_category,
-                               organization=request.user.organization,  pk=product_category.id)
+    organization=request.user.organization,  pk=product_category.id)
 
     if request.method == "POST":
 
@@ -152,3 +152,13 @@ def search_product_category(request, page):
     page_number = page
     page_object = paginator.get_page(page_number)
     return render(request, 'dashboard/product_category/product-categories-data.html', {'page_object': page_object})
+
+
+def get_subcategories(request):
+    category_id = request.GET.get('category_id')
+    if category_id:
+        subcategories = ProductCategory.objects.filter(parent_id=category_id)
+        data = [{'id': sub.id, 'name': sub.name} for sub in subcategories]
+    else:
+        data = []
+    return JsonResponse(data, safe=False)
