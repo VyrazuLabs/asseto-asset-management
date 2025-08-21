@@ -89,7 +89,6 @@ def search(request, page):
                 notification__notification_title__icontains=search_text) | Q(notification__notification_text__icontains=search_text)
             )).order_by('-notification__created_at')[:10]
         })
-
     notification_list = UserNotification.objects.filter(
         user=request.user).order_by('-notification__created_at')
     paginator = Paginator(notification_list, PAGE_SIZE, orphans=ORPHANS)

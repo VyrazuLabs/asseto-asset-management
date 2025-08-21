@@ -97,6 +97,35 @@
                         {% endfor %}
                     </div>
                 </div>
+                {% if get_custom_data %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6>Custom Fields</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for cf in get_custom_data %}
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <th >{{cf.field_name}}</th>
+                                            <td>{{cf.field_value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th>{{ cf.field_name }}</th>
+                            <td>{{ cf.field_value }}</td>
+                        </tr>
+                    </tbody>
+                </table> 
+                {% endif %}
             </div>
         </div>
         <div class="card">

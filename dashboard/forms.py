@@ -10,15 +10,15 @@ class LocationForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Office Name'}
     ))
-    contact_person_name = forms.CharField(required=True, widget=forms.TextInput(
+    contact_person_name = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class':  'form-control',
                'placeholder':  'Contact Person Name'}
     ))
-    contact_person_email = forms.EmailField(required=True, widget=forms.EmailInput(
+    contact_person_email = forms.EmailField(required=False, widget=forms.EmailInput(
         attrs={'autocomplete': 'off', 'class':  'form-control',
                'placeholder':  'Contact Person Email'}
     ))
-    contact_person_phone = forms.IntegerField(required=True, widget=forms.NumberInput(
+    contact_person_phone = forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Contact Person Phone'}
     ))
@@ -43,27 +43,27 @@ class LocationForm(forms.ModelForm):
 
 class AddressForm(forms.ModelForm):
 
-    address_line_one = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_one = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Address Line 1', 'rows': '2'}
     ))
-    address_line_two = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_two = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Address Line 2', 'rows': '2'}
     ))
-    country = forms.CharField(required=True, widget=forms.TextInput(
+    country = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'Country'}
     ))
-    state = forms.CharField(required=True, widget=forms.TextInput(
+    state = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'State'}
     ))
-    city = forms.CharField(required=True, widget=forms.TextInput(
+    city = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'City'}
     ))
-    pin_code = forms.CharField(required=True, widget=forms.TextInput(
+    pin_code = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Zip Code'}
     ))

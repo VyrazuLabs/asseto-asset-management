@@ -143,6 +143,33 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <div>
+                        {% if custom_fields %}
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6>Custom Fields</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        {% for cf in custom_fields %}
+                                            <div class="col-md-6 col-12">
+                                                <div class="form-group">
+                                                    <label>{{ cf.field_name }}</label>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        name="custom_field_{{ cf.entity_id }}"
+                                                        value="{{ cf.field_value|default_if_none:'' }}"
+                                                        autocomplete="off"
+                                                        placeholder="{{ cf.field_name }}"
+                                                    >
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="card-header">

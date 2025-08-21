@@ -82,7 +82,35 @@
                 </div>
             </div>
         </div>
-
+        {% if custom_fields %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6>Custom Fields</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for cf in custom_fields %}
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <th >{{cf.field_name}}</th>
+                                    <td>{{cf.field_value}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <table class="table table-borderless">
+            <tbody>
+                <tr>
+                    <th>{{ cf.field_name }}</th>
+                    <td>{{ cf.field_value }}</td>
+                </tr>
+            </tbody>
+        </table> 
+        {% endif %}
         <div class="card">
             <div class="card-header">
                 <h4>Asset List</h4>
@@ -163,8 +191,6 @@
                             </ul>
                         </nav>
                     {% endif %}
-
-
                 </div>
             </div>
         </div>
