@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from decouple import config 
-
+# import pysqlite3 as sqlite3
 import pymysql
 pymysql.install_as_MySQLdb()
 
@@ -35,8 +35,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
-# ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
 
@@ -116,6 +115,12 @@ DATABASES = {
         },
     }
 }
+# DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.sqlite3',
+    #         'NAME': BASE_DIR / 'db.sqlite3',
+    #     }
+    # }
 
 
 # Password validation
