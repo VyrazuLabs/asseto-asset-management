@@ -20,7 +20,7 @@ class AssetForm(forms.ModelForm):
     # )
     status = forms.ModelChoiceField(
         required=False,
-        queryset=AssetStatus.objects.all().values_list('name', flat=True),
+        queryset=AssetStatus.undeleted_objects.all().values_list('name', flat=True),
         widget=forms.Select(
             attrs={'class': 'form-select'}
         )

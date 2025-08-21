@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from assets.models import Asset
 from vendors.utils import get_count_of_assets
-
+from dashboard.models import CustomField
 from datetime import date
 today = date.today()
 
@@ -102,7 +102,7 @@ def details(request, id):
         Vendor.undeleted_objects, pk=id, organization=request.user.organization)
     address = Address.objects.get(id=vendor.address.id)
     
-    assets=Asset.objects.filter(vendor=vendor)
+    assets=Asset.undeleted_objects.filter(vendor=vendor)
     asset_page_param = 'asset_page'
     assets_paginator=Paginator(assets,10,orphans=1)
     assets_page_number=request.GET.get('asset_page')
@@ -113,9 +113,16 @@ def details(request, id):
     paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    get_custom_data=[]
+    get_data=CustomField.objects.filter(object_id=vendor.id)
+    for it in get_data:
+        obj={}
+        obj['field_name']=it.field_name
+        obj['field_value']=it.field_value
+        get_custom_data.append(obj)
+    print("get_custom_data",get_custom_data)
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
-    'address': address, 'title': 'Vendor - Details','assets_page_object':assets_page_object}
+    'address': address, 'title': 'Vendor - Details','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
     return render(request, 'vendors/detail.html', context=context)
 
 
@@ -127,16 +134,24 @@ def update_vendor(request, id):
     address = Address.objects.get(id=vendor.address.id)
     vendor_form = VendorForm(instance=vendor)
     address_form = AddressForm(instance=address)
+    custom_fields = CustomField.objects.filter(entity_type='asset', object_id=vendor.id, organization=request.user.organization)
     if request.method == "POST":
         vendor_form = VendorForm(request.POST, instance=vendor)
         address_form = AddressForm(request.POST, instance=address)
         if vendor_form.is_valid() and address_form.is_valid():
             vendor_form.save()
             address_form.save()
+            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=vendor.id, organization=request.user.organization)
+            for cf in custom_fields:
+                key = f"custom_field_{cf.entity_id}"
+                new_val = request.POST.get(key, "")
+                if new_val != cf.field_value:
+                    cf.field_value = new_val
+                    cf.save()
             messages.success(request, 'Vendor updated successfully')
             return redirect('vendors:list')
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
-               'address_form': address_form, 'vendor': vendor, 'title': 'Vendor - Update'}
+               'address_form': address_form, 'vendor': vendor, 'title': 'Vendor - Update','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
 
 
