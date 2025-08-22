@@ -61,20 +61,13 @@ class UserForm(forms.ModelForm):
     
     password1=forms.CharField(
         required=False,
-        widget=forms.TextInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Name', 'autocomplete': 'off'}
-    )
+        widget=forms.PasswordInput
     )
 
     password2=forms.CharField(
         required=False,
-        widget=forms.TextInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Name', 'autocomplete': 'off'}
+        widget=forms.PasswordInput
     )
-    )
-
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
