@@ -116,7 +116,14 @@ def add(request):
         address_form = AddressForm(request.POST)
 
         if form.is_valid() and address_form.is_valid():
+            print("valid",form.data)
             user = form.save(commit=False)
+            password1 = form.cleaned_data.get('password1', '')
+            password2 = form.cleaned_data.get('password2', '')
+
+            if password1 and password1 == password2:
+                user.set_password(password1)
+                print("password",user)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
