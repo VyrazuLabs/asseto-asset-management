@@ -198,17 +198,19 @@
                 </div>
             {% endif %}
             </div>
+            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
             <h3>Asset Graphs</h3>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                 <div style="border-radius: 10px;">
-                    <div id="donutchart" style="width: 700px; height: 500px; background-color: #a8d2fc; border-radius: 10px;"></div>
+                    <div id="donutchart" style="width: 700px; height: 500px; background-color: #1e1e2d; border-radius: 10px;"></div>
                 </div>
                 <div style="border-radius: 10px;">
-                    <div id="donutchartt" style="width: 700px; height: 500px; background-color: #607080; border-radius: 10px;"></div>
+                    <div id="donutchartt" style="width: 700px; height: 500px; background-color: #1e1e2d; border-radius: 10px;"></div>
                 </div>
             </div>
             <br>
             <br>
+            {% endif %}
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
             <div class="row">
                 <div class="page-heading">
@@ -383,7 +385,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{location.address}}
+                                                        {{location.address.address_line_one}}
                                                 </td>                                
                                                 <td class="col-auto">
                                                     <p class="mb-0">
@@ -452,13 +454,22 @@
 
   function drawChart(chartData) {
     var data = google.visualization.arrayToDataTable(chartData);
-
+    
     var options = {
-      title: 'Assets by Status',
-      pieHole: 0.4,
-      colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-      backgroundColor: '#607080',
-      chartArea: { backgroundColor: 'transparent' }
+        title: 'Assets by Assigned Status',
+        pieHole: 0.4,
+        titleTextStyle: {
+            color: 'white',
+        },
+        legend: {
+            textStyle: { color: 'white' } // Sets legend label color
+        },
+        pieSliceTextStyle: {
+            color: 'white',
+        },
+        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+        backgroundColor: 'transparent',  // transparent to allow corners to show
+        chartArea: { backgroundColor: 'transparent' }
     };
 
     var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
@@ -488,13 +499,25 @@
     var data = google.visualization.arrayToDataTable(chartData);
 
     var options = {
-      title: 'Assets by Assigned Status',
-      pieHole: 0.4,
-      colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-      backgroundColor: '#607080',
-      
-      chartArea: { backgroundColor: 'transparent' }
+    title: 'Assets by Assigned Status',
+    pieHole: 0.4,
+    titleTextStyle: {
+        color: 'white',
+    },
+    legend: {
+        textStyle: { color: 'white' } // Sets legend label color
+    },
+    pieSliceTextStyle: {
+        color: 'white',
+    },
+    colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+    titleTextStyle: {
+            color: 'white',
+          },
+    backgroundColor: 'transparent',  
+    chartArea: { backgroundColor: 'transparent' }
     };
+
 
     var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
     chart.draw(data, options);
