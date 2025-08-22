@@ -111,8 +111,7 @@ def add(request):
     if request.method == "POST":
         create_all_perm_role()
         form = UserForm(request.POST, request.FILES,
-                        organization=request.user.organization)
-        print("user",form.data)
+        organization=request.user.organization)
         address_form = AddressForm(request.POST)
 
         if form.is_valid() and address_form.is_valid():
