@@ -2,7 +2,6 @@
 {% block content %}
 {% load static %}
 
-
 <section class="section">
 
         {% if products %}
@@ -175,7 +174,7 @@
         {% endif %}
 
         {% if users %}
-            {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
+            {% if not request.user.is_superuser %}
                 <div class="card">
                     <div class="card-body">
                         <h4>Users</h4>
@@ -268,7 +267,7 @@
         {% endif %}
 
         {% if not products and not assets and not users%}
-        <div class="alert alert-warning" role="alert">
+        <div class="alert" role="alert">
             No matching results found.
         </div>
         {% endif %}

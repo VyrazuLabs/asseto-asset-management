@@ -1,3 +1,10 @@
+<style>
+    .highlight {
+        background-color: #435ebe;
+        color: white;
+    }
+</style>
+
 <footer>
     <div class="footer clearfix mb-0 text-muted">
         <div class="float-start">
@@ -30,10 +37,34 @@
         sessionStorage.setItem('searchOriginPage', window.location.href);
     }
 
+    function highlightText(container, text) {
+        if (!text) return;
+
+        const regex = new RegExp(`(${text})`, 'gi');
+
+        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+
+        while (walker.nextNode()) {
+            nodes.push(walker.currentNode);
+        }
+
+        for (const node of nodes) {
+            if (node.parentNode && !node.parentNode.classList.contains('highlight')) {
+                const replaced = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                if (replaced !== node.nodeValue) {
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = replaced;
+                    node.parentNode.replaceChild(wrapper, node);
+                }
+            }
+        }
+    }
+
     function doSearch(query) {
         const originPage = sessionStorage.getItem('searchOriginPage') || '/';
         document.querySelectorAll('h3').forEach(h3 => {
-        h3.innerText = 'Search Results';
+            h3.innerText = 'Search Results';
         });
 
         if (!query.trim()) {
@@ -61,6 +92,9 @@
 
             if (newSection && currentSection) {
                 currentSection.innerHTML = newSection.innerHTML;
+
+                // Highlight after injecting the new content
+                highlightText(currentSection, query);
             }
         })
         .catch(error => {
