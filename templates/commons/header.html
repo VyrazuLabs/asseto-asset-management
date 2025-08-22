@@ -40,9 +40,15 @@
                         </a>
 
                         <!-- 🔍 Search Form -->
-                        <form class="d-flex flex-grow-1 me-3" role="search" onsubmit="performSearch(); return false;" style="max-width: 380px;">
-                            <input id="global-search" class="form-control me-2 w-100" type="search" placeholder="Search for Products or Assets or Users" aria-label="Search"/>
-                        </form>
+                         {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
+                            <form class="d-flex flex-grow-1 me-3" role="search" onsubmit="performSearch(); return false;" style="max-width: 380px;">
+                                <input id="global-search" class="form-control me-2 w-100" type="search" placeholder="Search for Products or Assets or Users" aria-label="Search"/>
+                            </form>
+                        {% else %}
+                            <form class="d-flex flex-grow-1 me-3" role="search" onsubmit="performSearch(); return false;" style="max-width: 380px;">
+                                <input id="global-search" class="form-control me-2 w-100" type="search" placeholder="Search for Products or Assets" aria-label="Search"/>
+                            </form>
+                        {% endif %}
 
                         <!-- Push everything else to right -->
                         <div class="d-flex align-items-center ms-auto">
@@ -64,6 +70,11 @@
                                               hx-trigger="load, notificationListChanged from:body, every 5s">
                                             <li><a class="dropdown-item">No notification available</a></li>
                                         </span>
+                                        <li>
+                                            <a href="{% url 'notifications:list' %}" class="dropdown-item">
+                                                <span>See all Notifications</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                 </li>
                             </ul>

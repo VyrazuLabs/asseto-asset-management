@@ -99,7 +99,7 @@
                                 </td>
                                 <td>
                                     {{products.product_category.parent}}
-                                    {% if products.product_category.is_deleted %}
+                                    {% if products.product_category.parent.is_deleted %}
                                         <i class="bi bi-exclamation-triangle text-warning" title="Product category is deleted, please update."></i>
                                     {% endif %}       
                                 </td>
