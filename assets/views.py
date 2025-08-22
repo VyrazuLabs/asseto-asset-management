@@ -676,6 +676,8 @@ def update_in_detail(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
     asset_images = AssetImage.objects.filter(asset=asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+    custom_fields = CustomField.objects.filter(
+                entity_type='asset', object_id=asset.id, organization=request.user.organization)
     if request.method == 'POST':
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
@@ -704,8 +706,6 @@ def update_in_detail(request, id):
     else:
         form = AssetForm(instance=asset, organization=request.user.organization)
         image_form = AssetImageForm()
-        custom_fields = CustomField.objects.filter(
-                entity_type='asset', object_id=asset.id, organization=request.user.organization)
     context = {
         'sidebar': 'assets',
         'submenu': 'list',

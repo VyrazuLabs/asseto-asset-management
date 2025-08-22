@@ -215,8 +215,10 @@ def update_product(request, id):
             delete_ids = request.POST.getlist('delete_image_ids')
             if delete_ids:
                 ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
+                print("delete_ids",delete_ids)
             for img_file in images:
                 ProductImage.objects.create(product=product, image=img_file)
+                print("img_file",img_file)
             custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
             for cf in custom_fields:
                 key = f"custom_field_{cf.entity_id}"

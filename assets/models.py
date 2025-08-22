@@ -63,6 +63,9 @@ class Asset(TimeStampModel, SoftDeleteModel):
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
+    def __str__(self):
+        return self.name
+
 class AssetImage(models.Model):
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)

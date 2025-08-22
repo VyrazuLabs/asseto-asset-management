@@ -45,10 +45,12 @@
                 <li class="sidebar-title">Menu</li>
 
                 <li class="sidebar-item {% if sidebar == 'index' %}active{% endif %}">
-                    <a href="/" class="sidebar-link">
-                        <i class="bi bi-grid-fill"></i>
-                        <span>Dashboard</span>
-                    </a>
+                    {% if request.user.is_superuser %}
+                        <a href="/" class="sidebar-link">
+                            <i class="bi bi-grid-fill"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    {% endif %}
                 </li>
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
@@ -100,10 +102,12 @@
                 {% endif %}
 
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
-                    <a href="javascript:void(0)" class="sidebar-link">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Admin</span>
-                    </a>
+                    {% if request.user.is_superuser %}
+                        <a href="javascript:void(0)" class="sidebar-link">
+                            <i class="bi bi-person-fill"></i>
+                            <span>Admin</span>
+                        </a>
+                    {% endif %}
                     <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
                         {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
@@ -215,12 +219,6 @@
                         </ul>
                     </li>
                 {% endif %}
-                <li class="sidebar-item {% if sidebar == 'notifications' %}active{% endif %}">
-                    <a href="{% url 'notifications:list' %}" class="sidebar-link">
-                        <i class="bi bi-bell-fill"></i>
-                        <span>Notifications</span>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
