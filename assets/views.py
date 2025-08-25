@@ -478,24 +478,39 @@ def assigned_list(request):
 @login_required
 @permission_required('authentication.add_assign_asset')
 def assign_asset(request):
-    form = AssignedAssetForm(request.POST or None,
-                             organization=request.user.organization)
-    image_form = AssetImageForm(request.POST, request.FILES)
     if request.method == 'POST':
-        if form.is_valid():
-            form.instance.asset.is_assigned = True
-            # form.instance.asset.status = 0
-            form.instance.asset.save()
+        form = AssignedAssetForm(request.POST, organization=request.user.organization_id)
+        image_form = AssetImageForm(request.POST, request.FILES)
+
+        if form.is_valid() and image_form.is_valid():
+            # Mark the asset as assigned and save
+            asset = form.instance.asset
+            asset.is_assigned = True
+            set_asset_status = AssetStatus.objects.filter(
+                organization=request.user.organization,
+                name='Available'
+            ).first()
+            asset.asset_status = set_asset_status
+            asset.save()
+            # form.save_m2m()
             form.save()
-            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-                AssetImage.objects.create(asset=form.instance.asset, image=f)
+
+            # Save uploaded images related to the asset
+            for f in request.FILES.getlist('image'):
+                AssetImage.objects.create(asset=asset, image=f)
+
             messages.success(request, 'Asset assigned to user successfully')
             return HttpResponse(status=204)
     else:
-        form = AssignedAssetForm()
+        form = AssignedAssetForm(organization=request.user.organization)
         image_form = AssetImageForm()
-    context = {'form': form,'image_form':image_form}
-    return render(request, 'assets/assign-asset-modal.html', context=context)
+
+    context = {
+        'form': form,
+        'image_form': image_form,
+    }
+    return render(request, 'assets/assign-asset-modal.html', context)
+
 
 
 @login_required
@@ -569,11 +584,12 @@ def change_status(request, id):
             #     return JsonResponse({'error': 'Invalid status'}, status=400)
             get_status=AssetStatus.objects.filter(organization=request.user.organization, name=new_status).first()
             asset.asset_status = get_status
+            print("get_status", asset.asset_status)
             if asset.asset_status != "Available":  # If status is 'Assigned'
                 asset.is_assigned = False
                 # delete the assigned asset from the asigned asset list
                 AssignAsset.objects.filter(asset=asset).delete()
-                print("Asset DELTED FROM ASSIGNED LIST")
+                print("Asset DELETED FROM ASSIGNED LIST")
             asset.save()
             return JsonResponse({'success': True, 'new_status': new_status})
     except Exception as e:
@@ -751,7 +767,10 @@ def pie_chart_assigned_status(request):
     })
 
 def pie_chart_status(request):
-    data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
+    data = Asset.undeleted_objects.values('asset_status__name').annotate(total=Count('id'))
+    no_data=None
+    if data is None:
+        no_data='No Data Found'
     chart_data = [['Status', 'Assets']]
     print("data", data)
     for item in data:
@@ -759,6 +778,6 @@ def pie_chart_status(request):
     filtered_chart_data = [row for row in chart_data if row[0] is not None]
     # print(filtered_chart_data)
     print("chart_data", filtered_chart_data)
-    return JsonResponse({'chart_data': filtered_chart_data})
+    return JsonResponse({'chart_data': filtered_chart_data,'no_data':no_data})
 
 # [["Status", "Assets"], [null, 2], ["Lost/Stolen", 1], ["Out for Repair", 1], ["Assigned", 3], ["Available", 6]]
