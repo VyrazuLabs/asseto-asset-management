@@ -1,5 +1,30 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
+<style>
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(16px, 5vw, 164px);
+    flex-wrap: wrap;
+  }
+  @media (max-width: 800px) {
+    .flex-container {
+      flex-direction: column;
+      gap: 14px;
+    }
+    .flex-container > div {
+      width: 100vw !important;
+      max-width: 98vw;
+    }
+    .abc {
+      width: 90vw !important;
+      height: 48vw !important;
+      min-height: 200px;
+      max-width: 600px;
+    }
+  }
+</style>
 <div class="page-heading">
     <h3>Dashboard</h3>
 </div>
@@ -197,20 +222,22 @@
                     </div>
                 </div>
             {% endif %}
-            </div>
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
-            <h3>Asset Graphs</h3>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                <div style="border-radius: 10px;">
-                    <div class="abc" id="donutchart" style="width: 700px; height: 500px; border-radius: 10px;background: var(--background);"></div>
+                <h3>Asset Graphs</h3>
+                <div class="container-fluid">
+                    <div class="row gx-3"> <!-- gx-3 adds horizontal gutter (gap) -->
+                        <div class="col-md-6" style="border-radius: 10px;">
+                        <div class="abc" id="donutchart" style="width: 100%; height: 500px; border-radius: 10px; background: var(--background);"></div>
+                        </div>
+                        <div class="col-md-6" style="border-radius: 10px;">
+                        <div class="abc" id="donutchartt" style="width: 100%; height: 500px; border-radius: 10px; background: var(--background);"></div>
+                        </div>
+                    </div>
                 </div>
-                <div style="border-radius: 10px;">
-                    <div class="abc" id="donutchartt" style="width: 700px; height: 500px;  border-radius: 10px;background: var(--background);"></div>
-                </div>
-            </div>
-            <br>
-            <br>
             {% endif %}
+                <br>
+                <br>
+            </div>
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
             <div class="row">
                 <div class="page-heading">
@@ -497,6 +524,7 @@
             console.log({el});
 
             const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
+            const g = el.querySelectorAll('text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
             console.log({r});
       })
   }
