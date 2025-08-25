@@ -199,6 +199,19 @@
             {% endif %}
             </div>
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
+            <h3>Asset Graphs</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                <div style="border-radius: 10px;">
+                    <div class="abc" id="donutchart" style="width: 700px; height: 500px; border-radius: 10px;background: var(--background);"></div>
+                </div>
+                <div style="border-radius: 10px;">
+                    <div class="abc" id="donutchartt" style="width: 700px; height: 500px;  border-radius: 10px;background: var(--background);"></div>
+                </div>
+            </div>
+            <br>
+            <br>
+            {% endif %}
+            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
             <div class="row">
                 <div class="page-heading">
                     <h3>Upcoming Warranty Expiries</h3>
@@ -372,7 +385,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{location.address}}
+                                                        {{location.address.address_line_one}}
                                                 </td>                                
                                                 <td class="col-auto">
                                                     <p class="mb-0">
@@ -435,4 +448,142 @@
         </div>
     </section>
 </div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  // Get the theme from localStorage
+  google.charts.load("current", {packages:["corechart"]});
+
+  function drawChart(chartData) {
+    var data = google.visualization.arrayToDataTable(chartData);
+    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
+    console.log(labelColor)
+//      --background: #fff;
+//   --text-color: #222;
+    var options = {
+        title: 'Assets by Assigned Status',
+        pieHole: 0.4,
+        titleTextStyle: {
+            color: labelColor,
+        },
+        legend: {
+            textStyle: { color: labelColor } // Sets legend label color
+        },
+        pieSliceTextStyle: {
+            color: labelColor,
+        },
+        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+        backgroundColor: 'transparent',  // transparent to allow corners to show
+        chartArea: { backgroundColor: 'transparent' }
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+    chart.draw(data, options);
+  }
+
+  // Fetch data from the API endpoint and draw the chart
+  function loadAndDrawChart() {
+    fetch('assets/assets_by_status')
+      .then(response => response.json())
+      .then(json => {
+        console.log(Array.isArray(json.chart_data));
+        console.log("data",json.chart_data);
+        // The API should return { chart_data: [...] }
+        google.charts.setOnLoadCallback(() => drawChart(json.chart_data));
+      }).then(() => {
+        console.log("chart drawn")
+        console.log("redraw chart");
+
+            const el = document.getElementById('donutchart');
+            console.log({el});
+
+            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
+            console.log({r});
+      })
+  }
+
+  // Wait until Google Charts is loaded, then fetch chart data
+  google.charts.setOnLoadCallback(loadAndDrawChart);
+</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load("current", {packages:["corechart"]});
+
+//   function drawChartt(chartData) {
+//     var data = google.visualization.arrayToDataTable(chartData);
+
+//     var options = {
+//     title: 'Assets by Assigned Status',
+//     pieHole: 0.4,
+//     titleTextStyle: {
+//         color: 'white',
+//     },
+//     legend: {
+//         textStyle: { color: 'white' } // Sets legend label color
+//     },
+//     pieSliceTextStyle: {
+//         color: 'white',
+//     },
+//     colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+//     titleTextStyle: {
+//             color: 'white',
+//           },
+//     backgroundColor: 'transparent',  
+//     chartArea: { backgroundColor: 'transparent' }
+//     };
+
+
+//     var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
+//     chart.draw(data, options);
+//   }
+function drawChartt(chartData) {
+    var data = google.visualization.arrayToDataTable(chartData);
+
+    // Get the computed CSS variable value for --text-color
+    // const labelColor = getComputedStyle(document.documentElement)
+    //                      .getPropertyValue('--text-color').trim() || 'pink';
+
+    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
+    console.log(labelColor)
+    var options = {
+        title: 'Assets by Assigned Status',
+        pieHole: 0.4,
+        titleTextStyle: { color: labelColor },
+        legend: { textStyle: { color: "red" } },
+        pieSliceTextStyle: { color: labelColor },
+        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+        backgroundColor: 'transparent',
+        chartArea: { backgroundColor: 'transparent' }
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
+    chart.draw(data, options);
+}
+
+  // Fetch data from the API endpoint and draw the chart
+  function loadAndDrawChartt() {
+    fetch('assets/piechart_status_data')
+      .then(response => response.json())
+      .then(json => {
+        console.log(Array.isArray(json.chart_data));
+        console.log("data",json.chart_data);
+        // The API should return { chart_data: [...] }
+        google.charts.setOnLoadCallback(() => drawChartt(json.chart_data));
+      }).then(() => {
+        console.log("chart drawn")
+        console.log("redraw chart");
+
+            const el = document.getElementById('donutchartt');
+            console.log({el});
+
+            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
+            console.log({r});
+      })
+  }
+
+  
+
+  // Wait until Google Charts is loaded, then fetch chart data
+  google.charts.setOnLoadCallback(loadAndDrawChartt);
+</script>
+
 {% endblock content %}

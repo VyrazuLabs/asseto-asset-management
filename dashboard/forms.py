@@ -1,5 +1,6 @@
 from dataclasses import fields
 from django import forms
+from django.db.models import Q
 from .models import Location, Address, ProductType, Department, ProductCategory
 
 
@@ -9,15 +10,15 @@ class LocationForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Office Name'}
     ))
-    contact_person_name = forms.CharField(required=True, widget=forms.TextInput(
+    contact_person_name = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class':  'form-control',
                'placeholder':  'Contact Person Name'}
     ))
-    contact_person_email = forms.EmailField(required=True, widget=forms.EmailInput(
+    contact_person_email = forms.EmailField(required=False, widget=forms.EmailInput(
         attrs={'autocomplete': 'off', 'class':  'form-control',
                'placeholder':  'Contact Person Email'}
     ))
-    contact_person_phone = forms.IntegerField(required=True, widget=forms.NumberInput(
+    contact_person_phone = forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Contact Person Phone'}
     ))
@@ -42,27 +43,27 @@ class LocationForm(forms.ModelForm):
 
 class AddressForm(forms.ModelForm):
 
-    address_line_one = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_one = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Address Line 1', 'rows': '2'}
     ))
-    address_line_two = forms.CharField(required=True, widget=forms.Textarea(
+    address_line_two = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Address Line 2', 'rows': '2'}
     ))
-    country = forms.CharField(required=True, widget=forms.TextInput(
+    country = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'Country'}
     ))
-    state = forms.CharField(required=True, widget=forms.TextInput(
+    state = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'State'}
     ))
-    city = forms.CharField(required=True, widget=forms.TextInput(
+    city = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'class': 'form-control', 'placeholder': 'City'}
     ))
-    pin_code = forms.CharField(required=True, widget=forms.TextInput(
+    pin_code = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Zip Code'}
     ))
@@ -137,45 +138,32 @@ class DepartmentForm(forms.ModelForm):
 
 
 class ProductCategoryForm(forms.ModelForm):
+    
     name = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
-               'placeholder': 'Category Name'}
+        'placeholder': 'Category Name'}
     ))
+    parent = forms.ModelChoiceField(
+        queryset=ProductCategory.undeleted_objects.filter(
+        Q(parent__name='Root') | Q(name='Root')).order_by('name'),
+        widget=forms.Select(
+            attrs={'class': 'form-select'}
+        ),
+        initial=ProductCategory.undeleted_objects.filter(name='Root').first()
+        )
+    
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         self._pk = kwargs.pop('pk', None)
         super(ProductCategoryForm, self).__init__(*args, **kwargs)
-
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-        if ProductCategory.undeleted_objects.filter(name__iexact=name, organization=self._organization).exclude(pk=self._pk).exists():
-            raise forms.ValidationError('Name must be unique!')
-        return name
-
-    class Meta:
-        model = ProductCategory
-        fields = ['name']
-
-
-class ProductSubCategoryForm(forms.ModelForm):
-    name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control',
-               'placeholder': 'Category Name'}
-    ))
-
-    parent = forms.ModelChoiceField(
-        queryset=None,
-        empty_label="--SELECT--",
-        widget=forms.Select(
-            attrs={'class': 'form-select'}
-        ))
-
-    def __init__(self, *args, **kwargs):
-        self._organization = kwargs.pop('organization', None)
-        self._pk = kwargs.pop('pk', None)
-        super(ProductSubCategoryForm, self).__init__(*args, **kwargs)
-        self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__isnull=True)
+        # self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__name='root')
+        # try:
+        #     initial_parent=ProductCategory.undeleted_objects.filter(name='root').first()
+        #     print(initial_parent)
+        #     self.fields['parent'].initial=initial_parent
+        # except ProductCategory.DoesNotExist:
+        #     pass
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
@@ -186,3 +174,33 @@ class ProductSubCategoryForm(forms.ModelForm):
     class Meta:
         model = ProductCategory
         fields = ['name','parent']
+
+
+# class ProductSubCategoryForm(forms.ModelForm):
+#     name = forms.CharField(required=True, widget=forms.TextInput(
+#         attrs={'autocomplete': 'off', 'class': 'form-control',
+#                'placeholder': 'Category Name'}
+#     ))
+
+#     parent = forms.ModelChoiceField(
+#         queryset=None,
+#         empty_label="--SELECT--",
+#         widget=forms.Select(
+#             attrs={'class': 'form-select'}
+#         ))
+
+#     def __init__(self, *args, **kwargs):
+#         self._organization = kwargs.pop('organization', None)
+#         self._pk = kwargs.pop('pk', None)
+#         super(ProductSubCategoryForm, self).__init__(*args, **kwargs)
+#         self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__isnull=True)
+
+#     def clean_name(self):
+#         name = self.cleaned_data.get('name')
+#         if ProductCategory.undeleted_objects.filter(name__iexact=name, organization=self._organization).exclude(pk=self._pk).exists():
+#             raise forms.ValidationError('Name must be unique!')
+#         return name
+
+#     class Meta:
+#         model = ProductCategory
+#         fields = ['name','parent']
