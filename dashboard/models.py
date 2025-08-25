@@ -81,7 +81,7 @@ class Location(TimeStampModel, SoftDeleteModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f'{self.office_name} - {self.address}'
+        return f'{self.office_name} - {self.address.address_line_one}'
     
 
 class Organization(TimeStampModel):
