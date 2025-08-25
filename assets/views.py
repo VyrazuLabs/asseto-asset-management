@@ -17,6 +17,8 @@ from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from dashboard.models import CustomField
+from django.db.models import Count
+import json
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -281,20 +283,25 @@ def update(request, id):
                 AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
 
             # Handle new images
-            # images = request.FILES.getlist('image')
-            # print("get_imagesssssssssssssss",images)
-            # for img_file in images:
-            #     print(img_file)
-            #     AssetImage.objects.create(asset=asset, image=img_file)
-            print("get_imagesssssssssssssss",request.FILES.getlist('image'))
-            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-                AssetImage.objects.create(asset=asset, image=f)
+            images = request.FILES.getlist('image')
+            for img_file in images:
+                AssetImage.objects.create(asset=asset, image=img_file)
+            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
+            for cf in custom_fields:
+                key = f"custom_field_{cf.entity_id}"
+                new_val = request.POST.get(key, "")
+                if new_val != cf.field_value:
+                    cf.field_value = new_val
+                    cf.save()
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
     else:
         form = AssetForm(instance=asset, organization=request.user.organization)
         image_form = AssetImageForm()
+        custom_fields = CustomField.objects.filter(
+                entity_type='asset', object_id=asset.id, organization=request.user.organization)
+   
     context = {
         'sidebar': 'assets',
         'submenu': 'list',
@@ -303,7 +310,8 @@ def update(request, id):
         'form': form,
         'asset': asset,
         'assetSpecifications': assetSpecifications,
-        'title': 'Asset - Update'
+        'title': 'Asset - Update',
+        'custom_fields': custom_fields
     }
     return render(request, 'assets/update-assets.html', context)
 
@@ -419,12 +427,24 @@ def status(request, id):
 @login_required
 def search(request, page):
     search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'assets/assets-data.html', {
-            'page_object': Asset.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
+    page_object=Asset.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
                 name__icontains=search_text) | Q(serial_no__icontains=search_text) | Q(purchase_type__icontains=search_text) | Q(product__name__icontains=search_text)
                 | Q(vendor__name__icontains=search_text) | Q(vendor__gstin_number__icontains=search_text) | Q(location__office_name__icontains=search_text) | Q(product__product_type__name__icontains=search_text)
             )).order_by('-created_at')[:10]
+    image_object=AssetImage.objects.filter(Q(asset__organization=request.user.organization) & (Q(
+                asset__name__icontains=search_text) | Q(asset__serial_no__icontains=search_text) | Q(asset__purchase_type__icontains=search_text) | Q(asset__product__name__icontains=search_text)
+                | Q(asset__vendor__name__icontains=search_text) | Q(asset__vendor__gstin_number__icontains=search_text) | Q(asset__location__office_name__icontains=search_text) | Q(asset__product__product_type__name__icontains=search_text)
+            )).order_by('-uploaded_at')[:10]
+    asset_images = {}
+    for img in image_object:
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+    print("image_object",image_object)
+    print("page_object",page_object)
+    if search_text:
+        return render(request, 'assets/assets-data.html', {
+            'page_object': page_object,
+            'asset_images': asset_images
         })
 
     asset_list = Asset.undeleted_objects.filter(
@@ -656,6 +676,8 @@ def update_in_detail(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
     asset_images = AssetImage.objects.filter(asset=asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+    custom_fields = CustomField.objects.filter(
+                entity_type='asset', object_id=asset.id, organization=request.user.organization)
     if request.method == 'POST':
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
@@ -671,6 +693,13 @@ def update_in_detail(request, id):
             images = request.FILES.getlist('image')
             for img_file in images:
                 AssetImage.objects.create(asset=asset, image=img_file)
+            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
+            for cf in custom_fields:
+                key = f"custom_field_{cf.entity_id}"
+                new_val = request.POST.get(key, "")
+                if new_val != cf.field_value:
+                    cf.field_value = new_val
+                    cf.save()
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
@@ -685,6 +714,51 @@ def update_in_detail(request, id):
         'form': form,
         'asset': asset,
         'assetSpecifications': assetSpecifications,
-        'title': 'Asset - Update'
+        'title': 'Asset - Update',
+        'custom_fields': custom_fields
     }
     return render(request, 'assets/update-assets-in-detail.html', context=context)
+
+def piechart_status_data(request):
+    data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
+    print(data)
+    return data
+# This gives a list of statuses with counts, which can then be fed to a chart creation library.
+
+def pie_chart_assigned_status(request):
+    data = Asset.objects.all()
+    assigned=0
+    unassigned=0
+    for asset in data:
+        if asset.is_assigned:
+            assigned+= 1
+        else:
+            unassigned+= 1
+    if data is None:
+        chart_data = [
+          ['Status', 'Assets'],
+          ['Assigned', 0],
+          ['Unassigned', 0],
+        ]
+    chart_data=[
+          ['Status','Assets'],
+          ['Assigned',assigned],
+          ['Unassigned',unassigned],
+        ]
+    print("dfgfdgd",chart_data)
+    return JsonResponse({
+        'chart_data': chart_data
+    })
+
+def pie_chart_status(request):
+    data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
+    chart_data = [['Status', 'Assets']]
+    print("data", data)
+    for item in data:
+        chart_data.append([item['asset_status__name'], item['total']])
+    filtered_chart_data = [row for row in chart_data if row[0] is not None]
+    # print(filtered_chart_data)
+    print("chart_data", filtered_chart_data)
+    return JsonResponse({'chart_data': filtered_chart_data})
+
+# [["Status", "Assets"], [null, 2], ["Lost/Stolen", 1], ["Out for Repair", 1], ["Assigned", 3], ["Available", 6]]

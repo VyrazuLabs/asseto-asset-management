@@ -21,10 +21,7 @@
     <section class="section">
         {% if perms.authentication.add_product %}
             <div>
-                <button type="button" class="btn btn-sm btn-outline-info my-3" 
-                    hx-get="{% url 'products:add' %}" hx-target="#add-product-modal-content"
-                    data-bs-toggle="modal" data-bs-target="#add-product-modal"
-                >Add Product</i></button>
+                <a href="{% url 'products:add' %}" class="btn btn-sm btn-outline-info my-3">Add Product</a>
             </div>
         {% endif %}
         <!-- add modal -->
@@ -102,7 +99,7 @@
                                 </td>
                                 <td>
                                     {{products.product_category.parent}}
-                                    {% if products.product_category.is_deleted %}
+                                    {% if products.product_category.parent.is_deleted %}
                                         <i class="bi bi-exclamation-triangle text-warning" title="Product category is deleted, please update."></i>
                                     {% endif %}       
                                 </td>
@@ -134,10 +131,9 @@
                                             <a href="{% url 'products:details_product' products.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                         {% endif %}
                                         {% if perms.authentication.edit_product %}
-                                            <button type="button" class="btn btn-info" 
-                                                hx-get="{% url 'products:update_product' products.id %}" hx-target="#update-product-modal-content"
-                                                data-bs-toggle="modal" data-bs-target="#update-product-modal"
-                                            ><i class="bi bi-pencil-square"></i></button>
+                                            <a type="button" class="btn btn-info" 
+                                                href="{% url 'products:update_product' products.id %}" 
+                                            ><i class="bi bi-pencil-square"></i></a>
                                         {% endif %}
                                         {% if perms.authentication.delete_product %}
                                             <form action="{% url 'products:delete_product' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">

@@ -69,7 +69,7 @@ def details(request, id):
         User.undeleted_objects, pk=id, organization=request.user.organization)
 
     history_list = User.history.all()
-    paginator = Paginator(history_list, 5, orphans=1)   
+    paginator = Paginator(history_list, 10, orphans=1)   
     assigned_assets=[]
     get_assigned_assets = AssignAsset.objects.filter(user=user).values()
     for it in get_assigned_assets:
@@ -111,12 +111,18 @@ def add(request):
     if request.method == "POST":
         create_all_perm_role()
         form = UserForm(request.POST, request.FILES,
-                        organization=request.user.organization)
-        print("user",form.data)
+        organization=request.user.organization)
         address_form = AddressForm(request.POST)
 
         if form.is_valid() and address_form.is_valid():
+            print("valid",form.data)
             user = form.save(commit=False)
+            password1 = form.cleaned_data.get('password1', '')
+            password2 = form.cleaned_data.get('password2', '')
+
+            if password1 and password1 == password2:
+                user.set_password(password1)
+                print("password",user)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address

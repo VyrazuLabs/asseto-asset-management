@@ -20,8 +20,8 @@ urlpatterns = [
     path('status-repair-to-release/<str:id>/',views.release_asset,name='release'),
     path('status-ready-to-assign/<str:id>/',views.assign_assets,name='assigned'),
     path('status-ready-to-repair/<str:id>/',views.update_in_detail,name='update_in_detail'),
-
-
+    path('piechart_status_data/', views.pie_chart_assigned_status, name='piechart_status_data'),
+    path('assets_by_status', views.pie_chart_status, name='pie_chart_status'),
     #Asset Staus--->
 
     path('add_status',views.add_asset_status,name='add_asset_status'),
