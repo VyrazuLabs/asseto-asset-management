@@ -353,6 +353,8 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root {
+  --background: #fff;
+  --text-color: #222;
   --bs-blue: #435ebe;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -20038,6 +20040,16 @@ a {
 
 .list-unstyled b{
   width: 15rem;
+}
+
+body[data-theme="light"] {
+  --background: #fff;
+  --text-color: #222;
+}
+
+body[data-theme="dark"] {
+  --background: #1e1e2d;
+  --text-color: #fff;
 }
 
 @media (max-width: 1000px) {
