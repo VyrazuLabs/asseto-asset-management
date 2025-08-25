@@ -1,5 +1,7 @@
 @charset "UTF-8";
 body.theme-dark {
+  --background:#1e1e2d;
+  --text-color:#fff;
   --bs-blue: #435ebe;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -7375,4 +7377,9 @@ body.theme-dark .apexcharts-legend-text {
 }
 body.theme-dark .theme-toggle {
   color: #9899ac;
+}
+
+body[data-theme="dark"] {
+  --background: #1e1e2d;
+  --text-color: #fff;
 }
