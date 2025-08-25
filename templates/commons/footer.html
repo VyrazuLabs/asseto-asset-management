@@ -1,3 +1,10 @@
+<style>
+    .highlight {
+        background-color: #435ebe;
+        color: white;
+    }
+</style>
+
 <footer>
     <div class="footer clearfix mb-0 text-muted">
         <div class="float-start">
@@ -19,6 +26,96 @@
             e.innerHTML = ""
         })
     });
+    
 </script>
+
+<script>
+    const searchInput = document.getElementById('global-search');
+
+    // Save the current page URL as the origin page on every non-search page load
+    if (!window.location.pathname.startsWith('/search')) {
+        sessionStorage.setItem('searchOriginPage', window.location.href);
+    }
+
+    function highlightText(container, text) {
+        if (!text) return;
+
+        const regex = new RegExp(`(${text})`, 'gi');
+
+        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+        const nodes = [];
+
+        while (walker.nextNode()) {
+            nodes.push(walker.currentNode);
+        }
+
+        for (const node of nodes) {
+            if (node.parentNode && !node.parentNode.classList.contains('highlight')) {
+                const replaced = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                if (replaced !== node.nodeValue) {
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = replaced;
+                    node.parentNode.replaceChild(wrapper, node);
+                }
+            }
+        }
+    }
+
+    function doSearch(query) {
+        const originPage = sessionStorage.getItem('searchOriginPage') || '/';
+        document.querySelectorAll('h3').forEach(h3 => {
+            h3.innerText = 'Search Results';
+        });
+
+        if (!query.trim()) {
+            // Clear and go back to the origin page
+            sessionStorage.removeItem('searchOriginPage');
+            window.location.href = originPage;
+            return;
+        }
+
+        fetch(`/admin/global-search/?search_text=${encodeURIComponent(query)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch');
+            return response.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const newSection = doc.querySelector('section');
+            const currentSection = document.querySelector('section');
+
+            if (newSection && currentSection) {
+                currentSection.innerHTML = newSection.innerHTML;
+
+                // Highlight after injecting the new content
+                highlightText(currentSection, query);
+            }
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+        });
+    }
+
+    // Live search on input
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value;
+        doSearch(query);
+    });
+</script>
+
+<script>
+document.getElementById('global-search').addEventListener('keyup', function(e) {
+    if (e.key === 'Enter' || this.value.length > 2) {
+        performSearch();
+    }
+});
+</script>
+
 </body>
 </html>

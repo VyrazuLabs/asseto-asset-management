@@ -10,7 +10,8 @@ from django.contrib.auth.decorators import login_required
 from vendors.utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
-
+from dashboard.models import CustomField
+from assets.models import AssetImage
 
 from datetime import date
 today = date.today()
@@ -61,8 +62,6 @@ def list(request):
         if img.product_id not in product_images:
             product_images[img.product_id] = img
             # print("images_product",img)
-    for it in product_images:
-        print("here",it)
     context = {
         'sidebar': 'products',
         'product_images': product_images,
@@ -89,12 +88,21 @@ def details_product(request, id):
     for it in get_product_img:
         img_array.append(it)
     print(img_array)
+    get_custom_data=[]
+    get_data=CustomField.objects.filter(object_id=product.id)
+    for it in get_data:
+        obj={}
+        obj['field_name']=it.field_name
+        obj['field_value']=it.field_value
+        get_custom_data.append(obj)
+    print("get_custom_data",get_custom_data)
     context = {
         'sidebar': 'products',
         'product': product,
         'img_array':img_array,
         'title': 'Product - Details',
-        'page_object': page_object
+        'page_object': page_object,
+        'get_custom_data': get_custom_data
     }
 
     return render(request, 'products/detail.html', context=context)
@@ -116,8 +124,38 @@ def add_product(request):
             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
                 print("imagessssss",f)
                 ProductImage.objects.create(product=product, image=f)
-            messages.success(request, 'Product added successfully')
-            return HttpResponse(status=204)
+        names = request.POST.getlist('custom_field_name')
+        values = request.POST.getlist('custom_field_value')
+        for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip() != "":
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=product.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='product',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        pass
+
+        for name, val in zip(names, values):
+            if name.strip() and val.strip():
+                CustomField.objects.create(
+                    name=name.strip(),
+                    object_id=product.id,
+                    field_type='text',  # Defaulting new ones as text unless field type select is added
+                    field_name=name.strip(),
+                    field_value=val.strip(),
+                    entity_type='product',
+                    organization=request.user.organization
+                )
+        messages.success(request, 'Product added successfully')
+        return redirect('products:list')
     else:
         form = AddProductsForm()
         image_form = ProductImageForm()
@@ -156,21 +194,43 @@ def delete_product(request, id):
 @login_required
 @permission_required('authentication.edit_product')
 def update_product(request, id):
-
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
     form = AddProductsForm(
         instance=product, organization=request.user.organization)
-
+    img_form= ProductImageForm(request.POST, request.FILES)
+    get_product_img=ProductImage.objects.filter(product=product).values()
+    custom_fields = CustomField.objects.filter(
+                entity_type='product', object_id=product.id, organization=request.user.organization)
+    img_array=[]
+    for it in get_product_img:
+        img_array.append(it)
     if request.method == "POST":
         form = AddProductsForm(request.POST, request.FILES,
         instance=product, organization=request.user.organization)
+        img_form= ProductImageForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Product updated successfully')
-            return HttpResponse(status=204)
+            images = request.FILES.getlist('image')
+            delete_ids = request.POST.getlist('delete_image_ids')
+            if delete_ids:
+                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
+                print("delete_ids",delete_ids)
+            for img_file in images:
+                ProductImage.objects.create(product=product, image=img_file)
+                print("img_file",img_file)
+            custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
+            for cf in custom_fields:
+                key = f"custom_field_{cf.entity_id}"
+                new_val = request.POST.get(key, "")
+                if new_val != cf.field_value:
+                    cf.field_value = new_val
+                    cf.save()
+        messages.success(request, 'Product updated successfully')
+        return redirect('products:list')
 
-    context = {'form': form, 'product': product}
+    context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
+    # print("context",(img_array))
     return render(request, 'products/update-product-modal.html', context)
 
 

@@ -14,16 +14,16 @@ class AddProductsForm(forms.ModelForm):
     product_picture = forms.ImageField(required=False, widget=forms.FileInput(
         attrs={'class': 'form-control d-flex', 'id': 'inputFile'}
     ))
-    manufacturer = forms.CharField(required=True, widget=forms.TextInput(
+    manufacturer = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
                'placeholder': 'Manufacturer', 'class': 'form-control'}
     ))
     
-    model=forms.CharField(required=True, widget=forms.TextInput(
+    model=forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete':'off','placeholder':'Model Name','class':'form-control'}
     ))
 
-    eol=forms.IntegerField(required=True, widget=forms.NumberInput(
+    eol=forms.IntegerField(required=False, widget=forms.NumberInput(
         attrs={'autocomplete':'off','placeholder':'In Months','class':'form-control'}
     )) 
     description = forms.CharField(required=False, widget=forms.Textarea(
@@ -55,7 +55,8 @@ class AddProductsForm(forms.ModelForm):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['product_category'].queryset = ProductCategory.undeleted_objects.filter(
-            organization=self._organization, status=True, parent__isnull=True)
+            organization=self._organization, status=True, parent__name='Root')
+        
         self.fields['product_type'].queryset = ProductType.undeleted_objects.filter(
             organization=self._organization, status=True)
         

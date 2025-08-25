@@ -20,7 +20,7 @@ class AssetForm(forms.ModelForm):
     # )
     status = forms.ModelChoiceField(
         required=False,
-        queryset=AssetStatus.objects.all().values_list('name', flat=True),
+        queryset=AssetStatus.undeleted_objects.all().values_list('name', flat=True),
         widget=forms.Select(
             attrs={'class': 'form-select'}
         )
@@ -131,14 +131,12 @@ class AssetImageForm(forms.ModelForm):
     class Meta:
             model = AssetImage
             fields = ['image', ]
-        
     # def __init__(self, *args, **kwargs):
     #         super().__init__(*args, **kwargs)
     #         # Add the `multiple` attribute to allow selecting multiple files
     #         self.fields["image"].widget.attrs.update({"multiple": "true"})
 
 class AssignedAssetForm(forms.ModelForm):
-
     asset = forms.ModelChoiceField(
         required=True,
         queryset=None,
@@ -171,7 +169,6 @@ class AssignedAssetForm(forms.ModelForm):
 
 
 class ReassignedAssetForm(forms.ModelForm):
-
     user = forms.ModelChoiceField(
         required=True,
         queryset=None,
