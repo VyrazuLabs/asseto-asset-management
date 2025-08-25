@@ -202,10 +202,10 @@
             <h3>Asset Graphs</h3>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                 <div style="border-radius: 10px;">
-                    <div id="donutchart" style="width: 700px; height: 500px; background-color: #1e1e2d; border-radius: 10px;"></div>
+                    <div class="abc" id="donutchart" style="width: 700px; height: 500px; border-radius: 10px;background: var(--background);"></div>
                 </div>
                 <div style="border-radius: 10px;">
-                    <div id="donutchartt" style="width: 700px; height: 500px; background-color: #1e1e2d; border-radius: 10px;"></div>
+                    <div class="abc" id="donutchartt" style="width: 700px; height: 500px;  border-radius: 10px;background: var(--background);"></div>
                 </div>
             </div>
             <br>
@@ -450,22 +450,26 @@
 </div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+  // Get the theme from localStorage
   google.charts.load("current", {packages:["corechart"]});
 
   function drawChart(chartData) {
     var data = google.visualization.arrayToDataTable(chartData);
-    
+    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
+    console.log(labelColor)
+//      --background: #fff;
+//   --text-color: #222;
     var options = {
         title: 'Assets by Assigned Status',
         pieHole: 0.4,
         titleTextStyle: {
-            color: 'white',
+            color: labelColor,
         },
         legend: {
-            textStyle: { color: 'white' } // Sets legend label color
+            textStyle: { color: labelColor } // Sets legend label color
         },
         pieSliceTextStyle: {
-            color: 'white',
+            color: labelColor,
         },
         colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
         backgroundColor: 'transparent',  // transparent to allow corners to show
@@ -481,11 +485,20 @@
     fetch('assets/assets_by_status')
       .then(response => response.json())
       .then(json => {
-        console.log("bool",Array.isArray(json.chart_data));
-        console.log(json.chart_data);
+        console.log(Array.isArray(json.chart_data));
+        console.log("data",json.chart_data);
         // The API should return { chart_data: [...] }
         google.charts.setOnLoadCallback(() => drawChart(json.chart_data));
-      });
+      }).then(() => {
+        console.log("chart drawn")
+        console.log("redraw chart");
+
+            const el = document.getElementById('donutchart');
+            console.log({el});
+
+            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
+            console.log({r});
+      })
   }
 
   // Wait until Google Charts is loaded, then fetch chart data
@@ -495,33 +508,56 @@
 <script type="text/javascript">
   google.charts.load("current", {packages:["corechart"]});
 
-  function drawChartt(chartData) {
+//   function drawChartt(chartData) {
+//     var data = google.visualization.arrayToDataTable(chartData);
+
+//     var options = {
+//     title: 'Assets by Assigned Status',
+//     pieHole: 0.4,
+//     titleTextStyle: {
+//         color: 'white',
+//     },
+//     legend: {
+//         textStyle: { color: 'white' } // Sets legend label color
+//     },
+//     pieSliceTextStyle: {
+//         color: 'white',
+//     },
+//     colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+//     titleTextStyle: {
+//             color: 'white',
+//           },
+//     backgroundColor: 'transparent',  
+//     chartArea: { backgroundColor: 'transparent' }
+//     };
+
+
+//     var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
+//     chart.draw(data, options);
+//   }
+function drawChartt(chartData) {
     var data = google.visualization.arrayToDataTable(chartData);
 
-    var options = {
-    title: 'Assets by Assigned Status',
-    pieHole: 0.4,
-    titleTextStyle: {
-        color: 'white',
-    },
-    legend: {
-        textStyle: { color: 'white' } // Sets legend label color
-    },
-    pieSliceTextStyle: {
-        color: 'white',
-    },
-    colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-    titleTextStyle: {
-            color: 'white',
-          },
-    backgroundColor: 'transparent',  
-    chartArea: { backgroundColor: 'transparent' }
-    };
+    // Get the computed CSS variable value for --text-color
+    // const labelColor = getComputedStyle(document.documentElement)
+    //                      .getPropertyValue('--text-color').trim() || 'pink';
 
+    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
+    console.log(labelColor)
+    var options = {
+        title: 'Assets by Assigned Status',
+        pieHole: 0.4,
+        titleTextStyle: { color: labelColor },
+        legend: { textStyle: { color: "red" } },
+        pieSliceTextStyle: { color: labelColor },
+        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
+        backgroundColor: 'transparent',
+        chartArea: { backgroundColor: 'transparent' }
+    };
 
     var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
     chart.draw(data, options);
-  }
+}
 
   // Fetch data from the API endpoint and draw the chart
   function loadAndDrawChartt() {
@@ -532,10 +568,22 @@
         console.log("data",json.chart_data);
         // The API should return { chart_data: [...] }
         google.charts.setOnLoadCallback(() => drawChartt(json.chart_data));
-      });
+      }).then(() => {
+        console.log("chart drawn")
+        console.log("redraw chart");
+
+            const el = document.getElementById('donutchartt');
+            console.log({el});
+
+            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
+            console.log({r});
+      })
   }
+
+  
 
   // Wait until Google Charts is loaded, then fetch chart data
   google.charts.setOnLoadCallback(loadAndDrawChartt);
 </script>
+
 {% endblock content %}
