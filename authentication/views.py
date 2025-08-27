@@ -151,6 +151,7 @@ def user_register(request):
             organization = o_form.save()
             user = u_form.save(commit=False)
             user.organization = organization
+            user.is_active = True
             user.is_superuser = True
             user.access_level = True
             user.save()
