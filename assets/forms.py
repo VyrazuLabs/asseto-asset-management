@@ -88,6 +88,7 @@ class AssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
+        # print("organization in asset form",self._organization.id)
         super().__init__(*args, **kwargs)
         self.fields['product'].queryset = Product.objects.filter(organization=self._organization, status=True)
         # self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
@@ -107,7 +108,7 @@ class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = ['name', 'serial_no', 'price', 'purchase_date', 'warranty_expiry_date', 'description',
-                  'purchase_type', 'product', 'vendor', 'organization', 'location','tag',
+                  'purchase_type', 'product', 'vendor', 'location','tag',
                   'status'
                   ]
 class MultipleFileInput(forms.ClearableFileInput):
