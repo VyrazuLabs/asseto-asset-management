@@ -157,7 +157,7 @@ def add_product(request):
         messages.success(request, 'Product added successfully')
         return redirect('products:list')
     else:
-        form = AddProductsForm()
+        form = AddProductsForm(organization=request.user.organization)
         image_form = ProductImageForm()
 
     context = {'form': form,
@@ -201,7 +201,7 @@ def update_product(request, id):
     img_form= ProductImageForm(request.POST, request.FILES)
     get_product_img=ProductImage.objects.filter(product=product).values()
     custom_fields = CustomField.objects.filter(
-                entity_type='product', object_id=product.id, organization=request.user.organization)
+        entity_type='product', object_id=product.id, organization=request.user.organization)
     img_array=[]
     for it in get_product_img:
         img_array.append(it)

@@ -115,7 +115,8 @@ def user_login(request):
                 product = None
                 if user is not None:
                     
-                    if not AssetStatus.objects.filter(can_modify=False).first():
+                    if not AssetStatus.objects.filter(can_modify=False).first() or not AssetStatus.objects.filter(name='Available'):
+                        AssetStatus.objects.create(name='Available', organization=None, can_modify=False)
                         seed_asset_statuses(asset=True)
                     if not ProductType.objects.filter(can_modify=False).first():
                         seed_asset_statuses(product=True)
@@ -153,6 +154,7 @@ def user_register(request):
             user.organization = organization
             user.is_superuser = True
             user.access_level = True
+            user.is_active = True
             user.save()
 
             messages.success(

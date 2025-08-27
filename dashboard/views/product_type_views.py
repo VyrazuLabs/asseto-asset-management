@@ -38,8 +38,7 @@ def manage_access(user):
 def product_type_list(request):
     print("here above ==>", request.user.organization)
     all_product_type_list = ProductType.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    print("here is product types",all_product_type_list.values_list("id", flat=True))
+    Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
 
 
     paginator = Paginator(all_product_type_list, PAGE_SIZE, orphans=ORPHANS)

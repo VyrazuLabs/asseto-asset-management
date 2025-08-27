@@ -59,11 +59,13 @@ def global_search(request):
     ).order_by('-created_at')
 
     if request.user.is_superuser:
-        print("true")
-        users = User.undeleted_objects.filter(Q(organization=request.user.organization) & Q(is_superuser=False) & (Q(
-                    username__icontains=search_text) | Q(full_name__icontains=search_text) | Q(phone__icontains=search_text) | Q(employee_id__icontains=search_text) | Q(department__name__icontains=search_text) | Q(role__related_name__icontains=search_text)
-                    | Q(location__office_name__icontains=search_text) | Q(address__address_line_one__icontains=search_text) | Q(address__address_line_two__icontains=search_text) | Q(address__country__icontains=search_text) | Q(address__state__icontains=search_text) | Q(address__pin_code__icontains=search_text) | Q(address__city__icontains=search_text)
-                )).exclude(pk=request.user.id).order_by('-created_at')
+        try:
+            users = User.undeleted_objects.filter(Q(organization=request.user.organization) & Q(is_superuser=False) & (Q(
+                        username__icontains=search_text) | Q(full_name__icontains=search_text) | Q(phone__icontains=search_text) | Q(employee_id__icontains=search_text) | Q(department__name__icontains=search_text) | Q(role__related_name__icontains=search_text)
+                        | Q(location__office_name__icontains=search_text) | Q(address__address_line_one__icontains=search_text) | Q(address__address_line_two__icontains=search_text) | Q(address__country__icontains=search_text) | Q(address__state__icontains=search_text) | Q(address__pin_code__icontains=search_text) | Q(address__city__icontains=search_text)
+                    )).exclude(pk=request.user.id).order_by('-created_at')
+        except Exception as e:
+            print(e)
 
     context = {
         'products': products,

@@ -225,5 +225,25 @@
                 subCatSelect.innerHTML = '<option value="">Error loading</option>';
             });
     });
+
+    const productCategorySelect = document.getElementById('id_product_category');
+    const productSubCategorySelect = document.getElementById('id_product_sub_category');
+
+    function toggleSubCategory() {
+        if (!productCategorySelect.value) {
+            productSubCategorySelect.disabled = true;
+            productSubCategorySelect.value = '';
+        } else {
+            productSubCategorySelect.disabled = false;
+        }
+    }
+
+    // Initial state on page load
+    toggleSubCategory();
+
+    // Listen for changes
+    productCategorySelect.addEventListener('change', toggleSubCategory);
+
+
 </script>
 {% endblock content %}

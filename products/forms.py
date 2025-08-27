@@ -3,13 +3,14 @@ from django import forms
 from .models import *
 from dashboard.models import ProductCategory, ProductType
 from assets.forms import MultipleFileField
+from django.db.models import Q
 
 
 class AddProductsForm(forms.ModelForm):
 
     name = forms.CharField(required=True, widget=forms.TextInput(
         attrs={'autocomplete': 'off',
-               'placeholder': 'Product Name', 'class': 'form-control'}
+               'placeholder': 'Product Name', 'class': 'form-control','required':'required'}
     ))
     product_picture = forms.ImageField(required=False, widget=forms.FileInput(
         attrs={'class': 'form-control d-flex', 'id': 'inputFile'}
@@ -54,14 +55,14 @@ class AddProductsForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
-        self.fields['product_category'].queryset = ProductCategory.undeleted_objects.filter(
-            organization=self._organization, status=True, parent__name='Root')
+        self.fields['product_category'].queryset = ProductCategory.undeleted_objects.filter(Q(organization=None,status=True, parent__name='Root')|Q(
+            organization=self._organization, status=True, parent__name='Root'))
         
-        self.fields['product_type'].queryset = ProductType.undeleted_objects.filter(
-            organization=self._organization, status=True)
+        self.fields['product_type'].queryset = ProductType.undeleted_objects.filter(Q(organization=None)|Q(
+            organization=self._organization, status=True))
         
-        self.fields['product_sub_category'].queryset = ProductCategory.undeleted_objects.filter(
-            organization=self._organization, status=True, parent__isnull=False)
+        self.fields['product_sub_category'].queryset = ProductCategory.undeleted_objects.filter( Q(organization=None,status=True, parent__isnull=False)|Q(
+            organization=self._organization, status=True, parent__isnull=False))
         
         if self.instance.pk and self.instance.product_category:
             if self.instance.product_category.parent:

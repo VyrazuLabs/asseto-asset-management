@@ -44,8 +44,8 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def vendor_list(request):
-    vendors_list = Vendor.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('-created_at')
     print(vendors_list.values_list("id"))
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
     count_array=[]
