@@ -64,9 +64,9 @@ def assign_assets(request, id):
 
         # Mark asset as assigned
         asset.is_assigned = True
-        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Assigned').first()
+        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
         asset.asset_status=set_asset
-        print("set_asset",set_asset.id)
+        # print("set_asset",set_asset.id)
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
 
@@ -275,7 +275,10 @@ def update(request, id):
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
-            form.save()
+            asset_instance = form.save(commit=False)
+            asset_instance.organization = request.user.organization  # always set or preserve
+            asset_instance.save()
+            form.save_m2m()
             assetSpecifications.delete()
             # Handle image removals
             delete_ids = request.POST.getlist('delete_image_ids')
@@ -319,32 +322,41 @@ def update(request, id):
 @login_required
 @permission_required('authentication.add_asset')
 def add(request):
+    # Handle POST
     if request.method == 'POST':
         form = AssetForm(request.POST, organization=request.user.organization_id)
         image_form = AssetImageForm(request.POST, request.FILES)
-
+        print("organization---------id",request.user.organization_id)
         if form.is_valid() and image_form.is_valid():
-            # ------- Save asset -------
             asset = form.save(commit=False)
             asset.organization = request.user.organization
-            set_asset_status = AssetStatus.objects.filter(
-                organization=request.user.organization,
-                name='Available'
+            # asset.asset_status = AssetStatus.objects.filter(
+            #     organization=request.user.organization,
+            #     name='Available'
+            # ).first()
+            available_status = AssetStatus.objects.filter(
+            name='Available'
             ).first()
-            asset.asset_status = set_asset_status
+            print("status",available_status)
+            asset.asset_status = available_status 
+            print(asset.asset_status)
             asset.save()
             form.save_m2m()
 
-            # ------- Save images -------
+            # Save images
             for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
 
-            # ------- Save values for predefined custom fields -------
+            # Handle predefined custom fields
             for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip() != "":
+                if key.startswith("customfield_") and value.strip():
                     field_id = key.replace("customfield_", "")
                     try:
-                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
                         CustomField.objects.create(
                             name=cf.name,
                             object_id=asset.id,
@@ -355,32 +367,28 @@ def add(request):
                             organization=request.user.organization
                         )
                     except CustomField.DoesNotExist:
-                        pass
+                        continue
 
-            # ------- Save newly created custom fields from dynamic add section -------
+            # Handle dynamically added custom fields
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
-            print(asset.id)
-
             for name, val in zip(names, values):
                 if name.strip() and val.strip():
                     CustomField.objects.create(
                         name=name.strip(),
                         object_id=asset.id,
-                        field_type='text',  # Defaulting new ones as text unless field type select is added
+                        field_type='text',
                         field_name=name.strip(),
                         field_value=val.strip(),
                         entity_type='asset',
                         organization=request.user.organization
                     )
-
             return redirect('assets:list')
-
     else:
         form = AssetForm(organization=request.user.organization_id)
         image_form = AssetImageForm()
 
-    # Fetch existing predefined custom fields for assets
+    # Fetch custom fields for display
     custom_fields = CustomField.objects.filter(
         entity_type='asset',
         organization=request.user.organization
@@ -460,7 +468,7 @@ def search(request, page):
 def assigned_list(request):
 
     assign_asset_list = AssignAsset.objects.filter(
-        asset__organization=request.user.organization).order_by('-asset__created_at')
+        asset__organization=request.user.organization or None).order_by('-asset__created_at')
     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -487,7 +495,7 @@ def assign_asset(request):
             asset = form.instance.asset
             asset.is_assigned = True
             set_asset_status = AssetStatus.objects.filter(
-                organization=request.user.organization,
+                Q(organization=request.user.organization) | Q(organization__isnull=True),
                 name='Available'
             ).first()
             asset.asset_status = set_asset_status
@@ -539,7 +547,7 @@ def delete_assign(request, id):
         assignAsset.delete()
         assignAsset.asset.is_assigned = False
         # assignAsset.asset.status = 1  # Assuming 1 is 'Available'
-        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
+        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
         assignAsset.asset.asset_status=set_asset
         assignAsset.asset.save()
         messages.success(request, 'Asset unassigned successfully')
@@ -582,7 +590,7 @@ def change_status(request, id):
 
             # if new_status not in dict(Asset.STATUS_CHOICES).keys():
             #     return JsonResponse({'error': 'Invalid status'}, status=400)
-            get_status=AssetStatus.objects.filter(organization=request.user.organization, name=new_status).first()
+            get_status=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name=new_status).first()
             asset.asset_status = get_status
             print("get_status", asset.asset_status)
             if asset.asset_status != "Available":  # If status is 'Assigned'
@@ -624,7 +632,7 @@ def add_asset_status(request):
 @user_passes_test(manage_access_for_assets_status)
 def asset_status_list(request):
     all_asset_status_list = AssetStatus.undeleted_objects.filter(
-    organization=request.user.organization).order_by('-created_at')
+    organization=None).order_by('-created_at')
     
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)

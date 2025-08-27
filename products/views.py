@@ -46,7 +46,7 @@ def list(request):
     product_list = Product.undeleted_objects.filter(
                 organization=request.user.organization).annotate(
             total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=False))
+            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
     
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
@@ -55,7 +55,6 @@ def list(request):
     product_ids_in_page = [product.id for product in page_object]
     images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
     print(images_qs)
-    
     # Map asset ID to its first image
     product_images = {}
     for img in images_qs:
@@ -124,40 +123,40 @@ def add_product(request):
             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
                 print("imagessssss",f)
                 ProductImage.objects.create(product=product, image=f)
-        names = request.POST.getlist('custom_field_name')
-        values = request.POST.getlist('custom_field_value')
-        for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip() != "":
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=product.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='product',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        pass
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for key, value in request.POST.items():
+                    if key.startswith("customfield_") and value.strip() != "":
+                        field_id = key.replace("customfield_", "")
+                        try:
+                            cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                            CustomField.objects.create(
+                                name=cf.name,
+                                object_id=product.id,
+                                field_type=cf.field_type,
+                                field_name=cf.field_name,
+                                field_value=value,
+                                entity_type='product',
+                                organization=request.user.organization
+                            )
+                        except CustomField.DoesNotExist:
+                            pass
 
-        for name, val in zip(names, values):
-            if name.strip() and val.strip():
-                CustomField.objects.create(
-                    name=name.strip(),
-                    object_id=product.id,
-                    field_type='text',  # Defaulting new ones as text unless field type select is added
-                    field_name=name.strip(),
-                    field_value=val.strip(),
-                    entity_type='product',
-                    organization=request.user.organization
-                )
-        messages.success(request, 'Product added successfully')
-        return redirect('products:list')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=product.id,
+                        field_type='text',  # Defaulting new ones as text unless field type select is added
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='product',
+                        organization=request.user.organization
+                    )
+            messages.success(request, 'Product added successfully')
+            return redirect('products:list')
     else:
-        form = AddProductsForm()
+        form = AddProductsForm(organization=request.user.organization)
         image_form = ProductImageForm()
 
     context = {'form': form,
@@ -178,7 +177,6 @@ def add_product(request):
 @login_required
 @permission_required('authentication.delete_product')
 def delete_product(request, id):
-
     if request.method == 'POST':
         product = get_object_or_404(
             Product.undeleted_objects, pk=id, organization=request.user.organization)
