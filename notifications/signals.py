@@ -13,8 +13,6 @@ from django.db import connection
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def userNotification(sender, instance, created,  **kwargs):
-
-    print(instance.__dict__)
     if instance.previous_role != instance.role:
         notification = Notification.objects.create(
             instance_id=instance.id,

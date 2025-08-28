@@ -19,11 +19,10 @@ class Asseto_test_add(TestCase):
         )
 
     def test_role(self):
-        print("Roles Testing Start")
         role = Role.objects.get(related_name="Role 1")
         self.assertEqual(role.related_name, "Role 1")
         self.assertEqual(role.organization.name, "Organization 1")
-        print("Role Testing Successful\n")
+
 
 
 class EditRoleTest(TestCase):
@@ -36,7 +35,6 @@ class EditRoleTest(TestCase):
 
     def test_edit_role(self):
         # Edit the role
-        print("Testing Edit Role Starts")
         self.role.related_name = 'New Role'
         self.role.organization.name = 'New Organization'
         self.role.organization.website = 'www.newexample.com'
@@ -50,12 +48,10 @@ class EditRoleTest(TestCase):
         self.assertEqual(self.role.organization.website, 'www.newexample.com')
         self.assertEqual(self.role.organization.email, 'neworganization@example.com')
         self.assertEqual(self.role.organization.phone, '9876543210')
-        print("Testing Edit Role Successful\n")
+
 
     def delete_role(self):
-        print("Delete Role Start")
         self.role.delete()
         organization=Organization.objects.get(id=self.role.organization.id)
         self.assertIsNotNone(organization)
-        print("Delete Role End\n")
         

@@ -10,7 +10,4 @@ def trigger_seed_on_first_superuser(sender,instance,created,**kwargs):
         if created and instance.is_superuser:
             
             if not SeedFlag.objects.exists():  # Only seed once
-                print(f"First superuser {instance.username} created. Running seed...")
                 seed_parent_category()
-            else:
-                print("ℹSeed already performed. Skipping.")
