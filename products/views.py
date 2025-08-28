@@ -54,13 +54,11 @@ def list(request):
     page_object = paginator.get_page(page_number)
     product_ids_in_page = [product.id for product in page_object]
     images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
-    print(images_qs)
     # Map asset ID to its first image
     product_images = {}
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
-            # print("images_product",img)
     context = {
         'sidebar': 'products',
         'product_images': product_images,
@@ -86,7 +84,6 @@ def details_product(request, id):
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
-    print(img_array)
     get_custom_data=[]
     get_data=CustomField.objects.filter(object_id=product.id)
     for it in get_data:
@@ -94,7 +91,7 @@ def details_product(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    print("get_custom_data",get_custom_data)
+
     context = {
         'sidebar': 'products',
         'product': product,
@@ -121,7 +118,6 @@ def add_product(request):
             form.save_m2m()
 #             # product = form.save()
             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-                print("imagessssss",f)
                 ProductImage.objects.create(product=product, image=f)
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
@@ -170,7 +166,6 @@ def add_product(request):
 #             form.save_m2m()
 #             # product = form.save()
 #             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-#                 print("imagessssss",f)
 #                 AssetImage.objects.create(asset=asset, image=f)
 #             return redirect('assets:list')
 
@@ -213,10 +208,8 @@ def update_product(request, id):
             delete_ids = request.POST.getlist('delete_image_ids')
             if delete_ids:
                 ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
-                print("delete_ids",delete_ids)
             for img_file in images:
                 ProductImage.objects.create(product=product, image=img_file)
-                print("img_file",img_file)
             custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
             for cf in custom_fields:
                 key = f"custom_field_{cf.entity_id}"
@@ -228,7 +221,6 @@ def update_product(request, id):
         return redirect('products:list')
 
     context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
-    # print("context",(img_array))
     return render(request, 'products/update-product-modal.html', context)
 
 

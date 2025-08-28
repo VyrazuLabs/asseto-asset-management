@@ -88,7 +88,6 @@ class AssetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
-        # print("organization in asset form",self._organization.id)
         super().__init__(*args, **kwargs)
         self.fields['product'].queryset = Product.objects.filter(organization=self._organization, status=True)
         # self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
@@ -98,7 +97,6 @@ class AssetForm(forms.ModelForm):
     def get_status(self):
         """Returns the display value for the current status."""
         status_value = self.cleaned_data.get('status') or self.initial.get('status')
-        print("statussssssssss",status_value)
         if status_value is not None:
             # status_value might be string ('1') or int (1)
             for value, label in self.fields['status'].choices:

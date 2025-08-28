@@ -80,18 +80,15 @@ def create_matched_data_from_csv_product_type(request):
         try:
             # request.body is bytes, decode and parse JSON\
             # body = request.POST.getlist("arr")
-            # print("Received body: ", body, type(body))
 
             # data = json.loads(body)
             data = json.loads(request.body.decode())
             # Now 'data' is the python object sent from 'arr' (likely a list of dicts)
             
             # For example purposes:
-            print("Received data:", data, type(data))
             for it in data:
                 #Create the the user which are mapped from the csv to databsae
                 obj=ImportedUser.objects.create(entity_type="ProductType",name=it.get('name'))
-                print("IMported user successfully", obj.email)
 
                 # get_user=Vendor.objects.filter(email=it.get("email"),full_name=it.get("first_name"),phone=it.get("phone"),contact_person=it.get("contact_person"),gstin_number=it.get("gstin_number"),designation=it.get("designation"),description=it.get("description")).first()
 

@@ -66,7 +66,6 @@ def assign_assets(request, id):
         asset.is_assigned = True
         set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
         asset.asset_status=set_asset
-        # print("set_asset",set_asset.id)
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
 
@@ -211,7 +210,6 @@ def details(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    print("get_custom_data",get_custom_data)
     context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
     return render(request, 'assets/detail.html', context=context)
@@ -326,7 +324,6 @@ def add(request):
     if request.method == 'POST':
         form = AssetForm(request.POST, organization=request.user.organization_id)
         image_form = AssetImageForm(request.POST, request.FILES)
-        print("organization---------id",request.user.organization_id)
         if form.is_valid() and image_form.is_valid():
             asset = form.save(commit=False)
             asset.organization = request.user.organization
@@ -337,9 +334,7 @@ def add(request):
             available_status = AssetStatus.objects.filter(
             name='Available'
             ).first()
-            print("status",available_status)
             asset.asset_status = available_status 
-            print(asset.asset_status)
             asset.save()
             form.save_m2m()
 
@@ -447,8 +442,6 @@ def search(request, page):
     for img in image_object:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("image_object",image_object)
-    print("page_object",page_object)
     if search_text:
         return render(request, 'assets/assets-data.html', {
             'page_object': page_object,
@@ -573,35 +566,28 @@ def assign_asset_search(request, page):
 
 def change_status(request, id):
     # asset_id=request.GET.get('id')
-    try:
-        if request.method in ['PATCH', 'POST']:
-            try:
-                asset = Asset.objects.filter(id=id).first()
-            except Asset.DoesNotExist:
-                return JsonResponse({'error': 'Asset not found'}, status=404)
-            try:
-                print("Runing")
-                data = json.loads(request.body)
-                new_status = (data.get('status'))
-            except (ValueError, KeyError, json.JSONDecodeError)as e:
-                print("not woring")
-                print("Error", str(e))
-                return HttpResponseBadRequest('Invalid data')
+    if request.method in ['PATCH', 'POST']:
+        try:
+            asset = Asset.objects.filter(id=id).first()
+        except Asset.DoesNotExist:
+            return JsonResponse({'error': 'Asset not found'}, status=404)
+        try:
+            data = json.loads(request.body)
+            new_status = (data.get('status'))
+        except (ValueError, KeyError, json.JSONDecodeError)as e:
+            return HttpResponseBadRequest('Invalid data')
 
-            # if new_status not in dict(Asset.STATUS_CHOICES).keys():
-            #     return JsonResponse({'error': 'Invalid status'}, status=400)
-            get_status=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name=new_status).first()
-            asset.asset_status = get_status
-            print("get_status", asset.asset_status)
-            if asset.asset_status != "Available":  # If status is 'Assigned'
-                asset.is_assigned = False
-                # delete the assigned asset from the asigned asset list
-                AssignAsset.objects.filter(asset=asset).delete()
-                print("Asset DELETED FROM ASSIGNED LIST")
-            asset.save()
-            return JsonResponse({'success': True, 'new_status': new_status})
-    except Exception as e:
-        print("ERROR",str(e))
+        # if new_status not in dict(Asset.STATUS_CHOICES).keys():
+        #     return JsonResponse({'error': 'Invalid status'}, status=400)
+        get_status=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name=new_status).first()
+        asset.asset_status = get_status
+        if asset.asset_status != "Available":  # If status is 'Assigned'
+            asset.is_assigned = False
+            # delete the assigned asset from the asigned asset list
+            AssignAsset.objects.filter(asset=asset).delete()
+        asset.save()
+        return JsonResponse({'success': True, 'new_status': new_status})
+
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
@@ -745,7 +731,6 @@ def update_in_detail(request, id):
 
 def piechart_status_data(request):
     data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
-    print(data)
     return data
 # This gives a list of statuses with counts, which can then be fed to a chart creation library.
 
@@ -769,7 +754,6 @@ def pie_chart_assigned_status(request):
           ['Assigned',assigned],
           ['Unassigned',unassigned],
         ]
-    print("dfgfdgd",chart_data)
     return JsonResponse({
         'chart_data': chart_data
     })
@@ -780,12 +764,9 @@ def pie_chart_status(request):
     if data is None:
         no_data='No Data Found'
     chart_data = [['Status', 'Assets']]
-    print("data", data)
     for item in data:
         chart_data.append([item['asset_status__name'], item['total']])
     filtered_chart_data = [row for row in chart_data if row[0] is not None]
-    # print(filtered_chart_data)
-    print("chart_data", filtered_chart_data)
     return JsonResponse({'chart_data': filtered_chart_data,'no_data':no_data})
 
 # [["Status", "Assets"], [null, 2], ["Lost/Stolen", 1], ["Out for Repair", 1], ["Assigned", 3], ["Available", 6]]

@@ -19,7 +19,6 @@ def seed_asset_statuses(organization=None):
             )
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for status and types")
 
 
 
@@ -28,7 +27,6 @@ def seed_asset_statuses(organization=None):
 def seed_asset_statuses(asset=None, product=None, organization=None):
     default_statuses = ['Broken ', ' Ready To Deploy ', 'Assigned', 'Lost/Stolen','Repair Required','Out for Repair','Available']
     default_types=['Consumeables','Accesories']
-    # print("organization in seeder",organization)
     if asset:
         for status in default_statuses:
                 AssetStatus.objects.get_or_create(
@@ -46,5 +44,4 @@ def seed_asset_statuses(asset=None, product=None, organization=None):
                 )
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for status and types")
     return True
