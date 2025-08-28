@@ -142,11 +142,8 @@
 # @login_required
 # def search_product_sub_category(request, page):
 #     search_text = request.GET.get('search_text').strip()
-#     print("search here", search_text)
 #     if search_text:
-#         print("in here")
 #         sub_category=ProductCategory.undeleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text) & Q(parent__isnull=False)).order_by('-created_at')[:10]
-#         print("HERE",sub_category)
 #         return render(request, 'dashboard/product_sub_category/product-sub-categories-data.html', {
 #             'page_object': sub_category
 #         })
