@@ -327,10 +327,10 @@ def add(request):
         if form.is_valid() and image_form.is_valid():
             asset = form.save(commit=False)
             asset.organization = request.user.organization
-            # asset.asset_status = AssetStatus.objects.filter(
-            #     organization=request.user.organization,
-            #     name='Available'
-            # ).first()
+            set_asset_status = AssetStatus.objects.filter(
+                Q(organization=request.user.organization) | Q(organization__isnull=True),
+                name='Available'
+            ).first()
             available_status = AssetStatus.objects.filter(
             name='Available'
             ).first()
