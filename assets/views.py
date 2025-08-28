@@ -587,11 +587,8 @@ def change_status(request, id):
             AssignAsset.objects.filter(asset=asset).delete()
         asset.save()
         return JsonResponse({'success': True, 'new_status': new_status})
-<<<<<<< Updated upstream
 
 
-=======
->>>>>>> Stashed changes
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
 
