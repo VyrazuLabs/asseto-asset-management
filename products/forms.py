@@ -38,6 +38,7 @@ class AddProductsForm(forms.ModelForm):
         ))
     
     product_sub_category = forms.ModelChoiceField(
+        required=False,
         queryset=None,
         empty_label='--SELECT--',
         widget=forms.Select(

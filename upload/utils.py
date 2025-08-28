@@ -23,7 +23,6 @@ def render_to_csv(context_dict={}):
     writer.writerow(context_dict['header_list'])
     for row in context_dict['rows']:
         writer.writerow(row)
-        print(writer.writerow(row))
     return response
 
 
@@ -96,7 +95,6 @@ def create_matched_data_from_csv_generic(
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode())
-            print("Received data:", data, type(data))
             created_objs = []
             for it in data:
                 # Dynamic creation from mapping
@@ -104,8 +102,6 @@ def create_matched_data_from_csv_generic(
                 create_kwargs = {model_field: it.get(csv_key) for csv_key, model_field in field_map_imported_user.items()}
                 obj = ImportedUser.objects.create(**create_kwargs)
                 created_objs.append(obj)
-                print("obj_created",obj.full_name)
-                # print(f"Created {create_model.__name__}:", obj)
 
                 # Optionally link to base/matching model
                 if match_model and match_field_map and link_field_in_match:
@@ -114,9 +110,6 @@ def create_matched_data_from_csv_generic(
                     if match_obj:
                         setattr(match_obj, link_field_in_match, getattr(obj, link_value_field))
                         match_obj.save()
-                        print("LInked data",match_obj)
-                        # print(f"Linked {match_model.__name__} {match_obj.pk} to {create_model.__name__} {getattr(obj, link_value_field)}")
-
             return JsonResponse({'status': 'success', 'created': len(created_objs)})
         except json.JSONDecodeError:
             return HttpResponseBadRequest('Invalid JSON')

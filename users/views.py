@@ -75,11 +75,8 @@ def details(request, id):
     for it in get_assigned_assets:
         get_obj={}
         get_asset=Asset.objects.filter(id=it['asset_id']).values()
-        print("get_asset",get_asset.values())
-        # print("chc",get_asset[0]['name'])
         # assigned_assets.append(get_asset[0]['name'])
         for it in get_asset:
-            print("it",it)
             get_obj['asset_name']=it['name']
             get_obj['serial_no']=it['serial_no']
             get_obj['id']=it['id']
@@ -88,7 +85,6 @@ def details(request, id):
     #     assigned_assets.append(get_assigned_assets)
     # else:
     #     assigned_assets = None
-    print("-------------------------",assigned_assets)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
@@ -115,14 +111,12 @@ def add(request):
         address_form = AddressForm(request.POST)
 
         if form.is_valid() and address_form.is_valid():
-            print("valid",form.data)
             user = form.save(commit=False)
             password1 = form.cleaned_data.get('password1', '')
             password2 = form.cleaned_data.get('password2', '')
 
             if password1 and password1 == password2:
                 user.set_password(password1)
-                print("password",user)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
@@ -226,7 +220,6 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    print('worked')
     search_text = request.GET.get('search_text').strip()
     if search_text:
         return render(request, 'users/users-data.html', {

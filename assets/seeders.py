@@ -19,7 +19,6 @@ def seed_asset_statuses(organization=None):
             )
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for status and types")
 
 
 
@@ -45,5 +44,4 @@ def seed_asset_statuses(asset=None, product=None, organization=None):
                 )
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for status and types")
     return True
