@@ -43,8 +43,8 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def list(request):
 
-    product_list = Product.undeleted_objects.filter(
-                organization=request.user.organization).annotate(
+    product_list = Product.undeleted_objects.filter(Q(organization=None)|Q(
+                organization=request.user.organization)).annotate(
             total_assets=Count('asset'),
             available_assets=Count('asset', filter=Q(asset__is_assigned=False))
         ).order_by('-created_at')

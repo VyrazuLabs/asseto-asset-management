@@ -44,7 +44,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
+    users_list = User.undeleted_objects.filter(Q(organization=None,is_superuser=False)|Q(organization=request.user.organization, is_superuser=False)).exclude(
         pk=request.user.id).order_by('-created_at')
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')

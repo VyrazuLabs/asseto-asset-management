@@ -36,7 +36,6 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
-    print("here above ==>", request.user.organization)
     all_product_type_list = ProductType.undeleted_objects.filter(
     Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
 

@@ -147,8 +147,8 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
-    asset_list = Asset.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    asset_list = Asset.undeleted_objects.filter(Q(organization=None)|Q(
+        organization=request.user.organization)).order_by('-created_at')
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -742,7 +742,7 @@ def piechart_status_data(request):
 # This gives a list of statuses with counts, which can then be fed to a chart creation library.
 
 def pie_chart_assigned_status(request):
-    data = Asset.objects.all()
+    data = Asset.undeleted_objects.filter(Q(organization=None)|Q(organization=request.user.organization))
     assigned=0
     unassigned=0
     for asset in data:
@@ -767,7 +767,7 @@ def pie_chart_assigned_status(request):
     })
 
 def pie_chart_status(request):
-    data = Asset.undeleted_objects.values('asset_status__name').annotate(total=Count('id'))
+    data = Asset.undeleted_objects.filter(Q(organization=None)|Q(organization=request.user.organization)).values('asset_status__name').annotate(total=Count('id'))
     no_data=None
     if data is None:
         no_data='No Data Found'
