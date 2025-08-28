@@ -160,7 +160,6 @@ class ProductCategoryForm(forms.ModelForm):
         # self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__name='root')
         # try:
         #     initial_parent=ProductCategory.undeleted_objects.filter(name='root').first()
-        #     print(initial_parent)
         #     self.fields['parent'].initial=initial_parent
         # except ProductCategory.DoesNotExist:
         #     pass

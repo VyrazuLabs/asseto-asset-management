@@ -53,7 +53,6 @@ class Asseto_test(TestCase):
 
 
     def test_vendor(self):
-        print("Vendor Testing Start")
         self.vendor = Vendor.objects.get(email="vendor1@asseto.com")
         self.assertEqual(self.vendor.name, "Vendor 1")
         self.assertEqual(self.vendor.phone, "7896321454")
@@ -63,7 +62,6 @@ class Asseto_test(TestCase):
         self.assertEqual(self.vendor.description, "Description 1")
         self.assertEqual(self.vendor.address.address_line_one,"Address line 1")
         self.assertEqual(self.vendor.organization.name, "Organization 1")
-        print("Testing Vendor Successful\n")
 
 # class EditVendorTest(TestCase):
     # def setUp(self):
@@ -71,7 +69,6 @@ class Asseto_test(TestCase):
 
     def test_edit_vendor(self):
         # Edit the vendor
-        print("Testing Edit Vendor Start")
         self.vendor.name = 'New Name'
         self.vendor.email = 'newemail@example.com'
         self.vendor.phone = '1112223333'
@@ -106,7 +103,6 @@ class Asseto_test(TestCase):
         self.assertEqual(self.vendor.organization.date_format,"dd-mm-yyyy")
         self.assertEqual(self.vendor.organization.logo,"logo2.png")
 
-        print("Testing Edit Vendor Successful\n")
     # def test_edit_vendor_with_same_info(self):
     #     # Edit the vendor with same information
     #     self.vendor.name = 'Vendor 1'
@@ -153,10 +149,8 @@ class Asseto_test(TestCase):
     #                         designation='developer',gstin_number='21321',description='description 1',
     #                         address=user_address,organization=user_organization)
     #     self.vendor.save()
-    #     print('Delete vendor')
     def test_delete_vendor(self):
         # Try to delete the vendor object
-        print("Vendor Deletion Testing Start")
         self.vendor.delete()
         
         # Check if the vendor object is deleted from the database
@@ -168,5 +162,4 @@ class Asseto_test(TestCase):
         organization = Organization.objects.get(id=self.vendor.organization.id)
         self.assertIsNotNone(address)
         self.assertIsNotNone(organization)
-        print('Vendor Deleted Successfull\n')
 

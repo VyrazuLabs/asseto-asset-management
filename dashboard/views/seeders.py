@@ -10,8 +10,6 @@ def seed_parent_category(organization=None):
         )
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for parent category for super user")
-
 
 
 
@@ -28,5 +26,4 @@ def seed_parent_category(category=None, organization=None):
 
 
     SeedFlag.objects.create(seeded=True)
-    print("seeding Complete for parent category for users")
     return True
