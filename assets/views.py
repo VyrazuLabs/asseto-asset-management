@@ -66,6 +66,7 @@ def assign_assets(request, id):
         asset.is_assigned = True
         set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
         asset.asset_status=set_asset
+ 
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
 
