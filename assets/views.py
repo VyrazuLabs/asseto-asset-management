@@ -146,8 +146,8 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
-    asset_list = Asset.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('-created_at')
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -617,8 +617,8 @@ def add_asset_status(request):
 @login_required
 @user_passes_test(manage_access_for_assets_status)
 def asset_status_list(request):
-    all_asset_status_list = AssetStatus.undeleted_objects.filter(
-    organization=None).order_by('-created_at')
+    all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
+    Q(organization=request.user.organization)).order_by('-created_at')
     
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)
