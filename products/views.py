@@ -43,10 +43,10 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def list(request):
 
-    product_list = Product.undeleted_objects.filter(
-                organization=request.user.organization).annotate(
+    product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
+            organization=request.user.organization)).annotate(
             total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=False))
+            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
     
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
@@ -54,14 +54,11 @@ def list(request):
     page_object = paginator.get_page(page_number)
     product_ids_in_page = [product.id for product in page_object]
     images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
-    print(images_qs)
-    
     # Map asset ID to its first image
     product_images = {}
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
-            # print("images_product",img)
     context = {
         'sidebar': 'products',
         'product_images': product_images,
@@ -87,7 +84,6 @@ def details_product(request, id):
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
-    print(img_array)
     get_custom_data=[]
     get_data=CustomField.objects.filter(object_id=product.id)
     for it in get_data:
@@ -95,7 +91,7 @@ def details_product(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    print("get_custom_data",get_custom_data)
+
     context = {
         'sidebar': 'products',
         'product': product,
@@ -122,42 +118,41 @@ def add_product(request):
             form.save_m2m()
 #             # product = form.save()
             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-                print("imagessssss",f)
                 ProductImage.objects.create(product=product, image=f)
-        names = request.POST.getlist('custom_field_name')
-        values = request.POST.getlist('custom_field_value')
-        for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip() != "":
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=product.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='product',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        pass
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for key, value in request.POST.items():
+                    if key.startswith("customfield_") and value.strip() != "":
+                        field_id = key.replace("customfield_", "")
+                        try:
+                            cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                            CustomField.objects.create(
+                                name=cf.name,
+                                object_id=product.id,
+                                field_type=cf.field_type,
+                                field_name=cf.field_name,
+                                field_value=value,
+                                entity_type='product',
+                                organization=request.user.organization
+                            )
+                        except CustomField.DoesNotExist:
+                            pass
 
-        for name, val in zip(names, values):
-            if name.strip() and val.strip():
-                CustomField.objects.create(
-                    name=name.strip(),
-                    object_id=product.id,
-                    field_type='text',  # Defaulting new ones as text unless field type select is added
-                    field_name=name.strip(),
-                    field_value=val.strip(),
-                    entity_type='product',
-                    organization=request.user.organization
-                )
-        messages.success(request, 'Product added successfully')
-        return redirect('products:list')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=product.id,
+                        field_type='text',  # Defaulting new ones as text unless field type select is added
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='product',
+                        organization=request.user.organization
+                    )
+            messages.success(request, 'Product added successfully')
+            return redirect('products:list')
     else:
-        form = AddProductsForm()
+        form = AddProductsForm(organization=request.user.organization)
         image_form = ProductImageForm()
 
     context = {'form': form,
@@ -171,14 +166,12 @@ def add_product(request):
 #             form.save_m2m()
 #             # product = form.save()
 #             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-#                 print("imagessssss",f)
 #                 AssetImage.objects.create(asset=asset, image=f)
 #             return redirect('assets:list')
 
 @login_required
 @permission_required('authentication.delete_product')
 def delete_product(request, id):
-
     if request.method == 'POST':
         product = get_object_or_404(
             Product.undeleted_objects, pk=id, organization=request.user.organization)
@@ -201,7 +194,7 @@ def update_product(request, id):
     img_form= ProductImageForm(request.POST, request.FILES)
     get_product_img=ProductImage.objects.filter(product=product).values()
     custom_fields = CustomField.objects.filter(
-                entity_type='product', object_id=product.id, organization=request.user.organization)
+        entity_type='product', object_id=product.id, organization=request.user.organization)
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
@@ -215,10 +208,8 @@ def update_product(request, id):
             delete_ids = request.POST.getlist('delete_image_ids')
             if delete_ids:
                 ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
-                print("delete_ids",delete_ids)
             for img_file in images:
                 ProductImage.objects.create(product=product, image=img_file)
-                print("img_file",img_file)
             custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
             for cf in custom_fields:
                 key = f"custom_field_{cf.entity_id}"
@@ -230,7 +221,6 @@ def update_product(request, id):
         return redirect('products:list')
 
     context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
-    # print("context",(img_array))
     return render(request, 'products/update-product-modal.html', context)
 
 

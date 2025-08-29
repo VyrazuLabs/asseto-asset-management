@@ -37,8 +37,8 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def product_category_list(request):
 
-    all_product_category_list = ProductCategory.undeleted_objects.filter(
-    organization=request.user.organization).order_by('-created_at').exclude(name='Root')
+    all_product_category_list = ProductCategory.undeleted_objects.filter( Q(organization=None)|
+    Q(organization=request.user.organization)).order_by('-created_at').exclude(name='Root')
     
     paginator = Paginator(all_product_category_list,
     PAGE_SIZE, orphans=ORPHANS)
