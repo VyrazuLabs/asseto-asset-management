@@ -174,7 +174,7 @@
         {% endif %}
 
         {% if users %}
-            {% if not request.user.is_superuser %}
+            {% if request.user.is_superuser %}
                 <div class="card">
                     <div class="card-body">
                         <h4>Users</h4>
