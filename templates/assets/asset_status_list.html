@@ -1,22 +1,16 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Asset Status</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Asset Status</li>
-                    </ol>
-                </nav>
-            </div>
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Asset Status</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Asset Status</li>
+                </ol>
+            </nav>
         </div>
-    </div>
-    <section class="section">
         {% if perms.authentication.add_asset_status %}
             <div>
                 <button type="button" class="btn btn-sm btn-outline-info my-3" 
@@ -25,7 +19,8 @@
                 >Add Asset Status</button>
             </div>
         {% endif %}
-
+    </div>
+    <section class="section">
         <!-- add modal -->
         <div class="modal fade text-left" id="add-asset-status-modal" tabindex="-1" role="dialog"
             aria-labelledby="myModalLabel160" aria-hidden="true">

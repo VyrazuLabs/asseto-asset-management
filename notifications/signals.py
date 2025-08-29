@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_init, post_delete
+from django.db.models.signals import post_save, post_init, post_delete,pre_save
 from django.dispatch import receiver
 from django.conf import settings
 from notifications.models import Notification, UserNotification
@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from django.db.backends.signals import connection_created
 from assets.models import AssignAsset
 from django.db import connection
+from assets.models import Asset
 
 # User Notification
 
@@ -53,6 +54,34 @@ def remember_state_user(sender, instance, **kwargs):
 
 
 # Asset Notification
+
+
+@receiver(pre_save, sender=Asset)
+def save_old_status(sender, instance, **kwargs):
+    if instance.pk:
+        old_instance = Asset.objects.get(pk=instance.pk)
+        instance._old_status = old_instance.asset_status
+    else:
+        instance._old_status = None
+
+@receiver(post_save, sender=Asset)
+def notify_admin_on_status_change(sender, instance, created, **kwargs):
+    if not created and hasattr(instance, '_old_status'):
+        old_status = instance._old_status
+        new_status = instance.asset_status
+
+        if old_status != new_status:
+            notification = Notification.objects.create(
+                notification_title="Asset Status Changed",
+                notification_text=f"The status of asset '{instance}' has been changed to '{new_status}'.",
+                icon="status_change_icon",
+                # link=f"/admin/assets/asset/{instance.pk}/change/",  # Update to actual admin URL
+                is_superuser=True
+            )
+            admins = User.objects.filter(is_superuser=True)
+            for admin in admins:
+                UserNotification.objects.create(user=admin, notification=notification)
+
 
 @receiver(post_save, sender=AssignAsset)
 def asset_notification(sender, instance, created,  **kwargs):

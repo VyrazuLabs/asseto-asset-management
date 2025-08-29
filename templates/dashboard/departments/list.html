@@ -1,30 +1,26 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Departments</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Departments</li>
-                    </ol>
-                </nav>
-            </div>
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="page-title">
+            <h3>Departments</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Departments</li>
+                </ol>
+            </nav>
         </div>
-    </div>
-    <section class="section">
         {% if perms.authentication.add_department %}
-            <div>
+            <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-sm btn-outline-info my-3" 
                     hx-get="{% url 'dashboard:add_department' %}" hx-target="#add-department-modal-content"
                     data-bs-toggle="modal" data-bs-target="#add-department-modal"
                 >Add Department</i></button>
             </div>
         {% endif %}
+    </div>
+    <section class="section">
         <!-- add modal -->
         <div class="modal fade text-left" id="add-department-modal" tabindex="-1" role="dialog"
             aria-labelledby="myModalLabel160" aria-hidden="true">
