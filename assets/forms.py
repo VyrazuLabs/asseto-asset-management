@@ -97,7 +97,6 @@ class AssetForm(forms.ModelForm):
     def get_status(self):
         """Returns the display value for the current status."""
         status_value = self.cleaned_data.get('status') or self.initial.get('status')
-        print("statussssssssss",status_value)
         if status_value is not None:
             # status_value might be string ('1') or int (1)
             for value, label in self.fields['status'].choices:
@@ -107,7 +106,7 @@ class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = ['name', 'serial_no', 'price', 'purchase_date', 'warranty_expiry_date', 'description',
-                  'purchase_type', 'product', 'vendor', 'organization', 'location','tag',
+                  'purchase_type', 'product', 'vendor', 'location','tag',
                   'status'
                   ]
 class MultipleFileInput(forms.ClearableFileInput):

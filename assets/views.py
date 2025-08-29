@@ -64,9 +64,8 @@ def assign_assets(request, id):
 
         # Mark asset as assigned
         asset.is_assigned = True
-        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Assigned').first()
+        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
         asset.asset_status=set_asset
-        print("set_asset",set_asset.id)
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
 
@@ -147,8 +146,8 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
-    asset_list = Asset.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('-created_at')
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -211,7 +210,6 @@ def details(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    print("get_custom_data",get_custom_data)
     context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
     return render(request, 'assets/detail.html', context=context)
@@ -275,7 +273,10 @@ def update(request, id):
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
-            form.save()
+            asset_instance = form.save(commit=False)
+            asset_instance.organization = request.user.organization  # always set or preserve
+            asset_instance.save()
+            form.save_m2m()
             assetSpecifications.delete()
             # Handle image removals
             delete_ids = request.POST.getlist('delete_image_ids')
@@ -319,32 +320,38 @@ def update(request, id):
 @login_required
 @permission_required('authentication.add_asset')
 def add(request):
+    # Handle POST
     if request.method == 'POST':
         form = AssetForm(request.POST, organization=request.user.organization_id)
         image_form = AssetImageForm(request.POST, request.FILES)
-
         if form.is_valid() and image_form.is_valid():
-            # ------- Save asset -------
             asset = form.save(commit=False)
             asset.organization = request.user.organization
             set_asset_status = AssetStatus.objects.filter(
-                organization=request.user.organization,
+                Q(organization=request.user.organization) | Q(organization__isnull=True),
                 name='Available'
             ).first()
-            asset.asset_status = set_asset_status
+            available_status = AssetStatus.objects.filter(
+            name='Available'
+            ).first()
+            asset.asset_status = available_status 
             asset.save()
             form.save_m2m()
 
-            # ------- Save images -------
+            # Save images
             for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
 
-            # ------- Save values for predefined custom fields -------
+            # Handle predefined custom fields
             for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip() != "":
+                if key.startswith("customfield_") and value.strip():
                     field_id = key.replace("customfield_", "")
                     try:
-                        cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
                         CustomField.objects.create(
                             name=cf.name,
                             object_id=asset.id,
@@ -355,32 +362,28 @@ def add(request):
                             organization=request.user.organization
                         )
                     except CustomField.DoesNotExist:
-                        pass
+                        continue
 
-            # ------- Save newly created custom fields from dynamic add section -------
+            # Handle dynamically added custom fields
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
-            print(asset.id)
-
             for name, val in zip(names, values):
                 if name.strip() and val.strip():
                     CustomField.objects.create(
                         name=name.strip(),
                         object_id=asset.id,
-                        field_type='text',  # Defaulting new ones as text unless field type select is added
+                        field_type='text',
                         field_name=name.strip(),
                         field_value=val.strip(),
                         entity_type='asset',
                         organization=request.user.organization
                     )
-
             return redirect('assets:list')
-
     else:
         form = AssetForm(organization=request.user.organization_id)
         image_form = AssetImageForm()
 
-    # Fetch existing predefined custom fields for assets
+    # Fetch custom fields for display
     custom_fields = CustomField.objects.filter(
         entity_type='asset',
         organization=request.user.organization
@@ -439,8 +442,6 @@ def search(request, page):
     for img in image_object:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("image_object",image_object)
-    print("page_object",page_object)
     if search_text:
         return render(request, 'assets/assets-data.html', {
             'page_object': page_object,
@@ -460,7 +461,7 @@ def search(request, page):
 def assigned_list(request):
 
     assign_asset_list = AssignAsset.objects.filter(
-        asset__organization=request.user.organization).order_by('-asset__created_at')
+        asset__organization=request.user.organization or None).order_by('-asset__created_at')
     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -487,7 +488,7 @@ def assign_asset(request):
             asset = form.instance.asset
             asset.is_assigned = True
             set_asset_status = AssetStatus.objects.filter(
-                organization=request.user.organization,
+                Q(organization=request.user.organization) | Q(organization__isnull=True),
                 name='Available'
             ).first()
             asset.asset_status = set_asset_status
@@ -539,7 +540,7 @@ def delete_assign(request, id):
         assignAsset.delete()
         assignAsset.asset.is_assigned = False
         # assignAsset.asset.status = 1  # Assuming 1 is 'Available'
-        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
+        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
         assignAsset.asset.asset_status=set_asset
         assignAsset.asset.save()
         messages.success(request, 'Asset unassigned successfully')
@@ -565,35 +566,28 @@ def assign_asset_search(request, page):
 
 def change_status(request, id):
     # asset_id=request.GET.get('id')
-    try:
-        if request.method in ['PATCH', 'POST']:
-            try:
-                asset = Asset.objects.filter(id=id).first()
-            except Asset.DoesNotExist:
-                return JsonResponse({'error': 'Asset not found'}, status=404)
-            try:
-                print("Runing")
-                data = json.loads(request.body)
-                new_status = (data.get('status'))
-            except (ValueError, KeyError, json.JSONDecodeError)as e:
-                print("not woring")
-                print("Error", str(e))
-                return HttpResponseBadRequest('Invalid data')
+    if request.method in ['PATCH', 'POST']:
+        try:
+            asset = Asset.objects.filter(id=id).first()
+        except Asset.DoesNotExist:
+            return JsonResponse({'error': 'Asset not found'}, status=404)
+        try:
+            data = json.loads(request.body)
+            new_status = (data.get('status'))
+        except (ValueError, KeyError, json.JSONDecodeError)as e:
+            return HttpResponseBadRequest('Invalid data')
 
-            # if new_status not in dict(Asset.STATUS_CHOICES).keys():
-            #     return JsonResponse({'error': 'Invalid status'}, status=400)
-            get_status=AssetStatus.objects.filter(organization=request.user.organization, name=new_status).first()
-            asset.asset_status = get_status
-            print("get_status", asset.asset_status)
-            if asset.asset_status != "Available":  # If status is 'Assigned'
-                asset.is_assigned = False
-                # delete the assigned asset from the asigned asset list
-                AssignAsset.objects.filter(asset=asset).delete()
-                print("Asset DELETED FROM ASSIGNED LIST")
-            asset.save()
-            return JsonResponse({'success': True, 'new_status': new_status})
-    except Exception as e:
-        print("ERROR",str(e))
+        # if new_status not in dict(Asset.STATUS_CHOICES).keys():
+        #     return JsonResponse({'error': 'Invalid status'}, status=400)
+        get_status=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name=new_status).first()
+        asset.asset_status = get_status
+        if asset.asset_status != "Available":  # If status is 'Assigned'
+            asset.is_assigned = False
+            # delete the assigned asset from the asigned asset list
+            AssignAsset.objects.filter(asset=asset).delete()
+        asset.save()
+        return JsonResponse({'success': True, 'new_status': new_status})
+
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
 
@@ -623,8 +617,8 @@ def add_asset_status(request):
 @login_required
 @user_passes_test(manage_access_for_assets_status)
 def asset_status_list(request):
-    all_asset_status_list = AssetStatus.undeleted_objects.filter(
-    organization=request.user.organization).order_by('-created_at')
+    all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
+    Q(organization=request.user.organization)).order_by('-created_at')
     
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)
@@ -737,7 +731,6 @@ def update_in_detail(request, id):
 
 def piechart_status_data(request):
     data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
-    print(data)
     return data
 # This gives a list of statuses with counts, which can then be fed to a chart creation library.
 
@@ -761,7 +754,6 @@ def pie_chart_assigned_status(request):
           ['Assigned',assigned],
           ['Unassigned',unassigned],
         ]
-    print("dfgfdgd",chart_data)
     return JsonResponse({
         'chart_data': chart_data
     })
@@ -772,12 +764,9 @@ def pie_chart_status(request):
     if data is None:
         no_data='No Data Found'
     chart_data = [['Status', 'Assets']]
-    print("data", data)
     for item in data:
         chart_data.append([item['asset_status__name'], item['total']])
     filtered_chart_data = [row for row in chart_data if row[0] is not None]
-    # print(filtered_chart_data)
-    print("chart_data", filtered_chart_data)
     return JsonResponse({'chart_data': filtered_chart_data,'no_data':no_data})
 
 # [["Status", "Assets"], [null, 2], ["Lost/Stolen", 1], ["Out for Repair", 1], ["Assigned", 3], ["Available", 6]]

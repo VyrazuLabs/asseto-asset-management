@@ -28,5 +28,4 @@ def get_count_of_assets(request,vendor_id):
     Returns the count of assets for the given organization.
     """
     get_count=Asset.objects.filter(organization=request.user.organization,vendor=vendor_id, is_deleted=False).count()
-    print("get_count", get_count)
     return get_count

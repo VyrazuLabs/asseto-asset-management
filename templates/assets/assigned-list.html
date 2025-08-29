@@ -1,20 +1,26 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Assigned Asset List</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Assets</li>
-                    </ol>
-                </nav>
-            </div>
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Assign Asset</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Assign Asset</li>
+                </ol>
+            </nav>
         </div>
+        {% if perms.authentication.add_assign_asset %}
+            <div>
+                <!-- assign btn -->
+                <button type="button"  class="btn btn-sm btn-outline-info my-3 "
+                    hx-get="{% url 'assets:assign_asset' %}" hx-target="#assign-asset-modal-content"
+                    data-bs-toggle="modal" data-bs-target="#assign-asset-modal"
+                >Assign Asset</button>
+            </div>
+
+        {% endif %}
     </div>
     <section class="section">
         <!-- assign modal -->
@@ -23,15 +29,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div id="assign-asset-modal-content" class="modal-content" hx-target="this"></div>
             </div>
-        </div>
-        {% if perms.authentication.add_assign_asset %}
-            <!-- assign btn -->
-            <button type="button"  class="btn btn-sm btn-outline-info my-3"
-                hx-get="{% url 'assets:assign_asset' %}" hx-target="#assign-asset-modal-content"
-                data-bs-toggle="modal" data-bs-target="#assign-asset-modal"
-            >Assign Asset</button>
-        {% endif %}
-        
+        </div>        
         <!-- reassign modal -->
         <div class="modal fade text-left" id="reassign-asset-modal" tabindex="-1" role="dialog"
             aria-labelledby="myModalLabel160" aria-hidden="true">
@@ -48,7 +46,7 @@
                             hx-get="{% url 'assets:assign_asset_search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
                 {% endif %}
-                <table class="table table-hover" id="table1">
+                <table class="table table-hover text-center" id="table1">
                     <thead>
                         <tr>
                             <th>Sl No.</th>

@@ -96,7 +96,6 @@ def render_to_mapper_modal(request):
     arr = request.session.pop('arr', [])
     header= request.session.pop('header', [])
     model=request.session.pop('model',[])
-    print("Arr", arr, header)
     context = {'page': 'Vendors','arr':arr,'header':header,'model':model}
     return render(request, 'upload/modal.html', context)
 
@@ -105,18 +104,15 @@ def create_matched_data_from_csv_locations(request):
         try:
             # request.body is bytes, decode and parse JSON\
             # body = request.POST.getlist("arr")
-            # print("Received body: ", body, type(body))
 
             # data = json.loads(body)
             data = json.loads(request.body.decode())
             # Now 'data' is the python object sent from 'arr' (likely a list of dicts)
             
             # For example purposes:
-            print("Received data:", data, type(data))
             for it in data:
                 #Create the the user which are mapped from the csv to databsae
                 obj=ImportedUser.objects.create(entity_type="Location",office_name=it.get("office_name"),contact_person_name=it.get("contact_person_name"),contact_person_email=it.get("contact_person_email"),contact_person_phone=it.get("contact_person_phone")).first()
-                print("IMported user successfully", obj.email)
 
                 # get_user=Location.objects.filter(entity_type="Location",office_name=it.get("office_name"),contact_person_name=it.get("contact_person_name")).first()
 
