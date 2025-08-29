@@ -62,9 +62,6 @@
                                               hx-target="this"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end" onclick="event.stopPropagation();">
-                                        <li>
-                                            <h6 class="dropdown-header">Notifications</h6>
-                                        </li>
                                         <span hx-get="{% url 'notifications:data' %}" 
                                               hx-target="this" 
                                               hx-trigger="load, notificationListChanged from:body, every 5s">

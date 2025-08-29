@@ -59,8 +59,11 @@ def remember_state_user(sender, instance, **kwargs):
 @receiver(pre_save, sender=Asset)
 def save_old_status(sender, instance, **kwargs):
     if instance.pk:
-        old_instance = Asset.objects.get(pk=instance.pk)
-        instance._old_status = old_instance.asset_status
+        try:
+            old_instance = Asset.objects.get(pk=instance.pk)
+            instance._old_status = old_instance.asset_status
+        except Asset.DoesNotExist:
+            instance._old_status = None
     else:
         instance._old_status = None
 
