@@ -1,25 +1,23 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Add Product</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Products</li>
-                        <li class="breadcrumb-item active" aria-current="page">Add Product</li>
-                    </ol>
-                </nav>
-            </div>
-            <div>
-                <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
-            </div>
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Add Product</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Products</li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                </ol>
+            </nav>
+        </div>      
+
+        <div>
+            <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
         </div>
     </div>
+ 
     <section class="section">
         <form class="form row" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
@@ -225,5 +223,25 @@
                 subCatSelect.innerHTML = '<option value="">Error loading</option>';
             });
     });
+
+    const productCategorySelect = document.getElementById('id_product_category');
+    const productSubCategorySelect = document.getElementById('id_product_sub_category');
+
+    function toggleSubCategory() {
+        if (!productCategorySelect.value) {
+            productSubCategorySelect.disabled = true;
+            productSubCategorySelect.value = '';
+        } else {
+            productSubCategorySelect.disabled = false;
+        }
+    }
+
+    // Initial state on page load
+    toggleSubCategory();
+
+    // Listen for changes
+    productCategorySelect.addEventListener('change', toggleSubCategory);
+
+
 </script>
 {% endblock content %}
