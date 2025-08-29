@@ -123,10 +123,10 @@ def user_login(request):
                 login(request, user)
                 messages.success(request,  f'Welcome, {user.full_name}')
 
-                # redirecting to the requested url
-                if request.GET.get('next'):
-                    return redirect(request.GET.get('next'))
-                return redirect('/')
+                    # redirecting to the requested url
+                    if request.GET.get('next'):
+                        return redirect(request.GET.get('next'))
+                    return redirect('/')
             else:
                 messages.error(request, 'Invalid credentials!')
     return render(request, 'auth/login.html', context={'form': form})
