@@ -83,13 +83,11 @@ def make_fields_optional(form, fields=None):
         fields = form.fields.keys()
     for field_name in fields:
         if field_name in form.fields:
-            print(field_name, type(form.fields[field_name]))
             form.fields[field_name].required = False
 
 def get_asset_by_users(id):
     get_user=User.objects.filter(id=id).first()
     get_asset=AssignAsset.objects.filter(user=get_user)
-    print(get_asset)
     return get_asset
 
     

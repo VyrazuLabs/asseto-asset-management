@@ -116,7 +116,6 @@ class User_Test(TestCase):
 
 
     def test_user(self):
-        print("User Testing Start")
         # self.user = User.objects.get(email = "mail@gmail.com")
         self.assertEqual(self.user.full_name, "test")
         self.assertEqual(self.user.username, "usertest")
@@ -148,12 +147,10 @@ class User_Test(TestCase):
         self.assertEqual(self.user.organization.currency, "INR")
         self.assertEqual(self.user.organization.date_format, "dd-mm-yyyy")
         self.assertEqual(self.user.organization.logo, "logo.png")
-        print("User Testing Successful\n")
 
 
     def test_edit_user(self):
         # user = User.objects.get(email="mail2@gmail.com")
-        print("User Edit Testing Start")
         self.user.username = "usertest2"
         self.user.full_name = "test2"
         self.user.phone = "1234567890"
@@ -212,11 +209,9 @@ class User_Test(TestCase):
         self.assertEqual(self.user.department.name, "Department 2")
         self.assertEqual(self.user.department.contact_person_name, "Person 2")
         self.assertEqual(self.user.department.contact_person_email, "person2@asseto.com")
-        self.assertEqual(self.user.department.contact_person_phone, "1234567890")
-        print('User Edit Testing Successfuol\n')    
+        self.assertEqual(self.user.department.contact_person_phone, "1234567890")   
         
     def delete_user(self):
-        print("User Delete Testing Start")
         self.user.delete()
 
         # Check if the vendor object is deleted from the database
@@ -234,4 +229,3 @@ class User_Test(TestCase):
         self.assertIsNotNone(department)
         self.assertIsNotNone(organization)
         self.assertIsNotNone(role)
-        print("User Delete Testing Successful\n")

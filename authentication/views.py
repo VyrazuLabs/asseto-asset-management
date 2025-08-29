@@ -27,58 +27,58 @@ from assets.seeders import seed_asset_statuses
 from assets.models import AssignAsset
 from django.views.decorators.cache import never_cache
 from dashboard.views.seeders import seed_parent_category
-
+from django.db.models import Q
 User = get_user_model()
 
 
 @login_required
 def index(request):
-
+ 
     all_asset_cost = 0
     today = datetime.now()
     time_threshold = datetime.now() + timedelta(days=30)
-    expiring_assets = Asset.undeleted_objects.filter(organization=request.user.organization, warranty_expiry_date__lt=time_threshold).exclude(
+    expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(
         warranty_expiry_date__lt=today).order_by('warranty_expiry_date')
-
-    all_asset_list = Asset.undeleted_objects.filter(
-        organization=request.user.organization)
+ 
+    all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization))
     asset_count = all_asset_list.count()
-
+ 
     for asset in all_asset_list:
         all_asset_cost = all_asset_cost + asset.price
-
-    all_product_list = Product.undeleted_objects.filter(
-        organization=request.user.organization)
-    latest_product_list = Product.undeleted_objects.filter(
-        organization=request.user.organization).order_by('created_at').reverse()[0:5]
+ 
+    all_product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization))
+    latest_product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
     product_count = all_product_list.count()
-
-    all_vendor_list = Vendor.undeleted_objects.filter(
-        organization=request.user.organization)
-    latest_vendor_list = Vendor.undeleted_objects.filter(
-        organization=request.user.organization).order_by('created_at').reverse()[0:5]
+ 
+    all_vendor_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization))
+    latest_vendor_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
     vendor_count = all_vendor_list.count()
-
-    location_list = Location.undeleted_objects.filter(
-        organization=request.user.organization)
-    all_location_list = Location.undeleted_objects.filter(
-        organization=request.user.organization).order_by('created_at').reverse()[0:5]
+ 
+    location_list = Location.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization))
+    all_location_list = Location.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
     location_count = location_list.count()
-
-    assign_assets = AssignAsset.objects.filter(
-        asset__organization=request.user.organization)
+ 
+    assign_assets = AssignAsset.objects.filter(Q(asset__organization=None) | Q(
+        asset__organization=request.user.organization))
     assign_assets_counts = assign_assets.count()
-
+ 
     unassign_assets_count = asset_count - assign_assets_counts
-
-    users_list = User.undeleted_objects.filter(
-        organization=request.user.organization).exclude(is_superuser=True)
-    latest_users_list = User.undeleted_objects.filter(organization=request.user.organization).exclude(
+ 
+    users_list = User.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).exclude(is_superuser=True)
+    latest_users_list = User.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).exclude(
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
-
+ 
     context = {
-
+ 
         'sidebar': 'index',
         'product_count': product_count,
         'vendor_count': vendor_count,
@@ -94,15 +94,31 @@ def index(request):
         'users_count': users_count,
         'expiring_assets': expiring_assets,
         'title': 'Dashboard'
-
+ 
     }
-
+ 
     return render(request, 'index.html', context=context)
 
 
 @unauthenticated_user
 def user_login(request):
-    try:
+    form = UserLoginForm()
+    if request.method == 'POST':
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(email=email, password=password)
+            asset = None
+            product = None
+            if user is not None:
+                
+                if not AssetStatus.objects.filter(can_modify=False).first():
+                    seed_asset_statuses(asset=True)
+                if not ProductType.objects.filter(can_modify=False).first():
+                    seed_asset_statuses(product=True)
+                if not ProductCategory.objects.filter(name='Root').exists():
+                    seed_parent_category(category=True)
 
         form = UserLoginForm()
         if request.method == 'POST':
@@ -115,7 +131,8 @@ def user_login(request):
                 product = None
                 if user is not None:
                     
-                    if not AssetStatus.objects.filter(can_modify=False).first():
+                    if not AssetStatus.objects.filter(can_modify=False).first() or not AssetStatus.objects.filter(name='Available'):
+                        AssetStatus.objects.create(name='Available', organization=None, can_modify=False)
                         seed_asset_statuses(asset=True)
                     if not ProductType.objects.filter(can_modify=False).first():
                         seed_asset_statuses(product=True)
@@ -124,19 +141,17 @@ def user_login(request):
                     else:
                         print('seed fail for category')
 
-                    login(request, user)
-                    messages.success(request,  f'Welcome, {user.full_name}')
+                login(request, user)
+                messages.success(request,  f'Welcome, {user.full_name}')
 
-                    # redirecting to the requested url
-                    if request.GET.get('next'):
-                        return redirect(request.GET.get('next'))
-                    return redirect('/')
-                else:
-                    messages.error(request, 'Invalid credentials!')
-        return render(request, 'auth/login.html', context={'form': form})
+                # redirecting to the requested url
+                if request.GET.get('next'):
+                    return redirect(request.GET.get('next'))
+                return redirect('/')
+            else:
+                messages.error(request, 'Invalid credentials!')
+    return render(request, 'auth/login.html', context={'form': form})
 
-    except Exception as e:
-        print("\n",str(e),"\n")
 
 
 @unauthenticated_user
@@ -151,8 +166,10 @@ def user_register(request):
             organization = o_form.save()
             user = u_form.save(commit=False)
             user.organization = organization
+            user.is_active = True
             user.is_superuser = True
             user.access_level = True
+            user.is_active = True
             user.save()
 
             messages.success(

@@ -44,8 +44,8 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def vendor_list(request):
-    vendors_list = Vendor.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
+    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('-created_at')
     print(vendors_list.values_list("id"))
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
     count_array=[]
@@ -54,7 +54,6 @@ def vendor_list(request):
         count_array.append(get_count)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    print("page_object",page_object)
     context = {'sidebar': 'vendors','count_array': count_array,
                'page_object': page_object, 'title': 'Vendors'}
     return render(request, 'vendors/list.html', context=context)
@@ -120,7 +119,6 @@ def details(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    print("get_custom_data",get_custom_data)
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
     'address': address, 'title': 'Vendor - Details','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
     return render(request, 'vendors/detail.html', context=context)

@@ -1,35 +1,34 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
 <div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Roles</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Roles</li>
-                    </ol>
-                </nav>
-            </div>
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Roles</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Roles</li>
+                </ol>
+            </nav>
         </div>
-    </div>
-    <section class="section">
-        <!-- Add Modal -->
-        <div>
-            <button type="button" class="btn btn-sm btn-outline-info my-3" 
-                hx-get="{% url 'roles:add' %}" hx-target="#add-role-modal-content"
-                data-bs-toggle="modal" data-bs-target="#add-role-modal">Add role</button>
+                <!-- Add Modal -->
+            <div>
+                {% if perms.authentication.add_role %}
+                <button type="button" class="btn btn-sm btn-outline-info my-3" 
+                    hx-get="{% url 'roles:add' %}" hx-target="#add-role-modal-content"
+                    data-bs-toggle="modal" data-bs-target="#add-role-modal">Add role</button>
+                {% endif %}
 
-            <div class="modal fade text-left" id="add-role-modal" tabindex="-1" role="dialog"
-                aria-labelledby="myModalLabel160" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                    <div id="add-role-modal-content" class="modal-content" hx-target="this"></div>
+                <div class="modal fade text-left" id="add-role-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel160" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div id="add-role-modal-content" class="modal-content" hx-target="this"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+    </div>
+
+    <section class="section">
         <!-- update modal -->
         <div class="modal fade text-left" id="update-role-modal" tabindex="-1" role="dialog"
             aria-labelledby="myModalLabel160" aria-hidden="true">
