@@ -120,13 +120,16 @@ def user_login(request):
                 if not ProductCategory.objects.filter(name='Root').exists():
                     seed_parent_category(category=True)
 
-                    login(request, user)
-                    messages.success(request,  f'Welcome, {user.full_name}')
+                else:
+                    print('seed fail for category')
 
-                    # redirecting to the requested url
-                    if request.GET.get('next'):
-                        return redirect(request.GET.get('next'))
-                    return redirect('/')
+                login(request, user)
+                messages.success(request,  f'Welcome, {user.full_name}')
+
+                # redirecting to the requested url
+                if request.GET.get('next'):
+                    return redirect(request.GET.get('next'))
+                return redirect('/')
             else:
                 messages.error(request, 'Invalid credentials!')
     return render(request, 'auth/login.html', context={'form': form})
