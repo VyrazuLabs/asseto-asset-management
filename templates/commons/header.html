@@ -53,7 +53,7 @@
                         <!-- Push everything else to right -->
                         <div class="d-flex align-items-center ms-auto">
                             <!-- Notification -->
-                            <ul class="navbar-nav mb-0 me-3">
+                            <ul class="navbar-nav mb-0 me-3 ">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link active dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-bell bi-sub fs-4"></i>
@@ -61,17 +61,12 @@
                                               hx-get="{% url 'notifications:count' %}" 
                                               hx-target="this"></span>
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-end" onclick="event.stopPropagation();">
+                                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" onclick="event.stopPropagation();">
                                         <span hx-get="{% url 'notifications:data' %}" 
                                               hx-target="this" 
-                                              hx-trigger="load, notificationListChanged from:body, every 5s">
+                                              hx-trigger="load, notificationListChanged from:body">
                                             <li><a class="dropdown-item">No notification available</a></li>
                                         </span>
-                                        <li>
-                                            <a href="{% url 'notifications:list' %}" class="dropdown-item">
-                                                <span>See all Notifications</span>
-                                            </a>
-                                        </li>
                                     </ul>
                                 </li>
                             </ul>
