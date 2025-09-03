@@ -117,11 +117,12 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover table-lg">
+                    <table class="table table-hover table-lg table-borderless">
                         <thead>
                             <tr>
                                 <th>Sl No.</th>
-                                <th>Asset</th>
+                                <th>Asset Serial Number</th>
+                                <th>Asset Name</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -134,6 +135,10 @@
                                         </p>
                                     </div>
                                 </td>
+                                <td class="col-auto">
+                                    {{ asset.serial_no|default:"######" }}
+                                </td>
+
                                 <td class="col-auto">
                                     {{ asset.name|default:"Unnamed Asset" }}
                                 </td>
