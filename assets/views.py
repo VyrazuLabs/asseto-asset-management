@@ -622,7 +622,7 @@ def add_asset_status(request):
 def asset_status_list(request):
     all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
     Q(organization=request.user.organization)).order_by('-created_at')
-    
+    print(all_asset_status_list)
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
