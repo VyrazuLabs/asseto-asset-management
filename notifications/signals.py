@@ -8,6 +8,7 @@ from django.db.backends.signals import connection_created
 from assets.models import AssignAsset
 from django.db import connection
 from assets.models import Asset
+
 # User Notification
 
 
@@ -74,12 +75,11 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
 
         if old_status != new_status:
             notification = Notification.objects.create(
-                notification_title="Status Changed",
+                notification_title="Asset Status Changed",
                 notification_text=f"The status of asset '{instance}' has been changed to '{new_status}'.",
-                icon="bi-gear-fill",
-                link=f"/assets/list",  # Update to actual admin URL
-                is_superuser=True,
-                updated_by=instance.updated_by
+                icon="status_change_icon",
+                # link=f"/admin/assets/asset/{instance.pk}/change/",  # Update to actual admin URL
+                is_superuser=True
             )
             admins = User.objects.filter(is_superuser=True)
             for admin in admins:
@@ -121,9 +121,9 @@ def asset_notification(sender, instance, created,  **kwargs):
 def asset_delete_notification(sender, instance, *args,  **kwargs):
     notification = Notification.objects.create(
         instance_id=instance.id,
-        notification_title='Asset Deleted',
-        notification_text=f'{instance.asset.name} has been deleted.',
-        icon='bi-gear-fill',
+        notification_title='Assigned asset',
+        notification_text=f'{instance.asset.name} is unassigned from you.',
+        icon='bi-person-workspace',
     )
 
     UserNotification.objects.create(
