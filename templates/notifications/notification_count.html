@@ -3,8 +3,13 @@
 {% endif %}
 
 {% if notification_count %}
-    <span class="badge bg-danger text-white position-absolute d-flex align-items-center justify-content-center rounded-circle" 
-    style="top:10px; right:22px; height:1.2rem; width:1.2rem; font-size: 10px;">
+    <span class="badge text-white position-absolute d-flex align-items-center justify-content-center rounded-circle" 
+    style="top:10px; right:22px; height:1.2rem; width:1.2rem; font-size: 10px; background-color: #6f42c1 !important;">
         {{notification_count}}
+    </span>
+{% else %}
+    <span class="badge  text-white position-absolute d-flex align-items-center justify-content-center rounded-circle" 
+    style="top:10px; right:22px; height:1.2rem; width:1.2rem; font-size: 10px; background-color: #6f42c1 !important;">
+        0
     </span>
 {% endif %}
