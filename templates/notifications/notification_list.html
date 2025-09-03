@@ -110,10 +110,15 @@
 
         </div>
     </li>
+    {% else %}
+    <div class="p-3">
+        <li>No notifications available</li>
+    </div>
+{% endif %}
+
 
 <script>
     function removeUnreadDots() {
         document.querySelectorAll('.unread-dot').forEach(dot => dot.remove());
     }
 </script>
-{% endif %}
