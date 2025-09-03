@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import UserNotification
 from django.core.paginator import Paginator
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 import json
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
@@ -25,8 +25,8 @@ def list(request):
         'page_object': page_object,
         'title': 'Notifications'
     }
-    # UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
-    #     notification__instance_id=request.user.id).update(is_seen=True)
+    UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
+        notification__instance_id=request.user.id).update(is_seen=True)
     return render(request, 'notifications/details.html', context=context)
 
 
@@ -43,34 +43,25 @@ def count(request):
 @login_required
 def data(request):
     return render(request, 'notifications/notification_list.html', {
-        'notifications': UserNotification.objects.filter(user=request.user).exclude(notification__instance_id=request.user.id).order_by('-notification__created_at')[0:5]
+        'notifications': UserNotification.objects.filter(user=request.user, is_seen=False).exclude(notification__instance_id=request.user.id).order_by('-notification__created_at')[0:5]
     })
 
 
-# @login_required
-# @ require_POST
-# def clear(request):
-#     if request.method == 'POST':
-#         UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
-#             notification__instance_id=request.user.id).update(is_seen=True)
-#         return HttpResponse(
-#             status=204,
-#             headers={
-#                 'HX-Trigger': json.dumps({
-#                     "notificationCountChanged": None,
-#                     "notificationListChanged": None,
-#                 })
-#             }
-#         )
-
-
-
-def mark_all_as_read(request):
+@login_required
+@ require_POST
+def clear(request):
     if request.method == 'POST':
         UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
             notification__instance_id=request.user.id).update(is_seen=True)
-        return JsonResponse({"success": True})
-    return JsonResponse({"success": False}, status=400)  # Method Not Allowed if not POST
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "notificationCountChanged": None,
+                    "notificationListChanged": None,
+                })
+            }
+        )
 
 
 @login_required
