@@ -43,56 +43,6 @@
         </li>
     {% endfor %}
     
-{% if notifications  %}
-    <li>
-        <div class="p-3 d-flex flex-column">
-            {% with notifications|length as notification_count %}
-                {% if notification_count >= 2 %}
-                    <a 
-                        class="btn btn-sm align-items-center justify-content-center text-white mb-2"
-                        style="background-color: #9694ff !important;"
-                        hx-post="{% url 'notifications:mark_all_as_read' %}"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                        hx-trigger="click"
-                        hx-swap="none"
-                        onclick="removeUnreadDots()"
-                    >
-                        Mark all as read
-                    </a>
-                {% endif %}
-            
-
-            {% if notification_count >= 5 %}
-                <a 
-                    href="{% url 'notifications:list' %}" 
-                    class="btn text-center see-all-notifications btn-sm" 
-                    style="
-                        background-color: #435ebe !important;
-                        color: white !important;
-                        padding: 0.375rem 0.75rem;
-                        border: none;
-                        border-radius: 0.25rem;
-                        font-size: 0.875rem;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;"
-                >
-                    <span>See all Notifications</span>
-                </a>
-            {% endif %}
-            {% endwith %}
-
-        </div>
-    </li>
-    {% else %}
-    <div class="p-3">
-        <li>No notifications available</li>
-    </div>
+{% else %}
+    <li><a class="dropdown-item">No notification available</a></li>
 {% endif %}
-
-
-<script>
-    function removeUnreadDots() {
-        document.querySelectorAll('.unread-dot').forEach(dot => dot.remove());
-    }
-</script>
