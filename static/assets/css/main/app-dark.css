@@ -8043,3 +8043,16 @@ body[data-theme="dark"] {
     background: #555;
 }
 
+.box {
+  background-color: #435ebe;
+  color: white;
+  width: 200px;       /* Set desired width */
+  height: 100px;      /* Set desired height */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  border-radius: 5px;
+}
+
+
+
