@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import AssetForm, AssignedAssetForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
+from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.contrib import messages
 from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus
 from django.core.paginator import Paginator
@@ -35,15 +35,13 @@ from authentication.models import User
 @login_required
 @permission_required('assets.change_asset', raise_exception=True)
 def release_asset(request, id):
-    if request.method == 'POST':
-        asset = get_object_or_404(Asset, pk=id)
-        # Assumes status 3 means "Ready To Deploy"
-        set_asset=AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
-        asset.asset_status=set_asset
-        # asset.status = 1
-        asset.save()
-        messages.success(request, f"Asset '{asset.name}' has been released and is now Ready To Deploy.")
-    return redirect('assets:list')
+    asset = get_object_or_404(Asset, pk=id)
+    set_asset = AssetStatus.objects.filter(organization=request.user.organization, name='Available').first()
+    asset.asset_status = set_asset
+    asset.save()
+    msg = f"Asset '{asset.name}' has been released and is now Ready To Deploy."
+    return JsonResponse({'success': True, 'message': msg})
+
 
 from django.contrib.auth import get_user_model
 
@@ -483,7 +481,6 @@ def assign_asset(request):
     if request.method == 'POST':
         form = AssignedAssetForm(request.POST, organization=request.user.organization_id)
         image_form = AssetImageForm(request.POST, request.FILES)
-
         if form.is_valid() and image_form.is_valid():
             # Mark the asset as assigned and save
             asset = form.instance.asset
@@ -525,6 +522,7 @@ def reassign_asset(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+
             messages.success(
                 request, 'Asset re-assigned successfully')
             return HttpResponse(status=204)
@@ -773,3 +771,42 @@ def pie_chart_status(request):
     return JsonResponse({'chart_data': filtered_chart_data,'no_data':no_data})
 
 # [["Status", "Assets"], [null, 2], ["Lost/Stolen", 1], ["Out for Repair", 1], ["Assigned", 3], ["Available", 6]]
+def assign_asset_in_asset_list(request, id):
+    # import pdb
+    # pdb.set_trace()
+    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+    # data = dict(request.POST)
+    # if data is not None:
+    #     data["asset"] = asset.pk
+    form = AssignedAssetListForm(request.POST,
+                             organization=request.user.organization)
+    image_form = AssetImageForm(request.FILES)
+    if request.method == 'POST':
+        if form.is_valid() and image_form.is_valid():
+            assign_obj = form.save(commit=False)
+            assign_obj.asset = asset        # Explicitly set asset!
+            assign_obj.save()
+            asset.is_assigned = True
+            asset.asset_status = AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
+            asset.save()
+            form.save_m2m()
+            # print("infoooooooooooo",form.data)
+            # files=request.FILES.getlist('image')
+            # print("FILES",files)
+            # img_files=image_form.data('image')
+            # print("img_files",img_files)
+            # print("other IMAGESSSSSSSSSS",img_files)
+            files = request.FILES.getlist('images')
+            for f in files:
+                AssetImage.objects.create(asset=asset, image=f)
+            messages.success(request, 'Asset assigned to user successfully')
+            return HttpResponse(status=204)
+        else:
+            print("FORM IS NOT VALDIDDDDDDDDDDDDDDDDDDDDDDDD")
+            print(form.errors)
+            return redirect('assets:list')
+    else:
+        form = AssignedAssetListForm()
+        image_form = AssetImageForm()
+    context = {'form': form,'image_form':image_form,'asset':asset}
+    return render(request, 'assets/assign-asset-modal-in-list.html', context=context)
