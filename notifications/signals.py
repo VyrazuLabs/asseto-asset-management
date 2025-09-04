@@ -1,3 +1,4 @@
+import sys
 from django.db.models.signals import post_save, post_init, post_delete,pre_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -173,6 +174,9 @@ def expiring_asset(days):
 
 @receiver(connection_created)
 def conn_db(sender, connection, **kwargs):
+    # avoid running during migrations
+    if any(cmd in sys.argv for cmd in ['makemigrations', 'migrate']):
+        return
     expiring_asset(15)
     expiring_asset(7)
     expiring_asset(0)
