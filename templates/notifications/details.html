@@ -104,12 +104,11 @@
                   aria-label="Basic example"
                 >
                   {% if user_notification.notification.link is not None %}
-                  <a
-                    class="btn btn-success"
-                    href="{{user_notification.notification.link}}"
-                    class="btn btn-success"
-                    ><i class="bi bi-eye-fill"></i
-                  ></a>
+                  <a class="btn btn-success" onclick="location.href='{{user_notification.notification.link}}';"
+                    hx-post="{% url 'notifications:seen' user_notification.id %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-trigger="click"
+                  ><i class="bi bi-eye-fill"></i></a>
                   {% else %}
                   <button class="btn btn-danger">
                     <i class="bi bi-eye-fill"></i>
