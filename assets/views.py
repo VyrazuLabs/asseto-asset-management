@@ -565,6 +565,7 @@ def assign_asset_search(request, page):
     page_object = paginator.get_page(page_number)
     return render(request, 'assets/assigned-assets-data.html', {'page_object': page_object})
 
+@login_required
 def change_status(request, id):
     # asset_id=request.GET.get('id')
     if request.method in ['PATCH', 'POST']:
@@ -582,6 +583,7 @@ def change_status(request, id):
         #     return JsonResponse({'error': 'Invalid status'}, status=400)
         get_status=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name=new_status).first()
         asset.asset_status = get_status
+        asset.updated_by=request.user.full_name
         if asset.asset_status != "Available":  # If status is 'Assigned'
             asset.is_assigned = False
             # delete the assigned asset from the asigned asset list
@@ -620,7 +622,7 @@ def add_asset_status(request):
 def asset_status_list(request):
     all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
     Q(organization=request.user.organization)).order_by('-created_at')
-    
+    print(all_asset_status_list)
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
