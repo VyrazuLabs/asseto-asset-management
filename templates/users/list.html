@@ -1,7 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
 {% block content %}
-{% load custom_filters %}
-
 {% load static %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -67,7 +65,6 @@
                             <th>Image</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Assigned Assets</th>
                             <th>Designation</th>
                             <th>Access Level</th>
                             <th>Last Login</th>
@@ -97,32 +94,6 @@
                             </td>
                             <td>{{user.full_name | title}}</td>
                             <td>{{user.email}}</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 10px">
-                                {% if user.id in user_asset_map_count %}
-                                    <button type="button" 
-                                            style="background: transparent; border: none; color: inherit; cursor: pointer;"
-                                            hx-get="{% url 'users:user_assigned_assets' user.id %}" 
-                                            class="open-product-modal btn p-0"
-                                            hx-target="#show-user-asset-modal-content"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#show-user-asset-modal">
-                                        {{ user_asset_map_count|get_item:user.id }}
-                                    </button>
-                                    </div>
-                                    <div class="modal fade text-left" id="show-user-asset-modal" tabindex="-1" role="dialog"
-                                                aria-labelledby="myModalLabel140" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                                    <div id="show-user-asset-modal-content" class="modal-content" hx-target="this"></div>
-                                                </div>
-                                    </div>
-                                </td>
-                                {% endif %}
-                                {% if user.id not in user_asset_map %}
-                                    <p>0</p>
-                                {% endif %}
-                                </div>
-                            </td>
                             <td>{{user.role}}</td>
                             <td>
                                 {% if user.access_level %}

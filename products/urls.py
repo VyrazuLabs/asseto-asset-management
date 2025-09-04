@@ -13,5 +13,4 @@ urlpatterns = [
     path('search/<str:page>', views.search, name='search'),
     path('csv', views.export_products_csv, name='export_products_csv'),
     path('pdf', views.export_products_pdf, name='export_products_pdf'),
-    path('assigned-product-info/<uuid:id>', views.get_assigned_product_info, name='assigned_product_info'),
 ]
