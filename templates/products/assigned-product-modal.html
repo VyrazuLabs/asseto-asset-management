@@ -1,0 +1,84 @@
+<style>
+    .modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header, .modal-footer {
+  display: flex;
+  justify-content: space-between; /* spreads buttons/title */
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  overflow-y: auto; /* scroll if content too tall */
+}
+
+.modal-title {
+  flex-grow: 1;
+  text-align: center;
+}
+
+</style>
+<div class="modal-content" id="show-asset-modal-content" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel160" aria-hidden="true">
+    <div >
+        <div id="add-product-modal-content" class="modal-content" hx-target="this">
+        <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white" id="myModalLabel160">Assigned Assets
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+     <div class="modal-body">
+        <div class="row" style="width: 100%;">
+          <div class="col-12">
+            <div class="form-group">
+              <table class="table" style="align-items: center;">
+                <thead>
+                  <tr>
+                    <th>Sr No</th>
+                    <th>Asset Name</th>
+                    <th>Vendor</th>
+                    <th>Asset Serial Number</th>
+                    <th>Product Type</th>
+                    <th>Asset Status</th>
+                    <th>Assigned Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for it in get_assets %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ it.name }}</td>
+                    <td>{{ it.vendor }}</td>
+                    <td>{{ it.serial_no }}</td>
+                    <td>{{ it.product.product_type }}</td>
+                    <td>{{ it.asset_status.name }}</td>
+                    <td>{{ it.is_assigned }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+<script>
+
+document.getElementById("addCustomFieldBtn").onclick = function() {
+        var container = document.getElementById("custom-field-container");
+        var template = document.getElementById("custom-field-template");
+        container.appendChild(template.cloneNode(true));
+    }
+    // Remove a custom field row
+    function removeCustomField(el) {
+        el.closest(".rm-custom-field").remove();
+    }
+
+</script>
