@@ -22,10 +22,11 @@ urlpatterns = [
     path('status-ready-to-repair/<str:id>/',views.update_in_detail,name='update_in_detail'),
     path('piechart_status_data/', views.pie_chart_assigned_status, name='piechart_status_data'),
     path('assets_by_status', views.pie_chart_status, name='pie_chart_status'),
+    #Asset Staus--->
+
     path('add_status',views.add_asset_status,name='add_asset_status'),
     path('asset_status_list',views.asset_status_list,name='asset_status_list'),
     path('asset_status_details/<uuid:id>',views.asset_status_details,name='asset_status_details'),
     path('edit_asset_status/<uuid:id>',views.edit_asset_status,name='edit_asset_status'),
-    path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status'),
-    path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
+    path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status')
 ]
