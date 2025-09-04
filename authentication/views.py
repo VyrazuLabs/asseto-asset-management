@@ -104,32 +104,34 @@ def index(request):
 def user_login(request):
     form = UserLoginForm()
     if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            user = authenticate(email=email, password=password)
-            asset = None
-            product = None
-            if user is not None:
-                
-                if not AssetStatus.objects.filter(can_modify=False).first():
-                    seed_asset_statuses(asset=True)
-                if not ProductType.objects.filter(can_modify=False).first():
-                    seed_asset_statuses(product=True)
-                if not ProductCategory.objects.filter(name='Root').exists():
-                    seed_parent_category(category=True)
+        form = UserLoginForm()
+        if request.method == 'POST':
+            form = UserLoginForm(request.POST)
+            if form.is_valid():
+                email = form.cleaned_data['email']
+                password = form.cleaned_data['password']
+                user = authenticate(email=email, password=password)
+                asset = None
+                product = None
+                if user is not None:
+                    
+                    if not AssetStatus.objects.filter(can_modify=False).first() or not AssetStatus.objects.filter(name='Available'):
+                        AssetStatus.objects.create(name='Available', organization=None, can_modify=False)
+                        seed_asset_statuses(asset=True)
+                    if not ProductType.objects.filter(can_modify=False).first():
+                        seed_asset_statuses(product=True)
+                    if not ProductCategory.objects.filter(name='Root').exists():
+                        seed_parent_category(category=True)
+                    else:
+                        print('seed fail for category')
 
-                else:
-                    print('seed fail for category')
+                    login(request, user)
+                    messages.success(request,  f'Welcome, {user.full_name}')
 
-                login(request, user)
-                messages.success(request,  f'Welcome, {user.full_name}')
-
-                # redirecting to the requested url
-                if request.GET.get('next'):
-                    return redirect(request.GET.get('next'))
-                return redirect('/')
+                    # redirecting to the requested url
+                    if request.GET.get('next'):
+                        return redirect(request.GET.get('next'))
+                    return redirect('/')
             else:
                 messages.error(request, 'Invalid credentials!')
     return render(request, 'auth/login.html', context={'form': form})
