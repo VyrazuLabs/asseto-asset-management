@@ -12,7 +12,7 @@ from .utils import create_all_perm_role
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.contrib.auth.decorators import permission_required
 from datetime import date
 from assets.models import Asset
@@ -46,10 +46,27 @@ def manage_access(user):
 def list(request):
     users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
         pk=request.user.id).order_by('-created_at')
+    get_assets=AssignAsset.objects.filter(user__in=users_list)
+    arr=[]
+    user_asset_count = (
+        AssignAsset.objects
+        .filter(user__in=users_list)
+        .values('user_id')
+        .annotate(asset_count=Count('id'))
+    )
+    user_asset_map_count = {row['user_id']: row['asset_count'] for row in user_asset_count}
+    arr.append(user_asset_map_count)
+    # get_assets_count=AssignAsset.objects.filter(user__in=users_list).count()
+    print(str(get_assets.query))
+    print("Assets fpund:",get_assets)
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    user_asset_map = {asset.user_id: asset for asset in get_assets}
+    arr.append(user_asset_map)
+    print("arr",arr)
+    print("mappedddddddd",user_asset_map.keys())
+    print("count",get_assets)
     if request.method == "POST":
         messages.success(
             request, 'User added successfully and Verification email sent to the user')
@@ -57,14 +74,18 @@ def list(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     context = {'sidebar': 'users',
-               'page_object': page_object, 'title': 'Users'}
+               'get_assets': get_assets,   
+               'page_object': page_object,
+               'user_asset_map': user_asset_map,
+                'user_asset_map_count': user_asset_map_count,
+                'arr': arr,
+               'title': 'Users'}
     return render(request, 'users/list.html', context=context)
 
 
 @login_required
 @permission_required('authentication.view_users')
 def details(request, id):
-
     user = get_object_or_404(
         User.undeleted_objects, pk=id, organization=request.user.organization)
 
@@ -258,3 +279,9 @@ def export_users_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="export-users-{today}.pdf"'
     return response
+
+@login_required
+def user_assigned_assets(request, id): 
+    # user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
+    get_user=AssignAsset.objects.filter(user_id=id)
+    return render(request, 'users/assigned-asset-modal.html', {'get_user': get_user})
