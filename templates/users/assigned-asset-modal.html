@@ -1,0 +1,87 @@
+<style>
+    .modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header, .modal-footer {
+  display: flex;
+  justify-content: space-between; /* spreads buttons/title */
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  overflow-y: auto; /* scroll if content too tall */
+}
+
+.modal-title {
+  flex-grow: 1;
+  text-align: center;
+}
+
+</style>
+<div class="modal-content" id="user-show-asset-modal-content" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel140" aria-hidden="true">
+    <div>
+        <div id="add-product-modal-content" style="width: 100%;" class="modal-content" hx-target="this">
+            <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white w-100" id="myModalLabel140">Assigned Assets
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+            aria-label="Close">
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <table class="table" style="align-items:center; padding:40px;">
+                <thead>
+                  <tr>
+                    <th>Sr No</th>
+                    <th>User Assigned Asset Name</th>
+                    <th>Vendor</th>
+                    <th>Serial Number</th>
+                    <th>Product Type</th>
+                    <th>Product Category</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for it in get_user %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ it.asset.name }}</td>
+                    <td>{{ it.asset.vendor }}</td>
+                    <td>{{ it.asset.serial_no }}</td>
+                    <td>{{ it.asset.product.product_type }}</td>
+                    <td>{{ it.asset.product.product_category }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+              {% for error in get_user.name.errors %}
+              <small class="text-danger mb-3">{{ error }}</small>
+              {% endfor %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+<script>
+
+document.getElementById("addCustomFieldBtn").onclick = function() {
+        var container = document.getElementById("custom-field-container");
+        var template = document.getElementById("custom-field-template");
+        container.appendChild(template.cloneNode(true));
+    }
+    // Remove a custom field row
+    function removeCustomField(el) {
+        el.closest(".rm-custom-field").remove();
+    }
+
+</script>
