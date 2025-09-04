@@ -138,7 +138,7 @@ class AssetImageForm(forms.ModelForm):
 class AssignedAssetForm(forms.ModelForm):
     asset = forms.ModelChoiceField(
         required=True,
-        queryset=Asset.undeleted_objects.filter(is_assigned=False, status=True),
+        queryset=None,
         label='he;ll',
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -147,7 +147,7 @@ class AssignedAssetForm(forms.ModelForm):
 
     user = forms.ModelChoiceField(
         required=True,
-        queryset=User.undeleted_objects.filter(is_active=True).exclude(is_superuser=True),
+        queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
             attrs={'class': 'form-select'}
@@ -165,27 +165,6 @@ class AssignedAssetForm(forms.ModelForm):
     class Meta:
             model = AssignAsset
             fields = ['asset', 'user']
-
-class AssignedAssetListForm(forms.ModelForm):
-    user = forms.ModelChoiceField(
-        required=True,
-        queryset=User.undeleted_objects.filter(is_active=True).exclude(is_superuser=True),
-        empty_label="--SELECT--",
-        widget=forms.Select(
-            attrs={'class': 'form-select'}
-        ))
-    
-    # image = MultipleFileField(label='Select files', required=False)
-
-    def __init__(self, *args, **kwargs):
-        self._organization = kwargs.pop('organization', None)
-        super().__init__(*args, **kwargs)
-        self.fields['user'].queryset = User.undeleted_objects.filter(is_active=True, organization=self._organization).exclude(is_superuser=True)
-        
-    
-    class Meta:
-            model = AssignAsset
-            fields = ['user']
 
 
 class ReassignedAssetForm(forms.ModelForm):
