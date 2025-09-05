@@ -15,6 +15,7 @@ urlpatterns = [
     path('assign-asset', views.assign_asset, name='assign_asset'),
     path('reassign-asset/<uuid:id>', views.reassign_asset, name='reassign_asset'),
     path('delete-assign/<uuid:id>', views.delete_assign, name='delete_assign'),
+    path('delete-assign-asset-list/<uuid:id>', views.delete_assign_asset_list, name='delete_assign_asset_list'),
     path('assign_asset_search/<str:page>', views.assign_asset_search, name='assign_asset_search'),
     path('change-status/<str:id>/',views.change_status,name='change_status'),
     path('status-repair-to-release/<str:id>/',views.release_asset,name='release'),
