@@ -83,7 +83,7 @@
                                         {% if img %}
                                             <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
                                         {% elif not img.image.url %}
-                                            <img src="{% static 'assets/images/faces/1.jpg' %}">
+                                            <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                         {% endif %}
                                     {% endwith %}
                                 </td>
