@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    "django_htmx",
     'authentication',
     'vendors',
     'products',
@@ -78,7 +78,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',
+    "django_htmx.middleware.HtmxMiddleware"
 ]
 
 ROOT_URLCONF = 'AssetManagement.urls'
@@ -105,25 +106,25 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME':  os.environ.get('DB_DATABASE'),
-        'USER':  os.environ.get('DB_USERNAME'),
-        'PASSWORD':  os.environ.get('DB_PASSWORD'),
-        'HOST':  os.environ.get('DB_HOST'),
-        'PORT':  os.environ.get('DB_PORT'),
-        "TEST": {
-            "NAME": "test_asseto",
-        },
-    }
-}
 # DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
+#     'default': {
+#         'ENGINE': os.environ.get('DB_ENGINE'),
+#         'NAME':  os.environ.get('DB_DATABASE'),
+#         'USER':  os.environ.get('DB_USERNAME'),
+#         'PASSWORD':  os.environ.get('DB_PASSWORD'),
+#         'HOST':  os.environ.get('DB_HOST'),
+#         'PORT':  os.environ.get('DB_PORT'),
+#         "TEST": {
+#             "NAME": "test_asseto",
+#         },
 #     }
+# }
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -197,3 +198,4 @@ DJANGORESIZED_DEFAULT_KEEP_META = True
 DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
 DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000  # or higher if needed
