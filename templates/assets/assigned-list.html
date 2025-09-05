@@ -14,12 +14,14 @@
         {% if perms.authentication.add_assign_asset %}
             <div>
                 <!-- assign btn -->
-                <button type="button"  class="btn btn-sm btn-outline-info my-3 "
-                    hx-get="{% url 'assets:assign_asset' %}" hx-target="#assign-asset-modal-content"
-                    data-bs-toggle="modal" data-bs-target="#assign-asset-modal"
+                <button type="button"  
+                    class="btn btn-sm btn-outline-info my-3 "
+                    hx-get="{% url 'assets:assign_asset' %}" 
+                    hx-target="#assign-asset-modal-content"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#assign-asset-modal"
                 >Assign Asset</button>
             </div>
-
         {% endif %}
     </div>
     <section class="section">
