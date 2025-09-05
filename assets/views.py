@@ -795,6 +795,7 @@ def assign_asset_in_asset_list(request, id):
     
             # print("other IMAGESSSSSSSSSS",img_files)
             files = request.FILES.getlist('images')
+            # print("FILES",files)
             for f in files:
                 AssetImage.objects.create(asset=asset, image=f)
                 print("IMAGES CREATED",f)
@@ -805,7 +806,7 @@ def assign_asset_in_asset_list(request, id):
             print(form.errors)
             return redirect('assets:list')
     else:
-        form = AssignedAssetListForm()
+        form = AssignedAssetListForm(organization=request.user.organization)
         image_form = AssetImageForm()
     context = {'form': form,'image_form':image_form,'asset':asset}
     return render(request, 'assets/assign-asset-modal-in-list.html', context=context)
