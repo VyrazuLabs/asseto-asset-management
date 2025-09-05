@@ -95,12 +95,6 @@
                                                 data-bs-target="#assign-asset-list-modal">
                                                 Assign Asset
                                             </button>
-                                           <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
-                                                <div class="modal-dialog modal-lg">
-                                                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
@@ -180,8 +174,13 @@
                     {% endif %}
                 </table>
                 {% include 'commons/pagination.html' %}
-</div>
-
+                </div>
+                <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -194,13 +193,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const statusField = document.getElementById("status-id-" + assetId);
         const assignContainer = document.getElementById("assign-btn-container-" + assetId);
         const releaseContainer = document.getElementById("release-btn-container-" + assetId);
-        console.log("Asset:", selectEl.value, "Assign Container:", assignContainer, "Release Container:", releaseContainer);
+
         function toggleAssignContainer() {
             if (selectEl.value === "Assigned") {
                 releaseContainer.style.display = "none";
                 assignContainer.style.display = "none";
                 statusField.disabled = true;
-                console.log("Showing release container for asset", assetId);
             }
             else if (selectEl.value !== "Assigned" 
             // && selectEl.value !== "Ready To Deploy"
@@ -208,7 +206,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 assignContainer.style.display = "block";
 
                 releaseContainer.style.display = "none";
-                console.log("Showing assign container for asset", assetId);
             } 
             // else if (selectEl.value === "Ready To Deploy") {
             //     releaseContainer.style.display = "block";
