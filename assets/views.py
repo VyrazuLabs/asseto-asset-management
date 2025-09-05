@@ -544,6 +544,17 @@ def delete_assign(request, id):
         messages.success(request, 'Asset unassigned successfully')
     return redirect('assets:assigned_list')
 
+def delete_assign_asset_list(request, id):
+    if request.method == 'POST':
+        asset=Asset.objects.filter(id=id).first()
+        asset.is_assigned=False
+        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
+        asset.asset_status=set_asset
+        asset.save()
+        assignAsset = get_object_or_404(
+            AssignAsset, asset=asset, asset__organization=request.user.organization)
+        assignAsset.delete()
+    return redirect('assets:list')
 
 @login_required
 def assign_asset_search(request, page):
