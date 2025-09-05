@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     {% csrf_token %}
@@ -53,7 +54,7 @@
                             <td>
                                 {% with img=asset_images|get_item:asset.id %}
                                     {% if img %}
-                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
+                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
                                     {% else %}
                                         No Image
                                     {% endif %}
@@ -83,31 +84,74 @@
                             </td>
                             {{active_users}}
                             <td>
-                                <select class="status-select form-select" data-asset-id="{{ asset.id }}">
-                                    <option value="" disabled selected>{{ asset.asset_status.name }}</option>
-                                    {% for value, label in asset_form.fields.status.choices %}
-                                        <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                                {% if asset.asset_status.name == "Ready To Deploy" %}
+                                <div style="display: flex;justify-content: space-between;gap: 10px;">
+                                    <div style="display: none;" class="assign-button-container" id="assign-btn-container-{{ asset.id }}">
+                                        <div class="input-group">
+                                            <button type="button"  
+                                                class="btn btn-info btn-sm"
+                                                hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+                                                hx-target="#assign-asset-modal-list-content"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#assign-asset-list-modal">
+                                                Assign Asset
+                                            </button>
+                                           <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
+                                        <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
+                                        {% for value, label in asset_form.fields.status.choices %}
+                                            <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                        {% if asset.is_assigned and value == "Assigned" %}
+                                            <option value="{{ value }}" disabled>{{ label }}</option>
+                                        {% endif %}
+                                    </select>
+                                </div>
+                            <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-warning release-asset-btn"
+                                            data-asset-id="{{ asset.id }}">
+                                        Release
+                                    </button>
+                                </div>
+                            </div>
+
+                                <!-- {% if asset.asset_status.name == "Ready To Deploy" %}
                                     <form method="post" action="{% url 'assets:release' asset.id %}">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-warning btn-sm">Release</button>
+                                     <button 
+                                        type="button" 
+                                        class="btn btn-warning btn-sm release-asset-btn" 
+                                        data-asset-id="{{ asset.id }}"
+                                        data-csrf-token="{{ csrf_token }}">
+                                        Release
+                                    </button>
                                     </form>
                                 {% elif asset.asset_status.name == "Available" %}
-                                    <form method="post" action="{% url 'assets:assigned' asset.id %}">
-                                    {% csrf_token %}
-                                    <div class="input-group">
-                                        <select name="user_id" class="form-select" required>
-                                            <option value="">Select User</option>
-                                            {% for user in active_user %}
-                                                <option value="{{ user.id }}">{{ user.full_name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
-                                    </div>
+                                    <form 
+                                        method="post" 
+                                        action="{% url 'assets:change_status' asset.id %}" 
+                                        class="assign-user-form" 
+                                        data-asset-id="{{ asset.id }}"
+                                    >
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <select name="user_id" class="form-select" required>
+                                                <option value="">Select User</option>
+                                                {% for user in active_user %}
+                                                    <option value="{{ user.id }}">{{ user.full_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                                        </div>
                                     </form>
-                                {% endif %}
+                                {% endif %} -->
                             </td>
                             
                             <td>
@@ -136,59 +180,239 @@
                     {% endif %}
                 </table>
                 {% include 'commons/pagination.html' %}
+</div>
+
             </div>
         </div>
     </section>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.status-select').forEach(function(select) {
-            select.addEventListener('change', function() {
-                const result= this.getAttribute('data-asset-id');
-                const assetId  = result.replace(/-/g, "");
-                console.log("assetid",assetId)
-                const statusValue = this.value;
-                console.log("statusValue",statusValue)
-    
-                fetch(`/assets/change-status/${assetId}/`, {
-                    method: 'POST',  // or POST/PUT depending on your API
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')  // CSRF for Django POST requests
-                    },
-                    body: JSON.stringify({status: statusValue})
-                }).then(response => {
-                    console.log("response",response)
-                    if (!response.ok) {
-                        alert('Failed to update status');
-                    }
-                    return response.json();
-                }).then(data => {
-                    // Optional: handle success, update UI/toast message
-                    console.log('Status updated', data);
-                    location.reload();
-                }).catch((error) => {
-                    console.error('Error:', error);
-                });
+document.addEventListener("DOMContentLoaded", function () {
+    // Attach change listener to all status dropdowns
+    document.querySelectorAll(".status-select").forEach(function(selectEl) {
+        const assetId = selectEl.getAttribute("data-asset-id");
+        const statusField = document.getElementById("status-id-" + assetId);
+        const assignContainer = document.getElementById("assign-btn-container-" + assetId);
+        const releaseContainer = document.getElementById("release-btn-container-" + assetId);
+        console.log("Asset:", selectEl.value, "Assign Container:", assignContainer, "Release Container:", releaseContainer);
+        function toggleAssignContainer() {
+            if (selectEl.value === "Assigned") {
+                releaseContainer.style.display = "none";
+                assignContainer.style.display = "none";
+                statusField.disabled = true;
+                console.log("Showing release container for asset", assetId);
+            }
+            else if (selectEl.value !== "Assigned" 
+            // && selectEl.value !== "Ready To Deploy"
+        ) {
+                assignContainer.style.display = "block";
+
+                releaseContainer.style.display = "none";
+                console.log("Showing assign container for asset", assetId);
+            } 
+            // else if (selectEl.value === "Ready To Deploy") {
+            //     releaseContainer.style.display = "block";
+            //     assignContainer.style.display = "none";
+            //     console.log("Showing release container for asset", assetId);
+            // } 
+            else {
+                assignContainer.style.display = "none";
+                releaseContainer.style.display = "none";
+                statusField.disabled = false;
+            }
+        }
+
+        // Run on page load in case current value is "Available"
+        toggleAssignContainer();
+
+        // Run when user changes dropdown
+        selectEl.addEventListener("change", toggleAssignContainer);
+    });
+});
+
+document.querySelectorAll('.status-select').forEach(function(select) {
+    select.addEventListener('change', function() {
+        const get_selected_val = document.getElementById('selected-val').value;
+        const assetIdRaw = this.getAttribute('data-asset-id');
+        const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
+        const statusValue = this.value;
+        const currentSelect = this; // for UI updates later
+        if (!assetId) {
+            console.error("Asset ID missing");
+            return;
+        }
+
+        fetch(`/assets/change-status/${assetId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({status: statusValue})
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to update status');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Status updated', data);
+            updateStatusUI(assetId, statusValue, currentSelect);  // Update UI dynamically
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+        });
+    });
+});
+
+
+function updateStatusUI(assetId, statusValue, selectElement) {
+    // Example: Show a small success message next to select
+    let msgElem = selectElement.parentElement.querySelector('.status-msg');
+    if (!msgElem) {
+        msgElem = document.createElement('span');
+        msgElem.className = 'status-msg ms-2';  // spacing margin
+        selectElement.parentElement.appendChild(msgElem);
+    }
+    msgElem.textContent = 'Status updated!';
+    msgElem.style.color = 'green';
+
+    // Remove the message after 2 seconds
+    setTimeout(() => {
+        if (msgElem.parentElement) {
+            msgElem.parentElement.removeChild(msgElem);
+        }
+    }, 2000);
+
+    // Optionally: update other parts of UI, styles, buttons, etc. based on statusValue
+}
+
+// Helper function to get CSRF token cookie (Django default)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(trimmed.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        let cookieValue = null;
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith("csrftoken=")) {
+                cookieValue = cookie.substring("csrftoken=".length, cookie.length);
+                break;
+            }
+        }
+        return cookieValue;
+    }
+
+    // Attach click listener to all assign buttons
+    document.querySelectorAll(".assign-btn").forEach(function(button) {
+        button.addEventListener("click", function() {
+            const assetId = this.getAttribute("data-asset-id");
+            const statusField = document.getElementById("status-id-" + assetId);
+            const container = document.getElementById("assign-btn-container-" + assetId);
+            const userSelect = container.querySelector("select[name='user_id']");
+            const userId = userSelect.value;
+            console.log(userId)
+
+            if (!userId) {
+                alert("Please select a user first!");
+                return;
+            }
+            fetch(`/assets/status-ready-to-assign/${assetId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: new URLSearchParams({ user_id: userId })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Network error");
+                return response.text();
+            })
+            .then(data => {
+                alert("Asset successfully assigned!");
+                // e.g. hide the assign form & change status text
+                container.style.display = "none";
+                const statusDropdown = document.querySelector(`.status-select[data-asset-id="${assetId}"]`);
+                if (statusDropdown) {
+                    statusDropdown.value = "Assigned";  // update dropdown
+                }
+                statusField.disabled = true;  // disable further changes
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to assign asset. Please try again.");
             });
         });
-    
-        // CSRF helper function (standard Django pattern)
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
     });
-    </script>
+
+    document.querySelectorAll(".release-asset-btn").forEach(function(button) {
+        button.addEventListener("click", function() {
+            const statusField = document.getElementById("status-id-" + assetId);
+            const assetId = this.getAttribute("data-asset-id");
+            const container = document.getElementById("release-btn-container-" + assetId);
+            // const userSelect = container.querySelector("select[name='user_id']");
+            // const userId = userSelect.value;
+
+            fetch(`/assets/status-repair-to-release/${assetId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": getCSRFToken(),
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Network error");
+                return response.text();
+            })
+            .then(data => {
+                // 🔥 Optional: Update UI without reload
+                // e.g. hide the assign form & change status text
+                container.style.display = "none";
+                const statusDropdown = document.querySelector(`.status-select[data-asset-id="${assetId}"]`);
+                if (statusDropdown) {
+                    statusDropdown.value = "Available";  // update dropdown
+                }
+                statusField.disabled = false;  // enable further changes
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to assign asset. Please try again.");
+            });
+        });
+    });
+});
+</script>
+
+</script>
     
 {% endblock content%}
+<script type="application/json" id="active-users-json">
+    {{ active_user|json_script:"active-users-json" }}
+</script>
+<script>
+document.querySelectorAll(".status-select").forEach(function(select) {
+    select.addEventListener("change", function() {
+        if (this.value === "Assigned" || this.value === "In Use") {
+            this.disabled = true;
+            this.closest("tr").querySelector(".assign-button-container")?.remove();
+        }
+    });
+});
+</script>
+

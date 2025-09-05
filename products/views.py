@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from dashboard.models import CustomField
 from assets.models import AssetImage
-
+from assets.models import Asset
 from datetime import date
 today = date.today()
 
@@ -48,7 +48,7 @@ def list(request):
             total_assets=Count('asset'),
             available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
-    
+    print(product_list.values_list("total_assets","available_assets"))
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -112,12 +112,15 @@ def add_product(request):
             request.POST, request.FILES, organization=request.user.organization)
         image_form=ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
+            print("req Files",request.FILES)
             product = form.save(commit=False)
             product.organization = request.user.organization
             product.save()
             form.save_m2m()
 #             # product = form.save()
-            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+            files=request.FILES
+            print("FILES",files)
+            for f in files.getlist('image'): # 'image' is the name of your file input
                 ProductImage.objects.create(product=product, image=f)
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
@@ -275,3 +278,14 @@ def export_products_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="export-products-{today}.pdf"'
     return response
+
+def get_assigned_product_info(request, id):
+    product = get_object_or_404(
+        Product.undeleted_objects, pk=id, organization=request.user.organization)
+    get_assets=Asset.objects.filter(product=product, organization=request.user.organization)
+    print(get_assets)
+    context = {
+        'get_assets': get_assets,
+        'title': 'Assigned Product Info',
+    }
+    return render(request, 'products/assigned-product-modal.html', context=context)

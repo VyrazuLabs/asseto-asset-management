@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -65,7 +66,7 @@
                             <th>Product Type</th>
                             <th>Product Category</th>
                             <th>Total Assets</th>
-                            <th>Avialable Assets</th>
+                            <th>Available Assets</th>
                             <th>Status</th>
                             {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
                                 <th>Actions</th>
@@ -74,15 +75,15 @@
                     </thead>
                         {% if page_object %}
                     <tbody id="search_result">
-                         {% for products in page_object %}
+                        {% for products in page_object %}
                             <tr>
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
                                 <td>
                                     {% with img=product_images|get_item:products.id %}
                                         {% if img %}
-                                            <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;">
-                                        {% else %}
-                                            No Image
+                                            <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
+                                        {% elif not img.image.url %}
+                                            <img src="{% static 'assets/images/faces/1.jpg' %}">
                                         {% endif %}
                                     {% endwith %}
                                 </td>
@@ -100,7 +101,28 @@
                                     {% endif %}       
                                 </td>
                                 <td>
-                                    {{products.total_assets}}    
+                                    <div style="display: flex; align-items: center; gap: 10px;">   
+                                        {% if products.total_assets != 0 %}   
+                                            <button type="button" 
+                                                    style="background: transparent; border: none; color: inherit; cursor: pointer;padding-right: 15px;" 
+                                                    hx-get="{% url 'products:assigned_product_info' products.id %}" 
+                                                    class="open-product-modal" 
+                                                    hx-target="#show-asset-modal-content"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#show-asset-modal" >
+                                                    {{products.total_assets}}
+                                            </button>
+                                            </div>
+                                            <div class="modal fade text-left" id="show-asset-modal" tabindex="-1" role="dialog"
+                                                aria-labelledby="myModalLabel160" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                                    <div id="show-asset-modal-content" class="modal-content" hx-target="this"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p style="padding-left: 7px;">0</p>
+                                        {% endif %} 
+                                    </div>
                                 </td>
 
                                 <td>
@@ -140,7 +162,7 @@
                                     </div>
                                 </td>                            
                             </tr>
-                         {% endfor %}
+                        {% endfor %}
                     </tbody>
                     {% else %}
                     <div class="alert alert-info" role="alert">
@@ -154,3 +176,21 @@
     </section>
 </div>
 {% endblock content%}
+<script>
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+    if (e.detail.target.id === 'show-asset-modal-content') {
+        var myModal = new bootstrap.Modal(document.getElementById('show-asset-modal'));
+        myModal.show();
+    }
+});
+
+</script>
+<script>
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+    if (e.detail.target.id === 'assign-asset-modal-content') {
+        var myModal = new bootstrap.Modal(document.getElementById('assign-asset-modal'));
+        myModal.show();
+    }
+});
+
+</script>
