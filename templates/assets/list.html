@@ -77,35 +77,38 @@
                             </td>
                             <td>
                                 {% if asset.is_assigned %}
-                                    In Use
+                                    <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
+                                            {% csrf_token %}
+                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                                    </form>
                                 {% else %}
-                                    In Store
+                                    <div class="input-group">
+                                        <button type="button"  
+                                            class="btn btn-info btn-sm"
+                                            hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+                                            hx-target="#assign-asset-modal-list-content"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#assign-asset-list-modal">
+                                            Assign
+                                        </button>
+                                    </div>
                                 {% endif %}
                             </td>
                             {{active_users}}
                             <td>
                                 <div style="display: flex;justify-content: space-between;gap: 10px;">
-                                    <div style="display: none;" class="assign-button-container" id="assign-btn-container-{{ asset.id }}">
-                                        <div class="input-group">
-                                            <button type="button"  
-                                                class="btn btn-info btn-sm"
-                                                hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
-                                                hx-target="#assign-asset-modal-list-content"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#assign-asset-list-modal">
-                                                Assign Asset
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
-                                        <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
-                                        {% for value, label in asset_form.fields.status.choices %}
-                                            <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
-                                        {% endfor %}
-                                        {% if asset.is_assigned and value == "Assigned" %}
-                                            <option value="{{ value }}" disabled>{{ label }}</option>
-                                        {% endif %}
-                                    </select>
+                                    {% if not asset.is_assigned %}
+                                        <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
+                                            <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
+                                            {% for value, label in asset_form.fields.status.choices %}
+                                                <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% elif asset.is_assigned %}
+                                        <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}" disabled>
+                                            <option value="Assigned" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>Assigned</option>
+                                        </select>
+                                    {% endif %}
                                 </div>
                             <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
                                 <div class="input-group">
@@ -186,46 +189,7 @@
     </section>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Attach change listener to all status dropdowns
-    document.querySelectorAll(".status-select").forEach(function(selectEl) {
-        const assetId = selectEl.getAttribute("data-asset-id");
-        const statusField = document.getElementById("status-id-" + assetId);
-        const assignContainer = document.getElementById("assign-btn-container-" + assetId);
-        const releaseContainer = document.getElementById("release-btn-container-" + assetId);
 
-        function toggleAssignContainer() {
-            if (selectEl.value === "Assigned") {
-                releaseContainer.style.display = "none";
-                assignContainer.style.display = "none";
-                statusField.disabled = true;
-            }
-            else if (selectEl.value !== "Assigned" 
-            // && selectEl.value !== "Ready To Deploy"
-        ) {
-                assignContainer.style.display = "block";
-
-                releaseContainer.style.display = "none";
-            } 
-            // else if (selectEl.value === "Ready To Deploy") {
-            //     releaseContainer.style.display = "block";
-            //     assignContainer.style.display = "none";
-            //     console.log("Showing release container for asset", assetId);
-            // } 
-            else {
-                assignContainer.style.display = "none";
-                releaseContainer.style.display = "none";
-                statusField.disabled = false;
-            }
-        }
-
-        // Run on page load in case current value is "Available"
-        toggleAssignContainer();
-
-        // Run when user changes dropdown
-        selectEl.addEventListener("change", toggleAssignContainer);
-    });
-});
 
 document.querySelectorAll('.status-select').forEach(function(select) {
     select.addEventListener('change', function() {
@@ -271,8 +235,8 @@ function updateStatusUI(assetId, statusValue, selectElement) {
         msgElem.className = 'status-msg ms-2';  // spacing margin
         selectElement.parentElement.appendChild(msgElem);
     }
-    msgElem.textContent = 'Status updated!';
-    msgElem.style.color = 'green';
+    // msgElem.textContent = 'Status updated!';
+    // msgElem.style.color = 'green';
 
     // Remove the message after 2 seconds
     setTimeout(() => {
