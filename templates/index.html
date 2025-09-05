@@ -35,6 +35,7 @@
             {% if perms.authentication.view_asset or perms.authentication.add_asset or perms.authentication.edit_asset or perms.authentication.delete_asset %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'assets:list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -44,22 +45,22 @@
                                 </div>
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Assets</h6>
-
                                     {% if asset_count %}
                                         <h6 class="font-extrabold mb-0">{{asset_count}}</h6>
                                     {% else %}
                                         <h6 class="font-extrabold mb-0">0</h6>
                                     {% endif %}
-
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'assets:assigned_list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -78,6 +79,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>    
                     </div>
                 </div>
                 <div class="col-6 col-lg-3 col-md-6">
@@ -106,6 +108,7 @@
             {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'vendors:list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -125,12 +128,14 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
             {% if perms.authentication.view_location or perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'dashboard:locations' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -148,12 +153,14 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
             {% if perms.authentication.view_product or perms.authentication.add_product or perms.authentication.edit_product or perms.authentication.delete_product %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'products:list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -171,12 +178,14 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
             {% if request.user.is_superuser %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'users:list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
@@ -196,6 +205,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
