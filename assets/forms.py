@@ -169,7 +169,8 @@ class AssignedAssetForm(forms.ModelForm):
 class AssignedAssetListForm(forms.ModelForm):
     user = forms.ModelChoiceField(
         required=True,
-        queryset=User.undeleted_objects.filter(is_active=True).exclude(is_superuser=True),
+        # queryset=User.undeleted_objects.filter(is_active=True).exclude(is_superuser=True),
+        queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
             attrs={'class': 'form-select'}
