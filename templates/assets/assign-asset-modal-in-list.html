@@ -1,0 +1,70 @@
+
+    <div class="modal-header bg-dark text-center">
+        <h5 class="modal-title white w-100">Assign Asset</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <form id="assign-asset-form" enctype="multipart/form-data">
+    {% csrf_token %}
+        <div class="modal-body">
+            <div class="row">
+                <div class="form-group">
+                    <label>Asset Name</label>
+                    <select disabled>
+                        <option value="{{ asset.id }}">{{ asset.name }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+            <label>Add Asset Image(s)</label>
+            <input type="file" name="images" id="images" multiple class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Assign To</label>
+            {{ form.user }}
+        </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-info">Save</button>
+        </div>
+    </form>
+
+<script>
+
+
+
+document.getElementById("assign-asset-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let form = e.target;
+    let formData = new FormData(form);
+
+    fetch("{% url 'assets:assign_asset_in_asset_list' asset.id %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            let modal = bootstrap.Modal.getInstance(document.getElementById("assign-asset-list-modal"));
+            modal.hide();
+            location.reload();
+        } else {
+            return response.text().then(html => {
+                document.getElementById("assign-asset-modal-list-content").innerHTML = html;
+            });
+        }
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+
+</script>
+
+
+
+
