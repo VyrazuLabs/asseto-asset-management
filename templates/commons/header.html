@@ -61,7 +61,7 @@
                                               hx-get="{% url 'notifications:count' %}" 
                                               hx-target="this"></span>
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown" onclick="event.stopPropagation();">
+                                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul" onclick="event.stopPropagation();">
                                         <span hx-get="{% url 'notifications:data' %}" 
                                               hx-target="this" 
                                               hx-trigger="load, notificationListChanged from:body">
