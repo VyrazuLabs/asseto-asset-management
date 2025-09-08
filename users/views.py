@@ -12,10 +12,10 @@ from .utils import create_all_perm_role
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
-from django.db.models import Q,Count
+from django.db.models import Q
 from django.contrib.auth.decorators import permission_required
 from datetime import date
-from assets.models import Asset
+from assets.models import Asset,AssetImage
 today = date.today()
 
 PAGE_SIZE = 10
@@ -46,27 +46,10 @@ def manage_access(user):
 def list(request):
     users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
         pk=request.user.id).order_by('-created_at')
-    get_assets=AssignAsset.objects.filter(user__in=users_list)
-    arr=[]
-    user_asset_count = (
-        AssignAsset.objects
-        .filter(user__in=users_list)
-        .values('user_id')
-        .annotate(asset_count=Count('id'))
-    )
-    user_asset_map_count = {row['user_id']: row['asset_count'] for row in user_asset_count}
-    arr.append(user_asset_map_count)
-    # get_assets_count=AssignAsset.objects.filter(user__in=users_list).count()
-    print(str(get_assets.query))
-    print("Assets fpund:",get_assets)
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    user_asset_map = {asset.user_id: asset for asset in get_assets}
-    arr.append(user_asset_map)
-    print("arr",arr)
-    print("mappedddddddd",user_asset_map.keys())
-    print("count",get_assets)
+
     if request.method == "POST":
         messages.success(
             request, 'User added successfully and Verification email sent to the user')
@@ -74,49 +57,81 @@ def list(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     context = {'sidebar': 'users',
-               'get_assets': get_assets,   
-               'page_object': page_object,
-               'user_asset_map': user_asset_map,
-                'user_asset_map_count': user_asset_map_count,
-                'arr': arr,
-               'title': 'Users'}
+               'page_object': page_object, 'title': 'Users'}
     return render(request, 'users/list.html', context=context)
 
 
 @login_required
 @permission_required('authentication.view_users')
 def details(request, id):
-    user = get_object_or_404(
-        User.undeleted_objects, pk=id, organization=request.user.organization)
 
+    user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
+    assigned_assets = AssignAsset.objects.filter(user=user)
+    
+    
+    
     history_list = User.history.all()
-    paginator = Paginator(history_list, 10, orphans=1)   
-    assigned_assets=[]
-    get_assigned_assets = AssignAsset.objects.filter(user=user).values()
-    for it in get_assigned_assets:
-        get_obj={}
-        get_asset=Asset.objects.filter(id=it['asset_id']).values()
-        # assigned_assets.append(get_asset[0]['name'])
-        for it in get_asset:
-            get_obj['asset_name']=it['name']
-            get_obj['serial_no']=it['serial_no']
-            get_obj['id']=it['id']
-        assigned_assets.append(get_obj)
-    # if get_assigned_assets.exists():
-    #     assigned_assets.append(get_assigned_assets)
-    # else:
-    #     assigned_assets = None
+    paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
+
+    asset_paginator=Paginator(assigned_assets,10,orphans=1)
+    asset_page_number=request.GET.get('assets_page')
+    asset_page_object=asset_paginator.get_page(asset_page_number)
 
     context = {
         'sidebar': 'users',
         'user': user,
         'page_object': page_object,
-        'assigned_assets': assigned_assets,
+        'assigned_assets': asset_page_object,
         'title': 'User - Details'
     }
-    return render(request, 'users/detail.html', context)
+               
+    return render(request, 'users/detail.html',context)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # for get_asset in get_assigned_assets:
+    #     get_obj['assigned_date']=get_asset['assigned_date']
+
+    # for it in get_assigned_assets:
+    #     get_asset_obj=Asset.objects.filter(id=it['asset_id'])
+    #     for asset_data in get_asset_obj:
+    #         get_obj['vendor']=asset_data.vendor.name if asset_data.vendor else 'N/A'
+    #         get_obj['type']=asset_data.product.product_type.name if asset_data.product.product_type else 'N/A'
+
+    #     get_asset=get_asset_obj.values()
+    #     for it in get_asset:
+    #         get_obj['asset_name']=it['name']
+    #         get_obj['serial_no']=it['serial_no']
+    #         get_obj['id']=it['id']
+
+    #     assigned_assets.append(get_obj)
+
+ 
+
+
+    
 
 
 @login_required
@@ -281,7 +296,7 @@ def export_users_pdf(request):
     return response
 
 @login_required
-def user_assigned_assets(request, id): 
+def user_assigned_assets(request, id):
     # user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
     get_user=AssignAsset.objects.filter(user_id=id)
     return render(request, 'users/assigned-asset-modal.html', {'get_user': get_user})
