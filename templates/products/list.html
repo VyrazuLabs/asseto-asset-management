@@ -104,7 +104,7 @@
                                     <div style="display: flex; align-items: center; gap: 10px;">   
                                         {% if products.total_assets != 0 %}   
                                             <button type="button" 
-                                                    style="background: transparent; border: none; color: inherit; cursor: pointer;padding-right: 15px;" 
+                                                    style="background-color: rgb(67, 94, 204);border: none;border-radius: 7px; color: inherit; cursor: pointer;padding-right: 7px;" 
                                                     hx-get="{% url 'products:assigned_product_info' products.id %}" 
                                                     class="open-product-modal" 
                                                     hx-target="#show-asset-modal-content"

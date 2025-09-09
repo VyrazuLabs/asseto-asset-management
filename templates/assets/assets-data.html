@@ -1,4 +1,5 @@
 {% load custom_filters %}
+{% load static %}
 {% if page_object %}
     {% for asset in page_object %}
     <tr>
@@ -35,25 +36,46 @@
         </td>
         <td>
             {% if asset.is_assigned %}
-                In Use
+                <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
+                        {% csrf_token %}
+                        <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                </form>
             {% else %}
-                In Store
+                <div class="input-group">
+                    <button type="button"  
+                        class="btn btn-info btn-sm"
+                        hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+                        hx-target="#assign-asset-modal-list-content"
+                        data-bs-toggle="modal"
+                        data-bs-target="#assign-asset-list-modal">
+                        Assign
+                    </button>
+                </div>
             {% endif %}
         </td>
         <td>
-            {% if request.user.is_superuser %}
-                <div class="form-check form-switch">
-                    <input 
-                        class="form-check-input"
-                        hx-post="{% url 'assets:status' asset.id %}" 
-                        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                        type="checkbox" {% if asset.status %} checked {% endif %}
-                        style="cursor: pointer;"
-                    >
-                </div>  
-            {% else %}
-                {% if products.status %} Active {% else %} Inactive {% endif %}
-            {% endif %}
+            <div style="display: flex;justify-content: space-between;gap: 10px;">
+                {% if not asset.is_assigned %}
+                    <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
+                        <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
+                        {% for value, label in asset_form.fields.status.choices %}
+                            <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif asset.is_assigned %}
+                    <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}" disabled>
+                        <option value="Assigned" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>Assigned</option>
+                    </select>
+                {% endif %}
+            </div>
+            <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
+                <div class="input-group">
+                    <button type="button" class="btn btn-warning release-asset-btn"
+                            data-asset-id="{{ asset.id }}">
+                        Release
+                    </button>
+                </div>
+            </div>
         </td>
         <td>
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
@@ -76,3 +98,48 @@
 {% else %}
     <td colspan="9" class="text-center"> No record found related to your search keyword</td>
 {% endif %}
+
+<script>
+    document.querySelectorAll('.status-select').forEach(function(select) {
+    select.addEventListener('change', function() {
+        const get_selected_val = document.getElementById('selected-val').value;
+        const assetIdRaw = this.getAttribute('data-asset-id');
+        const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
+        const statusValue = this.value;
+        const currentSelect = this; // for UI updates later
+        if (!assetId) {
+            console.error("Asset ID missing");
+            return;
+        }
+
+        fetch(`/assets/change-status/${assetId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({status: statusValue})
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to update status');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Status updated', data);
+            updateStatusUI(assetId, statusValue, currentSelect);  // Update UI dynamically
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+        });
+    });
+});
+document.querySelectorAll(".status-select").forEach(function(select) {
+    select.addEventListener("change", function() {
+        if (this.value === "Assigned" || this.value === "In Use") {
+            this.disabled = true;
+            this.closest("tr").querySelector(".assign-button-container")?.remove();
+        }
+    });
+});
+</script>

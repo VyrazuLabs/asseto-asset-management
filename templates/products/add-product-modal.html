@@ -174,6 +174,20 @@
     </section>
 </div>
 <script>
+<<<<<<< Updated upstream
+=======
+    // Add new custom field row
+    document.getElementById("addCustomFieldBtn").onclick = function() {
+        var container = document.getElementById("custom-field-container");
+        var template = document.getElementById("custom-field-template");
+        container.appendChild(template.cloneNode(true));
+    }
+    // Remove a custom field row
+    function removeCustomField(el) {
+        el.closest(".rm-custom-field").remove();
+    }
+
+>>>>>>> Stashed changes
     // Trigger on product category change to fetch subcategories
     document.querySelector('#id_product_category')?.addEventListener('change', function () {
         const categoryId = this.value;

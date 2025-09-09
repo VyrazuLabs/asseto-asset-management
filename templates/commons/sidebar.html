@@ -87,16 +87,6 @@
                                     <a href="{% url 'assets:list' %}">List</a>
                                 </li>
                             {% endif %}
-                            {% if perms.authentication.add_asset %}
-                                <li class="submenu-item {% if submenu == 'add' %}active{% endif %}">
-                                    <a href="{% url 'assets:add' %}">Add</a>
-                                </li>
-                            {% endif %}
-                            {% if perms.authentication.reassign_assign_asset or perms.authentication.add_assign_asset or perms.authentication.delete_assign_asset %}
-                                <li class="submenu-item {% if submenu == 'assigned-assets' %}active{% endif %}">
-                                    <a href="{% url 'assets:assigned_list' %}">Assigned Assets</a>
-                                </li>
-                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}
