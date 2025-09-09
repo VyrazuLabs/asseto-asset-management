@@ -171,8 +171,61 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-header">
+                        <h6>Add New Custom Fields</h6>
+                    </div>
+                    <div class="card-body" id="custom-field-container">
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Name"
+                                        name="custom_field_name" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Value"
+                                        name="custom_field_value" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-auto" id="custom-field-main-btn">
+                                <div class="form-group">
+                                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-info">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:none">
+                        <div class="row rm-custom-field" id="custom-field-template">
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Name"
+                                        name="custom_field_name" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Value"
+                                        name="custom_field_value" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-group">
+                                    <button type="button" onclick="removeCustomField(this)" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+                                </div>
+                            </div>   
+                        </div>
+                    </div>
                 {% endif %}
-            </div>
+            {% if assetSpecifications %}
             <div class="card">
                 <div class="card-header">Asset Specifications</div>
                 <div class="card-body" id="container">
@@ -257,6 +310,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </form>
     </section>
 </div>
@@ -315,5 +369,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+</script>
+<script>
+// Add new custom field row
+document.getElementById("addCustomFieldBtn").onclick = function() {
+    var container = document.getElementById("custom-field-container");
+    var template = document.getElementById("custom-field-template");
+    container.appendChild(template.cloneNode(true));
+}
+
+// Remove a custom field row
+function removeCustomField(el) {
+    el.closest(".rm-custom-field").remove();
+}
 </script>
 {% endblock content%}
