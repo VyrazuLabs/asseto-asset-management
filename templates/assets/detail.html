@@ -91,7 +91,7 @@
                             </tbody>
                     </table>
                     <p ><b>Asset Images</b></p>
-                    <div style="display: flex;">
+                    <div style="display: flex;gap: 5px;">
                         {% for it in get_asset_img %}
                             <div >
                                 <img
@@ -125,73 +125,67 @@
                             <h6>Custom Fields</h6>
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            <div class="table-responsive">
                                 {% for cf in get_custom_data %}
                                      <table class="table table-borderless">
                                         <tbody>
                                             <tr>
-                                                <th >{{cf.field_name}}</th>
-                                                <td>{{cf.field_value}}</td>
+                                                <th>{{ cf.field_name }}</th>
+                                                <td>{{ cf.field_value }}</td>
                                             </tr>
                                         </tbody>
-                                    </table>
+                                    </table> 
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <th>{{ cf.field_name }}</th>
-                                <td>{{ cf.field_value }}</td>
-                            </tr>
-                        </tbody>
-                    </table> 
                     {% endif %}
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
-                            Asset Specifications
-                        </button>
-                      </h2>
-                      <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Specification Name</th>
-                                            <th>Specification Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% if assetSpecifications %}
-                                            {% for assetSpecification in assetSpecifications %}
-                                        <tr>
-                                            <th scope="row">
-                                                {{assetSpecification.name}}
-                                            </th>
-                                            <td>
-                                                {{assetSpecification.value}}
-                                            </td>
-                                        </tr>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </tbody>
-                                </table>
+        {% if assetSpecifications %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
+                                Asset Specifications
+                            </button>
+                        </h2>
+                        <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Specification Name</th>
+                                                <th>Specification Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if assetSpecifications %}
+                                                {% for assetSpecification in assetSpecifications %}
+                                            <tr>
+                                                <th scope="row">
+                                                    {{assetSpecification.name}}
+                                                </th>
+                                                <td>
+                                                    {{assetSpecification.value}}
+                                                </td>
+                                            </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                      </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         {% include 'commons/history.html' %}
     </section>
 </div>
