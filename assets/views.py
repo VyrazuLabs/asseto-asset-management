@@ -267,7 +267,19 @@ def update(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
     asset_images = AssetImage.objects.filter(asset=asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-    if request.method == 'POST':
+    if request.method=="DELETE":
+        try:
+            data = json.loads(request.body)
+            delete_ids = data.get('delete_image_ids', [])
+            if delete_ids:
+                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
+                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+        
+    elif request.method == 'POST':
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
@@ -276,11 +288,6 @@ def update(request, id):
             asset_instance.save()
             form.save_m2m()
             assetSpecifications.delete()
-            # Handle image removals
-            delete_ids = request.POST.getlist('delete_image_ids')
-            if delete_ids:
-                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
-
             # Handle new images
             images = request.FILES.getlist('image')
             for img_file in images:
@@ -698,14 +705,27 @@ def update_in_detail(request, id):
     asset_images = AssetImage.objects.filter(asset=asset)
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     custom_fields = CustomField.objects.filter(
-                entity_type='asset', object_id=asset.id, organization=request.user.organization)
-    if request.method == 'POST':
+        entity_type='asset', object_id=asset.id, organization=request.user.organization)
+
+    if request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            delete_ids = data.get('delete_image_ids', [])
+            if delete_ids:
+                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
+                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+
+    elif request.method == 'POST':
         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
         image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
             form.save()
             assetSpecifications.delete()
-            # Handle image removals
+            # Handle image removals (if any from POST)
             delete_ids = request.POST.getlist('delete_image_ids')
             if delete_ids:
                 AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
@@ -714,19 +734,20 @@ def update_in_detail(request, id):
             images = request.FILES.getlist('image')
             for img_file in images:
                 AssetImage.objects.create(asset=asset, image=img_file)
-            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
+
             for cf in custom_fields:
                 key = f"custom_field_{cf.entity_id}"
                 new_val = request.POST.get(key, "")
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
-            # Success message and redirect
+
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
     else:
         form = AssetForm(instance=asset, organization=request.user.organization)
         image_form = AssetImageForm()
+
     context = {
         'sidebar': 'assets',
         'submenu': 'list',
@@ -739,6 +760,8 @@ def update_in_detail(request, id):
         'custom_fields': custom_fields
     }
     return render(request, 'assets/update-assets-in-detail.html', context=context)
+
+
 
 def piechart_status_data(request):
     data = Asset.objects.values('asset_status__name').annotate(total=Count('id'))
