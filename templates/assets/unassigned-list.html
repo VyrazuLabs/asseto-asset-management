@@ -1,0 +1,104 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Unassigned Asset</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Unassigned Asset</li>
+                </ol>
+            </nav>
+        </div>
+        {% if perms.authentication.add_assign_asset %}
+            <div>
+                <!-- assign btn -->
+                <button type="button"  
+                    class="btn btn-sm btn-outline-info my-3 "
+                    hx-get="{% url 'assets:assign_asset' %}" 
+                    hx-target="#assign-asset-modal-content"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#assign-asset-modal"
+                >Assign Asset</button>
+            </div>
+        {% endif %}
+    </div>
+    <section class="section">
+        <!-- assign modal -->
+        <div class="modal fade text-left" id="assign-asset-modal" tabindex="-1" role="dialog"
+            aria-labelledby="myModalLabel160" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div id="assign-asset-modal-content" class="modal-content" hx-target="this"></div>
+            </div>
+        </div>        
+        <!-- reassign modal -->
+        <div class="modal fade text-left" id="reassign-asset-modal" tabindex="-1" role="dialog"
+            aria-labelledby="myModalLabel160" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div id="reassign-asset-modal-content" class="modal-content" hx-target="this"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                {% if page_object %}
+                    <a href="{% url 'assets:list' %}" class="btn btn btn-info">Asset List</a>
+                    <div class="d-flex justify-content-end my-2 gap-2">
+                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                            hx-get="{% url 'assets:assign_asset_search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                    </div>
+                {% endif %}
+                <table class="table table-hover text-center" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Asset Name</th>
+                            <th>Serial No.</th>
+                            {% if perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset%}
+                                <th>Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    {% if page_object %}
+                    <tbody id="search_result">
+                          {% for assign_asset in page_object %}
+                        <tr>
+                            <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                            <td>{{assign_asset.name}}</td>
+                            <td>{{assign_asset.serial_no}}</td>
+                            <td>
+                                <a href="{% url 'assets:details' assign_asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
+                                {% if perms.authentication.reassign_assign_asset %}
+                                <button type="button"  
+                                    class="btn btn-info"
+                                    hx-get="{% url 'assets:assign_asset_in_asset_list' assign_asset.id %}"
+                                    hx-target="#assign-asset-modal-list-content"
+                                    data-bs-toggle="modal"
+
+                                    data-bs-target="#assign-asset-list-modal">
+                                    Assign
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                      <div class="alert alert-info" role="alert">
+                        No record available!
+                      </div>
+                    {% endif %}
+                </table>
+                {% include 'commons/pagination.html' %}
+            </div>
+            <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content%}

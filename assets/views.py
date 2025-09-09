@@ -17,8 +17,10 @@ from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from dashboard.models import CustomField
+from vendors.models import Vendor
 from django.db.models import Count
 import json
+from products.models import ProductType
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -144,6 +146,10 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
+    user_list=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization),is_active=True).order_by('-created_at')
+    vendor_list=Vendor.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
+    asset_status_list=AssetStatus.objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    product_type_list=ProductType.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
     asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
         organization=request.user.organization)).order_by('-created_at')
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
@@ -156,15 +162,19 @@ def listed(request):
     # active_user=[active_users]
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('uploaded_at')
+    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
     
     # Map asset ID to its first image
     asset_images = {}
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-
+    # print("product_type_list",product_type_list)
     context = {
+        'product_type_list':product_type_list,
+        'asset_status_list':asset_status_list, 
+        'user_list':user_list,
+        'vendor_list':vendor_list,
         'active_user':active_users,
         'sidebar': 'assets',
         'submenu': 'list',
@@ -189,7 +199,7 @@ def details(request, id):
 
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     img_array=[]
-    get_asset_img=AssetImage.objects.filter(asset=asset).values()
+    get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
     for it in get_asset_img:
         img_array.append(it)
 
@@ -299,6 +309,43 @@ def update(request, id):
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
+            #Code to add new custom fields
+            for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip():
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=asset.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        continue
+
+            # Handle dynamically added custom fields
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=asset.id,
+                        field_type='text',
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='asset',
+                        organization=request.user.organization
+                    )
+                    print("Custom Field added successfully 2")
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
@@ -434,31 +481,59 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    search_text = request.GET.get('search_text').strip()
-    page_object=Asset.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(serial_no__icontains=search_text) | Q(purchase_type__icontains=search_text) | Q(product__name__icontains=search_text)
-                | Q(vendor__name__icontains=search_text) | Q(vendor__gstin_number__icontains=search_text) | Q(location__office_name__icontains=search_text) | Q(product__product_type__name__icontains=search_text)
-            )).order_by('-created_at')[:10]
-    image_object=AssetImage.objects.filter(Q(asset__organization=request.user.organization) & (Q(
-                asset__name__icontains=search_text) | Q(asset__serial_no__icontains=search_text) | Q(asset__purchase_type__icontains=search_text) | Q(asset__product__name__icontains=search_text)
-                | Q(asset__vendor__name__icontains=search_text) | Q(asset__vendor__gstin_number__icontains=search_text) | Q(asset__location__office_name__icontains=search_text) | Q(asset__product__product_type__name__icontains=search_text)
-            )).order_by('-uploaded_at')[:10]
+    search_text = (request.GET.get('search_text') or "").strip()
+    vendor_id = request.GET.get('vendor')
+    status_id = request.GET.get('status')
+    user_id = request.GET.get('user')
+    product_type_id = request.GET.get('type')
+
+    # Start query
+    q = Q(organization=request.user.organization)
+
+    # Apply filters if present
+    if search_text:
+        q &= (
+            Q(name__icontains=search_text) |
+            Q(serial_no__icontains=search_text) |
+            Q(purchase_type__icontains=search_text) |
+            Q(product__name__icontains=search_text) |
+            Q(vendor__name__icontains=search_text) |
+            Q(vendor__gstin_number__icontains=search_text) |
+            Q(location__office_name__icontains=search_text) |
+            Q(product__product_type__name__icontains=search_text)
+        )
+
+    if vendor_id:
+        q &= Q(vendor_id=vendor_id)
+
+    if status_id:
+        q &= Q(asset_status_id=status_id)
+
+    if user_id:
+        q &= Q(assigned_user_id=user_id)
+    
+    if product_type_id:
+        q &= Q(product__product_type_id=product_type_id)
+        print(q)
+    # Get assets
+    page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
+
+    asset_ids = list(page_object.values_list("id", flat=True))
+    image_object = AssetImage.objects.filter(
+        asset__organization=request.user.organization,
+        asset_id__in=asset_ids
+    ).order_by('-uploaded_at')
+
+
     asset_images = {}
     for img in image_object:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    if search_text:
-        return render(request, 'assets/assets-data.html', {
-            'page_object': page_object,
-            'asset_images': asset_images
-        })
 
-    asset_list = Asset.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'assets/assets-data.html', {'page_object': page_object})
+    return render(request, 'assets/assets-data.html', {
+        'page_object': page_object,
+        'asset_images': asset_images
+    })
 
 
 @login_required
@@ -479,6 +554,25 @@ def assigned_list(request):
     }
 
     return render(request, 'assets/assigned-list.html', context=context)
+
+@login_required
+@user_passes_test(manage_access_for_assign_assets)
+def unassigned_list(request):
+
+    assign_asset_list = Asset.objects.filter(
+        organization=request.user.organization or None,is_assigned=False).order_by('-created_at')
+    paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'assets',
+        'submenu': 'assigned-assets',
+        'page_object': page_object,
+        'title': 'Assigned Assets'
+    }
+
+    return render(request, 'assets/unassigned-list.html', context=context)
 
 
 @login_required
@@ -741,7 +835,48 @@ def update_in_detail(request, id):
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
+<<<<<<< Updated upstream
 
+=======
+            #Code to add new custom fields
+            for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip():
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=asset.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        continue
+
+            # Handle dynamically added custom fields
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=asset.id,
+                        field_type='text',
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='asset',
+                        organization=request.user.organization
+                    )
+                    print("Custom Field added successfully 2")
+            # Success message and redirect
+>>>>>>> Stashed changes
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
     else:

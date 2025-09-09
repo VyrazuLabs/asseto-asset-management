@@ -234,6 +234,43 @@ def update_product(request, id):
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
+        #Code to add new custom fields
+            for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip():
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=product.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        continue
+
+            # Handle dynamically added custom fields
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=product.id,
+                        field_type='text',
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='asset',
+                        organization=request.user.organization
+                    )
+                    print("Custom Field added successfully 2")   
         messages.success(request, 'Product updated successfully')
         return redirect('products:list')
     else:
