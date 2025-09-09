@@ -116,11 +116,10 @@
                         </div>
                         <div class="row my-3">
                             {% for img in product_images %}
-                            <div class="col-auto text-center">
-                                <img src="{% get_media_prefix %}{{ img.image }}" style="width:100px;height:auto;margin-bottom:3px;" alt="Product Image">
+                            <div class="col-auto text-center asst-prd-img-div">
+                                <img src="{% get_media_prefix %}{{ img.image }}" alt="Product Image"class="asst-prd-img">
                                 <br>
-                                <input type="checkbox" name="delete_image_ids" value="{{ img.id }}">
-                                <label>Remove</label>
+                                <button name="delete_image_ids" value="{{ img.id }}" class="btn delete-img-btn"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" /><path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" /></svg></button>
                             </div>
                             {% endfor %}
                             {% if custom_fields %}
@@ -157,25 +156,50 @@
     </section>
 </div>
 <script>
-    // Image Preview
-    function filePreview(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $("#imagePreview img").remove();
-                $("#imagePreview").after(
-                    '<img src="' +
-                        e.target.result +
-                        '" class="rounded" width="100" height="80"/>'
-                );
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-    $("#id_product_picture").change(function () {
-        $("#imagePreview img").remove();
-        filePreview(this);
+
+    document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.delete-img-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const imageId = this.value;
+        const btn = this;
+
+        if (!confirm('Are you sure you want to delete this image?')) return;
+
+        fetch('{% url "products:update_product" id=product.id %}', {
+            method: 'DELETE',
+            headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ delete_image_ids: [imageId] })  // send as array
+        })
+        .then(response => {
+            if (response.ok) {
+            btn.closest('.asst-prd-img-div').remove();
+            } else {
+            alert('Failed to delete image.');
+            }
+        })
+        .catch(() => alert('Error deleting image.'));
+        });
     });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(cookie => {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+            }
+        });
+        }
+        return cookieValue;
+    }
+    });
+
     // Subcategory cascade
     document.querySelector('#id_product_category')?.addEventListener('change', function () {
         const categoryId = this.value;
@@ -193,8 +217,9 @@
             .catch(() => {
                 subCatSelect.innerHTML = '<option value="">Error loading</option>';
             });
-    });
-      document.getElementById("newsectionbtn").onclick = function() {
+    }); 
+
+    document.getElementById("newsectionbtn").onclick = function() {
     var container = document.getElementById("container");
     var section = document.getElementById("mainsection");
     container.appendChild(section.cloneNode(true));
@@ -204,6 +229,6 @@
     var element = el;
     element.closest(".rmsection").remove()
     }
-
 </script>
+
 {% endblock content %}
