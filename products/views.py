@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 from .forms import AddProductsForm,ProductImageForm
 from django.contrib import messages
@@ -5,7 +6,7 @@ from .models import Product, ProductCategory, ProductType,ProductImage
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from vendors.utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
@@ -13,6 +14,7 @@ from django.db.models import Q,Count
 from dashboard.models import CustomField
 from assets.models import AssetImage
 from assets.models import Asset
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date
 today = date.today()
 
@@ -186,7 +188,7 @@ def delete_product(request, id):
 
     return redirect(request.META.get('HTTP_REFERER'))
 
-
+@csrf_exempt
 @login_required
 @permission_required('authentication.edit_product')
 def update_product(request, id):
@@ -201,16 +203,28 @@ def update_product(request, id):
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
-    if request.method == "POST":
+
+    if request.method=="DELETE":
+        print("delete method running")
+        try:
+            data = json.loads(request.body)
+            delete_ids = data.get('delete_image_ids', [])
+            if delete_ids:
+                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
+                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+        
+    elif request.method == "POST":
+        print("post method called------------->")
         form = AddProductsForm(request.POST, request.FILES,
         instance=product, organization=request.user.organization)
         img_form= ProductImageForm(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and img_form.is_valid():
             form.save()
             images = request.FILES.getlist('image')
-            delete_ids = request.POST.getlist('delete_image_ids')
-            if delete_ids:
-                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
             for img_file in images:
                 ProductImage.objects.create(product=product, image=img_file)
             custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
@@ -222,6 +236,8 @@ def update_product(request, id):
                     cf.save()
         messages.success(request, 'Product updated successfully')
         return redirect('products:list')
+    else:
+        print("error occurred somewhere---------->")
 
     context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
     return render(request, 'products/update-product-modal.html', context)

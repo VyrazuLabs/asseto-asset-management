@@ -8064,3 +8064,37 @@ body[data-theme="dark"] {
 }
 
 
+.asst-prd-img-div{
+  position: relative;
+  height: 50px;
+  overflow: hidden;
+}
+
+.asst-prd-img{
+  transition: opacity 0.3s ease !important;
+  opacity: 1 !important;
+  width: 100px !important;
+  height: auto !important;
+  margin: bottom 3px !important;
+   object-fit: cover!important;
+}
+
+.delete-img-btn{
+
+  display: none !important;
+  color: white !important;
+  position: absolute!important;
+  bottom: 0!important;
+  right: 0!important;
+  background-color: red!important;
+  padding: 2px!important;
+  line-height: 0!important;
+ 
+}
+
+.asst-prd-img-div:hover .asst-prd-img{
+  opacity: 0.80!important;
+}
+.asst-prd-img-div:hover .delete-img-btn{
+  display: block!important;
+}
