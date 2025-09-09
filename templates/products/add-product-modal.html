@@ -174,37 +174,6 @@
     </section>
 </div>
 <script>
-    // Image Preview (jQuery)
-    function filePreview(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                $("#imagePreview img").remove();
-                $("#imagePreview").after(
-                    '<img src="' +
-                        e.target.result +
-                        '" class="rounded" width="100" height="80"/>'
-                );
-            };
-            reader.readAsDataURL(input.files);
-        }
-    }
-    $("#id_image").change(function () {
-        $("#imagePreview img").remove();
-        filePreview(this);
-    });
-
-    // Add new custom field row
-    document.getElementById("addCustomFieldBtn").onclick = function() {
-        var container = document.getElementById("custom-field-container");
-        var template = document.getElementById("custom-field-template");
-        container.appendChild(template.cloneNode(true));
-    }
-    // Remove a custom field row
-    function removeCustomField(el) {
-        el.closest(".rm-custom-field").remove();
-    }
-
     // Trigger on product category change to fetch subcategories
     document.querySelector('#id_product_category')?.addEventListener('change', function () {
         const categoryId = this.value;
@@ -242,6 +211,36 @@
     // Listen for changes
     productCategorySelect.addEventListener('change', toggleSubCategory);
 
+    // Add new custom field row
+    document.getElementById("addCustomFieldBtn").onclick = function() {
+        var container = document.getElementById("custom-field-container");
+        var template = document.getElementById("custom-field-template");
+        container.appendChild(template.cloneNode(true));
+    }
+    // Remove a custom field row
+    function removeCustomField(el) {
+        el.closest(".rm-custom-field").remove();
+    }
+
+    // Image Preview (jQuery)
+    function filePreview(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $("#imagePreview img").remove();
+                $("#imagePreview").after(
+                    '<img src="' +
+                        e.target.result +
+                        '" class="rounded" width="100" height="80"/>'
+                );
+            };
+            reader.readAsDataURL(input.files);
+        }
+    }
+    $("#id_image").change(function () {
+        $("#imagePreview img").remove();
+        filePreview(this);
+    });
 
 </script>
 {% endblock content %}
