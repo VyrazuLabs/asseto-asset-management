@@ -23,12 +23,98 @@
     <section class="section">
         <div class="card">
             <div class="card-body">
-                {% if page_object %}
-                    <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
-                            hx-get="{% url 'assets:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                <div class="filter">
+                    <div class="d-flex justify-content-between gap-2">
+                        <form id="asset-filter-form"
+                            hx-get="{% url 'assets:search' page_object.number %}"
+                            hx-target="#search_result"
+                            hx-trigger="change, keyup changed delay:500ms from:input">
+
+                            <div class="d-flex justify-content-start gap-2">
+                            <!-- Search -->
+                                <div>
+                                <input name="search_text"
+                                        type="search"
+                                        class="dataTable-input"
+                                        autocomplete="off"
+                                        placeholder="Search here...">
+                                </div>
+
+                                <!-- Status -->
+                                <div class="dropdown-asset-status">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Select Status
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for status in asset_status_list %}
+                                    <li>
+                                    <a href="#"
+                                        class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=status]').value='{{ status.id }}'; 
+                                                this.closest('.dropdown-asset-status').querySelector('button').innerText='{{ status.name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ status.name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="status">
+                                </div>
+
+                                <!-- Vendor -->
+                                <div class="dropdown-asset-vendors">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Select Vendor
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for vendor in vendor_list %}
+                                    <li>
+                                    <a href="#"
+                                        class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}'; 
+                                                this.closest('.dropdown-asset-vendors').querySelector('button').innerText='{{ vendor.name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ vendor.name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="vendor">
+                                </div>
+
+                                <!-- User -->
+                                
+
+                                <div class="dropdown-asset-product-type">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Select Product Type
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% for type in product_type_list %}
+                                        <li>
+                                            <a href="#"
+                                                class="dropdown-item"
+                                                onclick="event.preventDefault(); 
+                                                        this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
+                                                        this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
+                                                        htmx.trigger(this.closest('form'),'change');">
+                                                {{ type.name }}
+                                            </a>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <input type="hidden" name="type">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="d-flex justify-content-end">
+                            <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
+                        </div>
                     </div>
-                {% endif %}
+                </div>
+                </br>
                 <table class="table" id="table1">
                     <thead>
                         <tr>
@@ -54,7 +140,7 @@
                             <td>
                                 {% with img=asset_images|get_item:asset.id %}
                                     {% if img %}
-                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
+                                        <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
                                     {% else %}
                                         <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                     {% endif %}

@@ -12,6 +12,7 @@ urlpatterns = [
     path('add', views.add, name='add'),
     path('search/<str:page>', views.search, name='search'),
     path('assigned-list', views.assigned_list, name='assigned_list'),
+    path('unassigned-list', views.unassigned_list, name='unassigned_list'),
     path('assign-asset', views.assign_asset, name='assign_asset'),
     path('reassign-asset/<uuid:id>', views.reassign_asset, name='reassign_asset'),
     path('delete-assign/<uuid:id>', views.delete_assign, name='delete_assign'),
