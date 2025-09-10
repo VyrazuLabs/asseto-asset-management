@@ -84,7 +84,7 @@
                                 <input type="hidden" name="vendor">
                                 </div>
 
-                                <!-- User -->
+                                <!-- Product Type -->
                                 
 
                                 <div class="dropdown-asset-product-type">
@@ -106,6 +106,28 @@
                                         {% endfor %}
                                     </ul>
                                     <input type="hidden" name="type">
+                                </div>
+
+                                <!--User-->
+                                <div class="dropdown-asset-users">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Select User
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for user in user_list %}
+                                    <li>
+                                    <a href="#"
+                                        class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
+                                                this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ user.full_name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="user">
                                 </div>
                             </div>
                         </form>
@@ -141,7 +163,7 @@
                                 {% with img=asset_images|get_item:asset.id %}
                                     {% if img %}
                                         <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
-                                    {% else %}
+                                    {% elif not img.image.url %}
                                         <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                     {% endif %}
                                 {% endwith %}
@@ -149,6 +171,7 @@
                             <td>{{asset.name}}</td>
                             <td>{{asset.serial_no}}</td>
                             <td>{{asset.product.product_type}}</td>
+                            
                             <td>
                                 {{asset.product}}
                                 {% if asset.product.is_deleted %}
@@ -182,7 +205,7 @@
                             </td>
                             {{active_users}}
                             <td>
-                                <div style="display: flex;justify-content: space-between;gap: 10px;">
+                                <div class="d-flex justify-content-between gap-2">
                                     {% if not asset.is_assigned %}
                                         <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
                                             <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
