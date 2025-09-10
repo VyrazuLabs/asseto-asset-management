@@ -91,19 +91,25 @@
                             </tbody>
                     </table>
                     <p ><b>Asset Images</b></p>
-                    <div style="display: flex;gap: 5px;">
+                    <div class="d-flex gap-2">
                         {% for it in get_asset_img %}
-                            <div >
-                                <img
-                                src="{% get_media_prefix %}{{ it.image }}" 
-                                alt="Asset Image {{ forloop.counter }}"
-                                style="cursor: pointer; width: 150px;"
-                                class="clickable-image"
-                                data-image-src="{% get_media_prefix %}{{ it.image }}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#imageModal{{ forloop.counter }}"
-                                >
-                            </div>
+                            {% if it.image %}
+                                <div >
+                                    <img
+                                    src="{% get_media_prefix %}{{ it.image }}" 
+                                    alt="Asset Image {{ forloop.counter }}"
+                                    style="cursor: pointer; width: 150px;"
+                                    class="clickable-image"
+                                    data-image-src="{% get_media_prefix %}{{ it.image }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#imageModal{{ forloop.counter }}"
+                                    >
+                                </div>
+                            {% elif not it.image.url %}
+                                <div >
+                                    <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                </div>
+                            {% endif %}
                             <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
                                 <div class="modal-content">
