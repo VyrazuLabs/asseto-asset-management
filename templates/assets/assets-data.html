@@ -13,7 +13,7 @@
         <td>
             {% with img=asset_images|get_item:asset.id %}
                 {% if img %}
-                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
+                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" class="max-width:100px; max-height:100px;">
                 {% else %}
                     <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                 {% endif %}
@@ -54,7 +54,7 @@
             {% endif %}
         </td>
         <td>
-            <div style="display: flex;justify-content: space-between;gap: 10px;">
+            <div class="d-flex justify-content-between gap-2">
                 {% if not asset.is_assigned %}
                     <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
                         <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
@@ -67,14 +67,6 @@
                         <option value="Assigned" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>Assigned</option>
                     </select>
                 {% endif %}
-            </div>
-            <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
-                <div class="input-group">
-                    <button type="button" class="btn btn-warning release-asset-btn"
-                            data-asset-id="{{ asset.id }}">
-                        Release
-                    </button>
-                </div>
             </div>
         </td>
         <td>
