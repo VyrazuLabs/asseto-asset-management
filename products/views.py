@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect
 from .forms import AddProductsForm,ProductImageForm
 from django.contrib import messages
@@ -5,14 +6,15 @@ from .models import Product, ProductCategory, ProductType,ProductImage
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from vendors.utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from dashboard.models import CustomField
 from assets.models import AssetImage
-
+from assets.models import Asset
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date
 today = date.today()
 
@@ -48,7 +50,7 @@ def list(request):
             total_assets=Count('asset'),
             available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
-    
+    deleted_product_count=Product.deleted_objects.count()
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -63,6 +65,7 @@ def list(request):
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
+        'deleted_product_count':deleted_product_count,
         'title': 'Products'
     }
 
@@ -117,7 +120,8 @@ def add_product(request):
             product.save()
             form.save_m2m()
 #             # product = form.save()
-            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+            files=request.FILES
+            for f in files.getlist('image'): # 'image' is the name of your file input
                 ProductImage.objects.create(product=product, image=f)
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
@@ -183,7 +187,7 @@ def delete_product(request, id):
 
     return redirect(request.META.get('HTTP_REFERER'))
 
-
+@csrf_exempt
 @login_required
 @permission_required('authentication.edit_product')
 def update_product(request, id):
@@ -198,16 +202,26 @@ def update_product(request, id):
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
-    if request.method == "POST":
+
+    if request.method=="DELETE":
+        try:
+            data = json.loads(request.body)
+            delete_ids = data.get('delete_image_ids', [])
+            if delete_ids:
+                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
+                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+            else:
+                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+        
+    elif request.method == "POST":
         form = AddProductsForm(request.POST, request.FILES,
         instance=product, organization=request.user.organization)
         img_form= ProductImageForm(request.POST, request.FILES)
-        if form.is_valid():
+        if form.is_valid() and img_form.is_valid():
             form.save()
             images = request.FILES.getlist('image')
-            delete_ids = request.POST.getlist('delete_image_ids')
-            if delete_ids:
-                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
             for img_file in images:
                 ProductImage.objects.create(product=product, image=img_file)
             custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
@@ -217,6 +231,43 @@ def update_product(request, id):
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
+        #Code to add new custom fields
+            for key, value in request.POST.items():
+                if key.startswith("customfield_") and value.strip():
+                    field_id = key.replace("customfield_", "")
+                    try:
+                        cf = CustomField.objects.get(
+                            pk=field_id,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                        CustomField.objects.create(
+                            name=cf.name,
+                            object_id=product.id,
+                            field_type=cf.field_type,
+                            field_name=cf.field_name,
+                            field_value=value,
+                            entity_type='asset',
+                            organization=request.user.organization
+                        )
+                    except CustomField.DoesNotExist:
+                        continue
+
+            # Handle dynamically added custom fields
+            names = request.POST.getlist('custom_field_name')
+            values = request.POST.getlist('custom_field_value')
+            for name, val in zip(names, values):
+                if name.strip() and val.strip():
+                    CustomField.objects.create(
+                        name=name.strip(),
+                        object_id=product.id,
+                        field_type='text',
+                        field_name=name.strip(),
+                        field_value=val.strip(),
+                        entity_type='asset',
+                        organization=request.user.organization
+                    )
+                    print("Custom Field added successfully 2")   
         messages.success(request, 'Product updated successfully')
         return redirect('products:list')
 
@@ -275,3 +326,13 @@ def export_products_pdf(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="export-products-{today}.pdf"'
     return response
+
+def get_assigned_product_info(request, id):
+    product = get_object_or_404(
+        Product.undeleted_objects, pk=id, organization=request.user.organization)
+    get_assets=Asset.objects.filter(product=product, organization=request.user.organization)
+    context = {
+        'get_assets': get_assets,
+        'title': 'Assigned Product Info',
+    }
+    return render(request, 'products/assigned-product-modal.html', context=context)

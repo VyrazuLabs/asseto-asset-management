@@ -3,11 +3,11 @@
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3>Assign Asset</h3>
+            <h3>Unassigned Asset</h3>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Assign Asset</li>
+                    <li class="breadcrumb-item active" aria-current="page">Unassigned Asset</li>
                 </ol>
             </nav>
         </div>
@@ -43,6 +43,7 @@
         <div class="card">
             <div class="card-body">
                 {% if page_object %}
+                    <a href="{% url 'assets:list' %}" class="btn btn btn-info">Asset List</a>
                     <div class="d-flex justify-content-end my-2 gap-2">
                         <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'assets:assign_asset_search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
@@ -54,8 +55,6 @@
                             <th>Sl No.</th>
                             <th>Asset Name</th>
                             <th>Serial No.</th>
-                            <th>Assigned To</th>
-                            <th>Department</th>
                             {% if perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset%}
                                 <th>Actions</th>
                             {% endif %}
@@ -66,30 +65,20 @@
                           {% for assign_asset in page_object %}
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                            <td>{{assign_asset.asset.name}}</td>
-                            <td>{{assign_asset.asset.serial_no}}</td>
-                            <td>
-                                {{assign_asset.user.full_name}}
-                                {% if assign_asset.user.is_deleted %}
-                                    <i class="bi bi-exclamation-triangle text-warning" title="User is deleted, please update or restore."></i>
-                                {% endif %}
-                            </td>
-                            <td>{{assign_asset.user.department.name}}</td>
+                            <td>{{assign_asset.name}}</td>
+                            <td>{{assign_asset.serial_no}}</td>
                             <td>
                                 <a href="{% url 'assets:details' assign_asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                 {% if perms.authentication.reassign_assign_asset %}
-                                    <button type="button" class="btn btn-info btn-sm" 
-                                        hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
-                                        data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
-                                    >Reassign</button>
-                                {% endif %}
-                                {% if perms.authentication.delete_assign_asset %}
-                                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                        <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
-                                            {% csrf_token %}
-                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
-                                        </form>
-                                    </div>
+                                <button type="button"  
+                                    class="btn btn-info"
+                                    hx-get="{% url 'assets:assign_asset_in_asset_list' assign_asset.id %}"
+                                    hx-target="#assign-asset-modal-list-content"
+                                    data-bs-toggle="modal"
+
+                                    data-bs-target="#assign-asset-list-modal">
+                                    Assign
+                                </button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -102,6 +91,12 @@
                     {% endif %}
                 </table>
                 {% include 'commons/pagination.html' %}
+            </div>
+            <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
+                    </div>
+                </div>
             </div>
         </div>
     </section>

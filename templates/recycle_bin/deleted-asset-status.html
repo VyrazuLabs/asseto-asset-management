@@ -1,0 +1,69 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3>Deleted Asset Status</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Asset Status</li>
+                    <li class="breadcrumb-item active" aria-current="page">Trash</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'assets:asset_status_list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset Status</a>
+        </div>
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                {% if page_object %}
+                    <div class="d-flex justify-content-end my-2 gap-2">
+                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                            hx-get="{% url 'recycle_bin:deleted_asset_status_search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                    </div>
+                {% endif %}
+                <table class="table table-hover" id="table1">
+                    <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Asset Status Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>      
+                        {% if page_object %}
+                        <tbody id="search_result">
+                            {% for products in page_object %}
+                                <tr>
+                                    <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
+                                    <td>{{ products.name }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                            <form action="{% url 'recycle_bin:deleted_asset_status_restore' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to restore this?')">  
+                                                {% csrf_token %}
+                                                <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
+                                            </form>
+                                            <form action="{% url 'recycle_bin:deleted_asset_status_permanently' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this permanently?')">  
+                                                {% csrf_token %}
+                                                <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>   
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    {% else %}
+                      <div class="alert alert-info" role="alert">
+                           No record available!
+                      </div>
+                    {% endif %}
+                </table>
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
+
+    </section>
+</div>
+{% endblock content%}
