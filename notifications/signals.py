@@ -1,3 +1,4 @@
+import sys
 from django.db.models.signals import post_save, post_init, post_delete,pre_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -8,7 +9,6 @@ from django.db.backends.signals import connection_created
 from assets.models import AssignAsset
 from django.db import connection
 from assets.models import Asset
-
 # User Notification
 
 
@@ -59,8 +59,11 @@ def remember_state_user(sender, instance, **kwargs):
 @receiver(pre_save, sender=Asset)
 def save_old_status(sender, instance, **kwargs):
     if instance.pk:
-        old_instance = Asset.objects.get(pk=instance.pk)
-        instance._old_status = old_instance.asset_status
+        try:
+            old_instance = Asset.objects.get(pk=instance.pk)
+            instance._old_status = old_instance.asset_status
+        except Asset.DoesNotExist:
+            instance._old_status = None
     else:
         instance._old_status = None
 
@@ -72,11 +75,12 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
 
         if old_status != new_status:
             notification = Notification.objects.create(
-                notification_title="Asset Status Changed",
+                notification_title="Status Changed",
                 notification_text=f"The status of asset '{instance}' has been changed to '{new_status}'.",
-                icon="status_change_icon",
-                # link=f"/admin/assets/asset/{instance.pk}/change/",  # Update to actual admin URL
-                is_superuser=True
+                icon="bi-gear-fill",
+                link=f"/assets/list",  # Update to actual admin URL
+                is_superuser=True,
+                updated_by=instance.updated_by
             )
             admins = User.objects.filter(is_superuser=True)
             for admin in admins:
@@ -118,9 +122,9 @@ def asset_notification(sender, instance, created,  **kwargs):
 def asset_delete_notification(sender, instance, *args,  **kwargs):
     notification = Notification.objects.create(
         instance_id=instance.id,
-        notification_title='Assigned asset',
-        notification_text=f'{instance.asset.name} is unassigned from you.',
-        icon='bi-person-workspace',
+        notification_title='Asset Deleted',
+        notification_text=f'{instance.asset.name} has been deleted.',
+        icon='bi-gear-fill',
     )
 
     UserNotification.objects.create(
@@ -170,6 +174,9 @@ def expiring_asset(days):
 
 @receiver(connection_created)
 def conn_db(sender, connection, **kwargs):
+    # avoid running during migrations
+    if any(cmd in sys.argv for cmd in ['makemigrations', 'migrate']):
+        return
     expiring_asset(15)
     expiring_asset(7)
     expiring_asset(0)
