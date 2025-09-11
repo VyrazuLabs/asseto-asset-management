@@ -46,6 +46,7 @@ def manage_access(user):
 def list(request):
     users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
         pk=request.user.id).order_by('-created_at')
+    deleted_user_count=User.deleted_objects.count()
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -57,7 +58,7 @@ def list(request):
         return redirect(request.META.get('HTTP_REFERER'))
 
     context = {'sidebar': 'users',
-               'page_object': page_object, 'title': 'Users'}
+               'page_object': page_object, 'deleted_user_count':deleted_user_count,'title': 'Users'}
     return render(request, 'users/list.html', context=context)
 
 
