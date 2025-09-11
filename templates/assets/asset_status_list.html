@@ -11,14 +11,19 @@
                 </ol>
             </nav>
         </div>
-        {% if perms.authentication.add_asset_status %}
-            <div>
-                <button type="button" class="btn btn-sm btn-outline-info my-3" 
-                    hx-get="{% url 'assets:add_asset_status' %}" hx-target="#add-asset-status-modal-content"
-                    data-bs-toggle="modal" data-bs-target="#add-asset-status-modal"
-                >Add Asset Status</button>
-            </div>
-        {% endif %}
+        <div class="d-flex">
+            {% if perms.authentication.add_asset_status %}
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
+                        hx-get="{% url 'assets:add_asset_status' %}" hx-target="#add-asset-status-modal-content"
+                        data-bs-toggle="modal" data-bs-target="#add-asset-status-modal"
+                    >Add Asset Status</button>
+                </div>
+            {% endif %}
+            <a href="{% url 'recycle_bin:deleted_asset_status' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-trash" style="margin-bottom: 2px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                </svg>Trash {% if deleted_asset_status_count %}<div class="trash-count-div">{{ deleted_asset_status_count }}</div>{% endif %}</a>
+        </div>
     </div>
     <section class="section">
         <!-- add modal -->
@@ -42,7 +47,7 @@
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
                         <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
-                            hx-get="{% url 'dashboard:search_product_category' page_object.number %}" 
+                            hx-get="{% url 'assets:asset_status_search' page_object.number %}" 
                             hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
                 {% endif %}

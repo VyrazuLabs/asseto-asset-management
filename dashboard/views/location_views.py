@@ -39,6 +39,7 @@ def manage_access(user):
 def locations(request):
     location_list = Location.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
+    deleted_location_count=Location.deleted_objects.count()
     paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -47,6 +48,7 @@ def locations(request):
         'sidebar': 'admin',
         'submenu': 'location',
         'page_object': page_object,
+        'deleted_location_count':deleted_location_count,
         'title': 'Locations'
     }
 

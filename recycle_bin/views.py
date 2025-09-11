@@ -1,8 +1,9 @@
 from itertools import product
 from django.shortcuts import render, redirect
 from authentication.models import User
+from dashboard.models import Department, Location, ProductCategory, ProductType
 from vendors.models import Vendor
-from assets.models import Asset
+from assets.models import Asset, AssetStatus
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import ProtectedError
@@ -310,3 +311,487 @@ def deleted_users_search(request, page):
     page_number = page
     page_object = paginator.get_page(page_number)
     return render(request, 'recycle_bin/deleted-users-data.html', {'page_object': page_object})
+
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_locations(request):
+
+    location_list = Location.deleted_objects.filter(Q(
+        organization=request.user.organization)|Q(organization=None)).order_by('-updated_at')
+    paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'locations',
+        'page_object': page_object,
+        'title': 'Deleted location'
+    }
+
+    return render(request, 'recycle_bin/deleted-location.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_locations_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                Location.deleted_objects, pk=id, organization=request.user.organization)
+            product.delete()
+            messages.success(request, 'Location deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Location is used in asset')
+
+    except:
+        messages.error(request, 'Location can not be deleted')
+
+    return redirect('recycle_bin:deleted_locations')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_locations_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                Location.deleted_objects, pk=id, organization=request.user.organization)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Location restored successfully')
+
+    except:
+
+        messages.error(request, 'Location can not be restored')
+
+    return redirect('recycle_bin:deleted_locations')
+
+
+@login_required
+def deleted_locations_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-location-data.html', {
+            'page_object': Location.deleted_objects.filter(Q(organization=request.user.organization) & (Q(
+                office_name__icontains=search_text) | Q(contact_person_name__icontains=search_text) | Q(contact_person_email__icontains=search_text) | Q(contact_person_phone__icontains=search_text)
+                | Q(address__address_line_one__icontains=search_text) | Q(address__address_line_two__icontains=search_text) | Q(address__country__icontains=search_text) | Q(address__state__icontains=search_text)
+                | Q(address__city__icontains=search_text) | Q(address__pin_code__icontains=search_text)
+            )).order_by('-created_at')[:10]
+        })
+
+    location_list = Location.deleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-location-data.html', {'page_object': page_object})
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_depertments(request):
+
+    department_list = Department.deleted_objects.filter(Q(
+        organization=request.user.organization)|Q(organization=None)).order_by('-updated_at')
+    paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'departments',
+        'page_object': page_object,
+        'title': 'Deleted department'
+    }
+
+    return render(request, 'recycle_bin/deleted-department.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_departments_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                Department.deleted_objects, pk=id, organization=request.user.organization)
+            product.delete()
+            messages.success(request, 'Department deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Department is used in asset')
+
+    except:
+        messages.error(request, 'Department can not be deleted')
+
+    return redirect('recycle_bin:deleted_departments')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_departments_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                Department.deleted_objects, pk=id, organization=request.user.organization)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Department restored successfully')
+
+    except:
+
+        messages.error(request, 'Location can not be restored')
+
+    return redirect('recycle_bin:deleted_departments')
+
+
+
+@login_required
+def deleted_departments_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-departments-data.html', {
+            'page_object': Department.deleted_objects.filter(Q(organization=request.user.organization) & (Q(
+                name__icontains=search_text) | Q(contact_person_name__icontains=search_text) | Q(contact_person_email__icontains=search_text) | Q(contact_person_phone__icontains=search_text)
+            )).order_by('-created_at')[:10]
+        })
+
+    department_list = Department.deleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-departments-data.html', {'page_object': page_object})
+
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_categories(request):
+
+    product_category_list = ProductCategory.deleted_objects.filter(Q(
+        organization=request.user.organization)|Q(organization=None)).order_by('-updated_at')
+    paginator = Paginator(product_category_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'Prodcut Category',
+        'page_object': page_object,
+        'title': 'Deleted Product Categories'
+    }
+
+    return render(request, 'recycle_bin/deleted-Product-Category.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_categories_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                ProductCategory.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.delete()
+            messages.success(request, 'Product Category deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Product Category is used in asset')
+
+    except:
+        messages.error(request, 'Product Category can not be deleted')
+
+    return redirect('recycle_bin:deleted_product_categories')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_categories_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                ProductCategory.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Product Category restored successfully')
+
+    except:
+
+        messages.error(request, 'Product Category can not be restored')
+
+    return redirect('recycle_bin:deleted_product_categories')
+
+@login_required
+def search_deleted_product_categories(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/delete-product-categories-data.html', {
+            'page_object': ProductCategory.deleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
+        })
+    
+    product_categories = ProductCategory.deleted_objects.filter(
+    organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(product_categories, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/delete-product-categories-data.html', {'page_object': page_object})
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_types(request):
+
+    product_category_list = ProductType.deleted_objects.filter(Q(
+        organization=request.user.organization, can_modify=True)|Q(
+        organization=None, can_modify=True)).order_by('-updated_at')
+    paginator = Paginator(product_category_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'Prodcut Types',
+        'page_object': page_object,
+        'title': 'Deleted Product Types'
+    }
+
+    return render(request, 'recycle_bin/deleted-Product-types.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_types_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                ProductType.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.delete()
+            messages.success(request, 'Product Type deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Product Type is used in asset')
+
+    except:
+        messages.error(request, 'Product Type can not be deleted')
+
+    return redirect('recycle_bin:deleted_product_types')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_product_types_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                ProductType.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Product Type restored successfully')
+
+    except:
+
+        messages.error(request, 'Product Type can not be restored')
+
+    return redirect('recycle_bin:deleted_product_types')
+
+
+@login_required
+def deleted_product_types_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-product-types-data.html', {
+            'page_object': ProductType.deleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
+        })
+
+    product_type_list = ProductType.deleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(product_type_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-product-types-data.html', {'page_object': page_object})
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_asset_status(request):
+
+    product_category_list = AssetStatus.deleted_objects.filter(Q(
+        organization=request.user.organization, can_modify=True)|Q(
+        organization=None, can_modify=True)).order_by('-updated_at')
+    paginator = Paginator(product_category_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'Asset Status',
+        'page_object': page_object,
+        'title': 'Deleted Asset Status'
+    }
+
+    return render(request, 'recycle_bin/deleted-asset-status.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_asset_status_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.delete()
+            messages.success(request, 'Asset Status  deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Asset Status  is used in asset')
+
+    except:
+        messages.error(request, 'Asset Status  can not be deleted')
+
+    return redirect('recycle_bin:deleted_asset_status')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_asset_status_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Asset Status  restored successfully')
+
+    except:
+
+        messages.error(request, 'Asset Status can not be restored')
+
+    return redirect('recycle_bin:deleted_asset_status')
+
+
+@login_required
+def deleted_asset_status_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-asset-status-data.html', {
+            'page_object': AssetStatus.deleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
+        })
+
+    status_list = AssetStatus.deleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(status_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-asset-status-data.html', {'page_object': page_object})
+
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_roles(request):
+
+    product_category_list = AssetStatus.deleted_objects.filter(Q(
+        organization=request.user.organization, can_modify=True)|Q(
+        organization=None, can_modify=True)).order_by('-updated_at')
+    paginator = Paginator(product_category_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'Roles',
+        'page_object': page_object,
+        'title': 'Deleted Roles'
+    }
+
+    return render(request, 'recycle_bin/deleted-roles.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_roles_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.delete()
+            messages.success(request, 'Asset Status  deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! Asset Status  is used in asset')
+
+    except:
+        messages.error(request, 'Asset Status  can not be deleted')
+
+    return redirect('recycle_bin:deleted_asset_status')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_roles_status_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            product = get_object_or_404(
+                AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
+            print(product)
+            product.restore()
+            history_id = product.history.first().history_id
+            product.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'Asset Status  restored successfully')
+
+    except:
+
+        messages.error(request, 'Asset Status can not be restored')
+
+    return redirect('recycle_bin:deleted_asset_status')
