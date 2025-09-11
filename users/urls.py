@@ -13,4 +13,5 @@ urlpatterns = [
     path('search/<str:page>', search, name='search'),
     path('csv', export_users_csv, name='export_users_csv'),
     path('pdf', export_users_pdf, name='export_users_pdf'),
+    path('assigned-assets/<uuid:id>', user_assigned_assets, name='user_assigned_assets')
 ]

@@ -137,42 +137,50 @@ class DepartmentForm(forms.ModelForm):
                   'contact_person_email', 'contact_person_phone']
 
 
+from django import forms
+from django.db.models import Q
+from .models import ProductCategory
+
 class ProductCategoryForm(forms.ModelForm):
-    
-    name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control',
-        'placeholder': 'Category Name'}
-    ))
-    parent = forms.ModelChoiceField(
-        queryset=ProductCategory.undeleted_objects.filter(
-        Q(parent__name='Root') | Q(name='Root')).order_by('name'),
-        widget=forms.Select(
-            attrs={'class': 'form-select'}
-        ),
-        initial=ProductCategory.undeleted_objects.filter(name='Root').first()
+    name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'autocomplete': 'off',
+                'class': 'form-control',
+                'placeholder': 'Category Name'
+            }
         )
-    
+    )
+    parent = forms.ModelChoiceField(
+        queryset=ProductCategory.undeleted_objects.none(),  # Empty queryset initially
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False  # Adjust based on your requirements
+    )
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         self._pk = kwargs.pop('pk', None)
-        super(ProductCategoryForm, self).__init__(*args, **kwargs)
-        # self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__name='root')
-        # try:
-        #     initial_parent=ProductCategory.undeleted_objects.filter(name='root').first()
-        #     self.fields['parent'].initial=initial_parent
-        # except ProductCategory.DoesNotExist:
-        #     pass
+        super().__init__(*args, **kwargs)
+        # Set the parent queryset dynamically
+        self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(
+            Q(parent__name='Root') | Q(name='Root')
+        ).order_by('name')
+        # Set the initial parent value
+        self.fields['parent'].initial = ProductCategory.undeleted_objects.filter(name='Root').first()
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
-        if ProductCategory.undeleted_objects.filter(name__iexact=name, organization=self._organization).exclude(pk=self._pk).exists():
+        if ProductCategory.undeleted_objects.filter(
+            name__iexact=name,
+            organization=self._organization
+        ).exclude(pk=self._pk).exists():
             raise forms.ValidationError('Name must be unique!')
         return name
 
     class Meta:
         model = ProductCategory
-        fields = ['name','parent']
+        fields = ['name', 'parent']
 
 
 # class ProductSubCategoryForm(forms.ModelForm):

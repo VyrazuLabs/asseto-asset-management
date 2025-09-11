@@ -4,19 +4,30 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
+    <title>{{ title }}</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}" />
     <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
     <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.png' %}" type="image/png" />
     <link rel="stylesheet" href="{% static 'assets/css/shared/iconly.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/pages/simple-datatables.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    
-    <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+    <!-- JS: Toastify -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- ✅ jQuery (only once) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJ+0+5TCkL1ZJkJb+OGtOeZzfvZnUAghj5CDo=" crossorigin="anonymous"></script>
+
+    <!-- ✅ Bootstrap 5 (Bundle includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HoA5keKvA3TtH8+Xae7Hi3yI0CGMBLgY0uJjl2CUQThYurW8Mu9uKdB7CpZl1Fcf"
+        crossorigin="anonymous"></script>
+
+    <!-- Other JS -->
     <script src="{% static 'assets/js/htmx.min.js' %}"></script>
     <script defer src="{% static 'assets/js/app.js' %}"></script>
 </head>
@@ -53,7 +64,7 @@
                         <!-- Push everything else to right -->
                         <div class="d-flex align-items-center ms-auto">
                             <!-- Notification -->
-                            <ul class="navbar-nav mb-0 me-3">
+                            <ul class="navbar-nav mb-0 me-3 ">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link active dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-bell bi-sub fs-4"></i>
@@ -61,20 +72,12 @@
                                               hx-get="{% url 'notifications:count' %}" 
                                               hx-target="this"></span>
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-end" onclick="event.stopPropagation();">
-                                        <li>
-                                            <h6 class="dropdown-header">Notifications</h6>
-                                        </li>
+                                    <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul" onclick="event.stopPropagation();">
                                         <span hx-get="{% url 'notifications:data' %}" 
                                               hx-target="this" 
-                                              hx-trigger="load, notificationListChanged from:body, every 5s">
+                                              hx-trigger="load, notificationListChanged from:body">
                                             <li><a class="dropdown-item">No notification available</a></li>
                                         </span>
-                                        <li>
-                                            <a href="{% url 'notifications:list' %}" class="dropdown-item">
-                                                <span>See all Notifications</span>
-                                            </a>
-                                        </li>
                                     </ul>
                                 </li>
                             </ul>

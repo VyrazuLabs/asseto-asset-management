@@ -93,7 +93,7 @@ Log in with this credential and use the below features
 
 1. Navigate to the "Admin" section.
 2. Admin consists of five sections: Locations, Departments, Product Types, Product Categories, and Roles.
-3. Each section has its own functionalities where you can perform operations such as Add/Edit/Delete/View. 
+3. Each section has its own functionalities where you can perform operations such as Add/Edit/Delete/View.
 
 ### Vendors
 <img src="static/assets/images/002-Vendors.png" alt="Vendors Section" style="border-radius: 15px;" width="900" height="450"/>
