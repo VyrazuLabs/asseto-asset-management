@@ -39,6 +39,7 @@ def manage_access(user):
 def departments(request):
     department_list = Department.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
+    deleted_department_count=Department.deleted_objects.count()
     paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -50,6 +51,7 @@ def departments(request):
         'submenu': 'department',
         'page_object': page_object,
         'department_form': department_form,
+        'deleted_department_count':deleted_department_count,
         'title': 'Departments'
     }
     return render(request, 'dashboard/departments/list.html', context=context)
