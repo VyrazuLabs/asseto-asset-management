@@ -23,4 +23,32 @@ urlpatterns = [
     path('deleted-users/restore/<uuid:id>', views.deleted_user_restore, name='deleted_user_restore'),
     path('deleted-users/delete/<uuid:id>', views.deleted_user_permanently, name='deleted_user_permanently'),
     path('deleted-users-search/<str:page>', views.deleted_users_search, name='deleted_users_search'),
+
+
+    path('deleted-locations', views.deleted_locations, name='deleted_locations'),
+    path('deleted-locations/restore/<uuid:id>', views.deleted_locations_restore, name='deleted_locations_restore'),
+    path('deleted-locations/delete/<uuid:id>', views.deleted_locations_permanently, name='deleted_locations_permanently'),
+    path('deleted-locations-search/<str:page>', views.deleted_locations_search, name='deleted_locations_search'),
+
+
+    path('deleted-departments', views.deleted_depertments, name='deleted_departments'),
+    path('deleted-departments/restore/<uuid:id>', views.deleted_departments_restore, name='deleted_departments_restore'),
+    path('deleted-departments/delete/<uuid:id>', views.deleted_departments_permanently, name='deleted_departments_permanently'),
+    path('deleted-departments-search/<str:page>', views.deleted_departments_search, name='deleted_departments_search'),
+
+
+    path('deleted_product_categories', views.deleted_product_categories, name='deleted_product_categories'),
+    path('deleted_product_categories/restore/<uuid:id>', views.deleted_product_categories_restore, name='deleted_product_categories_restore'),
+    path('deleted_product_categories/delete/<uuid:id>', views.deleted_product_categories_permanently, name='deleted_product_categories_permanently'),
+    path('search_deleted_product_categories/<str:page>', views.search_deleted_product_categories, name='search_deleted_product_categories'),
+
+    path('deleted_product_types', views.deleted_product_types, name='deleted_product_types'),
+    path('deleted_product_types/restore/<uuid:id>', views.deleted_product_types_restore, name='deleted_product_types_restore'),
+    path('deleted_product_types/delete/<uuid:id>', views.deleted_product_types_permanently, name='deleted_product_types_permanently'),
+    path('deleted_product_types_search/<str:page>', views.deleted_product_types_search, name='deleted_product_types_search'),
+
+    path('deleted_asset_status', views.deleted_asset_status, name='deleted_asset_status'),
+    path('deleted_asset_status/restore/<uuid:id>', views.deleted_asset_status_restore, name='deleted_asset_status_restore'),
+    path('deleted_asset_status/delete/<uuid:id>', views.deleted_asset_status_permanently, name='deleted_asset_status_permanently'),
+    path('deleted_asset_status_search/<str:page>', views.deleted_asset_status_search, name='deleted_asset_status_search'),
 ]
