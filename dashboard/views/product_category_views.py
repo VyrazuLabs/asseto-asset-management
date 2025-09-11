@@ -39,7 +39,11 @@ def product_category_list(request):
 
     all_product_category_list = ProductCategory.undeleted_objects.filter( Q(organization=None)|
     Q(organization=request.user.organization)).order_by('-created_at').exclude(name='Root')
-    
+
+    deleted_product_categories_count=ProductCategory.deleted_objects.filter( Q(organization=None)|
+    Q(organization=request.user.organization)).count()
+
+    print(deleted_product_categories_count)
     paginator = Paginator(all_product_category_list,
     PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
@@ -49,6 +53,7 @@ def product_category_list(request):
         'sidebar': 'admin',
         'submenu': 'product_category',
         'page_object': page_object,
+        'deleted_product_categories_count': deleted_product_categories_count,
         'title': 'Product Categories'
     }
     return render(request, 'dashboard/product_category/list.html', context=context)
