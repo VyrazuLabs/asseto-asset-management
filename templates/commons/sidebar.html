@@ -162,7 +162,7 @@
                         </ul>
                     </li>
                 {% endif %}
-                {% if request.user.is_superuser %}
+                <!-- {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'trash' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-trash3-fill"></i>
@@ -183,7 +183,7 @@
                             </li>
                         </ul>
                     </li>
-                {% endif %}
+                {% endif %} -->
                 {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'support' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">

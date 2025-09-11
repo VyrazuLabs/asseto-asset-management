@@ -28,6 +28,7 @@ urlpatterns = [
     path('asset_status_list',views.asset_status_list,name='asset_status_list'),
     path('asset_status_details/<uuid:id>',views.asset_status_details,name='asset_status_details'),
     path('edit_asset_status/<uuid:id>',views.edit_asset_status,name='edit_asset_status'),
+    path('asset_status_search/<str:page>',views.asset_status_search,name='asset_status_search'),
     path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
 ]

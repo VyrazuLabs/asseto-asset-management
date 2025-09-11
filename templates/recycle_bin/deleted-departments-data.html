@@ -1,0 +1,31 @@
+{% if page_object %}
+    {% for department in page_object %}
+    <tr>
+        <td>
+            {% if page_object.start_index %}
+                {{page_object.start_index|add:forloop.counter0}}
+            {% else %}
+                {{forloop.counter}}
+            {% endif %}
+        </td>
+        <td>{{department.name}}</td>
+        <td>{{department.contact_person_name}}</td>
+        <td>{{department.contact_person_email}}</td>
+        <td>{{department.contact_person_phone}}</td>
+        <td>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                <form action="{% url 'recycle_bin:deleted_departments_restore' department.id %}" method="post" onsubmit="return confirm('Are you sure you want to restore this?')">  
+                    {% csrf_token %}
+                    <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
+                </form>
+                <form action="{% url 'recycle_bin:deleted_departments_permanently' department.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this permanently?')">  
+                    {% csrf_token %}
+                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                </form>
+            </div>
+        </td> 
+    </tr>
+    {% endfor %}
+{% else %}
+    <td colspan="8" class="text-center"> No record found related to your search keyword</td>
+{% endif %}

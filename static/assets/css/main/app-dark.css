@@ -8098,3 +8098,24 @@ body[data-theme="dark"] {
 .asst-prd-img-div:hover .delete-img-btn{
   display: block!important;
 }
+
+.trash-btn{
+  height: 31px !important;
+}
+
+.trash-count-div{
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  background-color:#6f42c1;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}

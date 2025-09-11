@@ -152,6 +152,7 @@ def listed(request):
     product_type_list=ProductType.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
     asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
         organization=request.user.organization)).order_by('-created_at')
+    deleted_asset_count=Asset.deleted_objects.count()
     get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
     asset_user_map = {}
     for assign in get_assigned_asset_list:
@@ -193,6 +194,7 @@ def listed(request):
         'asset_form': asset_form,
         'assign_asset_form': assign_asset_form,
         'reassign_asset_form': reassign_asset_form,
+        'deleted_asset_count':deleted_asset_count,
         'title': 'Assets'
     }
 
@@ -775,7 +777,10 @@ def add_asset_status(request):
 def asset_status_list(request):
     all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
     Q(organization=request.user.organization)).order_by('-created_at')
-    print(all_asset_status_list)
+
+    deleted_asset_status_count= AssetStatus.deleted_objects.filter(Q(organization=None, can_modify=True)|
+    Q(organization=request.user.organization, can_modify=True)).count()
+
     paginator = Paginator(all_asset_status_list,
         PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
@@ -785,6 +790,7 @@ def asset_status_list(request):
         'sidebar': 'admin',
         'submenu': 'Asset_Status',
         'page_object': page_object,
+        'deleted_asset_status_count':deleted_asset_status_count,
         'title': 'Asset Status'
     }
     return render(request,'assets/asset_status_list.html',context=context)
@@ -821,6 +827,22 @@ def edit_asset_status(request,id):
 
     context = {'form': form, "modal_title": "Update Asset Status"}
     return render(request, 'assets/add_asset_status.html', context)
+
+@login_required
+def asset_status_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'assets/asset-status-data.html', {
+            'page_object': AssetStatus.undeleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
+        })
+
+    status_list = AssetStatus.undeleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(status_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'assets/asset-status-data.html', {'page_object': page_object})
+
 
 @login_required
 @permission_required('authentication.delete_asset_status')
@@ -1008,12 +1030,9 @@ def assign_asset_in_asset_list(request, id):
             # print("FILES",files)
             for f in files:
                 AssetImage.objects.create(asset=asset, image=f)
-                print("IMAGES CREATED",f)
             messages.success(request, 'Asset assigned to user successfully')
             return HttpResponse(status=204)
         else:
-            print("FORM IS NOT VALDIDDDDDDDDDDDDDDDDDDDDDDDD")
-            print(form.errors)
             return redirect('assets:list')
     else:
         form = AssignedAssetListForm(organization=request.user.organization)
