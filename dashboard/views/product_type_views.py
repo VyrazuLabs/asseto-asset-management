@@ -32,12 +32,12 @@ def manage_access(user):
 
     return False
 
-
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
     all_product_type_list = ProductType.undeleted_objects.filter(
     Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
+    deleted_product_types_count=ProductType.deleted_objects.filter(can_modify=True).count()
 
 
     paginator = Paginator(all_product_type_list, PAGE_SIZE, orphans=ORPHANS)
@@ -50,6 +50,7 @@ def product_type_list(request):
         'submenu': 'product_type',
         'product_type': product_type,
         'page_object': page_object,
+        'deleted_product_types_count':deleted_product_types_count,
         'title': 'Product Types'
     }
 
