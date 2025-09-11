@@ -50,7 +50,7 @@ def list(request):
             total_assets=Count('asset'),
             available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
-    print(product_list.values_list("total_assets","available_assets"))
+    deleted_product_count=Product.deleted_objects.count()
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -65,6 +65,7 @@ def list(request):
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
+        'deleted_product_count':deleted_product_count,
         'title': 'Products'
     }
 
@@ -114,14 +115,12 @@ def add_product(request):
             request.POST, request.FILES, organization=request.user.organization)
         image_form=ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
-            print("req Files",request.FILES)
             product = form.save(commit=False)
             product.organization = request.user.organization
             product.save()
             form.save_m2m()
 #             # product = form.save()
             files=request.FILES
-            print("FILES",files)
             for f in files.getlist('image'): # 'image' is the name of your file input
                 ProductImage.objects.create(product=product, image=f)
             names = request.POST.getlist('custom_field_name')
@@ -205,7 +204,6 @@ def update_product(request, id):
         img_array.append(it)
 
     if request.method=="DELETE":
-        print("delete method running")
         try:
             data = json.loads(request.body)
             delete_ids = data.get('delete_image_ids', [])
@@ -218,7 +216,6 @@ def update_product(request, id):
             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
     elif request.method == "POST":
-        print("post method called------------->")
         form = AddProductsForm(request.POST, request.FILES,
         instance=product, organization=request.user.organization)
         img_form= ProductImageForm(request.POST, request.FILES)
@@ -273,8 +270,6 @@ def update_product(request, id):
                     print("Custom Field added successfully 2")   
         messages.success(request, 'Product updated successfully')
         return redirect('products:list')
-    else:
-        print("error occurred somewhere---------->")
 
     context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
     return render(request, 'products/update-product-modal.html', context)
@@ -336,7 +331,6 @@ def get_assigned_product_info(request, id):
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
     get_assets=Asset.objects.filter(product=product, organization=request.user.organization)
-    print(get_assets)
     context = {
         'get_assets': get_assets,
         'title': 'Assigned Product Info',
