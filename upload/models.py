@@ -38,7 +38,7 @@ class ImportedUser(models.Model):
     full_name = models.CharField(max_length=255, blank=True, null=True)
     phone=models.CharField(max_length=12,blank=True,null=True)
     contact_person_name=models.CharField(max_length=255, blank=True, null=True)
-    contact_person_email = models.EmailField(max_length=255, unique=True)
+    contact_person_email = models.EmailField(max_length=255,blank=True, null=True)
     contact_person_phone=models.CharField(max_length=12,blank=True,null=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)

@@ -31,30 +31,24 @@
                 <div class="filter">
                     <div class="d-flex justify-content-between gap-2">
                         <form id="asset-filter-form"
-                            hx-get="{% url 'assets:search' page_object.number %}"
-                            hx-target="#search_result"
-                            hx-trigger="change, keyup changed delay:500ms from:input">
+                        hx-get="{% url 'assets:search' page_object.number %}"
+                        hx-target="#search_result"
+                        hx-trigger="change, keyup changed delay:500ms from:input">
 
-                            <div class="d-flex justify-content-start gap-2">
-                            <!-- Search -->
-                                <div>
-                                <input name="search_text"
-                                        type="search"
-                                        class="dataTable-input"
-                                        autocomplete="off"
-                                        placeholder="Search here...">
-                                </div>
-
-                                <!-- Status -->
+                        <div class="row g-3"> <!-- g-3 gives equal spacing between items -->
+                            <!-- First Row -->
+                            <div class="col-md-3">
+                                <input name="search_text" type="search" class="form-control" autocomplete="off" placeholder="Search here...">
+                            </div>
+                            <div class="col-md-3">
                                 <div class="dropdown-asset-status">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Status
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for status in asset_status_list %}
                                     <li>
-                                    <a href="#"
-                                        class="dropdown-item"
+                                    <a href="#" class="dropdown-item"
                                         onclick="event.preventDefault(); 
                                                 this.closest('form').querySelector('[name=status]').value='{{ status.id }}'; 
                                                 this.closest('.dropdown-asset-status').querySelector('button').innerText='{{ status.name }}';
@@ -66,17 +60,16 @@
                                 </ul>
                                 <input type="hidden" name="status">
                                 </div>
-
-                                <!-- Vendor -->
+                            </div>
+                            <div class="col-md-3">
                                 <div class="dropdown-asset-vendors">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Vendor
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for vendor in vendor_list %}
                                     <li>
-                                    <a href="#"
-                                        class="dropdown-item"
+                                    <a href="#" class="dropdown-item"
                                         onclick="event.preventDefault(); 
                                                 this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}'; 
                                                 this.closest('.dropdown-asset-vendors').querySelector('button').innerText='{{ vendor.name }}';
@@ -88,41 +81,39 @@
                                 </ul>
                                 <input type="hidden" name="vendor">
                                 </div>
-
-                                <!-- Product Type -->
-                                
-
+                            </div>
+                            <div class="col-md-3">
                                 <div class="dropdown-asset-product-type">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        Select Product Type
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {% for type in product_type_list %}
-                                        <li>
-                                            <a href="#"
-                                                class="dropdown-item"
-                                                onclick="event.preventDefault(); 
-                                                        this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
-                                                        this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
-                                                        htmx.trigger(this.closest('form'),'change');">
-                                                {{ type.name }}
-                                            </a>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <input type="hidden" name="type">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    Select Product Type
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for type in product_type_list %}
+                                    <li>
+                                    <a href="#" class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
+                                                this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ type.name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="type">
                                 </div>
+                            </div>
 
-                                <!--User-->
+                            <!-- Second Row -->
+                            <div class="col-md-3">
                                 <div class="dropdown-asset-users">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select User
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for user in user_list %}
                                     <li>
-                                    <a href="#"
-                                        class="dropdown-item"
+                                    <a href="#" class="dropdown-item"
                                         onclick="event.preventDefault(); 
                                                 this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
                                                 this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
@@ -135,8 +126,75 @@
                                 <input type="hidden" name="user">
                                 </div>
                             </div>
-                        </form>
-                        <div class="d-flex justify-content-end">
+                            <div class="col-md-3">
+                                <div class="dropdown-asset-product-category">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    Select Category
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for category in product_category_list %}
+                                    <li>
+                                    <a href="#" class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=category]').value='{{ category.id }}';
+                                                this.closest('.dropdown-asset-product-category').querySelector('button').innerText='{{ category.name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ category.name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="category">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="dropdown-asset-location">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    Select Location
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for location in location_list %}
+                                    <li>
+                                    <a href="#" class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=location]').value='{{ location.id }}'; 
+                                                this.closest('.dropdown-asset-location').querySelector('button').innerText='{{ location.office_name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ location.office_name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="location">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="dropdown-asset-department">
+                                <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                                    Select Department
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% for department in department_list %}
+                                    <li>
+                                    <a href="#" class="dropdown-item"
+                                        onclick="event.preventDefault(); 
+                                                this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
+                                                this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
+                                                htmx.trigger(this.closest('form'),'change');">
+                                        {{ department.name }}
+                                    </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <input type="hidden" name="department">
+                                </div>
+                            </div>
+
+                            </div>
+
+                    </form>
+
+                        <div class="d-flex justify-content-end h-75">
                             <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
                         </div>
                     </div>
@@ -147,8 +205,8 @@
                         <tr>
                             <th>Sl No.</th>
                             <th>Image</th>
+                            <th>Asset Tag</th>
                             <th>Asset Name</th>
-                            <th>Serial No.</th>
                             <th>Product Type</th>
                             <th>Product</th>
                             <th>Vendor</th>
@@ -173,8 +231,8 @@
                                     {% endif %}
                                 {% endwith %}
                             </td>
+                            <td>{{asset.tag}}</td>
                             <td>{{asset.name}}</td>
-                            <td>{{asset.serial_no}}</td>
                             <td>{{asset.product.product_type}}</td>
                             
                             <td>
@@ -191,6 +249,7 @@
                             </td>
                             <td>
                                 {% if asset.is_assigned %}
+                                    <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}<img src='{{ map.image.url }}' class="rounded-circle" style="width: 20px; height: 20px "/>{{ map.full_name }}{% endwith %}</sup>
                                     <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
                                             {% csrf_token %}
                                             <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>

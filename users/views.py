@@ -12,7 +12,7 @@ from .utils import create_all_perm_role
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
-from django.db.models import Q
+from django.db.models import Q,Prefetch
 from django.contrib.auth.decorators import permission_required
 from datetime import date
 from assets.models import Asset,AssetImage
@@ -44,33 +44,54 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
-        pk=request.user.id).order_by('-created_at')
-    deleted_user_count=User.deleted_objects.count()
+    users_list = (
+        User.undeleted_objects
+        .filter(organization=request.user.organization, is_superuser=False)
+        .exclude(pk=request.user.id)
+        .order_by('-created_at')
+    )
+    deleted_user_count = User.deleted_objects.count()
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
+    # 🔑 Collect all user IDs from this page
+    user_ids = [u.id for u in page_object]
+
+    # 🔑 Get assigned assets for those users
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+
+    # 🔑 Build map { user_id: [asset1, asset2, ...] }
+    user_asset_map_count = {}
+    for aa in assigned_assets:
+        user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
+    
+    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
+
     if request.method == "POST":
-        messages.success(
-            request, 'User added successfully and Verification email sent to the user')
-
+        messages.success
+        (
+            request, 'User added successfully and Verification email sent to the user'
+        )
         return redirect(request.META.get('HTTP_REFERER'))
-
-    context = {'sidebar': 'users',
-               'page_object': page_object, 'deleted_user_count':deleted_user_count,'title': 'Users'}
+    print("Mappeddddddddddd",user_asset_map_count)
+    context = {
+        'sidebar': 'users',
+        'page_object': page_object,
+        'deleted_user_count': deleted_user_count,
+        'title': 'Users',
+        'user_asset_map_count':user_asset_map_count,   # 👈 send to template
+        'user_asset_map_count_count':user_asset_map_count_count
+    }
     return render(request, 'users/list.html', context=context)
+
 
 
 @login_required
 @permission_required('authentication.view_users')
 def details(request, id):
-
     user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
     assigned_assets = AssignAsset.objects.filter(user=user)
-    
-    
-    
     history_list = User.history.all()
     paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
