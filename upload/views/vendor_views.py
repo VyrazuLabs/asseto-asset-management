@@ -9,7 +9,7 @@ import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
 import json
-from ..models import ImportedUser
+from upload.models import ImportedUser
 from authentication.models import User
 from ..utils import function_to_get_matching_objects_vendors
 # import django.contrib
@@ -68,7 +68,7 @@ def import_vendors_csv(request):
                     state=l[10],
                     country=l[11],
                 )
-
+                # Reflects in vendor list page
                 vendor=Vendor.objects.create(
                     name=l[0],
                     email=l[1],
@@ -90,22 +90,24 @@ def import_vendors_csv(request):
                 obj['description']=l[12]
                 obj['address']=address
                 obj['organization']=request.user.organization
-                # ImportedUser = ImportedUser.objects.create(
-                #     entity_type="Vendor",
-                #     email=obj.get('email'),
-                #     username=None,
-                #     full_name=obj.get('name'),
-                #     phone=obj.get('phone'),
-                #     contact_person_name=obj.get('contact_person'),
-                #     contact_person_email=obj.get('contact_person_email'),
-                #     contact_person_phone=obj.get('contact_person_phone'),
-                #     address=address,
-                #     organization=request.user.organization,
-                #     gstin_number=obj.get('gstin_number'),
-                #     description=obj.get('description'),
-                #     designation=obj.get('designation')
-                # )
-                # vendor.imported_user=ImportedUser.id
+                Importeduser = ImportedUser.objects.create(
+                    entity_type="Vendor",
+                    email=obj.get('email'),
+                    username=None,
+                    full_name=obj.get('name'),
+                    phone=obj.get('phone'),
+                    contact_person_name=obj.get('contact_person'),
+                    contact_person_email=obj.get('contact_person_email'),
+                    contact_person_phone=obj.get('contact_person_phone'),
+                    address=address,
+                    organization=request.user.organization,
+                    gstin_number=obj.get('gstin_number'),
+                    description=obj.get('description'),
+                    designation=obj.get('designation')
+                )
+                Importeduser.save()
+                print("IMPORT SAVEDDDDDDDDD_")
+                # vendor.imported_user=Importeduser.id
                 array.append(obj)
             arr=function_to_get_matching_objects_vendors(array)
 
@@ -115,7 +117,7 @@ def import_vendors_csv(request):
                 request, 'Vendors CSV file uploaded successfully')
             return redirect('upload:compare_data')
         except Exception as e:
-            messages.error(request, f'Error processing request: {str(e)}')
+            messages.error(request, f'Error processing requestssssssss: {str(e)}')
         return redirect('upload:vendor_list')
     context = {'page': 'Vendors'}
     return render(request, 'upload/upload-csv-modal.html', context)
@@ -123,7 +125,7 @@ def import_vendors_csv(request):
 def render_to_mapper_modal(request):
     arr = request.session.pop('arr', [])
     header= request.session.pop('header', [])
-    context = {'page': 'Vendors','arr':arr,'header':header}
+    context = {'page': 'vendors','arr':arr,'header':header}
     return render(request, 'upload/modal.html', context)
 
 # {'email': 'email@gmail.com', 'name': 'Vendoe 2', 'phone': ['847965123'], 'contact_person': 'Anando Singh', 'contact_person_email': '', 'contact_person_phone': '',
@@ -144,10 +146,10 @@ def create_matched_data_from_csv_vendor(request):
                 #Create the the user which are mapped from the csv to databsae
                 obj=ImportedUser.objects.create(entity_type="Vendor",**it)
 
-                # get_user=Vendor.objects.filter(email=it.get("email"),full_name=it.get("first_name"),phone=it.get("phone"),contact_person=it.get("contact_person"),gstin_number=it.get("gstin_number"),designation=it.get("designation"),description=it.get("description")).first()
-
+                get_user=Vendor.objects.filter(email=it.get("email"),full_name=it.get("first_name"),phone=it.get("phone"),contact_person=it.get("contact_person"),gstin_number=it.get("gstin_number"),designation=it.get("designation"),description=it.get("description")).first()
+                obj.save()
                 # get_user.imported_user = obj.id
-                # get_user.save()
+                get_user.save()
 
             return JsonResponse({'status': 'success', 'received_items': len(data)})
         except json.JSONDecodeError:
