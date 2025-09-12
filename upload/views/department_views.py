@@ -86,7 +86,8 @@ def render_to_mapper_modal(request):
     arr = request.session.pop('arr', [])
     header= request.session.pop('header', [])
     model=request.session.pop('model',[])
-    context = {'page': 'Vendors','arr':arr,'header':header,'model':model}
+    context = {'page': 'vendors','arr':arr,'header':header,'model':model}
+    print("ConTEXT------,",context)
     return render(request, 'upload/modal.html', context)
 
 def create_matched_data_from_csv_department(request):

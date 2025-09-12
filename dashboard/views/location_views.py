@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-
+from django.db.models import Q,Count
+from assets.models import AssignAsset
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -43,12 +43,21 @@ def locations(request):
     paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    asset_counts = (
+        AssignAsset.objects
+        .filter(asset__organization=request.user.organization,
+                asset__location__in=location_list)
+        .values("asset__location")
+        .annotate(asset_count=Count("id"))
+    )
+    location_asset_count = {item["asset__location"]: item["asset_count"] for item in asset_counts}
+    print(len(location_asset_count))
     context = {
         'sidebar': 'admin',
         'submenu': 'location',
         'page_object': page_object,
         'deleted_location_count':deleted_location_count,
+        'location_asset_count':location_asset_count,
         'title': 'Locations'
     }
 
