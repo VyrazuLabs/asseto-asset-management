@@ -16,7 +16,7 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from dashboard.models import CustomField
+from dashboard.models import CustomField,Location,Department,ProductCategory
 from vendors.models import Vendor
 from django.db.models import Count
 import json
@@ -146,6 +146,9 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
+    product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     user_list=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization),is_active=True).order_by('-created_at')
     vendor_list=Vendor.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
     asset_status_list=AssetStatus.objects.filter(Q(organization=None) | Q(organization=request.user.organization))
@@ -159,7 +162,7 @@ def listed(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id]=assign.user.full_name
+            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -179,8 +182,12 @@ def listed(request):
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
     print("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ",get_assigned_asset_list)
+    print("MAPPEDDDDDDDDDD",asset_user_map)
     # print("product_type_list",product_type_list)
     context = {
+        'product_category_list':product_category_list,
+        'department_list':department_list,
+        'location_list':location_list,
         'asset_user_map':asset_user_map,
         'product_type_list':product_type_list,
         'asset_status_list':asset_status_list, 
@@ -497,6 +504,9 @@ def search(request, page):
     vendor_id = request.GET.get('vendor')
     status_id = request.GET.get('status')
     user_id = request.GET.get('user')
+    department_id=request.GET.get('department')
+    location_id=request.GET.get('location')
+    product_category_id = request.GET.get('category')
     product_type_id = request.GET.get('type')
 
     # Start query
@@ -521,8 +531,11 @@ def search(request, page):
     if status_id:
         q &= Q(asset_status_id=status_id)
 
-    # if user_id:
-    #     q &= Q(assigned_user_id=user_id)
+    # if department_id:
+    #     q &= Q(department_id=department_id)
+    
+    if product_category_id:
+        q &= Q(product__product_category__id=product_category_id)
     
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
@@ -571,6 +584,14 @@ def search(request, page):
             Asset.undeleted_objects
             .filter(q, assignasset__user_id=user_id)
             .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+            .order_by("-created_at")[:10]
+        )
+    elif department_id: 
+        print("sddddddddddddddddddddddddddddddddddddddddddddd",department_id)
+        assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
+        page_object = (
+            Asset.undeleted_objects
+            .filter(q, assignasset__user__department_id=department_id)
             .order_by("-created_at")[:10]
         )
     else:
@@ -775,25 +796,50 @@ def add_asset_status(request):
 @login_required
 @user_passes_test(manage_access_for_assets_status)
 def asset_status_list(request):
-    all_asset_status_list = AssetStatus.undeleted_objects.filter(Q(organization=None)|
-    Q(organization=request.user.organization)).order_by('-created_at')
+    all_asset_status_list = (
+        AssetStatus.undeleted_objects
+        .filter(Q(organization=None) | Q(organization=request.user.organization))
+    )
 
-    deleted_asset_status_count= AssetStatus.deleted_objects.filter(Q(organization=None, can_modify=True)|
-    Q(organization=request.user.organization, can_modify=True)).count()
+    deleted_asset_status_count = (
+        AssetStatus.deleted_objects
+        .filter(
+            Q(organization=None, can_modify=True) |
+            Q(organization=request.user.organization, can_modify=True)
+        )
+        .count()
+    )
 
-    paginator = Paginator(all_asset_status_list,
-        PAGE_SIZE, orphans=ORPHANS)
+    paginator = Paginator(all_asset_status_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
+
+    # Count distinct assets per asset status
+    asset_counts = (
+        Asset.objects
+        .filter(
+            organization=request.user.organization,
+            asset_status__in=all_asset_status_list
+        )
+        .values("asset_status")
+        .annotate(asset_count=Count("id", distinct=True))   # ✅ unique assets
+    )
+
+    # Map: {asset_status_id: asset_count}
+    asset_status_asset_count = {
+        item["asset_status"]: item["asset_count"]
+        for item in asset_counts
+    }
 
     context = {
         'sidebar': 'admin',
         'submenu': 'Asset_Status',
         'page_object': page_object,
-        'deleted_asset_status_count':deleted_asset_status_count,
-        'title': 'Asset Status'
+        'deleted_asset_status_count': deleted_asset_status_count,
+        'asset_status_asset_count': asset_status_asset_count,
+        'title': 'Asset Status',
     }
-    return render(request,'assets/asset_status_list.html',context=context)
+    return render(request, 'assets/asset_status_list.html', context=context)
 
 @login_required
 @permission_required('authentication.asset_status_details')
