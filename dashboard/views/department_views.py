@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
-
+from django.db.models import Q,Count
+from assets.models import AssignAsset
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -37,25 +37,50 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def departments(request):
-    department_list = Department.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    deleted_department_count=Department.deleted_objects.count()
+    department_list = (
+        Department.undeleted_objects
+        .filter(organization=request.user.organization)
+    )
+    
+    deleted_department_count = (
+        Department.deleted_objects
+        .filter(organization=request.user.organization)
+        .count()
+    )
+
     paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
     department_form = DepartmentForm()
 
+    # Count distinct assets per department
+    asset_counts = (
+        AssignAsset.objects
+        .filter(
+            asset__organization=request.user.organization,
+            user__department__in=department_list
+        )
+        .values("user__department")
+        .annotate(asset_count=Count("asset", distinct=True))   # ✅ unique assets
+    )
+
+    # Map: {department_id: asset_count}
+    department_asset_count = {
+        item["user__department"]: item["asset_count"]
+        for item in asset_counts
+    }
+
     context = {
         'sidebar': 'admin',
         'submenu': 'department',
         'page_object': page_object,
         'department_form': department_form,
-        'deleted_department_count':deleted_department_count,
+        'deleted_department_count': deleted_department_count,
+        'department_asset_count': department_asset_count,
         'title': 'Departments'
     }
     return render(request, 'dashboard/departments/list.html', context=context)
-
 
 @login_required
 @user_passes_test(check_admin)

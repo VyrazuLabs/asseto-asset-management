@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between align-items-center">
@@ -54,6 +55,7 @@
                         <tr>
                             <th>Sl No.</th>
                             <th>Department Name</th>
+                            <th>Total Asset</th>
                             <th>Contact Person Name</th>
                             <th>Contact Person Email</th>
                             <th>Contact Person Phone</th>
@@ -69,6 +71,7 @@
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
                             <td>{{department.name}}</td>
+                            <td>{{ department_asset_count|get_item:department.id|default:0 }}</td>
                             <td>{{department.contact_person_name}}</td>
                             <td>{{department.contact_person_email}}</td>
                             <td>{{department.contact_person_phone}}</td>
