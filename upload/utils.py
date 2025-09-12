@@ -206,12 +206,12 @@ def function_to_get_matching_objects_product_category(arr):
 def function_to_get_matching_objects_product_types(arr):
     array=[]
     for it in arr:
-        get_existing_product_category=ProductType.objects.filter(**it).first()
+        get_existing_product_type=ProductType.objects.filter(**it).first()
         obj={}
         # entity_type="Vendor",
         obj['email']=""
         username=None
-        obj['name']=get_existing_product_category.name
+        obj['name']=get_existing_product_type.name
         obj['phone']=""
         obj['office_name']=""
         obj['contact_person_name']=""

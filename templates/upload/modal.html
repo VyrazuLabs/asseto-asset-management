@@ -300,8 +300,7 @@ document.addEventListener("DOMContentLoaded", function() {
           // Customize URL and data as per your needs
       const formData = new FormData(fileUserForm);
       var arr = {% autoescape off %}{{ arr }}{% endautoescape %}
-      var model="{{ model }}"
-      console.log(arr,model)
+      var model="{% autoescape off %}{{ page }}{% endautoescape %}"
 
       fetch(`/upload/${model}`, {
           method: 'POST',
@@ -310,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function() {
               'X-CSRFToken': getCookie('csrftoken'),  // you may need this if CSRF is enabled
           },
       })
-      .then(response => response.json())
+      .then(response => response.text())
       .then(data => {
           // Handle success response
           alert('API call successful!');
@@ -320,9 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
       .catch(error => {
           // Handle error
           alert('API call failed!');
-          console.error('Error:', error);
-          console.log("error",error)
-      }) 
+      })
     })
     function getCookie(name) {
         let cookieValue = null;
