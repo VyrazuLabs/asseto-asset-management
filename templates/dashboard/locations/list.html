@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between align-items-center">
@@ -46,6 +47,7 @@
                         <tr>
                             <th>Sl No.</th>
                             <th>Office Name</th>
+                            <th>Total Asset</th>
                             <th>Contact Person Name</th>
                             <th>State</th>
                             <th>City</th>
@@ -62,6 +64,7 @@
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
                             <td>{{location.office_name}}</td>
+                            <td>{{ location_asset_count|get_item:location.id|default:0 }}</td>
                             <td>{{location.contact_person_name}}</td>
                             <td>{{location.address.state}}</td>
                             <td>{{location.address.city}}</td>
