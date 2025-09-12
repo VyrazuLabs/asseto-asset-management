@@ -8,8 +8,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.http import JsonResponse
+from assets.models import AssignAsset
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -36,24 +37,49 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_category_list(request):
+    all_product_category_list = (
+        ProductCategory.undeleted_objects
+        .filter(
+            Q(organization=None) |
+            Q(organization=request.user.organization)
+        )
+        .exclude(name='Root')
+        .order_by('-created_at')
+    )
 
-    all_product_category_list = ProductCategory.undeleted_objects.filter( Q(organization=None)|
-    Q(organization=request.user.organization)).order_by('-created_at').exclude(name='Root')
+    deleted_product_categories_count = (
+        ProductCategory.deleted_objects
+        .filter(Q(organization=None) | Q(organization=request.user.organization))
+        .count()
+    )
 
-    deleted_product_categories_count=ProductCategory.deleted_objects.filter( Q(organization=None)|
-    Q(organization=request.user.organization)).count()
-
-    print(deleted_product_categories_count)
-    paginator = Paginator(all_product_category_list,
-    PAGE_SIZE, orphans=ORPHANS)
+    paginator = Paginator(all_product_category_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
+
+    # Count distinct assets per product category
+    asset_counts = (
+        AssignAsset.objects
+        .filter(
+            asset__organization=request.user.organization,
+            asset__product__product_category__in=all_product_category_list
+        )
+        .values("asset__product__product_category")
+        .annotate(asset_count=Count("asset", distinct=True))   # ✅ distinct asset count
+    )
+
+    # Map: {product_category_id: asset_count}
+    product_category_asset_count = {
+        item["asset__product__product_category"]: item["asset_count"]
+        for item in asset_counts
+    }
 
     context = {
         'sidebar': 'admin',
         'submenu': 'product_category',
         'page_object': page_object,
         'deleted_product_categories_count': deleted_product_categories_count,
+        'product_category_asset_count': product_category_asset_count,
         'title': 'Product Categories'
     }
     return render(request, 'dashboard/product_category/list.html', context=context)

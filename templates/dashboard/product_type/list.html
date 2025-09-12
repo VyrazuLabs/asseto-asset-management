@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between align-items-center">
@@ -55,6 +56,7 @@
                             <tr>
                                 <th>Sl No.</th>
                                 <th>Type Name</th>
+                                <th>Total Asset</th>
                                 <th>Status</th>
                                 {% if perms.authentication.edit_product_type or perms.authentication.delete_product_type %}
                                     <th>Actions</th>
@@ -67,6 +69,7 @@
                                 <tr>
                                     <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
                                     <td>{{ products.name }}</td>
+                                    <td>{{ user_product_type_asset_count|get_item:products.id|default:0 }}</td>
                                     <td>
                                         {% if request.user.is_superuser %}
                                             <div class="form-check form-switch">
