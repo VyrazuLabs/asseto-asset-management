@@ -29,18 +29,17 @@
         <div class="card">
             <div class="card-body">
                 <div class="filter">
-                    <div class="d-flex justify-content-between gap-2">
-                        <form id="asset-filter-form"
+                <div>
+                    <form id="asset-filter-form"
                         hx-get="{% url 'assets:search' page_object.number %}"
                         hx-target="#search_result"
                         hx-trigger="change, keyup changed delay:500ms from:input">
 
-                        <div class="row g-3"> <!-- g-3 gives equal spacing between items -->
-                            <!-- First Row -->
-                            <div class="col-md-3">
-                                <input name="search_text" type="search" class="form-control" autocomplete="off" placeholder="Search here...">
+                        <div class="row g-3"> 
+                            <div class="col-12 col-sm-6 col-lg-3">
+                                <input name="search_text" type="search" class="form-control" class="dataTable-input" autocomplete="off" placeholder="Search here...">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-status">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Status
@@ -61,7 +60,7 @@
                                 <input type="hidden" name="status">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-vendors">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Vendor
@@ -82,7 +81,7 @@
                                 <input type="hidden" name="vendor">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-type">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Product Type
@@ -105,7 +104,7 @@
                             </div>
 
                             <!-- Second Row -->
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-users">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select User
@@ -126,7 +125,7 @@
                                 <input type="hidden" name="user">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-category">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Category
@@ -147,7 +146,7 @@
                                 <input type="hidden" name="category">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-location">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Location
@@ -168,7 +167,7 @@
                                 <input type="hidden" name="location">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-department">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     Select Department
@@ -189,14 +188,12 @@
                                 <input type="hidden" name="department">
                                 </div>
                             </div>
-
-                            </div>
-
-                    </form>
-
-                        <div class="d-flex justify-content-end h-75">
-                            <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
                         </div>
+                    </form>
+                    </div>
+                    </br>
+                    <div class="d-flex justify-content-end h-75">
+                        <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
                     </div>
                 </div>
                 </br>
