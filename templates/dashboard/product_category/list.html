@@ -79,7 +79,20 @@
                                             <i class="bi bi-exclamation-triangle text-warning" title="Parent Category is deleted, please update or restore."></i>
                                         {% endif %}
                                     </td>
-                                    <td>{{ product_category_asset_count|get_item:products.id|default:0 }}</td>
+                                    <td>
+                                        {% if not product_category_asset_count|get_item:products.id %}
+                                            0
+                                        {% else %}
+                                            <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                                <input type="hidden" name="category" value="{{ products.id }}">
+                                                <button type="submit" 
+                                                    class="btn btn-sm text-white"
+                                                    style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                                                    {{ product_category_asset_count|get_item:products.id|default:0 }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {% if request.user.is_superuser %}
                                             <div class="form-check form-switch">
