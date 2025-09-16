@@ -123,6 +123,7 @@ def import_vendors_csv(request):
     return render(request, 'upload/upload-csv-modal.html', context)
 
 def render_to_mapper_modal(request):
+    print("RENDER TO MAPPER MODAL------------------------------")
     arr = request.session.pop('arr', [])
     header= request.session.pop('header', [])
     context = {'page': 'vendors','arr':arr,'header':header}
