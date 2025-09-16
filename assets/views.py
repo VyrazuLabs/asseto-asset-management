@@ -500,107 +500,120 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    search_text = (request.GET.get('search_text') or "").strip()
-    vendor_id = request.GET.get('vendor')
-    status_id = request.GET.get('status')
-    user_id = request.GET.get('user')
-    department_id=request.GET.get('department')
-    location_id=request.GET.get('location')
-    product_category_id = request.GET.get('category')
-    product_type_id = request.GET.get('type')
+    # if request.method == 'POST':
+        search_text = (request.GET.get('search_text') or "").strip()
+        vendor_id = request.GET.get('vendor')
+        status_id = request.GET.get('status')
+        user_id = request.GET.get('user')
+        department_id=request.GET.get('department')
+        location_id=request.GET.get('location')
+        product_category_id = request.GET.get('category')
+        product_type_id = request.GET.get('type')
+        print("searproduct_type_idch_textsadsdasdasdsadsa",product_type_id)
 
-    # Start query
-    q = Q(organization=request.user.organization)
+        # Start query
+        q = Q(organization=request.user.organization)
 
-    # Apply filters if present
-    if search_text:
-        q &= (
-            Q(name__icontains=search_text) |
-            Q(serial_no__icontains=search_text) |
-            Q(purchase_type__icontains=search_text) |
-            Q(product__name__icontains=search_text) |
-            Q(vendor__name__icontains=search_text) |
-            Q(vendor__gstin_number__icontains=search_text) |
-            Q(location__office_name__icontains=search_text) |
-            Q(product__product_type__name__icontains=search_text)
-        )
+        # Apply filters if present
+        if search_text:
+            q &= (
+                Q(name__icontains=search_text) |
+                Q(serial_no__icontains=search_text) |
+                Q(purchase_type__icontains=search_text) |
+                Q(product__name__icontains=search_text) |
+                Q(vendor__name__icontains=search_text) |
+                Q(vendor__gstin_number__icontains=search_text) |
+                Q(location__office_name__icontains=search_text) |
+                Q(product__product_type__name__icontains=search_text)
+            )
 
-    if vendor_id:
-        q &= Q(vendor_id=vendor_id)
+        if vendor_id:
+            q &= Q(vendor_id=vendor_id)
 
-    if status_id:
-        q &= Q(asset_status_id=status_id)
+        if status_id:
+            q &= Q(asset_status_id=status_id)
 
-    # if department_id:
-    #     q &= Q(department_id=department_id)
-    
-    if product_category_id:
-        q &= Q(product__product_category__id=product_category_id)
-    
-    if product_type_id:
-        q &= Q(product__product_type_id=product_type_id)
-    print(q)
-    # Get assets
-    # asset_user_map = {}
-    page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
-    # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
+        # if department_id:
+        #     q &= Q(department_id=department_id)
+        
+        if product_category_id:
+            q &= Q(product__product_category__id=product_category_id)
+        
+        if product_type_id:
+            q &= Q(product__product_type_id=product_type_id)
+        print(q)
+        # Get assets
+        # asset_user_map = {}
+        page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
+        # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
 
-    # page_object = (
-    #     Asset.undeleted_objects
-    #     .filter(q)
-    #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-    #     .order_by("-created_at")[:10]
-    # )
-    # if user_id:
-    #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
-    #     asset_user_map = {}
-    #     for assign in get_assigned_asset_list:
-    #         if assign.asset_id not in asset_user_map:
-    #             asset_user_map[assign.asset_id] = None
-    #         if assign.user:  # avoid None users
-    #             asset_user_map[assign.asset_id]=assign.user.full_name
-    # print(page_object)
-    asset_ids = list(page_object.values_list("id", flat=True))
-    image_object = AssetImage.objects.filter(
-        asset__organization=request.user.organization,
-        asset_id__in=asset_ids
-    ).order_by('-uploaded_at')
-    asset_images = {}
-    for img in image_object:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
-    # if user_id:
-    #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-    #     page_object = (
-    #         Asset.undeleted_objects
-    #         .filter(q, assignasset__user_id=user_id)
-    #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-    #         .order_by("-created_at")[:10]
-    #     )
+        # page_object = (
+        #     Asset.undeleted_objects
+        #     .filter(q)
+        #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        #     .order_by("-created_at")[:10]
+        # )
+        # if user_id:
+        #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
+        #     asset_user_map = {}
+        #     for assign in get_assigned_asset_list:
+        #         if assign.asset_id not in asset_user_map:
+        #             asset_user_map[assign.asset_id] = None
+        #         if assign.user:  # avoid None users
+        #             asset_user_map[assign.asset_id]=assign.user.full_name
+        # print(page_object)
+        asset_ids = list(page_object.values_list("id", flat=True))
+        image_object = AssetImage.objects.filter(
+            asset__organization=request.user.organization,
+            asset_id__in=asset_ids
+        ).order_by('-uploaded_at')
+        asset_images = {}
+        for img in image_object:
+            if img.asset_id not in asset_images:
+                asset_images[img.asset_id] = img
+        # if user_id:
+        #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
+        #     page_object = (
+        #         Asset.undeleted_objects
+        #         .filter(q, assignasset__user_id=user_id)
+        #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        #         .order_by("-created_at")[:10]
+        #     )
+        # else:
+        if user_id:
+            assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
+            page_object = (
+                Asset.undeleted_objects
+                .filter(q, assignasset__user_id=user_id)
+                .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+                .order_by("-created_at")[:10]
+            )
+        elif department_id: 
+            print("sddddddddddddddddddddddddddddddddddddddddddddd",department_id)
+            assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
+            page_object = (
+                Asset.undeleted_objects
+                .filter(q, assignasset__user__department_id=department_id)
+                .order_by("-created_at")[:10]
+            )
+        else:
+            page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
+
+        asset_user_map = {}
+        get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=page_object) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+        for assign in get_assigned_asset_list:
+            if assign.asset_id not in asset_user_map:
+                asset_user_map[assign.asset_id] = None
+            if assign.user:  # avoid None users
+                asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+        return render(request, 'assets/assets-data.html', {
+            'page_object': page_object,
+            'asset_user_map': asset_user_map,
+            # 'asset_user_map': asset_user_map,
+            'asset_images': asset_images
+        })
     # else:
-    if user_id:
-        assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-        page_object = (
-            Asset.undeleted_objects
-            .filter(q, assignasset__user_id=user_id)
-            .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-            .order_by("-created_at")[:10]
-        )
-    elif department_id: 
-        print("sddddddddddddddddddddddddddddddddddddddddddddd",department_id)
-        assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
-        page_object = (
-            Asset.undeleted_objects
-            .filter(q, assignasset__user__department_id=department_id)
-            .order_by("-created_at")[:10]
-        )
-    else:
-        page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
-    return render(request, 'assets/assets-data.html', {
-        'page_object': page_object,
-        # 'asset_user_map': asset_user_map,
-        'asset_images': asset_images
-    })
+        # return render(request, 'assets/list.html')
 
 
 @login_required
@@ -1085,3 +1098,179 @@ def assign_asset_in_asset_list(request, id):
         image_form = AssetImageForm()
     context = {'form': form,'image_form':image_form,'asset':asset}
     return render(request, 'assets/assign-asset-modal-in-list.html', context=context)
+
+def search_assets(request, page):
+    # if request.method == 'POST':
+        search_text = (request.GET.get('search_text') or "").strip()
+        vendor_id = request.GET.get('vendor')
+        status_id = request.GET.get('status')
+        user_id = request.GET.get('user')
+        department_id=request.GET.get('department')
+        location_id=request.GET.get('location')
+        product_category_id = request.GET.get('category')
+        product_type_id = request.GET.get('type')
+        print("searproduct_type_idch_textsadsdasdasdsadsa",product_type_id)
+
+        # Start query
+        q = Q(organization=request.user.organization)
+
+        # Apply filters if present
+        if search_text:
+            q &= (
+                Q(name__icontains=search_text) |
+                Q(serial_no__icontains=search_text) |
+                Q(purchase_type__icontains=search_text) |
+                Q(product__name__icontains=search_text) |
+                Q(vendor__name__icontains=search_text) |
+                Q(vendor__gstin_number__icontains=search_text) |
+                Q(location__office_name__icontains=search_text) |
+                Q(product__product_type__name__icontains=search_text)
+            )
+
+        if vendor_id:
+            q &= Q(vendor_id=vendor_id)
+
+        if status_id:
+            q &= Q(asset_status_id=status_id)
+
+        # if department_id:
+        #     q &= Q(department_id=department_id)
+        
+        if product_category_id:
+            q &= Q(product__product_category__id=product_category_id)
+        
+        if product_type_id:
+            q &= Q(product__product_type_id=product_type_id)
+        print(q)
+        # Get assets
+        # asset_user_map = {}
+        page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
+        # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
+
+        # page_object = (
+        #     Asset.undeleted_objects
+        #     .filter(q)
+        #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        #     .order_by("-created_at")[:10]
+        # )
+        # if user_id:
+        #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
+        #     asset_user_map = {}
+        #     for assign in get_assigned_asset_list:
+        #         if assign.asset_id not in asset_user_map:
+        #             asset_user_map[assign.asset_id] = None
+        #         if assign.user:  # avoid None users
+        #             asset_user_map[assign.asset_id]=assign.user.full_name
+        # print(page_object)
+        asset_ids = list(page_object.values_list("id", flat=True))
+        image_object = AssetImage.objects.filter(
+            asset__organization=request.user.organization,
+            asset_id__in=asset_ids
+        ).order_by('-uploaded_at')
+        asset_images = {}
+        for img in image_object:
+            if img.asset_id not in asset_images:
+                asset_images[img.asset_id] = img
+        # if user_id:
+        #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
+        #     page_object = (
+        #         Asset.undeleted_objects
+        #         .filter(q, assignasset__user_id=user_id)
+        #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        #         .order_by("-created_at")[:10]
+        #     )
+        # else:
+        if user_id:
+            assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
+            page_object = (
+                Asset.undeleted_objects
+                .filter(q, assignasset__user_id=user_id)
+                .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+                .order_by("-created_at")[:10]
+            )
+        elif department_id: 
+            print("sddddddddddddddddddddddddddddddddddddddddddddd",department_id)
+            assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
+            page_object = (
+                Asset.undeleted_objects
+                .filter(q, assignasset__user__department_id=department_id)
+                .order_by("-created_at")[:10]
+            )
+        else:
+            page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
+
+        asset_user_map = {}
+        get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=page_object) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+        for assign in get_assigned_asset_list:
+            if assign.asset_id not in asset_user_map:
+                asset_user_map[assign.asset_id] = None
+            if assign.user:  # avoid None users
+                asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+        return render(request, 'assets/list-upper.html', {
+            'page_object': page_object,
+            'asset_user_map': asset_user_map,
+            # 'asset_user_map': asset_user_map,
+            'asset_images': asset_images
+        })
+
+def listed_asset(request):
+    product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    user_list=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization),is_active=True).order_by('-created_at')
+    vendor_list=Vendor.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
+    asset_status_list=AssetStatus.objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    product_type_list=ProductType.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
+    asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
+        organization=request.user.organization)).order_by('-created_at')
+    deleted_asset_count=Asset.deleted_objects.count()
+    get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+    asset_user_map = {}
+    for assign in get_assigned_asset_list:
+        if assign.asset_id not in asset_user_map:
+            asset_user_map[assign.asset_id] = None
+        if assign.user:  # avoid None users
+            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+    paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    asset_form = AssetForm(organization=request.user.organization)
+    assign_asset_form = AssignedAssetForm(organization=request.user.organization)
+    reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
+    active_users=User.objects.filter(is_active=True,organization=request.user.organization)
+    print(active_users)
+    # active_user=[active_users]
+    # Gather the first image per asset in the current page
+    asset_ids_in_page = [asset.id for asset in page_object]
+    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
+    
+    # Map asset ID to its first image
+    asset_images = {}
+    for img in images_qs:
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+    print("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ",get_assigned_asset_list)
+    print("MAPPEDDDDDDDDDD",asset_user_map)
+    # print("product_type_list",product_type_list)
+    context = {
+        'product_category_list':product_category_list,
+        'department_list':department_list,
+        'location_list':location_list,
+        'asset_user_map':asset_user_map,
+        'product_type_list':product_type_list,
+        'asset_status_list':asset_status_list, 
+        'user_list':user_list,
+        'vendor_list':vendor_list,
+        'active_user':active_users,
+        'sidebar': 'assets',
+        'submenu': 'list',
+        'asset_images': asset_images,  # dict {asset.id: first AssetImage instance}
+        'page_object': page_object,
+        'asset_form': asset_form,
+        'assign_asset_form': assign_asset_form,
+        'reassign_asset_form': reassign_asset_form,
+        'deleted_asset_count':deleted_asset_count,
+        'title': 'Assets'
+    }
+
+    return render(request, 'assets/list-upper.html', context=context)

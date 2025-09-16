@@ -1,27 +1,22 @@
 {% load custom_filters %}
 {% load static %}
-{% if page_object %}
+<tbody id="search_result">
     {% for asset in page_object %}
     <tr>
-        <td>
-            {% if page_object.start_index %}
-                {{page_object.start_index|add:forloop.counter0}}
-            {% else %}
-                {{forloop.counter}}
-            {% endif %}
-        </td>
+        <td>{{page_object.start_index|add:forloop.counter0}}</td>
         <td>
             {% with img=asset_images|get_item:asset.id %}
                 {% if img %}
-                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" class="max-width:100px; max-height:100px;">
-                {% else %}
+                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;">
+                {% elif not img.image.url %}
                     <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                 {% endif %}
             {% endwith %}
         </td>
+        <td>{{asset.tag}}</td>
         <td>{{asset.name}}</td>
-        <td>{{asset.serial_no}}</td>
         <td>{{asset.product.product_type}}</td>
+        
         <td>
             {{asset.product}}
             {% if asset.product.is_deleted %}
@@ -54,6 +49,7 @@
                 </div>
             {% endif %}
         </td>
+        {{active_users}}
         <td>
             <div class="d-flex justify-content-between gap-2">
                 {% if not asset.is_assigned %}
@@ -69,14 +65,54 @@
                     </select>
                 {% endif %}
             </div>
+        <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
+            <div class="input-group">
+                <button type="button" class="btn btn-warning release-asset-btn"
+                        data-asset-id="{{ asset.id }}">
+                    Release
+                </button>
+            </div>
+        </div>
+
+            <!-- {% if asset.asset_status.name == "Ready To Deploy" %}
+                <form method="post" action="{% url 'assets:release' asset.id %}">
+                {% csrf_token %}
+                    <button 
+                    type="button" 
+                    class="btn btn-warning btn-sm release-asset-btn" 
+                    data-asset-id="{{ asset.id }}"
+                    data-csrf-token="{{ csrf_token }}">
+                    Release
+                </button>
+                </form>
+            {% elif asset.asset_status.name == "Available" %}
+                <form 
+                    method="post" 
+                    action="{% url 'assets:change_status' asset.id %}" 
+                    class="assign-user-form" 
+                    data-asset-id="{{ asset.id }}"
+                >
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <select name="user_id" class="form-select" required>
+                            <option value="">Select User</option>
+                            {% for user in active_user %}
+                                <option value="{{ user.id }}">{{ user.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                    </div>
+                </form>
+            {% endif %} -->
         </td>
+        
         <td>
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                 {% if perms.authentication.view_asset %}
                     <a href="{% url 'assets:details' asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                 {% endif %}
                 {% if perms.authentication.edit_asset %}
-                    <a href="{% url 'assets:update' asset.id %}"type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}"type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
                 {% endif %}
                 {% if perms.authentication.delete_asset %}
                     <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
@@ -88,51 +124,4 @@
         </td>
     </tr>
     {% endfor %}
-{% else %}
-    <td colspan="9" class="text-center"> No record found related to your search keyword</td>
-{% endif %}
-
-<script>
-    document.querySelectorAll('.status-select').forEach(function(select) {
-    select.addEventListener('change', function() {
-        const get_selected_val = document.getElementById('selected-val').value;
-        const assetIdRaw = this.getAttribute('data-asset-id');
-        const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
-        const statusValue = this.value;
-        const currentSelect = this; // for UI updates later
-        if (!assetId) {
-            console.error("Asset ID missing");
-            return;
-        }
-
-        fetch(`/assets/change-status/${assetId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({status: statusValue})
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to update status');
-            return response.json();
-        })
-        .then(data => {
-            console.log('Status updated', data);
-            updateStatusUI(assetId, statusValue, currentSelect);  // Update UI dynamically
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message);
-        });
-    });
-});
-document.querySelectorAll(".status-select").forEach(function(select) {
-    select.addEventListener("change", function() {
-        if (this.value === "Assigned" || this.value === "In Use") {
-            this.disabled = true;
-            this.closest("tr").querySelector(".assign-button-container")?.remove();
-        }
-    });
-});
-</script>
+</tbody>
