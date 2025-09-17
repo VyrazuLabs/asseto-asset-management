@@ -23,6 +23,7 @@ import json
 from products.models import ProductType
 from .utils import get_asset_filter_data
 
+
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
     args = [iter(iterable)] * n
