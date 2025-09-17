@@ -21,6 +21,7 @@ from vendors.models import Vendor
 from django.db.models import Count
 import json
 from products.models import ProductType
+from .utils import get_asset_filter_data
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -1206,11 +1207,26 @@ def search_assets(request, page):
                 asset_user_map[assign.asset_id] = None
             if assign.user:  # avoid None users
                 asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+        context=get_asset_filter_data(request)
+        print("CONTEXT",context['product_type_list'])
         return render(request, 'assets/list-upper.html', {
             'page_object': page_object,
             'asset_user_map': asset_user_map,
             # 'asset_user_map': asset_user_map,
-            'asset_images': asset_images
+            'asset_images': asset_images,
+            'product_category_list':context['product_category_list'],
+            'department_list':context['department_list'],
+            'location_list':context['location_list'],
+            'asset_user_map':context['asset_user_map'],
+            'product_type_list':context['product_type_list'],
+            'asset_status_list':context['asset_status_list'],
+            'user_list':context['user_list'],
+            'vendor_list':context['vendor_list'],
+            'sidebar': 'assets',
+            'submenu': 'list',
+            'asset_images': asset_images,  # dict {asset.id: first AssetImage instance}
+            'page_object': page_object,
+            'title': 'Assets'
         })
 
 def listed_asset(request):
