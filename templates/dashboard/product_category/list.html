@@ -60,8 +60,8 @@
                             <tr>
                                 <th>Sl No.</th>
                                 <th>Category Name</th>
-                                <th>Parent Category Name</th>
                                 <th>Total Asset</th>
+                                <th>Parent Category Name</th>
                                 <th>Status</th>
                                 {% if perms.authentication.edit_product_category or perms.authentication.delete_product_category %}
                                     <th>Actions</th>
@@ -74,11 +74,6 @@
                                 <tr>
                                     <td>{{page_object.start_index|add:forloop.counter0}}</td>
                                     <td>{{products.name}}</td>
-                                    <td>{{products.parent.name}}
-                                        {% if products.parent.is_deleted %}
-                                            <i class="bi bi-exclamation-triangle text-warning" title="Parent Category is deleted, please update or restore."></i>
-                                        {% endif %}
-                                    </td>
                                     <td>
                                         {% if not product_category_asset_count|get_item:products.id %}
                                             0
@@ -91,6 +86,11 @@
                                                     {{ product_category_asset_count|get_item:products.id|default:0 }}
                                                 </button>
                                             </form>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{products.parent.name}}
+                                        {% if products.parent.is_deleted %}
+                                            <i class="bi bi-exclamation-triangle text-warning" title="Parent Category is deleted, please update or restore."></i>
                                         {% endif %}
                                     </td>
                                     <td>
