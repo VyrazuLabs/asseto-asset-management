@@ -31,7 +31,7 @@ assets{% extends 'layouts/main-layout.html' %}
                 <div class="filter">
                 <div>
                     <form id="asset-filter-form"
-                        hx-get="% url 'assets:search_assets' 1 %"
+                        hx-get="{% url 'assets:search' 1 %}"
                         hx-target="#search_result"
                         hx-trigger="change, keyup changed delay:500ms from:input">
                         <div class="row g-3"> 
@@ -44,7 +44,6 @@ assets{% extends 'layouts/main-layout.html' %}
                                     Select Status
                                 </button>
                                 <ul class="dropdown-menu">
-                                    {{ asset_status_list }}
                                     {% for status in asset_status_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
