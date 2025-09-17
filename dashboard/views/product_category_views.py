@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from django.http import JsonResponse
-from assets.models import AssignAsset
+from assets.models import AssignAsset,Asset
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -38,7 +38,7 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def product_category_list(request):
     all_product_category_list = (
-        ProductCategory.undeleted_objects
+        ProductCategory.objects
         .filter(
             Q(organization=None) |
             Q(organization=request.user.organization)
@@ -48,7 +48,7 @@ def product_category_list(request):
     )
 
     deleted_product_categories_count = (
-        ProductCategory.deleted_objects
+        ProductCategory.objects
         .filter(Q(organization=None) | Q(organization=request.user.organization))
         .count()
     )
@@ -59,18 +59,18 @@ def product_category_list(request):
 
     # Count distinct assets per product category
     asset_counts = (
-        AssignAsset.objects
+        Asset.objects
         .filter(
-            asset__organization=request.user.organization,
-            asset__product__product_category__in=all_product_category_list
+            organization=request.user.organization,
+            product__product_category__in=all_product_category_list
         )
-        .values("asset__product__product_category")
-        .annotate(asset_count=Count("asset", distinct=True))   # ✅ distinct asset count
+        .values("product__product_category")
+        .annotate(asset_count=Count("id", distinct=True))   # ✅ distinct asset count
     )
 
     # Map: {product_category_id: asset_count}
     product_category_asset_count = {
-        item["asset__product__product_category"]: item["asset_count"]
+        item["product__product_category"]: item["asset_count"]
         for item in asset_counts
     }
 
