@@ -128,7 +128,7 @@ def function_to_get_matching_objects_vendors(arr):
         get_existing_vendors=Vendor.objects.filter(**filter_kwargs).select_related('address').first()
         obj={}
         if get_existing_vendors is not None:
-            obj['email']=it.get("email", get_existing_vendors.email)
+            obj['email']=get_existing_vendors.email
             username=None,
             obj['name']=get_existing_vendors.name
             obj['phone']=get_existing_vendors.phone
