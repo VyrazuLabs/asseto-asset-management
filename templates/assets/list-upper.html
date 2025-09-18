@@ -31,7 +31,7 @@ assets{% extends 'layouts/main-layout.html' %}
                 <div class="filter">
                 <div>
                     <form id="asset-filter-form"
-                        hx-get="% url 'assets:search_assets' 1 %"
+                        hx-get="{% url 'assets:search' 1 %}"
                         hx-target="#search_result"
                         hx-trigger="change, keyup changed delay:500ms from:input">
                         <div class="row g-3"> 
@@ -41,10 +41,13 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-status">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Status
+                                    {% if status_header %}
+                                        {{ status_header }}
+                                    {% else %}    
+                                        Select Status
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
-                                    {{ asset_status_list }}
                                     {% for status in asset_status_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
@@ -63,7 +66,11 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-vendors">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Vendor
+                                    {% if vendor_header %}
+                                        {{ vendor_header.name }}
+                                    {% else %}     
+                                        Select Vendor
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for vendor in vendor_list %}
@@ -84,7 +91,11 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-type">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Product Type
+                                    {% if product_type_header %} 
+                                        {{ product_type_header.product.product_type.name }}
+                                    {% else %}
+                                        Select Product Type
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for type in product_type_list %}
@@ -107,7 +118,11 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-users">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select User
+                                    {% if user_header %} 
+                                        {{ user_header }}
+                                    {% else %}
+                                        Select User
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for user in user_list %}
@@ -117,7 +132,11 @@ assets{% extends 'layouts/main-layout.html' %}
                                                 this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
                                                 this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
-                                        {{ user.full_name }}
+                                        {% if user_header %} 
+                                            {{ user_header }} 
+                                        {% else %}
+                                            {{ user.full_name }}
+                                        {% endif %}
                                     </a>
                                     </li>
                                     {% endfor %}
@@ -128,7 +147,11 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-category">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Category
+                                    {% if product_category_header %} 
+                                        {{ product_category_header.product.product_category.name }} 
+                                    {% else %}
+                                        Select Product Category
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for category in product_category_list %}
@@ -141,15 +164,20 @@ assets{% extends 'layouts/main-layout.html' %}
                                         {{ category.name }}
                                     </a>
                                     </li>
+                                    
                                     {% endfor %}
-                                </ul>
+                                
                                 <input type="hidden" name="category">
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-location">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Location
+                                    {% if location_header%} 
+                                        {{ location_header.asset.location.office_name }}
+                                    {% else %}
+                                        Select Location
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for location in location_list %}
@@ -170,7 +198,11 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-department">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    Select Department
+                                    {% if department_header %}
+                                        {{ department_header.user.department }}
+                                    {% elif department_header is None %}
+                                        Select Department
+                                    {% endif %}
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for department in department_list %}
@@ -180,7 +212,7 @@ assets{% extends 'layouts/main-layout.html' %}
                                                 this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
                                                 this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
-                                        {{ department.name }}
+                                            {{ department }}
                                     </a>
                                     </li>
                                     {% endfor %}
@@ -199,7 +231,7 @@ assets{% extends 'layouts/main-layout.html' %}
                 </br>
                 <table class="table" id="table1">
                     {% if page_object %}
-                        {% include 'assets/filter-out-asset.html' %}
+                        {% include 'assets/filter-out-asset.html' with page_object=page_object  %}
                     {% else %}
                       <div class="alert alert-info" role="alert">
                         No record available!
