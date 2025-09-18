@@ -17,9 +17,9 @@ def path_and_rename(instance, filename):
 
 
 class TimeStampModel(models.Model):
-    status = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add = True)
-    updated_at = models.DateTimeField(auto_now = True)  
+    status = models.BooleanField(default=True,null=True)
+    created_at = models.DateTimeField(auto_now_add = True,null=True)
+    updated_at = models.DateTimeField(auto_now = True,null=True )  
     created_by = models.CharField(max_length=255, blank=True, null=True)
     updated_by = models.CharField(max_length=255, blank=True, null=True)
 
