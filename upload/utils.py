@@ -123,7 +123,7 @@ def function_to_get_matching_objects_vendors(arr):
         get_existing_vendors=Vendor.objects.filter(**it).first()
         obj={}
         # entity_type="Vendor",
-        obj['email']=get_existing_vendors.email
+        obj['email']=it.get("email", get_existing_vendors.email)
         username=None,
         obj['name']=get_existing_vendors.name
         obj['phone']=get_existing_vendors.phone,
