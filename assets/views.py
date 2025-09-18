@@ -1256,7 +1256,6 @@ def listed_asset(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ",get_assigned_asset_list)
     print("MAPPEDDDDDDDDDD",asset_user_map)
     context = {
         'product_category_list':product_category_list,
