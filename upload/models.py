@@ -29,11 +29,11 @@ class Upload(TimeStampModel):
 
 class File(models.Model):
     file = models.FileField(upload_to=path_and_rename, blank=True, null=True)
-class ImportedUser(models.Model):
+class ImportedUser(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
     entity_type=models.CharField(max_length=255 , blank=True, null=True)
-    email = models.EmailField(max_length=255)
+    email = models.EmailField(max_length=255,null=True)
     username = models.CharField(max_length=255 , blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     phone=models.CharField(max_length=12,blank=True,null=True)

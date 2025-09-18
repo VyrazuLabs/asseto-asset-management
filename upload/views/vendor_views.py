@@ -1,6 +1,9 @@
+import os
+import traceback
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from AssetManagement import settings
 from vendors.models import Vendor
 from dashboard.models import Address
 from django.core.paginator import Paginator
@@ -12,17 +15,18 @@ import json
 from upload.models import ImportedUser
 from authentication.models import User
 from ..utils import function_to_get_matching_objects_vendors
+from django.core.files.storage import default_storage
+import csv
 # import django.contrib
 
 @login_required
 @permission_required('authentication.add_vendor')
 def vendor_list(request):
     vendors_list = ImportedUser.objects.filter(entity_type="Vendor",
-        organization=request.user.organization)
+        organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(vendors_list, 10, orphans=1)
     page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-
+    page_object = paginator.get_page(page_number)    
     context = {
         'sidebar': 'upload',
         'submenu': 'vendors',
@@ -43,94 +47,108 @@ def export_vendors_csv(request):
     response['Content-Disposition'] = f'attachment; filename="sample-vendors-file.csv"'
     return response
 
-
 @login_required
 @permission_required('authentication.add_vendor')
 def import_vendors_csv(request):
-    header_list = ['Vendor Name', 'Vendor Email', 'Phone', 'Contact Person Name', 'Designation', 'GSTIN Number',
-                   'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Description']
-    arr=None
+    print(request.method)
     if request.method == "POST":
-        try:
-            file = request.FILES.get('file', None)
-            file_path = csv_file_upload(request, file)
-            df = pd.read_csv(file_path, delimiter=',')
-            list_of_csv = [list(row) for row in df.values]
-            array=[]
+        file = request.FILES.get("file")
+        if not file:
+            messages.error(request, "no file uploaded")
+        
+        file_name = default_storage.save(f"temp/{file.name}", file)
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        request.session['uploaded_csv']=file_path
+        with open(file_path, newline="", encoding="utf-8-sig") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
 
-            for l in list_of_csv:
-                obj={}
-                address = Address.objects.create(
-                    address_line_one=l[6],
-                    address_line_two=l[7],
-                    city=l[8],
-                    pin_code=l[9],
-                    state=l[10],
-                    country=l[11],
-                )
-                # Reflects in vendor list page
-                vendor=Vendor.objects.create(
-                    name=l[0],
-                    email=l[1],
-                    phone=l[2],
-                    contact_person=l[3],
-                    designation=l[4],
-                    gstin_number=l[5],
-                    description=l[12],
-                    address=address,
-                    organization=request.user.organization
-                    )
+        return render(request, "upload/map-vendor-modal.html", {
+            "headers": headers,
+            "fields": [
+                "name", "email", "phone", "contact_person",
+                "designation", "gstin_number", "address_line_one",
+                "address_line_two", "city", "pin_code", "state",
+                "country", "description",
+            ]
+        })
+    else:
+        print("no response")
+        return render(request, "upload/upload-csv-modal.html", {"page": "Vendors","hx_target": "#mapping-vendors-modal-content"})
 
-                obj['name']=l[0]
-                obj['email']=l[1]
-                obj['phone']=l[2]
-                obj['contact_person']=l[3]
-                obj['designation']=l[4]
-                obj['gstin_number']=l[5]
-                obj['description']=l[12]
-                obj['address']=address
-                obj['organization']=request.user.organization
-                Importeduser = ImportedUser.objects.create(
-                    entity_type="Vendor",
-                    email=obj.get('email'),
-                    username=None,
-                    full_name=obj.get('name'),
-                    phone=obj.get('phone'),
-                    contact_person_name=obj.get('contact_person'),
-                    contact_person_email=obj.get('contact_person_email'),
-                    contact_person_phone=obj.get('contact_person_phone'),
-                    address=address,
-                    organization=request.user.organization,
-                    gstin_number=obj.get('gstin_number'),
-                    description=obj.get('description'),
-                    designation=obj.get('designation')
-                )
-                Importeduser.save()
-                print("IMPORT SAVEDDDDDDDDD_")
-                # vendor.imported_user=Importeduser.id
-                array.append(obj)
-            arr=function_to_get_matching_objects_vendors(array)
 
-            request.session['arr'] = arr
-            request.session['header']=header_list
-            messages.success(
-                request, 'Vendors CSV file uploaded successfully')
-            return redirect('upload:compare_data')
-        except Exception as e:
-            messages.error(request, f'Error processing requestssssssss: {str(e)}')
-        return redirect('upload:vendor_list')
-    context = {'page': 'Vendors'}
-    return render(request, 'upload/upload-csv-modal.html', context)
+@login_required
+@permission_required('authentication.add_vendor')
+def vendor_render_to_mapper_modal(request):
+    if request.method == "POST":
+        file_path = request.session.get("uploaded_csv")
+        if not file_path:
+            messages.error(request, "CSV file not found in session.")
+            return redirect("upload:vendor_list")
 
-def render_to_mapper_modal(request):
-    print("RENDER TO MAPPER MODAL------------------------------")
-    arr = request.session.pop('arr', [])
-    header= request.session.pop('header', [])
-    context = {'page': 'vendors','arr':arr,'header':header}
-    return render(request, 'upload/modal.html', context)
+        df = pd.read_csv(file_path,encoding="utf-8-sig")
+        mapping = {}
+        vendor_fields = [
+            "name", "email", "phone", "contact_person",
+            "designation", "gstin_number", "address_line_one",
+            "address_line_two", "city", "pin_code", "state",
+            "country", "description"
+        ]
+        for field in vendor_fields:
+            selected = request.POST.get(f"mapping_{field}")
+            if selected:
+                mapping[field] = selected
+        created_vendors = []
+        created_imported_users = []
+        for _, row in df.iterrows():
+            vendor_data = {f: row[c] for f, c in mapping.items() if c in row}
+            print(vendor_data)
+            address = Address.objects.create(
+                address_line_one=vendor_data.get("address_line_one"),
+                address_line_two=vendor_data.get("address_line_two"),
+                city=vendor_data.get("city"),
+                pin_code=vendor_data.get("pin_code"),
+                state=vendor_data.get("state"),
+                country=vendor_data.get("country")
+            )
 
-# {'email': 'email@gmail.com', 'name': 'Vendoe 2', 'phone': ['847965123'], 'contact_person': 'Anando Singh', 'contact_person_email': '', 'contact_person_phone': '',
-#  'gstin_number': 'GSTIN4945511564', 'description': 'Developer', 'designation': 'CTO'}
+            vendor = Vendor.objects.create(
+                name=vendor_data.get("name"),
+                email=vendor_data.get("email"),
+                phone=str(vendor_data.get("phone")),
+                contact_person=vendor_data.get("contact_person"),
+                designation=vendor_data.get("designation"),
+                gstin_number=vendor_data.get("gstin_number"),
+                description=vendor_data.get("description"),
+                address=address,
+                organization=request.user.organization,
+            )
+            created_vendors.append(vendor)
+
+            imported_user = ImportedUser.objects.create(
+                name=vendor_data.get("name"),
+                entity_type="Vendor",
+                email=vendor_data.get("email"),
+                username=None,
+                full_name=vendor_data.get("name"),
+                phone=str(vendor_data.get("phone")),
+                contact_person_name=vendor_data.get("contact_person"),
+                contact_person_email=vendor_data.get("email"),
+                contact_person_phone=str(vendor_data.get("phone")),
+                address=address,
+                organization=request.user.organization,
+                gstin_number=vendor_data.get("gstin_number"),
+                description=vendor_data.get("description"),
+                designation=vendor_data.get("designation")
+            )
+            created_imported_users.append(imported_user)
+
+        messages.success(request, f"{len(created_vendors)} vendors imported successfully.")
+        return redirect("upload:vendor_list")
+
+    messages.error(request, "Invalid request.")
+    return redirect("upload:vendor_list")
+
 
 def create_matched_data_from_csv_vendor(request):
     if request.method == 'POST':
