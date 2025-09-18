@@ -1,4 +1,6 @@
+import csv
 from django.contrib.auth.decorators import login_required
+from AssetManagement import settings
 from upload.models import *
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -10,6 +12,7 @@ from django.contrib.auth.decorators import permission_required
 from ..utils import function_to_get_matching_objects_product_types
 import json
 from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
+from django.core.files.storage import default_storage
 
 
 @login_required
@@ -17,7 +20,7 @@ from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
 def product_type_list(request):
 
     product_type_list = ImportedUser.objects.filter(entity_type="ProductType",
-        organization=request.user.organization)
+        organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(product_type_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -44,36 +47,72 @@ def export_product_types_csv(request):
 @login_required
 @permission_required('authentication.add_product_type')
 def import_product_types_csv(request):
-    model="product-type"
-    header_list = ['Product Type Name']
+    print(request.method)
     if request.method == "POST":
-        try:
-            file = request.FILES.get('file', None)
-            file_path = csv_file_upload(request, file)
-            df = pd.read_csv(file_path, delimiter=',')
-            list_of_csv = [list(row) for row in df.values]
-            array=[]
-            for l in list_of_csv:
-                obj={}
-                ProductType.objects.create(
-                    name=l[0],
-                    organization=request.user.organization
-                )
-                obj['name']=l[0]
-                obj['organization']=request.user.organization
-                array.append(obj)
-                arr=function_to_get_matching_objects_product_types(array)
-            request.session['arr'] = arr
-            request.session['header']=header_list
-            request.session['model']=model
-            messages.success(
-                request, 'Product Types CSV file uploaded successfully')
-            return redirect('upload:compare_data')
-        except:
-            pass
-        return redirect('upload:product_type_list')
-    context = {'page': 'Product Types'}
-    return render(request, 'upload/upload-csv-modal.html', context)
+        file = request.FILES.get("file")
+        if not file:
+            messages.error(request, "no file uploaded")
+            return redirect('upload:product_type_list')
+        
+        file_name = default_storage.save(f"temp/{file.name}", file)
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        request.session['uploaded_csv']=file_path
+        with open(file_path, newline="", encoding="utf-8-sig") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+
+        return render(request, "upload/map-product-type-modal.html", {
+            "headers": headers,
+            "fields": ["name"]
+        })
+    else:
+        print("no response")
+        return render(request, "upload/upload-csv-modal.html", {"page": "Product Type","hx_target": "#upload-product-types-modal-content"})
+
+
+@login_required
+@permission_required('authentication.add_product_type')
+def product_type_render_to_mapper_model(request):
+    if request.method == "POST":
+        file_path = request.session.get("uploaded_csv")
+        if not file_path:
+            messages.error(request, "CSV file not found in session.")
+            return redirect("upload:product_type_list")
+
+        df = pd.read_csv(file_path,encoding="utf-8-sig")
+        mapping = {}
+        product_type_fields = ["name"]
+        for field in product_type_fields:
+            selected = request.POST.get(f"mapping_{field}")
+            if selected:
+                mapping[field] = selected
+
+        created_product_types = []
+        created_imported_users = []
+
+        for _, row in df.iterrows():
+            product_type_data = {f: row[c] for f, c in mapping.items() if c in row}
+            
+            product_type = ProductType.objects.create(
+                name=product_type_data.get("name"),
+                organization=request.user.organization,
+            )
+            created_product_types.append(product_type)
+            print("names are--------->",product_type_data.get("name"))
+
+            imported_user = ImportedUser.objects.create(
+                name=product_type_data.get("name"),
+                entity_type="ProductType",
+                organization=request.user.organization,
+            )
+            created_imported_users.append(imported_user)
+
+        messages.success(request, f"{len( created_product_types)} Product Types imported successfully.")
+        return redirect("upload:product_type_list")
+
+    messages.error(request, "Invalid request.")
+    return redirect("upload:product_type_list")
+
 
 def create_matched_data_from_csv_product_type(request):
     if request.method == 'POST':
