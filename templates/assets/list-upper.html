@@ -212,7 +212,9 @@ assets{% extends 'layouts/main-layout.html' %}
                                                 this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
                                                 this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
+
                                             {{ department.name }}
+
                                     </a>
                                     </li>
                                     {% endfor %}
