@@ -34,6 +34,14 @@
                     </div>
                 </div>
 
+                <div class="modal fade text-left" id="mapping-departments-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="mappingModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div id="mapping-departments-modal-content" class="modal-content" hx-target="this">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-end my-2 gap-2">
                     <a
                         type="button"
@@ -86,4 +94,27 @@
         </div>
     </section>
 </div>
+
+<script>
+htmx.on("htmx:afterSwap", (e) => {
+    console.log("HTMX afterSwap triggered for target:", e.target.id);
+    if (e.target.id === "mapping-departments-modal-content") {
+        const uploadModalEl = document.getElementById("upload-departments-modal");
+        const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
+        if (uploadModal) {
+            console.log("Hiding upload modal");
+            uploadModal.hide();
+        } else {
+            console.warn("Upload modal instance not found");
+        }
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+
+        const mappingModalEl = document.getElementById("mapping-departments-modal");
+        const mappingModal = bootstrap.Modal.getOrCreateInstance(mappingModalEl);
+        mappingModal.show();
+    }
+});
+</script>
 {% endblock content%}

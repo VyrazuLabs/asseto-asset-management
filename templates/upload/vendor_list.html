@@ -1,4 +1,5 @@
-{% extends 'layouts/main-layout.html' %} {% block content %}
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -6,18 +7,11 @@
                 <h3>Vendors</h3>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav
-                    aria-label="breadcrumb"
-                    class="breadcrumb-header float-start float-lg-end"
-                >
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="/">Dashboard</a>
-                        </li>
+                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                         <li class="breadcrumb-item">Upload</li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Vendors
-                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Vendors</li>
                     </ol>
                 </nav>
             </div>
@@ -26,31 +20,32 @@
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <!-- upload Modal -->
+                <!-- Upload Modal -->
                 <div class="modal fade text-left" id="upload-vendors-modal" tabindex="-1" role="dialog"
                     aria-labelledby="myModalLabel160" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div id="upload-vendors-modal-content" class="modal-content" hx-target="this"></div>
                     </div>
                 </div>
+                <!-- Mapping Modal -->
+                <div class="modal fade text-left" id="mapping-vendors-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="mappingModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div id="mapping-vendors-modal-content" class="modal-content" hx-target="this">
+                        </div>
+                    </div>
+                </div>
 
                 <div class="d-flex justify-content-end my-2 gap-2">
-                    <a
-                        type="button"
-                        class="btn btn-secondary rounded"
-                        class="btn-space"
-                        href="{% url 'upload:export_vendors_csv' %}"
-                        ><i class="bi bi-download"></i> Sample File
+                    <a type="button" class="btn btn-secondary rounded" href="{% url 'upload:export_vendors_csv' %}">
+                        <i class="bi bi-download"></i> Sample File
                     </a>
-                    <button
-                        type="button"
-                        class="btn btn-secondary rounded"
+                    <button type="button" class="btn btn-secondary rounded"
                         hx-get="{% url 'upload:import_vendors_csv' %}"
                         hx-target="#upload-vendors-modal-content"
-                        data-bs-target="#upload-vendors-modal"
                         data-bs-toggle="modal"
-                    >
-                    <i class="bi bi-upload"></i> Upload
+                        data-bs-target="#upload-vendors-modal">
+                        <i class="bi bi-upload"></i> Upload
                     </button>
                 </div>
                 <table class="table table-hover" id="table1">
@@ -68,14 +63,12 @@
                     <tbody>
                         {% for vendors in page_object %}
                         <tr>
-                            <td>
-                                {{page_object.start_index|add:forloop.counter0}}
-                            </td>
-                            <td>{{vendors.name}}</td>
-                            <td>{{vendors.contact_person}}</td>
-                            <td>{{vendors.email}}</td>
-                            <td>{{vendors.gstin_number}}</td>
-                            <td>{{vendors.phone}}</td>
+                            <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
+                            <td>{{ vendors.name }}</td>
+                            <td>{{ vendors.contact_person_name }}</td>
+                            <td>{{ vendors.email }}</td>
+                            <td>{{ vendors.gstin_number }}</td>
+                            <td>{{ vendors.phone }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -83,11 +76,34 @@
                     <div class="alert alert-info" role="alert">
                         No record available!
                     </div>
-                  {% endif %}
+                    {% endif %}
                 </table>
                 {% include 'commons/pagination.html' %}
             </div>
         </div>
     </section>
 </div>
-{% endblock content%}
+
+<script>
+htmx.on("htmx:afterSwap", (e) => {
+    console.log("HTMX afterSwap triggered for target:", e.target.id);
+    if (e.target.id === "mapping-vendors-modal-content") {
+        const uploadModalEl = document.getElementById("upload-vendors-modal");
+        const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
+        if (uploadModal) {
+            console.log("Hiding upload modal");
+            uploadModal.hide();
+        } else {
+            console.warn("Upload modal instance not found");
+        }
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+
+        const mappingModalEl = document.getElementById("mapping-vendors-modal");
+        const mappingModal = bootstrap.Modal.getOrCreateInstance(mappingModalEl);
+        mappingModal.show();
+    }
+});
+</script>
+{% endblock content %}
