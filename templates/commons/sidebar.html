@@ -159,6 +159,12 @@
                                     <a href="{% url 'upload:product_category_list' %}">Product Categories</a>
                                 </li>
                             {% endif %}
+                            
+                            {% if perms.authentication.add_users %}
+                                <li class="submenu-item {% if submenu == 'users' %}active{% endif %}"> 
+                                    <a href="{% url 'upload:user_list' %}">Users</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}
