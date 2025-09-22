@@ -88,7 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
 
 
     def __str__(self):
-        return f'{self.full_name} ({self.role})'
+        return self.full_name or f'Role {self.role}' or " "
     
 
 class SeedFlag(models.Model):
