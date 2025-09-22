@@ -74,7 +74,6 @@ def list(request):
             request, 'User added successfully and Verification email sent to the user'
         )
         return redirect(request.META.get('HTTP_REFERER'))
-    print("Mappeddddddddddd",user_asset_map_count)
     context = {
         'sidebar': 'users',
         'page_object': page_object,
