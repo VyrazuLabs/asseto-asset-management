@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+from .views import user_views
 
 app_name = 'upload'
 
@@ -31,5 +31,11 @@ urlpatterns = [
     path('departments/import/csv', views.import_departments_csv , name='import_departments_csv'),
     path('departments-compare-data/', views.department_render_to_mapper_modal, name='department_compare_data'),
     path('create-obj-department/',views.create_matched_data_from_csv_department, name='create_data'),
+
+    path('users/', user_views.user_list, name = 'user_list' ),
+    path('users/export/csv', user_views.export_users_csv , name='export_users_csv'),
+    path('users/import/csv', user_views.import_user_csv , name='import_users_csv'),
+    path('users-compare-data/', user_views.user_render_to_mapper_model, name='users_compare_data'),
+    # path('create-obj-department/',views.create_matched_data_from_csv_department, name='create_data'),
     
 ]
