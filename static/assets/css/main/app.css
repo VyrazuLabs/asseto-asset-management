@@ -20404,10 +20404,14 @@ body .bi::before,
   display: none;
 }
 
-#main {
-  margin-left: 300px;
-  padding: 2rem;
+#main{
+  margin-left: 300px !important;
+  padding: 2rem !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
+
 @media screen and (max-width: 1199px) {
   #main {
     margin-left: 0;
