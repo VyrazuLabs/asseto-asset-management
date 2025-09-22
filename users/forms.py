@@ -88,15 +88,16 @@ class UserForm(forms.ModelForm):
         self.fields['role'].queryset = Role.objects.filter(
             organization=self._organization, status=True)
         self.fields['role'].required=False
-
     def clean_email(self):
         email = self.cleaned_data.get('email').lower()
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email already registered with us')
+        print("--------------------------")
         return email.lower()
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')
+        print("sssssssssssssss")
         return full_name.title()
     
     # def clean_password1(self):
