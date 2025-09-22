@@ -50,7 +50,6 @@ def export_vendors_csv(request):
 @login_required
 @permission_required('authentication.add_vendor')
 def import_vendors_csv(request):
-    print(request.method)
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
@@ -73,7 +72,6 @@ def import_vendors_csv(request):
             ]
         })
     else:
-        print("no response")
         return render(request, "upload/upload-csv-modal.html", {"page": "Vendors","hx_target": "#mapping-vendors-modal-content"})
 
 
@@ -102,7 +100,6 @@ def vendor_render_to_mapper_modal(request):
         created_imported_users = []
         for _, row in df.iterrows():
             vendor_data = {f: row[c] for f, c in mapping.items() if c in row}
-            print(vendor_data)
             address = Address.objects.create(
                 address_line_one=vendor_data.get("address_line_one"),
                 address_line_two=vendor_data.get("address_line_two"),
