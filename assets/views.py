@@ -12,6 +12,7 @@ from django.db.models import Q,Prefetch
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseBadRequest
 import json
+from products.models import Product
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.http import HttpResponseRedirect
@@ -1112,6 +1113,9 @@ def search_assets(request, page):
     """
 
     # --- Collect filters from request ---
+    product=request.GET.get("product")# gts the id of the product
+    # get_products=Product.objects.filter(Q(organization=None) | Q(organization=request.user.organization) & Q(id=product))
+    print("product-------------------------------------------",product)
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
     status_id = request.GET.get("status")
@@ -1147,7 +1151,15 @@ def search_assets(request, page):
 
     # --- Base queryset ---
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
-
+    get_prod_type=None
+    get_prod_category=None
+    if product:
+        assets_qs=assets_qs.filter(product_id=product)
+        if assets_qs.exists():
+            get_prod_category = assets_qs.first().product.product_category.name
+            get_prod_type = assets_qs.first().product.product_type.name
+            print("category for product-------------------------------------------",get_prod_category)
+            print("type for product-------------------------------------------",get_prod_type)
     # --- Handle user/department filtering ---
     if user_id:
         assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
@@ -1217,8 +1229,10 @@ def search_assets(request, page):
             "user_header": AssignAsset.objects.filter(asset__in=page_object, user_id=user_id).first(),
             "department_header": AssignAsset.objects.filter(asset__in=page_object, user__department_id=department_id).first(),
             "location_header": AssignAsset.objects.filter(asset__in=page_object, asset__location_id=location_id).first(),
-            "product_category_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
-            "product_type_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
+            "product_category_header": get_prod_category if search else Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
+            "product_type_header": get_prod_type if search else Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
+            'get_prod_category': get_prod_category,
+            'get_prod_type': get_prod_type,
         },
     )
 
