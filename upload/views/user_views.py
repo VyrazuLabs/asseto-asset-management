@@ -118,6 +118,7 @@ def user_render_to_mapper_model(request):
                 address=user_address,
                 department=department,
                 role=role,
+                organization=request.user.organization
 
             )
             print("-------->user created for uploaded users<---------")
