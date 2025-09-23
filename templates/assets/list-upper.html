@@ -92,7 +92,9 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-type">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if product_type_header %} 
+                                    {% if get_prod_type %}
+                                        {{ get_prod_type }}
+                                    {% elif product_type_header %} 
                                         {{ product_type_header.product.product_type.name }}
                                     {% else %}
                                         Select Product Type
@@ -148,7 +150,9 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-category">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if product_category_header %} 
+                                    {% if get_prod_category %}
+                                        {{ get_prod_category }}
+                                    {% elif product_category_header %} 
                                         {{ product_category_header.product.product_category.name }} 
                                     {% else %}
                                         Select Product Category
