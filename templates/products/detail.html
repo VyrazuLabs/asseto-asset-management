@@ -2,26 +2,25 @@
 {% load static %}
 {% block content %}
 <div class="page-heading">
+    <div class="d-flex justify-content-between">
     <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Product Details</h3>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Assets</li>
-                        <li class="breadcrumb-item active" aria-current="page">Asset Details</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
+        <h3>Product Details</h3>
+
+        <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                <li class="breadcrumb-item" aria-current="page">Assets</li>
+                <li class="breadcrumb-item active" aria-current="page">Asset Details</li>
+            </ol>
+        </nav>
+
     </div>
-    <section class="section">
         <div>
             <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
         </div>
+    </div>
+    <section class="section">
+
         <div class="card">
             <div class="card-body">
                 <h6 class="my-3">
@@ -70,7 +69,7 @@
                     <p ><b>Product Images</b></p>
                     <div style="display: flex;">
                         {% for it in img_array %}
-                            <div >
+                            <div class="me-2">
                                 <img
                                 src="{% get_media_prefix %}{{ it.image }}" 
                                 alt="Product Image {{ forloop.counter }}"
@@ -79,8 +78,10 @@
                                 data-image-src="{% get_media_prefix %}{{ it.image }}"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#imageModal{{ forloop.counter }}"
+                                onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
                                 >
                             </div>
+                            
                             <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
                                 <div class="modal-content">
@@ -89,7 +90,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
+                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
                                     </div>
                                 </div>
                                 </div>

@@ -103,6 +103,7 @@
                                     data-image-src="{% get_media_prefix %}{{ it.image }}"
                                     data-bs-toggle="modal" 
                                     data-bs-target="#imageModal{{ forloop.counter }}"
+                                    onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
                                     >
                                 </div>
                             {% elif not it.image.url %}
@@ -118,7 +119,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" style="max-width: 100%; max-height: 80vh;">
+                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
                                     </div>
                                 </div>
                                 </div>
