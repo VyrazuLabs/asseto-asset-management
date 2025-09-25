@@ -1,4 +1,5 @@
 {% if page_object %}
+{% load custom_filters %}
 {% load static %}
     {% for user in page_object %}
     <tr>
@@ -22,6 +23,20 @@
         </td>
         <td>{{user.full_name | title}}</td>
         <td>{{user.email}}</td>
+        <td><div style="display: flex; align-items: center; gap: 10px">
+            {% if user.id in user_asset_map_count %}
+                <form method="get" action="{% url 'assets:search_assets' 1 %}">
+                    <input type="hidden" name="user-data" value="{{ user.id }}">
+                    <button type="submit" 
+                            class="btn btn-sm text-white"
+                            style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                        {{ user_asset_map_count_count|get_item:user.id }}
+                    </button>
+                </form>
+            {% else %}
+                <p>0</p>
+            {% endif %}
+        </div></td>
         <td>{{user.role}}</td>
         <td>
             {% if user.access_level %}

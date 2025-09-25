@@ -839,7 +839,7 @@ def asset_status_list(request):
             asset_status__in=all_asset_status_list
         )
         .values("asset_status")
-        .annotate(asset_count=Count("id", distinct=True))   # ✅ unique assets
+        .annotate(asset_count=Count("id", distinct=True))
     )
 
     # Map: {asset_status_id: asset_count}
@@ -1115,6 +1115,7 @@ def search_assets(request, page):
     """
 
     # --- Collect filters from request ---
+    user_data=request.GET.get("user-data")
     product=request.GET.get("product")# gts the id of the product
     # get_products=Product.objects.filter(Q(organization=None) | Q(organization=request.user.organization) & Q(id=product))
     print("product-------------------------------------------",product)
@@ -1129,6 +1130,7 @@ def search_assets(request, page):
 
     # --- Build base Q object ---
     filters = Q(organization=request.user.organization)
+    print("user-------------------------------------------",user_data)
 
     if search_text:
         filters &= (
@@ -1155,6 +1157,12 @@ def search_assets(request, page):
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
     get_prod_type=None
     get_prod_category=None
+    if user_data:
+        assigned_qs = AssignAsset.objects.filter(user_id=user_data).select_related("user").order_by("-assigned_date")
+        assets_qs = (
+            assets_qs.filter(assignasset__user=user_data)
+            .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        )
     if product:
         assets_qs=assets_qs.filter(product_id=product)
         if assets_qs.exists():
@@ -1202,7 +1210,7 @@ def search_assets(request, page):
 
     # --- Context with filter lists ---
     context = get_asset_filter_data(request)
-
+    # asset_user_data=AssignAsset.objects.filter(asset__in=page_object, user_id=user).first()
     return render(
         request,
         "assets/list-upper.html",
@@ -1229,12 +1237,13 @@ def search_assets(request, page):
             "vendor_header": Asset.undeleted_objects.filter(id__in=asset_ids, vendor_id=vendor_id).first(),
             "status_header": Asset.undeleted_objects.filter(id__in=asset_ids, asset_status_id=status_id).first(),
             "user_header": AssignAsset.objects.filter(asset__in=page_object, user_id=user_id).first(),
-            "department_header": AssignAsset.objects.filter(asset__in=page_object, user__department_id=department_id).first(),
+            "department_header": AssignAsset.objects.filter(asset__in=page_object, user__department_id=department_id).first() if department_id else None,
             "location_header": AssignAsset.objects.filter(asset__in=page_object, asset__location_id=location_id).first(),
-            "product_category_header": get_prod_category if search else Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
-            "product_type_header": get_prod_type if search else Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
+            "product_category_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
+            "product_type_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
             'get_prod_category': get_prod_category,
             'get_prod_type': get_prod_type,
+            "user_data": AssignAsset.objects.filter(asset__in=page_object, user_id=user_data).first(),
         },
     )
 
