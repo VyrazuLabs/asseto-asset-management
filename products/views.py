@@ -292,7 +292,10 @@ def search(request, page):
         return render(request, 'products/products-data.html', {
             'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
                 name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
-            )).order_by('-created_at')[:10]
+            )).annotate(
+            total_assets=Count('asset'),
+            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
+        ).order_by('-created_at')
         })
 
     product_list = Product.undeleted_objects.filter(

@@ -23,7 +23,7 @@ def product_category_list(request):
     paginator = Paginator(product_category_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    print("page_object----------------->",(page_object))
     context = {
         'sidebar': 'upload',
         'submenu': 'product_categories',
