@@ -44,12 +44,13 @@
         </div>
         <div class="card">
             <div class="card-body">
-                    {% if page_object %}
-                        <div class="d-flex justify-content-end my-2 gap-2">
-                            <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
-                                hx-get="{% url 'dashboard:search_department' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
-                        </div>
-                    {% endif %}
+                {% if page_object %}
+                    <div class="d-flex justify-content-end my-2 gap-2">
+                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                            hx-get="{% url 'dashboard:search_department' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                    </div>
+                {% endif %}
+                <div class="table-responsive">
                     <table class="table table-hover" id="table1">
                         <thead>
                             <tr>
@@ -131,8 +132,9 @@
                         </div>
                         {% endif %}
                     </table>
-                    {% include 'commons/pagination.html' %}
                 </div>
+                {% include 'commons/pagination.html' %}
+            </div>
         </div>
     </section>
 </div>

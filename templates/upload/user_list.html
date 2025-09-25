@@ -48,38 +48,40 @@
                         <i class="bi bi-upload"></i> Upload
                     </button>
                 </div>
-                <table class="table table-hover" id="table1">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Username</th>
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Phone No.</th>
-                            <th>Department</th>
-                            <th>Role</th>
-                        </tr>
-                    </thead>
-                    {% if page_object %}
-                    <tbody>
-                        {% for user in page_object %}
-                        <tr>
-                            <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.full_name }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.phone }}</td>
-                            <td>{{ user.department }}</td>
-                            <td>{{ user.role }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <div class="alert alert-info" role="alert">
-                        No record available!
-                    </div>
-                    {% endif %}
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone No.</th>
+                                <th>Department</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        {% if page_object %}
+                        <tbody>
+                            {% for user in page_object %}
+                            <tr>
+                                <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.full_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone }}</td>
+                                <td>{{ user.department }}</td>
+                                <td>{{ user.role }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                        {% endif %}
+                    </table>
+                </div>
                 {% include 'commons/pagination.html' %}
             </div>
         </div>
