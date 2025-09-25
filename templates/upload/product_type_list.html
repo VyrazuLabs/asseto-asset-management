@@ -54,28 +54,30 @@
                     <i class="bi bi-upload"></i> Upload
                     </button>
                 </div>
-                <table class="table table-hover" id="table1">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Type Name</th>
-                        </tr>
-                    </thead>
-                        {% if page_object %}
-                    <tbody>
-                        {% for product_type in page_object %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
                             <tr>
-                                <td width="50%">{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td width="50%">{{product_type.name}}</td>
+                                <th>Sl No.</th>
+                                <th>Type Name</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <div class="alert alert-info" role="alert">
-                        No record available!
-                    </div>
-                  {% endif %}
-                </table>
+                        </thead>
+                            {% if page_object %}
+                        <tbody>
+                            {% for product_type in page_object %}
+                                <tr>
+                                    <td width="50%">{{page_object.start_index|add:forloop.counter0}}</td>
+                                    <td width="50%">{{product_type.name}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                    {% endif %}
+                    </table>
+                </div>
                 {% include 'commons/pagination.html' %}
             </div>
         </div>

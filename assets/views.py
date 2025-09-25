@@ -222,6 +222,7 @@ def details(request, id):
     get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
     for it in get_asset_img:
         img_array.append(it)
+        print(img_array)
 
     months_int=asset.product.eol
     today=timezone.now().date()
