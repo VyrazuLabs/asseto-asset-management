@@ -23,6 +23,27 @@
             {% endif %}       
         </td>
         <td>
+            <div style="display: flex; align-items: center; gap: 10px;">   
+                {% if products.total_assets != 0 %}   
+                {{ product.id }}
+                <form method="get" action="{% url 'assets:search_assets' 1 %}">
+                    <input type="hidden" name="product" value="{{ products.id }}">
+                    <button type="submit" 
+                            class="btn btn-sm text-white"
+                            style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                        {{ products.total_assets }}
+                    </button>
+                </form>
+                {% else %}
+                    <p style="padding-left: 7px;">0</p>
+                {% endif %} 
+            </div>
+        </td>
+
+        <td>
+            {{products.available_assets}}    
+        </td>
+        <td>
             {% if request.user.is_superuser %}
                 <div class="form-check form-switch">
                     <input 

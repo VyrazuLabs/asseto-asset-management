@@ -23,6 +23,7 @@ urlpatterns = [
     path('departments/status/<uuid:id>', views.department_status, name='department_status'),
     path('departments/search/<str:page>', views.search_department, name='search_department'),
 
+    # path('product/')
     # product type urls
     path('product-types/list', views.product_type_list, name='product_type_list'),
     path('product-types/add', views.add_product_type, name='add_product_type'),
