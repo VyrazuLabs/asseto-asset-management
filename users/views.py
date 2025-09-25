@@ -277,21 +277,72 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'users/users-data.html', {
-            'page_object': User.undeleted_objects.filter(Q(organization=request.user.organization) & Q(is_superuser=False) & (Q(
-                username__icontains=search_text) | Q(full_name__icontains=search_text) | Q(phone__icontains=search_text) | Q(employee_id__icontains=search_text) | Q(department__name__icontains=search_text) | Q(role__related_name__icontains=search_text)
-                | Q(location__office_name__icontains=search_text) | Q(address__address_line_one__icontains=search_text) | Q(address__address_line_two__icontains=search_text) | Q(address__country__icontains=search_text) | Q(address__state__icontains=search_text) | Q(address__pin_code__icontains=search_text) | Q(address__city__icontains=search_text)
-            )).exclude(pk=request.user.id).order_by('-created_at')[:10]
-        })
+    search_text = (request.GET.get('search_text') or "").strip()
 
-    user_list = User.undeleted_objects.filter(
-        organization=request.user.organization, is_superuser=False).exclude(pk=request.user.id).order_by('-created_at')
-    paginator = Paginator(user_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'users/users-data.html', {'page_object': page_object})
+    if search_text:
+        users_list = (
+            User.undeleted_objects.filter(
+                Q(organization=request.user.organization),
+                Q(is_superuser=False),
+                (
+                    Q(username__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(phone__icontains=search_text) |
+                    Q(employee_id__icontains=search_text) |
+                    Q(department__name__icontains=search_text) |
+                    Q(role__related_name__icontains=search_text) |
+                    Q(location__office_name__icontains=search_text) |
+                    Q(address__address_line_one__icontains=search_text) |
+                    Q(address__address_line_two__icontains=search_text) |
+                    Q(address__country__icontains=search_text) |
+                    Q(address__state__icontains=search_text) |
+                    Q(address__pin_code__icontains=search_text) |
+                    Q(address__city__icontains=search_text)
+                )
+            )
+            .exclude(pk=request.user.id)
+            .order_by("-created_at")[:10]
+        )
+        page_object = users_list
+    else:
+        users_list = (
+            User.undeleted_objects.filter(
+                organization=request.user.organization, is_superuser=False
+            )
+            .exclude(pk=request.user.id)
+            .order_by("-created_at")
+        )
+        paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
+        page_object = paginator.get_page(page)
+
+    # 🔑 Collect all user IDs from this page
+    user_ids = [u.id for u in page_object]
+
+    # 🔑 Get assigned assets for those users
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+
+    # 🔑 Build map { user_id: [asset1, asset2, ...] }
+    user_asset_map_count = {}
+    for aa in assigned_assets:
+        user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
+
+    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
+
+    deleted_user_count = User.deleted_objects.count()
+
+    return render(
+        request,
+        "users/users-data.html",
+        {
+            "sidebar": "users",
+            "page_object": page_object,
+            "deleted_user_count": deleted_user_count,
+            "title": "Users",
+            "user_asset_map_count": user_asset_map_count,
+            "user_asset_map_count_count": user_asset_map_count_count,
+        },
+    )
+
 
 
 @login_required
