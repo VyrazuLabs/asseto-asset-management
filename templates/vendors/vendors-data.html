@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% if page_object %}
     {% for vendors in page_object %}
         <tr>
@@ -29,6 +30,11 @@
                     {% if vendors.status %} Active {% else %} Inactive {% endif %}
                 {% endif %}
             </td>
+            <td>{% if count_array|get_at_index:forloop.counter0 %}
+                    {{ count_array|get_at_index:forloop.counter0 }}
+                {% else %}  
+                    0
+                {% endif %}
             <td>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                     {% if perms.authentication.view_vendor %}
