@@ -42,7 +42,7 @@ assets{% extends 'layouts/main-layout.html' %}
                                 <div class="dropdown-asset-status">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if status_header %}
-                                        {{ status_header }}
+                                        {{ status_header.asset_status }}
                                     {% else %}    
                                         Select Status
                                     {% endif %}
@@ -91,7 +91,9 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-type">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if product_type_header %} 
+                                    {% if get_prod_type %}
+                                        {{ get_prod_type }}
+                                    {% elif product_type_header %} 
                                         {{ product_type_header.product.product_type.name }}
                                     {% else %}
                                         Select Product Type
@@ -118,7 +120,9 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-users">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if user_header %} 
+                                    {% if user_data %}
+                                            {{ user_data.user.full_name }}
+                                    {% elif user_header %} 
                                         {{ user_header }}
                                     {% else %}
                                         Select User
@@ -147,7 +151,9 @@ assets{% extends 'layouts/main-layout.html' %}
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-product-category">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if product_category_header %} 
+                                    {% if get_prod_category %}
+                                        {{ get_prod_category }}
+                                    {% elif product_category_header %} 
                                         {{ product_category_header.product.product_category.name }} 
                                     {% else %}
                                         Select Product Category
