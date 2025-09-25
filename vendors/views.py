@@ -155,20 +155,52 @@ def update_vendor(request, id):
 
 @login_required
 def search(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'vendors/vendors-data.html', {
-            'page_object': Vendor.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(email__icontains=search_text) | Q(phone__icontains=search_text) | Q(designation__icontains=search_text) | Q(gstin_number__icontains=search_text) | Q(contact_person__icontains=search_text)
-            )).order_by('-created_at')[:10]
-        })
+    search_text = (request.GET.get('search_text') or "").strip()
 
-    vendor_list = Vendor.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(vendor_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'vendors/vendors-data.html', {'page_object': page_object})
+    if search_text:
+        vendors_list = (
+            Vendor.undeleted_objects.filter(
+                Q(organization=request.user.organization) &
+                (
+                    Q(name__icontains=search_text) |
+                    Q(email__icontains=search_text) |
+                    Q(phone__icontains=search_text) |
+                    Q(designation__icontains=search_text) |
+                    Q(gstin_number__icontains=search_text) |
+                    Q(contact_person__icontains=search_text)
+                )
+            )
+            .order_by("-created_at")[:10]
+        )
+        page_object = vendors_list
+    else:
+        vendors_list = Vendor.undeleted_objects.filter(
+            organization=request.user.organization
+        ).order_by("-created_at")
+
+        paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+        page_number = page
+        page_object = paginator.get_page(page_number)
+
+    # 🔑 Build count array for assets per vendor
+    count_array = []
+    for it in page_object:  # only loop over the page’s vendors, not all
+        get_count = get_count_of_assets(request, it.id)
+        count_array.append(get_count)
+
+    deleted_vendor_count = Vendor.deleted_objects.count()
+
+    return render(
+        request,
+        "vendors/vendors-data.html",
+        {
+            "sidebar": "vendors",
+            "page_object": page_object,
+            "count_array": count_array,
+            "deleted_vendor_count": deleted_vendor_count,
+            "title": "Vendors",
+        },
+    )
 
 
 @user_passes_test(check_admin)
