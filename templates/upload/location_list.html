@@ -56,36 +56,38 @@
                     <i class="bi bi-upload"></i> Upload
                     </button>
                 </div>
-                <table class="table table-hover" id="table1">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Office Name</th>
-                            <th>Contact Person Name</th>
-                            <th>State</th>
-                            <th>City</th>
-                            <th>Zip Code</th>
-                        </tr>
-                    </thead>
-                    {% if page_object %}
-                    <tbody>
-                          {% for location in page_object %}
-                        <tr>
-                            <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                            <td>{{location.name}}</td>
-                            <td>{{location.contact_person_name}}</td>
-                            <td>{{location.address.state}}</td>
-                            <td>{{location.address.city}}</td>
-                            <td>{{location.address.pin_code}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <div class="alert alert-info" role="alert">
-                        No record available!
-                    </div>
-                  {% endif %}
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Office Name</th>
+                                <th>Contact Person Name</th>
+                                <th>State</th>
+                                <th>City</th>
+                                <th>Zip Code</th>
+                            </tr>
+                        </thead>
+                        {% if page_object %}
+                        <tbody>
+                            {% for location in page_object %}
+                            <tr>
+                                <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                                <td>{{location.name}}</td>
+                                <td>{{location.contact_person_name}}</td>
+                                <td>{{location.address.state}}</td>
+                                <td>{{location.address.city}}</td>
+                                <td>{{location.address.pin_code}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                    {% endif %}
+                    </table>
+                </div>
                 {% include 'commons/pagination.html' %}
             </div>
         </div>

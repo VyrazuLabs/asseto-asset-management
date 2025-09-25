@@ -8120,3 +8120,79 @@ body[data-theme="dark"] {
   font-weight: bold;
 }
 
+
+.nav-bar{
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+.first-nav-div{
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+/* ✅ Default: show full search bar */
+#global-search {
+    display: block;
+}
+
+/* Container for the search bar + icon */
+.responsive-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Hide search icon on desktop */
+.search-toggle {
+    display: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #555;
+}
+
+/* For tablets & mobiles ≤ 768px */
+@media (max-width: 768px) {
+  #global-search {
+      display: none; /* hide input */
+  }
+
+  .search-toggle {
+      display: block; /* show icon */
+      color: #435ebe;
+  }
+
+  /* Expanded search input when icon is clicked */
+  .responsive-search.active #global-search {
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 250px;
+      max-width: 90vw;
+      margin-top: 8px;
+      z-index: 1000;
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      background-color: #1b1b29;
+      background-clip: padding-box;
+      border: 1px solid #35354f;
+      margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 768px){
+  .bread-crumb{
+    display: none !important;
+  }
+}
+
+.data-search{
+
+  width:100%
+}

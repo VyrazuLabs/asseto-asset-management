@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between">
         <div class="page-title">
             <h3>Vendors</h3>
-            <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb" class="d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Vendors</li>
@@ -37,7 +37,7 @@
             <div class="card-body">
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'vendors:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                         {% if request.user.is_superuser %}
                             <button
