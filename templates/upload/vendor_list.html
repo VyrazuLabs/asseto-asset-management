@@ -48,37 +48,39 @@
                         <i class="bi bi-upload"></i> Upload
                     </button>
                 </div>
-                <table class="table table-hover" id="table1">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Vendor Name</th>
-                            <th>Contact Person</th>
-                            <th>Email</th>
-                            <th>GSTIN No.</th>
-                            <th>Phone No.</th>
-                        </tr>
-                    </thead>
-                    {% if page_object %}
-                    <tbody>
-                        {% for vendors in page_object %}
-                        <tr>
-                            <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
-                            <td>{{ vendors.name }}</td>
-                            <td>{{ vendors.contact_person_name }}</td>
-                            <td>{{ vendors.email }}</td>
-                            <td>{{ vendors.gstin_number }}</td>
-                            <td>{{ vendors.phone }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <div class="alert alert-info" role="alert">
-                        No record available!
-                    </div>
-                    {% endif %}
-                </table>
-                {% include 'commons/pagination.html' %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Vendor Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>GSTIN No.</th>
+                                <th>Phone No.</th>
+                            </tr>
+                        </thead>
+                        {% if page_object %}
+                        <tbody>
+                            {% for vendors in page_object %}
+                            <tr>
+                                <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
+                                <td>{{ vendors.name }}</td>
+                                <td>{{ vendors.contact_person_name }}</td>
+                                <td>{{ vendors.email }}</td>
+                                <td>{{ vendors.gstin_number }}</td>
+                                <td>{{ vendors.phone }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                        {% endif %}
+                    </table>
+                    {% include 'commons/pagination.html' %}
+                </div>
             </div>
         </div>
     </section>
