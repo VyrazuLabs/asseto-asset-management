@@ -65,6 +65,7 @@
                         {% endif %}
                     </div>
                 {% endif %}
+<<<<<<< HEAD
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
                         <thead>
@@ -79,6 +80,71 @@
                                 <th>Last Login</th>
                                 {% if request.user.is_superuser %}
                                     <th>Status</th>
+=======
+                <table class="table table-hover" id="table1">
+                    <thead>
+                        <tr>
+                            <th>Sl No.</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Assigned Assets</th>
+                            <th>Designation</th>
+                            <th>Access Level</th>
+                            <th>Last Login</th>
+                            {% if request.user.is_superuser %}
+                                <th>Status</th>
+                            {% endif %}
+                            {% if perms.authentication.delete_users or perms.authentication.view_users or perms.authentication.edit_users %}
+                                <th>Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    {% if page_object %}
+                    <tbody id="search_result">
+                          {% for user in page_object %}
+                        <tr>
+                            <td>{{page_object.start_index|add:forloop.counter0}}</td>
+                            <td>
+                                <div class="user-img d-flex align-items-center">
+                                    <div class="avatar avatar-lg">
+                                        {% if user.profile_pic %}
+                                            <img src="{{ user.profile_pic.url }}"
+                                                alt="{{ user.get_full_name|default:user.username }}"
+                                                onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';">
+                                        {% else %}
+                                            <img src="{% static 'assets/images/faces/1.jpg' %}"
+                                                alt="Default user">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{user.full_name | title}}</td>
+                            <td>{{user.email}}</td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px">
+                                    {% if user.id in user_asset_map_count %}
+                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                            <input type="hidden" name="user-data" value="{{ user.id }}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm text-white"
+                                                    style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                                                {{ user_asset_map_count_count|get_item:user.id }}
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <p>0</p>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>{{user.role}}</td>
+                            <td>
+                                {% if user.access_level %}
+                                All
+                                {% else %}
+                                Only Assigned
+>>>>>>> 1ba6ef7 (fixed asset search errors and implemented user to asset mapping button)
                                 {% endif %}
                                 {% if perms.authentication.delete_users or perms.authentication.view_users or perms.authentication.edit_users %}
                                     <th>Actions</th>
