@@ -50,7 +50,7 @@
             <div class="card-body">
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'dashboard:search_product_category' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
                 {% endif %}
