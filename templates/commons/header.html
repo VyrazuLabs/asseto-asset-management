@@ -31,7 +31,20 @@
     <script src="{% static 'assets/js/htmx.min.js' %}"></script>
     <script defer src="{% static 'assets/js/app.js' %}"></script>
 </head>
+<style>
+    .user-dropdown-menu {
+    min-width: 11rem;
+}
 
+/* On mobile (up to 576px) → full width, left aligned */
+@media (max-width: 576px) {
+    .user-dropdown-menu {
+        position: absolute;
+        overflow-x: hidden;
+        right: -370%;
+    }
+}
+</style>
 <body>
     <!-- Changing Theme on Reload -->
     <script>
@@ -42,81 +55,102 @@
     <div id="app">
         {% include 'commons/sidebar.html' %}
         <div class="main">
+            <header class="mb-3">
+                <nav class="navbar navbar-expand navbar-light nav-bar">
+                    <div class="container-fluid d-flex align-items-center first-nav-div">
+                        <!-- Burger for mobile -->
+                        <a href="#" class="burger-btn d-block d-xl-none me-3">
+                            <i class="bi bi-justify fs-3"></i>
+                        </a>
 
-                <header class="mb-3">
-    <nav class="navbar navbar-expand navbar-light nav-bar">
-        <div class="container-fluid d-flex align-items-center first-nav-div">
+                        <!-- 🔍 Search Form -->
+                         {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
+                            <form class="d-flex flex-grow-1 me-3 responsive-search" role="search" 
+                                onsubmit="performSearch(); return false;" style="max-width: 380px;">
+                                <input id="global-search" class="form-control me-2 w-100" type="search"
+                                    placeholder="Search for Products or Assets or Users" aria-label="Search" />
+                                <button type="button" class="search-toggle" onclick="this.parentElement.classList.toggle('active')">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                        {% else %}
+                            <form class="d-flex flex-grow-1 me-3 responsive-search" role="search" 
+                                onsubmit="performSearch(); return false;" style="max-width: 380px;">
+                                <input id="global-search" class="form-control me-2 w-100" type="search"
+                                    placeholder="Search for Products or Assets" aria-label="Search" />
+                                <button type="button" class="search-toggle" onclick="this.parentElement.classList.toggle('active')">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                        {% endif %}
 
-            <!-- Burger for mobile -->
-            <a href="#" class="burger-btn d-block d-xl-none me-3">
-                <i class="bi bi-justify fs-3"></i>
-            </a>
+                        <!-- Push everything else to right -->
+                        <div class="d-flex align-items-center ms-auto">
+                            <!-- Notification -->
+                            <ul class="navbar-nav mb-0 me-3 ">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link active dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-bell bi-sub fs-4"></i>
+                                        <span hx-trigger="load, notificationCountChanged from:body, every 5s"
+                                              hx-get="{% url 'notifications:count' %}" 
+                                              hx-target="this"></span>
+                                    </a>
+                                    <ul style="position: absolute;overflow-x: hidden;right: -370%;" class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul" onclick="event.stopPropagation();">
+                                        <span hx-get="{% url 'notifications:data' %}" 
+                                              hx-target="this" 
+                                              hx-trigger="load, notificationListChanged from:body">
+                                            <li><a class="dropdown-item">No notification available</a></li>
+                                        </span>
+                                    </ul>
+                                </li>
+                            </ul>
 
-            <!-- 🔍 Search Form -->
-            <form class="d-flex flex-grow-1 me-3 responsive-search position-relative" 
-                  role="search" onsubmit="performSearch(); return false;" style="max-width: 380px;">
-                <input id="global-search" class="form-control w-100 search-input" type="search"
-                       placeholder="Search..." aria-label="Search" />
-                <button type="button" class="search-toggle">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+                            <!-- User Dropdown -->
+                            <div class="dropdown">
+                                <a href="#" class="d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-menu d-flex align-items-center">
+                                        <div class="user-name text-end me-3">
+                                            <h6 class="mb-0 text-gray-600">{{request.user.full_name}}</h6>
+                                            <p class="mb-0 text-sm text-gray-600">
+                                                {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="user-img d-flex align-items-center">
+                                            <div class="avatar avatar-md">
+                                                {% if request.user.profile_pic %}
+                                                    <img src="{{request.user.profile_pic.url}}" />
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/faces/1.jpg' %}" />
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown-menu" 
+                                    aria-labelledby="userDropdown">
+                                    <li><h6 class="dropdown-header">Hello, {{request.user.full_name}}</h6></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% if profile %}javascript:void(0){% else %}{% url 'authentication:profile' %}{% endif %}">
+                                            <i class="icon-mid bi bi-person me-2"></i> My Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'password_change' %}">
+                                            <i class="icon-mid bi bi-key me-2"></i> Change Password
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'authentication:logout' %}">
+                                            <i class="icon-mid bi bi-box-arrow-left me-2"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
 
-            <!-- Right Section -->
-            <div class="d-flex align-items-center ms-auto flex-wrap flex-md-nowrap">
-                
-                <!-- User Dropdown -->
-                <div class="dropdown order-1 order-md-2 ms-md-3">
-                    <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="user-menu d-flex align-items-center">
-                            <div class="user-img d-flex align-items-center me-2">
-                                <div class="avatar avatar-md">
-                                    {% if request.user.profile_pic %}
-                                        <img src="{{request.user.profile_pic.url}}"/>
-                                    {% else %}
-                                        <img src="{% static 'assets/images/faces/1.jpg' %}"/>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="user-name text-end d-none d-md-block">
-                                <h6 class="mb-0 text-gray-600">{{request.user.full_name}}</h6>
-                                <p class="mb-0 text-sm text-gray-600">
-                                    {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
-                                </p>
                             </div>
                         </div>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><h6 class="dropdown-header">Hello, {{request.user.full_name}}</h6></li>
-                        <li><a class="dropdown-item" href="{% url 'authentication:profile' %}"><i class="bi bi-person me-2"></i> My Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'password_change' %}"><i class="bi bi-key me-2"></i> Change Password</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'authentication:logout' %}"><i class="bi bi-box-arrow-left me-2"></i> Logout</a></li>
-                    </ul>
-                </div>
-
-                <!-- Notification (moved below on mobile) -->
-                <ul class="navbar-nav mb-0 order-2 order-md-1 w-100 mt-2 mt-md-0 d-flex justify-content-center">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown">
-                            <i class="bi bi-bell fs-4"></i>
-                            <span hx-trigger="load, notificationCountChanged from:body, every 5s"
-                                  hx-get="{% url 'notifications:count' %}" hx-target="this"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <span hx-get="{% url 'notifications:data' %}" 
-                                  hx-target="this" 
-                                  hx-trigger="load, notificationListChanged from:body">
-                                <li><a class="dropdown-item">No notification available</a></li>
-                            </span>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-</header>
-
+                    </div>
+                </nav>
 
                 {% if messages %}
                     {% for message in messages %}
