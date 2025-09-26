@@ -36,7 +36,7 @@ def user_list(request):
 @login_required
 @permission_required('authentication.add_user')
 def export_users_csv(request):
-    header_list=['Employee ID','User Name','Name','Email','Phone','Department','Role','Office Location','Address','City','State','Country','Zip Code']
+    header_list=['Employee ID','User Name','Name','Email','Phone','Department','Office Location','Address','City','State','Country','Zip Code']
     context={'header_list':header_list,'rows':[]}
     response=render_to_csv(context_dict=context)
     response['Content-Disposition']=f'attachment; filename="sample-user-file.CSV"'
@@ -58,7 +58,7 @@ def import_user_csv(request):
             headers=next(reader)
         context={
         'headers':headers,
-        'fields':['Employee ID','User Name','Name','Email','Phone','Department','Role','Office Location','Address','City','State','Country','Zip Code']
+        'fields':['Employee ID','User Name','Name','Email','Phone','Department','Office Location','Address','City','State','Country','Zip Code']
         }
         return render(request,'upload/map-user-modal.html',context)
     else:
@@ -74,7 +74,7 @@ def user_render_to_mapper_model(request):
             messages.error(request,'CSV file not found in session')
         df=pd.read_csv(file_path,encoding="utf-8-sig")
         mapping={}
-        user_fields=['Employee ID','User Name','Name','Email','Phone','Department','Role','Office Location','Address','City','State','Country','Zip Code']
+        user_fields=['Employee ID','User Name','Name','Email','Phone','Department','Office Location','Address','City','State','Country','Zip Code']
         for field in user_fields:
             selected=request.POST.get(f"mapping_{field}")
             if selected:
@@ -88,7 +88,6 @@ def user_render_to_mapper_model(request):
                 messages.error(request, f'{user_data.get("Email")} is already exists')
                 continue
             
-            print("user data--------->",user_data)
             user_address=Address.objects.create(
                 address_line_one=user_data.get('Address'),
                 city=user_data.get("City"),
@@ -96,20 +95,12 @@ def user_render_to_mapper_model(request):
                 country=user_data.get('Country'),
                 pin_code=user_data.get('Zip Code')
             )
-            print("-------->adress created for uploaded users<---------")
 
             department=Department.objects.create(
                 name=user_data.get("Department"),
                 organization=request.user.organization
 
             )
-            print("-------->department created for uploaded users<---------")
-            role=Role.objects.create(
-                name = uuid4().hex,
-                related_name=user_data.get('Role'),
-                organization=request.user.organization
-            )
-            print("-------->role created for uploaded users<---------")
             user=User.objects.create(
                 employee_id=user_data.get('Employee ID'),
                 username=user_data.get('User Name'),
@@ -117,11 +108,9 @@ def user_render_to_mapper_model(request):
                 full_name=user_data.get('Name'),
                 address=user_address,
                 department=department,
-                role=role,
                 organization=request.user.organization
 
             )
-            print("-------->user created for uploaded users<---------")
             created_users.append(user)
             import_user=ImportedUser.objects.create(
                 username=user_data.get('User Name'),
@@ -130,11 +119,9 @@ def user_render_to_mapper_model(request):
                 phone=user_data.get('Phone'),
                 entity_type="User",
                 department=department,
-                role=role,
                 address=user_address,
                 organization=request.user.organization
             )
-            print("-------->imported_user created for uploaded users<---------")
             created_imported_user.append(import_user)
 
         messages.success(request,f"{len(created_users)} users imported successfully.")
