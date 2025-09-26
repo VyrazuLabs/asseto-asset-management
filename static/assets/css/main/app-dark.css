@@ -8192,7 +8192,8 @@ body[data-theme="dark"] {
   }
 }
 
-.data-search{
-
-  width:100%
+@media screen and (max-width: 425px) {
+  .data-search{
+    width:100%
+  }
 }

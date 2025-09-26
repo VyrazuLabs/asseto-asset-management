@@ -37,6 +37,15 @@
                         </div>
                         <div class="col-md-4 col-12">
                             <div class="form-group">
+                                <label for="company-column">Asset Name</label>
+                                {{form.name}}
+                                {% for error in form.name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
                                 <label for="city-column">Product</label>
                                 {{form.product}}
                                 {% for error in form.product.errors %}
@@ -58,15 +67,6 @@
                                 <label for="email-id-column">Office Location</label>
                                 {{form.location}}
                                 {% for error in form.location.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="company-column">Asset Name</label>
-                                {{form.name}}
-                                {% for error in form.name.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
                             </div>
