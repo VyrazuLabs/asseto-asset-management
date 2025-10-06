@@ -47,6 +47,7 @@ def global_search(request):
 
     assets = Asset.undeleted_objects.filter(
         (Q(organization=request.user.organization)|Q(organization=None)) & (
+            Q(tag__icontains=search_text) |
             Q(name__icontains=search_text) |
             Q(serial_no__icontains=search_text) |
             Q(purchase_type__icontains=search_text) |

@@ -6,7 +6,7 @@
     {% csrf_token %}
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3>Assets</h3>
+            <h3 class="page-name">Assets</h3>
             <nav aria-label="breadcrumb " class="d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
@@ -207,7 +207,7 @@
                                 <th>Asset Name</th>
                                 <th>Product Type</th>
                                 <th>Product</th>
-                                <th>Vendor</th>
+                                <!-- <th>Vendor</th> -->
                                 <th>Current State</th>
                                 <th>Status</th>
                                 {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
@@ -244,12 +244,12 @@
                                     <i class="bi bi-exclamation-triangle text-warning" title="Product is deleted, please update or restore."></i>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <!-- <td>
                                     {{asset.vendor}} 
                                     {% if asset.vendor.is_deleted %}
                                     <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted, please update or restore."></i>
                                     {% endif %}
-                                </td>
+                                </td> -->
                                 <td>
                                     {% if asset.is_assigned %}
                                         <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}{% if map.image %}<img src='{{ map.image.url }}' onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';" class="rounded-circle" style="width: 20px; height: 20px "/> {% endif %} {{ map.full_name }}{% endwith %}</sup>
