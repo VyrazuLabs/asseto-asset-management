@@ -127,6 +127,7 @@ DATABASES = {
 #     }
 
 
+
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -199,3 +200,5 @@ DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
 DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000  # or higher if needed
+
+APPEND_SLASH = True

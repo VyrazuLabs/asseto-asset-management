@@ -8,7 +8,8 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q,Count
+from assets.models import AssignAsset,Asset
 
 
 PAGE_SIZE = 10
@@ -35,7 +36,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
-    all_product_type_list = ProductType.undeleted_objects.filter(
+    all_product_type_list = ProductType.objects.filter(
     Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
     deleted_product_types_count=ProductType.deleted_objects.filter(can_modify=True).count()
 
@@ -45,12 +46,27 @@ def product_type_list(request):
     page_object = paginator.get_page(page_number)
     product_type = ProductTypeForm(organization=request.user.organization)
 
+    asset_counts = (
+        Asset.objects
+        .filter(
+            organization=request.user.organization,
+            product__product_type__in=all_product_type_list
+        )
+        .values("product__product_type")
+        .annotate(asset_count=Count("id", distinct=True))   # ✅ unique assets
+    )
+    user_product_type_asset_count = {
+        item["product__product_type"]: item["asset_count"]
+        for item in asset_counts
+    }
+
     context = {
         'sidebar': 'admin',
         'submenu': 'product_type',
         'product_type': product_type,
         'page_object': page_object,
         'deleted_product_types_count':deleted_product_types_count,
+        'user_product_type_asset_count':user_product_type_asset_count,
         'title': 'Product Types'
     }
 

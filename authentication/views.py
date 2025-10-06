@@ -37,14 +37,16 @@ def index(request):
     all_asset_cost = 0
     today = datetime.now()
     time_threshold = datetime.now() + timedelta(days=30)
-    expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(
-        warranty_expiry_date__lt=today).order_by('warranty_expiry_date')
+    expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(Q(
+        warranty_expiry_date__lt=today)|Q(warranty_expiry_date=None)).order_by('warranty_expiry_date')
  
     all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
         organization=request.user.organization))
     asset_count = all_asset_list.count()
  
     for asset in all_asset_list:
+        if asset.price is None:
+            asset.price=0
         all_asset_cost = all_asset_cost + asset.price
  
     all_product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(

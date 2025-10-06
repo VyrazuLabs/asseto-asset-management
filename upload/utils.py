@@ -120,22 +120,33 @@ def create_matched_data_from_csv_generic(
 def function_to_get_matching_objects_vendors(arr):
     array=[]    
     for it in arr:
-        get_existing_vendors=Vendor.objects.filter(**it).first()
+        filter_kwargs={
+            'email': it.get('email'),
+            # 'organization_id': it.get('organization_id') if hasattr(it.get('organization_id'), 'id') else it.get('organization_id')
+            'organization_id': it.get("organization_id"),
+        }
+        get_existing_vendors=Vendor.objects.filter(**filter_kwargs).select_related('address').first()
         obj={}
-        # entity_type="Vendor",
-        obj['email']=get_existing_vendors.email
-        username=None,
-        obj['name']=get_existing_vendors.name
-        obj['phone']=get_existing_vendors.phone,
-        obj['contact_person']=get_existing_vendors.contact_person
-        obj['contact_person_email']=""
-        obj['contact_person_phone']=""
-        # address=address
-        # organization=request.user.organization,
-        obj['gstin_number']=get_existing_vendors.gstin_number
-        obj['description']=get_existing_vendors.description
-        obj['designation']=get_existing_vendors.designation
-        array.append(obj)
+        if get_existing_vendors is not None:
+            obj['email']=get_existing_vendors.email
+            username=None,
+            obj['name']=get_existing_vendors.name
+            obj['phone']=get_existing_vendors.phone
+            obj['contact_person']=get_existing_vendors.contact_person
+            obj['contact_person_email']=""
+            obj['contact_person_phone']=""
+            obj['gstin_number']=get_existing_vendors.gstin_number
+            obj['adress_line_one']=get_existing_vendors.address.address_line_one
+            obj['address_line_two']= get_existing_vendors.address.address_line_two
+            obj['city']= get_existing_vendors.address.city
+            obj['pin_code']= get_existing_vendors.address.pin_code
+            obj['state']= get_existing_vendors.address.state
+            obj['country']= get_existing_vendors.address.country
+            obj['description']=get_existing_vendors.description
+            obj['designation']=get_existing_vendors.designation
+            array.append(obj)
+        else:
+            print(f"No vendor found for email")
     return array
 
 def function_to_get_matching_objects_departments(arr):
@@ -145,9 +156,7 @@ def function_to_get_matching_objects_departments(arr):
         obj={}
         # entity_type="Vendor",
         obj['email']=""
-        username=None,
-        obj['name']=""
-        obj['phone']=""
+        obj['name']=get_existing_departments.name
         obj['contact_person_name']=get_existing_departments.contact_person_name
         obj['contact_person_email']=get_existing_departments.contact_person_email
         obj['contact_person_phone']=get_existing_departments.contact_person_phone
@@ -160,26 +169,37 @@ def function_to_get_matching_objects_departments(arr):
     return array
 
 def function_to_get_matching_objects_locations(arr):
-    array=[]    
+    array = []
+
     for it in arr:
-        get_existing_locations=Location.objects.filter(**it).first()
-        obj={}
-        # entity_type="Vendor",
-        obj['email']=""
-        username=None,
-        obj['name']=""
-        obj['phone']=""
-        obj['office_name']=get_existing_locations.office_name
-        obj['contact_person_name']=get_existing_locations.contact_person_name
-        obj['contact_person_email']=get_existing_locations.contact_person_email
-        obj['contact_person_phone']=get_existing_locations.contact_person_phone
-        # address=address
-        # organization=request.user.organization,
-        obj['gstin_number']=""
-        obj['description']=""
-        obj['designation']=""
-        array.append(obj)
+        org = it.get('organization')
+        org_id = org.id if hasattr(org, 'id') else org
+
+        location = Location.objects.filter(
+            office_name=it.get('office_name'),
+            organization_id=org_id
+        ).select_related('address').first()
+
+        if location:
+            addr = location.address
+            array.append({
+                'name': location.office_name,
+                'contact_person_name': location.contact_person_name,
+                'contact_person_email': location.contact_person_email,
+                'contact_person_phone': location.contact_person_phone,
+                'address_line_one': addr.address_line_one if addr else "",
+                'address_line_two': addr.address_line_two if addr else "",
+                'city': addr.city if addr else "",
+                'pin_code': addr.pin_code if addr else "",
+                'state': addr.state if addr else "",
+                'country': addr.country if addr else "",
+            })
+        else:
+            it['exists'] = False
+            array.append(it)
+
     return array
+
 
 def function_to_get_matching_objects_product_category(arr):
     array=[]
@@ -206,12 +226,12 @@ def function_to_get_matching_objects_product_category(arr):
 def function_to_get_matching_objects_product_types(arr):
     array=[]
     for it in arr:
-        get_existing_product_category=ProductType.objects.filter(**it).first()
+        get_existing_product_type=ProductType.objects.filter(**it).first()
         obj={}
         # entity_type="Vendor",
         obj['email']=""
         username=None
-        obj['name']=get_existing_product_category.name
+        obj['name']=get_existing_product_type.name
         obj['phone']=""
         obj['office_name']=""
         obj['contact_person_name']=""

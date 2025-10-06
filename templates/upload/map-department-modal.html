@@ -1,0 +1,36 @@
+<div class="modal-header bg-dark text-white">
+    <h5 class="modal-title">Map CSV Fields to Department Fields</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<form method="post" action="{% url 'upload:department_compare_data' %}">
+    {% csrf_token %}
+    <div class="modal-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Department Field</th>
+                    <th>CSV Header</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for field in fields %}
+                <tr>
+                    <td>{{ field }}</td>
+                    <td>
+                        <select name="mapping_{{ field }}" class="form-select">
+                            <option value="">-- Select --</option>
+                            {% for header in headers %}
+                            <option value="{{ header }}">{{ header }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Import Departments</button>
+    </div>
+</form>
