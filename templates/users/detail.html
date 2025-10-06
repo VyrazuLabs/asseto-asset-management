@@ -28,7 +28,8 @@
                     <div class="row gallery">
                         <div class="col-12 mb-2 py-2 px-2 border">
                         {% if user.profile_pic %}
-                            <img class="w-100 active" src="{{user.profile_pic.url}}">               
+                            <img class="w-100 active" src="{{user.profile_pic.url}}"
+                            onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';">               
                         {% else %}
                             <img class="w-100 active" src="{% static 'assets/images/faces/1.jpg' %}">
                         {% endif %}
@@ -88,37 +89,6 @@
                     </table>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-building"></i>
-                        <span>Company Information</span>
-                    </h6>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><b>Company Name</b></td>
-                            <td>{{user.location.office_name}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Company Address</b></td>
-                            <td>{{user.location.address.address_line_one}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Contact Person Name</b></td>
-                            <td>{{user.location.contact_person_name}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Contact Person Number</b></td>
-                            <td>{{user.location.contact_person_phone}}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Contact Person Email</b></td>
-                            <td>{{user.location.contact_person_email}}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
         </div>
         <div>   
             <div class="card">
@@ -148,6 +118,7 @@
                                                 <div class="asset-thumbnail">
                                                     {% if images %}
                                                         <img src="{{ images.0.image.url }}"
+                                                            onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
                                                             class="img-fluid"
                                                             style="width: 150px; height: 150px; object-fit: cover; border: none; cursor: pointer;"
                                                             onclick="openAssetModal('carouselModal{{ assigned_asset.asset.id }}')"
@@ -220,6 +191,7 @@
                                                         {% for image in images %}
                                                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                                                 <img class="d-block w-100"
+                                                                    onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
                                                                     src="{{ image.image.url }}"
                                                                     alt="Asset Image"
                                                                     style="object-fit: contain; max-height: 600px;">
