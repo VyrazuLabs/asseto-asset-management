@@ -173,7 +173,6 @@ def listed(request):
     assign_asset_form = AssignedAssetForm(organization=request.user.organization)
     reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
     active_users=User.objects.filter(is_active=True,organization=request.user.organization)
-    print(active_users)
     # active_user=[active_users]
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
@@ -184,8 +183,6 @@ def listed(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ",get_assigned_asset_list)
-    print("MAPPEDDDDDDDDDD",asset_user_map)
     # print("product_type_list",product_type_list)
     context = {
         'product_category_list':product_category_list,
@@ -224,7 +221,6 @@ def details(request, id):
     get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
     for it in get_asset_img:
         img_array.append(it)
-        print(img_array)
 
     months_int=asset.product.eol
     today=timezone.now().date()
@@ -368,7 +364,6 @@ def update(request, id):
                         entity_type='asset',
                         organization=request.user.organization
                     )
-                    print("Custom Field added successfully 2")
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:list')
@@ -513,7 +508,6 @@ def search(request, page):
         location_id=request.GET.get('location')
         product_category_id = request.GET.get('category')
         product_type_id = request.GET.get('type')
-        print("searproduct_type_idch_textsadsdasdasdsadsa",product_type_id)
 
         # Start query
         q = Q(organization=request.user.organization)
@@ -545,7 +539,6 @@ def search(request, page):
         
         if product_type_id:
             q &= Q(product__product_type_id=product_type_id)
-        print(q)
         # Get assets
         # asset_user_map = {}
         page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
@@ -593,7 +586,6 @@ def search(request, page):
                 .order_by("-created_at")[:10]
             )
         elif department_id: 
-            print("sddddddddddddddddddddddddddddddddddddddddddddd",department_id)
             assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
             page_object = (
                 Asset.undeleted_objects
@@ -999,7 +991,7 @@ def update_in_detail(request, id):
                         entity_type='asset',
                         organization=request.user.organization
                     )
-                    print("Custom Field added successfully 2")
+
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
             return redirect('assets:update_in_detail', id=asset.id)

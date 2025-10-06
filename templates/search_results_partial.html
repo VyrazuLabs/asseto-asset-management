@@ -102,6 +102,7 @@
                         <thead>
                             <tr>
                                 <th>Sl No.</th>
+                                <th>Asset Tag</th>
                                 <th>Asset Name</th>
                                 <th>Serial No.</th>
                                 <th>Product Type</th>
@@ -117,6 +118,7 @@
                             {% for asset in assets %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
+                                <td>{{ asset.tag }}</td>
                                 <td>{{ asset.name }}</td>
                                 <td>{{ asset.serial_no }}</td>
                                 <td>{{ asset.product.product_type }}</td>
