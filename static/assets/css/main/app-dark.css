@@ -8152,12 +8152,18 @@ body[data-theme="dark"] {
     color: #555;
 }
 
+.notification-btn svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+.notification-btn span {
+  width: 15px;
+  height: 15px;
+  font-size: 10px !important;
+}
+
 /* For tablets & mobiles ≤ 768px */
 @media (max-width: 768px) {
-  #global-search {
-      display: none; /* hide input */
-  }
-
   .search-toggle {
       display: block; /* show icon */
       color: #435ebe;
@@ -8196,4 +8202,23 @@ body[data-theme="dark"] {
   .data-search{
     width:100%
   }
+}
+
+@media screen and (max-width:767px){
+  .page-name{
+
+    margin-top: 16px !important;
+  }
+}
+
+.notification-count-div{
+  top:-7px; 
+  right:10px; 
+  height:1.2rem; 
+  width:1.2rem; 
+  background-color: #6f42c1 !important;
+}
+.notification-count-div p{
+
+  font-size: 10px;
 }
