@@ -1,10 +1,12 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3>Asset Status</h3>
-            <nav aria-label="breadcrumb">
+            <h3 class="page-name">Asset Status</h3>
+            <nav aria-label="breadcrumb" class="d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Asset Status</li>
@@ -46,7 +48,7 @@
             <div class="card-body">
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'assets:asset_status_search' page_object.number %}" 
                             hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
@@ -58,6 +60,7 @@
                                 <th>Sl No.</th>
                                 <th>Asset Status Name</th>
                                 <th>Status</th>
+                                <th>Total Assets</th>
                                 {% if perms.authentication.edit_asset_status or perms.authentication.asset_status %}
                                     <th>Actions</th>
                                 {% endif %}
@@ -82,6 +85,20 @@
                                             </div> 
                                         {% else %}
                                             {% if products.status %} Active {% else %} Inactive {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if not asset_status_asset_count|get_item:products.id %}
+                                            <p>0</p>
+                                        {% else %}
+                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                            <input type="hidden" name="status" value="{{ products.id }}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm text-white"
+                                                    style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                                                {{ asset_status_asset_count|get_item:products.id}}
+                                            </button>
+                                        </form>
                                         {% endif %}
                                     </td>
                                     {% if products.can_modify %}
@@ -118,7 +135,7 @@
                                         {% endif %}
 
                                         {% else %}
-                                            <td><div><p class="fw-bold">Actions are not allowed!</p></div></td>
+                                            <td><button class="btn btn-danger btn-sm" ><i class="bi bi-eye-fill"></i></button></td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}

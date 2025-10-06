@@ -1,4 +1,6 @@
+import csv
 from django.contrib.auth.decorators import login_required
+from AssetManagement import settings
 from upload.models import *
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -10,12 +12,12 @@ from django.contrib.auth.decorators import permission_required
 from ..utils import function_to_get_matching_objects_locations
 import json
 from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
-
+from django.core.files.storage import default_storage
 @login_required
 @permission_required('authentication.add_location')
 def location_list(request):
     location_list = ImportedUser.objects.filter(entity_type="Location",
-        organization=request.user.organization)
+        organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(location_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -43,61 +45,95 @@ def export_locations_csv(request):
 @login_required
 @permission_required('authentication.add_location')
 def import_locations_csv(request):
-    header_list = ['Office Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
-                   'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country']
-    model='create-obj-department'
+    print(request.method)
     if request.method == "POST":
-        try:
-            file = request.FILES.get('file', None)
-            file_path = csv_file_upload(request, file)
-            df = pd.read_csv(file_path, delimiter=',')
-            list_of_csv = [list(row) for row in df.values]
-            array=[]
+        file = request.FILES.get("file")
+        if not file:
+            messages.error(request, "no file uploaded")
+            return redirect('upload:location_list')
+        
+        file_name = default_storage.save(f"temp/{file.name}", file)
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        request.session['uploaded_csv']=file_path
+        with open(file_path, newline="", encoding="utf-8-sig") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+        return render(request, "upload/map-location-modal.html", {
+            "headers": headers,
+            'fields' : [
+                'Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
+                'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country'
+            ]
+        })
+    else:
+        return render(request, "upload/upload-csv-modal.html", {"page": "Locations ","hx_target": "#upload-locations-modal-content"})
 
-            for l in list_of_csv:
-                obj={}
-                address = Address.objects.create(
-                    address_line_one=l[4],
-                    address_line_two=l[5],
-                    country=l[9],
-                    state=l[8],
-                    city=l[6],
-                    pin_code=l[7]
-                )
 
-                Location.objects.create(
-                    office_name=l[0],
-                    contact_person_name=l[1],
-                    contact_person_email=l[2],
-                    contact_person_phone=l[3],
-                    address=address,
-                    organization=request.user.organization
-                )
-                obj['name']=l[0]
-                obj['contact_person_name']=l[1]
-                obj['contact_person_email']=l[2]
-                obj['contact_person_phone']=l[3]
-                obj['address']=address
-                obj['organization']=request.user.organization
-                array.append(obj)
-                arr=function_to_get_matching_objects_locations(array)
-            request.session['arr'] = arr
-            request.session['header']=header_list
-            request.session['model']=model
-            messages.success(
-                request, 'Locations CSV file uploaded successfully')
-        except:
-            pass
-        return redirect('upload:location_list')
-    context = {'page': 'Locations'}
-    return render(request, 'upload/upload-csv-modal.html', context)
+@login_required
+@permission_required('authentication.add_location')
+def location_render_to_mapper_modal(request):
+    if request.method == "POST":
+        file_path = request.session.get("uploaded_csv")
+        if not file_path:
+            messages.error(request, "CSV file not found in session.")
+            return redirect("upload:location_list")
 
-def render_to_mapper_modal(request):
-    arr = request.session.pop('arr', [])
-    header= request.session.pop('header', [])
-    model=request.session.pop('model',[])
-    context = {'page': 'Vendors','arr':arr,'header':header,'model':model}
-    return render(request, 'upload/modal.html', context)
+        df = pd.read_csv(file_path,encoding="utf-8-sig")
+        print("df----->",df)
+        mapping = {}
+        locations_fields = [
+            'Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
+            'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country'
+        ]
+        for field in locations_fields:
+            print("fields are--->",field)
+            selected = request.POST.get(f"mapping_{field}")
+            print("selected",selected)
+            if selected:
+                mapping[field] = selected
+        created_location = []
+        created_imported_users = []
+        print('mapping are------>',mapping)
+        for _, row in df.iterrows():
+            location_data = {f: row[c] for f, c in mapping.items() if c in row}
+            print(location_data)
+            address = Address.objects.create(
+                address_line_one=location_data.get("Address Line One"),
+                address_line_two=location_data.get("Address Line Two"),
+                city=location_data.get("City"),
+                pin_code=location_data.get("Pin Code"),
+                state=location_data.get("State"),
+                country=location_data.get("Country")
+            )
+
+            locations = Location.objects.create(
+                office_name=location_data.get("Name"),
+                contact_person_name=location_data.get('Contact Person Name'),
+                contact_person_email=location_data.get('Contact Person Email'),
+                contact_person_phone=location_data.get('Contact Person Phone'),
+                address=address,
+                organization=request.user.organization,
+            )
+            created_location.append(locations)
+
+            imported_user = ImportedUser.objects.create(
+                name=location_data.get("Name"),
+                entity_type="Location",
+                contact_person_name=location_data.get("Contact Person Name"),
+                contact_person_email=location_data.get("Contact Person Email"),
+                contact_person_phone=str(location_data.get("Contact Person Phone")),
+                address=address,
+                organization=request.user.organization,
+
+
+            )
+            created_imported_users.append(imported_user)
+
+        messages.success(request, f"{len(created_location)} location imported successfully.")
+        return redirect("upload:location_list")
+
+    messages.error(request, "Invalid request.")
+    return redirect("upload:location_list")
 
 def create_matched_data_from_csv_locations(request):
     if request.method == 'POST':

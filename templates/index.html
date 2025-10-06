@@ -18,12 +18,59 @@
       max-width: 98vw;
     }
     .abc {
-      width: 90vw !important;
       height: 48vw !important;
       min-height: 200px;
       max-width: 600px;
     }
   }
+
+
+    .abc {
+        width: 100%;
+        border-radius: 10px;
+        background: var(--background);
+    }
+
+    /* Mobile */
+    @media (max-width: 576px) {
+        .abc {
+            height: 280px;
+            width: 100%;
+        }
+    }
+
+    /* Tablets */
+    @media (min-width: 577px) and (max-width: 768px) {
+        .abc {
+            height: 300px;
+            width: 100%;
+        }
+    }
+
+    /* Large Tablets */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .abc {
+            height: 500px;
+            width: 100%;
+        }
+    }
+
+    /* Laptop */
+    @media (min-width: 1025px) and (max-width: 1440px) {
+        .abc {
+            height: 500px;
+            width: 100%;
+        }
+    }
+
+    /* Desktops */
+    @media (min-width: 1441px) {
+        .abc {
+            height: 600px;
+            width: 100%;
+        }
+    }
+
 </style>
 <div class="page-heading">
     <h3>Dashboard</h3>
@@ -93,12 +140,11 @@
                                 </div>
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Unassigned Assets</h6>
-
-                                        {% if unassign_assets_count %}
-                                           <h6 class="font-extrabold mb-0">{{unassign_assets_count}}</h6>
-                                        {% else %}
-                                           <h6 class="font-extrabold mb-0">0</h6>
-                                        {% endif %}
+                                    {% if unassign_assets_count %}
+                                        <h6 class="font-extrabold mb-0">{{unassign_assets_count}}</h6>
+                                    {% else %}
+                                        <h6 class="font-extrabold mb-0">0</h6>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -238,12 +284,12 @@
                 </div>
                 </br>
                 <div class="container-fluid">
-                    <div class="row gx-3"> <!-- gx-3 adds horizontal gutter (gap) -->
-                        <div class="col-md-6" style="border-radius: 10px;">
-                        <div class="abc" id="donutchart" style="width: 100%; height: 500px; border-radius: 10px; background: var(--background);"></div>
+                    <div class="row gx-3">
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="abc" id="donutchart"></div>
                         </div>
-                        <div class="col-md-6" style="border-radius: 10px;">
-                        <div class="abc" id="donutchartt" style="width: 100%; height: 500px; border-radius: 10px; background: var(--background);"></div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="abc" id="donutchartt"></div>
                         </div>
                     </div>
                 </div>
@@ -266,6 +312,7 @@
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-hover table-lg">
+                                    {% if expiring_assets %}
                                     <thead>
                                         <tr>
                                             <th>Sl No.</th>
@@ -284,7 +331,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                       {{asset.name}} 
+                                                    {{asset.name}} 
                                                     </p>
                                                 </td>
                                                 <td class="col-auto">
@@ -304,6 +351,9 @@
                                             </tr>
                                         {% endfor %}
                                     </tbody>
+                                    {% else %}
+                                        <p>No records found</p>
+                                    {% endif %}
                                 </table>
                             </div>
                         </div>
@@ -313,7 +363,7 @@
             {% endif %}
             <div class="row">
                 <div class="page-heading">
-                    <h3>Recent Activities</h3>
+                    <h3>Recently Added</h3>
                 </div>
                 {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
                 <div class="col-12 col-xl-6">

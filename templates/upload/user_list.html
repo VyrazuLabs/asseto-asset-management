@@ -1,0 +1,106 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="page-title">
+        <h3>Users</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                <li class="breadcrumb-item">Upload</li>
+                <li class="breadcrumb-item active" aria-current="page">Users</li>
+            </ol>
+        </nav>
+
+    </div>
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <!-- Upload Modal -->
+                <div class="modal fade text-left" id="upload-user-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="myModalLabel160" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div id="upload-user-modal-content" class="modal-content" hx-target="this"></div>
+                    </div>
+                </div>
+                <!-- Mapping Modal -->
+                <div class="modal fade text-left" id="mapping-users-modal" tabindex="-1" role="dialog"
+                    aria-labelledby="mappingModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div id="mapping-users-modal-content" class="modal-content" hx-target="this">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end my-2 gap-2">
+                    <a type="button" class="btn btn-secondary rounded" href="{% url 'upload:export_users_csv' %}">
+                        <i class="bi bi-download"></i> Sample File
+                    </a>
+                    <button type="button" class="btn btn-secondary rounded"
+                        hx-get="{% url 'upload:import_users_csv' %}"
+                        hx-target="#upload-user-modal-content"
+                        data-bs-toggle="modal"
+                        data-bs-target="#upload-user-modal">
+                        <i class="bi bi-upload"></i> Upload
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Phone No.</th>
+                                <th>Department</th>
+                            </tr>
+                        </thead>
+                        {% if page_object %}
+                        <tbody>
+                            {% for user in page_object %}
+                            <tr>
+                                <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.full_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone }}</td>
+                                <td>{{ user.department }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                        {% endif %}
+                    </table>
+                </div>
+                {% include 'commons/pagination.html' %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+htmx.on("htmx:afterSwap", (e) => {
+    console.log("HTMX afterSwap triggered for target:", e.target.id);
+    if (e.target.id === "mapping-users-modal-content") {
+        const uploadModalEl = document.getElementById("upload-user-modal");
+        const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
+        if (uploadModal) {
+            console.log("Hiding upload modal");
+            uploadModal.hide();
+        } else {
+            console.warn("Upload modal instance not found");
+        }
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+
+        const mappingModalEl = document.getElementById("mapping-users-modal");
+        const mappingModal = bootstrap.Modal.getOrCreateInstance(mappingModalEl);
+        mappingModal.show();
+    }
+});
+</script>
+{% endblock content %}
