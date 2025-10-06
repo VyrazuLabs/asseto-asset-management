@@ -1,10 +1,11 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between align-items-center">
         <div class="page-title">
-            <h3>Product Types</h3>
-            <nav aria-label="breadcrumb">
+            <h3 class="page-name">Product Types</h3>
+            <nav aria-label="breadcrumb" class="d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Product Types</li>
@@ -45,7 +46,7 @@
             <div class="card-body">
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
+                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'dashboard:search_product_type' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
                 {% endif %}
@@ -55,6 +56,7 @@
                             <tr>
                                 <th>Sl No.</th>
                                 <th>Type Name</th>
+                                <th>Total Asset</th>
                                 <th>Status</th>
                                 {% if perms.authentication.edit_product_type or perms.authentication.delete_product_type %}
                                     <th>Actions</th>
@@ -67,6 +69,20 @@
                                 <tr>
                                     <td>{{ page_object.start_index|add:forloop.counter0 }}</td>
                                     <td>{{ products.name }}</td>
+                                    <td>
+                                        {% if not user_product_type_asset_count|get_item:products.id %}
+                                            0
+                                        {% else %}
+                                            <form method="get" action="{% url 'assets:search_assets' page_object.number %}" class="d-inline">
+                                                <input type="hidden" name="type" value="{{ products.id }}">
+                                                <button type="submit" 
+                                                        class="btn btn-sm text-white"
+                                                        style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                                                    {{ user_product_type_asset_count|get_item:products.id|default:0 }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {% if request.user.is_superuser %}
                                             <div class="form-check form-switch">
@@ -107,7 +123,7 @@
                                             </td>
                                         {% endif %}
                                     {% else %}
-                                        <td><div><p class="fw-bold">Actions are not allowed!</p></div></td>
+                                        <td><button class="btn btn-danger btn-sm" ><i class="bi bi-eye-fill"></i></button></td>
                                     {% endif %}
                                 </tr>
                             {% endfor %}

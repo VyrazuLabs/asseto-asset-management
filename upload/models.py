@@ -1,8 +1,10 @@
 import uuid
 from django.db import models
-from dashboard.models import TimeStampModel, Organization,Address
+from dashboard.models import Department, Location, TimeStampModel, Organization,Address
 import os
 from uuid import uuid4
+
+from roles.models import Role
 
 
 def path_and_rename(instance, filename):
@@ -29,24 +31,25 @@ class Upload(TimeStampModel):
 
 class File(models.Model):
     file = models.FileField(upload_to=path_and_rename, blank=True, null=True)
-class ImportedUser(models.Model):
+class ImportedUser(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
     entity_type=models.CharField(max_length=255 , blank=True, null=True)
-    email = models.EmailField(max_length=255)
+    email = models.EmailField(max_length=255,null=True)
     username = models.CharField(max_length=255 , blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     phone=models.CharField(max_length=12,blank=True,null=True)
     contact_person_name=models.CharField(max_length=255, blank=True, null=True)
-    contact_person_email = models.EmailField(max_length=255, unique=True)
+    contact_person_email = models.EmailField(max_length=255,blank=True, null=True)
     contact_person_phone=models.CharField(max_length=12,blank=True,null=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, blank=True, null=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     gstin_number=models.CharField(max_length=255 , blank=True, null=True)
     description=models.CharField(max_length=255 , blank=True, null=True)
     designation=models.CharField(max_length=50 , blank=True, null=True)
-
-
+    department=models.ForeignKey(Department, models.DO_NOTHING, blank=True, null=True)
+    office_location=models.ForeignKey(Location,models.DO_NOTHING,blank=True, null=True)
+    role=models.ForeignKey(Role,models.DO_NOTHING,null=True,blank=True)
     def __str__(self):
         return f'{self.full_name}'
 

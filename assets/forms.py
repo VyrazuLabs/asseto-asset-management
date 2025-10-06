@@ -25,7 +25,7 @@ class AssetForm(forms.ModelForm):
             attrs={'class': 'form-select'}
         )
     )
-    tag =  forms.CharField(required=False, widget=forms.TextInput(
+    tag =  forms.CharField(required=True, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Asset Tag'}
     ))
@@ -33,18 +33,18 @@ class AssetForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Asset Name'}
     ))
-    serial_no = forms.CharField(required=True, widget=forms.TextInput(
+    serial_no = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control',
                'placeholder': 'Enter Serial No.'}
     ))
-    price = forms.FloatField(required=True, widget=forms.NumberInput(
+    price = forms.FloatField(required=False, widget=forms.NumberInput(
         attrs={'class': 'form-control',
                'placeholder':  'Enter Price'}
     ))
-    purchase_date = forms.DateField(required=True, widget=forms.DateInput(
+    purchase_date = forms.DateField(required=False, widget=forms.DateInput(
         attrs={'type': 'date', 'class': 'form-control'}
     ))
-    warranty_expiry_date = forms.DateField(required=True, widget=forms.DateInput(
+    warranty_expiry_date = forms.DateField(required=False, widget=forms.DateInput(
         attrs={'type': 'date', 'class': 'form-control'}
     ))
     description = forms.CharField(required=False, widget=forms.Textarea(
@@ -52,7 +52,7 @@ class AssetForm(forms.ModelForm):
                'rows': '3', 'placeholder': 'Enter Description'}
     ))
     purchase_type = forms.ChoiceField(
-        required=True,
+        required=False,
         choices=(
             ("1", "Owned"),
             ("2", "Rented"),
@@ -71,7 +71,7 @@ class AssetForm(forms.ModelForm):
         ))
     
     vendor = forms.ModelChoiceField(
-        required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
@@ -79,7 +79,7 @@ class AssetForm(forms.ModelForm):
         ))
     
     location = forms.ModelChoiceField(
-        required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
