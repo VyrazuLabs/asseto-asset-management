@@ -73,7 +73,6 @@ def get_asset_filter_data(request):
     assign_asset_form = AssignedAssetForm(organization=request.user.organization)
     reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
     active_users=User.objects.filter(is_active=True,organization=request.user.organization)
-    print(active_users)
     # active_user=[active_users]
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
@@ -84,8 +83,6 @@ def get_asset_filter_data(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzZ",get_assigned_asset_list)
-    print("MAPPEDDDDDDDDDD",asset_user_map)
     return {
         'product_category_list':product_category_list,
         'department_list':department_list,
