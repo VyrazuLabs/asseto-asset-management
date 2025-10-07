@@ -1,16 +1,14 @@
 ---
-name: "Default Issue"
-about: "Use this template to report bugs, request features, or ask questions"
-title: "[ISSUE]"
-labels: ""
+name: Default Issue
+description: Use this template to report bugs, request features, or ask questions
+title: "[ISSUE] "
+labels: ["triage"]
 assignees: ""
 ---
-
 # 📝 Issue Template
 
 ### how to tick check boxes
 - Just remove the space and add "x" on the options
-
 
 ## Type of Issue
 <!-- Select one by removing the others -->
@@ -21,7 +19,6 @@ assignees: ""
 
 ## Description
 A clear and concise description of the issue or request
-
 
 ## Steps to Reproduce (For Bugs)
 Only fill this section for bugs
