@@ -49,7 +49,7 @@ class ImportedUser(TimeStampModel):
     designation=models.CharField(max_length=50 , blank=True, null=True)
     department=models.ForeignKey(Department, models.DO_NOTHING, blank=True, null=True)
     office_location=models.ForeignKey(Location,models.DO_NOTHING,blank=True, null=True)
-    role=models.ForeignKey(Role,models.DO_NOTHING,null=True,blank=True)
+    role=models.ForeignKey(Role,models.SET_NULL,null=True,blank=True)
     def __str__(self):
         return f'{self.full_name}'
 

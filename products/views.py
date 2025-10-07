@@ -99,7 +99,7 @@ def details_product(request, id):
         'sidebar': 'products',
         'product': product,
         'img_array':img_array,
-        'title': 'Product - Details',
+        'title': f'Details-{product.name}',
         'page_object': page_object,
         'get_custom_data': get_custom_data
     }
@@ -271,7 +271,7 @@ def update_product(request, id):
         messages.success(request, 'Product updated successfully')
         return redirect('products:list')
 
-    context = {'form': form, 'product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
+    context = {'form': form, 'title': f'Edit - {product.name}','product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
     return render(request, 'products/update-product-modal.html', context)
 
 
