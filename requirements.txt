@@ -10,7 +10,7 @@ coverage==6.4.2
 cryptography==45.0.7
 cssselect2==0.8.0
 dj-database-url==0.5.0
-Django==5.2.6
+Django==5.2.7
 django-htmx==1.23.2
 django-resized==1.0.2
 django-simple-history==3.2.0
