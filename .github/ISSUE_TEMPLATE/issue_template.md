@@ -3,7 +3,7 @@ name: Default Issue
 about: Use this template to report bugs, request features, or ask questions
 title: "[DATE]: [FEATURE NAME]/ [ISSUE NAME]"
 labels: ["triage"]
-assignees: ""
+assignee: ""
 ---
 # 📝 Issue Template
 
