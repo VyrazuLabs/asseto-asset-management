@@ -34,7 +34,9 @@
                 </div>
             </div>
         </div>
-        {% include 'commons/history.html' %}
+        {% if product_type.can_modify %}
+            {% include 'commons/history.html' %}
+        {% endif %}
     </section>
 </div>
 {% endblock content%}
