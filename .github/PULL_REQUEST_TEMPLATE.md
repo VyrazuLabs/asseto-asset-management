@@ -9,9 +9,12 @@ assignees: ""
 # 🧩 Pull Request Template
 
 ## Description
-<!-- Describe your changes clearly and concisely -->
+Describe your changes clearly and concisely
 - What problem does this PR solve?
 - Which feature or bug does it relate to?
+
+### how to tick check boxes
+- Just remove the space and add "x" on the options
 
 ## Type of Change
 <!-- Select one -->
@@ -22,7 +25,7 @@ assignees: ""
 - [ ] Refactor / Code Cleanup
 
 ## Related Issue
-<!-- If this PR addresses a specific issue, link it here -->
+If this PR addresses a specific issue, link it here
 - Closes # (issue number)
 
 ## Checklist
@@ -33,7 +36,7 @@ assignees: ""
 - [ ] I have updated documentation if necessary
 
 ## Screenshots / Recordings (Optional)
-<!-- If applicable, include screenshots or recordings demonstrating the changes -->
+If applicable, include screenshots or recordings demonstrating the changes
 
 ## Additional Notes
-<!-- Any additional context, concerns, or feedback -->
+Any additional context, concerns, or feedback
