@@ -1,11 +1,3 @@
----
-name: "Default Issue"
-about: "Use this template to report bugs, request features, or ask questions"
-title: "[ISSUE]"
-labels: ""
-assignees: ""
----
-
 # 📝 Issue Template
 
 ## Type of Issue

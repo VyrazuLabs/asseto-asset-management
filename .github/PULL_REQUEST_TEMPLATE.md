@@ -1,11 +1,3 @@
----
-name: "Default Pull Request"
-about: "Use this template for all pull requests to maintain consistency"
-title: "[PR] "
-labels: ""
-assignees: ""
----
-
 # 🧩 Pull Request Template
 
 ## Description
