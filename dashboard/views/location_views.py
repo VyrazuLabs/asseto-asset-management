@@ -77,7 +77,7 @@ def location_details(request, id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'admin', 'submenu': 'location', 'page_object': page_object,
-               'location': location, 'title': 'Location - Details'}
+               'location': location, 'title': f'Details-{location. office_name}'}
     return render(request, 'dashboard/locations/detail.html', context=context)
 
 
@@ -127,7 +127,7 @@ def update_location(request, id):
                 return redirect('dashboard:locations')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
-                   'address_form': address_form, 'location': location, 'title': 'Location - Update'}
+                   'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}
 
     else:
         return redirect('/admin/locations/list')
