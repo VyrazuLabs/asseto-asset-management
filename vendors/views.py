@@ -120,7 +120,7 @@ def details(request, id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
-    'address': address, 'title': 'Vendor - Details','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
+    'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
     return render(request, 'vendors/detail.html', context=context)
 
 
@@ -149,7 +149,7 @@ def update_vendor(request, id):
             messages.success(request, 'Vendor updated successfully')
             return redirect('vendors:list')
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
-               'address_form': address_form, 'vendor': vendor, 'title': 'Vendor - Update','custom_fields': custom_fields}
+               'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
 
 
