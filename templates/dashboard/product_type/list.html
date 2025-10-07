@@ -98,7 +98,6 @@
                                             {% if products.status %} Active {% else %} Inactive {% endif %}
                                         {% endif %}
                                     </td>
-                                    {% if products.can_modify %}
                                         {% if perms.authentication.edit_product_type or perms.authentication.delete_product_type %}
                                             <td>
                                                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
@@ -122,9 +121,6 @@
                                                 </div>
                                             </td>
                                         {% endif %}
-                                    {% else %}
-                                        <td><button class="btn btn-danger btn-sm" ><i class="bi bi-eye-fill"></i></button></td>
-                                    {% endif %}
                                 </tr>
                             {% endfor %}
                         </tbody>

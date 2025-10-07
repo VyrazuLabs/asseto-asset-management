@@ -118,6 +118,7 @@
                                                     hx-get="{% url 'dashboard:update_product_category' products.id %}"
                                                     hx-target="#update-product-category-modal-content" 
                                                     data-bs-toggle="modal" data-bs-target="#update-product-category-modal"
+                                                    {% if products.name == "Root" %} disabled {% endif %}
                                                 ><i class="bi bi-pencil-square"></i></button>
                                             {% endif%}
                                             {% if perms.authentication.delete_product_category %}

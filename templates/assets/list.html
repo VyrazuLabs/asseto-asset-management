@@ -218,7 +218,7 @@
                         {% if page_object %}
                         <tbody id="search_result">
                             {% for asset in page_object %}
-                            <tr>
+                            <tr style="height: 100px;">
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
                                 <td>
                                     {% with img=asset_images|get_item:asset.id %}
