@@ -35,7 +35,9 @@
                 </div>
             </div>
         </div>
-        {% include 'commons/history.html' %}
+        {% if asset_status.can_modify %}
+            {% include 'commons/history.html' %}
+        {% endif %}
     </section>
 </div>
 {% endblock content%}

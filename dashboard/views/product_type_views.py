@@ -108,7 +108,7 @@ def product_type_details(request, id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'product_type', 'product_type': product_type, 'title': 'Product Type - Details'}
+               'submenu': 'product_type', 'product_type': product_type, 'title': f'Details-{ product_type.name}'}
     return render(request, 'dashboard/product_type/detail.html', context=context)
 
 
