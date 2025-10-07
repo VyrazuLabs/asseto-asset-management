@@ -36,6 +36,7 @@ A clear and concise description of the issue or request
 
 ## Steps to Reproduce (For Bugs)
 Only fill this section for bugs
+Only fill this section for bugs
 1. Go to '...'
 2. Click on '...'
 3. Scroll down to '...'
