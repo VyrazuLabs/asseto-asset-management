@@ -105,7 +105,7 @@ def details(request, id):
         'user': user,
         'page_object': page_object,
         'assigned_assets': asset_page_object,
-        'title': 'User - Details'
+        'title': f'Details-{user.full_name}'
     }
                
     return render(request, 'users/detail.html',context)

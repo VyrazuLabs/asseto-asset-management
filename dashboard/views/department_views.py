@@ -95,7 +95,7 @@ def department_details(request, id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'department', 'department': department, 'title': 'Department - Details'}
+               'submenu': 'department', 'department': department, 'title': f'Details-{department.name}'}
     return render(request, 'dashboard/departments/detail.html', context=context)
 
 

@@ -238,7 +238,7 @@ def details(request, id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': 'Asset - Details','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
     return render(request, 'assets/detail.html', context=context)
 
 
@@ -381,7 +381,7 @@ def update(request, id):
         'form': form,
         'asset': asset,
         'assetSpecifications': assetSpecifications,
-        'title': 'Asset - Update',
+        'title': f'Update-{asset.tag}-{asset.name}',
         'custom_fields': custom_fields
     }
     return render(request, 'assets/update-assets.html', context)
@@ -862,7 +862,7 @@ def asset_status_details(request,id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'asset_status', 'asset_status': asset_status, 'title': 'Asset_Status - Details'}
+               'submenu': 'asset_status', 'asset_status': asset_status, 'title': f'Details-{asset_status.name}'}
     return render(request, 'assets/asset_status_details.html', context=context)
 
 @login_required
@@ -1007,7 +1007,7 @@ def update_in_detail(request, id):
         'form': form,
         'asset': asset,
         'assetSpecifications': assetSpecifications,
-        'title': 'Asset - Update',
+        'title': f'Update-{asset.tag}-{asset.name}',
         'custom_fields': custom_fields
     }
     if current_path == f'/assets/update-assets-details/{id}/':
