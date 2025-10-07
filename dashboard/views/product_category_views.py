@@ -119,7 +119,7 @@ def product_category_details(request, id):
     page_object = paginator.get_page(page_number)
 
     context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'product_category', 'product_category': product_category, 'title': 'Product Category - Details'}
+               'submenu': 'product_category', 'product_category': product_category, 'title': f'Details-{product_category.name}'}
     return render(request, 'dashboard/product_category/detail.html', context=context)
 
 
