@@ -1,3 +1,11 @@
+---
+name: "Default Issue"
+about: "Use this template to report bugs, request features, or ask questions"
+title: "[ISSUE]"
+labels: ""
+assignees: ""
+---
+
 # 📝 Issue Template
 
 ## Type of Issue
@@ -7,12 +15,8 @@
 - [ ] Question / Help
 - [ ] Enhancement / Improvement
 
----
-
 ## Description
 <!-- A clear and concise description of the issue or request -->
-
----
 
 ## Steps to Reproduce (For Bugs)
 <!-- Only fill this section for bugs -->
@@ -21,17 +25,11 @@
 3. Scroll down to '...'
 4. See error
 
----
-
 ## Expected Behavior
 <!-- What you expected to happen -->
 
----
-
 ## Screenshots / Recordings
 <!-- If applicable, add screenshots, recordings, or GIFs to help explain the issue -->
-
----
 
 ## Environment
 <!-- Include relevant details about the system -->
@@ -40,12 +38,8 @@
 - **Browser (if applicable):** Chrome 140, Firefox 121
 - **Additional Info:** Any other relevant details
 
----
-
 ## Additional Context
 <!-- Add any other context about the problem here -->
-
----
 
 ## Suggested Fix / Feature Details (Optional)
 <!-- For feature requests, describe the solution or idea -->
