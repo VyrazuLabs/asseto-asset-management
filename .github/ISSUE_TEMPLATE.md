@@ -1,10 +1,20 @@
 ---
+<<<<<<< HEAD:.github/ISSUE_TEMPLATE/issue_template.md
 name: Default Issue
 about: Use this template to report bugs, request features, or ask questions
 title: "[DATE]: [FEATURE NAME]/ [ISSUE NAME]"
 labels: ["triage"]
 assignees: ""
 ---
+=======
+name: "Default Issue"
+about: "Use this template to report bugs, request features, or ask questions"
+title: "[ISSUE]"
+labels: ""
+assignees: ""
+---
+
+>>>>>>> 93ef36f (restructured templates):.github/ISSUE_TEMPLATE.md
 # 📝 Issue Template
 
 ### how to tick check boxes
@@ -18,7 +28,11 @@ assignees: ""
 - [ ] Enhancement / Improvement
 
 ## Description
+<<<<<<< HEAD:.github/ISSUE_TEMPLATE/issue_template.md
 A clear and concise description of the issue or request
+=======
+<!-- A clear and concise description of the issue or request -->
+>>>>>>> 93ef36f (restructured templates):.github/ISSUE_TEMPLATE.md
 
 ## Steps to Reproduce (For Bugs)
 Only fill this section for bugs
@@ -28,10 +42,17 @@ Only fill this section for bugs
 4. See error
 
 ## Expected Behavior
+<<<<<<< HEAD:.github/ISSUE_TEMPLATE/issue_template.md
 What you expected to happen
 
 ## Screenshots / Recordings
 If applicable, add screenshots, recordings, or GIFs to help explain the issue
+=======
+<!-- What you expected to happen -->
+
+## Screenshots / Recordings
+<!-- If applicable, add screenshots, recordings, or GIFs to help explain the issue -->
+>>>>>>> 93ef36f (restructured templates):.github/ISSUE_TEMPLATE.md
 
 ## Environment
 Include relevant details about the system
@@ -41,7 +62,11 @@ Include relevant details about the system
 - **Additional Info:** Any other relevant details
 
 ## Additional Context
+<<<<<<< HEAD:.github/ISSUE_TEMPLATE/issue_template.md
 Add any other context about the problem here
+=======
+<!-- Add any other context about the problem here -->
+>>>>>>> 93ef36f (restructured templates):.github/ISSUE_TEMPLATE.md
 
 ## Suggested Fix / Feature Details (Optional)
 For feature requests, describe the solution or idea
