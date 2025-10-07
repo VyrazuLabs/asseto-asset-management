@@ -1,7 +1,7 @@
 ---
 name: Default Issue
-description: Use this template to report bugs, request features, or ask questions
-title: "[ISSUE] "
+about: Use this template to report bugs, request features, or ask questions
+title: "[DATE]: [FEATURE NAME]/ [ISSUE NAME]"
 labels: ["triage"]
 assignees: ""
 ---
