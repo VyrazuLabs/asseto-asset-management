@@ -12,3 +12,7 @@ def get_at_index(list_obj, index):
             return list_obj[index]
         except (IndexError, TypeError):
             return None
+        
+@register.filter
+def split(value, key=' '):
+    return value.split(key)
