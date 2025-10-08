@@ -291,99 +291,102 @@ def details(request, id):
 # from .models import Asset, AssetImage
 # from .forms import AssetForm, AssetImageForm
 
-def update(request, id):
-    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
-    asset_images = AssetImage.objects.filter(asset=asset)
-    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-    if request.method=="DELETE":
-        try:
-            data = json.loads(request.body)
-            delete_ids = data.get('delete_image_ids', [])
-            if delete_ids:
-                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
-                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
-            else:
-                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+# def update(request, id):
+#     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+#     asset_images = AssetImage.objects.filter(asset=asset)
+#     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+#     if request.method=="DELETE":
+#         try:
+#             data = json.loads(request.body)
+#             delete_ids = data.get('delete_image_ids', [])
+#             if delete_ids:
+#                 AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
+#                 return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+#             else:
+#                 return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+#         except json.JSONDecodeError:
+#             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
-    elif request.method == 'POST':
-        form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
-        image_form = AssetImageForm(request.POST, request.FILES)
-        if form.is_valid() and image_form.is_valid():
-            asset_instance = form.save(commit=False)
-            asset_instance.organization = request.user.organization  # always set or preserve
-            asset_instance.save()
-            form.save_m2m()
-            assetSpecifications.delete()
-            # Handle new images
-            images = request.FILES.getlist('image')
-            for img_file in images:
-                AssetImage.objects.create(asset=asset, image=img_file)
-            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
-            for cf in custom_fields:
-                key = f"custom_field_{cf.entity_id}"
-                new_val = request.POST.get(key, "")
-                if new_val != cf.field_value:
-                    cf.field_value = new_val
-                    cf.save()
-            #Code to add new custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=asset.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
+#     elif request.method == 'POST':
+#         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
+#         image_form = AssetImageForm(request.POST, request.FILES)
+#         if form.is_valid() and image_form.is_valid():
+#             asset_instance = form.save(commit=False)
+#             asset_instance.organization = request.user.organization  # always set or preserve
+#             asset_instance.save()
+#             form.save_m2m()
+#             assetSpecifications.delete()
+#             # Handle new images
+#             images = request.FILES.getlist('image')
+#             for img_file in images:
+#                 AssetImage.objects.create(asset=asset, image=img_file)
+#             custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
+#             for cf in custom_fields:
+#                 key = f"custom_field_{cf.entity_id}"
+#                 new_val = request.POST.get(key, "")
+#                 if new_val != cf.field_value:
+#                     cf.field_value = new_val
+#                     cf.save()
+#             #Code to add new custom fields
+#             for key, value in request.POST.items():
+#                 if key.startswith("customfield_") and value.strip():
+#                     field_id = key.replace("customfield_", "")
+#                     try:
+#                         cf = CustomField.objects.get(
+#                             pk=field_id,
+#                             entity_type='asset',
+#                             organization=request.user.organization
+#                         )
+#                         CustomField.objects.create(
+#                             name=cf.name,
+#                             object_id=asset.id,
+#                             field_type=cf.field_type,
+#                             field_name=cf.field_name,
+#                             field_value=value,
+#                             entity_type='asset',
+#                             organization=request.user.organization
+#                         )
+#                     except CustomField.DoesNotExist:
+#                         continue
 
-            # Handle dynamically added custom fields
-            names = request.POST.getlist('custom_field_name')
-            values = request.POST.getlist('custom_field_value')
-            for name, val in zip(names, values):
-                if name.strip() and val.strip():
-                    CustomField.objects.create(
-                        name=name.strip(),
-                        object_id=asset.id,
-                        field_type='text',
-                        field_name=name.strip(),
-                        field_value=val.strip(),
-                        entity_type='asset',
-                        organization=request.user.organization
-                    )
-            # Success message and redirect
-            messages.success(request, "Asset updated successfully.")
-            return redirect('assets:list')
-    else:
-        form = AssetForm(instance=asset, organization=request.user.organization)
-        image_form = AssetImageForm()
-        custom_fields = CustomField.objects.filter(
-                entity_type='asset', object_id=asset.id, organization=request.user.organization)
+#             # Handle dynamically added custom fields
+#             names = request.POST.getlist('custom_field_name')
+#             values = request.POST.getlist('custom_field_value')
+#             for name, val in zip(names, values):
+#                 if name.strip() and val.strip():
+#                     CustomField.objects.create(
+#                         name=name.strip(),
+#                         object_id=asset.id,
+#                         field_type='text',
+#                         field_name=name.strip(),
+#                         field_value=val.strip(),
+#                         entity_type='asset',
+#                         organization=request.user.organization
+#                     )
+#             # Success message and redirect
+#             print("hiiiiiiiiiiiiii")    
+#             messages.success(request, "Asset updated successfully.")
+            
+#             return redirect('assets:list')
+#             # return redirect(f'/assets/details/{asset.id}/')
+#     else:
+#         form = AssetForm(instance=asset, organization=request.user.organization)
+#         image_form = AssetImageForm()
+#         custom_fields = CustomField.objects.filter(
+#                 entity_type='asset', object_id=asset.id, organization=request.user.organization)
    
-    context = {
-        'sidebar': 'assets',
-        'submenu': 'list',
-        'image_form': image_form,
-        'asset_images': asset_images,
-        'form': form,
-        'asset': asset,
-        'assetSpecifications': assetSpecifications,
-        'title': f'Update-{asset.tag}-{asset.name}',
-        'custom_fields': custom_fields
-    }
-    return render(request, 'assets/update-assets.html', context)
+#     context = {
+#         'sidebar': 'assets',
+#         'submenu': 'list',
+#         'image_form': image_form,
+#         'asset_images': asset_images,
+#         'form': form,
+#         'asset': asset,
+#         'assetSpecifications': assetSpecifications,
+#         'title': f'Update-{asset.tag}-{asset.name}',
+#         'custom_fields': custom_fields
+#     }
+#     return render(request, 'assets/update-assets.html', context)
 
 
 @login_required
@@ -993,7 +996,8 @@ def update_in_detail(request, id):
 
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
-            return redirect('assets:update_in_detail', id=asset.id)
+            # return redirect('assets:update_in_detail', id=asset.id)
+            return redirect(f'/assets/details/{asset.id}')
     else:
         form = AssetForm(instance=asset, organization=request.user.organization)
         image_form = AssetImageForm()
@@ -1272,7 +1276,6 @@ def listed_asset(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("MAPPEDDDDDDDDDD",asset_user_map)
     context = {
         'product_category_list':product_category_list,
         'department_list':department_list,
