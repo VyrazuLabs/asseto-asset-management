@@ -2,11 +2,6 @@
 {% load custom_filters %}
 {% load static %}
 {% block content %}
-<style>
-    #asset-search{
-        width: 100%;
-    }
-</style>
 <div class="page-heading">
     {% csrf_token %}
     <div class="d-flex justify-content-between">
@@ -42,8 +37,7 @@
 
                             <div class="row g-3"> 
                                 <div class="col-12 col-sm-6 col-lg-3">
-                                    <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'"
-                            hx-get="{% url 'assets:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                                    <input name="search_text" type="search" class="form-control" class="dataTable-input data-search" autocomplete="off" placeholder="Search here...">
                                 </div>
                                 <div class="col-12 col-sm-6 col-lg-3">
                                     <div class="dropdown-asset-status">
@@ -258,22 +252,7 @@
                                 </td> -->
                                 <td>
                                     {% if asset.is_assigned %}
-                                            {% with map=asset_user_map|get_item:asset.id %}
-                                                {% if map.image %}
-                                                    <sup class="d-flex ">
-                                                        <img src="{{ map.image.url }}"
-                                                            onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';"
-                                                            class="rounded-circle mb-1"
-                                                            style="width: 20px; height: 20px;" 
-                                                        />
-                                                    </sup>
-                                                {% endif %}
-                                                {% with parts=map.full_name|split %}
-                                                    {% for part in parts %}
-                                                        <sup >{{ part }}</sup>
-                                                    {% endfor %}
-                                                {% endwith %}
-                                            {% endwith %}
+                                        <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}{% if map.image %}<img src='{{ map.image.url }}' onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';" class="rounded-circle" style="width: 20px; height: 20px "/> {% endif %} {{ map.full_name }}{% endwith %}</sup>
                                         <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
                                                 {% csrf_token %}
                                                 <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
