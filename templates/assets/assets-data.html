@@ -13,14 +13,14 @@
         <td>
             {% with img=asset_images|get_item:asset.id %}
                 {% if img %}
-                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" class="max-width:100px; max-height:100px;" onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';">
+                    <img src="{{ img.image.url }}" alt="{{ asset.name }}" style="max-width:100px; max-height:100px;" class="max-width:100px; max-height:100px;">
                 {% else %}
                     <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                 {% endif %}
             {% endwith %}
         </td>
-        <td>{{asset.tag}}</td>
         <td>{{asset.name}}</td>
+        <td>{{asset.serial_no}}</td>
         <td>{{asset.product.product_type}}</td>
         <td>
             {{asset.product}}
@@ -36,22 +36,7 @@
         </td>
         <td>
             {% if asset.is_assigned %}
-                {% with map=asset_user_map|get_item:asset.id %}
-                    {% if map.image %}
-                        <sup class="d-flex ">
-                            <img src="{{ map.image.url }}"
-                                onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';"
-                                class="rounded-circle mb-1"
-                                style="width: 20px; height: 20px;" 
-                            />
-                        </sup>
-                    {% endif %}
-                    {% with parts=map.full_name|split %}
-                        {% for part in parts %}
-                            <sup >{{ part }}</sup>
-                        {% endfor %}
-                    {% endwith %}
-                {% endwith %}
+                <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}{% if map.image %}<img src='{{ map.image.url }}' class="rounded-circle" style="width: 20px; height: 20px "/> {% endif %} {{ map.full_name }}{% endwith %}</sup>
                 <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
                         {% csrf_token %}
                         <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
@@ -73,7 +58,7 @@
             <div class="d-flex justify-content-between gap-2">
                 {% if not asset.is_assigned %}
                     <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
-                        <option id="selected-val" style="display: flex;" disabled selected>{{ asset.asset_status.name }}</option>
+                        <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
                         {% for value, label in asset_form.fields.status.choices %}
                             <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
