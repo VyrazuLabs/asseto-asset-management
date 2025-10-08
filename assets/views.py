@@ -176,7 +176,7 @@ def listed(request):
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
     images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
-    
+
     # Map asset ID to its first image
     asset_images = {}
     for img in images_qs:
@@ -201,6 +201,7 @@ def listed(request):
         'assign_asset_form': assign_asset_form,
         'reassign_asset_form': reassign_asset_form,
         'deleted_asset_count':deleted_asset_count,
+        # "full_name_first":active_users.full_name_first,
         'title': 'Assets'
     }
 
@@ -499,6 +500,7 @@ def status(request, id):
 @login_required
 def search(request, page):
     # if request.method == 'POST':
+        tag=request.GET.get('tag')
         search_text = (request.GET.get('search_text') or "").strip()
         vendor_id = request.GET.get('vendor')
         status_id = request.GET.get('status')
@@ -521,7 +523,8 @@ def search(request, page):
                 Q(vendor__name__icontains=search_text) |
                 Q(vendor__gstin_number__icontains=search_text) |
                 Q(location__office_name__icontains=search_text) |
-                Q(product__product_type__name__icontains=search_text)
+                Q(product__product_type__name__icontains=search_text)|
+                Q(tag__icontains=search_text)
             )
 
         if vendor_id:
