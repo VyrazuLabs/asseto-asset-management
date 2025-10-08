@@ -1,3 +1,5 @@
+{% load custom_filters %}
+{% load static %}
 {% if page_object %}
     {% for products in page_object %}
     <tr>
@@ -8,7 +10,15 @@
                 {{forloop.counter}}
             {% endif %}
         </td>
-        <td>{% if products.product_picture %} <img src="{{products.product_picture.url}}" class="rounded" width="100" height="80" /> {% else %} Not Uploaded {% endif %}</td>
+        <td>
+            {% with img=product_images|get_at_index:products.id %}
+                {% if img %}
+                    <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
+                {% elif not img.image.url %}
+                    <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                {% endif %}
+            {% endwith %}
+        </td>
         <td>{{products.name}}</td>
         <td>
             {{products.product_type}}       
