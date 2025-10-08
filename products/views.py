@@ -269,7 +269,7 @@ def update_product(request, id):
                     )
                     print("Custom Field added successfully 2")   
         messages.success(request, 'Product updated successfully')
-        return redirect('products:list')
+        return redirect(f'/products/details/{product.id}')
 
     context = {'form': form, 'title': f'Edit - {product.name}','product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
     return render(request, 'products/update-product-modal.html', context)

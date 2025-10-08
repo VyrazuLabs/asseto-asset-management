@@ -147,7 +147,7 @@ def update_vendor(request, id):
                     cf.field_value = new_val
                     cf.save()
             messages.success(request, 'Vendor updated successfully')
-            return redirect('vendors:list')
+            return redirect(f'/vendors/details/{vendor.id}')
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
                'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
