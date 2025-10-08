@@ -124,7 +124,7 @@ def update_location(request, id):
                 location_form.save()
                 address_form.save()
                 messages.success(request, 'Location updated successfully')
-                return redirect('dashboard:locations')
+                return redirect(f'/admin/locations/details/{location.id}')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
                    'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}
