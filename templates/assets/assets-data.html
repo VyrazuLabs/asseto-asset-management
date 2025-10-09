@@ -91,7 +91,7 @@
                     <a href="{% url 'assets:details' asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                 {% endif %}
                 {% if perms.authentication.edit_asset %}
-                    <a href="{% url 'assets:update' asset.id %}"type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}"type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
                 {% endif %}
                 {% if perms.authentication.delete_asset %}
                     <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
