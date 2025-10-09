@@ -4,3 +4,4 @@
 **/env
 # .pytest_cache
 media
+db.sqlite3
