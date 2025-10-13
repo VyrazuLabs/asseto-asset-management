@@ -108,28 +108,19 @@
                                 <td>{{user.email}}</td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 10px">
-                                        {% if user.id in user_asset_map_count %}
-                                            <button type="button" 
-                                                    style="background-color: rgb(67, 94, 204);border: none;border-radius: 7px; color: inherit; cursor: pointer;padding-right: 7px;" 
-                                                    hx-get="{% url 'users:user_assigned_assets' user.id %}" 
-                                                    class="open-product-modal text-white"
-                                                    hx-target="#show-user-asset-modal-content"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#show-user-asset-modal">
+                                    {% if user.id in user_asset_map_count %}
+                                        <form method="post" action="{% url 'assets:list' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user-data" value="{{ user.id }}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm text-white"
+                                                    style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
                                                 {{ user_asset_map_count_count|get_item:user.id }}
                                             </button>
-
-                                            <!-- Modal -->
-                                            <div class="modal fade text-left" id="show-user-asset-modal" tabindex="-1" role="dialog"
-                                                aria-labelledby="myModalLabel140" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                                    <div id="show-user-asset-modal-content" class="modal-content" hx-target="this"></div>
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <p>0</p>
-                                        {% endif %}
-                                    </div>
+                                        </form>
+                                    {% else %}
+                                        <p>0</p>
+                                    {% endif %}
                                 </td>
 
                                 <td>{{user.role}}</td>

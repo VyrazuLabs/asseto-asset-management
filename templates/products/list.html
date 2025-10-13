@@ -110,7 +110,8 @@
                                     <div style="display: flex; align-items: center; gap: 10px;">   
                                         {% if products.total_assets != 0 %}   
                                         {{ product.id }}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                        <form method="post" action="{% url 'assets:list'%}">
+                                            {% csrf_token %}
                                             <input type="hidden" name="product" value="{{ products.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"

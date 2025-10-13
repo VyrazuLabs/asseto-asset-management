@@ -49,15 +49,8 @@
                             <tr>
                                 <th scope="row">Product Category</th>
                                 <td>{{asset.product.product_category.parent}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
-                            </tr>
-                            
-                            <tr>
                                 <th scope="row">Product Sub Category</th>
                                 <td>{{asset.product.product_category}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Price</th>
@@ -80,7 +73,9 @@
                             </tr>
                             <tr>
                                 <th scope="row">Status</th>
-                                <td colspan="3">{{asset.asset_status.name}}</td>
+                                <td >{{asset.asset_status.name}}</td>
+                                <th scope="row">Serial No.</th>
+                                <td>{{asset.serial_no}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Description</th>

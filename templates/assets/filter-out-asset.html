@@ -1,8 +1,14 @@
 {% load custom_filters %}
 {% load static %}
+<style>
+    #table-size {
+        vertical-align: middle;
+        height: 100px;
+    }
+</style>
 {% if page_object %}
     <thead>
-        <tr>
+        <tr >
             <th>Sl No.</th>
             <th>Image</th>
             <th>Asset Tag</th>
@@ -19,7 +25,7 @@
     </thead>
     <tbody id="search_result">
         {% for asset in page_object %}
-        <tr>
+        <tr >
             <td>{{forloop.counter}}</td>
             <td>
                 {% with img=asset_images|get_item:asset.id %}

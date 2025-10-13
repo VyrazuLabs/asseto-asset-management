@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% if page_object %}
     {% for department in page_object %}
     <tr>
@@ -9,6 +10,20 @@
             {% endif %}
         </td>
         <td>{{department.name}}</td>
+         <td>
+            {% if not department_asset_count|get_item:department.id  %}
+                0
+            {% else %}
+                <form method="get" action="{% url 'dashboard:search_department' 1 %}">
+                    <input type="hidden" name="department" value="{{ department.id }}">
+                    <button type="submit" 
+                            class="btn btn-sm text-white"
+                            style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                        {{ department_asset_count|get_item:department.id }}
+                    </button>
+                </form>
+            {% endif %}
+        </td>
         <td>{{department.contact_person_name}}</td>
         <td>{{department.contact_person_email}}</td>
         <td>{{department.contact_person_phone}}</td>

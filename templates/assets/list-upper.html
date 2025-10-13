@@ -2,6 +2,11 @@
 {% load custom_filters %}
 {% load static %}
 {% block content %}
+<style>
+    #asset-search{
+        width: 100%;
+    }
+</style>
 {% if page_object %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -36,7 +41,8 @@
                         hx-trigger="change, keyup changed delay:500ms from:input">
                         <div class="row g-3"> 
                             <div class="col-12 col-sm-6 col-lg-3">
-                                <input name="search_text" type="search" class="form-control" class="dataTable-input" autocomplete="off" placeholder="Search here...">
+                                <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
+                                        hx-get="{% url 'assets:search' 1 %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                             </div>
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-status">

@@ -76,7 +76,8 @@
                                     {% if not department_asset_count|get_item:department.id %}
                                         0
                                     {% else %}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                        <form method="post" action="{% url 'assets:list' %}">
+                                            {% csrf_token %}
                                             <input type="hidden" name="department" value="{{ department.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"

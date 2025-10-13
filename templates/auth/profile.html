@@ -10,11 +10,11 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row gallery">
-                        <div class="col-12 mb-2 py-2 px-2 border">
+                        <div class="col-12 mb-2 ">
                         {% if user.profile_pic %}
-                            <img class="w-100 active" src="{{request.user.profile_pic.url}}">               
+                            <img class="w-50 active" src="{{request.user.profile_pic.url}}">               
                         {% else %}
-                            <img class="w-100 active" src="{% static 'assets/images/faces/1.jpg' %}">
+                            <img class="w-50 active" src="{% static 'assets/images/faces/1.jpg' %}">
                         {% endif %}
                         </div>
                         <h6 class="my-3">

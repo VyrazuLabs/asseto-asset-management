@@ -297,13 +297,20 @@ def search(request, page):
             available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
         })
-
+    
     product_list = Product.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = page
     page_object = paginator.get_page(page_number)
-    return render(request, 'products/products-data.html', {'page_object': page_object})
+    product_ids_in_page = [product.id for product in page_object]
+    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
+    # Map asset ID to its first image
+    product_images = {}
+    for img in images_qs:
+        if img.product_id not in product_images:
+            product_images[img.product_id] = img
+    return render(request, 'products/list.html', {'page_object': page_object})
 
 
 @login_required

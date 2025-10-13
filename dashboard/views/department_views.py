@@ -165,7 +165,7 @@ def department_status(request, id):
 
 @login_required
 def search_department(request, page):
-    search_text = request.GET.get('search_text').strip()
+    search_text = request.GET.get('search_text')
     if search_text:
         return render(request, 'dashboard/departments/departments-data.html', {
             'page_object': Department.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
@@ -178,4 +178,22 @@ def search_department(request, page):
     paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = page
     page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/departments/departments-data.html', {'page_object': page_object})
+    asset_counts = (
+        AssignAsset.objects
+        .filter(
+            asset__organization=request.user.organization,
+            user__department__in=department_list
+        )
+        .values("user__department")
+        .annotate(asset_count=Count("asset", distinct=True))   # ✅ unique assets
+    )
+
+    # Map: {department_id: asset_count}
+    department_asset_count = {
+        item["user__department"]: item["asset_count"]
+        for item in asset_counts
+    }
+    return render(request, 'dashboard/departments/departments-data.html', {'page_object': page_object,
+                'department_asset_count': department_asset_count})
+
+
