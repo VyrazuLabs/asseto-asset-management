@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+import requests
+from assets.utils import slack_notification
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.contrib import messages
 from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus
@@ -71,7 +73,7 @@ def assign_assets(request, id):
         asset.asset_status=set_asset
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
-
+        slack_notification(request,f"{asset.name} is assigned",id,asset.tag)
         messages.success(request, f"Asset assigned to user.")
         return redirect('assets:list')
 
@@ -149,6 +151,65 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
+    #Function to get all the list data 
+    tag=request.GET.get("tag")
+    user_data=request.POST.get("user-data")
+    product=request.POST.get("product")# gts the id of the product
+    search_text = (request.GET.get("search_text") or "").strip()
+    vendor_id = request.GET.get("vendor")
+    status_id = request.POST.get("status")
+    user_id = request.GET.get("user")
+    department_id = request.POST.get("department")
+    location_id = request.POST.get("location")
+    category_id = request.POST.get("category")
+    type_id = request.POST.get("type")
+    print("caregory_id",category_id)
+    filters = Q(organization=request.user.organization)
+    if search_text:
+        filters &= (
+            Q(tag__icontains=search_text) |
+            Q(name__icontains=search_text) |
+            Q(serial_no__icontains=search_text) |
+            Q(purchase_type__icontains=search_text) |
+            Q(product__name__icontains=search_text) |
+            Q(vendor__name__icontains=search_text) |
+            Q(vendor__gstin_number__icontains=search_text) |
+            Q(location__office_name__icontains=search_text) |
+            Q(product__product_type__name__icontains=search_text)
+        )
+
+    if vendor_id:
+        filters &= Q(vendor_id=vendor_id)
+    if status_id:
+        filters &= Q(asset_status_id=status_id)
+    if category_id:
+        filters &= Q(product__product_category_id=category_id)
+    if type_id:
+        filters &= Q(product__product_type_id=type_id)
+    if location_id:
+        filters &= Q(location_id=location_id)
+
+    # --- Base queryset ---
+    assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
+    get_prod_type=None
+    get_prod_category=None
+    #Filter by product based on product type and category
+    if product:
+        assets_qs=assets_qs.filter(product_id=product)
+        if assets_qs.exists():
+            get_prod_category = assets_qs.first().product.product_category.name
+            get_prod_type = assets_qs.first().product.product_type.name
+            print("category for product-------------------------------------------",get_prod_category)
+            print("type for product-------------------------------------------",get_prod_type)
+    if user_data:
+        assigned_qs = AssignAsset.objects.filter(user_id=user_data).select_related("user").order_by("-assigned_date")
+        assets_qs = (
+            assets_qs.filter(assignasset__user=user_data)
+            .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        )
+    if department_id:
+        assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
+        assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
     product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
@@ -167,6 +228,8 @@ def listed(request):
         if assign.user:  # avoid None users
             asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
+    if assets_qs.exists():
+        paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     asset_form = AssetForm(organization=request.user.organization)
@@ -203,7 +266,18 @@ def listed(request):
         'reassign_asset_form': reassign_asset_form,
         'deleted_asset_count':deleted_asset_count,
         # "full_name_first":active_users.full_name_first,
-        'title': 'Assets'
+        'title': 'Assets',
+        # headers for selected filters
+        "vendor_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, vendor_id=vendor_id).first(),
+        "status_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, asset_status_id=status_id).first(),
+        "user_header": AssignAsset.objects.filter(asset__in=page_object, user_id=user_id).first(),
+        "department_header": AssignAsset.objects.filter(asset__in=page_object, user__department_id=department_id).first() if department_id else None,
+        "location_header": AssignAsset.objects.filter(asset__in=page_object, asset__location_id=location_id).first(),
+        "product_category_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
+        "product_type_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
+        'get_prod_category': get_prod_category,
+        'get_prod_type': get_prod_type,
+        "user_data": AssignAsset.objects.filter(asset__in=page_object, user_id=user_data).first(),
     }
 
     return render(request, 'assets/list.html', context=context)
@@ -254,50 +328,50 @@ def details(request, id):
 
 @login_required
 @permission_required('authentication.edit_asset')
-# def update(request, id):
-#     # AssetImageForm
-#     asset = get_object_or_404(
-#         Asset.undeleted_objects, pk=id, organization=request.user.organization)
-#     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-#     form = AssetForm(request.POST or None, instance=asset,
-#                      organization=request.user.organization)
-#     image_form = AssetImageForm(request.POST or None, request.FILES)
-#     if request.method == "POST":
+def update(request, id):
+    # AssetImageForm
+    asset = get_object_or_404(
+        Asset.undeleted_objects, pk=id, organization=request.user.organization)
+    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+    form = AssetForm(request.POST or None, instance=asset,
+                     organization=request.user.organization)
+    image_form = AssetImageForm(request.POST or None, request.FILES)
+    if request.method == "POST":
 
-#         if form.is_valid():
+        if form.is_valid():
 
-#             assetSpecifications.delete()
+            assetSpecifications.delete()
 
-#             specifications_names = request.POST.getlist(
-#                 'specifications_name')
+            specifications_names = request.POST.getlist(
+                'specifications_name')
 
-#             specifications_values = request.POST.getlist(
-#                 'specifications_value')
+            specifications_values = request.POST.getlist(
+                'specifications_value')
 
-#             for name, value in zip(specifications_names, specifications_values):
-#                 if name != '' or value != '':
-#                     AssetSpecification.objects.create(
-#                         asset=asset, name=name, value=value)
+            for name, value in zip(specifications_names, specifications_values):
+                if name != '' or value != '':
+                    AssetSpecification.objects.create(
+                        asset=asset, name=name, value=value)
 
-#             asset = form.save(commit=False)
-#             asset.organization = request.user.organization
-#             asset.save()
-#             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-#                 AssetImage.objects.create(asset=asset, image=f)
+            asset = form.save(commit=False)
+            asset.organization = request.user.organization
+            asset.save()
+            for f in request.FILES.getlist('image'): # 'image' is the name of your file input
+                AssetImage.objects.create(asset=asset, image=f)
 
-#             messages.success(request, 'Asset updated successfully')
-#             return redirect('assets:list')
+            messages.success(request, 'Asset updated successfully')
+            return redirect('assets:list')
 
-#     context = {
-#         'sidebar': 'assets',
-#         'submenu': 'list',
-#         'image_form': image_form,
-#         'form': form,
-#         'asset': asset,
-#         'assetSpecifications': assetSpecifications,
-#         'title': 'Asset - Update'
-#     }
-#     return render(request, 'assets/update-assets.html', context=context)
+    context = {
+        'sidebar': 'assets',
+        'submenu': 'list',
+        'image_form': image_form,
+        'form': form,
+        'asset': asset,
+        'assetSpecifications': assetSpecifications,
+        'title': 'Asset - Update'
+    }
+    return render(request, 'assets/update-assets.html', context=context)
 # from django.shortcuts import get_object_or_404, redirect, render
 # from .models import Asset, AssetImage
 # from .forms import AssetForm, AssetImageForm
@@ -461,6 +535,7 @@ def add(request):
                         entity_type='asset',
                         organization=request.user.organization
                     )
+            slack_notification(request,f"{asset.name}  added successfully",asset.id,asset.tag)
             return redirect('assets:list')
     else:
         form = AssetForm(organization=request.user.organization_id)
@@ -496,6 +571,7 @@ def delete(request, id):
             history_id = asset.history.first().history_id
             asset.history.filter(pk=history_id).update(history_type='-')
             messages.success(request, 'Asset deleted successfully.')
+        slack_notification(request,f"{asset.name}  deleted successfully",id,asset.tag)
 
     return redirect('assets:list')
 
@@ -512,117 +588,87 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    # if request.method == 'POST':
-        tag=request.GET.get('tag')
-        search_text = (request.GET.get('search_text') or "").strip()
-        vendor_id = request.GET.get('vendor')
-        status_id = request.GET.get('status')
-        user_id = request.GET.get('user')
-        department_id=request.GET.get('department')
-        location_id=request.GET.get('location')
-        product_category_id = request.GET.get('category')
-        product_type_id = request.GET.get('type')
+    PAGE_SIZE = 10
 
-        # Start query
-        q = Q(organization=request.user.organization)
+    # Get filter params
+    tag = request.GET.get('tag')
+    search_text = (request.GET.get('search_text') or "").strip()
+    vendor_id = request.GET.get('vendor')
+    status_id = request.GET.get('status')
+    user_id = request.GET.get('user')
+    department_id = request.GET.get('department')
+    location_id = request.GET.get('location')
+    product_category_id = request.GET.get('category')
+    product_type_id = request.GET.get('type')
+    page_number = request.GET.get('page', page)
 
-        # Apply filters if present
-        if search_text:
-            q &= (
-                Q(name__icontains=search_text) |
-                Q(serial_no__icontains=search_text) |
-                Q(purchase_type__icontains=search_text) |
-                Q(product__name__icontains=search_text) |
-                Q(vendor__name__icontains=search_text) |
-                Q(vendor__gstin_number__icontains=search_text) |
-                Q(location__office_name__icontains=search_text) |
-                Q(product__product_type__name__icontains=search_text)|
-                Q(tag__icontains=search_text)
-            )
+    # Build initial query
+    q = Q(organization=request.user.organization)
 
-        if vendor_id:
-            q &= Q(vendor_id=vendor_id)
+    if search_text:
+        q &= (
+            Q(name__icontains=search_text) |
+            Q(serial_no__icontains=search_text) |
+            Q(purchase_type__icontains=search_text) |
+            Q(product__name__icontains=search_text) |
+            Q(vendor__name__icontains=search_text) |
+            Q(vendor__gstin_number__icontains=search_text) |
+            Q(location__office_name__icontains=search_text) |
+            Q(product__product_type__name__icontains=search_text) |
+            Q(tag__icontains=search_text)
+        )
 
-        if status_id:
-            q &= Q(asset_status_id=status_id)
+    if vendor_id:
+        q &= Q(vendor_id=vendor_id)
+    if status_id:
+        q &= Q(asset_status_id=status_id)
+    if product_category_id:
+        q &= Q(product__product_category__id=product_category_id)
+    if product_type_id:
+        q &= Q(product__product_type_id=product_type_id)
+    if location_id:
+        q &= Q(location_id=location_id)
 
-        # if department_id:
-        #     q &= Q(department_id=department_id)
-        
-        if product_category_id:
-            q &= Q(product__product_category__id=product_category_id)
-        
-        if product_type_id:
-            q &= Q(product__product_type_id=product_type_id)
-        # Get assets
-        # asset_user_map = {}
-        page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
-        # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
+    # Start with full asset queryset
+    assets_qs = Asset.undeleted_objects.filter(q).order_by('-created_at')
 
-        # page_object = (
-        #     Asset.undeleted_objects
-        #     .filter(q)
-        #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #     .order_by("-created_at")[:10]
-        # )
-        # if user_id:
-        #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
-        #     asset_user_map = {}
-        #     for assign in get_assigned_asset_list:
-        #         if assign.asset_id not in asset_user_map:
-        #             asset_user_map[assign.asset_id] = None
-        #         if assign.user:  # avoid None users
-        #             asset_user_map[assign.asset_id]=assign.user.full_name
-        # print(page_object)
-        asset_ids = list(page_object.values_list("id", flat=True))
-        image_object = AssetImage.objects.filter(
-            asset__organization=request.user.organization,
-            asset_id__in=asset_ids
-        ).order_by('-uploaded_at')
-        asset_images = {}
-        for img in image_object:
-            if img.asset_id not in asset_images:
-                asset_images[img.asset_id] = img
-        # if user_id:
-        #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-        #     page_object = (
-        #         Asset.undeleted_objects
-        #         .filter(q, assignasset__user_id=user_id)
-        #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #         .order_by("-created_at")[:10]
-        #     )
-        # else:
-        if user_id:
-            assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-            page_object = (
-                Asset.undeleted_objects
-                .filter(q, assignasset__user_id=user_id)
-                .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-                .order_by("-created_at")[:10]
-            )
-        elif department_id: 
-            assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
-            page_object = (
-                Asset.undeleted_objects
-                .filter(q, assignasset__user__department_id=department_id)
-                .order_by("-created_at")[:10]
-            )
-        else:
-            page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
+    # Apply user/department filters, if present
+    if user_id:
+        assets_qs = assets_qs.filter(assignasset__user_id=user_id)
+    if department_id:
+        assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
 
-        asset_user_map = {}
-        get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=page_object) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
-        for assign in get_assigned_asset_list:
-            if assign.asset_id not in asset_user_map:
-                asset_user_map[assign.asset_id] = None
-            if assign.user:  # avoid None users
-                asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
-        return render(request, 'assets/assets-data.html', {
-            'page_object': page_object,
-            'asset_user_map': asset_user_map,
-            # 'asset_user_map': asset_user_map,
-            'asset_images': asset_images
-        })
+    # Set up paginator
+    paginator = Paginator(assets_qs, PAGE_SIZE)
+    page_object = paginator.get_page(page_number)
+
+    # Get asset IDs for current page
+    asset_ids = list(page_object.object_list.values_list("id", flat=True))
+
+    # Get images for current page assets
+    image_object = AssetImage.objects.filter(
+        asset__organization=request.user.organization,
+        asset_id__in=asset_ids
+    ).order_by('-uploaded_at')
+    asset_images = {img.asset_id: img for img in image_object}
+
+    # Assigned user map for each asset on current page
+    get_assigned_asset_list = AssignAsset.objects.filter(asset_id__in=asset_ids).order_by('-assigned_date')
+    asset_user_map = {}
+    for assign in get_assigned_asset_list:
+        if assign.user:
+            asset_user_map[assign.asset_id] = {
+                "full_name": assign.user.full_name,
+                "image": assign.user.profile_pic,
+            }
+
+    # Render template
+    return render(request, 'assets/assets-data.html', {
+        'page_object': page_object,
+        'asset_user_map': asset_user_map,
+        'asset_images': asset_images,
+        'paginator': paginator,  # Optionally pass paginator if you want manual controls
+    })
     # else:
         # return render(request, 'assets/list.html')
 
@@ -746,6 +792,8 @@ def delete_assign_asset_list(request, id):
         assignAsset = get_object_or_404(
             AssignAsset, asset=asset, asset__organization=request.user.organization)
         assignAsset.delete()
+        slack_notification(request,f"{asset.name} asset unassigned successfully",id,asset.tag)
+        messages.success(request, 'Asset unassigned successfully')
     return redirect('assets:list')
 
 @login_required
@@ -788,7 +836,9 @@ def change_status(request, id):
             asset.is_assigned = False
             # delete the assigned asset from the asigned asset list
             AssignAsset.objects.filter(asset=asset).delete()
+        slack_notification(request,f"{asset.name}  changed to {new_status} successfully",id,asset.tag)
         asset.save()
+
         return JsonResponse({'success': True, 'new_status': new_status})
 
 
@@ -896,6 +946,7 @@ def edit_asset_status(request,id):
             return HttpResponse(status=204)
 
     context = {'form': form, "modal_title": "Update Asset Status"}
+    slack_notification(request,f"{asset_status.name}  updated successfully",id,None)
     return render(request, 'assets/add_asset_status.html', context)
 
 @login_required
@@ -1009,6 +1060,7 @@ def update_in_detail(request, id):
 
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
+            slack_notification(request,f"{asset.name}  updated successfully",id,asset.tag)
             # return redirect('assets:update_in_detail', id=asset.id)
             return redirect(f'/assets/details/{asset.id}')
     else:
@@ -1102,6 +1154,7 @@ def assign_asset_in_asset_list(request, id):
             for f in files:
                 AssetImage.objects.create(asset=asset, image=f)
             messages.success(request, 'Asset assigned to user successfully')
+            slack_notification(request,f"{asset.name} is assigned successfully",id,asset.tag)
             return HttpResponse(status=204)
         else:
             return redirect('assets:list')
@@ -1123,6 +1176,7 @@ def search_assets(request, page):
     """
 
     # --- Collect filters from request ---
+    tag=request.GET.get("tag")
     user_data=request.GET.get("user-data")
     product=request.GET.get("product")# gts the id of the product
     # get_products=Product.objects.filter(Q(organization=None) | Q(organization=request.user.organization) & Q(id=product))
@@ -1142,6 +1196,7 @@ def search_assets(request, page):
 
     if search_text:
         filters &= (
+            Q(tag__icontains=search_text) |
             Q(name__icontains=search_text) |
             Q(tag__icontains=search_text) |
             Q(serial_no__icontains=search_text) |
@@ -1255,7 +1310,6 @@ def search_assets(request, page):
             "user_data": AssignAsset.objects.filter(asset__in=page_object, user_id=user_data).first(),
         },
     )
-
 
 def listed_asset(request):
     product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))

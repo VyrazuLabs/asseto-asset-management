@@ -3,6 +3,17 @@ from dashboard.models import Department,ProductType,ProductCategory
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.core.paginator import Paginator
 from django.db.models import Q,Prefetch
+import requests
+from django.http import HttpResponse
+from datetime import datetime
+from itertools import zip_longest
+from .models import Asset,AssignAsset
+from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from authentication.models import User
+import os
+
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -11,12 +22,6 @@ def grouper(iterable, n):
     args = [iter(iterable)] * n
     return list(zip_longest(*args, fillvalue=None))
 
-from itertools import zip_longest
-from .models import Asset,AssignAsset
-from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from authentication.models import User
 
 @login_required
 @permission_required('assets.change_asset', raise_exception=True)
@@ -103,3 +108,28 @@ def get_asset_filter_data(request):
         'deleted_asset_count':deleted_asset_count,
         'title': 'Assets'
     }
+
+def slack_notification(request,text,object,tag):
+    redirect_url=redirect_from_slack_url(request,object)
+    SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL')
+
+    now = datetime.now()
+    formatted = now.strftime("%B %d, %Y, %-I:%M %p")
+    link_text = f"<{redirect_url}|{text}>"
+    message = {
+        "text": f"{formatted}: Asset {tag} {link_text}",
+        # Optionally: "channel": "#your-channel", "username": "Notifier"
+    }
+    response = requests.post(SLACK_WEBHOOK_URL, json=message)
+    if response.status_code == 200:
+        print("Notification sent!")
+        return HttpResponse("Notification sent!", status=200)
+    else:
+        print("Failed:", response.text)
+        return HttpResponse("Failed to send notification", status=500)
+
+def redirect_from_slack_url(request,obj_id):
+    endpoint=f'/assets/details/{obj_id}'
+    url=request.build_absolute_uri(endpoint)
+    return url
+    
