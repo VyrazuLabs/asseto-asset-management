@@ -117,5 +117,175 @@ document.getElementById('global-search').addEventListener('keyup', function(e) {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById("exampleModal");
+    const cameraDiv = document.getElementById("camera-preview");
+    let scanning = false;
+    let opening = false;
+
+    async function checkCameraAvailability() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment",
+                    width: { min: 640 },
+                    height: { min: 480 }
+                }
+            });
+            // Stop the test stream to avoid keeping the camera active
+            stream.getTracks().forEach(track => track.stop());
+            return true;
+        } catch (err) {
+            console.error("Camera check error:", err);
+            return false;
+        }
+    }
+
+    function startQuagga() {
+        if (scanning) return;
+        scanning = true;
+
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: cameraDiv,
+                constraints: {
+                    facingMode: "environment",
+                    width: { min: 640 },
+                    height: { min: 480 }
+                }
+            },
+            decoder: {
+                readers: ["code_128_reader","ean_reader","ean_8_reader","code_39_reader","upc_reader"]
+            },
+            locate: true,
+            numOfWorkers: 2,
+            frequency: 10,
+            debug: {
+                drawBoundingBox: true,
+                showFrequency: true,
+                drawScanline: true,
+                showPattern: true
+            }
+        }, function(err) {
+            if (err) {
+                console.error("Quagga init error:", err);
+                alert("Camera not found or not accessible.");
+                scanning = false;
+                return;
+            }
+            Quagga.start();
+            console.log("Quagga started");
+        });
+
+        Quagga.onProcessed(function(result) {
+            // Debug: frames processed
+            console.log("Frame processed");
+        });
+
+        Quagga.onDetected(function(result) {
+            const code = result.codeResult.code;
+            console.log("Detected barcode:", code);
+
+            // Example API call
+            fetch(`/assets/scan-barcode/${code}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        window.location.href = `/assets/details/${data.id}`;
+                    } else {
+                        alert("Invalid tag");
+                    }
+                })
+                .catch(err => console.error("API Error:", err))
+                .finally(() => {
+                    // Stop Quagga after detection
+                    setTimeout(() => {
+                        Quagga.stop();
+                        scanning = false;
+                    }, 500);
+                });
+        });
+    }
+
+    function stopQuagga() {
+        if (scanning) {
+            Quagga.stop();
+            scanning = false;
+            console.log("Quagga stopped");
+        }
+    }
+
+    // Handle show event to check camera asynchronously without double alerts
+    modal.addEventListener("show.bs.modal", function(e) {
+        if (opening) {
+            opening = false;
+            return; // Allow the manual show to proceed
+        }
+
+        opening = true;
+        e.preventDefault(); // Prevent default show initially
+
+        checkCameraAvailability().then(hasCamera => {
+            if (!hasCamera) {
+                alert("Camera not found or not accessible.");
+                opening = false;
+                return;
+            }
+
+            // Manually show the modal if camera is available
+            new bootstrap.Modal(modal).show();
+        }).catch(err => {
+            console.error("Error checking camera:", err);
+            alert("Error checking camera access.");
+            opening = false;
+        });
+    });
+
+    // Start scanning when modal is fully shown
+    modal.addEventListener("shown.bs.modal", () => setTimeout(startQuagga, 300));
+
+    // Stop scanning when modal is hidden
+    modal.addEventListener("hidden.bs.modal", stopQuagga);
+});
+</script>
+
+<script>
+    document.getElementById("download-btn").addEventListener("click", function() {
+        var svgElement = document.querySelector('.asset-barcode').querySelector("svg");
+        console.log(svgElement,"svgElement")
+        
+        // Add necessary attributes
+        if (!svgElement.hasAttribute('xmlns')) {
+            console.log("if1")
+            svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        }
+        if (!svgElement.hasAttribute('width')) {
+            console.log("if2")
+            svgElement.setAttribute('width', '300');
+        }
+        if (!svgElement.hasAttribute('height')) {
+            console.log("if3")
+            svgElement.setAttribute('height', '150');
+        }
+        
+        var serializer = new XMLSerializer();
+        var svgString = serializer.serializeToString(svgElement);
+        
+        var blob = new Blob([svgString], {type: "image/svg+xml"});
+        var url = URL.createObjectURL(blob);
+        
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'barcode.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+</script>
+
 </body>
 </html>
