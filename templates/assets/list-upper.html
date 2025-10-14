@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between">
         <div class="page-title">
             <h3>Assets</h3>
-            <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb" class="d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Assets</li>
@@ -237,15 +237,17 @@
                     </div>
                 </div>
                 </br>
-                <table class="table" id="table1">
-                    {% if page_object %}
-                        {% include 'assets/filter-out-asset.html' with page_object=page_object  %}
-                    {% else %}
-                      <div class="alert alert-info" role="alert">
-                        No record available!
-                      </div>
-                    {% endif %}
-                </table>
+                <div class="table-responsive">
+                    <table class="table" id="table1">
+                        {% if page_object %}
+                            {% include 'assets/filter-out-asset.html' with page_object=page_object  %}
+                        {% else %}
+                        <div class="alert alert-info" role="alert">
+                            No record available!
+                        </div>
+                        {% endif %}
+                    </table>
+                </div>
                 {% include 'commons/pagination.html' %}
                 </div>
                 <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
