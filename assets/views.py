@@ -214,7 +214,10 @@ def listed(request):
 def details(request, id):
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
     assiggned_asset=AssignAsset.objects.filter(asset=asset).first()
-    assigned_user=assiggned_asset.user.full_name
+    if assiggned_asset:
+        assigned_user=assiggned_asset.user.full_name
+    else:
+        assigned_user=None
     asset_barcode = generate_barcode(asset.tag)
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
