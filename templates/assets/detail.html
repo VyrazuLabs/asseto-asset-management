@@ -54,12 +54,6 @@
                             </tr>
                             
                             <tr>
-                                <th scope="row">Product Sub Category</th>
-                                <td>{{asset.product.product_category}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
-                            </tr>
-                            <tr>
                                 <th scope="row">Price</th>
                                 <td>{{asset.price}}</td>
                                 <th scope="row">Office Location</th>
@@ -80,12 +74,16 @@
                             </tr>
                             <tr>
                                 <th scope="row">Status</th>
-                                <td colspan="3">{{asset.asset_status.name}}</td>
+                                <td>{{asset.asset_status.name}}</td>
+                                <th scope="row">Assigned User</th>
+                                <td>{{assigned_user}}</td>
+                                
                             </tr>
                             <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{asset.description|urlize}}</td>
                             </tr>
+
                             </tbody>
                     </table>
                     <p ><b>Asset Images</b></p>
@@ -146,6 +144,23 @@
                     </div>
                     {% endif %}
                 </div>
+                <div class="d-flex justify-content-end pt-4">
+                    <div class="barcode-dowload-btn pe-3" style="margin-top: 50px;">
+                        <button
+                            id="download-btn"
+                            type="button"
+                            class="btn btn-secondary rounded"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        ><i class="bi bi-download"></i>
+                        </button>
+                    </div>
+                    <!-- <button id="download-btn">Download SVG</button> -->
+                    <div class="asset-barcode">
+                        
+                        <span>{{asset_barcode|safe}}</span>
+                    </div>
+                </div>
             </div>
         </div>
         {% if assetSpecifications %}
@@ -200,6 +215,5 @@ document.querySelectorAll('.modal').forEach(modal => {
     window.location.reload();
   });
 });
-</script>
-  
+</script>  
 {% endblock content%}

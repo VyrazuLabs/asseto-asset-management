@@ -35,6 +35,7 @@ pyhanko-certvalidator==0.28.0
 PyMySQL==1.1.1
 pypdf==6.0.0
 PyPDF3==1.0.6
+python-barcode==0.16.1
 python-bidi==0.6.6
 python-dateutil==2.8.2
 python-decouple==3.6

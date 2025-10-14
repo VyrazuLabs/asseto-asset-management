@@ -1,6 +1,8 @@
 from django.urls import path
+from django.views.generic import TemplateView
 from . import views
-
+# from . import barcode
+from .barcode import scan_barcode
 app_name = 'assets'
 
 urlpatterns = [
@@ -33,4 +35,5 @@ urlpatterns = [
     path('asset_status_search/<str:page>',views.asset_status_search,name='asset_status_search'),
     path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
+    path('scan-barcode/<str:tag_id>',scan_barcode.as_view(), name='barcode'),
 ]
