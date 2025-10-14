@@ -23,6 +23,7 @@ from django.db.models import Count
 import json
 from products.models import ProductType
 from .utils import get_asset_filter_data
+from .barcode import generate_barcode
 
 
 def grouper(iterable, n):
@@ -213,6 +214,9 @@ def listed(request):
 @permission_required('authentication.view_asset')
 def details(request, id):
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
+    assiggned_asset=AssignAsset.objects.filter(asset=asset).first()
+    assigned_user=assiggned_asset.user.full_name
+    asset_barcode = generate_barcode(asset.tag)
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
         asset=assetSpecifications.asset
@@ -238,7 +242,7 @@ def details(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
+    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
     return render(request, 'assets/detail.html', context=context)
 
@@ -1134,6 +1138,7 @@ def search_assets(request, page):
     if search_text:
         filters &= (
             Q(name__icontains=search_text) |
+            Q(tag__icontains=search_text) |
             Q(serial_no__icontains=search_text) |
             Q(purchase_type__icontains=search_text) |
             Q(product__name__icontains=search_text) |
