@@ -8238,7 +8238,7 @@ body[data-theme="dark"] {
     object-fit: cover; /* Ensures video fills without distortion */
 }
 
-@media (max-width: 436px) {
+/* @media (max-width: 436px) {
     .d-flex.justify-content-end.pt-4 {
         flex-direction: column;
         align-items: center;
@@ -8260,15 +8260,34 @@ body[data-theme="dark"] {
     .asset-barcode {
         display: block;
         overflow-x: auto;
-        white-space: nowrap; /* keep barcode inline, scroll if needed */
+        white-space: nowrap; 
         max-width: 100%;
         padding: 5px 0;
     }
 
     .asset-barcode span {
-        display: inline-block; /* keep original barcode size */
+        display: inline-block; 
     }
+} */
+
+@media (max-width: 436px) {
+  .barcode-div{
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .barcode-dowload-btn{
+    margin-top: 7px !important;
+    padding-left: 0px !important;
+    margin-bottom: 10px !important;
+  }
+  .asset-barcode svg{
+    width: 100%;
+  }
+ 
 }
+ 
+
+
 .bell-icon-div{
   margin-right: 20px;
 }
