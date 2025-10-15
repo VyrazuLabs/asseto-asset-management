@@ -144,8 +144,13 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="d-flex justify-content-end pt-4">
-                    <div class="barcode-dowload-btn pe-3" style="margin-top: 50px;">
+                <h5 class="pt-5">BARCODE</h5>
+                <div class="d-flex">
+                    <div class="asset-barcode">
+                        
+                        <span>{{asset_barcode|safe}}</span>
+                    </div>
+                    <div class="barcode-dowload-btn ps-3" style="margin-top: 50px;">
                         <button
                             id="download-btn"
                             type="button"
@@ -154,11 +159,6 @@
                             aria-expanded="false"
                         ><i class="bi bi-download"></i>
                         </button>
-                    </div>
-                    <!-- <button id="download-btn">Download SVG</button> -->
-                    <div class="asset-barcode">
-                        
-                        <span>{{asset_barcode|safe}}</span>
                     </div>
                 </div>
             </div>
