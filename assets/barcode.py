@@ -4,6 +4,7 @@ from django.views import View
 from assets.models import Asset
 from barcode import Code128
 from barcode.writer import SVGWriter
+from django.contrib.auth.decorators import login_required
 
 class scan_barcode(View):
     def get(self,request,**kwargs):
@@ -22,8 +23,8 @@ class scan_barcode(View):
                 'message':"asset with this tag does not exists!"
             }
             return JsonResponse(respones_data, status=404)
-
-def generate_barcode(tag_id):
+        
+def generate_barcode(tag_id,user_organization):
     barcode_svg = Code128(tag_id, writer=SVGWriter())
-    svg_content = barcode_svg.render(writer_options={'write_text': False,'module_width': 0.8,'module_height': 25,},text=tag_id).decode('utf-8')
+    svg_content = barcode_svg.render(writer_options={'write_text': False,'module_width': 0.8,'module_height': 25,},text=f'Asset-{tag_id}').decode('utf-8')
     return svg_content
