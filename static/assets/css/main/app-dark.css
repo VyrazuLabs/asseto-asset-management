@@ -8224,26 +8224,7 @@ body[data-theme="dark"] {
 }
 
 .barcode-scanner{
-
-  background-color: #435ebe !important;
-  width: 51px !important;
-  height: 40px !important;
-  /* margin-left: 57% !important; */
-}
-
-.barcode-scanner :hover{
-
-  background-color: #304592 !important;
-}
-
-@media screen and (max-width:425px) {
-  .barcode-scanner{
-    background: none !important;
-    padding-top: 0px !important;
-  }
-  .barcode-scanner svg{
-    color: #435ebe;
-  }
+  color: #435ebe !important;
 }
 
 #camera-preview {
@@ -8287,4 +8268,12 @@ body[data-theme="dark"] {
     .asset-barcode span {
         display: inline-block; /* keep original barcode size */
     }
+}
+.bell-icon-div{
+  margin-right: 20px;
+}
+@media  screen and (max-width:991) {
+  .bell-icon-div{
+    margin-right: 0px;
+  }
 }

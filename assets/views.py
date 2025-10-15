@@ -219,7 +219,10 @@ def details(request, id):
         assigned_user=assiggned_asset.user.full_name
     else:
         assigned_user=None
-    asset_barcode = generate_barcode(asset.tag)
+    user= request.user
+    user_organization=user.organization
+    print('------------->',user_organization)
+    asset_barcode = generate_barcode(asset.tag,user_organization)
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
         asset=assetSpecifications.asset
