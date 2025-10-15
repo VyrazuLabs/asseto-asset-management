@@ -145,10 +145,9 @@
                     {% endif %}
                 </div>
                 <h5 class="pt-5">BARCODE</h5>
-                <div class="d-flex">
+                <div class="d-flex barcode-div">
                     <div class="asset-barcode">
-                        
-                        <span>{{asset_barcode|safe}}</span>
+                        {{asset_barcode|safe}}
                     </div>
                     <div class="barcode-dowload-btn ps-3" style="margin-top: 50px;">
                         <button
