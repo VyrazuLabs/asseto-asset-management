@@ -1,4 +1,4 @@
-from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus,Location,Vendor
+from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus,Location,Vendor,SlackWebhook
 from dashboard.models import Department,ProductType,ProductCategory
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.core.paginator import Paginator
@@ -13,7 +13,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from authentication.models import User
 import os
-
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -108,19 +107,133 @@ def get_asset_filter_data(request):
         'deleted_asset_count':deleted_asset_count,
         'title': 'Assets'
     }
+#Previous Workflow
+# def slack_notification(request,text,object,tag):
+#     redirect_url=redirect_from_slack_url(request,object)
+#     SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL')
 
-def slack_notification(request,text,object,tag):
-    redirect_url=redirect_from_slack_url(request,object)
-    SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL')
+#     now = datetime.now()
+#     formatted = now.strftime("%B %d, %Y, %-I:%M %p")
+#     link_text = f"<{redirect_url}|{text}>"
+#     message = {
+#         "text": f"{formatted}: Asset {tag} {link_text}",
+#         # Optionally: "channel": "#your-channel", "username": "Notifier"
+#     }
+#     response = requests.post(SLACK_WEBHOOK_URL, json=message)
+#     if response.status_code == 200:
+#         print("Notification sent!")
+#         return HttpResponse("Notification sent!", status=200)
+#     else:
+#         print("Failed:", response.text)
+#         return HttpResponse("Failed to send notification", status=500)
 
+def redirect_from_slack_url(request,obj_id):
+    endpoint=f'/assets/details/{obj_id}'
+    url=request.build_absolute_uri(endpoint)
+    return url
+
+def set_slack_webhook(organization, admin, url):
+    obj, created = SlackWebhook.objects.update_or_create(
+        organization=organization,
+        admin=admin,
+        defaults={'webhook_url': url},
+    )
+
+def get_slack_webhook_url(organization, admin):
+    try:
+        return SlackWebhook.objects.get(organization=organization, admin=admin).webhook_url
+    except SlackWebhook.DoesNotExist:
+        return None
+
+def send_slack_notification(organization, admin, message):
+    webhook_url = get_slack_webhook_url(organization, admin)
+    if webhook_url:
+        import requests
+        payload = {"text": message}
+        resp = requests.post(webhook_url, json=payload)
+        resp.raise_for_status()
+        return True
+    else:
+        # Handle: webhook not set
+        return False
+
+#New Integrations
+SLACK_API_BASE = "https://slack.com/api"
+
+def headers(token):
+    return {"Authorization": f"Bearer {token}"}
+
+# def create_channel_if_not_exists(workspace: SlackWorkspace, channel_name: str, is_private=True):
+#     """
+#     Ensure a channel exists in the workspace; return channel_id.
+#     """
+#     token = workspace.bot_access_token
+#     # Try to create
+#     resp = requests.post(f"{SLACK_API_BASE}/conversations.create", headers=headers(token), data={
+#         "name": channel_name,
+#         "is_private": "true" if is_private else "false"
+#     }).json()
+
+#     if resp.get("ok"):
+#         return resp["channel"]["id"]
+
+#     # if name_taken, list and find it
+#     err = resp.get("error", "")
+#     if err == "name_taken" or "already_in_channel" in err:
+#         lst = requests.get(f"{SLACK_API_BASE}/conversations.list", headers=headers(token), params={"limit": 1000}).json()
+#         for ch in lst.get("channels", []):
+#             if ch.get("name") == channel_name:
+#                 return ch.get("id")
+#     # else raise/log
+#     raise Exception(f"Failed to ensure channel {channel_name}: {resp}")
+
+
+# def invite_user_by_email(workspace: SlackWorkspace, user_email: str, channel_id: str):
+#     token = workspace.bot_access_token
+#     # lookup user
+#     resp = requests.get(f"{SLACK_API_BASE}/users.lookupByEmail", headers=headers(token), params={"email": user_email}).json()
+#     if not resp.get("ok"):
+#         # can't find user; may need workspace admin to invite manually
+#         return {"ok": False, "error": resp.get("error")}
+#     slack_user_id = resp["user"]["id"]
+
+#     invite = requests.post(f"{SLACK_API_BASE}/conversations.invite", headers=headers(token), data={
+#         "channel": channel_id,
+#         "users": slack_user_id
+#     }).json()
+#     return invite
+
+
+#New Integrations with slack bot
+def slack_notification(request,text,object,tag):    
+    user=request.user
+    get_obj=SlackWebhook.objects.filter(user=user).first()
+    print("get_obj",get_obj)
+    bot_token=None
+    channel_id=None
+    if get_obj is not None:
+        bot_token=get_obj.access_token
+        channel_id=get_obj.channel_id
+    else:
+        return HttpResponse("Slack not configured for user", status=400)
     now = datetime.now()
+    redirect_url=redirect_from_slack_url(request,object)
     formatted = now.strftime("%B %d, %Y, %-I:%M %p")
+    
     link_text = f"<{redirect_url}|{text}>"
-    message = {
-        "text": f"{formatted}: Asset {tag} {link_text}",
-        # Optionally: "channel": "#your-channel", "username": "Notifier"
+    message = f"{formatted}: Asset {tag} {link_text}"
+                                                        # Optionally: "channel": "#your-channel", "username": "Notifier"
+    url = "https://slack.com/api/chat.postMessage"
+    headers = {"Authorization": f"Bearer {bot_token}"}
+    payload = {
+        "channel": channel_id,  # channel_id, not name!
+        "text": message
     }
-    response = requests.post(SLACK_WEBHOOK_URL, json=message)
+    print("payload",payload)
+    print("headers",headers)
+    response = requests.post(url, headers=headers, json=payload)
+    print("response",response)
+    # return resp.json()
     if response.status_code == 200:
         print("Notification sent!")
         return HttpResponse("Notification sent!", status=200)
@@ -128,8 +241,22 @@ def slack_notification(request,text,object,tag):
         print("Failed:", response.text)
         return HttpResponse("Failed to send notification", status=500)
 
-def redirect_from_slack_url(request,obj_id):
-    endpoint=f'/assets/details/{obj_id}'
-    url=request.build_absolute_uri(endpoint)
-    return url
-    
+#Make a new slack channelfrom scratch.
+def create_slack_channel(bot_token, channel_name):
+    url = "https://slack.com/api/conversations.create"
+    headers = {
+        "Authorization": f"Bearer {bot_token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "name": channel_name  # channel names must be lowercase and without spaces
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    data = response.json()
+    if data.get("ok"):
+        channel_id = data["channel"]["id"]
+        print(f"Channel {channel_name} created with ID: {channel_id}")
+        return channel_id
+    else:
+        print(f"Failed to create channel: {data.get('error')}")
+        return None

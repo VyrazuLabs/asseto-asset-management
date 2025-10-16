@@ -36,4 +36,6 @@ urlpatterns = [
     path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
     path('scan-barcode/<str:tag_id>',scan_barcode.as_view(), name='barcode'),
+    path('slack/oauth/callback/', views.slack_oauth_callback, name='slack_oauth_callback'),
+    path("slack/install/", views.slack_authorize, name="slack_authorize"),
 ]

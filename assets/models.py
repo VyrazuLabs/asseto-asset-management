@@ -6,7 +6,8 @@ from vendors.models import Vendor
 from django.db.models import Sum
 from authentication.models import User
 from simple_history.models import HistoricalRecords
-
+from django.db import models
+from django.conf import settings
 
 def path_and_rename(instance, filename):
     upload_to = 'asset_images/'
@@ -16,6 +17,15 @@ def path_and_rename(instance, filename):
     else:
         filename = '{}.{}'.format(uuid.uuid4().hex, ext)
     return os.path.join(upload_to, filename)
+
+class SlackWebhook(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="slack_integration")
+    slack_user_id = models.CharField(max_length=100, null=True, blank=True)
+    access_token = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    team_id=models.CharField(max_length=100, null=True, blank=True)
+    channel_id=models.CharField(max_length=100, null=True, blank=True)
 
 class AssetSpecification(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

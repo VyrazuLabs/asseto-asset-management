@@ -32,6 +32,7 @@ LOGIN_REDIRECT_URL = '/'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
@@ -202,3 +203,10 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000  # or higher if needed
 
 APPEND_SLASH = True
+
+CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',  # Optional: unique identifier for this cache instance
+        }
+    }

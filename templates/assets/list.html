@@ -19,6 +19,9 @@
                 </ol>
             </nav>
         </div>
+        <a href="{% url 'assets:slack_authorize' %}" class="btn btn-outline-secondary btn-sm" style="height: 38px; align-self: center;" id="slack-integration-btn">
+            Integrate with Slack
+        </a>
         <div class="d-flex">
             {% if perms.authentication.add_asset %}
                 <div>
