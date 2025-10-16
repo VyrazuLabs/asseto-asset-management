@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
+<<<<<<< HEAD
 from django.core.cache import cache
 import os
 from dotenv import load_dotenv
+=======
+>>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
 import requests
 from assets.utils import slack_notification
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
@@ -79,7 +82,10 @@ def assign_assets(request, id):
         # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
         asset.save()
         slack_notification(request,f"{asset.name} is assigned",id,asset.tag)
+<<<<<<< HEAD
         # slack_notification(request,text,object,tag,bot_token, channel_id)
+=======
+>>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
         messages.success(request, f"Asset assigned to user.")
         return redirect('assets:list')
 
@@ -274,6 +280,7 @@ def listed(request):
         # "full_name_first":active_users.full_name_first,
         'title': 'Assets',
         # headers for selected filters
+<<<<<<< HEAD
         # "vendor_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, vendor_id=vendor_id).first(),
         # "status_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, asset_status_id=status_id).first(),
         # "user_header": AssignAsset.objects.filter(asset__in=page_object, user_id=user_id).first(),
@@ -284,6 +291,18 @@ def listed(request):
         # 'get_prod_category': get_prod_category,
         # 'get_prod_type': get_prod_type,
         # "user_data": AssignAsset.objects.filter(asset__in=page_object, user_id=user_data).first(),
+=======
+        "vendor_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, vendor_id=vendor_id).first(),
+        "status_header": Asset.undeleted_objects.filter(id__in=assets_qs.id, asset_status_id=status_id).first(),
+        "user_header": AssignAsset.objects.filter(asset__in=page_object, user_id=user_id).first(),
+        "department_header": AssignAsset.objects.filter(asset__in=page_object, user__department_id=department_id).first() if department_id else None,
+        "location_header": AssignAsset.objects.filter(asset__in=page_object, asset__location_id=location_id).first(),
+        "product_category_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_category_id=category_id).first(),
+        "product_type_header": Asset.undeleted_objects.filter(id__in=asset_ids, product__product_type_id=type_id).first(),
+        'get_prod_category': get_prod_category,
+        'get_prod_type': get_prod_type,
+        "user_data": AssignAsset.objects.filter(asset__in=page_object, user_id=user_data).first(),
+>>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
     }
 
     return render(request, 'assets/list.html', context=context)
