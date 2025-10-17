@@ -13,10 +13,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from authentication.models import User
 import os
-<<<<<<< HEAD
-=======
-
->>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -111,7 +107,6 @@ def get_asset_filter_data(request):
         'deleted_asset_count':deleted_asset_count,
         'title': 'Assets'
     }
-<<<<<<< HEAD
 #Previous Workflow
 # def slack_notification(request,text,object,tag):
 #     redirect_url=redirect_from_slack_url(request,object)
@@ -239,21 +234,6 @@ def slack_notification(request,text,object,tag):
     response = requests.post(url, headers=headers, json=payload)
     print("response",response)
     # return resp.json()
-=======
-
-def slack_notification(request,text,object,tag):
-    redirect_url=redirect_from_slack_url(request,object)
-    SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL')
-
-    now = datetime.now()
-    formatted = now.strftime("%B %d, %Y, %-I:%M %p")
-    link_text = f"<{redirect_url}|{text}>"
-    message = {
-        "text": f"{formatted}: Asset {tag} {link_text}",
-        # Optionally: "channel": "#your-channel", "username": "Notifier"
-    }
-    response = requests.post(SLACK_WEBHOOK_URL, json=message)
->>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
     if response.status_code == 200:
         print("Notification sent!")
         return HttpResponse("Notification sent!", status=200)
@@ -261,7 +241,6 @@ def slack_notification(request,text,object,tag):
         print("Failed:", response.text)
         return HttpResponse("Failed to send notification", status=500)
 
-<<<<<<< HEAD
 #Make a new slack channelfrom scratch.
 def create_slack_channel(bot_token, channel_name):
     url = "https://slack.com/api/conversations.create"
@@ -281,10 +260,13 @@ def create_slack_channel(bot_token, channel_name):
     else:
         print(f"Failed to create channel: {data.get('error')}")
         return None
-=======
+
 def redirect_from_slack_url(request,obj_id):
     endpoint=f'/assets/details/{obj_id}'
     url=request.build_absolute_uri(endpoint)
     return url
-    
->>>>>>> 79fa78fa72d1913ae87d1a5c770f42762a4271ef
+
+def get_host(request):
+    endpoint=f'/assets/list'
+    host=request.build_absolute_uri(endpoint)
+    return host

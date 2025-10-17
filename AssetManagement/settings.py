@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 LOGIN_REDIRECT_URL = '/'
 
-
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://638d2592b034.ngrok-free.app',
+# ]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -38,7 +40,7 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com',]
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://638d2592b034.ngrok-free.app',]
 
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
@@ -107,25 +109,25 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('DB_ENGINE'),
-#         'NAME':  os.environ.get('DB_DATABASE'),
-#         'USER':  os.environ.get('DB_USERNAME'),
-#         'PASSWORD':  os.environ.get('DB_PASSWORD'),
-#         'HOST':  os.environ.get('DB_HOST'),
-#         'PORT':  os.environ.get('DB_PORT'),
-#         "TEST": {
-#             "NAME": "test_asseto",
-#         },
-#     }
-# }
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME':  os.environ.get('DB_DATABASE'),
+        'USER':  os.environ.get('DB_USERNAME'),
+        'PASSWORD':  os.environ.get('DB_PASSWORD'),
+        'HOST':  os.environ.get('DB_HOST'),
+        'PORT':  os.environ.get('DB_PORT'),
+        "TEST": {
+            "NAME": "test_asseto",
+        },
     }
+}
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 
 
