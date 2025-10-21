@@ -35,6 +35,7 @@ urlpatterns = [
     path('support/', include('support.urls', namespace='support')),
     path('users/', include('users.urls', namespace='users')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
+	path('configurations/',include('configurations.urls',namespace='configurations')),
 
     # django smart select urls
     path('chaining/', include('smart_selects.urls')),
