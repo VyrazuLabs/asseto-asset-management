@@ -66,7 +66,8 @@ INSTALLED_APPS = [
     'users',
     'support',
     'notifications',
-    'simple_history'
+    'simple_history',
+    'configurations'
 ]
 
 MIDDLEWARE = [
