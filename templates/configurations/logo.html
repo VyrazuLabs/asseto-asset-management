@@ -1,0 +1,81 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Upload Logo</h3>
+
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Upload Logo</li>
+                </ol>
+            </nav>
+
+        </div>
+    </div>
+    <section class="section">
+        <div>
+
+            
+            <form method="post" enctype="multipart/form-data" class="pt-4">
+                {% csrf_token %}
+                <div>
+                    <div>
+                        <h4>Upload Logo</h4>
+                        {% if add_path_context.logo %}
+                            <img src="/media/{{add_path_context.logo}}" alt="logo_image" style="width: 25%; height: 15%;">
+                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                        {% else %}
+                            <p>i'm inside elese!</p>
+                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="max-width: 25%;  height: 15%;"/>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <input type="file" name="logo">
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div>
+                        <h4>Upload Favicon</h4>
+                        {% if add_path_context.favicon %}
+                            <img src="/media/{{add_path_context.favicon}}" alt="logo_image"style="width: 25%; height: 15%;">
+                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                        {% else %}
+                            <p>i'm inside elese!</p>
+                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <input type="file" name="favicon">
+                    </div>
+                </div>
+
+                <div class="mt-4 mb-4">
+                    <div>
+                        <h4>Upload Login page logo</h4>
+                        {% if add_path_context.login_page_logo %}
+                            <img src="/media/{{add_path_context.login_page_logo}}" alt="logo_image" style="width: 25%; height: 15%;">
+                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                        {% else %}
+                            <p>i'm inside elese!</p>
+                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <input type="file" name="login_page_logo">
+                    </div>
+                </div>
+                
+                <button class="btn text-white logo-upload-btn" type="submit">Upload </button>
+            </form>
+        </div>
+    </section>
+</div>
+</script>
+  
+{% endblock content%}
+
+
