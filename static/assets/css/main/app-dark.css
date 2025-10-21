@@ -8286,8 +8286,6 @@ body[data-theme="dark"] {
  
 }
  
-
-
 .bell-icon-div{
   margin-right: 20px;
 }
@@ -8295,4 +8293,9 @@ body[data-theme="dark"] {
   .bell-icon-div{
     margin-right: 0px;
   }
+}
+
+.logo-upload-btn{
+  background-color:#0dcaf0 !important;
+  border-color:#0dcaf0 !important;
 }
