@@ -47,13 +47,13 @@ def product_type_list(request):
     product_type = ProductTypeForm(organization=request.user.organization)
 
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             product__product_type__in=all_product_type_list
         )
         .values("product__product_type")
-        .annotate(asset_count=Count("id", distinct=True))   # ✅ unique assets
+        .annotate(asset_count=Count("id", distinct=True)) 
     )
     user_product_type_asset_count = {
         item["product__product_type"]: item["asset_count"]
