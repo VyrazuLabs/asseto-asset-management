@@ -91,7 +91,8 @@
                                         {% if not asset_status_asset_count|get_item:products.id %}
                                             <p>0</p>
                                         {% else %}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                        <form method="post" action="{% url 'assets:list' %}">
+                                            {% csrf_token %}
                                             <input type="hidden" name="status" value="{{ products.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"

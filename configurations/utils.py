@@ -51,3 +51,33 @@ def add_path(organization):
         image_dist['login_page_logo']=f'{brand_img.login_page_logo_path}{brand_img.login_page_logo}'
 
     return image_dist
+
+def generate_asset_tag(prefix, number_suffix):
+    """
+    Generate an auto-incrementing tag with given prefix and number suffix as strings.
+    Example: prefix='VY', number_suffix='001' -> VY001, VY002, ...
+    """
+    from assets.models import Asset
+
+    # Determine numeric part from number_suffix string
+    start_num = int(number_suffix)
+    size = len(number_suffix)
+
+    # Get last asset tag that starts with prefix
+    last_tag = Asset.undeleted_objects.filter(tag__startswith=prefix,).order_by('-created_at').first()
+    if last_tag:
+        # Extract numeric part after prefix
+        numeric_part = last_tag.tag[len(prefix):]
+        if numeric_part.isdigit():
+            last_num = int(numeric_part)
+            next_num = last_num + 1
+        else:
+            next_num = start_num
+    else:
+        next_num = start_num
+        print("No existing tags found with the given prefix.")
+
+    # Format number with leading zeros to match size of input number_suffix
+    number_str = str(next_num).zfill(size)
+
+    return f"{prefix}{number_str}"
