@@ -2,7 +2,7 @@
 {% load static %}
 {% if page_object %}
     {% for asset in page_object %}
-    <tr>
+    <tr style="height: 100px;">
         <td>
             {% if page_object.start_index %}
                 {{page_object.start_index|add:forloop.counter0}}
@@ -70,7 +70,7 @@
             {% endif %}
         </td>
         <td>
-            <div class="d-flex justify-content-between gap-2">
+            <div class="d-flex justify-content-between gap-2" style="width: 193px;">
                 {% if not asset.is_assigned %}
                     <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
                         <option id="selected-val" style="display: flex;" disabled selected>{{ asset.asset_status.name }}</option>
