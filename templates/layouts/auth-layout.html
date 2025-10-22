@@ -19,15 +19,9 @@
       <div class="row h-100">
         <div class="col-lg-6 col-12">
             <div id="auth-left">
-              {% if updated_login_page_logo %}
-                <div class="auth-logo">
-                    <a href="/"><img src="/media/{{ updated_login_page_logo }}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
-                </div>
-              {% else %}
                 <div class="auth-logo">
                     <a href="/"><img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
                 </div>
-              {% endif %}
         {% block content %}
         {% endblock %}
     </div>
