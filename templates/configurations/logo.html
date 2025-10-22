@@ -16,19 +16,20 @@
         </div>
     </div>
     <section class="section">
-        <div>
+        <div class="d-flex align-items-center">
+        <i class="bi bi-info-circle"></i><span class="ms-2">Image Size should not exceed <b>5 MB</b></span>
+        </div>
 
-            
+        <div> 
             <form method="post" enctype="multipart/form-data" class="pt-4">
                 {% csrf_token %}
                 <div>
-                    <div>
+                    <div class="mb-3">
                         <h4>Upload Logo</h4>
                         {% if add_path_context.logo %}
                             <img src="/media/{{add_path_context.logo}}" alt="logo_image" style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                            <a class="btn btn-lg btn-danger" href="{% url 'configurations:delete_logo' add_path_context.id %}"><i class="bi bi-trash3-fill"></i></a>
                         {% else %}
-                            <p>i'm inside elese!</p>
                             <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="max-width: 25%;  height: 15%;"/>
                         {% endif %}
                     </div>
@@ -38,14 +39,13 @@
                 </div>
 
                 <div class="mt-4">
-                    <div>
+                    <div class="mb-3">
                         <h4>Upload Favicon</h4>
                         {% if add_path_context.favicon %}
-                            <img src="/media/{{add_path_context.favicon}}" alt="logo_image"style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                            <img src="/media/{{add_path_context.favicon}}" alt="logo_image"style="width: 15%; height: 15%;">
+                            <a class="btn btn-lg btn-danger" href="{% url 'configurations:delete_favicon' add_path_context.id %}"><i class="bi bi-trash3-fill"></i></a>
                         {% else %}
-                            <p>i'm inside elese!</p>
-                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
+                            <img src="{% static 'assets/images/logo/Logo.svg' %}" alt="logo_image"style="width: 10%; height: 10%;">
                         {% endif %}
                     </div>
                     <div>
@@ -54,13 +54,12 @@
                 </div>
 
                 <div class="mt-4 mb-4">
-                    <div>
+                    <div class="mb-3">
                         <h4>Upload Login page logo</h4>
                         {% if add_path_context.login_page_logo %}
                             <img src="/media/{{add_path_context.login_page_logo}}" alt="logo_image" style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
+                            <a class="btn btn-lg btn-danger" href="{% url 'configurations:delete_login_page_logo' add_path_context.id %}"><i class="bi bi-trash3-fill"></i></a>
                         {% else %}
-                            <p>i'm inside elese!</p>
                             <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
                         {% endif %}
                     </div>
