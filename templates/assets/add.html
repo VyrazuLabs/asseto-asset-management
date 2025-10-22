@@ -28,8 +28,8 @@
                     <div class="row">
                         <div class="col-md-4 col-12">
                             <div class="form-group">
-                                <label for="city-column">Tag</label>
-                                {{form.tag}}
+                                <label for="city-column" value="{{ form.data.tag }}">Tag</label>
+                                <input type="text" id="city-column" class="form-control" name="tag" value="{{ form.data.tag }}">
                                 {% for error in form.tag.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}

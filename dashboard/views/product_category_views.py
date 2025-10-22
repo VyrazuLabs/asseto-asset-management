@@ -59,7 +59,7 @@ def product_category_list(request):
 
     # Count distinct assets per product category
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             product__product_category__in=all_product_category_list

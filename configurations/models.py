@@ -1,5 +1,5 @@
 from django.db import models
-
+import uuid
 from dashboard.models import Organization
 
 class BrandingImages(models.Model):
@@ -13,3 +13,14 @@ class BrandingImages(models.Model):
     favicon=models.TextField(max_length=255, null=True)
     login_page_logo=models.TextField(max_length=255, null=True,)
     organization=models.ForeignKey(Organization, null=True, on_delete=models.CASCADE, related_name='organization_logo')
+ 
+class TagConfiguration(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    prefix = models.CharField(max_length=50, blank=True, null=True)
+    number_suffix = models.CharField(max_length=50,blank=True, null=True)
+    use_default_settings = models.BooleanField(default=False)
+    
+
+    def __str__(self):
+        return f"{self.organization.name} - {self.prefix}"

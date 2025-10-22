@@ -72,7 +72,7 @@
                                 <th>Product Type</th>
                                 <th>Product Category</th>
                                 <th>Total Assets</th>
-                                <th>Available Assets</th>
+                                
                                 <th>Status</th>
                                 {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
                                     <th>Actions</th>
@@ -110,7 +110,8 @@
                                     <div style="display: flex; align-items: center; gap: 10px;">   
                                         {% if products.total_assets != 0 %}   
                                         {{ product.id }}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                        <form method="post" action="{% url 'assets:list'%}">
+                                            {% csrf_token %}
                                             <input type="hidden" name="product" value="{{ products.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"
@@ -124,9 +125,7 @@
                                     </div>
                                 </td>
 
-                                        <td>
-                                            {{products.available_assets}}    
-                                        </td>
+                                        
                                         <td>
                                             {% if request.user.is_superuser %}
                                                 <div class="form-check form-switch">
