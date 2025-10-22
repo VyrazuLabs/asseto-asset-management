@@ -53,5 +53,8 @@ urlpatterns = [
     # path('product-sub-categories/search/<str:page>', product_sub_category_views.search_product_sub_category, name='search_product_sub_category'),
     path('get-subcategories/',views.get_subcategories, name='get_subcategories'),
      
+     
+     
+     
     path('global-search/', global_search_views.global_search, name='global_search'),
 ]
