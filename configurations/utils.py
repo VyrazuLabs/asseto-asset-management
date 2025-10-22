@@ -1,21 +1,35 @@
 import os
+from django.contrib import messages
 import uuid
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from configurations.models import BrandingImages
 
-def update_files_name(logo,favicon,login_page_logo):
+def update_files_name(request,logo,favicon,login_page_logo):
+    max_file_size=5*1024*1024
     my_uuid=uuid.uuid4()
     file_dist={}
 
     def save_files(file_obj,folder_name):
-        # if not file_obj:
-        #     return None
+        if not file_obj:
+            return None
+        
+        if file_obj.size >max_file_size:
+            messages.error(request,"File size is more than 5 MB")
+            return None
+        
         folder_path = os.path.join(settings.MEDIA_ROOT, folder_name)
+
+        video_extentions={'.mp4', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.webm'}
+        ext = os.path.splitext(file_obj.name)[1].lower()
+
+        if ext in video_extentions:
+            messages.error(request,"Video files are not allowed")
+            return None
+
         os.makedirs(folder_path, exist_ok=True)
 
         # Generate new name
-        # ext = os.path.splitext(file_obj.name)[1]
         unique_name = f"{my_uuid}__{file_obj.name}"
 
         # Save file
@@ -51,3 +65,32 @@ def add_path(organization):
         image_dist['login_page_logo']=f'{brand_img.login_page_logo_path}{brand_img.login_page_logo}'
 
     return image_dist
+
+def create_or_update_image(request,logo, favicon, login_page_logo,file_dist,organization):
+    try:
+        if any([file_dist.get("logo"), file_dist.get("favicon"), file_dist.get("login_page_logo")]):
+            if BrandingImages.objects.filter(organization=organization).exists():
+                existing_image=BrandingImages.objects.get(organization=organization)
+                if logo:
+                    existing_image.logo=file_dist.get("logo")
+                    existing_image.save()
+                if favicon:
+                    existing_image.favicon=file_dist.get("favicon")
+                    existing_image.save()
+                if login_page_logo:
+                    existing_image.login_page_logo=file_dist.get("login_page_logo")
+                    existing_image.save()
+                messages.success(request,"Upload sucessfully")
+            else:
+                if any([file_dist.get("logo"), file_dist.get("favicon"), file_dist.get("login_page_logo")]):
+                    BrandingImages.objects.create(
+                        organization=request.user.organization,
+                        logo= file_dist.get("logo"),
+                        favicon= file_dist.get("favicon"),
+                        login_page_logo=file_dist.get("login_page_logo")
+                        )
+                    messages.success(request,"Upload sucessfully")
+
+    except Exception as e:
+        print('error is----->,',str(e))
+        messages.error(request,"Upload did not happen")
