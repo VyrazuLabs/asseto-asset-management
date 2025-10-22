@@ -95,7 +95,10 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
+                'configurations.context_processors.sidebar_logo',
+                'configurations.context_processors.favicon_image',
+                'configurations.context_processors.login_page_logo'
             ],
         },
     },
