@@ -43,7 +43,7 @@
                             <div class="row g-3"> 
                                 <div class="col-12 col-sm-6 col-lg-3">
                                     <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'"
-                            hx-get="{% url 'assets:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                                        hx-get="{% url 'assets:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                                 </div>
                                 <div class="col-12 col-sm-6 col-lg-3">
                                     <div class="dropdown-asset-status">
@@ -213,7 +213,7 @@
                                 <th>Asset Name</th>
                                 <th>Product Type</th>
                                 <th>Product</th>
-                                <!-- <th>Vendor</th> -->
+                                <th>Vendor</th>
                                 <th>Current State</th>
                                 <th>Status</th>
                                 {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
@@ -250,12 +250,12 @@
                                     <i class="bi bi-exclamation-triangle text-warning" title="Product is deleted, please update or restore."></i>
                                     {% endif %}
                                 </td>
-                                <!-- <td>
+                                <td>
                                     {{asset.vendor}} 
                                     {% if asset.vendor.is_deleted %}
                                     <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted, please update or restore."></i>
                                     {% endif %}
-                                </td> -->
+                                </td>
                                 <td>
                                     {% if asset.is_assigned %}
                                             {% with map=asset_user_map|get_item:asset.id %}

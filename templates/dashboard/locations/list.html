@@ -70,7 +70,8 @@
                                     {% if not location_asset_count|get_item:location.id %}
                                             0
                                     {% else %}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}" class="d-inline">
+                                        <form method="post" action="{% url 'assets:list' %}">
+                                            {% csrf_token %}
                                             <input type="hidden" name="location" value="{{ location.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"

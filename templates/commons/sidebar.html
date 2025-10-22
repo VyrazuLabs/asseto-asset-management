@@ -52,6 +52,19 @@
                         </a>
                     {% endif %}
                 </li>
+                <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
+                    <a href="javascript:void(0)" class="sidebar-link">
+                        <i class="bi bi-person-fill"></i>
+                        <span>Configuration</span>
+                    </a>
+                    <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
+                    {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
+                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                            <a href="{% url 'configurations:list_tag' %}">Tag Configuration</a>
+                        </li>
+                    {% endif %}
+                    </ul>
+                </li>
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">
