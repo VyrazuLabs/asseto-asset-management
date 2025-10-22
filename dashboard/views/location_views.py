@@ -177,4 +177,15 @@ def search_location(request, page):
     paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = page
     page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/locations/locations-data.html', {'page_object': page_object})
+    asset_counts = (
+        Asset.objects
+        .filter(organization=request.user.organization,
+                location__in=location_list)
+        .values("location")
+        .annotate(asset_count=Count("id"))
+    )
+    location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
+    return render(request, 'dashboard/locations/locations-data.html', 
+                  {'page_object': page_object,
+                   'location_asset_count':location_asset_count
+                   })
