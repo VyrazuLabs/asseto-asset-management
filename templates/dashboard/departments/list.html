@@ -73,15 +73,15 @@
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
                                 <td>{{department.name}}</td>
                                 <td>
-                                    {% if not department_asset_count|get_item:department.id %}
+                                    {% if not department_asset_count|get_item:department.id  %}
                                         0
                                     {% else %}
-                                        <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                        <form method="get" action="{% url 'dashboard:search_department' 1 %}">
                                             <input type="hidden" name="department" value="{{ department.id }}">
                                             <button type="submit" 
                                                     class="btn btn-sm text-white"
                                                     style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
-                                                {{ department_asset_count|get_item:department.id|default:0 }}
+                                                {{ department_asset_count|get_item:department.id }}
                                             </button>
                                         </form>
                                     {% endif %}
