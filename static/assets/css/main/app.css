@@ -16095,6 +16095,10 @@ fieldset:disabled .btn {
   content: "\f4da";
 }
 
+.bi-sliders-fill::before{
+  content: "\F56B";
+}
+
 .bi-person-lines-fill::before {
   content: "\f4db";
 }
