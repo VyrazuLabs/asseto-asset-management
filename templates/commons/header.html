@@ -9,7 +9,12 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}" />
-    <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
+    {% if get_favicon %}
+        <link rel="shortcut icon" href="/media/{{ get_favicon }}" type="image/x-icon" />
+    {% else %}
+        <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
+    {% endif %}
+
     <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.png' %}" type="image/png" />
     <link rel="stylesheet" href="{% static 'assets/css/shared/iconly.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/pages/simple-datatables.css' %}" />
