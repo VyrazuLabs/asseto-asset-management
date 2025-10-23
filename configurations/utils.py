@@ -3,7 +3,10 @@ from django.contrib import messages
 import uuid
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
-from configurations.models import BrandingImages
+from configurations.models import BrandingImages,LocalizationConfiguration
+from .constants import DATETIME_CHOICES,CURRENCY_CHOICES
+from datetime import datetime
+from dateutil.parser import parse
 
 def update_files_name(request,logo,favicon,login_page_logo):
     max_file_size=5*1024*1024
@@ -125,3 +128,43 @@ def generate_asset_tag(prefix, number_suffix):
     number_str = str(next_num).zfill(size)
 
     return f"{prefix}{number_str}"
+
+def get_currency_and_datetime_format(organization):
+    getLocalization=LocalizationConfiguration.objects.filter(organization=organization).first()
+    get_currency=getLocalization.currency  #we get the currency no.
+    get_time=getLocalization.time_format   #we get the time no.
+    currency_format=None
+    date_format=None
+    for it,data in CURRENCY_CHOICES:
+        if it==get_currency:
+            currency_format=data
+            break
+    for it,data in DATETIME_CHOICES:
+        if it==get_time:
+            date_format=data
+            break
+    # new_date_format=format_datetime(output_format=date_format)
+    obj={'currency':currency_format,'date_format':date_format}
+    print(obj,"obj in utils-----------------------------")
+    return obj
+    # return organization.currency, organization.date_format
+
+def format_datetime(x,output_format):
+    """Convert datetime object to the specified output format."""
+    # x = datetime.datetime.now()
+    if isinstance(x, str):
+        x = parse(x)
+
+    formats = {
+        'YYYY-MM-DD': '%Y-%m-%d',
+        'Day Month DD, Year': '%A %B %d, %Y',
+        'Month DD, YYYY': '%B %d, %Y',
+        'DD/MM/YYYY': '%d/%m/%Y',
+        'MM/DD/YYYY': '%m/%d/%Y'
+    }
+
+    if output_format not in formats:
+        raise ValueError("Invalid format. Choose from: " + ", ".join(formats.keys()))
+
+    return x.strftime(formats[output_format])
+    

@@ -3,6 +3,7 @@ from django.core.cache import cache
 import os
 from dotenv import load_dotenv
 import requests
+from configurations.models import BrandingImages,LocalizationConfiguration
 from assets.utils import slack_notification
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.contrib import messages
@@ -31,6 +32,7 @@ from .utils import get_asset_filter_data,get_host
 from configurations.utils import generate_asset_tag
 from .barcode import generate_barcode
 from configurations.models import TagConfiguration
+from configurations.utils import get_currency_and_datetime_format,format_datetime
 
 
 def grouper(iterable, n):
@@ -310,15 +312,23 @@ def details(request, id):
     page_object = paginator.get_page(page_number)
     get_custom_data=[]
     get_data=CustomField.objects.filter(object_id=asset.id)
+    organization=request.user.organization
+    obj=get_currency_and_datetime_format(organization)
+    get_currency=obj['currency']
+    get_date_format=obj['date_format']
+    print(asset.warranty_expiry_date,"==========================")
+    # obj['date_format']=format_datetime(x=obj['date_format'],output_format=get_date_format)
+    asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format)
+    asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format)
+    eol_date=format_datetime(x=eol_date, output_format=get_date_format)
     for it in get_data:
         obj={}
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency}
     return render(request, 'assets/detail.html', context=context)
-
 
 @login_required
 @permission_required('authentication.edit_asset')
@@ -533,7 +543,7 @@ def add(request):
             return redirect('assets:list')
     else:
         form = AssetForm(organization=request.user.organization_id)
-        tag_config=TagConfiguration.objects.filter(organization=request.user.organization).first()
+        tag_config=TagConfiguration.objects.filter(organization=request.user.organization,use_default_settings=True).first()
         print("here tag_config",tag_config)
         if tag_config:
             form.data['tag'] = generate_asset_tag(prefix=tag_config.prefix, number_suffix=tag_config.number_suffix)

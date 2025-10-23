@@ -28,6 +28,8 @@ from assets.models import AssignAsset
 from django.views.decorators.cache import never_cache
 from dashboard.views.seeders import seed_parent_category
 from django.db.models import Q
+from configurations.utils import get_currency_and_datetime_format
+from configurations.utils import format_datetime
 User = get_user_model()
 
 
@@ -78,9 +80,29 @@ def index(request):
     latest_users_list = User.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).exclude(
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
- 
+    obj=get_currency_and_datetime_format(request.user.organization)
+    print(obj,"obj in index view-----------------------------")
+    for it in latest_vendor_list:
+        print(it.created_at,"before formatting date-------------------")
+        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        print(it.created_at,"after formatting date-------------------")
+    for it in latest_product_list:
+        print(it.created_at,"before formatting date-------------------")
+        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        print(it.created_at,"after formatting date-------------------")
+
+    for it in all_location_list:
+        print(it.created_at,"before formatting date-------------------")
+        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        print(it.created_at,"after formatting date-------------------")
+    
+    for it in latest_users_list:
+        print(it.created_at,"before formatting date-------------------")
+        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        print(it.created_at,"after formatting date-------------------")
     context = {
- 
+        'currency': obj['currency'],
+        'date_format': obj['date_format'],
         'sidebar': 'index',
         'product_count': product_count,
         'vendor_count': vendor_count,
