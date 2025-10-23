@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}" />
     {% if get_favicon %}
-        <link rel="shortcut icon" href="/media/{{ get_favicon }}" type="image/x-icon" />
+        <link rel="shortcut icon" href="/media{{ get_favicon }}" type="image/x-icon" />
     {% else %}
         <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
     {% endif %}
