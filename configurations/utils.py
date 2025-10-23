@@ -53,17 +53,17 @@ def add_path(organization):
     image_dist={}
     try:
         brand_img=BrandingImages.objects.get(organization=organization)
-        image_dist={'id':brand_img.id}
     except:
         brand_img=None
-    
-    if brand_img.logo:
-        image_dist['logo']=f'{brand_img.logo_path}{brand_img.logo}'
-    if brand_img.favicon:
-        image_dist['favicon']=f'{brand_img.favicon_path}{brand_img.favicon}'
-    if brand_img.login_page_logo:
-        image_dist['login_page_logo']=f'{brand_img.login_page_logo_path}{brand_img.login_page_logo}'
 
+    if brand_img:
+        image_dist={'id':brand_img.id}
+        if brand_img.logo:
+            image_dist['logo']=f'{brand_img.logo_path}{brand_img.logo}'
+        if brand_img.favicon:
+            image_dist['favicon']=f'{brand_img.favicon_path}{brand_img.favicon}'
+        if brand_img.login_page_logo:
+            image_dist['login_page_logo']=f'{brand_img.login_page_logo_path}{brand_img.login_page_logo}'
     return image_dist
 
 def create_or_update_image(request,logo, favicon, login_page_logo,file_dist,organization):
