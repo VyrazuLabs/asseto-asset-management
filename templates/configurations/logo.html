@@ -1,81 +1,98 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+
 {% block content %}
 <div class="page-heading">
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="page-title">
-            <h3 class="page-name">Upload Logo</h3>
-
+            <h3 class="page-name mb-1">Branding</h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
+                <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Upload Logo</li>
+                    <li class="breadcrumb-item active" aria-current="page">Branding</li>
                 </ol>
             </nav>
-
         </div>
     </div>
+
     <section class="section">
-        <div>
+        <!-- Upload Form -->
+        <form method="post" enctype="multipart/form-data" class="pt-3">
+            {% csrf_token %}
 
-            
-            <form method="post" enctype="multipart/form-data" class="pt-4">
-                {% csrf_token %}
-                <div>
-                    <div>
-                        <h4>Upload Logo</h4>
-                        {% if add_path_context.logo %}
-                            <img src="/media/{{add_path_context.logo}}" alt="logo_image" style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
-                        {% else %}
-                            <p>i'm inside elese!</p>
-                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="max-width: 25%;  height: 15%;"/>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <input type="file" name="logo">
+            <div class="row g-4">
+                <!-- Upload Logo -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card p-3 h-100">
+                        <h4 class="mb-3">Upload Logo</h4>
+                        <div class="mb-3 text-center">
+                            {% if add_path_context.logo %}
+                                <img src="/media/{{ add_path_context.logo }}" alt="logo_image" class="img-fluid" style="max-height: 90px;">
+                                <a class="btn btn-sm btn-danger ms-2" href="{% url 'configurations:delete_logo' add_path_context.id %}">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            {% else %}
+                                <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 90px;">
+                            {% endif %}
+                        </div>
+                        <input type="file" name="logo" class="form-control">
+                        <div class="d-flex align-items-center mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <div>
-                        <h4>Upload Favicon</h4>
-                        {% if add_path_context.favicon %}
-                            <img src="/media/{{add_path_context.favicon}}" alt="logo_image"style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
-                        {% else %}
-                            <p>i'm inside elese!</p>
-                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <input type="file" name="favicon">
+                <!-- Upload Favicon -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card p-3 h-100">
+                        <h4 class="mb-3">Upload Favicon</h4>
+                        <div class="mb-3 text-center">
+                            {% if add_path_context.favicon %}
+                                <img src="/media/{{ add_path_context.favicon }}" alt="favicon_image" class="img-fluid" style="max-height: 90px;">
+                                <a class="btn btn-sm btn-danger ms-2" href="{% url 'configurations:delete_favicon' add_path_context.id %}">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            {% else %}
+                                <img src="{% static 'assets/images/logo/Logo.svg' %}" alt="favicon_placeholder" class="img-fluid" style="max-height: 90px;">
+                            {% endif %}
+                        </div>
+                        <input type="file" name="favicon" class="form-control">
+                        <div class="d-flex align-items-center mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-4 mb-4">
-                    <div>
-                        <h4>Upload Login page logo</h4>
-                        {% if add_path_context.login_page_logo %}
-                            <img src="/media/{{add_path_context.login_page_logo}}" alt="logo_image" style="width: 25%; height: 15%;">
-                            <a class="btn" href="{% url 'configurations:delete_logo' add_path_context.id %}">delete</a>
-                        {% else %}
-                            <p>i'm inside elese!</p>
-                            <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="width: 25%; height: 15%;"/>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <input type="file" name="login_page_logo">
+                <!-- Upload Login Page Logo -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card p-3 h-100">
+                        <h4 class="mb-3">Upload Login Page Logo</h4>
+                        <div class="mb-3 text-center">
+                            {% if add_path_context.login_page_logo %}
+                                <img src="/media/{{ add_path_context.login_page_logo }}" alt="login_page_logo" class="img-fluid" style="max-height: 90px;">
+                                <a class="btn btn-sm btn-danger ms-2" href="{% url 'configurations:delete_login_page_logo' add_path_context.id %}">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </a>
+                            {% else %}
+                                <img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 90px;">
+                            {% endif %}
+                        </div>
+                        <input type="file" name="login_page_logo" class="form-control">
+                        <div class="d-flex align-items-center mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                        </div>
                     </div>
                 </div>
-                
-                <button class="btn text-white logo-upload-btn" type="submit">Upload </button>
-            </form>
-        </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-end mt-4">
+                <button class="btn text-white logo-upload-btn" type="submit">Upload</button>
+            </div>
+        </form>
     </section>
 </div>
-</script>
-  
-{% endblock content%}
-
-
+{% endblock content %}
