@@ -14,4 +14,6 @@ urlpatterns=[
     # path('update-tag-configuration/<str:id>/', views.update_tag_configuration, name='update_tag_configuration'),
     path('list-tag-configuration/', views.list_tag_configurations, name='list_tag'),
     path('toggle-default-settings/<str:id>/', views.toggle_default_settings, name='toggle_default_settings'),
+    path('list-localization/', views.list_localizations, name='list_localization'),
+    path('create-localization-configuration/', views.create_localization_configuration, name='create_localization_configuration'),
 ]
