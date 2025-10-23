@@ -95,7 +95,10 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
+                'configurations.context_processors.sidebar_logo',
+                'configurations.context_processors.favicon_image',
+                'configurations.context_processors.login_page_logo'
             ],
         },
     },
@@ -107,25 +110,25 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('DB_ENGINE'),
-#         'NAME':  os.environ.get('DB_DATABASE'),
-#         'USER':  os.environ.get('DB_USERNAME'),
-#         'PASSWORD':  os.environ.get('DB_PASSWORD'),
-#         'HOST':  os.environ.get('DB_HOST'),
-#         'PORT':  os.environ.get('DB_PORT'),
-#         "TEST": {
-#             "NAME": "test_asseto",
-#         },
-#     }
-# }
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    'default': {
+        'ENGINE': os.environ.get('DB_ENGINE'),
+        'NAME':  os.environ.get('DB_DATABASE'),
+        'USER':  os.environ.get('DB_USERNAME'),
+        'PASSWORD':  os.environ.get('DB_PASSWORD'),
+        'HOST':  os.environ.get('DB_HOST'),
+        'PORT':  os.environ.get('DB_PORT'),
+        "TEST": {
+            "NAME": "test_asseto",
+        },
     }
+}
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 
 
