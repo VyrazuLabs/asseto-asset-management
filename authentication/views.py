@@ -84,21 +84,36 @@ def index(request):
     print(obj,"obj in index view-----------------------------")
     for it in latest_vendor_list:
         print(it.created_at,"before formatting date-------------------")
-        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         print(it.created_at,"after formatting date-------------------")
     for it in latest_product_list:
         print(it.created_at,"before formatting date-------------------")
-        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         print(it.created_at,"after formatting date-------------------")
 
     for it in all_location_list:
         print(it.created_at,"before formatting date-------------------")
-        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         print(it.created_at,"after formatting date-------------------")
     
     for it in latest_users_list:
         print(it.created_at,"before formatting date-------------------")
-        it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         print(it.created_at,"after formatting date-------------------")
     context = {
         'currency': obj['currency'],
