@@ -131,8 +131,13 @@ def generate_asset_tag(prefix, number_suffix):
 
 def get_currency_and_datetime_format(organization):
     getLocalization=LocalizationConfiguration.objects.filter(organization=organization).first()
-    get_currency=getLocalization.currency  #we get the currency no.
-    get_time=getLocalization.time_format   #we get the time no.
+    print("getLocalization", getLocalization)
+    if getLocalization:
+        get_currency=getLocalization.currency   #we get the currency no.
+        get_time=getLocalization.time_format    #we get the time no.
+    if getLocalization is None:
+        get_currency=None
+        get_time=None
     currency_format=None
     date_format=None
     for it,data in CURRENCY_CHOICES:
