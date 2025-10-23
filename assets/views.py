@@ -315,11 +315,13 @@ def details(request, id):
     obj=get_currency_and_datetime_format(organization)
     get_currency=obj['currency']
     get_date_format=obj['date_format']
-    print(asset.warranty_expiry_date,"==========================")
+    print(get_date_format,"==========================")
+    # print(asset.warranty_expiry_date,"==========================")
     # obj['date_format']=format_datetime(x=obj['date_format'],output_format=get_date_format)
-    asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format)
-    asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format)
-    eol_date=format_datetime(x=eol_date, output_format=get_date_format)
+    if get_date_format:
+        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format)
+        asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format)
+        eol_date=format_datetime(x=eol_date, output_format=get_date_format)
     for it in get_data:
         obj={}
         obj['field_name']=it.field_name
