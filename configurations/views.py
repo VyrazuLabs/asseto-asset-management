@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.models import BrandingImages
 from configurations.utils import add_path, create_or_update_image, update_files_name
+from django.contrib import messages
+from configurations.models import BrandingImages,LocalizationConfiguration
+from configurations.utils import add_path, update_files_name
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm
 from .models import TagConfiguration
+from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,DEFAULT_NAME_DISPLAY_FORMAT,DEFAULT_LANGUAGE,DATETIME_CHOICES
 
 @login_required
 def logo_upload(request):
@@ -59,7 +63,7 @@ def create_or_update_tag_configuration(request, id=None):
     # Check if we're editing an existing configuration
     instance = None
     if id:
-        instance = get_object_or_404(TagConfiguration, pk=id, organization=request.user.organization,use_default_settings=True)
+        instance = get_object_or_404(TagConfiguration, pk=id, organization=request.user.organization)
         print("Editing existing configuration:", instance)
     if request.method == 'POST':
         organization = request.user.organization
@@ -115,3 +119,43 @@ def toggle_default_settings(request, id):
     config.use_default_settings = not config.use_default_settings
     config.save()
     return 
+
+def list_localizations(request):
+    configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES})
+
+
+# def get_localization(request):
+#     context = {
+#         'country_choices': COUNTRY_CHOICES
+#     }
+#     return render(request, 'configurations/add.html', context)
+
+def create_localization_configuration(request):
+    if request.method == 'POST':
+        country_format = request.POST.get('country-format')
+        currency_format = request.POST.get('currency-format')
+        name_display_format = request.POST.get('name-format')
+        default_language = request.POST.get('language-format')
+        time_format=request.POST.get('time-format')
+
+        configurations, created = LocalizationConfiguration.objects.get_or_create(
+            organization=request.user.organization,
+            country_format=country_format,
+            currency=currency_format,
+            name_display_format=name_display_format,
+            default_language=default_language,
+            time_format=time_format
+        )
+
+        if not created:
+            configurations.country_format = country_format
+            configurations.currency = currency_format
+            configurations.name_display_format = name_display_format
+            configurations.default_language = default_language
+            configurations.time_format = time_format
+            configurations.save()
+
+        return redirect('configurations:list_localization')
+
+    return redirect('configurations:list_localization')

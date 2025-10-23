@@ -55,7 +55,10 @@
                             
                             <tr>
                                 <th scope="row">Price</th>
-                                <td>{{asset.price}}</td>
+                                {% if asset.price == None %} <td>Not Available</td> 
+                                {% else %}
+                                <td>{{get_currency}} {{asset.price}}</td>
+                                {% endif %}
                                 <th scope="row">Office Location</th>
                                 <td>{{asset.location.address.address_line_one}}</td>
                             </tr>
