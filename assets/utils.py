@@ -116,11 +116,9 @@ def get_asset_filter_data(request):
 #         # Optionally: "channel": "#your-channel", "username": "Notifier"
 #     }
 #     response = requests.post(SLACK_WEBHOOK_URL, json=message)
-#     if response.status_code == 200:
-#         print("Notification sent!")
+#     if response.status_code == 200:         
 #         return HttpResponse("Notification sent!", status=200)
 #     else:
-#         print("Failed:", response.text)
 #         return HttpResponse("Failed to send notification", status=500)
 
 def redirect_from_slack_url(request,obj_id):
@@ -204,7 +202,6 @@ def headers(token):
 def slack_notification(request,text,object,tag):    
     user=request.user
     get_obj=SlackWebhook.objects.filter(user=user).first()
-    print("get_obj",get_obj)
     bot_token=None
     channel_id=None
     if get_obj is not None:
@@ -225,16 +222,11 @@ def slack_notification(request,text,object,tag):
         "channel": channel_id,  # channel_id, not name!
         "text": message
     }
-    print("payload",payload)
-    print("headers",headers)
     response = requests.post(url, headers=headers, json=payload)
-    print("response",response)
     # return resp.json()
     if response.status_code == 200:
-        print("Notification sent!")
         return HttpResponse("Notification sent!", status=200)
     else:
-        print("Failed:", response.text)
         return HttpResponse("Failed to send notification", status=500)
 
 #Make a new slack channelfrom scratch.
@@ -251,10 +243,8 @@ def create_slack_channel(bot_token, channel_name):
     data = response.json()
     if data.get("ok"):
         channel_id = data["channel"]["id"]
-        print(f"Channel {channel_name} created with ID: {channel_id}")
         return channel_id
     else:
-        print(f"Failed to create channel: {data.get('error')}")
         return None
 
 def redirect_from_slack_url(request,obj_id):
