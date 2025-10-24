@@ -47,7 +47,7 @@ def export_product_types_csv(request):
 @login_required
 @permission_required('authentication.add_product_type')
 def import_product_types_csv(request):
-    print(request.method)
+
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
@@ -66,7 +66,6 @@ def import_product_types_csv(request):
             "fields": ["name"]
         })
     else:
-        print("no response")
         return render(request, "upload/upload-csv-modal.html", {"page": "Product Type","hx_target": "#upload-product-types-modal-content"})
 
 
@@ -98,7 +97,6 @@ def product_type_render_to_mapper_model(request):
                 organization=request.user.organization,
             )
             created_product_types.append(product_type)
-            print("names are--------->",product_type_data.get("name"))
 
             imported_user = ImportedUser.objects.create(
                 name=product_type_data.get("name"),
