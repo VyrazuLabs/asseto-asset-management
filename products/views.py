@@ -265,8 +265,7 @@ def update_product(request, id):
                         field_value=val.strip(),
                         entity_type='asset',
                         organization=request.user.organization
-                    )
-                    print("Custom Field added successfully 2")   
+                    )  
         messages.success(request, 'Product updated successfully')
         return redirect(f'/products/details/{product.id}')
 

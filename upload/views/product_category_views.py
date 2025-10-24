@@ -23,7 +23,6 @@ def product_category_list(request):
     paginator = Paginator(product_category_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    print("page_object----------------->",(page_object))
     context = {
         'sidebar': 'upload',
         'submenu': 'product_categories',
@@ -46,7 +45,6 @@ def export_product_categories_csv(request):
 @login_required
 @permission_required('authentication.add_product_category')
 def import_product_catagories_csv(request):
-    print(request.method)
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
@@ -65,7 +63,6 @@ def import_product_catagories_csv(request):
             "fields": ["name"]
         })
     else:
-        print("no response")
         return render(request, "upload/upload-csv-modal.html", {"page": "Product Category","hx_target": "#upload-product-catagories-modal-content"})
 
 
@@ -91,7 +88,6 @@ def product_category_render_to_mapper_model(request):
 
         for _, row in df.iterrows():
             product_category_data = {f: row[c] for f, c in mapping.items() if c in row}
-            print("product_category_data---------->",product_category_data)
             product_type = ProductCategory.objects.create(
                 name=product_category_data.get("name"),
                 organization=request.user.organization,
