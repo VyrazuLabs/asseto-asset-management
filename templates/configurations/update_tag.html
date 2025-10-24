@@ -1,4 +1,13 @@
 {% extends 'layouts/main-layout.html' %}
+<css>
+    .field-error {
+    color: #dc3545; /* Bootstrap .text-danger color */
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: block;
+    }
+
+</css>
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -22,17 +31,18 @@
                         <div class="col-md-6 col-12">
                             <label for="id_prefix">Tag Prefix</label>
                             {{ form.prefix }}
-                            {% for error in form.prefix.errors %}
-                                <small class="text-danger">{{ error }}</small>
+                            <div>{% for error in form.prefix.errors %}
+                                <p><small class="text-danger">{{ error }}</small></p>
+                            </div>
                             {% endfor %}
                         </div>
 
                         <div class="col-md-6 col-12">
                             <label for="id_number_suffix">Tag Suffix</label>
                             {{ form.number_suffix }}
-                            {% for error in form.number_suffix.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
+                            <div>{% for error in form.number_suffix.errors %}
+                                <p><small class="text-danger">{{ error }}</small></p>
+                            </div>
                         </div>
                     </div>
                     <div class="row mt-3">
