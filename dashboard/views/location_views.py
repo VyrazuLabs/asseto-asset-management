@@ -51,7 +51,6 @@ def locations(request):
         .annotate(asset_count=Count("id"))
     )
     location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
-    print("--------------------",len(location_asset_count))
     context = {
         'sidebar': 'admin',
         'submenu': 'location',

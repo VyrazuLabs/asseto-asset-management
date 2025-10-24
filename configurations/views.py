@@ -23,7 +23,6 @@ def logo_upload(request):
 
     else:
         add_path_context=add_path(request.user.organization)
-        print(add_path_context)
         return render(request, 'configurations/logo.html',{'add_path_context':add_path_context})
 
 
@@ -58,13 +57,10 @@ def delete_login_page_logo(request, id):
 @csrf_exempt
 def create_or_update_tag_configuration(request, id=None):
     user_default_settings = request.GET.get('user_default_settings')
-    print("user_default_settings", user_default_settings)
-    print(id)
     # Check if we're editing an existing configuration
     instance = None
     if id:
         instance = get_object_or_404(TagConfiguration, pk=id, organization=request.user.organization)
-        print("Editing existing configuration:", instance)
     if request.method == 'POST':
         organization = request.user.organization
         form = TagConfigurationForm(request.POST, instance=instance)
@@ -73,8 +69,6 @@ def create_or_update_tag_configuration(request, id=None):
             config = form.save(commit=False)
             config.organization = organization
             config.save()
-
-            print("Saved configuration:", config)
             return redirect('configurations:list_tag')
 
         # Invalid form -> show field errors in context
@@ -122,7 +116,27 @@ def toggle_default_settings(request, id):
 
 def list_localizations(request):
     configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES})
+    get_default_language={}
+    get_default_name_display_format={}
+    get_default_time_format={}
+    get_default_currency_format={}
+    get_default_country_format={}
+    for id,name in DEFAULT_LANGUAGE:
+        if id == configurations.default_language:
+            get_default_language= {'name':name,'id':id}
+    for id,name in DEFAULT_NAME_DISPLAY_FORMAT:
+        if id == configurations.name_display_format:
+            get_default_name_display_format= {'name':name,'id':id}
+    for id,name in DATETIME_CHOICES:
+        if id == configurations.time_format:
+            get_default_time_format= {'name':name,'id':id}
+    for id,name in CURRENCY_CHOICES:
+        if id == configurations.time_format:
+            get_default_currency_format= {'name':name,'id':id}
+    for id,name in COUNTRY_CHOICES:
+        if id == configurations.time_format:
+            get_default_country_format= {'name':name,'id':id}
+    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
 
 
 # def get_localization(request):
