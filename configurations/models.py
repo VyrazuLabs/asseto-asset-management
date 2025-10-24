@@ -24,3 +24,17 @@ class TagConfiguration(models.Model):
 
     def __str__(self):
         return f"{self.organization.name} - {self.prefix}"
+    
+class LocalizationConfiguration(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    date_format = models.IntegerField( blank=True, null=True)
+    time_format = models.IntegerField( blank=True, null=True)
+    timezone = models.IntegerField( blank=True, null=True)
+    currency = models.IntegerField( blank=True, null=True)
+    name_display_format = models.IntegerField( blank=True, null=True)
+    country_format = models.IntegerField( blank=True, null=True)
+    default_language=models.IntegerField( blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.organization.name} - Localization Settings"

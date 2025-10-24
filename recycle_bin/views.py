@@ -511,7 +511,6 @@ def deleted_product_categories_permanently(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 ProductCategory.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.delete()
             messages.success(request, 'Product Category deleted permanently')
 
@@ -534,8 +533,7 @@ def deleted_product_categories_restore(request, id):
 
         if request.method == 'POST':
             product = get_object_or_404(
-                ProductCategory.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
+                ProductCategory.deleted_objects, pk=id, organization=request.user.organization)            
             product.restore()
             history_id = product.history.first().history_id
             product.history.filter(pk=history_id).update(history_type='^')
@@ -593,7 +591,6 @@ def deleted_product_types_permanently(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 ProductType.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.delete()
             messages.success(request, 'Product Type deleted permanently')
 
@@ -617,7 +614,6 @@ def deleted_product_types_restore(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 ProductType.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.restore()
             history_id = product.history.first().history_id
             product.history.filter(pk=history_id).update(history_type='^')
@@ -676,7 +672,6 @@ def deleted_asset_status_permanently(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.delete()
             messages.success(request, 'Asset Status  deleted permanently')
 
@@ -700,7 +695,6 @@ def deleted_asset_status_restore(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.restore()
             history_id = product.history.first().history_id
             product.history.filter(pk=history_id).update(history_type='^')
@@ -760,7 +754,6 @@ def deleted_roles_permanently(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.delete()
             messages.success(request, 'Asset Status  deleted permanently')
 
@@ -784,7 +777,6 @@ def deleted_roles_status_restore(request, id):
         if request.method == 'POST':
             product = get_object_or_404(
                 AssetStatus.deleted_objects, pk=id, organization=request.user.organization)
-            print(product)
             product.restore()
             history_id = product.history.first().history_id
             product.history.filter(pk=history_id).update(history_type='^')
