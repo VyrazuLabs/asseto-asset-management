@@ -64,11 +64,16 @@
                             </tr>
                             <tr>
                                 <th scope="row">Purchase Date</th>
+                                {% if asset.purchase_date == None %} <td>Not Available</td> 
+                                {% else %}
                                 <td>{{asset.purchase_date}}</td>
+                                {% endif %}
                                 <th scope="row">Warranty Expiry Date</th>
+                                {% if asset.warranty_expiry_date == None %} <td>Not Available</td> 
+                                {% else %}
                                 <td>{{asset.warranty_expiry_date}}</td>
+                                {% endif %}
                             </tr>
-                            
                             <tr>
                                 <th scope="row">End of Life</th>
                                 <td>{{eol_date}}</td>
