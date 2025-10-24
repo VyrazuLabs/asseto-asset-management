@@ -46,9 +46,7 @@ def export_users_csv(request):
 @login_required
 @permission_required('authentication.add_user')
 def import_user_csv(request):
-    print("the form method is ",request.method)
     if request.method=="POST":
-        print("i'm inside post")
         file=request.FILES.get("file")
         file_name=default_storage.save(f"temp/{file.name}",file)
         file_path=os.path.join(settings.MEDIA_ROOT,file_name)
@@ -62,8 +60,7 @@ def import_user_csv(request):
         }
         return render(request,'upload/map-user-modal.html',context)
     else:
-        print("not inside post of user")
-    return render(request,"upload/upload-csv-modal.html",{'page':'Users',"hx_target": "#mapping-users-modal-content"})
+        return render(request,"upload/upload-csv-modal.html",{'page':'Users',"hx_target": "#mapping-users-modal-content"})
 
 @login_required
 @permission_required('authentication.add_user')
