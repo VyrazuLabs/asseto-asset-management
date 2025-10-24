@@ -95,7 +95,6 @@ def create_or_update_image(request,logo, favicon, login_page_logo,file_dist,orga
                     messages.success(request,"Upload sucessfully")
 
     except Exception as e:
-        print('error is----->,',str(e))
         messages.error(request,"Upload did not happen")
 
 
@@ -122,7 +121,6 @@ def generate_asset_tag(prefix, number_suffix):
             next_num = start_num
     else:
         next_num = start_num
-        print("No existing tags found with the given prefix.")
 
     # Format number with leading zeros to match size of input number_suffix
     number_str = str(next_num).zfill(size)
@@ -131,7 +129,6 @@ def generate_asset_tag(prefix, number_suffix):
 
 def get_currency_and_datetime_format(organization):
     getLocalization=LocalizationConfiguration.objects.filter(organization=organization).first()
-    print("getLocalization", getLocalization)
     if getLocalization:
         get_currency=getLocalization.currency   #we get the currency no.
         get_time=getLocalization.time_format    #we get the time no.
@@ -150,7 +147,6 @@ def get_currency_and_datetime_format(organization):
             break
     # new_date_format=format_datetime(output_format=date_format)
     obj={'currency':currency_format,'date_format':date_format}
-    print(obj,"obj in utils-----------------------------")
     return obj
     # return organization.currency, organization.date_format
 

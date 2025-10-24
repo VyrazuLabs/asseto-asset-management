@@ -45,7 +45,6 @@ def export_locations_csv(request):
 @login_required
 @permission_required('authentication.add_location')
 def import_locations_csv(request):
-    print(request.method)
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
@@ -79,24 +78,19 @@ def location_render_to_mapper_modal(request):
             return redirect("upload:location_list")
 
         df = pd.read_csv(file_path,encoding="utf-8-sig")
-        print("df----->",df)
         mapping = {}
         locations_fields = [
             'Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
             'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country'
         ]
         for field in locations_fields:
-            print("fields are--->",field)
             selected = request.POST.get(f"mapping_{field}")
-            print("selected",selected)
             if selected:
                 mapping[field] = selected
         created_location = []
         created_imported_users = []
-        print('mapping are------>',mapping)
         for _, row in df.iterrows():
             location_data = {f: row[c] for f, c in mapping.items() if c in row}
-            print(location_data)
             address = Address.objects.create(
                 address_line_one=location_data.get("Address Line One"),
                 address_line_two=location_data.get("Address Line Two"),

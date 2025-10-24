@@ -17,7 +17,7 @@ COUNTRY_CHOICES = [
 
 DEFAULT_LANGUAGE=[
     (1, 'English'),
-    (2, 'Spanish'),
+    (2, 'Espaniol'),
     (3, 'French'),
     (4, 'German'),
     (5, 'Italian'),
