@@ -34,6 +34,7 @@ from .barcode import generate_barcode
 from configurations.models import TagConfiguration
 from configurations.utils import get_currency_and_datetime_format,format_datetime
 
+
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
     args = [iter(iterable)] * n
