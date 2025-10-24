@@ -121,21 +121,24 @@ def list_localizations(request):
     get_default_time_format={}
     get_default_currency_format={}
     get_default_country_format={}
-    for id,name in DEFAULT_LANGUAGE:
-        if id == configurations.default_language:
-            get_default_language= {'name':name,'id':id}
-    for id,name in DEFAULT_NAME_DISPLAY_FORMAT:
-        if id == configurations.name_display_format:
-            get_default_name_display_format= {'name':name,'id':id}
-    for id,name in DATETIME_CHOICES:
-        if id == configurations.time_format:
-            get_default_time_format= {'name':name,'id':id}
-    for id,name in CURRENCY_CHOICES:
-        if id == configurations.time_format:
-            get_default_currency_format= {'name':name,'id':id}
-    for id,name in COUNTRY_CHOICES:
-        if id == configurations.time_format:
-            get_default_country_format= {'name':name,'id':id}
+    if configurations:
+        for id,name in DEFAULT_LANGUAGE:
+            if id == configurations.default_language:
+                get_default_language= {'name':name,'id':id}
+        for id,name in DEFAULT_NAME_DISPLAY_FORMAT:
+            if id == configurations.name_display_format:
+                get_default_name_display_format= {'name':name,'id':id}
+        for id,name in DATETIME_CHOICES:
+            if id == configurations.time_format:
+                get_default_time_format= {'name':name,'id':id}
+        for id,name in CURRENCY_CHOICES:
+            if id == configurations.time_format:
+                get_default_currency_format= {'name':name,'id':id}
+        for id,name in COUNTRY_CHOICES:
+            if id == configurations.time_format:
+                get_default_country_format= {'name':name,'id':id}
+    else:
+        configurations=None
     return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
 
 
