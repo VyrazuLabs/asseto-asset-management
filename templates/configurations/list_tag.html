@@ -17,7 +17,7 @@
                 {% if configurations %}
                     <a href="{% url 'configurations:update_tag_configuration' configurations.id %}" class="btn btn-sm btn-outline-info my-3 me-2">Update Tag</a>
                 {% else %}
-                    <a href="{% url 'configurations:update_tag_configuration_without_id' %}" class="btn btn-sm btn-outline-info my-3 me-2">Add Tag</a>
+                    <a href="{% url 'configurations:update_tag_configuration_without_id' %}" class="btn btn-sm btn-outline-info my-3 me-2">Tag Configuration</a>
                 {% endif %}
             </div>
         </div>
