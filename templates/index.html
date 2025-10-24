@@ -267,8 +267,10 @@
                                 </div>
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Total Asset Cost</h6>
-                                    {% if all_asset_cost %}
-                                       <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                    {% if all_asset_cost and currency %}
+                                       <h6 class="font-extrabold mb-0">{{currency}} {{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                    {% elif all_asset_cost %}
+                                        <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
                                     {% else %}
                                        <h6 class="font-extrabold mb-0">0</h6>
                                     {% endif %}
@@ -396,7 +398,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{vendor.created_at.date}}
+                                                        {{vendor.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -439,7 +441,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{product.created_at.date}}
+                                                        {{product.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -481,7 +483,7 @@
                                                 </td>                                
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{location.created_at.date}}
+                                                        {{location.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -524,7 +526,7 @@
                                             </td>
                                             <td class="col-auto">
                                                 <p class="mb-0">
-                                                    {{users.created_at.date}}
+                                                    {{users.created_at}}
                                                 </p>
                                             </td>
                                         </tr>
