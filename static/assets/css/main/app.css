@@ -20613,5 +20613,21 @@ body[data-theme="dark"] {
   }
 }
 
+.intro-btn{
+  width: 60%;
+    font-weight: 600;
+    font-size: x-large;
+    background-color: #0dcaf0 !important;
+    color: #25396f !important;
+}
 
-
+.spinner-div{
+  display:none !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  z-index: 9999 !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-direction: column !important;
+}
