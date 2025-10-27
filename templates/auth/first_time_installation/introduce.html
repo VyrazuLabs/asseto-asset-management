@@ -1,40 +1,14 @@
-{% extends 'layouts/auth-layout.html' %}
-{% load static %}
-{% block title %}Login{% endblock title %}
+{% extends 'commons/first_time_installation.html' %}
+{% block title %}Register{% endblock title %}
 {% block content %}
-
-            <h1 class="title">Log In</h1>
-            <p class="subtitle mb-5">Log in with your data that you entered during registration.</p>
-
-            <form action="{% url 'authentication:login' %}?next={{request.GET.next}}" method="post" novalidate>
-                {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-                
-                {% csrf_token %}
-                <div class="form-group position-relative has-icon-left mb-3">
-                    {{form.email}}
-                    <div class="form-control-icon">
-                        <i class="bi bi-envelope"></i>
-                    </div>
+{% load static %}
+            <div class="d-flex align-items-center" style="padding-top: 18rem;">
+                <h1>Welcome to</h1>
+                <div class="mt-2" style="flex: 1;">
+                    <a href="/"><img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
                 </div>
-                {% for error in form.email.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
-                <div class="form-group position-relative has-icon-left mb-3">
-                    {{form.password}}
-                    <div class="form-control-icon">
-                        <i class="bi bi-shield-lock"></i>
-                    </div>
-                </div>
-                {% for error in form.password.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Log in</button>
-            </form>
-            <p><a class="font-bold" href="{% url 'password_reset' %}">Forgot password?</a></p>
+            </div>
+            <a class="btn intro-btn mt-4" href="{% url 'authentication:db_configure' %}" role="button">Continue</a>
         </div>
     </div>
     <div class="col-lg-6 d-none d-lg-block">
