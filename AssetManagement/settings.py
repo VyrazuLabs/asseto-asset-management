@@ -11,18 +11,21 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from ctypes import cast
+import json
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 from decouple import config 
 # import pysqlite3 as sqlite3
 import pymysql
+from django.db import connection
 pymysql.install_as_MySQLdb()
-
+from django.db.utils import OperationalError
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv()
+load_dotenv(BASE_DIR / '.env')
+
 LOGIN_REDIRECT_URL = '/'
 
 
@@ -60,7 +63,6 @@ INSTALLED_APPS = [
     'recycle_bin',
     'upload',
     'error_handlers',
-
     'smart_selects',
     'roles',
     'users',
@@ -71,6 +73,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "authentication.middleware.DBConnectionMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,7 +88,34 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'AssetManagement.urls'
 
-TEMPLATES = [
+WSGI_APPLICATION = 'AssetManagement.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+if not os.environ.get('DB_NAME'):
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [BASE_DIR / 'templates'],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
+else:
+    TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
