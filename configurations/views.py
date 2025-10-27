@@ -113,9 +113,9 @@ def toggle_default_settings(request, id):
     config.use_default_settings = not config.use_default_settings
     config.save()
     return 
-
+@login_required
 def list_localizations(request):
-    configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).last()
     get_default_language={}
     get_default_name_display_format={}
     get_default_time_format={}
