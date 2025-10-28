@@ -1,3 +1,4 @@
+from socket import create_connection
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
@@ -15,6 +16,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
+from authentication.utils import create_db_connection
 from dashboard.forms import LocationForm, AddressForm
 from dashboard.models import Location, Address,ProductType,ProductCategory
 from django.contrib.auth import get_user_model
@@ -30,8 +32,38 @@ from dashboard.views.seeders import seed_parent_category
 from django.db.models import Q
 from configurations.utils import get_currency_and_datetime_format
 from configurations.utils import format_datetime
+from django.contrib import messages
+from .constant import db_engines
 User = get_user_model()
 
+
+
+
+def introduce(request):
+    return render(request,'auth/first_time_installation/introduce.html')
+
+def db_configure(request):
+    if request.method=="POST":
+        db_type=request.POST.get('database')
+        db_engine=db_engines.get(db_type)
+
+        db_data={
+            'DB_ENGINE':db_engine,
+            'DB_NAME':request.POST.get('db_name'),
+            'DB_USER':request.POST.get('user_name'),
+            'DB_PASSWORD':request.POST.get('password'),
+            'DB_HOST':request.POST.get('host_name'),
+            'DB_PORT':request.POST.get('port')
+        }
+
+        if create_db_connection(request,db_data):
+            messages.success(request, "Database configured successfully!")
+            return redirect('authentication:register')
+        else:
+            messages.error(request, "Database connection failed. Please check your credentials.")
+            return render(request, 'auth/first_time_installation/db_configure.html')
+        
+    return render(request,'auth/first_time_installation/db_configure.html')
 
 @login_required
 def index(request):
