@@ -1,40 +1,50 @@
-{% extends 'layouts/auth-layout.html' %}
-{% load static %}
-{% block title %}Login{% endblock title %}
+{% extends 'commons/first_time_installation.html' %}
+{% block title %}Register{% endblock title %}
 {% block content %}
 
-            <h1 class="title">Log In</h1>
-            <p class="subtitle mb-5">Log in with your data that you entered during registration.</p>
-
-            <form action="{% url 'authentication:login' %}?next={{request.GET.next}}" method="post" novalidate>
+            <h4 class="title">Setup the Data Base</h4>
+            <form method="post">
+                
                 {% if messages %}
                     {% for message in messages %}
                     <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
-                
+
                 {% csrf_token %}
                 <div class="form-group position-relative has-icon-left mb-3">
-                    {{form.email}}
-                    <div class="form-control-icon">
-                        <i class="bi bi-envelope"></i>
-                    </div>
+                    <select class="form-select form-select-lg mb-3 form-control-xl" aria-label="Large select example" name="database" required>
+                        <option selected disabledv alue="">Choose Data Bsse</option>
+                        <option value="1">MySQL</option>
+                        <option value="2">PostgreSQL</option>
+                    </select>
                 </div>
-                {% for error in form.email.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
+
                 <div class="form-group position-relative has-icon-left mb-3">
-                    {{form.password}}
-                    <div class="form-control-icon">
-                        <i class="bi bi-shield-lock"></i>
-                    </div>
+                    <input type="text" class="form-control form-control-xl" name="db_name" placeholder="Data Base Name" required>
                 </div>
-                {% for error in form.password.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Log in</button>
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <input type="text" class="form-control form-control-xl" name="user_name"  placeholder="User Name" required>
+                </div>
+
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <input type="password" class="form-control form-control-xl" name="password"  placeholder="Password" required>
+                </div>
+                            
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <input type="text" class="form-control form-control-xl" name="host_name"  placeholder="Host" required>
+                </div>
+                        
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <input type="text" class="form-control form-control-xl" name="port"  placeholder="Port Number" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Continue</button>
             </form>
-            <p><a class="font-bold" href="{% url 'password_reset' %}">Forgot password?</a></p>
+            <div id="loader" class="spinner-div">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+                <p class="mt-3 text-dark fw-bold">Configuring database... Please wait</p>
+            </div>
         </div>
     </div>
     <div class="col-lg-6 d-none d-lg-block">
