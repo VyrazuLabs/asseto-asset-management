@@ -84,9 +84,6 @@
                             <select name="country-format" class="form-control w-50">
                                 {% if get_default_country_format %}
                                     <option value="{{ get_default_country_format.id }}">{{ get_default_country_format.name }}</option>
-                                    {% for code, name in country_choices %}
-                                    <option value="{{ code }}">{{ name }}</option>
-                                    {% endfor %}
                                 {% endif %}
                                 {% for code, name in country_choices %}
                                     <option value="{{ code }}">{{ name }}</option>
@@ -95,9 +92,6 @@
                             <select name="currency-format" class="form-control w-50">
                                 {% if get_default_currency_format %}
                                     <option value="{{ get_default_currency_format.id }}">{{ get_default_currency_format.name }} 1234.55</option>
-                                    {% for code, name in currency_choices %}
-                                    <option value="{{ code }}">{{ name }} 1234.55</option>
-                                    {% endfor %}
                                 {% endif %}
                                 {% for code, name in currency_choices %}
                                     <option value="{{ code }}">{{ name }} 1234.55</option>
@@ -115,4 +109,3 @@
     </section>
 </div>
 {% endblock %}
-
