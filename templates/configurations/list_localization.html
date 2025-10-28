@@ -38,7 +38,9 @@
                             <p style="margin-right: 150px;"><b>Default Language</b></p>
                             <select name="language-format" class="form-control w-100 w-2" style="margin-right: 20px;">
                                 {% if get_default_language %}
-                                    <option value="{{ get_default_language.id }}">{{ get_default_language.name }}</option>
+                                    <option value="" disabled selected>
+                                        {{ get_default_language.name }}
+                                    </option>
                                     {% for code, name in default_language %}
                                         <option value="{{ code }}">{{ name }}</option>
                                     {% endfor %}
@@ -53,7 +55,9 @@
                             <p style="margin-right: 130px;"><b>Name Display Format</b></p>
                             <select name="name-format" class="form-control w-100" style="margin-right: 20px;">
                                 {% if get_default_name_display_format %}
-                                    <option value="{{ get_default_name_display_format.id }}">{{ get_default_name_display_format.name }}</option>
+                                    <option value="" disabled selected>
+                                        {{ get_default_name_display_format.name }}
+                                    </option>
                                         {% for code, name in name_display_format %}
                                             <option value="{{ code }}">{{ name }}</option>
                                         {% endfor %}
@@ -68,7 +72,9 @@
                             <p style="margin-right: 120px;"><b>Time And Date Display</b></p>
                             <select name="time-format" class="form-control w-100 w-2" style="margin-right: 20px;">
                                 {% if get_default_time_format %}
-                                    <option value="{{ get_default_time_format.id }}">{{ get_default_time_format.name }}</option>
+                                    <option value="" disabled selected>
+                                        {{ get_default_time_format.name }}
+                                    </option>
                                             {% for code, name in datetime_choices %}
                                                 <option value="{{ code }}">{{ name }}</option>
                                             {% endfor %}
@@ -81,17 +87,19 @@
                         </div>
                         <div class="btn-group  mt-4 d-flex gap-5" style="padding-right: 40px;">
                             <p style="margin-right: 120px;"><b>Default Currency</b></p>
-                            <select name="country-format" class="form-control w-50">
-                                {% if get_default_country_format %}
-                                    <option value="{{ get_default_country_format.id }}">{{ get_default_country_format.name }}</option>
-                                {% endif %}
+                            <select name="country-format" class="form-control w-50" placeholder="{{ get_default_country_format}}" style="margin-right: 20px;">
+                                <option value="" disabled selected>
+                                    {{ get_default_country_format.name }}
+                                </option>
                                 {% for code, name in country_choices %}
                                     <option value="{{ code }}">{{ name }}</option>
                                 {% endfor %}
                             </select>
                             <select name="currency-format" class="form-control w-50">
                                 {% if get_default_currency_format %}
-                                    <option value="{{ get_default_currency_format.id }}">{{ get_default_currency_format.name }} 1234.55</option>
+                                    <option value="" disabled selected>
+                                    {{ get_default_currency_format.name }} 1234.55
+                                </option>
                                 {% endif %}
                                 {% for code, name in currency_choices %}
                                     <option value="{{ code }}">{{ name }} 1234.55</option>
