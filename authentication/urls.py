@@ -5,6 +5,8 @@ from django.contrib.auth import views as auth_views
 app_name = 'authentication'
 
 urlpatterns = [
+    path('introduce/', views.introduce, name = 'introduce'),
+    path('data-base-configure/',views.db_configure, name="db_configure"),
     path('', views.index, name = 'index'),
     path('login', views.user_login, name = 'login'),
     path('register', views.user_register, name = 'register'),
