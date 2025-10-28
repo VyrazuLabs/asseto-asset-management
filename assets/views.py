@@ -313,9 +313,9 @@ def details(request, id):
     get_date_format=obj['date_format']
     # obj['date_format']=format_datetime(x=obj['date_format'],output_format=get_date_format)
     if get_date_format:
-        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format)
-        asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format)
-        eol_date=format_datetime(x=eol_date, output_format=get_date_format)
+        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format) if asset.warranty_expiry_date is not None else ""
+        asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format) if asset.purchase_date is not None else ""
+        eol_date=format_datetime(x=eol_date, output_format=get_date_format) if eol_date is not None else ""
     for it in get_data:
         obj={}
         obj['field_name']=it.field_name
@@ -337,7 +337,7 @@ def details(request, id):
 #     image_form = AssetImageForm(request.POST or None, request.FILES)
 #     if request.method == "POST":
 
-#         if form.is_valid():
+#         if form.is_valid():No d
 
 #             assetSpecifications.delete()
 

@@ -81,6 +81,12 @@ def index(request):
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
     obj=get_currency_and_datetime_format(request.user.organization)
+    for it in expiring_assets:
+        if not obj['date_format']:
+            it.warranty_expiry_date=it.warranty_expiry_date.date()
+        if obj['date_format']:
+            it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
+        # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
     for it in latest_vendor_list:
         if not obj['date_format']:
             it.created_at=it.created_at.date
