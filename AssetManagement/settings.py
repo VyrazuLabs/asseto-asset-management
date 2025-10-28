@@ -10,21 +10,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from ctypes import cast
-import json
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 from decouple import config 
 # import pysqlite3 as sqlite3
 import pymysql
-from django.db import connection
 pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / '.env', override=True)
+# os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -98,7 +96,9 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-if not os.environ.get('DB_NAME'):
+
+try:
+    os.environ['DB_ENGINE']
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -110,11 +110,14 @@ if not os.environ.get('DB_NAME'):
                     'django.template.context_processors.request',
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
+                    'configurations.context_processors.sidebar_logo',
+                    'configurations.context_processors.favicon_image',
+                    'configurations.context_processors.login_page_logo'
                 ],
             },
         },
     ]
-else:
+except Exception:
     TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -125,10 +128,7 @@ else:
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'configurations.context_processors.sidebar_logo',
-                'configurations.context_processors.favicon_image',
-                'configurations.context_processors.login_page_logo'
+                'django.contrib.messages.context_processors.messages'
             ],
         },
     },
@@ -144,8 +144,8 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME':  os.environ.get('DB_DATABASE'),
-        'USER':  os.environ.get('DB_USERNAME'),
+        'NAME':  os.environ.get('DB_NAME'),
+        'USER':  os.environ.get('DB_USER'),
         'PASSWORD':  os.environ.get('DB_PASSWORD'),
         'HOST':  os.environ.get('DB_HOST'),
         'PORT':  os.environ.get('DB_PORT'),
