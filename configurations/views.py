@@ -132,11 +132,12 @@ def list_localizations(request):
             if id == configurations.time_format:
                 get_default_time_format= {'name':name,'id':id}
         for id,name in CURRENCY_CHOICES:
-            if id == configurations.time_format:
+            if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
         for id,name in COUNTRY_CHOICES:
-            if id == configurations.time_format:
+            if id == configurations.country_format:
                 get_default_country_format= {'name':name,'id':id}
+                print(get_default_country_format)
     else:
         get_default_language=None
         get_default_name_display_format=None
@@ -158,7 +159,7 @@ def create_localization_configuration(request):
         name_display_format = request.POST.get('name-format')
         default_language = request.POST.get('language-format')
         time_format = request.POST.get('time-format')
-
+        print(country_format,currency_format,name_display_format,default_language,time_format,'-----------------')
         # Use update_or_create for atomic upsert operation
         LocalizationConfiguration.objects.update_or_create(
             organization=request.user.organization,
