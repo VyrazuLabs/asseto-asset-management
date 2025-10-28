@@ -115,7 +115,7 @@ def toggle_default_settings(request, id):
     return 
 @login_required
 def list_localizations(request):
-    configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).last()
+    configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     get_default_language={}
     get_default_name_display_format={}
     get_default_time_format={}
@@ -132,15 +132,19 @@ def list_localizations(request):
             if id == configurations.time_format:
                 get_default_time_format= {'name':name,'id':id}
         for id,name in CURRENCY_CHOICES:
-            if id == configurations.time_format:
+            if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
         for id,name in COUNTRY_CHOICES:
-            if id == configurations.time_format:
+            if id == configurations.country_format:
                 get_default_country_format= {'name':name,'id':id}
+                print(get_default_country_format)
     else:
-        configurations=None
+        get_default_language=None
+        get_default_name_display_format=None
+        get_default_time_format=None
+        get_default_currency_format=None
+        get_default_country_format=None
     return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
-
 
 # def get_localization(request):
 #     context = {
@@ -154,24 +158,19 @@ def create_localization_configuration(request):
         currency_format = request.POST.get('currency-format')
         name_display_format = request.POST.get('name-format')
         default_language = request.POST.get('language-format')
-        time_format=request.POST.get('time-format')
-
-        configurations, created = LocalizationConfiguration.objects.get_or_create(
+        time_format = request.POST.get('time-format')
+        print(country_format,currency_format,name_display_format,default_language,time_format,'-----------------')
+        # Use update_or_create for atomic upsert operation
+        LocalizationConfiguration.objects.update_or_create(
             organization=request.user.organization,
-            country_format=country_format,
-            currency=currency_format,
-            name_display_format=name_display_format,
-            default_language=default_language,
-            time_format=time_format
+            defaults={
+                'country_format': country_format,
+                'currency': currency_format,
+                'name_display_format': name_display_format,
+                'default_language': default_language,
+                'time_format': time_format,
+            }
         )
-
-        if not created:
-            configurations.country_format = country_format
-            configurations.currency = currency_format
-            configurations.name_display_format = name_display_format
-            configurations.default_language = default_language
-            configurations.time_format = time_format
-            configurations.save()
 
         return redirect('configurations:list_localization')
 
