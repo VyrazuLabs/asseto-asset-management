@@ -2,7 +2,6 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.utils import OperationalError, ConnectionDoesNotExist
-from django.conf import settings
 
 class DBConnectionMiddleware:
     def __init__(self, get_response):
