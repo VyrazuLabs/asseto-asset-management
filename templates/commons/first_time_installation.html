@@ -17,15 +17,59 @@
   <body>
     <div id="auth">
       <div class="row h-100">
-        <div class="col-lg-6 col-12">
+        <div class="col-lg-6 col-12" style="position: relative;">
             <div id="auth-left">
         {% block content %}
         {% endblock %}
     </div>
 
 <script>
-document.getElementById("dbForm").addEventListener("submit", function() {
-    document.getElementById("loader").style.display = "flex";
+    document.addEventListener("DOMContentLoaded", () => {
+        console.log("Progress bar script loaded");
+        const container = document.getElementById("progress-bar");
+        const currentStep = parseInt(container.dataset.step);
+        const steps = container.querySelectorAll(".step");
+        const progressLine = container.querySelector(".progress-line");
+
+        // mark completed/active steps
+        steps.forEach(step => {
+        const stepNum = parseInt(step.dataset.step);
+        if (stepNum < currentStep) step.classList.add("completed");
+        if (stepNum === currentStep) step.classList.add("active");
+        });
+
+        // animate progress line
+        console.log("Current Step:", currentStep);
+        const percent = ((currentStep - 1) / (steps.length - 1)) * 100;
+        requestAnimationFrame(() => {
+        progressLine.style.width = percent + "%";
+        });
+    });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dbSelect = document.querySelector("select[name='database']");
+    const hostInput = document.querySelector("input[name='host_name']");
+    const portInput = document.querySelector("input[name='port']");
+
+    // Default values for each DB type
+    const defaults = {
+        "1": { host: "localhost", port: "3306" }, // MySQL
+        "2": { host: "localhost", port: "5432" }  // PostgreSQL
+    };
+
+    dbSelect.addEventListener("change", function () {
+        const selected = this.value;
+        if (defaults[selected]) {
+            hostInput.value = defaults[selected].host;
+            portInput.value = defaults[selected].port;
+        }
+    });
+
+    // Allow users to clear or edit values
+    hostInput.addEventListener("input", () => {});
+    portInput.addEventListener("input", () => {});
 });
 </script>
 
