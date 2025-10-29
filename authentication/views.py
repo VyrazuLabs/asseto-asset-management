@@ -40,7 +40,7 @@ User = get_user_model()
 
 
 def introduce(request):
-    return render(request,'auth/first_time_installation/introduce.html')
+    return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})
 
 def db_configure(request):
     if request.method=="POST":
@@ -50,7 +50,7 @@ def db_configure(request):
         db_data={
             'DB_ENGINE':db_engine,
             'DB_NAME':request.POST.get('db_name'),
-            'DB_USER':request.POST.get('user_name'),
+            'DB_USERNAME':request.POST.get('user_name'),
             'DB_PASSWORD':request.POST.get('password'),
             'DB_HOST':request.POST.get('host_name'),
             'DB_PORT':request.POST.get('port')
@@ -63,7 +63,7 @@ def db_configure(request):
             messages.error(request, "Database connection failed. Please check your credentials.")
             return render(request, 'auth/first_time_installation/db_configure.html')
         
-    return render(request,'auth/first_time_installation/db_configure.html')
+    return render(request,'auth/first_time_installation/db_configure.html',context={'current_step':2})
 
 @login_required
 def index(request):
@@ -203,34 +203,40 @@ def user_login(request):
                 return redirect('/')
             else:
                 messages.error(request, 'Invalid credentials!')
-    return render(request, 'auth/login.html', context={'form': form})
+    last_logins=User.objects.values_list('last_login',flat=True)
+    print(last_logins)
+
+
+    return render(request, 'auth/login.html', context={'form': form,'current_step':4,'last_logins':last_logins})
 
 
 
 @unauthenticated_user
-def user_register(request):
-
+def user_register(request):    
     u_form = UserRegisterForm()
     o_form = OrganizationForm()
     if request.method == "POST":
-        o_form = OrganizationForm(request.POST)
-        u_form = UserRegisterForm(request.POST)
-        if o_form.is_valid() and u_form.is_valid():
-            organization = o_form.save()
-            user = u_form.save(commit=False)
-            user.organization = organization
-            user.is_active = True
-            user.is_superuser = True
-            user.access_level = True
-            user.is_active = True
-            user.save()
-
-            messages.success(
-                request, f'Account for {user.full_name} created successfully. Please verify your email to continue.')
-            return redirect('authentication:login')
+        if User.objects.filter(is_superuser=True).first():
+            messages.error(request,'You are already registered')
         else:
-            messages.error(request, 'Please correct the below errors.')
-    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form})
+            o_form = OrganizationForm(request.POST)
+            u_form = UserRegisterForm(request.POST)
+            if o_form.is_valid() and u_form.is_valid():
+                organization = o_form.save()
+                user = u_form.save(commit=False)
+                user.organization = organization
+                user.is_active = True
+                user.is_superuser = True
+                user.access_level = True
+                user.is_active = True
+                user.save()
+
+                messages.success(
+                    request, f'Account for {user.full_name} created successfully.')
+                return redirect('authentication:login')
+            else:
+                messages.error(request, 'Please correct the below errors.')
+    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form,'current_step':3})
 
 
 @unauthenticated_user
