@@ -3,6 +3,10 @@
 {% block title %}Login{% endblock title %}
 {% block content %}
 
+            {% if not last_logins %}   
+                {% include 'commons/progress-bar.html' with current_step=4 %}
+            {% endif %}
+
             <h1 class="title">Log In</h1>
             <p class="subtitle mb-5">Log in with your data that you entered during registration.</p>
 

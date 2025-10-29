@@ -32,5 +32,27 @@
         {% endblock %}
     </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+      console.log("Progress bar script loaded");
+      const container = document.getElementById("progress-bar");
+      const currentStep = parseInt(container.dataset.step);
+      const steps = container.querySelectorAll(".step");
+      const progressLine = container.querySelector(".progress-line");
 
+      // mark completed/active steps
+      steps.forEach(step => {
+      const stepNum = parseInt(step.dataset.step);
+      if (stepNum < currentStep) step.classList.add("completed");
+      if (stepNum === currentStep) step.classList.add("active");
+      });
+
+      // animate progress line
+      console.log("Current Step:", currentStep);
+      const percent = ((currentStep - 1) / (steps.length - 1)) * 100;
+      requestAnimationFrame(() => {
+      progressLine.style.width = percent + "%";
+      });
+  });
+</script>
 </html>

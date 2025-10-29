@@ -2,14 +2,22 @@
 {% block title %}Register{% endblock title %}
 {% block content %}
 {% load static %}
-            <div class="d-flex align-items-center" style="padding-top: 18rem;">
-                <h1>Welcome to</h1>
-                <div class="mt-2" style="flex: 1;">
+            <div class="text-center" style="margin-top:52px;">
+                <div>
                     <a href="/"><img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
                 </div>
+
+                {% include 'commons/progress-bar.html' with current_step=1 %}
             </div>
-            <a class="btn intro-btn mt-4" href="{% url 'authentication:db_configure' %}" role="button">Continue</a>
+            <div class="text-center responsive-text">
+                <p>Thank you for choosing <b>Assetto</b>, the open-source asset management application.
+                    To get started, please continue with the installation process to unlock all the features and start managing your assets effectively.</p>
+            </div>
+            <div class="text-center" style="margin-top:80px;">
+            <a class="btn intro-btn mt-4" href="{% url 'authentication:db_configure' %}" role="button">Continue Installation</a>
+            </div>
         </div>
+        <p class="company-name" style="position: absolute; bottom: 0;">Powered by <a href="https://vyrazu.com/">Vyrazu Labs</a></p>
     </div>
     <div class="col-lg-6 d-none d-lg-block">
         <div id="auth-right">
