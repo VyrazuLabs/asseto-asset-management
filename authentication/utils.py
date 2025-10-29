@@ -21,7 +21,7 @@ def create_db_connection(request, db_data):
         "default": {
             "ENGINE": os.environ.get("DB_ENGINE"),
             "NAME": os.environ.get("DB_NAME"),
-            "USER": os.environ.get("DB_USER"),
+            "USER": os.environ.get("DB_USERNAME"),
             "PASSWORD": os.environ.get("DB_PASSWORD"),
             "HOST": os.environ.get("DB_HOST"),
             "PORT": os.environ.get("DB_PORT"),
@@ -29,7 +29,6 @@ def create_db_connection(request, db_data):
         }
     }
 
-    print("✅ New config ready:", new_config)
 
     # Step 4: Replace settings.DATABASES completely
     settings.DATABASES = new_config
@@ -44,13 +43,11 @@ def create_db_connection(request, db_data):
     try:
         conn = new_connections["default"]
         conn.ensure_connection()
-        print("✅ Database connection successful!")
 
         # Step 8: Apply migrations
         call_command("migrate", interactive=False, verbosity=1)
-        print("✅ Migrations completed!")
         return True
 
     except Exception as e:
-        print("❌ Database connection failed:", e)
+        print("Database connection failed:", e)
         return False
