@@ -16,6 +16,9 @@ from assets.models import AssetImage
 from assets.models import Asset
 from django.views.decorators.csrf import csrf_exempt
 from datetime import date
+import os 
+
+IS_DEMO = os.environ.get('IS_DEMO')
 today = date.today()
 
 PAGE_SIZE = 10
@@ -60,11 +63,17 @@ def list(request):
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     context = {
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
         'deleted_product_count':deleted_product_count,
+        'is_demo':is_demo,
         'title': 'Products'
     }
 

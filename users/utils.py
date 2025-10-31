@@ -3,7 +3,8 @@ from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from assets.models import AssignAsset
-
+from django.http import JsonResponse
+from configurations.utils import dynamic_display_name
 PERMISSION_LIST = [
     # products
     'view_product',
@@ -89,5 +90,3 @@ def get_asset_by_users(id):
     get_user=User.objects.filter(id=id).first()
     get_asset=AssignAsset.objects.filter(user=get_user)
     return get_asset
-
-    
