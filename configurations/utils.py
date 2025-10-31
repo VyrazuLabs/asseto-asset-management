@@ -4,9 +4,10 @@ import uuid
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from configurations.models import BrandingImages,LocalizationConfiguration
-from .constants import DATETIME_CHOICES,CURRENCY_CHOICES
+from .constants import DATETIME_CHOICES,CURRENCY_CHOICES,NAME_FORMATS
 from datetime import datetime
 from dateutil.parser import parse
+from authentication.models import User
 
 def update_files_name(request,logo,favicon,login_page_logo):
     max_file_size=5*1024*1024
@@ -169,3 +170,56 @@ def format_datetime(x,output_format):
 
     return x.strftime(formats[output_format])
     
+# def dynamic_display_name(request, format_key="first_last"):
+#     user_id=request.user
+#     user=User.objects.filter(id=user_id.id).first()
+#     if not user:
+#         return ""
+#     # For generalized templates, support initials and such
+#     formats = NAME_FORMATS
+#     # Prepare mapping with all possible user name parts
+#     context = {
+#         "first": getattr(user, "first_name", "") or "",
+#         "last": getattr(user, "last_name", "") or "",
+#     }
+#     try:
+#         fmt = formats.get(format_key, formats["first_last"])
+#         return fmt.format(**context)
+#     except Exception:
+#         # fallback to simple "first last"
+#         return f'{context["first"]} {context["last"]}'
+
+def dynamic_display_name(request,fullname):
+    format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    # for id,it in NAME_FORMATS.items():
+    #     if format_key and format_key.name_display_format == id:
+    #         format_key=id
+    format_key=format_key.name_display_format if format_key else "0"
+    """
+    Formats a full name string according to the specified naming convention.
+    
+    Args:
+        fullname (str): The full name (e.g., "John Doe")
+        format_key (str): Key selecting the name format
+    
+    Returns:
+        str: Formatted name string
+    """
+    parts = (fullname or "").strip().split()
+    first = parts[0] if len(parts) >= 1 else ""
+    last = parts[-1] if len(parts) >= 2 else ""
+    first_initial = first[0] if first else ""
+    print("format_key",format_key)
+    context = {
+        "first": first,
+        "last": last,
+        "first_initial": first_initial,
+    }
+    format_key=str(format_key)
+    fmt = NAME_FORMATS.get(format_key)
+    print(fmt,'---------fmt')
+    try:
+        return fmt.format(**context).strip()
+    except Exception:
+        # fallback to standard "First Last"
+        return f"{first} {last}".strip()

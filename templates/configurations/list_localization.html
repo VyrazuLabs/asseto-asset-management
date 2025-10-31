@@ -36,17 +36,17 @@
                     <div class="row p-4">
                         <div class="btn-group mt-2">
                             <p style="margin-right: 150px;"><b>Default Language</b></p>
-                            <select name="language-format" class="form-control w-100 w-2" style="margin-right: 20px;">
+                            <select name="language-format" class="form-control w-100 w-2" style="margin-right: 20px;" disabled>
                                 {% if get_default_language %}
                                     <option value="" disabled selected>
                                         {{ get_default_language.name }}
                                     </option>
                                     {% for code, name in default_language %}
-                                        <option value="{{ code }}">{{ name }}</option>
+                                        <option value="{{ code }}" disabled>{{ name }}</option>
                                     {% endfor %}
                                 {% else %}
                                     {% for code, name in default_language %}
-                                        <option value="{{ code }}">{{ name }}</option>
+                                        <option value="{{ code }}" disabled selected>{{ name }}</option>
                                     {% endfor %}
                                 {% endif %}
                             </select>

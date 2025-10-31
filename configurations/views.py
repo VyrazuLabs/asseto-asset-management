@@ -6,9 +6,9 @@ from configurations.models import BrandingImages,LocalizationConfiguration
 from configurations.utils import add_path, update_files_name
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .forms import TagConfigurationForm
+from .forms import TagConfigurationForm,ClientCredentialsForm
 from .models import TagConfiguration
-from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,DEFAULT_NAME_DISPLAY_FORMAT,DEFAULT_LANGUAGE,DATETIME_CHOICES
+from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,DEFAULT_LANGUAGE,DATETIME_CHOICES,NAME_FORMATS
 
 @login_required
 def logo_upload(request):
@@ -113,6 +113,7 @@ def toggle_default_settings(request, id):
     config.use_default_settings = not config.use_default_settings
     config.save()
     return 
+
 @login_required
 def list_localizations(request):
     configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
@@ -125,7 +126,7 @@ def list_localizations(request):
         for id,name in DEFAULT_LANGUAGE:
             if id == configurations.default_language:
                 get_default_language= {'name':name,'id':id}
-        for id,name in DEFAULT_NAME_DISPLAY_FORMAT:
+        for id,name in NAME_FORMATS.items():
             if id == configurations.name_display_format:
                 get_default_name_display_format= {'name':name,'id':id}
         for id,name in DATETIME_CHOICES:
@@ -144,7 +145,7 @@ def list_localizations(request):
         get_default_time_format=None
         get_default_currency_format=None
         get_default_country_format=None
-    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':DEFAULT_NAME_DISPLAY_FORMAT,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
+    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS.items(),'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
 
 # def get_localization(request):
 #     context = {
@@ -175,3 +176,16 @@ def create_localization_configuration(request):
         return redirect('configurations:list_localization')
 
     return redirect('configurations:list_localization')
+
+def integration(request):
+    if request.method == 'POST':
+        form = ClientCredentialsForm(request.POST)
+        if form.is_valid():
+            client_id = form.cleaned_data['client_id']
+            client_secret = form.cleaned_data['client_secret']
+            # Save logic here...
+            return redirect('configurations:list_client_credentials')
+    else:
+        form = ClientCredentialsForm()
+
+    return render(request, 'configurations/integrations.html', {'form': form})

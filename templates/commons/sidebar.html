@@ -132,6 +132,9 @@
                                 <a href="{% url 'roles:list' %}">Roles</a>
                             </li>
                         {% endif %}
+                        <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
+                                <a href="{% url 'configurations:integration' %}">Integrations</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
@@ -149,11 +152,13 @@
                         </li>
                         <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                             <a href="{% url 'configurations:list_localization' %}">Localizations</a>
-                        </li>            
+                        </li>       
+                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                            <a href="{% url 'configurations:list_localization' %}">Slack Integration</a>
+                        </li> 
                     {% endif %}
                     </ul>
                 </li>
-
                 {% if perms.authentication.add_vendor or perms.authentication.add_location or perms.authentication.add_department or perms.authentication.add_product_type or perms.authentication.add_product_category %}
                     <li class="sidebar-item has-sub {% if sidebar == 'upload' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">

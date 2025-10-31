@@ -18,9 +18,15 @@
             <div class="me-2">
                 <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
             </div>
-            <div>
-                <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
-            </div>
+            {% if is_demo is not None %}
+                <div>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="d-none btn-sm btn-outline-info my-3">Update Asset</a>
+                </div>
+            {% else %}
+                <div>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn-sm btn-outline-info my-3">Update Asset</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -222,5 +228,5 @@ document.querySelectorAll('.modal').forEach(modal => {
     window.location.reload();
   });
 });
-</script>  
+</script>
 {% endblock content%}
