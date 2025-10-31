@@ -16,4 +16,6 @@ urlpatterns=[
     path('toggle-default-settings/<str:id>/', views.toggle_default_settings, name='toggle_default_settings'),
     path('list-localization/', views.list_localizations, name='list_localization'),
     path('create-localization-configuration/', views.create_localization_configuration, name='create_localization_configuration'),
+    path('integration/', views.integration, name='integration'),
+
 ]
