@@ -137,7 +137,7 @@
                                             <a href="#" class="d-flex align-items-center justify-content-end" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <div class="user-menu d-flex align-items-center">
                                                     <div class="user-name text-end me-3 d-none d-lg-block">
-                                                        <h6 class="mb-0 text-gray-600">{{request.user.full_name}}</h6>
+                                                        <h6 id="full-name" class="full-name-text mb-0 text-gray-600">{{request.user.reverse_full_name}}</h6>
                                                         <p class="mb-0 text-sm text-gray-600">
                                                             {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
                                                         </p>
@@ -153,11 +153,11 @@
                                                     </div>
                                                 </div>
                                             </a>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown-menu" 
+                                            <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown-menu"
                                                 aria-labelledby="userDropdown">
                                                 <li>
                                                     <div class="d-flex">
-                                                        <h6 class="dropdown-header pe-1">Hello, {{request.user.full_name}}</h6><h6 class=" ps-0 dropdown-header d-block d-lg-none">
+                                                        <h6 id="full-name" class="full-name-text dropdown-header pe-1">Hello, {{request.user.reverse_full_name}}</h6><h6 class=" ps-0 dropdown-header d-block d-lg-none">
                                                         {% if request.user.is_superuser %} [Administrator] {% else %} [{{request.user.role}}] {% endif %}
                                                         </h6>
                                                     </div>
@@ -240,3 +240,6 @@
                     {% endfor %}
                 {% endif %}
             </header>
+<script>
+
+</script>

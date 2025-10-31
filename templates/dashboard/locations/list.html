@@ -41,6 +41,9 @@
                         <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'dashboard:search_location' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
+                    <div>
+                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                    </div>
                 {% endif %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
@@ -81,7 +84,7 @@
                                         </form>
                                     {% endif %}
                                 </td>
-                                <td>{{location.contact_person_name}}</td>
+                                <td>{% dynamic_display_name location.contact_person_name %}</td>
                                 <td>{{location.address.state}}</td>
                                 <td>{{location.address.city}}</td>
                                 <td>{{location.address.pin_code}}</td>
@@ -106,13 +109,24 @@
                                             <a href="{% url 'dashboard:location_details' location.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                         {% endif %}
                                         {% if perms.authentication.edit_location %}
-                                        <a href="{% url 'dashboard:update_location' location.id %}" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% if is_demo is True %}
+                                                <a href="{% url 'dashboard:update_location' location.id %}" class="disabled btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% else %}
+                                                <a href="{% url 'dashboard:update_location' location.id %}" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% endif %}
                                         {% endif %}
                                         {% if perms.authentication.delete_location %}
-                                            <form action="{% url 'dashboard:delete_location' location.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                {% csrf_token %}
-                                                <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                            </form>
+                                            {% if is_demo is True %}
+                                                <form action="{% url 'dashboard:delete_location' location.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% else %}
+                                                <form action="{% url 'dashboard:delete_location' location.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </td>

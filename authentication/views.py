@@ -34,6 +34,9 @@ from configurations.utils import get_currency_and_datetime_format
 from configurations.utils import format_datetime
 from django.contrib import messages
 from .constant import db_engines
+from configurations.models import LocalizationConfiguration
+from configurations.utils import dynamic_display_name
+from configurations.constants import NAME_FORMATS
 User = get_user_model()
 
 
@@ -195,6 +198,7 @@ def user_login(request):
                     print('seed fail for category')
 
                 login(request, user)
+                # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request,  f'Welcome, {user.full_name}')
 
                 # redirecting to the requested url
@@ -261,7 +265,13 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile(request):
-    context = {'profile': True, 'title': 'Profile'}
+    format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    for id,it in NAME_FORMATS.items():
+        if format_key and format_key.name_display_format == id:
+            format_key=id
+    user = request.user
+    get_user_full_name=dynamic_display_name(request=request,fullname=user.full_name)
+    context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name}
     return render(request, 'auth/profile.html', context=context)
 
 
