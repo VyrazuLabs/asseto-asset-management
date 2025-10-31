@@ -64,6 +64,9 @@
                             </div>
                         {% endif %}
                     </div>
+                    <div>
+                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                    </div>
                 {% endif %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
@@ -153,16 +156,30 @@
                                                     <a href="{% url 'users:details' user.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                                 {% endif %}
                                                 {% if perms.authentication.edit_users %}
-                                                    <button type="button" class="btn btn-info" 
-                                                        hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
-                                                        data-bs-toggle="modal" data-bs-target="#update-user-modal"
-                                                    ><i class="bi bi-pencil-square"></i></button>
+                                                    {% if is_demo is True%}
+                                                        <button type="button" class="disabled btn btn-info" 
+                                                            hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
+                                                            data-bs-toggle="modal" data-bs-target="#update-user-modal"
+                                                        ><i class="bi bi-pencil-square"></i></button>
+                                                    {% else %}
+                                                        <button type="button" class="btn btn-info" 
+                                                            hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
+                                                            data-bs-toggle="modal" data-bs-target="#update-user-modal"
+                                                        ><i class="bi bi-pencil-square"></i></button>
+                                                    {% endif %}
                                                 {% endif %}
                                                 {% if perms.authentication.delete_users %}
-                                                    <form action="{% url 'users:delete' user.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                        {% csrf_token %}
-                                                        <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                                    </form>
+                                                    {% if is_demo is True %}
+                                                        <form action="{% url 'users:delete' user.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                            {% csrf_token %}
+                                                            <button type="submit" value="Delete" class=" btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
+                                                        </form>
+                                                    {% else %}
+                                                        <form action="{% url 'users:delete' user.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                            {% csrf_token %}
+                                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                        </form>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </td>

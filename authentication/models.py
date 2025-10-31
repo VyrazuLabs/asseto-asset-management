@@ -9,6 +9,8 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
+from configurations.models import LocalizationConfiguration
+from configurations.constants import NAME_FORMATS
 
 
 def path_and_rename(instance, filename):
@@ -84,12 +86,51 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name', 'phone', 'username']
+    REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
 
+    def dynamic_display_name(self,fullname):
+        format_key= LocalizationConfiguration.objects.filter(organization=self.organization).first()
+        # for id,it in NAME_FORMATS.items():
+        #     if format_key and format_key.name_display_format == id:
+        #         format_key=id
+        format_key=format_key.name_display_format if format_key else "0"
+        """
+        Formats a full name string according to the specified naming convention.
+        
+        Args:
+            fullname (str): The full name (e.g., "John Doe")
+            format_key (str): Key selecting the name format
+        
+        Returns:
+            str: Formatted name string
+        """
+        parts = (fullname or "").strip().split()
+        first = parts[0] if len(parts) >= 1 else ""
+        last = parts[-1] if len(parts) >= 2 else ""
+        first_initial = first[0] if first else ""
+        print("format_key",format_key)
+        context = {
+            "first": first,
+            "last": last,
+            "first_initial": first_initial,
+        }
+        format_key=str(format_key)
+        fmt = NAME_FORMATS.get(format_key)
+        print(fmt,'---------fmt')
+        try:
+            return fmt.format(**context).strip()
+        except Exception:
+            # fallback to standard "First Last"
+            return f"{first} {last}".strip()
 
     def __str__(self):
         return self.full_name or f'Role {self.role}' or " "
     
+    @property
+    def reverse_full_name(self):
+        if self.full_name:
+            return self.dynamic_display_name(self.full_name)
+        return ""
 
 class SeedFlag(models.Model):
     seeded=models.BooleanField(default=False)

@@ -33,7 +33,11 @@ from configurations.utils import generate_asset_tag
 from .barcode import generate_barcode
 from configurations.models import TagConfiguration
 from configurations.utils import get_currency_and_datetime_format,format_datetime
+from configurations.utils import dynamic_display_name
+import os
+from configurations.forms import TagConfigurationForm,ClientCredentialsForm
 
+IS_DEMO = os.environ.get('IS_DEMO')
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -231,7 +235,7 @@ def listed(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     if assets_qs.exists():
         paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
@@ -245,6 +249,11 @@ def listed(request):
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
     images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     # Map asset ID to its first image
     asset_images = {}
     for img in images_qs:
@@ -269,7 +278,8 @@ def listed(request):
         'reassign_asset_form': reassign_asset_form,
         'deleted_asset_count':deleted_asset_count,
         # "full_name_first":active_users.full_name_first,
-        'title': 'Assets'
+        'title': 'Assets',
+        'is_demo':is_demo,
     }
 
     return render(request, 'assets/list.html', context=context)
@@ -296,7 +306,6 @@ def details(request, id):
     get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
     for it in get_asset_img:
         img_array.append(it)
-
     months_int=asset.product.eol
     today=timezone.now().date()
     eol_date= today+relativedelta(months=months_int) if months_int is not None else None
@@ -311,9 +320,14 @@ def details(request, id):
     obj=get_currency_and_datetime_format(organization)
     get_currency=obj['currency']
     get_date_format=obj['date_format']
+    is_demo=True
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     # obj['date_format']=format_datetime(x=obj['date_format'],output_format=get_date_format)
     if get_date_format:
-        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format) if asset.warranty_expiry_date is not None else ""
+        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=+get_date_format) if asset.warranty_expiry_date is not None else ""
         asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format) if asset.purchase_date is not None else ""
         eol_date=format_datetime(x=eol_date, output_format=get_date_format) if eol_date is not None else ""
     for it in get_data:
@@ -322,7 +336,7 @@ def details(request, id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency}
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo}
     return render(request, 'assets/detail.html', context=context)
 
 @login_required
@@ -692,7 +706,7 @@ def search(request, page):
             if assign.asset_id not in asset_user_map:
                 asset_user_map[assign.asset_id] = None
             if assign.user:  # avoid None users
-                asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+                asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
         return render(request, 'assets/assets-data.html', {
             'page_object': page_object,
             'asset_user_map': asset_user_map,
@@ -930,6 +944,11 @@ def asset_status_list(request):
         item["asset_status"]: item["asset_count"]
         for item in asset_counts
     }
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -938,6 +957,7 @@ def asset_status_list(request):
         'deleted_asset_status_count': deleted_asset_status_count,
         'asset_status_asset_count': asset_status_asset_count,
         'title': 'Asset Status',
+        'is_demo':is_demo
     }
     return render(request, 'assets/asset_status_list.html', context=context)
 
@@ -1278,7 +1298,7 @@ def search_assets(request, page):
     for assign in assignments:
         if assign.user:
             asset_user_map[assign.asset_id] = {
-                "full_name": assign.user.full_name,
+                "full_name": dynamic_display_name(request,fullname=assign.user.full_name),
                 "image": assign.user.profile_pic,
             }
 
@@ -1339,7 +1359,7 @@ def listed_asset(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  
-            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -1391,6 +1411,20 @@ def slack_authorize(request):
         f"&scope={scopes}&redirect_uri={redirect_uri}"
     )
     return redirect(oauth_url)
+
+def integration(request):
+    if request.method == 'POST':
+        form = ClientCredentialsForm(request.POST)
+        if form.is_valid():
+            client_id = form.cleaned_data['client_id']
+            client_secret = form.cleaned_data['client_secret']
+            # Save logic here...
+            return redirect('configurations:list_client_credentials')
+    else:
+        form = ClientCredentialsForm()
+
+    return render(request, 'configurations/integrations.html', {'form': form})
+
 
 # @login_required 
 # def slack_oauth_callback(request):
