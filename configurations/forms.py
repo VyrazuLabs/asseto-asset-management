@@ -26,4 +26,7 @@ class TagConfigurationForm(forms.ModelForm):
             raise forms.ValidationError("Suffix must contain only numbers (0-9).")
         return suffix
 
+class ClientCredentialsForm(forms.Form):
+    client_id = forms.CharField(max_length=255)
+    client_secret = forms.CharField(widget=forms.PasswordInput)
     

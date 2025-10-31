@@ -141,10 +141,23 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.environ.get('DB_ENGINE'),
+#         'NAME':  os.environ.get('DB_DATABASE'),
+#         'USER':  os.environ.get('DB_USERNAME'),
+#         'PASSWORD':  os.environ.get('DB_PASSWORD'),
+#         'HOST':  os.environ.get('DB_HOST'),
+#         'PORT':  os.environ.get('DB_PORT'),
+#         "TEST": {
+#             "NAME": "test_asseto",
+#         },
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME':  os.environ.get('DB_NAME'),
+        'NAME':  os.environ.get('DB_DATABASE'),
         'USER':  os.environ.get('DB_USERNAME'),
         'PASSWORD':  os.environ.get('DB_PASSWORD'),
         'HOST':  os.environ.get('DB_HOST'),
