@@ -10,6 +10,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset,Asset
+import os
+
+IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -50,6 +53,11 @@ def locations(request):
         .values("location")
         .annotate(asset_count=Count("id"))
     )
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
     context = {
         'sidebar': 'admin',
@@ -57,7 +65,8 @@ def locations(request):
         'page_object': page_object,
         'deleted_location_count':deleted_location_count,
         'location_asset_count':location_asset_count,
-        'title': 'Locations'
+        'title': 'Locations',
+        'is_demo':is_demo
     }
 
     return render(request, 'dashboard/locations/list.html', context=context)

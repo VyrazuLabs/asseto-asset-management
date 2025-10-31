@@ -52,6 +52,9 @@
                             hx-get="{% url 'assets:asset_status_search' page_object.number %}" 
                             hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
+                    <div>
+                        {% if is_demo is not None %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                    </div>
                 {% endif %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
@@ -112,22 +115,38 @@
                                                     {% endif %}
 
                                                     {% if perms.authentication.edit_asset_status %}
-                                                        <button type="button" class="btn btn-info"
-                                                            hx-get="{% url 'assets:edit_asset_status' products.id %}"
-                                                            hx-target="#update-asset-status-modal-content" 
-                                                            data-bs-toggle="modal" data-bs-target="#update-asset-status-modal"
-                                                            {% if products.can_modify is False %} disabled {% endif %}
-                                                        >
-                                                            <i class="bi bi-pencil-square"></i>
-                                                        </button>
+                                                        {% if is_demo is not None %}
+                                                            <button type="button" class=" btn btn-info" disabled
+                                                                hx-get="{% url 'assets:edit_asset_status' products.id %}"
+                                                                hx-target="#update-asset-status-modal-content" 
+                                                                data-bs-toggle="modal" data-bs-target="#update-asset-status-modal"
+                                                                {% if products.can_modify is False %} disabled {% endif %}
+                                                            >
+                                                                <i class="bi bi-pencil-square"></i>
+                                                            </button>
+                                                        {% else %}
+                                                            <button type="button" class="btn btn-info"
+                                                                hx-get="{% url 'assets:edit_asset_status' products.id %}"
+                                                                hx-target="#update-asset-status-modal-content" 
+                                                                data-bs-toggle="modal" data-bs-target="#update-asset-status-modal"
+                                                            >
+                                                                <i class="bi bi-pencil-square"></i>
+                                                            </button>
+                                                        {% endif %}
                                                     {% endif %}
 
                                                     {% if perms.authentication.asset_status %}
                                                         <form action="{% url 'assets:delete_asset_status' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
                                                             {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-danger" {% if products.can_modify is False %} disabled {% endif %}>
-                                                                <i class="bi bi-trash3-fill"></i>
-                                                            </button>
+                                                            {% if is_demo is not None %}
+                                                                <button type="submit" disabled class="btn btn-sm btn-danger" {% if products.can_modify is False %} disabled {% endif %}>
+                                                                    <i class="bi bi-trash3-fill"></i>
+                                                                </button>
+                                                            {% else %}
+                                                                <button type="submit" class="btn btn-sm btn-danger" {% if products.can_modify is False %} disabled {% endif %}>
+                                                                    <i class="bi bi-trash3-fill"></i>
+                                                                </button>
+                                                            {% endif %}
                                                         </form> 
                                                     {% endif %}
                                                 </div>
