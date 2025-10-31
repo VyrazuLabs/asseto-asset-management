@@ -60,4 +60,10 @@ TIME_FORMAT = '%H:%M:%S'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 PAGE_SIZE = 10
 ORPHANS = 1
-DEFAULT_NAME_DISPLAY_FORMAT = [(1, 'first_name  last_name'), (2, 'last_name  first_name')]  # e.g., John Doe
+NAME_FORMATS = {
+    "0": "{first} {last}",
+    "1": "{last} {first}",
+    "2": "{first_initial}. {last}",
+    "3": "{last}, {first}",
+    # Add more as needed
+} # e.g., John Doe

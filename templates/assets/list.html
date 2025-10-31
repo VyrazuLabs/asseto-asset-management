@@ -201,6 +201,9 @@
                     <div class="d-flex justify-content-end h-75">
                         <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
                     </div>
+                    <div>
+                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                    </div>
                 </div>
                 </br>
                 <div class="table-responsive items-table">
@@ -353,13 +356,24 @@
                                             <a href="{% url 'assets:details' asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                         {% endif %}
                                         {% if perms.authentication.edit_asset %}
-                                            <a href="{% url 'assets:update_in_detail' asset.id %}"type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% if is_demo is True %}
+                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info disabled" ><i class="bi bi-pencil-square"></i></a>
+                                            {% else %}
+                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% endif %}
                                         {% endif %}
                                         {% if perms.authentication.delete_asset %}
-                                            <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                {% csrf_token %}
-                                                <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                            </form>
+                                            {% if is_demo is True %}
+                                                <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="disabled btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% else %}
+                                                <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </td>
