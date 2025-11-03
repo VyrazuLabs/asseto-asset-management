@@ -2,30 +2,30 @@
 
 # Example dropdown values
 COUNTRY_CHOICES = [
-    (1, 'United Arab Emirates'),
-    (2, 'Saudi Arabia'),
-    (3, 'Kuwait'),
-    (4, 'Qatar'),
-    (5, 'Oman'),
-    (6, 'United States of America'),
-    (7, 'United Kingdom'),
-    (8, 'India'),
-    (9, 'Germany'),
-    (10, 'France'),
-    (11, 'Japan'),
+    (0, 'United Arab Emirates'),
+    (1, 'Saudi Arabia'),
+    (2, 'Kuwait'),
+    (3, 'Qatar'),
+    (4, 'Oman'),
+    (5, 'United States of America'),
+    (6, 'United Kingdom'),
+    (7, 'India'),
+    (8, 'Germany'),
+    (9, 'France'),
+    (10, 'Japan'),
 ]
 
 DEFAULT_LANGUAGE=[
-    (1, 'English'),
-    (2, 'Espaniol'),
-    (3, 'French'),
-    (4, 'German'),
-    (5, 'Italian'),
-    (6, 'Portuguese'),
-    (7, 'Russian'),
-    (8, 'Chinese'),
-    (9, 'Hindi'),
-    (10, 'Bengali'),]
+    (0, 'English'),
+    (1, 'Espaniol'),
+    (2, 'French'),
+    (3, 'German'),
+    (4, 'Italian'),
+    (5, 'Portuguese'),
+    (6, 'Russian'),
+    (7, 'Chinese'),
+    (8, 'Hindi'),
+    (9, 'Bengali'),]
 
 ASSET_STATUS_CHOICES = [
     ('ready', 'Ready to Deploy'),
@@ -39,19 +39,23 @@ PURCHASE_TYPE_CHOICES = [
     ('opex', 'Operational Expenditure'),
 ]
 CURRENCY_CHOICES = [
-    (1, 'USD'),
-    (2, 'EUR'),
-    (3, 'GBP'),
-    (4, 'AED'),
-    (5, 'SAR'),
+    (0, 'USD'),
+    (1, 'EUR'),
+    (2, 'GBP'),
+    (3, 'AED'),
+    (4, 'SAR'),
+]
+
+INTEGRATION_CHOICES = [
+    (0, 'Slack')
 ]
 
 DATETIME_CHOICES=[
-    (1, 'YYYY-MM-DD'),
-    (2, 'Day Month DD, Year'),
-    (3, 'Month DD, YYYY'),
-    (4, 'DD/MM/YYYY'),
-    (5, 'MM/DD/YYYY'),
+    (0, 'YYYY-MM-DD'),
+    (1, 'Day Month DD, Year'),
+    (2, 'Month DD, YYYY'),
+    (3, 'DD/MM/YYYY'),
+    (4, 'MM/DD/YYYY'),
 ]
 
 DEFAULT_CURRENCY = 'USD'
@@ -66,4 +70,4 @@ NAME_FORMATS = {
     "2": "{first_initial}. {last}",
     "3": "{last}, {first}",
     # Add more as needed
-} # e.g., John Doe
+}
