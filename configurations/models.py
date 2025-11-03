@@ -37,29 +37,24 @@ class LocalizationConfiguration(models.Model):
 
     def __str__(self):
         return f"{self.organization.name} - Localization Settings"
-    
-class Integration(models.Model):
-    STATUS_CHOICES = [
-        (1, 'Active'),
-        (2, 'Inactive'),
-        (3, 'Suspended'),
-    ]
 
+class Extensions(models.Model):
+    STATUS_CHOICES = [
+        (0, 'Inactive'),
+        (1, 'Active'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
         related_name='integrations'
     )
-    entity_model = models.CharField(
+    entity_name = models.CharField(
         max_length=150,
     )
-    status = models.IntegerField(choices=STATUS_CHOICES, default='inactive')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    payment_date = models.DateTimeField(auto_now_add=True)
+    validity= models.IntegerField( default=0)
+    
 
-    # flags for paid access
-    payment_flag = models.BooleanField(default=False, help_text="Indicates if this integration requires payment.")
-
-    # Audit fields
-    created_by = models.ForeignKey('authentication.User', on_delete=models.SET_NULL, null=True, related_name='created_integrations')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    
