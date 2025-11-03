@@ -7,8 +7,9 @@ from configurations.utils import add_path, update_files_name
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
-from .models import TagConfiguration
-from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,DEFAULT_LANGUAGE,DATETIME_CHOICES,NAME_FORMATS
+from .models import TagConfiguration,Extensions
+from django.http import JsonResponse
+from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES
 
 @login_required
 def logo_upload(request):
@@ -160,7 +161,7 @@ def create_localization_configuration(request):
         name_display_format = request.POST.get('name-format')
         default_language = request.POST.get('language-format')
         time_format = request.POST.get('time-format')
-        print(country_format,currency_format,name_display_format,default_language,time_format,'-----------------')
+
         # Use update_or_create for atomic upsert operation
         LocalizationConfiguration.objects.update_or_create(
             organization=request.user.organization,
@@ -177,15 +178,53 @@ def create_localization_configuration(request):
 
     return redirect('configurations:list_localization')
 
+
+
+
 def integration(request):
     if request.method == 'POST':
+        print(request.POST,"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        integration_type = request.POST.get('integration_type')
+        print(integration_type,"-----------------------------------------------------------------------------------------------")
         form = ClientCredentialsForm(request.POST)
         if form.is_valid():
             client_id = form.cleaned_data['client_id']
             client_secret = form.cleaned_data['client_secret']
+            # integration_type = form.cleaned_data['integration_type']
+            if integration_type:  # Slack
+                # Logic to save Slack credentials
+                request.session['slack'] = True
+            else:
+                request.session['slack'] = False
             # Save logic here...
-            return redirect('configurations:list_client_credentials')
+            return redirect('configurations:integration')
     else:
         form = ClientCredentialsForm()
+        integration_choices=INTEGRATION_CHOICES
+        print(integration_choices)
+    return render(request, 'configurations/integrations.html', {'form': form,'integration_choices':integration_choices})
 
-    return render(request, 'configurations/integrations.html', {'form': form})
+def list_extensions(request):
+    integration_choices=INTEGRATION_CHOICES
+    return render(request, 'configurations/list-extensions.html',{'integration_choices':integration_choices})
+
+def extension_status(request, id):
+    integration_choices=INTEGRATION_CHOICES
+    status = request.POST.get('status')
+    print("choicessssssssss",status)
+    # Convert to boolean or int safely
+    status_bool = str(status).lower() in ['true', '1', 'yes',0]
+    products=None
+    for choice_id, entity_name in integration_choices:
+        if choice_id == id:
+            products, created = Extensions.objects.get_or_create(
+                organization=request.user.organization,
+                entity_name=entity_name,
+                status=status
+                # defaults={"status": 0}
+            )
+            # Update status with incoming boolean
+            products.status = 1 if status_bool else 0
+            products.save()
+            break
+    return redirect('configurations:list_extensions')
