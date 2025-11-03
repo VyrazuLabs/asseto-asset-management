@@ -1,0 +1,82 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Add Client Credentials</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item active" aria-current="page">Client Credentials</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <section class="section">
+        <form class="form row" 
+              action="{% url 'configurations:integration' %}" 
+              method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                <div class="d-flex justify-content-between align-items-center p-4 border-top">
+                    <h5>Integrate with Slack</h5>
+                    <a href="{% url 'assets:slack_authorize' %}" class="btn btn-outline-secondary btn-sm" style="height: 38px; align-self: center;" id="slack-integration-btn">
+                        Integrate with Slack
+                    </a>
+                </div>
+                <p><input type="checkbox" name="slack" id="slack" value="True">Give Credentials to connect with Slack</p>
+                <div id="slack-credentials" class="card-body p-4 border-top ">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for err in form.non_field_errors %}
+                                    <li>{{ err }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <div class="row p-4">
+                        <div class="col-md-6 col-12 mb-3">
+                            <label for="id_client_id"><b>Client ID</b></label>
+                            <input type="text" name="client_id" id="id_client_id" 
+                                   class="form-control" placeholder="Enter Client ID" required>
+                            {% if form.client_id.errors %}
+                                {% for error in form.client_id.errors %}
+                                    <small class="text-danger d-block">{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 col-12 mb-3">
+                            <label for="id_client_secret"><b>Client Secret</b></label>
+                            <input type="password" name="client_secret" id="id_client_secret" 
+                                   class="form-control" placeholder="Enter Client Secret" required>
+                            {% if form.client_secret.errors %}
+                                {% for error in form.client_secret.errors %}
+                                    <small class="text-danger d-block">{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 p-4">
+                            <button type="button" class="btn btn-sm btn-danger" style="width: 100px;">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-info" style="width: 100px;">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+<script>
+    document.getElementById("slack").addEventListener("change", function() {
+        if (this.checked) {
+            document.getElementById("slack-credentials").style.display = "block";
+        } else {
+            document.getElementById("slack-credentials").style.display = "none";
+        }
+    });
+</script>
+{% endblock %}
+
