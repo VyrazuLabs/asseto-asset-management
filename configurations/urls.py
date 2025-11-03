@@ -17,5 +17,6 @@ urlpatterns=[
     path('list-localization/', views.list_localizations, name='list_localization'),
     path('create-localization-configuration/', views.create_localization_configuration, name='create_localization_configuration'),
     path('integration/', views.integration, name='integration'),
-
+    path('list_extensions/', views.list_extensions, name='list_extensions'),
+    path('extension-status/<str:id>/', views.extension_status, name='extension_status'),
 ]
