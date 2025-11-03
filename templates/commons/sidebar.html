@@ -133,7 +133,7 @@
                             </li>
                         {% endif %}
                         <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
-                                <a href="{% url 'configurations:integration' %}">Integrations</a>
+                                <a href="{% url 'configurations:list_extensions' %}">Extensions</a>
                         </li>
                     </ul>
                 </li>
@@ -152,10 +152,12 @@
                         </li>
                         <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                             <a href="{% url 'configurations:list_localization' %}">Localizations</a>
-                        </li>       
-                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                            <a href="{% url 'configurations:list_localization' %}">Slack Integration</a>
-                        </li> 
+                        </li>  
+                        {% if request.session.slack %}  
+                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                                <a href="{% url 'configurations:integration' %}">Slack Integration</a>
+                            </li>  
+                        {% endif %}     
                     {% endif %}
                     </ul>
                 </li>
@@ -245,3 +247,15 @@
         </div>
     </div>
 </div>
+<script>
+    function conditionalRender(){
+        const slack_bool=sessionStorage.getItem('slack');
+        if(slack_bool){ 
+            document.getElementById('slack').style.display='block';
+        }
+        else{
+            document.getElementById('slack').style.display='none';
+        }
+    }
+    conditionalRender()
+</script>
