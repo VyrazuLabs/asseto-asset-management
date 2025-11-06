@@ -21,6 +21,8 @@ urlpatterns=[
     path('integration/', views.integration, name='integration'),
     path('list_extensions/', views.list_extensions, name='list_extensions'),
     path('extension-status/<str:id>/', views.extension_status, name='extension_status'),
+    path('add-configurations/',views.save_slack_configuration,name='save_slack_configuration'),
+    # path('create-extension/', views.create_extension, name='create_extension'),
 ]
 
 configuration_api_url_patterns = [

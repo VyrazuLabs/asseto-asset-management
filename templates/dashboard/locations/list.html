@@ -91,7 +91,8 @@
                                 <td>
                                     {% if request.user.is_superuser %}
                                         <div class="form-check form-switch">
-                                            <input 
+                                            <input id="flexSwitchCheckChecked"
+                                                type="checkbox" role="switch" 
                                                 class="form-check-input"
                                                 hx-post="{% url 'dashboard:location_status' location.id %}" 
                                                 hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
