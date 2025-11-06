@@ -33,10 +33,10 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <div class="row p-4">
-                        <div class="btn-group mt-2">
+                    <div class="row p-2">
+                        <div class="btn-group mt-1">
                             <p style="margin-right: 150px;"><b>Default Language</b></p>
-                            <select name="language-format" class="form-control w-100 w-2" style="margin-right: 20px;" disabled>
+                            <select name="language-format" class="form-control w-100" style="margin-right: 20px;" disabled>
                                 {% if get_default_language %}
                                     <option value="" disabled selected>
                                         {{ get_default_language.name }}
