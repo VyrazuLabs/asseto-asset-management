@@ -10,7 +10,20 @@ from dashboard.models import CustomField, Department,ProductType,ProductCategory
 from .forms import AssetForm, AssignedAssetForm,ReassignedAssetForm
 from django.core.paginator import Paginator
 from django.db.models import Q,Prefetch
-from dateutil.relativedelta import relativedelta
+from .models import Asset
+from configurations.models import SlackConfiguration
+from django.http import JsonResponse, HttpResponse
+from datetime import date,datetime
+import requests
+
+PAGE_SIZE = 10
+ORPHANS = 1
+def grouper(iterable, n):
+    # Groups iterable into chunks of size n
+    args = [iter(iterable)] * n
+    return list(zip_longest(*args, fillvalue=None))
+
+from itertools import zip_longest
 from .models import Asset,AssignAsset
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect

@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.models import BrandingImages,LocalizationConfiguration
-from configurations.utils import add_path, create_or_update_image, update_files_name
+from configurations.utils import add_path, create_or_update_image, update_files_name,hide_last_digits
 from django.contrib import messages
 from configurations.models import BrandingImages,LocalizationConfiguration
 from configurations.utils import add_path, update_files_name
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
-from .models import TagConfiguration,Extensions
+from .models import TagConfiguration,Extensions,SlackConfiguration
 from django.http import JsonResponse
 from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
@@ -203,31 +203,90 @@ def integration(request):
                 request.session['slack'] = False
             # Save logic here...
             return redirect('configurations:integration')
-    else:
+    elif request.method == 'GET':
         form = ClientCredentialsForm()
         integration_choices=INTEGRATION_CHOICES
+        slack_config=SlackConfiguration.objects.filter(user=request.user).first()
+        client_id=base64.b64decode(slack_config.client_id).decode() if slack_config else None
+        client_secret=base64.b64decode(slack_config.client_secret).decode() if slack_config else None
+        print(client_id,client_secret,"--------------------++++++++++++++++++++++++++++++")
+        if client_id is not None:   
+            client_id=hide_last_digits(client_id)
+        # if not client_id:
+        #     client_id=""
+        # if not client_secret:
+        #     client_secret=""
+        context={
+            'client_id':client_id,
+            'client_secret':client_secret
+        }
+        print(context)
+    # On GET or other methods, you may render the form page or handle differently
+        return render(request, "configurations/integrations.html", context=context)
+
+        print(integration_choices)
     return render(request, 'configurations/integrations.html', {'form': form,'integration_choices':integration_choices})
 
 def list_extensions(request):
-    integration_choices=INTEGRATION_CHOICES
-    return render(request, 'configurations/list-extensions.html',{'integration_choices':integration_choices})
+    # integration_choices=INTEGRATION_CHOICES
+    for choice_id, (entity_name, description) in INTEGRATION_CHOICES:
+        existing_extension = Extensions.objects.filter(
+            organization=request.user.organization, entity_name=entity_name
+        ).first()
+        if not existing_extension:
+            Extensions.objects.create(
+                organization=request.user.organization,
+                description=description,
+                entity_name=entity_name,
+                status=0,  # Inactive by default
+                validity=0,
+            )
+    get_extensions=Extensions.objects.filter(organization=request.user.organization).first()
+    print()
+    if get_extensions:
+        request.session['slack'] = True
+    else:
+        request.session['slack'] = False
+    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions})
 
 def extension_status(request, id):
-    integration_choices=INTEGRATION_CHOICES
-    status = request.POST.get('status')
-    # Convert to boolean or int safely
-    status_bool = str(status).lower() in ['true', '1', 'yes',0]
-    products=None
-    for choice_id, entity_name in integration_choices:
-        if choice_id == id:
-            products, created = Extensions.objects.get_or_create(
-                organization=request.user.organization,
-                entity_name=entity_name,
-                status=status
-                # defaults={"status": 0}
-            )
-            # Update status with incoming boolean
-            products.status = 1 if status_bool else 0
-            products.save()
-            break
+    integration_choices = INTEGRATION_CHOICES
+    status = request.POST.get('status', 0) 
+    print(status,"===========================================")
+    status_bool = status == 'on'
+    get_extensions=Extensions.objects.filter(organization=request.user.organization,id=id).first()
+    if status_bool==0:
+        get_extensions.status=0
+        get_extensions.save()
+    else:
+        get_extensions.status=1
+        get_extensions.save()
     return redirect('configurations:list_extensions')
+
+@login_required
+def save_slack_configuration(request):
+    if request.method == "POST":
+        client_id = request.POST.get("client_id", "").strip()
+        client_secret = request.POST.get("client_secret", "").strip()
+        client_id = base64.b64encode(client_id.encode()).decode()
+        client_secret = base64.b64encode(client_secret.encode()).decode()
+        # Encode client_id and client_secret in base64
+
+        slack_config, created = SlackConfiguration.objects.get_or_create(user=request.user)
+        slack_config.client_id = client_id
+        slack_config.client_secret = client_secret
+        slack_config.save()
+        print("Slack configuration saved successfully")
+        # Redirect or render success message as needed
+        return redirect("configurations:integration")
+    if request.method == "GET":
+        slack_config=SlackConfiguration.objects.filter(user=request.user).first()
+        client_id=base64.b64decode(slack_config.client_id).decode() 
+        client_secret=base64.b64decode(slack_config.client_secret).decode()
+        context={
+            'client_id':client_id,
+            'client_secret':client_secret
+        }
+        print(context)
+        # On GET or other methods, you may render the form page or handle differently
+        return redirect("configurations:integration")
