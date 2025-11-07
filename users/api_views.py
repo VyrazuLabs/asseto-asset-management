@@ -3,11 +3,13 @@ from rest_framework.views import APIView
 from assets.models import AssetImage, AssignAsset
 from authentication.models import User
 from common.pagination import add_pagination
-from users.serializers import UserSerializer
+from users.serializers import UserAdressSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
 from common.API_custom_response import api_response
 from users.utils import user_data, user_details
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema
 
 class UserList(APIView):
     permission_classes=[IsAuthenticated]
@@ -27,16 +29,21 @@ class UserList(APIView):
 
 class AddUser(APIView):
     permission_classes=[IsAuthenticated]
+    serializer_class = UserSerializer
+
+    parser_classes=[MultiPartParser,FormParser]    
+    @extend_schema(request={"multipart/form-data": UserSerializer})
     def post(self,request):
         try:
             serializer=UserSerializer(data=request.data)
-            serializer.is_valid(raise_exception=False)
+            if not serializer.is_valid():
+                raise ValueError(serializer.errors)
+            
             serializer.save()
             return api_response(status=200,message="User data add sucessfully")       
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
         except Exception as e:
-            print(serializer.errors)
             return api_response(status=500, system_message=str(e))        
 
 class UpdateUser(APIView):
