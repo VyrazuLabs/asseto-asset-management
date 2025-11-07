@@ -16,10 +16,12 @@ class UserAdressSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(required=False)
-    address=UserAdressSerializer()
+    address=UserAdressSerializer(required=False)
+    access_level = serializers.BooleanField(required=False)
+    profile_pic=serializers.ImageField(required=False)
     class Meta:
         model=User
-        fields=['full_name','email','phone','password','department','role','access_level','location','address']
+        fields=['full_name','email','phone','password','department','role','access_level','location','address','profile_pic']
     
     def validate_email(self,email):
         domain='@'
@@ -30,10 +32,10 @@ class UserSerializer(serializers.ModelSerializer):
         return email
     
     def create(self,validate_data):
-        address_data=validate_data.pop('address')
+        address_data=validate_data.pop('address') if validate_data.get('address') else None
 
         try:
-            address=Address.objects.create(**address_data)
+            address=Address.objects.create(**address_data) if address_data else None
         except Exception as e:
             raise ValueError("Data did not add for address",e)
         try:
