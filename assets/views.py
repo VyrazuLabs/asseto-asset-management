@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 import os
 from django.contrib import messages
 from django.contrib.auth.decorators import (login_required,permission_required,user_passes_test,)
@@ -493,12 +494,12 @@ def slack_oauth_callback(request):
     slack_client_id=base64.b64decode(get_connection_data.client_id).decode() 
     slack_client_secret=base64.b64decode(get_connection_data.client_secret).decode()
     # print(client_id,client_secret,"--------------------")
-    redirect_uri ="https://flowing-modest-macaw.ngrok-free.app/assets/slack/oauth/callback/"
+    # redirect_uri ="http://127.0.0.1:8000//assets/slack/oauth/callback/"
     # client_id=get_connection_data.client_id
     # client_secret=get_connection_data.client_secret
     # client_id = "YOUR_SLACK_CLIENT_ID"
-    # redirect_uri = os.getenv("SLACK_REDIRECT_URI")
     # client_secret = os.getenv("SLACK_CLIENT_SECRET")
+    redirect_uri = os.getenv("SLACK_REDIRECT_URI")
 
     response = requests.post(
         "https://slack.com/api/oauth.v2.access",
@@ -567,9 +568,13 @@ def slack_oauth_callback(request):
     )
     host=get_host(request)
     print(host,"--------------------------------------------------------------------")
-    redirect_url="http://127.0.0.1:9000/"
+    # redirect_url="http://127.0.0.1:9000/"
     # return redirect(f"{host}")
-    return redirect(f"http://127.0.0.1:9000/")
+    if settings.DEBUG:
+        redirect_url = "http://127.0.0.1:8000/"
+    else:
+        redirect_url = "https://asset-management-hg2x.onrender.com/"
+    return redirect(redirect_url)
 
 # 
 def automated_tag(request):
