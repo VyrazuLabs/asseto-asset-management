@@ -70,7 +70,8 @@ INSTALLED_APPS = [
     'support',
     'notifications',
     'simple_history',
-    'configurations'
+    'configurations',
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -254,9 +255,12 @@ REST_FRAMEWORK = {
     
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FormParser'
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
 }
 
@@ -283,4 +287,9 @@ SIMPLE_JWT = {
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
     "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
     "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed"
+}
+
+SPECTACULAR_SETTINGS = {
+    'COMPONENT_SPLIT_REQUEST': True,  # Splits FileField schemas for request/response
+    # Other settings like TITLE, VERSION, etc.
 }
