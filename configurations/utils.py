@@ -211,7 +211,6 @@ def dynamic_display_name(request,fullname):
     first = parts[0] if len(parts) >= 1 else ""
     last = parts[-1] if len(parts) >= 2 else ""
     first_initial = first[0] if first else ""
-    print("format_key",format_key)
     context = {
         "first": first,
         "last": last,
@@ -219,7 +218,6 @@ def dynamic_display_name(request,fullname):
     }
     format_key=str(format_key)
     fmt = NAME_FORMATS.get(format_key)
-    print(fmt,'---------fmt')
     try:
         return fmt.format(**context).strip()
     except Exception:
