@@ -27,7 +27,7 @@ load_dotenv(BASE_DIR / '.env', override=True)
 
 LOGIN_REDIRECT_URL = '/'
 
-
+DEBUG=True 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -41,7 +41,7 @@ ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
 
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
 
-LOCALHOST_URL = 'http:127.0.0.1:9000'
+LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
 
 # Application definition
