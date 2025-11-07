@@ -20,9 +20,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from authentication.forms import UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetRequestForm
 from authentication.decorators import unauthenticated_user
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
+	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
     path('secret/', admin.site.urls),
     path('', include('authentication.urls', namespace='authentication')),
     path('vendors/', include('vendors.urls', namespace='vendors')),
@@ -59,6 +64,7 @@ urlpatterns = [
 
     path('reset/done/', unauthenticated_user(auth_views.PasswordResetCompleteView.as_view(
         template_name='auth/password/password-reset-complete.html')), name="password_reset_complete"),
+	
 ]
 
 if settings.DEBUG:
