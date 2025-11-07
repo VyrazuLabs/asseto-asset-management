@@ -208,8 +208,6 @@ def user_login(request):
             else:
                 messages.error(request, 'Invalid credentials!')
     last_logins=User.objects.values_list('last_login',flat=True)
-    print(last_logins)
-
 
     return render(request, 'auth/login.html', context={'form': form,'current_step':4,'last_logins':last_logins})
 
