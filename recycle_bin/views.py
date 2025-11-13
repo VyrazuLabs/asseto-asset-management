@@ -179,8 +179,7 @@ def deleted_products_search(request, page):
 @user_passes_test(check_admin)
 def deleted_assets(request):
 
-    asset_list = Asset.deleted_objects.filter(
-        organization=request.user.organization).order_by('-updated_at')
+    asset_list = Asset.deleted_objects.all().order_by('-updated_at')
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -200,7 +199,7 @@ def deleted_asset_restore(request, id):
     try:
         if request.method == 'POST':
             asset = get_object_or_404(
-                Asset.deleted_objects, pk=id, organization=request.user.organization)
+                Asset.deleted_objects, pk=id)
             asset.restore()
             history_id = asset.history.first().history_id
             asset.history.filter(pk=history_id).update(history_type='^')
@@ -217,7 +216,7 @@ def deleted_asset_permanently(request, id):
     try:
         if request.method == 'POST':
             asset = get_object_or_404(
-                Asset.deleted_objects, pk=id, organization=request.user.organization)
+                Asset.deleted_objects, pk=id)
             asset.delete()
             messages.success(request, 'Asset deleted permanently')
     except:
