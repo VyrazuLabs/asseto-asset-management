@@ -175,7 +175,7 @@ def listed(request):
     location_id = request.POST.get("location")
     category_id = request.POST.get("category")
     type_id = request.POST.get("type")
-    filters = Q(organization=request.user.organization)
+    filters = Q(organization=None)
     if search_text:
         filters &= (
             Q(tag__icontains=search_text) |
@@ -296,7 +296,7 @@ def details(request, id):
         assigned_user=None
     user= request.user
     user_organization=user.organization
-    asset_barcode = generate_barcode(asset.tag,user_organization)
+    asset_barcode = generate_barcode(asset.tag)
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
         asset=assetSpecifications.asset
@@ -578,7 +578,7 @@ def delete(request, id):
 
     if request.method == "POST":
         asset = get_object_or_404(
-            Asset.undeleted_objects, pk=id, organization=request.user.organization)
+            Asset.undeleted_objects, pk=id)
         if asset.is_assigned:
             messages.error(
                 request, 'Error! Asset is assigned to a user')
