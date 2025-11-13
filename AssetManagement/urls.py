@@ -21,8 +21,9 @@ from django.conf.urls.static import static
 from authentication.forms import UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetRequestForm
 from authentication.decorators import unauthenticated_user
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-
-
+from assets.urls import api_url_patterns
+from users.urls import user_api_url_patterns
+from authentication.urls import authentication_url_patterns
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -66,6 +67,8 @@ urlpatterns = [
         template_name='auth/password/password-reset-complete.html')), name="password_reset_complete"),
 	
 ]
+
+urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
