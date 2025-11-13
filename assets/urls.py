@@ -1,11 +1,13 @@
 from django.urls import path
 from django.views.generic import TemplateView
+from .barcode import Scan_barcode
 from . import views
-# from . import barcode
-from .barcode import scan_barcode
+from . import api_views
 app_name = 'assets'
 
 urlpatterns = [
+    #template_urls
+
     path('list', views.listed, name='list'),
     path('list-upper', views.listed_asset, name='list-upper'),
     path('details/<uuid:id>', views.details, name='details'),
@@ -35,6 +37,18 @@ urlpatterns = [
     path('asset_status_search/<str:page>',views.asset_status_search,name='asset_status_search'),
     path('delete_asset_status/<uuid:id>',views.delete_asset_status,name='delete_asset_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
-    path('scan-barcode/<str:tag_id>',scan_barcode.as_view(), name='barcode'),
+    path('scan-barcode/<str:tag_id>',Scan_barcode.as_view(), name='barcode'),
     path('slack-authorize/', views.slack_authorize, name='slack_authorize'),
+
+]
+
+api_url_patterns = [
+    #api urls
+    path('api/asset/list/',api_views.AssetList.as_view(),name="asset_list"),
+    path('api/asset/add/',api_views.AddAsset.as_view(),name='add_asset'),
+    path('api/asset/details/<uuid:id>',api_views.AssetDetails.as_view(),name="asset_details"),
+    path('api/asset/update/<uuid:id>',api_views.UpdateAsset.as_view(),name='update_asset'),
+    path('api/asset/delete/<uuid:id>',api_views.DeleteAsset.as_view(),name="delete_asset"),
+    path('api/asset/search/',api_views.SearchAsset.as_view(),name='search_asset'),
+    path('api/asset/scan-barcode/<str:tag_id>',api_views.Scan_api_barcode.as_view(), name='scan_barcode'),
 ]
