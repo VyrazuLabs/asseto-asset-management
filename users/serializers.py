@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             if "password" not in validate_data:
                 validate_data["password"] = ""
-            user=User.objects.create(address=address, **validate_data)
+            user=User.objects.create(address=address, **validate_data,organization=self.context["request"].user.organization)
             if user.password:
                 user.set_password(user.password)
         except Exception as e:

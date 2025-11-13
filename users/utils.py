@@ -2,7 +2,7 @@
 from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
-from assets.models import AssignAsset
+from assets.models import AssetImage, AssignAsset
 from django.http import JsonResponse
 from configurations.utils import dynamic_display_name
 PERMISSION_LIST = [
@@ -107,31 +107,47 @@ def assigned_asset_to_user(page_object):
     return user_asset_map
 
 
-def user_data(user_list):
+def user_data(request,user_list):
+    current_host=request.get_host()                                                                                                           
     user_data_list=[]
     for user in user_list:
         user_data_list.append({
             'id':user.id,
-            'full_name':user.full_name,
+            'fullName':user.full_name,
             'email':user.email,
-            'role':user.role.related_name if user.role else None
+            'role':user.role.related_name if user.role else None,
+            'isActive':user.is_active,
+            'lastLogin':user.last_login,
+            'profilePicture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
+            'assetCount':AssignAsset.objects.filter(user=user.id).count()
         })
     return user_data_list
 
-def user_details(get_user,assigned_assets,asset_images):
-    asset_images_list=[]
-    for asset_image in asset_images:
-        asset_images_list.append(asset_image.image.url)
-    print(asset_images_list,type(asset_images_list))
-
+def user_details(request,get_user,assigned_assets):
+    current_host=request.get_host()
     user_details={
         'name':get_user.full_name,
         'email':get_user.email,
         'phone_number':get_user.phone,
-        'assigned_asset_name':assigned_assets.asset.name,
-        'asset_tag':assigned_assets.asset.tag,
-        'vendor':assigned_assets.asset.vendor.name,
-        'assigned_date':assigned_assets.assigned_date,
-        'asset_image_list':asset_images_list
-    }
+        'profilePicture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
+        'department':get_user.department.name if get_user.department else None,
+        'role':get_user.role.related_name if get_user.role else None,
+        'address':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None
+    }   
+    assigned_assets_list=[]
+    for assigned_asset in assigned_assets:
+        assigned_assets_data={
+            'assigned_asset_name':assigned_asset.asset.name,
+            'asset_tag':assigned_asset.asset.tag,
+            'vendor':assigned_asset.asset.vendor.name if assigned_asset.asset and assigned_asset.asset.vendor else None,
+            'assigned_date':assigned_asset.assigned_date,
+        }
+        asset_images=AssetImage.objects.filter(asset=assigned_asset.asset.id).all()
+        asset_images_list=[]
+        for asset_image in asset_images:
+            asset_images_list.append(f'http://{current_host}'+asset_image.image.url)
+        assigned_assets_data["asset_images_list"]=asset_images_list
+
+        assigned_assets_list.append(assigned_assets_data)
+    user_details["assigned_assets_list"]=assigned_assets_list
     return user_details

@@ -292,4 +292,5 @@ SIMPLE_JWT = {
 SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,  # Splits FileField schemas for request/response
     # Other settings like TITLE, VERSION, etc.
+    'SWAGGER_OPTIONS': {'persistAuthorization': True}
 }
