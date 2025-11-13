@@ -1,6 +1,12 @@
 from math import ceil
 
-def add_pagination(list_data, page=1,page_size=10):
+def add_pagination(list_data, page,page_size=10):
+    try:
+        if page<1:
+            page=1
+    except ValueError:
+        page=1
+        
     total_length=len(list_data)
     start_index=(page-1)*page_size
     end_index=start_index+page_size
