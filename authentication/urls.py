@@ -17,10 +17,11 @@ urlpatterns = [
     path('profile-basic-information/update', views.profile_basic_info_update, name='profile_basic_info_update'),
     path('organization-information/update', views.organization_info_update, name='organization_info_update'),
 
+]
 
-
+authentication_url_patterns=[
     #api urls
-    path('api/login/', TokenObtainPairView.as_view(),name='login'),
-    path('api/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
-    path('api/logout/',TokenBlacklistView.as_view(),name='logout')
+    path('api/authentication/login/', TokenObtainPairView.as_view(),name='login'),
+    path('api/authentication/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
+    path('api/authentication/logout/',TokenBlacklistView.as_view(),name='logout')
 ]
