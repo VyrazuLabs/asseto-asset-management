@@ -12,7 +12,11 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item" aria-current="page">Audit</li>
+                    {% if get_asset is not None %}
+                       <li class="breadcrumb-item active" aria-current="page">Update Audit</li>
+                    {% else %}
                     <li class="breadcrumb-item active" aria-current="page">Add Audit</li>
+                    {% endif %}
                 </ol>
             </nav>
         </div>      
