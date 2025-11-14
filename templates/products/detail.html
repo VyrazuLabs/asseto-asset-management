@@ -59,7 +59,11 @@
                             <tr>
                                 <td><b>Product EOL</b></td>
                                 <td>{{ product.eol }} months</td>
-                                </tr>
+                            </tr>
+                            <tr>
+                                <td><b>Audit interval</b></td>
+                                <td>{{ product.get_audit_interval }}</td>
+                            </tr>
                             <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{product.description|urlize}}</td>

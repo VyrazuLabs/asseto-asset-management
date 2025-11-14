@@ -92,6 +92,15 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group mb-2">
+                                <label>Audit Interval</label>
+                                {{ form.audit_interval }}
+                                {% for error in form.audit_interval.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
                         <div class="col-md-12 col-12">
                             <div class="form-group">
                                 <label>Description</label>

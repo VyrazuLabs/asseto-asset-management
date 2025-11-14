@@ -219,6 +219,42 @@
                 </div>
             </div>
         {% endif %}
+            <div class="card mt-3">
+                <div class="card-header border-bottom mb-4">
+                    <h2>Audit History</h2>
+                </div>
+                <div class="card-body" id="custom-field-container">
+                    <div class="table-responsive items-table">
+                        {% if history is not None %}
+                            <table class="table" id="table1">
+                                <thead>
+                                    <tr>
+                                        <th>Sl No.</th>
+                                        <th>Asset Id</th>
+                                        <th>Condition</th>
+                                        <th>Notes</th>
+                                        <th>Image</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody id="search_result">
+                                    <tr style="height: 100px;">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p colspan="6">No audit history found</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% include 'commons/history.html' %}
     </section>
 </div>

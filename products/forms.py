@@ -52,6 +52,13 @@ class AddProductsForm(forms.ModelForm):
         widget=forms.Select(
             attrs={'class': 'form-control'}
         ))
+    
+    audit_interval=forms.ChoiceField(
+        choices=AUDIT_INTERVAL,
+        widget=forms.Select(
+            attrs={'class': 'form-control'}
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
@@ -73,11 +80,11 @@ class AddProductsForm(forms.ModelForm):
             else:
                 # It's a top-level category — only show it in product_category
                 self.initial['product_category'] = self.instance.product_category
-
+        
     class Meta:
         model = Product
         fields = ['name', 'product_picture', 'manufacturer',
-                  'description','product_category','product_sub_category','product_type','eol','model']
+                  'description','product_category','product_sub_category','product_type','eol','model','audit_interval']
     
     def save(self, commit=True):
         instance = super().save(commit=False)

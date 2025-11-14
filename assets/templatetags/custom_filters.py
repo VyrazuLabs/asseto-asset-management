@@ -4,6 +4,10 @@ from configurations.utils import get_currency_and_datetime_format
 from datetime import datetime
 from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
+from audit.utils import get_time_difference
+from audit.constants import AUDIT_INTERVAL_VALUE
+from datetime import datetime, timedelta,timezone
+from dateutil.relativedelta import relativedelta
 
 register = template.Library()
 
@@ -82,3 +86,40 @@ def dynamic_display_name(context,fullname):
     except Exception:
         # fallback to standard "First Last"
         return f"{first} {last}".strip()
+
+
+@register.filter
+def audit_time_diff(audit):
+    # Guard clauses if related objects are missing
+    if not audit or not audit.asset or not audit.asset.created_at or not audit.asset.product:
+        return None
+    
+    asset_creation_time = audit.asset.created_at
+    audit_interval_days = audit.asset.product.audit_interval
+    
+    return get_time_difference(asset_creation_time, audit_interval_days)
+
+@register.filter
+def next_audit_due(audits):
+    interval_days = audits.asset.product.get_audit_interval()
+    print(interval_days)
+    today=datetime.today().date()
+    if not interval_days:
+        return None 
+    # last_audit = audits.asset.order_by("-created_at").first()
+
+    if not audits:
+        base_date = audits.created_at.date()
+    else:
+        base_date = audits.created_at.date()
+
+    # First due date after interval
+    next_due = base_date + relativedelta(days=interval_days)
+
+    # Grace period rule: If 30 days pass after due date → push to next interval
+    days_remaining = (next_due - today).days
+    return  days_remaining
+    # else:
+    #     days_remaining = (next_due - today).days
+    #     return days_remaining
+

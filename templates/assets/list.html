@@ -244,7 +244,7 @@
 
                                 </td>
                                 <td>{{asset.tag}}</td>
-                                <td>{{asset.name}}</td>
+                                <td><div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"></div>{{asset.name}}</div></td>
                                 <td>{{asset.product.product_type}}</td>
                                 
                                 <td>
@@ -375,6 +375,7 @@
                                                 </form>
                                             {% endif %}
                                         {% endif %}
+                                        <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="btn btn-sm btn-primary"><i class="bi bi-archive"></i></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -391,7 +392,7 @@
             </div>
             <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
                 <div class="modal-dialog modal-lg">
-                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"><!-- HTMX will inject modal content here -->
+                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this">
                     </div>
                 </div>
             </div>

@@ -63,3 +63,4 @@ urllib3==2.5.0
 webencodings==0.5.1
 whitenoise==6.1.0
 xhtml2pdf==0.2.17
+django-crontab==0.7.1

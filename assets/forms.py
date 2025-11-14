@@ -223,3 +223,14 @@ class AssetStatusForm(forms.ModelForm):
         model=AssetStatus
         fields=['name']
 
+from django import forms
+# from .models import Audit
+
+# class AuditForm(forms.ModelForm):
+#     class Meta:
+#         model = Audit
+#         fields = ['Image', 'Asset', 'Organization', 'Condition', 'Comments']
+#         widgets = {
+#             'Condition': forms.Select(choices=Audit.CONDITION_CHOICES, attrs={'class': 'form-select'}),
+#             'Comments': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter comments'}),
+#         }

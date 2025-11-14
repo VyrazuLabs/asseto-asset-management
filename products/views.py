@@ -224,8 +224,8 @@ def update_product(request, id):
             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
     elif request.method == "POST":
-        form = AddProductsForm(request.POST, request.FILES,
-        instance=product, organization=request.user.organization)
+        form = AddProductsForm(request.POST, request.FILES,instance=product, organization=request.user.organization)
+        print("UPDATE FROM",form.data)
         img_form= ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and img_form.is_valid():
             form.save()
