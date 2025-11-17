@@ -53,12 +53,11 @@ class AddProductsForm(forms.ModelForm):
             attrs={'class': 'form-control'}
         ))
     
-    audit_interval=forms.ChoiceField(
-        choices=AUDIT_INTERVAL,
-        widget=forms.Select(
-            attrs={'class': 'form-control'}
-        )
-    )
+    audit_interval = forms.TypedChoiceField(
+    choices=AUDIT_INTERVAL,
+    coerce=int,
+    widget=forms.Select(attrs={'class': 'form-control'})
+)
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)

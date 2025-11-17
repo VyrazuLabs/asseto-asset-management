@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.cache import cache
 import os
+from audit.models import Audit 
 # from .forms import AuditForm
 from dotenv import load_dotenv
 import requests
@@ -165,6 +166,10 @@ def manage_access_for_assets_status(user):
 @user_passes_test(manage_access_for_assets)
 def listed(request):
     #Function to get all the list data 
+    list_of_audits=Audit.objects.all()
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
+    print(list_of_audited_assets,"list of audited assets")
     tag=request.GET.get("tag")
     user_data=request.POST.get("user-data")
     product=request.POST.get("product")# gts the id of the product
@@ -281,6 +286,7 @@ def listed(request):
         # "full_name_first":active_users.full_name_first,
         'title': 'Assets',
         'is_demo':is_demo,
+        'list_of_audited_assets':list_of_audited_assets
     }
 
     return render(request, 'assets/list.html', context=context)
@@ -512,27 +518,27 @@ def add(request):
             for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
 
-            # Handle predefined custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=asset.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
+            # # Handle predefined custom fields
+            # for key, value in request.POST.items():
+            #     if key.startswith("customfield_") and value.strip():
+            #         field_id = key.replace("customfield_", "")
+            #         try:
+            #             cf = CustomField.objects.get(
+            #                 pk=field_id,
+            #                 entity_type='asset',
+            #                 organization=request.user.organization
+            #             )
+            #             CustomField.objects.create(
+            #                 name=cf.name,
+            #                 object_id=asset.id,
+            #                 field_type=cf.field_type,
+            #                 field_name=cf.field_name,
+            #                 field_value=value,
+            #                 entity_type='asset',
+            #                 organization=request.user.organization
+            #             )
+            #         except CustomField.DoesNotExist:
+            #             continue
 
             # Handle dynamically added custom fields
             names = request.POST.getlist('custom_field_name')

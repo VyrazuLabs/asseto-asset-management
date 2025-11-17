@@ -100,24 +100,26 @@ def audit_time_diff(audit):
     return get_time_difference(asset_creation_time, audit_interval_days)
 
 @register.filter
-def next_audit_due(audits):
-    interval_days = audits.asset.product.get_audit_interval()
-    print(interval_days)
+def next_audit_due(audit):
+    print(audit.asset.product.name,"audit in filter")
+    interval_days = audit.asset.product.get_audit_interval()
+    print(interval_days,"interval date")
     today=datetime.today().date()
     if not interval_days:
         return None 
     # last_audit = audits.asset.order_by("-created_at").first()
 
-    if not audits:
-        base_date = audits.created_at.date()
+    if not audit:
+        base_date = audit.created_at.date()
     else:
-        base_date = audits.created_at.date()
+        base_date = audit.created_at.date()
 
     # First due date after interval
     next_due = base_date + relativedelta(days=interval_days)
 
     # Grace period rule: If 30 days pass after due date → push to next interval
     days_remaining = (next_due - today).days
+    print("days remaining",days_remaining)
     return  days_remaining
     # else:
     #     days_remaining = (next_due - today).days

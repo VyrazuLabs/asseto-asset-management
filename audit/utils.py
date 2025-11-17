@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta,timezone
+from .constants import AUDIT_INTERVAL_VALUE
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:
@@ -45,52 +46,45 @@ def is_upcoming_audit(audit):
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
-AUDIT_INTERVAL_VALUE = {
-    0: None,   # Not Applicable
-    1: 12,     # Yearly
-    2: 6,      # Half-Yearly
-    3: 3,      # Quarterly
-    4: 2,      # Bi Monthly
-    5: 1,      # Monthly
-}
 
-def next_audit_due(asset):
-    """
-    Returns the next audit due date based on:
-        - last audit date
-        - audit interval
-        - deadline rollover rule (30-day grace)
 
-    Supports: monthly, bi-monthly, quarterly, half-yearly, yearly.
-    """
+# def next_audit_due(audit):
+#     interval_days = audit.asset.product.get_audit_interval()
+#     print(interval_days,"interval date")
+#     today=datetime.today().date()
+#     if not interval_days:
+#         return None 
+#     # last_audit = audits.asset.order_by("-created_at").first()
 
-    interval_months = AUDIT_INTERVAL_VALUE.get(asset.get_audit_interval())
-    if not interval_months:
-        return None  # Not applicable
+#     if not audit:
+#         base_date = audit.created_at.date()
+#     else:
+#         base_date = audit.created_at.date()
 
-    # Get last audit
-    last_audit = asset.audits.order_by("-created_at").first()
+#     # First due date after interval
+#     next_due = base_date + relativedelta(days=interval_days)
 
-    # If never audited → due date is from asset creation date
-    if not last_audit:
-        base_date = asset.created_at.date()
-    else:
-        base_date = last_audit.created_at.date()
+#     # Grace period rule: If 30 days pass after due date → push to next interval
+#     days_remaining = (next_due - today).days
+#     print("days remaining",days_remaining)
+#     return  days_remaining
+#     # else:
 
-    # First due date after interval
-    next_due = base_date + relativedelta(months=interval_months)
+def next_audit_due(audit):
+    if not audit or not audit.asset or not audit.asset.product:
+        return None, False
 
-    # Grace period rule: If 30 days pass after due date → push to next interval
+    interval_days = audit.asset.product.get_audit_interval()
+    if not interval_days or interval_days == 0:
+        return None, False
+
     today = datetime.today().date()
+    last_audit_date = audit.created_at.date()
+    next_due = last_audit_date + relativedelta(days=interval_days)
 
-    if today > next_due + timedelta(days=30):
-        # Carry over to next period
-        # Calculate how many cycles have passed
-        months_passed = (today.year - next_due.year) * 12 + (today.month - next_due.month)
-        cycles = (months_passed // interval_months) + 1
-        next_due = next_due + relativedelta(months=interval_months * cycles)
+    days_remaining = (next_due - today).days
 
-    return next_due
+    is_pending = days_remaining < 0
 
-
-# def get_condition_type(index):
+    return days_remaining, is_pending
+    # return days_remaining

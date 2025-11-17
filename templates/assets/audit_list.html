@@ -37,7 +37,7 @@
                                     <th>Condition</th>
                                     <th>Notes</th>
                                     <th>Audit Time</th>
-                                    <th>Audit Deadline</th>
+                                    <th>Next Audit</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -49,8 +49,7 @@
                                     <td>{{ audit.condition_label }}</td>
                                     <td>{{ audit.notes }}</td>
                                     <td>{{ audit.created_at }}</td>
-                                    
-                                        <td>{{ audit|next_audit_due }} days to go</td>
+                                    <td>{{ audit|next_audit_due }} days to go</td>
                                     
                                     <td> <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary"><i class="bi bi-archive"></i></i></a></td>
                                 </tr>

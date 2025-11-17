@@ -35,6 +35,7 @@ class Product(TimeStampModel, SoftDeleteModel):
         return self.name
     
     def get_audit_interval(self):
+        print("interval value",dict(AUDIT_INTERVAL_VALUE).get(self.audit_interval))
         return dict(AUDIT_INTERVAL_VALUE).get(self.audit_interval)
 
 class ProductImage(models.Model):

@@ -125,6 +125,7 @@ def add_product(request):
         if form.is_valid() and image_form.is_valid():
             product = form.save(commit=False)
             product.organization = request.user.organization
+            product.audit_interval = form.cleaned_data["audit_interval"]
             product.save()
             form.save_m2m()
 #             # product = form.save()

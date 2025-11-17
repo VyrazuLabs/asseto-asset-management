@@ -110,7 +110,7 @@
                             <div class="form-group">
                                 <label>Asset Image</label>
                                 {{form.product_sub_category}}
-                                <input type="file" class="form-control w-100" name="image"/>
+                                <input type="file" class="form-control w-100" name="image" multiple />
                                 <sub >The number of file selected will be logged</sub>
                                 {% for error in form.product_sub_category.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>

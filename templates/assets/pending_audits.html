@@ -34,14 +34,29 @@
                                 <tr>
                                     <th>Sl No.</th>
                                     <th>Asset Name</th>
+                                    <th>Expected Audit Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="search_result">
+                                {% for audit in due_audits %}
+                                <tr style="height: 100px;">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ audit.asset.name }}</td>
+                                    <td>{{ audit.expected_date }}</td>
+                                    
+                                    <td> <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary"><i class="bi bi-archive"></i></i></a></td>
+                                </tr>
+                                {% endfor %}
                                 {% for audit in audits %}
                                 <tr style="height: 100px;">
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ audit.name }}</td>
+                                    {% if audit.expected_audit_date %}
+                                        <td>{{ audit.expected_audit_date }} days ago</td>
+                                    {% else %}
+                                        <td>N/A</td>
+                                    {% endif %}
                                     <td> <a href="{% url 'audit:get_audits_by_id' audit.id %}" class="btn btn-sm btn-primary"><i class="bi bi-archive"></i></i></a></td>
                                 </tr>
                                 {% endfor %}

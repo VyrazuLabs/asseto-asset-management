@@ -5,7 +5,7 @@ from dashboard.models import Organization
 from authentication.models import User  
 
 def path_and_rename(instance, filename):
-    upload_to = 'audit/images/'
+    upload_to = 'audit_images/'
     ext = filename.split('.')[-1]
     if instance.pk:
         filename = '{}.{}'.format(instance.pk, ext)
