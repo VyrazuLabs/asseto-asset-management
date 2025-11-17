@@ -1,4 +1,4 @@
-from .models import Audit,AuditImage
+from .models import Audit
 from django import forms
 # class AuditForm(forms.ModelForm):
 #     tag =  forms.CharField(required=True, widget=forms.TextInput(
@@ -47,8 +47,3 @@ class MultipleFileField(forms.FileField):
             result = single_file_clean(data, initial)
         return result
     
-class AuditImageForm(forms.ModelForm):
-    image = MultipleFileField(label='Select files', required=False)
-    class Meta:
-            model = AuditImage
-            fields = ['image' ]

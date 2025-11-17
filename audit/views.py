@@ -1,13 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Audit,AuditImage
+from .models import Audit
 from assets.models import AssetImage
-from .forms import AuditForm,AuditImageForm
+from .forms import AuditForm
 from django.core.paginator import Paginator
 from assets.models import AssignAsset,Asset
 from authentication.models import User
 from audit.utils import next_audit_due
-from datetime import datetime,timedelta,timezone
-from assets.forms import AssetImageForm
+from datetime import datetime,timedelta,timezone 
 
 PAGE_SIZE = 10
 ORPHANS = 1
