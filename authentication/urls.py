@@ -20,7 +20,7 @@ urlpatterns = [
 
 
     #api urls
-    path('api/login/', TokenObtainPairView.as_view(),name='api_login'),
-    path('api/token/refresh/',TokenRefreshView.as_view(),name='api_token_refresh'),
-    path('api/logout/',TokenBlacklistView.as_view(),name='api_logout')
+    path('api/login/', TokenObtainPairView.as_view(),name='login'),
+    path('api/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
+    path('api/logout/',TokenBlacklistView.as_view(),name='logout')
 ]
