@@ -36,7 +36,7 @@ from configurations.utils import get_currency_and_datetime_format,format_datetim
 from configurations.utils import dynamic_display_name
 import os
 from configurations.forms import TagConfigurationForm,ClientCredentialsForm
-
+from audit.models import Audit
 IS_DEMO = os.environ.get('IS_DEMO')
 
 def grouper(iterable, n):
@@ -288,6 +288,20 @@ def listed(request):
 @login_required
 @permission_required('authentication.view_asset')
 def details(request, id):
+    get_audit_by_asset_id=Audit.objects.filter(asset__id=id).first()
+    get_audit_image=[]
+    get_audit_history=None
+    if get_audit_by_asset_id:
+        # obj={}
+        # get_audit_image=AssetImage.objects.filter(asset=get_audit_by_asset_id.asset).order_by('- changed_at').first()
+        get_audit_history=Audit.objects.filter(asset_id=id).order_by('-created_at')
+        print(get_audit_history,"audit history")
+        # for get_img in get_audit_history:
+        #     get_asset_image=AssetImage.objects.filter(uploaded_at=get_img.changed_at).order_by('-uploaded_at').first()
+        #     get_audit_image.append({
+        #         "audit_history_id": get_img.id,
+        #         "image": get_asset_image
+        #     })
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
     assiggned_asset=AssignAsset.objects.filter(asset=asset).first()
     if assiggned_asset:
@@ -336,7 +350,7 @@ def details(request, id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo}
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':get_audit_history,'get_audit_image':get_audit_image}
     return render(request, 'assets/detail.html', context=context)
 
 @login_required
@@ -581,6 +595,9 @@ def status(request, id):
 
 @login_required
 def search(request, page):
+        list_of_audits=Audit.objects.all()
+        list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+        list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
     # if request.method == 'POST':
         tag=request.GET.get('tag')
         search_text = (request.GET.get('search_text') or "").strip()
@@ -689,10 +706,9 @@ def search(request, page):
             'page_object': page_object,
             'asset_user_map': asset_user_map,
             # 'asset_user_map': asset_user_map,
-            'asset_images': asset_images
+            'asset_images': asset_images,
+            'list_of_audited_assets':list_of_audited_assets
         })
-    # else:
-        # return render(request, 'assets/list.html')
 
 
 @login_required
