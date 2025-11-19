@@ -92,6 +92,22 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group mb-2">
+                                <label>Audit Interval</label>
+                                <select class="form-control" name="audit_interval">
+                                    <option value="1">Yearly</option>
+                                    <option value="2">Half Yearly</option>
+                                    <option value="3">Quarterly</option>
+                                    <option value="4">Bi-Monthly</option>
+                                    <option value="4">Monthly</option>
+                                    <option value="5">Not Applicable</option>
+                                </select>
+                                {% for error in form.eol.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
                         <div class="col-md-12 col-12">
                             <div class="form-group">
                                 <label>Description</label>
