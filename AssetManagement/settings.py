@@ -71,7 +71,8 @@ INSTALLED_APPS = [
     'notifications',
     'simple_history',
     'configurations',
-    'drf_spectacular'
+    'drf_spectacular',
+    'audit',
 ]
 
 MIDDLEWARE = [
