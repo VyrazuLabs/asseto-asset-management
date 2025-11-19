@@ -55,6 +55,28 @@ PERMISSION_LIST = [
     'delete_product_type',
     'edit_product_type',
     'add_product_type',
+
+    # branding
+    'view_branding',
+    'add_branding'
+    'edit_branding',
+    'delete_branding',
+
+    #localization
+    'view_localization',
+    'add_localization',
+    'delete_localization',
+    'edit_localization',
+
+    #tag_configuration
+    'view_tag_configuration',
+    'add_tag_configuration',
+    'edit_tag_configuration',
+    'delete_tag_configuration',
+
+    #upload
+    'view_upload',
+    'add_upload'
 ]
 
 
@@ -128,6 +150,7 @@ def user_details(request,get_user,assigned_assets):
     user_details={
         'name':get_user.full_name,
         'email':get_user.email,
+        'isActive':get_user.is_active,
         'phone_number':get_user.phone,
         'profilePicture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
         'department':get_user.department.name if get_user.department else None,

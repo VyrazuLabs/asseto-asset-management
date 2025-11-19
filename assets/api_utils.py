@@ -1,6 +1,7 @@
 from django.utils import timezone
 from assets.models import Asset, AssetImage, AssignAsset
 from dateutil.relativedelta import relativedelta
+from dashboard.models import CustomField
 
 def convert_to_list(request,queryset):
     current_host=request.get_host()
@@ -33,7 +34,7 @@ def convert_to_list(request,queryset):
     return asset_list
 
 
-def asset_data(request,asset,asset_images,asset_barcode):
+def asset_data(request,asset,asset_images,asset_barcode,asset_statuses):
     current_host=request.get_host()
     asset_data={
         "id":asset.id,
@@ -69,6 +70,16 @@ def asset_data(request,asset,asset_images,asset_barcode):
 
     asset_data['eol']=eol_date
 
+    asset_status_list=[]
+    for asset_status in asset_statuses:
+        asset_status_dict={
+            'id':asset_status.id,
+            'name':asset_status.name
+        }
+        asset_status_list.append(asset_status_dict)
+    
+    asset_data['asset_statuses']=asset_status_list
+
     return asset_data
 
 
@@ -89,3 +100,10 @@ def get_asset_id(tag_id):
         }
 
     return respones_data
+
+def get_asset(tag_id):
+    asset=Asset.objects.filter(tag=tag_id).first()
+    if not asset:
+        raise ValueError("Asset with this tag does not exists!")
+ 
+    return {"asset_id": asset.id}

@@ -1,8 +1,9 @@
+import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from assets.api_utils import asset_data, convert_to_list, get_asset_id
+from assets.api_utils import asset_data, convert_to_list, get_asset
 from assets.barcode import generate_barcode
-from assets.models import Asset, AssetImage
+from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
@@ -17,7 +18,7 @@ class AssetList(APIView):
         OpenApiParameter(name="page",type=int,default=1,description="page number for pagination")])
     def get(self,request):
         try:
-            asset_queryset=Asset.objects.filter(organization=request.user.organization).order_by("created_at")
+            asset_queryset=Asset.undeleted_objects.filter(organization=request.user.organization).order_by("created_at")
             data=convert_to_list(request,asset_queryset)
             page=int(request.GET.get('page'))
             paginated_data=add_pagination(data,page=page)
@@ -51,7 +52,8 @@ class AssetDetails(APIView):
             asset=get_object_or_404(Asset,pk=id)
             asset_images=AssetImage.objects.filter(asset=asset.id).all()
             asset_barcode = generate_barcode(asset.tag)
-            data=asset_data(request,asset,asset_images,asset_barcode)
+            asset_statuses=AssetStatus.objects.all()
+            data=asset_data(request,asset,asset_images,asset_barcode,asset_statuses)
             return api_response(data=data, message="Details retrived successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
@@ -122,7 +124,7 @@ class Scan_api_barcode(APIView):
     def get(self,request,**kwargs):
         try:
             tag_id=self.kwargs.get('tag_id')
-            respones_data = get_asset_id(tag_id)
+            respones_data = get_asset(tag_id)
             return api_response(data=respones_data,message="Tag id found")
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
