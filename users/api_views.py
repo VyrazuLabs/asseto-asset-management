@@ -17,7 +17,7 @@ class UserList(APIView):
         OpenApiParameter(name="page",type=int,default=1,description="page number for pagination")])
     def get(self, request):
         try:
-            user_list=User.objects.all().exclude(pk=request.user.id).order_by("-created_at")
+            user_list=User.undeleted_objects.all().exclude(pk=request.user.id).order_by("-created_at")
             data=user_data(request,user_list)
             page=int(request.GET.get('page',1))
             paginated_data=add_pagination(data,page=page)
@@ -27,6 +27,7 @@ class UserList(APIView):
             return api_response(status=400,error_message=str(e))
         
         except Exception as e:
+            print(e)
             return api_response(status=500,system_message=str(e))
         
 
@@ -63,7 +64,6 @@ class UpdateUser(APIView):
         except ValueError as e:
             return api_response(status=400,error_message=e)
         except Exception as e:
-            print(serializer.errors)
             return api_response(status=500, system_message=e) 
 
 class UserDetails(APIView):
