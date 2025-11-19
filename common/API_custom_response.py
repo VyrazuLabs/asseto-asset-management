@@ -20,7 +20,7 @@ def api_response(
     }
 
     if status!=200:
-        response['success']=False,
+        response['success']=False
 
     if status == 500:
         response['error_message'] = "Somthing went wrong Please try again later."
