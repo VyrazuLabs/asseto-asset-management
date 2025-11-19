@@ -4,7 +4,8 @@ from configurations.utils import get_currency_and_datetime_format
 from datetime import datetime
 from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
-
+from dateutil.relativedelta import relativedelta
+from audit.utils import get_time_difference
 register = template.Library()
 
 @register.filter
@@ -21,8 +22,8 @@ def get_at_index(list_obj, index):
 @register.filter
 def split(value, key=' '):
     return value.split(key)
-
-@register.simple_tag(takes_context=True)
+@register.filter
+# @register.simple_tag(takes_context=True)
 def format_datetime(context,x):
     request = context['request']
     obj=get_currency_and_datetime_format(request.user.organization)
@@ -82,3 +83,60 @@ def dynamic_display_name(context,fullname):
     except Exception:
         # fallback to standard "First Last"
         return f"{first} {last}".strip()
+    
+def audit_time_diff(audit):
+    # Guard clauses if related objects are missing
+    if not audit or not audit.asset or not audit.asset.created_at or not audit.asset.product:
+        return None
+    
+    asset_creation_time = audit.asset.created_at
+    audit_interval_days = audit.asset.product.audit_interval
+    
+    return get_time_difference(asset_creation_time, audit_interval_days)
+
+@register.filter
+def next_audit_due(audit):
+    print(audit.asset.product.name,"audit in filter")
+    interval_days = audit.asset.product.get_audit_interval()
+    print(interval_days,"interval date")
+    today=datetime.today().date()
+    if not interval_days:
+        return None 
+    # last_audit = audits.asset.order_by("-created_at").first()
+
+    if not audit:
+        base_date = audit.created_at.date()
+    else:
+        base_date = audit.created_at.date()
+
+    # First due date after interval
+    next_due = base_date + relativedelta(days=interval_days)
+
+    # Grace period rule: If 30 days pass after due date → push to next interval
+    days_remaining = (next_due - today).days
+    return  days_remaining
+    # else:
+    #     days_remaining = (next_due - today).days
+    #     return days_remaining
+
+# @register.filter
+# def get_audit_image(audit_history):
+#     # get_audit_by_asset_id=Audit.objects.filter(asset__id=id).first()
+#     # get_audit_image=[]
+#     # get_audit_history=None
+#     get_audit_history=AuditHistory.objects.filter(id=audit_history).first()
+#     gety_audit_date=get_audit_history.changed_at
+#     # audit_minute = get_audit_history.changed_at.replace(second=0, microsecond=0)
+#     get_asset_image = (
+#         AssetImage.objects.filter(
+#             uploaded_at__year=gety_audit_date.year,
+#             uploaded_at__month=gety_audit_date.month,
+#             uploaded_at__day=gety_audit_date.day,
+#             uploaded_at__hour=gety_audit_date.hour,
+#             uploaded_at__minute=gety_audit_date.minute,
+#         )
+#         # .filter(uploaded_minute=gety_audit_date)
+#         .first()
+#     )
+#     print("audit image",get_asset_image,gety_audit_date)
+#     return get_asset_image
