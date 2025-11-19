@@ -510,29 +510,7 @@ def add(request):
             # Save images
             for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
-
-            # Handle predefined custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=asset.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
-
+                
             # Handle dynamically added custom fields
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
