@@ -1,0 +1,64 @@
+{% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Audit</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Audit</li>
+                    <li class="breadcrumb-item active" aria-current="page">List</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <section class="section">   
+            <div class="card mt-3">
+                <div class="card-body" id="custom-field-container">
+                    <div class="table-responsive items-table">
+                        <div class="choice-buttons">
+                            <a href="{% url 'audit:pending_audits' %}" type="button" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Pending</a>
+                            <a href="{% url 'audit:completed_audits' %}" type="button" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Completed</a>
+                            <div style="height: 40px;"></div>
+                            <div class="d-flex justify-content-between">
+                                <h3>Completed Audits</h3>
+                                <a href="{% url 'audit:add_audit' %}" class="btn btn-sm btn-outline-info my-3 me-2">Add Audit</a>
+                            </div>
+                        </div>
+                        <table class="table mt-3" id="table1">
+                            <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Asset Name</th>
+                                    <th>Condition</th>
+                                    <th>Notes</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            {% if audits is not None %}
+                                {% for audit in audits %}
+                                <tbody id="search_result">
+                                    <tr style="height: 100px;">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ audit.asset.name}}</td>
+                                        <td>{{ audit.condition_label }}</td>
+                                        <td>{{ audit.notes }}</td>
+                                        <td>{{ audit.created_at }}</td>
+                                        <td> <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary"><i class="bi bi-archive"></i></i></a></td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            {% else %}
+                                <p>No audit history found</p>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+    </section>
+</div>
+{% endblock content %}
