@@ -56,7 +56,7 @@ def create_db_connection(request, db_data):
 
         # Step 8: Apply migrations
         call_command("migrate", interactive=False, verbosity=1)
-        return True
+        return TrueVY003
 
     except Exception as e:
         print("Database connection failed:", e)
