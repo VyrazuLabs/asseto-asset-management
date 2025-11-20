@@ -69,7 +69,9 @@ class AssetImage(models.Model):
     image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-            return self.id
+        if self.image and hasattr(self.image, "url"):
+            return str(self.image.url)
+        return "No Image"
 
 class AssignAsset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
