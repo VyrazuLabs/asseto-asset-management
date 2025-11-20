@@ -31,7 +31,17 @@ def create_db_connection(request, db_data):
 
 
     # Step 4: Replace settings.DATABASES completely
-    settings.DATABASES = new_config
+    # settings.DATABASES = new_config
+    conn = connections['default']
+    conn.settings_dict.update({
+        "ENGINE": os.environ.get("DB_ENGINE"),
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USERNAME"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
+        "TEST": {"NAME": "test_asseto"},
+    })
 
     # Step 5: Create a new connection handler using the raw dict (NOT global settings)
     new_connections = ConnectionHandler(new_config)
