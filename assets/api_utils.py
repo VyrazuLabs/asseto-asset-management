@@ -66,7 +66,6 @@ def asset_data(request,asset,asset_images,asset_barcode,asset_statuses):
     eol_date=None
     if months_int:
         eol_date= today+relativedelta(months=months_int)
-        print(type(eol_date))
 
     asset_data['eol']=eol_date
 
@@ -87,7 +86,6 @@ def get_asset_id(tag_id):
     get_tag=Asset.objects.filter(tag=tag_id).exists()
     if get_tag:
         asset_id=Asset.objects.get(tag=tag_id)
-        print(asset_id.id)
         respones_data={
             'id':asset_id.id,
             "status": "success"
