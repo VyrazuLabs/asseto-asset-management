@@ -44,7 +44,6 @@ def add_audit(request):
         form = AuditForm(request.POST, request.FILES, organization=request.user.organization)
         # image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid():
-            print(form.data)
             image_instance=None
             audit = form.save(commit=False)
             audit.asset=get_asset
@@ -52,10 +51,8 @@ def add_audit(request):
             audit.audited_by = request.user  # save current user as auditor
             audit.notes = notes
             files=request.FILES.getlist('image')
-            print("files'''''''",files)
             if not files:
                 file = request.FILES.get("image")
-                print("file",file)
                 if file:
                     files = [file]
             for f in files:
@@ -69,7 +66,6 @@ def add_audit(request):
 
     if request.method == 'GET':
         user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
-        print(user_list)
         context = {'get_audit': get_audit, 'assigned_users': user_list}
         return render(request, 'audit/add_audit.html', context)
 
@@ -81,16 +77,12 @@ def add_audit(request):
 def get_audits_by_id(request, id):
     get_asset = get_object_or_404(Asset, id=id)
     get_assigned_user = AssignAsset.objects.filter(asset__id=id).first()
-    print("get_assigned_user",get_assigned_user)
     if request.method == 'POST':
         comments = request.POST.get('comments', None)
         condition = request.POST.get('condition', None)
-        print("condition",condition)
         files=request.FILES.getlist('image')
-        print("files'''''''",files)
         if not files:
             file = request.FILES.get("image")
-            print("file",file)
             if file:
                 files = [file]
         image_instance=None
@@ -99,23 +91,22 @@ def get_audits_by_id(request, id):
         get_img_instance=AssetImage.objects.filter(asset=get_asset).first()
         Audit.objects.create(
             asset=get_asset,
+            assigned_to=get_assigned_user.user.full_name if get_assigned_user else '',
             condition= condition,
             notes= comments,
             audited_by=request.user if request.user.is_authenticated else None,
             created_at= datetime.now(),
+            organization=request.user.organization,
             image=get_img_instance
         )
         return redirect('audit:completed_audits')
 
     elif request.method == 'GET':
         if get_assigned_user is None:
-            print("No USER")
             user_list = list(User.undeleted_objects.all())
             context = {'get_asset': get_asset, 'assigned_users': user_list}
         else:
-            print(get_asset, get_assigned_user.user.full_name)
             context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name}
-        print("context",context)
         return render(request, 'audit/add_audit.html', context)
 
 def audit_list(request):
@@ -128,7 +119,6 @@ def audit_list(request):
 # def upcoming_audits(request):
 #     audits = Audit.objects.all()
 #     upcoming = [a for a in audits if is_upcoming_audit(a)]
-#     print(upcoming)
 #     return render(request, 'assets/audit_list.html',context={
 #         'audits': upcoming
 #     })
@@ -162,20 +152,14 @@ def completed_audits(request):
 #     audits={}
 #     for audit in get_audits:
 #         time_diff=next_audit_due(audit)
-#         print("time diff",time_diff)
 #         if time_diff<=0:
 #             audits['name']=audit.asset
 #             audits['expected_date']=audit.created_at+timedelta(days=abs(time_diff))
 #             get_due_audits.append(audits)
 #     audit = Audit.objects.all().values('asset')
-#     print(audit)
 #     for it in audit:
-#         print(it['asset'])
 #     get_remaining_assets = Asset.objects.exclude(id__in=audit.values('asset'))
-#     print(get_remaining_assets)
 #     # pending = [a for a in audits if is_pending_audit(a)]
-#     # print(pending)
-#     print("due audits",get_due_audits)
 #     return render(request, 'assets/pending_audits.html',context={
 #         'audits': get_remaining_assets,
 #         'due_audits': get_due_audits

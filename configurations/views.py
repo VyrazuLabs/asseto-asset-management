@@ -183,9 +183,7 @@ def create_localization_configuration(request):
 
 def integration(request):
     if request.method == 'POST':
-        print(request.POST,"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         integration_type = request.POST.get('integration_type')
-        print(integration_type,"-----------------------------------------------------------------------------------------------")
         form = ClientCredentialsForm(request.POST)
         if form.is_valid():
             client_id = form.cleaned_data['client_id']
@@ -201,7 +199,6 @@ def integration(request):
     else:
         form = ClientCredentialsForm()
         integration_choices=INTEGRATION_CHOICES
-        print(integration_choices)
     return render(request, 'configurations/integrations.html', {'form': form,'integration_choices':integration_choices})
 
 def list_extensions(request):

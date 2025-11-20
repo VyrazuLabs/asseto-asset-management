@@ -163,6 +163,9 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
+    list_of_audits=Audit.objects.all()
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
     #Function to get all the list data 
     tag=request.GET.get("tag")
     user_data=request.POST.get("user-data")
@@ -280,6 +283,7 @@ def listed(request):
         # "full_name_first":active_users.full_name_first,
         'title': 'Assets',
         'is_demo':is_demo,
+        'list_of_audited_assets':list_of_audited_assets
     }
 
     return render(request, 'assets/list.html', context=context)
@@ -295,7 +299,6 @@ def details(request, id):
         # obj={}
         # get_audit_image=AssetImage.objects.filter(asset=get_audit_by_asset_id.asset).order_by('- changed_at').first()
         get_audit_history=Audit.objects.filter(asset_id=id).order_by('-created_at')
-        print(get_audit_history,"audit history")
         # for get_img in get_audit_history:
         #     get_asset_image=AssetImage.objects.filter(uploaded_at=get_img.changed_at).order_by('-uploaded_at').first()
         #     get_audit_image.append({
@@ -642,7 +645,7 @@ def search(request, page):
             q &= Q(product__product_type_id=product_type_id)
         # Get assets
         # asset_user_map = {}
-        page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
+        page_object = list(Asset.undeleted_objects.filter(q).order_by('-created_at')[:10])
         # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
 
         # page_object = (
@@ -659,11 +662,13 @@ def search(request, page):
         #             asset_user_map[assign.asset_id] = None
         #         if assign.user:  # avoid None users
         #             asset_user_map[assign.asset_id]=assign.user.full_name
-        asset_ids = list(page_object.values_list("id", flat=True))
+        asset_ids = [obj.id for obj in page_object]
+        print("asset_ids",asset_ids)
         image_object = AssetImage.objects.filter(
             asset__organization=request.user.organization,
             asset_id__in=asset_ids
         ).order_by('-uploaded_at')
+        print("image_object",image_object)
         asset_images = {}
         for img in image_object:
             if img.asset_id not in asset_images:
@@ -696,7 +701,10 @@ def search(request, page):
             page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
 
         asset_user_map = {}
-        get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=page_object) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+        get_assigned_asset_list = AssignAsset.objects.filter(
+            asset_id__in=asset_ids,
+            asset__organization=request.user.organization
+        ).order_by('-assigned_date')
         for assign in get_assigned_asset_list:
             if assign.asset_id not in asset_user_map:
                 asset_user_map[assign.asset_id] = None
@@ -1273,7 +1281,7 @@ def search_assets(request, page):
     page_object = assets_qs[:10]
 
     # --- Asset Images (first image per asset) ---
-    asset_ids = list(page_object.values_list("id", flat=True))
+    asset_ids = list(page_object.values("id", flat=True))
     asset_images_qs = (
         AssetImage.objects.filter(asset_id__in=asset_ids, asset__organization=request.user.organization)
         .order_by("-uploaded_at")
