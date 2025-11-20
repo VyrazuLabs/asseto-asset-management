@@ -96,9 +96,7 @@ def audit_time_diff(audit):
 
 @register.filter
 def next_audit_due(audit):
-    print(audit.asset.product.name,"audit in filter")
     interval_days = audit.asset.product.get_audit_interval()
-    print(interval_days,"interval date")
     today=datetime.today().date()
     if not interval_days:
         return None 
@@ -138,5 +136,4 @@ def next_audit_due(audit):
 #         # .filter(uploaded_minute=gety_audit_date)
 #         .first()
 #     )
-#     print("audit image",get_asset_image,gety_audit_date)
 #     return get_asset_image

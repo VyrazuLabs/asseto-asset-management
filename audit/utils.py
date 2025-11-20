@@ -9,7 +9,6 @@ def get_time_difference(asset_creation_time, audit_interval_days):
     now = datetime.now()
     audit_due_date = asset_creation_time + timedelta(days=audit_interval_days)
     time_diff = audit_due_date - now
-    # print("time diff", abs(time_diff.days))
     return time_diff.days
 # product = Product.objects.get(id=some_id)
 # time_left = get_time_difference(product.created_at, product.audit_interval)
@@ -24,7 +23,6 @@ def audit_time_diff(audit):
     
     asset_creation_or_updation_time = audit.created_at
     audit_interval_days = audit.asset.product.get_audit_interval()
-    print("asset_creation_time", audit_interval_days)
     return get_time_difference(asset_creation_or_updation_time, audit_interval_days)
 def is_pending_audit(audit):
     time_diff = audit_time_diff(audit)

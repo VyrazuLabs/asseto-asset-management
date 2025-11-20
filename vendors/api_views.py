@@ -97,7 +97,6 @@ class SearchVendor(APIView):
         search_text=request.GET.get('search_text')
         try:
             vendors_list = searched_data(request,search_text)
-            print(vendors_list)
             if vendors_list:
                 data=convert_to_list(vendors_list,request)
                 page=int(request.GET.get('page',1))
