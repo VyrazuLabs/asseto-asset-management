@@ -21,5 +21,4 @@ class Audit(models.Model):
     audited_by=models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
     def condition_label(self):
-        print("yo",dict(self.CONDITION_CHOICES).get(self.condition))
         return dict(self.CONDITION_CHOICES).get(self.condition)

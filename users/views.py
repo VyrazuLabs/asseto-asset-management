@@ -219,7 +219,6 @@ def delete(request, id):
 
 @user_passes_test(check_admin)
 def status(request, id):
-    print(id)
     if request.method == "POST":
         user = get_object_or_404(
             User.undeleted_objects, pk=id)
