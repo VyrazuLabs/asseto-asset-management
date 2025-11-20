@@ -31,7 +31,11 @@
                 {% endwith %}
             </td>
             <td>{{asset.tag}}</td>
-            <td>{{asset.name}}</td>
+            <td>{% if asset in list_of_audited_assets %}
+                    <div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"> 
+                {% endif %}
+                </div>{{asset.name}}</div>
+            </td>
             <td>{{asset.product.product_type}}</td>
             
             <td>
