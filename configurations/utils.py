@@ -149,7 +149,6 @@ def get_currency_and_datetime_format(organization):
             break
     # new_date_format=format_datetime(output_format=date_format)
     obj={'currency':currency_format,'date_format':date_format}
-    print(obj,"obj in utils")
     return obj
     # return organization.currency, organization.date_format
 
