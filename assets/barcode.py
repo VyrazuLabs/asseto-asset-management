@@ -11,8 +11,20 @@ from rest_framework.views import APIView
 class Scan_barcode(View):
     def get(self,request,**kwargs):
         tag_id=self.kwargs.get('tag_id')
-        respones_data = get_asset_id(tag_id)
-        return JsonResponse(respones_data=respones_data, status=404)
+        get_tag=Asset.objects.filter(tag=tag_id).exists()
+        if get_tag:
+            asset_id=Asset.objects.filter(tag=tag_id).first()
+            respones_data={
+                'id':asset_id.id,
+                "status": "success"
+            }
+            return JsonResponse(respones_data)
+        else:
+            respones_data={
+                'status':False,
+                'message':"asset with this tag does not exists!"
+            }
+            return JsonResponse(respones_data, status=404)
         
 def generate_barcode(tag_id):
     barcode_svg = Code128(tag_id, writer=SVGWriter())
