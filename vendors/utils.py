@@ -80,7 +80,6 @@ def vendor_details(get_vendor,request):
 
 
 def searched_data(request,search_text):
-    print(search_text)
     vendor_list=Vendor.undeleted_objects.filter(
         Q(organization=request.user.organization) &
         (
