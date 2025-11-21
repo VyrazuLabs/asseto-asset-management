@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta,timezone
 from .constants import AUDIT_INTERVAL_VALUE
 from dateutil.relativedelta import relativedelta
+from .models import Audit
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:
@@ -38,21 +39,54 @@ def is_upcoming_audit(audit):
         return 0
     return time_diff >= 0
 
-def next_audit_due(audit):
-    if not audit or not audit.asset or not audit.asset.product:
-        return None, False
+def next_audit_due(audit=None, asset=None):
+    if audit:
+        if not audit or not audit.asset or not audit.asset.product:
+            return None, False
 
-    interval_days = audit.asset.product.get_audit_interval()
-    if not interval_days or interval_days == 0:
-        return None, False
+        interval_days = audit.asset.product.get_audit_interval()
+        if not interval_days or interval_days == 0:
+            return None, False
 
-    today = datetime.today().date()
-    last_audit_date = audit.created_at.date()
-    next_due = last_audit_date + relativedelta(days=interval_days)
+        today = datetime.today().date()
+        last_audit_date = audit.created_at.date()
+        next_due = last_audit_date + relativedelta(days=interval_days)
 
-    days_remaining = (next_due - today).days
+        days_remaining = (next_due - today).days
 
-    is_pending = days_remaining < 0
+        is_pending = days_remaining < 0
 
-# def get_condition_type(index):
-    return days_remaining, is_pending
+    # def get_condition_type(index):
+        return days_remaining, is_pending
+
+    elif asset:
+        if not asset or not asset.product:
+            return None, False
+
+        interval_days = asset.product.get_audit_interval()
+        if not interval_days or interval_days == 0:
+            return None, False
+
+        today = datetime.today().date()
+        asset_creation_date = asset.created_at.date()
+        next_due = asset_creation_date + relativedelta(days=interval_days)
+
+        days_remaining = (next_due - today).days
+
+        is_pending = days_remaining < 0
+
+        return days_remaining, is_pending
+
+
+
+
+
+def next_audit_due_for_asset(asset):
+    interval_days = asset.product.get_audit_interval()
+    if interval_days == 0:
+        return None
+
+    audit_asset = Audit.objects.filter(asset=asset).order_by("-created_at").first()
+    base_date = asset.created_at.date() if not audit_asset else audit_asset.created_at.date()
+    next_due = base_date + relativedelta(days=interval_days)
+    return  next_due
