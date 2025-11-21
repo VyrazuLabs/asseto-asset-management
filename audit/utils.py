@@ -39,6 +39,7 @@ def is_upcoming_audit(audit):
         return 0
     return time_diff >= 0
 
+
 def next_audit_due(audit=None, asset=None):
     if audit:
         if not audit or not audit.asset or not audit.asset.product:
@@ -90,3 +91,22 @@ def next_audit_due_for_asset(asset):
     base_date = asset.created_at.date() if not audit_asset else audit_asset.created_at.date()
     next_due = base_date + relativedelta(days=interval_days)
     return  next_due
+
+def next_audit_due(audit):
+    if not audit or not audit.asset or not audit.asset.product:
+        return None, False
+
+    interval_days = audit.asset.product.get_audit_interval()
+    if not interval_days or interval_days == 0:
+        return None, False
+
+    today = datetime.today().date()
+    last_audit_date = audit.created_at.date()
+    next_due = last_audit_date + relativedelta(days=interval_days)
+
+    days_remaining = (next_due - today).days
+
+    is_pending = days_remaining < 0
+
+# def get_condition_type(index):
+    return days_remaining, is_pending

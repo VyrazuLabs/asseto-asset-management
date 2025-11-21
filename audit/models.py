@@ -22,6 +22,7 @@ class Audit(models.Model):
         (3, 'Bad'),
         (4, 'Retired')
     ]
+
     assigned_to = models.CharField(max_length=150,blank=True, null=True)
     asset = models.ForeignKey(Asset, null=True, blank=True, related_name='audits', on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
