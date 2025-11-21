@@ -29,6 +29,7 @@ class Product(TimeStampModel, SoftDeleteModel):
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
     audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
+    audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
 
     def __str__(self):
         return self.name

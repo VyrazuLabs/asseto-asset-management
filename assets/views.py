@@ -662,6 +662,7 @@ def search(request, page):
             asset__organization=request.user.organization,
             asset_id__in=asset_ids
         ).order_by('-uploaded_at')
+        print("image_object",image_object)
         asset_images = {}
         for img in image_object:
             if img.asset_id not in asset_images:
