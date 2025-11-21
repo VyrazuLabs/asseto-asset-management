@@ -83,6 +83,12 @@
                         </a>
                     </li>
                 {% endif %}
+                <li class="sidebar-item {% if sidebar == 'audit' %}active{% endif %}">
+                    <a href="{% url 'audit:completed_audits' %}" class="sidebar-link">
+                        <i class="bi bi-archive"></i>
+                        <span>Audit</span>
+                    </a>
+                </li>
                 {% if perms.authentication.edit_asset or perms.authentication.delete_asset or perms.authentication.delete_assign_asset or perms.authentication.add_assign_asset or perms.authentication.add_asset or perms.authentication.reassign_assign_asset %}
                 <li class="sidebar-item {% if sidebar == 'assets' %}active{% endif %}">
                         <a href="{% url 'assets:list' %}" class="sidebar-link">
@@ -132,35 +138,34 @@
                                 <a href="{% url 'roles:list' %}">Roles</a>
                             </li>
                         {% endif %}
-                        <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
-                                <a href="{% url 'configurations:list_extensions' %}">Extensions</a>
-                        </li>
                     </ul>
                 </li>
-                <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
-                    <a href="javascript:void(0)" class="sidebar-link">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Configuration</span>
-                    </a>
-                    <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
-                    {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
-                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                            <a href="{% url 'configurations:upload_logo' %}">Branding</a>
-                        </li>
-                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                            <a href="{% url 'configurations:list_tag' %}">Tag Configuration</a>
-                        </li>
-                        <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                            <a href="{% url 'configurations:list_localization' %}">Localizations</a>
-                        </li>  
-                        {% if request.session.slack %}  
+                {% if perms.authentication.add_vendor or perms.authentication.add_location or perms.authentication.add_department or perms.authentication.add_product_type or perms.authentication.add_product_category %}
+                    <li class="sidebar-item has-sub {% if sidebar == 'configurations' %}active{% endif %}">
+                        <a href="javascript:void(0)" class="sidebar-link">
+                            <i class="bi bi-sliders2-vertical"></i>
+                            <span>Configuration</span>
+                        </a>
+                        <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
+                        {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                                <a href="{% url 'configurations:integration' %}">Slack Integration</a>
+                                <a href="{% url 'configurations:upload_logo' %}">Branding</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                                <a href="{% url 'configurations:list_tag' %}">Tag Configuration</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                                <a href="{% url 'configurations:list_localization' %}">Localizations</a>
                             </li>  
-                        {% endif %}     
-                    {% endif %}
-                    </ul>
-                </li>
+                            {% if request.session.slack %}  
+                                <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                                    <a href="{% url 'configurations:integration' %}">Slack Integration</a>
+                                </li>  
+                            {% endif %}     
+                        {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
                 {% if perms.authentication.add_vendor or perms.authentication.add_location or perms.authentication.add_department or perms.authentication.add_product_type or perms.authentication.add_product_category %}
                     <li class="sidebar-item has-sub {% if sidebar == 'upload' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
