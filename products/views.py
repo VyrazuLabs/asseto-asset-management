@@ -124,6 +124,7 @@ def add_product(request):
         image_form=ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
             product = form.save(commit=False)
+            product.audit_interval = form.cleaned_data.get('audit_interval') or 0
             product.organization = request.user.organization
             product.save()
             form.save_m2m()
@@ -199,6 +200,7 @@ def delete_product(request, id):
 @login_required
 @permission_required('authentication.edit_product')
 def update_product(request, id):
+    audit_interval = request.POST.get("audit_interval")
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
     form = AddProductsForm(
@@ -224,59 +226,72 @@ def update_product(request, id):
             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
     elif request.method == "POST":
-        form = AddProductsForm(request.POST, request.FILES,
-        instance=product, organization=request.user.organization)
-        img_form= ProductImageForm(request.POST, request.FILES)
+        form = AddProductsForm(
+            request.POST,
+            request.FILES,
+            instance=product,
+            organization=request.user.organization
+        )
+        img_form = ProductImageForm(request.POST, request.FILES)
+
         if form.is_valid() and img_form.is_valid():
-            form.save()
-            images = request.FILES.getlist('image')
-            for img_file in images:
+            product = form.save(commit=False)
+            product.audit_interval = form.cleaned_data.get("audit_interval") or 0
+            product.organization = request.user.organization
+            product.save()
+            form.save_m2m()
+
+            for img_file in request.FILES.getlist("image"):
                 ProductImage.objects.create(product=product, image=img_file)
-            custom_fields = CustomField.objects.filter(entity_type='product', object_id=product.id, organization=request.user.organization)
+
+            # Update existing custom fields
             for cf in custom_fields:
-                key = f"custom_field_{cf.entity_id}"
+                key = f"custom_field_{cf.id}"
                 new_val = request.POST.get(key, "")
                 if new_val != cf.field_value:
                     cf.field_value = new_val
                     cf.save()
-        #Code to add new custom fields
+
+            # Add new custom fields
             for key, value in request.POST.items():
                 if key.startswith("customfield_") and value.strip():
                     field_id = key.replace("customfield_", "")
                     try:
-                        cf = CustomField.objects.get(
+                        original = CustomField.objects.get(
                             pk=field_id,
-                            entity_type='asset',
+                            entity_type="product",
                             organization=request.user.organization
                         )
                         CustomField.objects.create(
-                            name=cf.name,
+                            name=original.name,
                             object_id=product.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
+                            field_type=original.field_type,
+                            field_name=original.field_name,
                             field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
+                            entity_type="product",
+                            organization=request.user.organization,
                         )
                     except CustomField.DoesNotExist:
                         continue
 
-            # Handle dynamically added custom fields
-            names = request.POST.getlist('custom_field_name')
-            values = request.POST.getlist('custom_field_value')
+            # Add dynamically created fields
+            names = request.POST.getlist("custom_field_name")
+            values = request.POST.getlist("custom_field_value")
+
             for name, val in zip(names, values):
                 if name.strip() and val.strip():
                     CustomField.objects.create(
                         name=name.strip(),
                         object_id=product.id,
-                        field_type='text',
+                        field_type="text",
                         field_name=name.strip(),
                         field_value=val.strip(),
-                        entity_type='asset',
-                        organization=request.user.organization
-                    )  
-        messages.success(request, 'Product updated successfully')
-        return redirect(f'/products/details/{product.id}')
+                        entity_type="product",  # FIXED!
+                        organization=request.user.organization,
+                    )
+
+            messages.success(request, "Product updated successfully")
+            return redirect(f"/products/details/{product.id}")
 
     context = {'form': form, 'title': f'Edit - {product.name}','product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
     return render(request, 'products/update-product-modal.html', context)
@@ -290,7 +305,6 @@ def status(request, id):
         product.status = False if product.status else True
         product.save()
     return HttpResponse(status=204)
-
 
 @login_required
 def search(request, page):
