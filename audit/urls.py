@@ -11,4 +11,5 @@ urlpatterns = [
     # path('upcoming-audits/',views.upcoming_audits, name='upcoming_audits'),
     path('completed-audits/',views.completed_audits, name='completed_audits'),
     path('get-assigned-user/<str:tag>/',views.get_assigned_user, name='get_assigned_users'),
+    path('details/<str:id>/',views.audit_details, name='details'),
 ]
