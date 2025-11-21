@@ -37,18 +37,26 @@
                                 <tr>
                                     <th>Sl No.</th>
                                     <th>Asset Name</th>
+                                    <th>Last Audit Date</th>
                                     <th>Expected Audit Date</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="search_result">
-                                {% for audit in due_audits %}
+                                {% for data in data_set %}
                                 <tr style="height: 100px;">
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ audit.asset.name }}</td>
-                                    <td>{{ audit.expected_date }}</td>
+                                    <td>{{ data.asset.name }}</td>
+                                    <td>
+                                        {% if data.last_audit_date %}
+                                            {{ data.last_audit_date.created_at.date}}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ data.expected_audit_date }}</td>
 
-                                    <td> <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive"></i></i></a></td>
+                                    <td> <a href="{% url 'audit:get_audits_by_id' data.asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive"></i></i></a></td>
                                 </tr>
                                 {% endfor %}
                                 {% for audit in audits %}

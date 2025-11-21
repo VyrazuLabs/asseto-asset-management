@@ -51,16 +51,6 @@
                                     {% else %}
                                         <input type="text" class="form-control w-75" name="tag" id="tag-input"  />
                                     {% endif %}
-                                    <button type="button" class="btn barcode-scanner pt-0" id="scanButton">
-                                        <svg id="scan-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:27px; height:27px">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                            <path d="M4 7v-1a2 2 0 0 1 2 -2h2"/>
-                                            <path d="M4 17v1a2 2 0 0 0 2 2h2"/>
-                                            <path d="M16 4h2a2 2 0 0 1 2 2v1"/>
-                                            <path d="M16 20h2a2 2 0 0 0 2 -2v-1"/>
-                                            <path d="M5 12l14 0"/>
-                                        </svg>
-                                    </button>
                                 </div>
                                 {% for error in form.name.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -96,11 +86,10 @@
                                     <button type="button" data-value="3" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Bad</button>
                                     <button type="button" data-value="4" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Retired</button>
                                 </div>
-
                                 <input type="hidden" name="condition" id="condition-input" value="">
-                                {% for error in form.product_category.errors %}
-                                    <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
+                                {% if errors.condition %}
+                                    <small class="text-danger">{{ errors.condition }}</small>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="col-md-6 col-12 mt-2">
@@ -121,11 +110,13 @@
                                 {% if not get_audit.comments %}
                                     <textarea  class="form-control" name="comments" placeholder="Enter comments" value="{{ get_audit.comments }}"></textarea>
                                 {% else %}
-                                    <textarea  class="form-control" name="comments"></textarea>
+                                    <textarea class="form-control" name="comments" placeholder="Enter comments">
+                                        {{ request.POST.comments }}
+                                    </textarea>
                                 {% endif %}
-                                {% for error in form.model.errors %}
-                                    <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
+                                {% if errors.comments %}
+                                    <small class="text-danger">{{ errors.comments }}</small>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
