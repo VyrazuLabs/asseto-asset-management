@@ -14,6 +14,7 @@
             </nav>
         </div>
         <div>
+            <a href="{% url 'products:details_product' product.id %}" class="btn btn-sm btn-outline-info my-3">Product Detail</a>
             <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
         </div>
     </div>
@@ -21,11 +22,10 @@
         <form class="form row" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <button type="submit" class="btn btn-sm btn-info float-end"
-                        onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;">
-                        Save
-                    </button>
+                        onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
+                    >Save</button>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -88,6 +88,15 @@
                                 <label>Product EOL</label>
                                 {{ form.eol }}
                                 {% for error in form.eol.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group mb-2">
+                                <label>Audit Interval</label>
+                                {{ form.audit_interval }}
+                                {% for error in form.audit_interval.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
                             </div>

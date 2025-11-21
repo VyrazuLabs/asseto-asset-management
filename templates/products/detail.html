@@ -16,6 +16,7 @@
 
     </div>
         <div>
+            <a href="{% url 'products:update_product' product.id %}" class="btn btn-sm btn-outline-info my-3">Product Update</a>
             <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
         </div>
     </div>
@@ -59,7 +60,18 @@
                             <tr>
                                 <td><b>Product EOL</b></td>
                                 <td>{{ product.eol }} months</td>
+                            </tr>
+                            {% if product.get_audit_duration %}
+                                <tr>
+                                    <th scope="row">Audit Interval</th>
+                                    <td colspan="3">{{product.get_audit_duration}}</td>
                                 </tr>
+                            {% elif product.get_audit_duration == 0 %}
+                                <tr>
+                                    <th scope="row">Audit Interval</th>
+                                    <td colspan="3">Not Applicable</td>
+                                </tr>
+                            {% endif %}
                             <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{product.description|urlize}}</td>
