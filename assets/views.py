@@ -36,7 +36,7 @@ from configurations.utils import get_currency_and_datetime_format,format_datetim
 from configurations.utils import dynamic_display_name
 import os
 from configurations.forms import TagConfigurationForm,ClientCredentialsForm
-from audit.models import Audit
+from audit.models import Audit,AuditImage
 IS_DEMO = os.environ.get('IS_DEMO')
 
 def grouper(iterable, n):
@@ -292,13 +292,27 @@ def listed(request):
 @login_required
 @permission_required('authentication.view_asset')
 def details(request, id):
-    get_audit_by_asset_id=Audit.objects.filter(asset__id=id).first()
-    get_audit_image=[]
-    get_audit_history=None
-    if get_audit_by_asset_id:
+    # get_audit_by_asset_id=Audit.objects.filter(asset__id=id)
+    get_audit_history=Audit.objects.filter(asset_id=id)
+    get_audit_image=AuditImage.objects.filter(audit__asset__id=id).order_by('-uploaded_at').first()
+    # get_audit_history=None
+    # if get_audit_by_asset_id:
         # obj={}
         # get_audit_image=AssetImage.objects.filter(asset=get_audit_by_asset_id.asset).order_by('- changed_at').first()
-        get_audit_history=Audit.objects.filter(asset_id=id).order_by('-created_at')
+        # get_audit_history=Audit.objects.filter(asset_id=id).order_by('-created_at')
+    
+    audit_data = []
+    if get_audit_history:
+        for audit in get_audit_history:
+            data = {
+                "id": audit.id,
+                "asset_name": audit.asset.name,
+                "condition_label": audit.condition_label,
+                "notes": audit.notes,
+                "created_at": audit.created_at,
+                "audit_image": AuditImage.objects.filter(audit=audit).order_by('-uploaded_at').first()
+            }
+            audit_data.append(data)
         # for get_img in get_audit_history:
         #     get_asset_image=AssetImage.objects.filter(uploaded_at=get_img.changed_at).order_by('-uploaded_at').first()
         #     get_audit_image.append({
@@ -353,7 +367,7 @@ def details(request, id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
     context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':get_audit_history,'get_audit_image':get_audit_image}
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image}
     return render(request, 'assets/detail.html', context=context)
 
 @login_required
@@ -634,54 +648,25 @@ def search(request, page):
 
         if status_id:
             q &= Q(asset_status_id=status_id)
-
-        # if department_id:
-        #     q &= Q(department_id=department_id)
         
         if product_category_id:
             q &= Q(product__product_category__id=product_category_id)
         
         if product_type_id:
             q &= Q(product__product_type_id=product_type_id)
-        # Get assets
-        # asset_user_map = {}
-        page_object = list(Asset.undeleted_objects.filter(q).order_by('-created_at')[:10])
-        # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
 
-        # page_object = (
-        #     Asset.undeleted_objects
-        #     .filter(q)
-        #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #     .order_by("-created_at")[:10]
-        # )
-        # if user_id:
-        #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
-        #     asset_user_map = {}
-        #     for assign in get_assigned_asset_list:
-        #         if assign.asset_id not in asset_user_map:
-        #             asset_user_map[assign.asset_id] = None
-        #         if assign.user:  # avoid None users
-        #             asset_user_map[assign.asset_id]=assign.user.full_name
+        page_object = list(Asset.undeleted_objects.filter(q).order_by('-created_at')[:10])
+
         asset_ids = [obj.id for obj in page_object]
-        print("asset_ids",asset_ids)
         image_object = AssetImage.objects.filter(
             asset__organization=request.user.organization,
             asset_id__in=asset_ids
         ).order_by('-uploaded_at')
-        print("image_object",image_object)
         asset_images = {}
         for img in image_object:
             if img.asset_id not in asset_images:
                 asset_images[img.asset_id] = img
-        # if user_id:
-        #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-        #     page_object = (
-        #         Asset.undeleted_objects
-        #         .filter(q, assignasset__user_id=user_id)
-        #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #         .order_by("-created_at")[:10]
-        #     )
-        # else:
+
         if user_id:
             assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
             page_object = (
