@@ -69,7 +69,7 @@ def product_type_list(request):
 
     context = {
         'sidebar': 'admin',
-        'submenu': 'product_type',
+        # 'submenu': 'product_type',
         'product_type': product_type,
         'page_object': page_object,
         'deleted_product_types_count':deleted_product_types_count,

@@ -144,7 +144,8 @@ def completed_audits(request):
         created_at__gte=thirty_days_ago
     ).order_by('-created_at')
     return render(request, 'audit/audit_list.html', {
-        'audits': audits
+        'audits': audits,
+        'sidebar': 'audit'
     })
 
 def pending_audits(request):

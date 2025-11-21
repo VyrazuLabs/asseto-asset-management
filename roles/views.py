@@ -32,7 +32,7 @@ def list(request):
 
     context = {
         'sidebar': 'admin',
-        'submenu': 'roles',
+        # 'submenu': 'roles',
         'page_object': page_object,
         'title': 'Roles'
     }
