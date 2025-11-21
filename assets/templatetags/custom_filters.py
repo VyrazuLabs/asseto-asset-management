@@ -26,6 +26,8 @@ def split(value, key=' '):
     return value.split(key)
 @register.filter
 # @register.simple_tag(takes_context=True)
+@register.filter
+# @register.simple_tag(takes_context=True)
 def format_datetime(context,x):
     request = context['request']
     obj=get_currency_and_datetime_format(request.user.organization)
