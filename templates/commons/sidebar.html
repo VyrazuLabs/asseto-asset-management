@@ -75,10 +75,10 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}                    <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
-                    <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">   
+                {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
+                    <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
                         <a href="{% url 'users:list' %}" class="sidebar-link">
-                            <i class="bi bi bi-people-fill"></i>
+                            <i class="bi bi-people-fill"></i>
                             <span>Users</span>
                         </a>
                     </li>
@@ -105,7 +105,7 @@
                             <span>Admin</span>
                         </a>
                     {% endif %}
-                    <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
+                    <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
                         {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                                 <a href="{% url 'dashboard:locations' %}">Locations</a>
@@ -147,7 +147,6 @@
                             <span>Configuration</span>
                         </a>
                         <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
-                        {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                                 <a href="{% url 'configurations:upload_logo' %}">Branding</a>
                             </li>
@@ -156,13 +155,7 @@
                             </li>
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                                 <a href="{% url 'configurations:list_localization' %}">Localizations</a>
-                            </li>  
-                            {% if request.session.slack %}  
-                                <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                                    <a href="{% url 'configurations:integration' %}">Slack Integration</a>
-                                </li>  
-                            {% endif %}     
-                        {% endif %}
+                            </li>
                         </ul>
                     </li>
                 {% endif %}

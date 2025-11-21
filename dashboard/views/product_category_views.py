@@ -82,7 +82,7 @@ def product_category_list(request):
         is_demo=False
     context = {
         'sidebar': 'admin',
-        'submenu': 'product_category',
+        # 'submenu': 'product_category',
         'page_object': page_object,
         'deleted_product_categories_count': deleted_product_categories_count,
         'product_category_asset_count': product_category_asset_count,
