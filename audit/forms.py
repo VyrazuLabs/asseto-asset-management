@@ -23,14 +23,51 @@ class AuditForm(forms.ModelForm):
         model = Audit
         fields = ['condition', 'notes', 'assigned_to']
         widgets = {
-            'condition': forms.Select(choices=Audit.CONDITION_CHOICES, attrs={'class': 'form-select'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter comments'}),
-            'assigned_to': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Assigned to'}),
+            'condition': forms.Select(
+                choices=Audit.CONDITION_CHOICES,
+                attrs={'class': 'form-select'}
+            ),
+            'notes': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': 'Enter comments'}
+            ),
+            'assigned_to': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Assigned to'}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
+
+        self.fields['condition'].required = True
+        self.fields['notes'].required = True
+
+        self.fields['assigned_to'].required = False
+        self.fields['condition'].error_messages = {
+            "required": "Please select  condition."
+        }
+        self.fields['notes'].error_messages = {
+            "required": "Please enter notes for the audit."
+        }
+
+    def clean_notes(self):
+        notes = self.cleaned_data.get("notes", "").strip()
+        if len(notes) < 1:
+            raise forms.ValidationError("Notes must be at least 1 characters long.")
+        return notes
+
+    def clean(self):
+        cleaned_data = super().clean()
+        condition = cleaned_data.get("condition")
+        notes = cleaned_data.get("notes")
+
+        if not condition:
+            self.add_error("condition", "Condition is required.")
+
+        if not notes:
+            self.add_error("notes", "Notes cannot be empty.")
+
+        return cleaned_data
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True

@@ -6,6 +6,8 @@ from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
 from dateutil.relativedelta import relativedelta
 from audit.utils import get_time_difference
+from audit.models import Audit,AuditImage
+from assets.models import AssetImage
 register = template.Library()
 
 @register.filter
@@ -95,13 +97,13 @@ def audit_time_diff(audit):
     return get_time_difference(asset_creation_time, audit_interval_days)
 
 @register.filter
-def next_audit_due(audit):
+def next_audit_due(audit_id):
+    audit=Audit.objects.filter(id=audit_id).first()
     interval_days = audit.asset.product.get_audit_interval()
     today=datetime.today().date()
     if not interval_days:
         return None 
     # last_audit = audits.asset.order_by("-created_at").first()
-
     if not audit:
         base_date = audit.created_at.date()
     else:
@@ -112,7 +114,7 @@ def next_audit_due(audit):
 
     # Grace period rule: If 30 days pass after due date → push to next interval
     days_remaining = (next_due - today).days
-    return  days_remaining
+    return  next_due
     # else:
     #     days_remaining = (next_due - today).days
     #     return days_remaining
@@ -137,3 +139,30 @@ def next_audit_due(audit):
 #         .first()
 #     )
 #     return get_asset_image
+
+@register.filter
+def get_img_for_audit(audit):
+    get_audit_image=audit.image
+    get_asset_image = (
+        AssetImage.objects.filter(
+            image=get_audit_image,
+        )
+        .first()
+    )
+    return get_asset_image.image.url
+
+@register.filter
+def audit_image_url(audit):
+    if audit:
+        get_audit_image = (
+            AuditImage.objects.filter(
+                audit=audit,
+            )
+            .order_by('-uploaded_at')
+            .first()
+        )
+        if get_audit_image:
+            return get_audit_image.image.url
+        else:
+            return ""
+    return ""
