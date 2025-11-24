@@ -9,7 +9,12 @@
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}" />
-    <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
+    {% if get_favicon %}
+        <link rel="shortcut icon" href="/media{{ get_favicon }}" type="image/x-icon" />
+    {% else %}
+        <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
+    {% endif %}
+
     <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.png' %}" type="image/png" />
     <link rel="stylesheet" href="{% static 'assets/css/shared/iconly.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/pages/simple-datatables.css' %}" />
@@ -26,6 +31,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HoA5keKvA3TtH8+Xae7Hi3yI0CGMBLgY0uJjl2CUQThYurW8Mu9uKdB7CpZl1Fcf"
         crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
 
     <!-- Other JS -->
     <script src="{% static 'assets/js/htmx.min.js' %}"></script>
@@ -74,15 +81,37 @@
                             </div>
                         </div>
                         <div class="col-md-12 col-xl-6">
-                            <div class="d-flex justify-content-between">
+                            <div class="d-flex justify-content-between" style="margin-top: 18px;">
                                 <div class="hamburger-btn-wrap">
                                     <a href="#" class="burger-btn d-block d-xl-none me-3">
                                         <i class="bi bi-justify fs-3"></i>
                                     </a> 
-                                </div>
+                                </div>  
                                 <div class="d-flex notification-profile">
+                                    <!-- <button type="button" class="btn barcode-scanner pt-0" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <svg id="scan-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-scan" style="width:27px; height:27px
+                                        ">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 7v-1a2 2 0 0 1 2 -2h2"/>
+                                            <path d="M4 17v1a2 2 0 0 0 2 2h2"/>
+                                            <path d="M16 4h2a2 2 0 0 1 2 2v1"/>
+                                            <path d="M16 20h2a2 2 0 0 0 2 -2v-1"/>
+                                            <path d="M5 12l14 0"/>
+                                        </svg>
+                                    </button> -->
+
+                                    <button type="button" class="btn barcode-scanner pt-0" id="scanButton">
+                                        <svg id="scan-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:27px; height:27px">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 7v-1a2 2 0 0 1 2 -2h2"/>
+                                            <path d="M4 17v1a2 2 0 0 0 2 2h2"/>
+                                            <path d="M16 4h2a2 2 0 0 1 2 2v1"/>
+                                            <path d="M16 20h2a2 2 0 0 0 2 -2v-1"/>
+                                            <path d="M5 12l14 0"/>
+                                        </svg>
+                                    </button>
                                     <!-- Notification -->
-                                    <div class="bell-btn-area" style="margin-right: 20px;">
+                                    <div class="bell-btn-area">
                                         <ul class="navbar-nav mb-0 me-3 justify-content-end">
                                             <li class="nav-item dropdown">
                                                 <a class="nav-link active dropdown-toggle text-gray-600" href="#" data-bs-toggle="dropdown" aria-expanded="false" style="padding-top: 0px;">
@@ -107,8 +136,8 @@
                                         <div class="dropdown">
                                             <a href="#" class="d-flex align-items-center justify-content-end" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <div class="user-menu d-flex align-items-center">
-                                                    <div class="user-name text-end me-3">
-                                                        <h6 class="mb-0 text-gray-600">{{request.user.full_name}}</h6>
+                                                    <div class="user-name text-end me-3 d-none d-lg-block">
+                                                        <h6 id="full-name" class="full-name-text mb-0 text-gray-600">{{request.user.reverse_full_name}}</h6>
                                                         <p class="mb-0 text-sm text-gray-600">
                                                             {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
                                                         </p>
@@ -124,9 +153,15 @@
                                                     </div>
                                                 </div>
                                             </a>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown-menu" 
+                                            <ul class="dropdown-menu dropdown-menu-end shadow user-dropdown-menu"
                                                 aria-labelledby="userDropdown">
-                                                <li><h6 class="dropdown-header">Hello, {{request.user.full_name}}</h6></li>
+                                                <li>
+                                                    <div class="d-flex">
+                                                        <h6 id="full-name" class="full-name-text dropdown-header pe-1">Hello, {{request.user.reverse_full_name}}</h6><h6 class=" ps-0 dropdown-header d-block d-lg-none">
+                                                        {% if request.user.is_superuser %} [Administrator] {% else %} [{{request.user.role}}] {% endif %}
+                                                        </h6>
+                                                    </div>
+                                                </li>
                                                 <li>
                                                     <a class="dropdown-item" href="{% if profile %}javascript:void(0){% else %}{% url 'authentication:profile' %}{% endif %}">
                                                         <i class="icon-mid bi bi-person me-2"></i> My Profile
@@ -148,6 +183,36 @@
                                     </div>
                                 </div>
                             </div>      
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Scan Barcode</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="camera-wrapper" style="position: relative; width: 100%; height: 400px; background: #000;">
+                                    <div id="camera-preview" style="width: 100%; height: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Scan Barcode</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="camera-wrapper" style="position: relative; width: 100%; height: 400px; background: #000;">
+                                    <div id="camera-preview" style="width: 100%; height: 100%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,3 +240,6 @@
                     {% endfor %}
                 {% endif %}
             </header>
+<script>
+
+</script>

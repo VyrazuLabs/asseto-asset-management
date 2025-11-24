@@ -8222,3 +8222,80 @@ body[data-theme="dark"] {
 
   font-size: 10px;
 }
+
+.barcode-scanner{
+  color: #435ebe !important;
+}
+
+#camera-preview {
+    width: 100%;
+    height: 400px; /* Adjust as needed for your modal size */
+    position: relative;
+}
+#camera-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures video fills without distortion */
+}
+
+/* @media (max-width: 436px) {
+    .d-flex.justify-content-end.pt-4 {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .barcode-dowload-btn {
+        margin: 0 !important;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .barcode-dowload-btn button {
+        width: auto;
+    }
+
+    .asset-barcode {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap; 
+        max-width: 100%;
+        padding: 5px 0;
+    }
+
+    .asset-barcode span {
+        display: inline-block; 
+    }
+} */
+
+@media (max-width: 436px) {
+  .barcode-div{
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .barcode-dowload-btn{
+    margin-top: 7px !important;
+    padding-left: 0px !important;
+    margin-bottom: 10px !important;
+  }
+  .asset-barcode svg{
+    width: 100%;
+  }
+ 
+}
+ 
+.bell-icon-div{
+  margin-right: 20px;
+}
+@media  screen and (max-width:991) {
+  .bell-icon-div{
+    margin-right: 0px;
+  }
+}
+
+.logo-upload-btn{
+  background-color:#0dcaf0 !important;
+  border-color:#0dcaf0 !important;
+}

@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% if page_object %}
     {% for location in page_object %}
     <tr>
@@ -9,6 +10,20 @@
             {% endif %}
         </td>
         <td>{{location.office_name}}</td>
+        <td>
+            {% if not location_asset_count|get_item:location.id %}
+                    0
+            {% else %}
+                <form method="get" action="{% url 'dashboard:search_location' 1 %}" class="d-inline">
+                    <input type="hidden" name="location" value="{{ location.id }}">
+                    <button type="submit" 
+                            class="btn btn-sm text-white"
+                            style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
+                        {{ location_asset_count|get_at_index:location.id|default:0 }}
+                    </button>
+                </form>
+            {% endif %}
+        </td>
         <td>{{location.contact_person_name}}</td>
         <td>{{location.address.state}}</td>
         <td>{{location.address.city}}</td>

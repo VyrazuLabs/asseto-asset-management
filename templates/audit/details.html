@@ -1,0 +1,106 @@
+{% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
+{% load static %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Audit Details</h3>
+
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Audit</li>
+                    <li class="breadcrumb-item active" aria-current="page">Audit Details</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <div class="me-2">
+                <a href="{% url 'audit:completed_audits' %}" class="btn btn-sm btn-outline-info my-3">Back to Audit List</a>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-pc-display"></i>
+                    <span>Audit Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">Asset Tag</th>
+                                <td>{{audit.asset.tag}}</td>
+                                <th scope="row">Asset Name</th>
+                                <td>{{audit.asset.name}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Audited At</th>
+                                <td>{{audit.created_at}}</td>
+                                <th scope="row">Audited By</th>
+                                <td>{{audit.audited_by}}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Asset Audit Interval</th>
+                                <td>{{audit.asset.product.get_audit_duration}}</td>
+                                <th scope="row">Condition</th>
+                                <td>{{audit.condition_label}}</td>
+                            </tr>
+                            </tbody>
+                    </table>
+                    <p class="ps-2"><b>Notes</b>:  {{audit.notes}}</p>
+                    
+                    <p class="ps-2"><b>Audit Images</b></p>
+                    <div class="d-flex gap-2">
+                            {% if images %}
+                                {% for images in images %}
+                                    <div >
+                                        <img
+                                        src="{% get_media_prefix %}{{ images.image }}" 
+                                        alt="Asset Image {{ forloop.counter }}"
+                                        style="cursor: pointer; width: 150px;"
+                                        class="clickable-image"
+                                        data-image-src="{% get_media_prefix %}{{ images.image }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#imageModal{{ forloop.counter }}"
+                                        onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                        >
+                                    </div>
+                                    <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ images.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% elif not images %}
+                                <div >
+                                    <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                </div>
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('hidden.bs.modal', () => {
+    window.location.reload();
+  });
+});
+</script>
+{% endblock content%}

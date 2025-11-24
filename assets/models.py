@@ -45,7 +45,7 @@ class Asset(TimeStampModel, SoftDeleteModel):
     ]
     status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tag = models.CharField(max_length=255, blank=False, null=True)
+    tag = models.CharField(max_length=255, blank=False, null=True, unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
@@ -68,15 +68,10 @@ class AssetImage(models.Model):
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    # def __str__(self):
-    #     return f"Image for {self.asset.name or self.asset.id}"
-    # @classmethod
-    # def total_asset_cost(self):
-    #     return self.objects.all().aggregate(total_cost=Sum('price')).get('total_cost',0)
-
-    # def __str__(self):
-    #     return f'{self.name} ({self.serial_no})'
+    def __str__(self):
+        if self.image and hasattr(self.image, "url"):
+            return str(self.image.url)
+        return "No Image"
 
 class AssignAsset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -1,7 +1,7 @@
-{% extends 'layouts/auth-layout.html' %}
+{% extends 'commons/first_time_installation.html' %}
 {% block title %}Register{% endblock title %}
 {% block content %}
-
+            {% include 'commons/progress-bar.html' with current_step=3 %}
             <h1 class="title">Sign Up</h1>
             <p class="subtitle mb-5">Input your data to register to our website.</p>
   
@@ -11,7 +11,7 @@
 
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="alert alert-light-danger">{{ message }}</div>
+                    <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
 
@@ -91,11 +91,6 @@
                 {% endfor %}
                 <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">Sign Up</button>
             </form>
-            <div class="text-center mt-5 text-lg fs-4">
-                <p class='text-gray-600'>Already have an account? 
-                    <a href="{% url 'authentication:login' %}" class="font-bold">Log in</a>
-                </p>
-            </div>
         </div>
     </div>
     <div class="col-lg-6 d-none d-lg-block">

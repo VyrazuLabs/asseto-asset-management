@@ -4,7 +4,7 @@ from .models import *
 from dashboard.models import ProductCategory, ProductType
 from assets.forms import MultipleFileField
 from django.db.models import Q
-
+from audit.constants import AUDIT_INTERVAL
 
 class AddProductsForm(forms.ModelForm):
 
@@ -52,7 +52,12 @@ class AddProductsForm(forms.ModelForm):
         widget=forms.Select(
             attrs={'class': 'form-control'}
         ))
-
+    
+    audit_interval = forms.TypedChoiceField(
+        choices=AUDIT_INTERVAL,
+        coerce=int,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
@@ -77,7 +82,7 @@ class AddProductsForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'product_picture', 'manufacturer',
-                  'description','product_category','product_sub_category','product_type','eol','model']
+                  'description','product_category','product_sub_category','product_type','eol','model','audit_interval']
     
     def save(self, commit=True):
         instance = super().save(commit=False)

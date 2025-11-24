@@ -10,6 +10,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset,Asset
+import os
+
+IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -50,15 +53,20 @@ def locations(request):
         .values("location")
         .annotate(asset_count=Count("id"))
     )
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
-    print("--------------------",len(location_asset_count))
     context = {
         'sidebar': 'admin',
         'submenu': 'location',
         'page_object': page_object,
         'deleted_location_count':deleted_location_count,
         'location_asset_count':location_asset_count,
-        'title': 'Locations'
+        'title': 'Locations',
+        'is_demo':is_demo
     }
 
     return render(request, 'dashboard/locations/list.html', context=context)
@@ -124,7 +132,7 @@ def update_location(request, id):
                 location_form.save()
                 address_form.save()
                 messages.success(request, 'Location updated successfully')
-                return redirect('dashboard:locations')
+                return redirect(f'/admin/locations/details/{location.id}')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
                    'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}
@@ -177,4 +185,15 @@ def search_location(request, page):
     paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = page
     page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/locations/locations-data.html', {'page_object': page_object})
+    asset_counts = (
+        Asset.objects
+        .filter(organization=request.user.organization,
+                location__in=location_list)
+        .values("location")
+        .annotate(asset_count=Count("id"))
+    )
+    location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
+    return render(request, 'dashboard/locations/locations-data.html', 
+                  {'page_object': page_object,
+                   'location_asset_count':location_asset_count
+                   })

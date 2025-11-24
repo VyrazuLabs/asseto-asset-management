@@ -5,7 +5,7 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
-
+from audit.constants import AUDIT_INTERVAL_VALUE, AUDIT_INTERVAL
 
 def path_and_rename(instance, filename):
     upload_to =  'product/'
@@ -28,9 +28,17 @@ class Product(TimeStampModel, SoftDeleteModel):
     product_type = models.ForeignKey(ProductType, models.DO_NOTHING, blank=True, null=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
+    audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
+    audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
 
     def __str__(self):
         return self.name
+    
+    def get_audit_interval(self):
+        return dict(AUDIT_INTERVAL_VALUE).get(self.audit_interval)
+    
+    def get_audit_duration(self):
+        return dict(AUDIT_INTERVAL).get(self.audit_interval)
 
 class ProductImage(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='images')

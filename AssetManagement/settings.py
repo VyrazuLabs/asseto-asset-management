@@ -10,19 +10,21 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from ctypes import cast
 from pathlib import Path
 from dotenv import load_dotenv
 import os
-from decouple import config 
+from decouple import config
+from datetime import timedelta
 # import pysqlite3 as sqlite3
 import pymysql
 pymysql.install_as_MySQLdb()
-
+from django.db.utils import OperationalError
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv()
+load_dotenv(BASE_DIR / '.env', override=True)
+# os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
 LOGIN_REDIRECT_URL = '/'
 
 
@@ -37,7 +39,7 @@ DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com',]
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
 
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
@@ -51,6 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
     "django_htmx",
     'authentication',
     'vendors',
@@ -60,16 +64,19 @@ INSTALLED_APPS = [
     'recycle_bin',
     'upload',
     'error_handlers',
-
     'smart_selects',
     'roles',
     'users',
     'support',
     'notifications',
-    'simple_history'
+    'simple_history',
+    'configurations',
+    'drf_spectacular',
+    'audit',
 ]
 
 MIDDLEWARE = [
+    "authentication.middleware.DBConnectionMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -84,7 +91,39 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'AssetManagement.urls'
 
-TEMPLATES = [
+WSGI_APPLICATION = 'AssetManagement.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+
+try:
+    os.environ['DB_ENGINE']
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [BASE_DIR / 'templates'],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                    'configurations.context_processors.sidebar_logo',
+                    'configurations.context_processors.favicon_image',
+                    'configurations.context_processors.login_page_logo'
+                ],
+            },
+        },
+    ]
+except Exception:
+    TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
@@ -106,10 +145,11 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME':  os.environ.get('DB_DATABASE'),
+        'NAME':  os.environ.get('DB_NAME'),
         'USER':  os.environ.get('DB_USERNAME'),
         'PASSWORD':  os.environ.get('DB_PASSWORD'),
         'HOST':  os.environ.get('DB_HOST'),
@@ -120,11 +160,13 @@ DATABASES = {
     }
 }
 # DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
+#        'default': {
+#            'ENGINE': 'django.db.backends.sqlite3',
+#            'NAME': BASE_DIR / 'db.sqlite3',
+#        }
+#    }
+
+
 
 
 
@@ -202,3 +244,54 @@ DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000  # or higher if needed
 
 APPEND_SLASH = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'     
+    ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FormParser'
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5) if not DEBUG else timedelta(minutes=50),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
+
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY":SECRET_KEY ,
+    "VERIFYING_KEY": "",
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JSON_ENCODER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
+    "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed"
+}
+
+SPECTACULAR_SETTINGS = {
+    'COMPONENT_SPLIT_REQUEST': True,  # Splits FileField schemas for request/response
+    # Other settings like TITLE, VERSION, etc.
+    'SWAGGER_OPTIONS': {'persistAuthorization': True}
+}

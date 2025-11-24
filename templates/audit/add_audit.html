@@ -1,0 +1,174 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            {% if get_asset is not None %}
+                <h3 class="page-name">Update Audit</h3>
+            {% else %}
+                <h3 class="page-name">Add Audit</h3>
+            {% endif %}
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Audit</li>
+                    {% if get_asset is not None %}
+                       <li class="breadcrumb-item active" aria-current="page">Update Audit</li>
+                    {% else %}
+                    <li class="breadcrumb-item active" aria-current="page">Add Audit</li>
+                    {% endif %}
+                </ol>
+            </nav>
+        </div>      
+        <div>
+            <a href="{% url 'audit:completed_audits' %}" class="btn btn-sm btn-outline-info my-3">Back to Audit</a>
+        </div>
+    </div>
+    <section class="section">
+        <form class="form row" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card">
+                {% if get_asset is not None %}
+                     <div class="card-header border-bottom mb-4">
+                        <h2>Update Audit</h2>
+                    </div>
+                {% else %}
+                    <div class="card-header border-bottom mb-4">
+                        <h2>New Audit Entry</h2>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <div class="form-group">
+                                <label>Asset Id/ Tag Number</label>
+                                {{form.name}}
+                                <div class="input-group d-flex">
+                                    {% if get_asset is not None %}
+                                        <input type="text" class="form-control w-75" name="name" value="{{ get_asset.tag }}" disabled/>
+                                    {% elif get_audit.asset is not None %}
+                                        <input type="text" class="form-control w-75" name="tag" value="{{ get_audit.asset.tag }}" />
+                                    {% else %}
+                                        <input type="text" class="form-control w-75" name="tag" id="tag-input"  />
+                                    {% endif %}
+                                </div>
+                                {% for error in form.name.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <div class="form-group mb-2">
+                                <label>Assigned To</label>
+                                {{form.product_sub_category}}         
+                                {% if get_asset is not None and  asset_assigned_users is not None %}
+                                    <input type="text" class="form-control w-100" name="assigned-to" id="assigned-to-input" value="{{asset_assigned_users}}" disabled/>
+                                {% elif get_audit is not None  %}
+                                    <input type="text" class="form-control w-100" name="assigned-to" id="assigned-to-input" value="Not Assigned" disabled/>
+                                {% else %}                       
+                                    <input type="text" class="form-control w-100 " name="assigned-to-input" id="assigned-to-input" value="Not Assigned" disabled/>
+                                {% endif %}
+                                <small id="assigned-to-msg" class="text-info"></small>
+                                <sub ></sub>
+                                {% for error in form.product_sub_category.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <div class="form-group mb-2">
+                                <label class="">Condition Status</label>
+                                {{form.product_category}}
+                                <div class="d-flex gap-3 p-1">
+                                    <button type="button" data-value="0" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Excellent</button>
+                                    <button type="button" data-value="1" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Good</button>
+                                    <button type="button" data-value="2" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Fair</button>
+                                    <button type="button" data-value="3" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Bad</button>
+                                    <button type="button" data-value="4" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Retired</button>
+                                </div>
+                                <input type="hidden" name="condition" id="condition-input" value="">
+                                {% if errors.condition %}
+                                    <small class="text-danger">{{ errors.condition }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-12 mt-2">
+                            <div class="form-group">
+                                <label>Asset Image</label>
+                                {{form.product_sub_category}}
+                                <input type="file" class="form-control w-100" name="image" multiple />
+                                <sub >The number of file selected will be logged</sub>
+                                {% for error in form.product_sub_category.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group mb-2">
+                                <label>Detailed Observations/Comments</label>
+                                {{ form.model }}
+                                {% if not get_audit.comments %}
+                                    <textarea  class="form-control" name="comments" placeholder="Enter comments" value="{{ get_audit.comments }}"></textarea>
+                                {% else %}
+                                    <textarea class="form-control" name="comments" placeholder="Enter comments">
+                                        {{ request.POST.comments }}
+                                    </textarea>
+                                {% endif %}
+                                {% if errors.comments %}
+                                    <small class="text-danger">{{ errors.comments }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="card-header">
+                    <button type="submit" class="btn btn-sm btn-info float-end"
+                        onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
+                    >Save</button>
+                </div>
+            </div>
+            <!-- Custom Fields Section -->
+        </form>
+    </section>
+</div>
+<script>
+    document.querySelectorAll('button[data-value]').forEach(button => {
+        button.addEventListener('click', () => {
+            document.getElementById('condition-input').value = button.getAttribute('data-value');
+            // Optionally visually highlight selected button:
+            document.querySelectorAll('button[data-value]').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        });
+    });
+    document.getElementById("tag-input").addEventListener("keyup", function () {
+    const tag = this.value.trim();
+    if (tag.length === 0) return;
+
+    fetch(`/audit/get-assigned-user/${tag}`)
+        .then(response => response.json())
+        .then(data => {
+            const inputField = document.getElementById("assigned-to-input");
+            const message = document.getElementById("assigned-to-msg");
+
+            if (data.exists === true) {
+                // asset exists → input should be disabled
+                inputField.disabled = true;
+                inputField.value = data.assigned_user || "Not Assigned";
+
+                message.innerHTML = data.assigned_user
+                    ? "Assigned user found."
+                    : "Asset exists but not assigned.";
+            } else {
+                // asset does NOT exist → input becomes editable
+                inputField.disabled = false;
+                inputField.value = "";
+
+                message.innerHTML = "No asset found with this tag. You can assign a user.";
+            }
+        })
+        .catch(error => console.error("Error:", error));
+});
+
+
+</script>
+{% endblock content %}

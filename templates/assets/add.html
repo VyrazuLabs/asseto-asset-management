@@ -28,8 +28,8 @@
                     <div class="row">
                         <div class="col-md-4 col-12">
                             <div class="form-group">
-                                <label for="city-column">Tag</label>
-                                {{form.tag}}
+                                <label for="city-column" value="{{ form.data.tag }}">Tag</label>
+                                <input type="text" id="city-column" class="form-control" name="tag" value="{{ form.data.tag }}">
                                 {% for error in form.tag.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
@@ -167,7 +167,7 @@
         </div>
 
                 <!-- Hidden template for cloning -->
-                <div style="display:none">
+                <div class="d-none">
                     <div class="row rm-custom-field" id="custom-field-template">
                         <div class="col-5">
                             <div class="form-group">
@@ -219,7 +219,7 @@
                         </div>
                     </div>
 
-                    <div style="display:none">
+                    <div class="d-none">
                         <div class="row rmsection" id="mainsection">
                             <div class="col-5">
                                 <div class="form-group">

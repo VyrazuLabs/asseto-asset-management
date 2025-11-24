@@ -1,0 +1,87 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Configuration Tags</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        {% if not configurations %}Add Tag Configurations{% else %}Update Tag Configurations{% endif %}
+                    </li>
+                </ol>
+            </nav>
+            <div>
+                {% if configurations %}
+                    <a href="{% url 'configurations:update_tag_configuration' configurations.id %}" class="btn btn-sm btn-outline-info my-3 me-2">Update Tag</a>
+                {% else %}
+                    <a href="{% url 'configurations:update_tag_configuration_without_id' %}" class="btn btn-sm btn-outline-info my-3 me-2">Tag Configuration</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if configurations %}
+        <section class="section">
+            <form class="form row" 
+                method="POST" 
+                novalidate
+                action="{% if is_update %}{% url 'configurations:create_or_update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}">
+                {% csrf_token %}
+                <div class="card d-flex justify-content-between">
+                    <div class="card-body">
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for err in form.non_field_errors %}
+                                        <li>{{ err }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <label for="id_prefix"><b>Tag Prefix</b></label>
+                                <p>{{ configurations.prefix }}</p>
+                                {% for error in form.prefix.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <label for="id_number_suffix"><b>Tag Suffix</b></label>
+                                <p>{{ configurations.number_suffix }}</p>
+                                {% for error in form.number_suffix.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                       <div class="row mt-3">
+                            <div class="col-md-6 col-12 form-check">
+                                <input type="checkbox" 
+                                    id="use_default_settings_{{ configurations.id }}"
+                                    name="use_default_settings"
+                                    class="form-check-input"
+                                    {% if configurations.use_default_settings %}checked{% endif %}
+                                    hx-post="{% url 'configurations:toggle_default_settings' configurations.id %}"
+                                    hx-trigger="change"
+                                    hx-target="#use_default_settings_{{ configurations.id }}"
+                                    hx-swap="outerHTML">
+                                <label for="use_default_settings_{{ configurations.id }}" class="form-check-label">
+                                    Use This As Default Settings
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    {% else %}
+        <section class="section">
+            <div class="alert alert-info">
+                No Tag Configuration found. Please create one.
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

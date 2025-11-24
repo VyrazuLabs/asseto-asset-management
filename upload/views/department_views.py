@@ -46,7 +46,6 @@ def export_departments_csv(request):
 @login_required
 @permission_required('authentication.add_department')
 def import_departments_csv(request):
-    print(request)
     if request.method == "POST":
         file = request.FILES.get("file")
         if not file:
@@ -66,7 +65,6 @@ def import_departments_csv(request):
             'Contact Person Email', 'Contact Person Phone']})
 
     else:
-        print("no response from department")
         return render(request, "upload/upload-csv-modal.html", {"page": "Department","hx_target": "#upload-departments-modal-content"})
 
 def department_render_to_mapper_modal(request):
@@ -90,7 +88,6 @@ def department_render_to_mapper_modal(request):
         created_imported_users = []
         for _, row in df.iterrows():
             department_data = {f: row[c] for f, c in mapping.items() if c in row}
-            print(department_data)
             department = Department.objects.create(
                 name=department_data.get("Department Name"),
                 contact_person_name=department_data.get("Contact Person Name"),
@@ -108,7 +105,6 @@ def department_render_to_mapper_modal(request):
                 contact_person_phone=str(department_data.get("Contact Person Phone")),
                 organization=request.user.organization,
             )
-            print("imported user:------>",imported_user)
             created_imported_users.append(imported_user)
 
         messages.success(request, f"{len(created_departments)} Departments imported successfully.")

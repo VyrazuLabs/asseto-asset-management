@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from .utils import render_to_csv, render_to_pdf
+from .utils import render_to_csv, render_to_pdf, searched_data
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from assets.models import Asset
@@ -17,6 +17,8 @@ from vendors.utils import get_count_of_assets
 from dashboard.models import CustomField
 from datetime import date
 today = date.today()
+import os
+IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -39,8 +41,6 @@ def manage_access(user):
             return True
 
     return False
-
-
 @login_required
 @user_passes_test(manage_access)
 def vendor_list(request):
@@ -54,8 +54,14 @@ def vendor_list(request):
         count_array.append(get_count)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     context = {'sidebar': 'vendors','count_array': count_array,
-               'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors'}
+               'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
+               'is_demo':is_demo}
     return render(request, 'vendors/list.html', context=context)
 
 
@@ -147,7 +153,7 @@ def update_vendor(request, id):
                     cf.field_value = new_val
                     cf.save()
             messages.success(request, 'Vendor updated successfully')
-            return redirect('vendors:list')
+            return redirect(f'/vendors/details/{vendor.id}')
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
                'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
@@ -158,20 +164,7 @@ def search(request, page):
     search_text = (request.GET.get('search_text') or "").strip()
 
     if search_text:
-        vendors_list = (
-            Vendor.undeleted_objects.filter(
-                Q(organization=request.user.organization) &
-                (
-                    Q(name__icontains=search_text) |
-                    Q(email__icontains=search_text) |
-                    Q(phone__icontains=search_text) |
-                    Q(designation__icontains=search_text) |
-                    Q(gstin_number__icontains=search_text) |
-                    Q(contact_person__icontains=search_text)
-                )
-            )
-            .order_by("-created_at")[:10]
-        )
+        vendors_list = searched_data(request,search_text)
         page_object = vendors_list
     else:
         vendors_list = Vendor.undeleted_objects.filter(
@@ -182,9 +175,8 @@ def search(request, page):
         page_number = page
         page_object = paginator.get_page(page_number)
 
-    # 🔑 Build count array for assets per vendor
     count_array = []
-    for it in page_object:  # only loop over the page’s vendors, not all
+    for it in page_object:
         get_count = get_count_of_assets(request, it.id)
         count_array.append(get_count)
 

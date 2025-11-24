@@ -57,7 +57,7 @@
 
                         <tr>
                             <td><b>Full Name</b></td>
-                            <td>{{user.full_name}}</td>
+                            <td>{{full_name}}</td>
                         </tr>
 
                         <tr>
@@ -103,7 +103,7 @@
                                 <tr>
                                     <td><b>Sl No.</b></td>
                                     <td>Asset Images</td>
-                                    <td><b>Asset Number</b></td>
+                                    <td><b>Asset Tag</b></td>
                                     <td><b>Asset Name</b></td>
                                     <td>Type</td>
                                     <td>Vendor Name</td>
@@ -130,7 +130,7 @@
                                                 </div>
                                             {% endwith %}
                                         </td>
-                                        <td>{{assigned_asset.asset.serial_no}}</td>
+                                        <td>{{assigned_asset.asset.tag}}</td>
                                         <td>{{assigned_asset.asset.name}}</td>
                                         <td>{{assigned_asset.asset.product.name}}</td>
                                         <td>{{assigned_asset.asset.vendor}}</td>

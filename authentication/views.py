@@ -1,3 +1,4 @@
+from socket import create_connection
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
@@ -15,6 +16,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
+from authentication.utils import create_db_connection
 from dashboard.forms import LocationForm, AddressForm
 from dashboard.models import Location, Address,ProductType,ProductCategory
 from django.contrib.auth import get_user_model
@@ -28,8 +30,43 @@ from assets.models import AssignAsset
 from django.views.decorators.cache import never_cache
 from dashboard.views.seeders import seed_parent_category
 from django.db.models import Q
+from configurations.utils import get_currency_and_datetime_format
+from configurations.utils import format_datetime
+from django.contrib import messages
+from .constant import db_engines
+from configurations.models import LocalizationConfiguration
+from configurations.utils import dynamic_display_name
+from configurations.constants import NAME_FORMATS
 User = get_user_model()
 
+
+
+
+def introduce(request):
+    return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})
+
+def db_configure(request):
+    if request.method=="POST":
+        db_type=request.POST.get('database')
+        db_engine=db_engines.get(db_type)
+
+        db_data={
+            'DB_ENGINE':db_engine,
+            'DB_NAME':request.POST.get('db_name'),
+            'DB_USERNAME':request.POST.get('user_name'),
+            'DB_PASSWORD':request.POST.get('password'),
+            'DB_HOST':request.POST.get('host_name'),
+            'DB_PORT':request.POST.get('port')
+        }
+
+        if create_db_connection(request,db_data):
+            messages.success(request, "Database configured successfully!")
+            return redirect('authentication:register')
+        else:
+            messages.error(request, "Database connection failed. Please check your credentials.")
+            return render(request, 'auth/first_time_installation/db_configure.html')
+        
+    return render(request,'auth/first_time_installation/db_configure.html',context={'current_step':2})
 
 @login_required
 def index(request):
@@ -78,9 +115,42 @@ def index(request):
     latest_users_list = User.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).exclude(
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
- 
+    obj=get_currency_and_datetime_format(request.user.organization)
+    for it in expiring_assets:
+        if not obj['date_format']:
+            it.warranty_expiry_date=it.warranty_expiry_date.date()
+        if obj['date_format']:
+            it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
+        # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
+    for it in latest_vendor_list:
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+    for it in latest_product_list:
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+
+    for it in all_location_list:
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+    
+    for it in latest_users_list:
+
+        if not obj['date_format']:
+            it.created_at=it.created_at.date
+        if obj['date_format']:
+            it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
     context = {
- 
+        'currency': obj['currency'],
+        'date_format': obj['date_format'],
         'sidebar': 'index',
         'product_count': product_count,
         'vendor_count': vendor_count,
@@ -128,6 +198,7 @@ def user_login(request):
                     print('seed fail for category')
 
                 login(request, user)
+                # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request,  f'Welcome, {user.full_name}')
 
                 # redirecting to the requested url
@@ -136,34 +207,38 @@ def user_login(request):
                 return redirect('/')
             else:
                 messages.error(request, 'Invalid credentials!')
-    return render(request, 'auth/login.html', context={'form': form})
+    last_logins=User.objects.values_list('last_login',flat=True)
+
+    return render(request, 'auth/login.html', context={'form': form,'current_step':4,'last_logins':last_logins})
 
 
 
 @unauthenticated_user
-def user_register(request):
-
+def user_register(request):    
     u_form = UserRegisterForm()
     o_form = OrganizationForm()
     if request.method == "POST":
-        o_form = OrganizationForm(request.POST)
-        u_form = UserRegisterForm(request.POST)
-        if o_form.is_valid() and u_form.is_valid():
-            organization = o_form.save()
-            user = u_form.save(commit=False)
-            user.organization = organization
-            user.is_active = True
-            user.is_superuser = True
-            user.access_level = True
-            user.is_active = True
-            user.save()
-
-            messages.success(
-                request, f'Account for {user.full_name} created successfully. Please verify your email to continue.')
-            return redirect('authentication:login')
+        if User.objects.filter(is_superuser=True).first():
+            messages.error(request,'You are already registered')
         else:
-            messages.error(request, 'Please correct the below errors.')
-    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form})
+            o_form = OrganizationForm(request.POST)
+            u_form = UserRegisterForm(request.POST)
+            if o_form.is_valid() and u_form.is_valid():
+                organization = o_form.save()
+                user = u_form.save(commit=False)
+                user.organization = organization
+                user.is_active = True
+                user.is_superuser = True
+                user.access_level = True
+                user.is_active = True
+                user.save()
+
+                messages.success(
+                    request, f'Account for {user.full_name} created successfully.')
+                return redirect('authentication:login')
+            else:
+                messages.error(request, 'Please correct the below errors.')
+    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form,'current_step':3})
 
 
 @unauthenticated_user
@@ -188,7 +263,14 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile(request):
-    context = {'profile': True, 'title': 'Profile'}
+    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    format_key= None
+    # for id,it in NAME_FORMATS:
+    #     if format_key and obj.name_display_format == id:
+    #         format_key=id
+    user = request.user
+    get_user_full_name=user.dynamic_display_name(user.full_name)
+    context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name}
     return render(request, 'auth/profile.html', context=context)
 
 

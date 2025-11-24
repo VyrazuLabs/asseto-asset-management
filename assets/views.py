@@ -1,4 +1,10 @@
 from django.shortcuts import render, redirect
+from django.core.cache import cache
+import os
+from dotenv import load_dotenv
+import requests
+from configurations.models import BrandingImages,LocalizationConfiguration
+from assets.utils import slack_notification
 from .forms import AssetForm, AssignedAssetForm,AssignedAssetListForm, ReassignedAssetForm,AssetImageForm,AssetStatusForm
 from django.contrib import messages
 from .models import Asset, AssetSpecification, AssignAsset,AssetImage,AssetStatus
@@ -22,7 +28,16 @@ from vendors.models import Vendor
 from django.db.models import Count
 import json
 from products.models import ProductType
-from .utils import get_asset_filter_data
+from .utils import get_asset_filter_data,get_host
+from configurations.utils import generate_asset_tag
+from .barcode import generate_barcode
+from configurations.models import TagConfiguration
+from configurations.utils import get_currency_and_datetime_format,format_datetime
+from configurations.utils import dynamic_display_name
+import os
+from configurations.forms import TagConfigurationForm,ClientCredentialsForm
+from audit.models import Audit,AuditImage
+IS_DEMO = os.environ.get('IS_DEMO')
 
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
@@ -148,6 +163,65 @@ def manage_access_for_assets_status(user):
 @login_required
 @user_passes_test(manage_access_for_assets)
 def listed(request):
+    list_of_audits=Audit.objects.all()
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
+    #Function to get all the list data 
+    tag=request.GET.get("tag")
+    user_data=request.POST.get("user-data")
+    product=request.POST.get("product")# gts the id of the product
+    search_text = (request.GET.get("search_text") or "").strip()
+    vendor_id = request.GET.get("vendor")
+    status_id = request.POST.get("status")
+    user_id = request.GET.get("user")
+    department_id = request.POST.get("department")
+    location_id = request.POST.get("location")
+    category_id = request.POST.get("category")
+    type_id = request.POST.get("type")
+    filters = Q(organization=None)
+    if search_text:
+        filters &= (
+            Q(tag__icontains=search_text) |
+            Q(name__icontains=search_text) |
+            Q(serial_no__icontains=search_text) |
+            Q(purchase_type__icontains=search_text) |
+            Q(product__name__icontains=search_text) |
+            Q(vendor__name__icontains=search_text) |
+            Q(vendor__gstin_number__icontains=search_text) |
+            Q(location__office_name__icontains=search_text) |
+            Q(product__product_type__name__icontains=search_text)
+        )
+
+    if vendor_id:
+        filters &= Q(vendor_id=vendor_id)
+    if status_id:
+        filters &= Q(asset_status_id=status_id)
+    if category_id:
+        filters &= Q(product__product_category_id=category_id)
+    if type_id:
+        filters &= Q(product__product_type_id=type_id)
+    if location_id:
+        filters &= Q(location_id=location_id)
+
+    # --- Base queryset ---
+    assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
+    get_prod_type=None
+    get_prod_category=None
+    #Filter by product based on product type and category
+    if product:
+        assets_qs=assets_qs.filter(product_id=product)
+        if assets_qs.exists():
+            get_prod_category = assets_qs.first().product.product_category.name
+            get_prod_type = assets_qs.first().product.product_type.name
+    if user_data:
+        assigned_qs = AssignAsset.objects.filter(user_id=user_data).select_related("user").order_by("-assigned_date")
+        assets_qs = (
+            assets_qs.filter(assignasset__user=user_data)
+            .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
+        )
+    if department_id:
+        assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
+        assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
     product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
@@ -164,8 +238,10 @@ def listed(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":request,"fullname":assign.user.full_name,"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
+    if assets_qs.exists():
+        paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     asset_form = AssetForm(organization=request.user.organization)
@@ -176,13 +252,16 @@ def listed(request):
     # Gather the first image per asset in the current page
     asset_ids_in_page = [asset.id for asset in page_object]
     images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
-    
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
     # Map asset ID to its first image
     asset_images = {}
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    # print("product_type_list",product_type_list)
     context = {
         'product_category_list':product_category_list,
         'department_list':department_list,
@@ -201,7 +280,10 @@ def listed(request):
         'assign_asset_form': assign_asset_form,
         'reassign_asset_form': reassign_asset_form,
         'deleted_asset_count':deleted_asset_count,
-        'title': 'Assets'
+        # "full_name_first":active_users.full_name_first,
+        'title': 'Assets',
+        'is_demo':is_demo,
+        'list_of_audited_assets':list_of_audited_assets
     }
 
     return render(request, 'assets/list.html', context=context)
@@ -210,7 +292,42 @@ def listed(request):
 @login_required
 @permission_required('authentication.view_asset')
 def details(request, id):
+    # get_audit_by_asset_id=Audit.objects.filter(asset__id=id)
+    get_audit_history=Audit.objects.filter(asset_id=id)
+    get_audit_image=AuditImage.objects.filter(audit__asset__id=id).order_by('-uploaded_at').first()
+    # get_audit_history=None
+    # if get_audit_by_asset_id:
+        # obj={}
+        # get_audit_image=AssetImage.objects.filter(asset=get_audit_by_asset_id.asset).order_by('- changed_at').first()
+        # get_audit_history=Audit.objects.filter(asset_id=id).order_by('-created_at')
+    
+    audit_data = []
+    if get_audit_history:
+        for audit in get_audit_history:
+            data = {
+                "id": audit.id,
+                "asset_name": audit.asset.name,
+                "condition_label": audit.condition_label,
+                "notes": audit.notes,
+                "created_at": audit.created_at,
+                "audit_image": AuditImage.objects.filter(audit=audit).order_by('-uploaded_at').first()
+            }
+            audit_data.append(data)
+        # for get_img in get_audit_history:
+        #     get_asset_image=AssetImage.objects.filter(uploaded_at=get_img.changed_at).order_by('-uploaded_at').first()
+        #     get_audit_image.append({
+        #         "audit_history_id": get_img.id,
+        #         "image": get_asset_image
+        #     })
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
+    assiggned_asset=AssignAsset.objects.filter(asset=asset).first()
+    if assiggned_asset:
+        assigned_user=assiggned_asset.user.full_name
+    else:
+        assigned_user=None
+    user= request.user
+    user_organization=user.organization
+    asset_barcode = generate_barcode(asset.tag)
     if asset is None:
         assetSpecifications=AssignAsset.objects.filter(id=id).first()
         asset=assetSpecifications.asset
@@ -220,7 +337,6 @@ def details(request, id):
     get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
     for it in get_asset_img:
         img_array.append(it)
-
     months_int=asset.product.eol
     today=timezone.now().date()
     eol_date= today+relativedelta(months=months_int) if months_int is not None else None
@@ -231,15 +347,28 @@ def details(request, id):
     page_object = paginator.get_page(page_number)
     get_custom_data=[]
     get_data=CustomField.objects.filter(object_id=asset.id)
+    organization=request.user.organization
+    obj=get_currency_and_datetime_format(organization)
+    get_currency=obj['currency']
+    get_date_format=obj['date_format']
+    is_demo=True
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
+    # obj['date_format']=format_datetime(x=obj['date_format'],output_format=get_date_format)
+    if get_date_format:
+        asset.warranty_expiry_date = format_datetime(x=asset.warranty_expiry_date, output_format=+get_date_format) if asset.warranty_expiry_date is not None else ""
+        asset.purchase_date = format_datetime(x=asset.purchase_date, output_format=get_date_format) if asset.purchase_date is not None else ""
+        eol_date=format_datetime(x=eol_date, output_format=get_date_format) if eol_date is not None else ""
     for it in get_data:
         obj={}
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
-    context = {'sidebar': 'assets', 'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data}
+    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
+               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image}
     return render(request, 'assets/detail.html', context=context)
-
 
 @login_required
 @permission_required('authentication.edit_asset')
@@ -253,7 +382,7 @@ def details(request, id):
 #     image_form = AssetImageForm(request.POST or None, request.FILES)
 #     if request.method == "POST":
 
-#         if form.is_valid():
+#         if form.is_valid():No d
 
 #             assetSpecifications.delete()
 
@@ -291,99 +420,101 @@ def details(request, id):
 # from .models import Asset, AssetImage
 # from .forms import AssetForm, AssetImageForm
 
-def update(request, id):
-    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
-    asset_images = AssetImage.objects.filter(asset=asset)
-    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-    if request.method=="DELETE":
-        try:
-            data = json.loads(request.body)
-            delete_ids = data.get('delete_image_ids', [])
-            if delete_ids:
-                AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
-                return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
-            else:
-                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+# def update(request, id):
+#     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+#     asset_images = AssetImage.objects.filter(asset=asset)
+#     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+#     if request.method=="DELETE":
+#         try:
+#             data = json.loads(request.body)
+#             delete_ids = data.get('delete_image_ids', [])
+#             if delete_ids:
+#                 AssetImage.objects.filter(id__in=delete_ids, asset=asset).delete()
+#                 return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+#             else:
+#                 return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+#         except json.JSONDecodeError:
+#             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
-    elif request.method == 'POST':
-        form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
-        image_form = AssetImageForm(request.POST, request.FILES)
-        if form.is_valid() and image_form.is_valid():
-            asset_instance = form.save(commit=False)
-            asset_instance.organization = request.user.organization  # always set or preserve
-            asset_instance.save()
-            form.save_m2m()
-            assetSpecifications.delete()
-            # Handle new images
-            images = request.FILES.getlist('image')
-            for img_file in images:
-                AssetImage.objects.create(asset=asset, image=img_file)
-            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
-            for cf in custom_fields:
-                key = f"custom_field_{cf.entity_id}"
-                new_val = request.POST.get(key, "")
-                if new_val != cf.field_value:
-                    cf.field_value = new_val
-                    cf.save()
-            #Code to add new custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=asset.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
+#     elif request.method == 'POST':
+#         form = AssetForm(request.POST, instance=asset, organization=request.user.organization)
+#         image_form = AssetImageForm(request.POST, request.FILES)
+#         if form.is_valid() and image_form.is_valid():
+#             asset_instance = form.save(commit=False)
+#             asset_instance.organization = request.user.organization  # always set or preserve
+#             asset_instance.save()
+#             form.save_m2m()
+#             assetSpecifications.delete()
+#             # Handle new images
+#             images = request.FILES.getlist('image')
+#             for img_file in images:
+#                 AssetImage.objects.create(asset=asset, image=img_file)
+#             custom_fields = CustomField.objects.filter(entity_type='asset', object_id=asset.id, organization=request.user.organization)
+#             for cf in custom_fields:
+#                 key = f"custom_field_{cf.entity_id}"
+#                 new_val = request.POST.get(key, "")
+#                 if new_val != cf.field_value:
+#                     cf.field_value = new_val
+#                     cf.save()
+#             #Code to add new custom fields
+#             for key, value in request.POST.items():
+#                 if key.startswith("customfield_") and value.strip():
+#                     field_id = key.replace("customfield_", "")
+#                     try:
+#                         cf = CustomField.objects.get(
+#                             pk=field_id,
+#                             entity_type='asset',
+#                             organization=request.user.organization
+#                         )
+#                         CustomField.objects.create(
+#                             name=cf.name,
+#                             object_id=asset.id,
+#                             field_type=cf.field_type,
+#                             field_name=cf.field_name,
+#                             field_value=value,
+#                             entity_type='asset',
+#                             organization=request.user.organization
+#                         )
+#                     except CustomField.DoesNotExist:
+#                         continue
 
-            # Handle dynamically added custom fields
-            names = request.POST.getlist('custom_field_name')
-            values = request.POST.getlist('custom_field_value')
-            for name, val in zip(names, values):
-                if name.strip() and val.strip():
-                    CustomField.objects.create(
-                        name=name.strip(),
-                        object_id=asset.id,
-                        field_type='text',
-                        field_name=name.strip(),
-                        field_value=val.strip(),
-                        entity_type='asset',
-                        organization=request.user.organization
-                    )
-            # Success message and redirect
-            messages.success(request, "Asset updated successfully.")
-            return redirect('assets:list')
-    else:
-        form = AssetForm(instance=asset, organization=request.user.organization)
-        image_form = AssetImageForm()
-        custom_fields = CustomField.objects.filter(
-                entity_type='asset', object_id=asset.id, organization=request.user.organization)
+#             # Handle dynamically added custom fields
+#             names = request.POST.getlist('custom_field_name')
+#             values = request.POST.getlist('custom_field_value')
+#             for name, val in zip(names, values):
+#                 if name.strip() and val.strip():
+#                     CustomField.objects.create(
+#                         name=name.strip(),
+#                         object_id=asset.id,
+#                         field_type='text',
+#                         field_name=name.strip(),
+#                         field_value=val.strip(),
+#                         entity_type='asset',
+#                         organization=request.user.organization
+#                     )
+#             # Success message and redirect  
+#             messages.success(request, "Asset updated successfully.")
+            
+#             return redirect('assets:list')
+#             # return redirect(f'/assets/details/{asset.id}/')
+#     else:
+#         form = AssetForm(instance=asset, organization=request.user.organization)
+#         image_form = AssetImageForm()
+#         custom_fields = CustomField.objects.filter(
+#                 entity_type='asset', object_id=asset.id, organization=request.user.organization)
    
-    context = {
-        'sidebar': 'assets',
-        'submenu': 'list',
-        'image_form': image_form,
-        'asset_images': asset_images,
-        'form': form,
-        'asset': asset,
-        'assetSpecifications': assetSpecifications,
-        'title': f'Update-{asset.tag}-{asset.name}',
-        'custom_fields': custom_fields
-    }
-    return render(request, 'assets/update-assets.html', context)
+#     context = {
+#         'sidebar': 'assets',
+#         'submenu': 'list',
+#         'image_form': image_form,
+#         'asset_images': asset_images,
+#         'form': form,
+#         'asset': asset,
+#         'assetSpecifications': assetSpecifications,
+#         'title': f'Update-{asset.tag}-{asset.name}',
+#         'custom_fields': custom_fields
+#     }
+#     return render(request, 'assets/update-assets.html', context)
 
 
 @login_required
@@ -401,8 +532,8 @@ def add(request):
                 name='Available'
             ).first()
             available_status = AssetStatus.objects.filter(
-            name='Available'
-            ).first()
+                name='Available'
+                ).first()
             asset.asset_status = available_status 
             asset.save()
             form.save_m2m()
@@ -410,29 +541,7 @@ def add(request):
             # Save images
             for f in request.FILES.getlist('image'):
                 AssetImage.objects.create(asset=asset, image=f)
-
-            # Handle predefined custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        cf = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                        CustomField.objects.create(
-                            name=cf.name,
-                            object_id=asset.id,
-                            field_type=cf.field_type,
-                            field_name=cf.field_name,
-                            field_value=value,
-                            entity_type='asset',
-                            organization=request.user.organization
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
-
+                
             # Handle dynamically added custom fields
             names = request.POST.getlist('custom_field_name')
             values = request.POST.getlist('custom_field_value')
@@ -450,6 +559,11 @@ def add(request):
             return redirect('assets:list')
     else:
         form = AssetForm(organization=request.user.organization_id)
+        tag_config=TagConfiguration.objects.filter(organization=request.user.organization,use_default_settings=True).first()
+        if tag_config:
+            form.data['tag'] = generate_asset_tag(prefix=tag_config.prefix, number_suffix=tag_config.number_suffix)
+        else:
+            form.data['tag'] = generate_asset_tag(prefix='VY', number_suffix='001')
         image_form = AssetImageForm()
 
     # Fetch custom fields for display
@@ -473,7 +587,7 @@ def delete(request, id):
 
     if request.method == "POST":
         asset = get_object_or_404(
-            Asset.undeleted_objects, pk=id, organization=request.user.organization)
+            Asset.undeleted_objects, pk=id)
         if asset.is_assigned:
             messages.error(
                 request, 'Error! Asset is assigned to a user')
@@ -498,7 +612,11 @@ def status(request, id):
 
 @login_required
 def search(request, page):
+        list_of_audits=Audit.objects.all()
+        list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+        list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
     # if request.method == 'POST':
+        tag=request.GET.get('tag')
         search_text = (request.GET.get('search_text') or "").strip()
         vendor_id = request.GET.get('vendor')
         status_id = request.GET.get('status')
@@ -521,7 +639,8 @@ def search(request, page):
                 Q(vendor__name__icontains=search_text) |
                 Q(vendor__gstin_number__icontains=search_text) |
                 Q(location__office_name__icontains=search_text) |
-                Q(product__product_type__name__icontains=search_text)
+                Q(product__product_type__name__icontains=search_text)|
+                Q(tag__icontains=search_text)
             )
 
         if vendor_id:
@@ -529,53 +648,26 @@ def search(request, page):
 
         if status_id:
             q &= Q(asset_status_id=status_id)
-
-        # if department_id:
-        #     q &= Q(department_id=department_id)
         
         if product_category_id:
             q &= Q(product__product_category__id=product_category_id)
         
         if product_type_id:
             q &= Q(product__product_type_id=product_type_id)
-        # Get assets
-        # asset_user_map = {}
-        page_object = Asset.undeleted_objects.filter(q).order_by('-created_at')[:10]
-        # assigned_qs = AssignAsset.objects.select_related("user").order_by("-assigned_date")
 
-        # page_object = (
-        #     Asset.undeleted_objects
-        #     .filter(q)
-        #     .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #     .order_by("-created_at")[:10]
-        # )
-        # if user_id:
-        #     page_object=AssignAsset.objects.filter(Q(user_id=user_id)).order_by('-assigned_date')
-        #     asset_user_map = {}
-        #     for assign in get_assigned_asset_list:
-        #         if assign.asset_id not in asset_user_map:
-        #             asset_user_map[assign.asset_id] = None
-        #         if assign.user:  # avoid None users
-        #             asset_user_map[assign.asset_id]=assign.user.full_name
-        # print(page_object)
-        asset_ids = list(page_object.values_list("id", flat=True))
+        page_object = list(Asset.undeleted_objects.filter(q).order_by('-created_at')[:10])
+
+        asset_ids = [obj.id for obj in page_object]
         image_object = AssetImage.objects.filter(
             asset__organization=request.user.organization,
             asset_id__in=asset_ids
         ).order_by('-uploaded_at')
+
         asset_images = {}
         for img in image_object:
             if img.asset_id not in asset_images:
                 asset_images[img.asset_id] = img
-        # if user_id:
-        #     assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
-        #     page_object = (
-        #         Asset.undeleted_objects
-        #         .filter(q, assignasset__user_id=user_id)
-        #         .prefetch_related(Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments"))
-        #         .order_by("-created_at")[:10]
-        #     )
-        # else:
+
         if user_id:
             assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
             page_object = (
@@ -595,20 +687,22 @@ def search(request, page):
             page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
 
         asset_user_map = {}
-        get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=page_object) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+        get_assigned_asset_list = AssignAsset.objects.filter(
+            asset_id__in=asset_ids,
+            asset__organization=request.user.organization
+        ).order_by('-assigned_date')
         for assign in get_assigned_asset_list:
             if assign.asset_id not in asset_user_map:
                 asset_user_map[assign.asset_id] = None
             if assign.user:  # avoid None users
-                asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+                asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
         return render(request, 'assets/assets-data.html', {
             'page_object': page_object,
             'asset_user_map': asset_user_map,
             # 'asset_user_map': asset_user_map,
-            'asset_images': asset_images
+            'asset_images': asset_images,
+            'list_of_audited_assets':list_of_audited_assets
         })
-    # else:
-        # return render(request, 'assets/list.html')
 
 
 @login_required
@@ -838,6 +932,11 @@ def asset_status_list(request):
         item["asset_status"]: item["asset_count"]
         for item in asset_counts
     }
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -846,6 +945,7 @@ def asset_status_list(request):
         'deleted_asset_status_count': deleted_asset_status_count,
         'asset_status_asset_count': asset_status_asset_count,
         'title': 'Asset Status',
+        'is_demo':is_demo
     }
     return render(request, 'assets/asset_status_list.html', context=context)
 
@@ -993,7 +1093,8 @@ def update_in_detail(request, id):
 
             # Success message and redirect
             messages.success(request, "Asset updated successfully.")
-            return redirect('assets:update_in_detail', id=asset.id)
+            # return redirect('assets:update_in_detail', id=asset.id)
+            return redirect(f'/assets/details/{asset.id}')
     else:
         form = AssetForm(instance=asset, organization=request.user.organization)
         image_form = AssetImageForm()
@@ -1073,15 +1174,8 @@ def assign_asset_in_asset_list(request, id):
             asset.is_assigned = True
             asset.asset_status = AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
             asset.save()
-            # print("infoooooooooooo",form.data)
-            # files=request.FILES.getlist('image')
-            # print("FILES",files)
-            # img_files=image_form.data('image')
-            # print("img_files",img_files)
-    
-            # print("other IMAGESSSSSSSSSS",img_files)
             files = request.FILES.getlist('images')
-            # print("FILES",files)
+
             for f in files:
                 AssetImage.objects.create(asset=asset, image=f)
             messages.success(request, 'Asset assigned to user successfully')
@@ -1109,7 +1203,6 @@ def search_assets(request, page):
     user_data=request.GET.get("user-data")
     product=request.GET.get("product")# gts the id of the product
     # get_products=Product.objects.filter(Q(organization=None) | Q(organization=request.user.organization) & Q(id=product))
-    print("product-------------------------------------------",product)
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
     status_id = request.GET.get("status")
@@ -1121,11 +1214,11 @@ def search_assets(request, page):
 
     # --- Build base Q object ---
     filters = Q(organization=request.user.organization)
-    print("user-------------------------------------------",user_data)
 
     if search_text:
         filters &= (
             Q(name__icontains=search_text) |
+            Q(tag__icontains=search_text) |
             Q(serial_no__icontains=search_text) |
             Q(purchase_type__icontains=search_text) |
             Q(product__name__icontains=search_text) |
@@ -1159,8 +1252,6 @@ def search_assets(request, page):
         if assets_qs.exists():
             get_prod_category = assets_qs.first().product.product_category.name
             get_prod_type = assets_qs.first().product.product_type.name
-            print("category for product-------------------------------------------",get_prod_category)
-            print("type for product-------------------------------------------",get_prod_type)
     # --- Handle user/department filtering ---
     if user_id:
         assigned_qs = AssignAsset.objects.filter(user_id=user_id).select_related("user").order_by("-assigned_date")
@@ -1176,7 +1267,7 @@ def search_assets(request, page):
     page_object = assets_qs[:10]
 
     # --- Asset Images (first image per asset) ---
-    asset_ids = list(page_object.values_list("id", flat=True))
+    asset_ids = list(page_object.values("id", flat=True))
     asset_images_qs = (
         AssetImage.objects.filter(asset_id__in=asset_ids, asset__organization=request.user.organization)
         .order_by("-uploaded_at")
@@ -1195,7 +1286,7 @@ def search_assets(request, page):
     for assign in assignments:
         if assign.user:
             asset_user_map[assign.asset_id] = {
-                "full_name": assign.user.full_name,
+                "full_name": dynamic_display_name(request,fullname=assign.user.full_name),
                 "image": assign.user.profile_pic,
             }
 
@@ -1256,7 +1347,7 @@ def listed_asset(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  
-            asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -1264,7 +1355,6 @@ def listed_asset(request):
     assign_asset_form = AssignedAssetForm(organization=request.user.organization)
     reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
     active_users=User.objects.filter(is_active=True,organization=request.user.organization)
-    print(active_users)
     asset_ids_in_page = [asset.id for asset in page_object]
     images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by('-uploaded_at')
     
@@ -1272,7 +1362,6 @@ def listed_asset(request):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    print("MAPPEDDDDDDDDDD",asset_user_map)
     context = {
         'product_category_list':product_category_list,
         'department_list':department_list,
@@ -1285,7 +1374,7 @@ def listed_asset(request):
         'active_user':active_users,
         'sidebar': 'assets',
         'submenu': 'list',
-        'asset_images': asset_images,  
+        'asset_images': asset_images,
         'page_object': page_object,
         'asset_form': asset_form,
         'assign_asset_form': assign_asset_form,
@@ -1295,3 +1384,281 @@ def listed_asset(request):
     }
 
     return render(request, 'assets/list-upper.html', context=context)
+
+#Slack OAuth Integration
+def slack_authorize(request):
+    user_id=request.user.id
+    cache.set('user_id',str(user_id),timeout=300)
+    # client_id="9657988599239.9704005306276"
+    client_id=os.getenv("SLACK_CLIENT_ID")
+    # client_id = "YOUR_SLACK_CLIENT_ID"
+    redirect_uri = os.getenv("SLACK_REDIRECT_URI")
+    scopes = "chat:write,channels:read"
+    oauth_url = (
+        f"https://slack.com/oauth/v2/authorize?client_id={client_id}"
+        f"&scope={scopes}&redirect_uri={redirect_uri}"
+    )
+    return redirect(oauth_url)
+
+def integration(request):
+    if request.method == 'POST':
+        form = ClientCredentialsForm(request.POST)
+        if form.is_valid():
+            client_id = form.cleaned_data['client_id']
+            client_secret = form.cleaned_data['client_secret']
+            # Save logic here...
+            return redirect('configurations:list_client_credentials')
+    else:
+        form = ClientCredentialsForm()
+
+    return render(request, 'configurations/integrations.html', {'form': form})
+
+
+# @login_required 
+# def slack_oauth_callback(request):
+#     user_id=request.user
+#     request.session['user_id']=user_id
+#     code = request.GET.get("code")
+#     client_id = "9657988599239.9670790594597"
+#     client_secret = "1d21733a257df76a6f87592bad66798c"
+#     redirect_uri = "https://67247d344888.ngrok-free.app/assets/slack/oauth/callback/"
+#     request.session['client_id']=client_id
+#     response = requests.post(
+#         "https://slack.com/api/oauth.v2.access",
+#         data={
+#             "code": code,
+#             "client_id": client_id,
+#             "client_secret": client_secret,
+#             "redirect_uri": redirect_uri,
+#         }
+#     )
+
+#     data = response.json()
+#     webhook_info = data.get("incoming_webhook", {})
+#     channel_id_webhook = webhook_info.get("channel_id")
+
+#     access_token = data.get("access_token")
+#     team_id = data.get("team", {}).get("id")
+#     authed_user = data.get("authed_user", {}).get("id")
+
+#     user = request.user  # Now guaranteed to be a logged-in user
+#     webhook_data = {
+#         "user": user,
+#         "slack_user_id": authed_user,
+#         "access_token": access_token,
+#         "team_id": team_id,
+#         "channel_id": channel_id_webhook,
+#     }
+
+#     obj, created = SlackWebhook.objects.update_or_create(
+#         user=user,
+#         defaults=webhook_data,
+#     )
+#     if created:
+#         messages.success(request, "Slack integration successful!")
+#     else:
+#         messages.success(request, "Slack integration updated successfully!")
+
+#     return redirect('http://127.0.0.1:8001/assets/list')
+
+# SLACK IN TEGRATION OAUTH CALL
+# def slack_oauth_callback(request):
+#     code = request.GET.get("code")
+#     # client_id = "9657988599239.9704005306276"
+#     client_id=os.getenv("SLACK_CLIENT_ID")
+#     # client_id = "YOUR_SLACK_CLIENT_ID"
+#     redirect_uri = os.getenv("SLACK_REDIRECT_URI")
+#     client_secret = os.getenv("SLACK_CLIENT_SECRET")
+
+#     response = requests.post(
+#         "https://slack.com/api/oauth.v2.access",
+#         data={
+#             "client_id": client_id,
+#             "client_secret": client_secret,
+#             "code": code,
+#             "redirect_uri": redirect_uri,
+#         }
+#     )
+#     data = response.json()
+#     bot_token = data.get("access_token")
+#     # Ensure the channel exists or create it
+#     channel_name = "second-test-channel"
+#     channel_id = None
+
+#     channels_resp = requests.get(
+#         "https://slack.com/api/conversations.list",
+#         headers={"Authorization": f"Bearer {bot_token}"}
+#     ).json()
+
+#     for ch in channels_resp.get("channels", []):
+#         if ch["name"] == channel_name:
+#             channel_id = ch["id"]
+#             break
+
+#     # Step 4: Create the channel if not found
+#     if channel_id is None:
+#         create_resp = requests.post(
+#             "https://slack.com/api/conversations.create",
+#             headers={
+#                 "Authorization": f"Bearer {bot_token}",
+#                 "Content-Type": "application/json"
+#             },
+#             json={"name": channel_name}
+#         ).json()
+
+#         if create_resp.get("ok"):
+#             channel_id = create_resp["channel"]["id"]
+#         elif create_resp.get("error") == "name_taken":
+#             for ch in channels_resp.get("channels", []):
+#                 if ch["name"] == channel_name:
+#                     channel_id = ch["id"]
+#                     break
+#         else:
+#             return HttpResponse(f"Error creating channel: {create_resp.get('error')}", status=400)
+#     user_id=cache.get('user_id')
+#     # Extract relevant info
+#     team_id = data.get("team", {}).get("id")
+#     slack_user_id = data.get("authed_user", {}).get("id")
+#     # Optionally, get webhook/channel info if present
+#     get_user=User.objects.filter(id=user_id).first()
+#     if not get_user:
+#         return HttpResponse("User not found", status=404)
+#     # Save or update token (associate with logged-in user, or use state parameter)
+#     SlackWebhook.objects.update_or_create(
+#         user=get_user,  # Or use session/state logic
+#         defaults={
+#             "access_token": bot_token,
+#             "team_id": team_id,
+#             "slack_user_id": slack_user_id,
+#             # "channel_id": "C09KTE0DRMG",
+#             "channel_id": channel_id,  # General channel ID
+#             # Add more fields as desired
+#         }
+#     )
+#     host=get_host(request)
+#     # return redirect(f"{host}")
+#     return redirect(f"http://127.0.0.1:9001/assets/list")
+
+# 
+def automated_tag(request):
+    tag_prefix=request.GET.get('tag_prefix',None)
+    tag_suffix=request.GET.get('tag_start',None)
+    # assets=Asset.undeleted_objects.filter(Q(organization=request.user.organization) & Q(tag__isnull=True))
+    generate_asset_tag(prefix=tag_prefix,number_suffix=tag_suffix)
+    #CREATE a table for the tag configuration.
+    messages.success(request, "Automated tags assigned successfully.")
+    return redirect(request.META.get('HTTP_REFERER'))
+
+# After the tag is created we will be having an option to use the generated tag or use custom tag(by the user/admin) while adding the asset.
+# So when a user will try to add an asset the tag which was created recently that type of tag will be prepopulated in the tag field of the add 
+# asset form or if we want out custom tag we can erase it and write one of our own.
+
+# def slack_oauth_callback(request):
+#     code = request.GET.get("code")
+#     if not code:
+#         return HttpResponse("Missing code parameter", status=400)
+
+#     client_id = "9701335130115.9711337126596"
+#     client_secret = "720a47b8dcf5e14df9f2284882e84d73"
+#     redirect_uri = "https://d9070ca62851.ngrok-free.app/assets/slack/oauth/callback/"
+
+#     # Step 1: Exchange code for OAuth token
+#     response = requests.post(
+#         "https://slack.com/api/oauth.v2.access",
+#         data={
+#             "client_id": client_id,
+#             "client_secret": client_secret,
+#             "code": code,
+#             "redirect_uri": redirect_uri,
+#         }
+#     )
+
+#     data = response.json()
+
+#     if not data.get("ok"):
+#         return HttpResponse(f"Slack OAuth failed: {data.get('error')}", status=400)
+
+#     # Step 2: Extract the correct bot token
+#     bot_token = (
+#         data.get("access_token")
+#         or data.get("bot", {}).get("bot_access_token")
+#     )
+#     if not bot_token:
+#         return HttpResponse("No bot access token found.", status=400)
+
+#     team_id = data.get("team", {}).get("id")
+#     slack_user_id = data.get("authed_user", {}).get("id")
+
+#     # Step 3: Ensure the channel exists or create it
+#     channel_name = "second-test-channel"
+#     channel_id = None
+
+#     channels_resp = requests.get(
+#         "https://slack.com/api/conversations.list",
+#         headers={"Authorization": f"Bearer {bot_token}"}
+#     ).json()
+
+#     for ch in channels_resp.get("channels", []):
+#         if ch["name"] == channel_name:
+#             channel_id = ch["id"]
+#             break
+
+#     # Step 4: Create the channel if not found
+#     if channel_id is None:
+#         create_resp = requests.post(
+#             "https://slack.com/api/conversations.create",
+#             headers={
+#                 "Authorization": f"Bearer {bot_token}",
+#                 "Content-Type": "application/json"
+#             },
+#             json={"name": channel_name}
+#         ).json()
+
+#         if create_resp.get("ok"):
+#             channel_id = create_resp["channel"]["id"]
+#         elif create_resp.get("error") == "name_taken":
+#             for ch in channels_resp.get("channels", []):
+#                 if ch["name"] == channel_name:
+#                     channel_id = ch["id"]
+#                     break
+#         else:
+#             return HttpResponse(f"Error creating channel: {create_resp.get('error')}", status=400)
+
+#     # Step 5: Invite bot to the channel
+    # auth_test = requests.get(
+    #     "https://slack.com/api/auth.test",
+    #     headers={"Authorization": f"Bearer {bot_token}"}
+    # ).json()
+
+    # bot_user_id = auth_test.get("user_id")
+    # if bot_user_id and channel_id:
+    #     invite_resp = requests.post(
+    #         "https://slack.com/api/conversations.invite",
+    #         headers={
+    #             "Authorization": f"Bearer {bot_token}",
+    #             "Content-Type": "application/json"
+    #         },
+    #         json={"channel": channel_id, "users": bot_user_id}
+    #     ).json()
+
+    #     # Ignore if already in channel
+    #     if not invite_resp.get("ok") and invite_resp.get("error") != "already_in_channel":
+
+#     # Step 6: Store the Slack credentials for your user
+#     user_id = cache.get('user_id')
+#     get_user = User.objects.filter(id=user_id).first()
+#     if not get_user:
+#         return HttpResponse("User not found", status=404)
+
+#     SlackWebhook.objects.update_or_create(
+#         user=get_user,
+#         defaults={
+#             "access_token": bot_token,
+#             "team_id": team_id,
+#             "slack_user_id": slack_user_id,
+#             "channel_id": channel_id,
+#         }
+#     )
+
+
+#     return redirect("http://127.0.0.1:8001/assets/list")
