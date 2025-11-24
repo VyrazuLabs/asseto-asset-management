@@ -9,6 +9,8 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
+from configurations.models import LocalizationConfiguration
+from configurations.constants import NAME_FORMATS
 
 
 def path_and_rename(instance, filename):
@@ -84,12 +86,65 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name', 'phone', 'username']
+    REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
 
+    def dynamic_display_name(self, fullname):
+        # Normalize fullname
+        fullname = (fullname or "").strip()
+        if not fullname:
+            return ""
+
+        # Get organization's configured format key (safe)
+        format_key_value = None
+        try:
+            config = LocalizationConfiguration.objects.filter(
+                organization=self.organization
+            ).values_list("name_display_format", flat=True).first()
+            format_key_value = config
+        except Exception:
+            format_key_value = None
+
+        # coerce to int safely, fallback to 0
+        try:
+            format_key = int(format_key_value) if format_key_value is not None else 0
+        except (ValueError, TypeError):
+            format_key = 0
+
+        # Convert NAME_FORMATS list to dict for lookup
+        formats_map = dict(NAME_FORMATS)
+
+        # prepare name parts
+        parts = fullname.split()
+        first = parts[0] if parts else ""
+        last = parts[-1] if len(parts) > 1 else ""
+        first_initial = (first[0].upper() if first else "")
+
+        context = {
+            "first": first,
+            "last": last,
+            "first_initial": first_initial,
+        }
+
+        fmt = formats_map.get(format_key, formats_map.get(0, "{first} {last}"))
+        try:
+            result = fmt.format(**context).strip()
+        except Exception:
+            # final fallback to "First Last" or fullname if that's all we have
+            if first and last:
+                result = f"{first} {last}"
+            else:
+                result = first or last or fullname
+
+        return result
 
     def __str__(self):
         return self.full_name or f'Role {self.role}' or " "
     
+    @property
+    def reverse_full_name(self):
+        if self.full_name:
+            return self.dynamic_display_name(self.full_name)
+        return ""
 
 class SeedFlag(models.Model):
     seeded=models.BooleanField(default=False)
