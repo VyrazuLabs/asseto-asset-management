@@ -155,7 +155,6 @@ def pending_audits(request):
         has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
         next_due_date = next_audit_due_for_asset(asset)
         if has_audit:
-            print(next_due_date, datetime.now().date(), next_due_date < datetime.now().date())
             if (next_due_date > datetime.now().date()):
                 continue
         data = {}
@@ -167,18 +166,6 @@ def pending_audits(request):
     return render(request, 'audit/pending_audits.html', {
         'data_set': data_set
     })
-
-    #     latest_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
-    #     if latest_audit:
-    #         days_remaining, is_pending = next_audit_due(latest_audit)
-    #         if days_remaining is not None and days_remaining < 0:
-    #             asset.latest_audit = latest_audit
-    #             asset.expected_date = latest_audit.created_at + timedelta(days=abs(days_remaining))
-    #     else:
-    #         asset.latest_audit = None
-    #         asset.expected_date = None
-    # latest_audits=Audit.objects.order_by('-created_at').all()
-
 
 def get_assigned_user(request, tag=None):
     if not tag:

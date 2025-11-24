@@ -61,7 +61,7 @@ def locations(request):
     location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
     context = {
         'sidebar': 'admin',
-        # 'submenu': 'location',
+        'submenu': 'location',
         'page_object': page_object,
         'deleted_location_count':deleted_location_count,
         'location_asset_count':location_asset_count,
