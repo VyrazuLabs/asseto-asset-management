@@ -2,8 +2,9 @@
 from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
-from assets.models import AssignAsset
-
+from assets.models import AssetImage, AssignAsset
+from django.http import JsonResponse
+from configurations.utils import dynamic_display_name
 PERMISSION_LIST = [
     # products
     'view_product',
@@ -54,6 +55,28 @@ PERMISSION_LIST = [
     'delete_product_type',
     'edit_product_type',
     'add_product_type',
+
+    # branding
+    'view_branding',
+    'add_branding'
+    'edit_branding',
+    'delete_branding',
+
+    #localization
+    'view_localization',
+    'add_localization',
+    'delete_localization',
+    'edit_localization',
+
+    #tag_configuration
+    'view_tag_configuration',
+    'add_tag_configuration',
+    'edit_tag_configuration',
+    'delete_tag_configuration',
+
+    #upload
+    'view_upload',
+    'add_upload'
 ]
 
 
@@ -85,9 +108,69 @@ def make_fields_optional(form, fields=None):
         if field_name in form.fields:
             form.fields[field_name].required = False
 
+
+
+
 def get_asset_by_users(id):
     get_user=User.objects.filter(id=id).first()
     get_asset=AssignAsset.objects.filter(user=get_user)
     return get_asset
 
+
+def assigned_asset_to_user(page_object):
+    user_ids = [u.id for u in page_object]
+
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+
+    user_asset_map = {}
+    for aa in assigned_assets:
+        user_asset_map.setdefault(aa.user_id, []).append(aa.asset)
     
+    return user_asset_map
+
+
+def user_data(request,user_list):
+    current_host=request.get_host()                                                                                                           
+    user_data_list=[]
+    for user in user_list:
+        user_data_list.append({
+            'id':user.id,
+            'fullName':user.full_name,
+            'email':user.email,
+            'role':user.role.related_name if user.role else None,
+            'isActive':user.is_active,
+            'lastLogin':user.last_login,
+            'profilePicture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
+            'assetCount':AssignAsset.objects.filter(user=user.id).count()
+        })
+    return user_data_list
+
+def user_details(request,get_user,assigned_assets):
+    current_host=request.get_host()
+    user_details={
+        'name':get_user.full_name,
+        'email':get_user.email,
+        'isActive':get_user.is_active,
+        'phone_number':get_user.phone,
+        'profilePicture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
+        'department':get_user.department.name if get_user.department else None,
+        'role':get_user.role.related_name if get_user.role else None,
+        'address':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None
+    }   
+    assigned_assets_list=[]
+    for assigned_asset in assigned_assets:
+        assigned_assets_data={
+            'assigned_asset_name':assigned_asset.asset.name,
+            'asset_tag':assigned_asset.asset.tag,
+            'vendor':assigned_asset.asset.vendor.name if assigned_asset.asset and assigned_asset.asset.vendor else None,
+            'assigned_date':assigned_asset.assigned_date,
+        }
+        asset_images=AssetImage.objects.filter(asset=assigned_asset.asset.id).all()
+        asset_images_list=[]
+        for asset_image in asset_images:
+            asset_images_list.append(f'http://{current_host}'+asset_image.image.url)
+        assigned_assets_data["asset_images_list"]=asset_images_list
+
+        assigned_assets_list.append(assigned_assets_data)
+    user_details["assigned_assets_list"]=assigned_assets_list
+    return user_details
