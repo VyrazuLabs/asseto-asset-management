@@ -88,38 +88,54 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
 
-    def dynamic_display_name(self,fullname):
-        format_key= LocalizationConfiguration.objects.filter(organization=self.organization).first()
-        # for id,it in NAME_FORMATS.items():
-        #     if format_key and format_key.name_display_format == id:
-        #         format_key=id
-        format_key=format_key.name_display_format if format_key else "0"
-        """
-        Formats a full name string according to the specified naming convention.
-        
-        Args:
-            fullname (str): The full name (e.g., "John Doe")
-            format_key (str): Key selecting the name format
-        
-        Returns:
-            str: Formatted name string
-        """
-        parts = (fullname or "").strip().split()
-        first = parts[0] if len(parts) >= 1 else ""
-        last = parts[-1] if len(parts) >= 2 else ""
-        first_initial = first[0] if first else ""
+    def dynamic_display_name(self, fullname):
+        # Normalize fullname
+        fullname = (fullname or "").strip()
+        if not fullname:
+            return ""
+
+        # Get organization's configured format key (safe)
+        format_key_value = None
+        try:
+            config = LocalizationConfiguration.objects.filter(
+                organization=self.organization
+            ).values_list("name_display_format", flat=True).first()
+            format_key_value = config
+        except Exception:
+            format_key_value = None
+
+        # coerce to int safely, fallback to 0
+        try:
+            format_key = int(format_key_value) if format_key_value is not None else 0
+        except (ValueError, TypeError):
+            format_key = 0
+
+        # Convert NAME_FORMATS list to dict for lookup
+        formats_map = dict(NAME_FORMATS)
+
+        # prepare name parts
+        parts = fullname.split()
+        first = parts[0] if parts else ""
+        last = parts[-1] if len(parts) > 1 else ""
+        first_initial = (first[0].upper() if first else "")
+
         context = {
             "first": first,
             "last": last,
             "first_initial": first_initial,
         }
-        format_key=str(format_key)
-        fmt = NAME_FORMATS.get(format_key)
+
+        fmt = formats_map.get(format_key, formats_map.get(0, "{first} {last}"))
         try:
-            return fmt.format(**context).strip()
+            result = fmt.format(**context).strip()
         except Exception:
-            # fallback to standard "First Last"
-            return f"{first} {last}".strip()
+            # final fallback to "First Last" or fullname if that's all we have
+            if first and last:
+                result = f"{first} {last}"
+            else:
+                result = first or last or fullname
+
+        return result
 
     def __str__(self):
         return self.full_name or f'Role {self.role}' or " "
