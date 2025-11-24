@@ -192,20 +192,9 @@ def format_datetime(x,output_format):
 
 def dynamic_display_name(request,fullname):
     format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    # for id,it in NAME_FORMATS.items():
-    #     if format_key and format_key.name_display_format == id:
-    #         format_key=id
+
     format_key=format_key.name_display_format if format_key else "0"
-    """
-    Formats a full name string according to the specified naming convention.
-    
-    Args:
-        fullname (str): The full name (e.g., "John Doe")
-        format_key (str): Key selecting the name format
-    
-    Returns:
-        str: Formatted name string
-    """
+
     parts = (fullname or "").strip().split()
     first = parts[0] if len(parts) >= 1 else ""
     last = parts[-1] if len(parts) >= 2 else ""
@@ -216,7 +205,10 @@ def dynamic_display_name(request,fullname):
         "first_initial": first_initial,
     }
     format_key=str(format_key)
-    fmt = NAME_FORMATS.get(format_key)
+    for it,data in NAME_FORMATS:
+        if str(it)==format_key:
+            format_key=data
+    fmt = format_key
     try:
         return fmt.format(**context).strip()
     except Exception:

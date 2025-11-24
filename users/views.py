@@ -90,13 +90,13 @@ def details(request, id):
     page_object = paginator.get_page(page_number)
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     format_key= None
-    for id,it in NAME_FORMATS.items():
-        if format_key and obj.name_display_format == id:
+    for id,it in NAME_FORMATS:
+        if obj.name_display_format == id:
             format_key=id
     asset_paginator=Paginator(assigned_assets,10,orphans=1)
     asset_page_number=request.GET.get('assets_page')
     asset_page_object=asset_paginator.get_page(asset_page_number)
-    get_user_full_name=dynamic_display_name(request,fullname=user.full_name)
+    get_user_full_name=user.dynamic_display_name(user.full_name)
     context = {
         'sidebar': 'users',
         'full_name': get_user_full_name,

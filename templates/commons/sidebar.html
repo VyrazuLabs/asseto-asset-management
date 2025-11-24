@@ -91,11 +91,11 @@
                 </li>
                 {% if perms.authentication.edit_asset or perms.authentication.delete_asset or perms.authentication.delete_assign_asset or perms.authentication.add_assign_asset or perms.authentication.add_asset or perms.authentication.reassign_assign_asset %}
                 <li class="sidebar-item {% if sidebar == 'assets' %}active{% endif %}">
-                        <a href="{% url 'assets:list' %}" class="sidebar-link">
-                            <i class="bi bi-gear-fill"></i>
-                            <span>Assets</span>
-                        </a>
-                    </li>
+                    <a href="{% url 'assets:list' %}" class="sidebar-link">
+                        <i class="bi bi-gear-fill"></i>
+                        <span>Assets</span>
+                    </a>
+                </li>
                 {% endif %}
 
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
@@ -105,7 +105,7 @@
                             <span>Admin</span>
                         </a>
                     {% endif %}
-                    <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
+                    <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
                         {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                                 <a href="{% url 'dashboard:locations' %}">Locations</a>
@@ -128,7 +128,7 @@
                         {% endif %}
 
                         {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
-                            <li class="submenu-item {% if submenu == 'Asset Status' %}active{% endif %}">
+                            <li class="submenu-item {% if submenu == 'Asset_Status' %}active{% endif %}">
                                 <a href="{% url 'assets:asset_status_list' %}">Asset Status</a>
                             </li>
                         {% endif %}
@@ -147,13 +147,13 @@
                             <span>Configuration</span>
                         </a>
                         <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
-                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                            <li class="submenu-item {% if submenu == 'branding' %}active{% endif %}">
                                 <a href="{% url 'configurations:upload_logo' %}">Branding</a>
                             </li>
-                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                            <li class="submenu-item {% if submenu == 'tag-configuration' %}active{% endif %}">
                                 <a href="{% url 'configurations:list_tag' %}">Tag Configuration</a>
                             </li>
-                            <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
+                            <li class="submenu-item {% if submenu == 'localization' %}active{% endif %}">
                                 <a href="{% url 'configurations:list_localization' %}">Localizations</a>
                             </li>
                         </ul>

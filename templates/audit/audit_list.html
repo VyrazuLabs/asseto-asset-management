@@ -53,9 +53,9 @@
                                         <td>
                                             {% with image_url=audit|audit_image_url %}
                                                 {% if image_url %}
-                                                    <img src="{{ audit|audit_image_url }}" height="100" width="100" />
+                                                    <img src="{{ audit|audit_image_url }}" height="100" width="100"/>
                                                 {% else %}
-                                                    No Image
+                                                    <img src='{% static 'assets/images/No_Image.jpg' %}' height="100" width="100">
                                                 {% endif %}
                                             {% endwith %}
                                         </td>

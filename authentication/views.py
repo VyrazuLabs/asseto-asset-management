@@ -263,12 +263,13 @@ def activate(request, uidb64, token):
 
 @login_required
 def profile(request):
-    format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    for id,it in NAME_FORMATS.items():
-        if format_key and format_key.name_display_format == id:
-            format_key=id
+    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    format_key= None
+    # for id,it in NAME_FORMATS:
+    #     if format_key and obj.name_display_format == id:
+    #         format_key=id
     user = request.user
-    get_user_full_name=dynamic_display_name(request=request,fullname=user.full_name)
+    get_user_full_name=user.dynamic_display_name(user.full_name)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name}
     return render(request, 'auth/profile.html', context=context)
 
