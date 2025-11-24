@@ -238,7 +238,7 @@ def listed(request):
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":request,"fullname":assign.user.full_name,"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     if assets_qs.exists():
         paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
@@ -662,7 +662,7 @@ def search(request, page):
             asset__organization=request.user.organization,
             asset_id__in=asset_ids
         ).order_by('-uploaded_at')
-        print("image_object",image_object)
+
         asset_images = {}
         for img in image_object:
             if img.asset_id not in asset_images:
@@ -1374,7 +1374,7 @@ def listed_asset(request):
         'active_user':active_users,
         'sidebar': 'assets',
         'submenu': 'list',
-        'asset_images': asset_images,  
+        'asset_images': asset_images,
         'page_object': page_object,
         'asset_form': asset_form,
         'assign_asset_form': assign_asset_form,
