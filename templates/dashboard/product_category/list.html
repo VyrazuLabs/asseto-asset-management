@@ -53,6 +53,9 @@
                         <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                             hx-get="{% url 'dashboard:search_product_category' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
+                    <div>
+                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                    </div>
                 {% endif %}
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
@@ -78,7 +81,8 @@
                                         {% if not product_category_asset_count|get_item:products.id %}
                                             0
                                         {% else %}
-                                            <form method="get" action="{% url 'assets:search_assets' page_object.number %}">
+                                            <form method="post" action="{% url 'assets:list' %}">
+                                                {% csrf_token %}
                                                 <input type="hidden" name="category" value="{{ products.id }}">
                                                 <button type="submit" 
                                                     class="btn btn-sm text-white"
@@ -114,18 +118,34 @@
                                                 <a href="{% url 'dashboard:product_category_details' products.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                             {% endif %}
                                             {% if perms.authentication.edit_product_category %}
-                                                <button type="button" class="btn btn-info"
-                                                    hx-get="{% url 'dashboard:update_product_category' products.id %}"
-                                                    hx-target="#update-product-category-modal-content" 
-                                                    data-bs-toggle="modal" data-bs-target="#update-product-category-modal"
-                                                    {% if products.name == "Root" %} disabled {% endif %}
-                                                ><i class="bi bi-pencil-square"></i></button>
+                                                {% if is_demo is True %}
+                                                    <button type="button" class=" btn btn-info" disabled
+                                                        hx-get="{% url 'dashboard:update_product_category' products.id %}"
+                                                        hx-target="#update-product-category-modal-content" 
+                                                        data-bs-toggle="modal" data-bs-target="#update-product-category-modal"
+                                                        {% if products.name == "Root" %} disabled {% endif %}
+                                                    ><i class="bi bi-pencil-square"></i></button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-info"
+                                                        hx-get="{% url 'dashboard:update_product_category' products.id %}"
+                                                        hx-target="#update-product-category-modal-content" 
+                                                        data-bs-toggle="modal" data-bs-target="#update-product-category-modal"
+                                                        {% if products.name == "Root" %} disabled {% endif %}
+                                                    ><i class="bi bi-pencil-square"></i></button>
+                                                {% endif %}
                                             {% endif%}
                                             {% if perms.authentication.delete_product_category %}
-                                                <form action="{% url 'dashboard:delete_product_category' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                    {% csrf_token %}
-                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                                </form>  
+                                                {% if is_demo is True %}
+                                                    <form action="{% url 'dashboard:delete_product_category' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                        {% csrf_token %}
+                                                        <button type="submit" value="Delete" class="btn btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
+                                                    </form>  
+                                                {% else %}
+                                                    <form action="{% url 'dashboard:delete_product_category' products.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                        {% csrf_token %}
+                                                        <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                    </form>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </td>

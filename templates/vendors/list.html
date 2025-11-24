@@ -54,6 +54,9 @@
                         {% endif %}
                     </div>
                 {% endif %}
+                <div>
+                    {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover" id="table1">
                         <thead>
@@ -104,13 +107,24 @@
                                             <a href="{% url 'vendors:details' vendors.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                         {% endif %}
                                         {% if perms.authentication.edit_vendor %}
-                                            <a href="{% url 'vendors:update_vendor' vendors.id %}" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% if is_demo is True %}
+                                                <a href="{% url 'vendors:update_vendor' vendors.id %}" class="disabled btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% else %}
+                                                <a href="{% url 'vendors:update_vendor' vendors.id %}" class="btn btn-info"><i class="bi bi-pencil-square"></i></a>
+                                            {% endif %}
                                         {% endif %}
                                         {% if perms.authentication.delete_vendor %}
-                                            <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                {% csrf_token %}
-                                                <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                            </form>
+                                            {% if is_demo is True %}
+                                                <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% else %}
+                                                <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                                                    {% csrf_token %}
+                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </td>

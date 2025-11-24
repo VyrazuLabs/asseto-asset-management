@@ -11,7 +11,9 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from django.http import JsonResponse
 from assets.models import AssignAsset,Asset
+import os
 
+IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
 ORPHANS = 1
 
@@ -59,7 +61,7 @@ def product_category_list(request):
 
     # Count distinct assets per product category
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             product__product_category__in=all_product_category_list
@@ -73,14 +75,19 @@ def product_category_list(request):
         item["product__product_category"]: item["asset_count"]
         for item in asset_counts
     }
-
+    is_demo=IS_DEMO
+    if is_demo==True:
+        is_demo=True
+    else:
+        is_demo=False
     context = {
         'sidebar': 'admin',
         'submenu': 'product_category',
         'page_object': page_object,
         'deleted_product_categories_count': deleted_product_categories_count,
         'product_category_asset_count': product_category_asset_count,
-        'title': 'Product Categories'
+        'title': 'Product Categories',
+        'is_demo':is_demo
     }
     return render(request, 'dashboard/product_category/list.html', context=context)
 

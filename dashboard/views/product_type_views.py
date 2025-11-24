@@ -10,7 +10,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset,Asset
+import os 
 
+IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -47,18 +49,23 @@ def product_type_list(request):
     product_type = ProductTypeForm(organization=request.user.organization)
 
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             product__product_type__in=all_product_type_list
         )
         .values("product__product_type")
-        .annotate(asset_count=Count("id", distinct=True))   # ✅ unique assets
+        .annotate(asset_count=Count("id", distinct=True)) 
     )
     user_product_type_asset_count = {
         item["product__product_type"]: item["asset_count"]
         for item in asset_counts
     }
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -67,6 +74,7 @@ def product_type_list(request):
         'page_object': page_object,
         'deleted_product_types_count':deleted_product_types_count,
         'user_product_type_asset_count':user_product_type_asset_count,
+        'is_demo':is_demo,
         'title': 'Product Types'
     }
 

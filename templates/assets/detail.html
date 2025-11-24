@@ -1,4 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
+{% load custom_filters %}
+{% load custom_filters %}
 {% load static %}
 {% block content %}
 <div class="page-heading">
@@ -18,9 +20,15 @@
             <div class="me-2">
                 <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
             </div>
-            <div>
-                <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
-            </div>
+            {% if is_demo is not None %}
+                <div>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+                </div>
+            {% else %}
+                <div>
+                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -54,24 +62,26 @@
                             </tr>
                             
                             <tr>
-                                <th scope="row">Product Sub Category</th>
-                                <td>{{asset.product.product_category}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
-                            </tr>
-                            <tr>
                                 <th scope="row">Price</th>
-                                <td>{{asset.price}}</td>
+                                {% if asset.price == None %} <td>Not Available</td> 
+                                {% else %}
+                                <td>{{get_currency}} {{asset.price}}</td>
+                                {% endif %}
                                 <th scope="row">Office Location</th>
                                 <td>{{asset.location.address.address_line_one}}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Purchase Date</th>
+                                {% if asset.purchase_date == None %} <td>Not Available</td> 
+                                {% else %}
                                 <td>{{asset.purchase_date}}</td>
+                                {% endif %}
                                 <th scope="row">Warranty Expiry Date</th>
+                                {% if asset.warranty_expiry_date == None %} <td>Not Available</td> 
+                                {% else %}
                                 <td>{{asset.warranty_expiry_date}}</td>
+                                {% endif %}
                             </tr>
-                            
                             <tr>
                                 <th scope="row">End of Life</th>
                                 <td>{{eol_date}}</td>
@@ -80,12 +90,16 @@
                             </tr>
                             <tr>
                                 <th scope="row">Status</th>
-                                <td colspan="3">{{asset.asset_status.name}}</td>
+                                <td>{{asset.asset_status.name}}</td>
+                                <th scope="row">Serial No.</th>
+                                <td>{{asset.serial_no}}</td>
+                                
                             </tr>
                             <tr>
                                 <th scope="row">Description</th>
                                 <td colspan="3">{{asset.description|urlize}}</td>
                             </tr>
+
                             </tbody>
                     </table>
                     <p ><b>Asset Images</b></p>
@@ -146,6 +160,22 @@
                     </div>
                     {% endif %}
                 </div>
+                <h5 class="pt-5">BARCODE</h5>
+                <div class="d-flex barcode-div">
+                    <div class="asset-barcode">
+                        {{asset_barcode|safe}}
+                    </div>
+                    <div class="barcode-dowload-btn ps-3" style="margin-top: 50px;">
+                        <button
+                            id="download-btn"
+                            type="button"
+                            class="btn btn-secondary rounded"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        ><i class="bi bi-download"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         {% if assetSpecifications %}
@@ -191,6 +221,51 @@
                 </div>
             </div>
         {% endif %}
+        <div class="card mt-3">
+            <div class="card-header  mb-4">
+                <h5>Audit History</h5>
+            </div>
+            <div class="card-body" id="custom-field-container">
+                <div class="table-responsive items-table">
+                        <table class="table" id="table1">
+                            <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Image</th>
+                                    <th>Condition</th>
+                                    <th>Notes</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            {% for audit in get_audit_history %}
+                            <tbody id="search_result">
+                                <tr style="height: 100px;">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{% if audit.audit_image %}
+                                            <img src="{{ audit.id|audit_image_url}}" height="100" width="100" />
+                                        {% else %}
+                                            <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                        {% endif %}
+                                        </td>
+                                    <td>{{ audit.condition_label }}</td>
+                                    <td>{{ audit.notes|truncatechars:30  }}</td>                                       
+                                    <td>{{ audit.created_at }}</td>
+                                    <td> 
+                                        <div> 
+                                            <a href="{% url 'audit:details' audit.id %}" class="btn btn-sm btn-success pt-2"><i class="bi bi-eye-fill p-1"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            {% endfor %}
+                        </table>
+                    {% if not get_audit_history %}
+                        <p colspan="6">No audit history found</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
         {% include 'commons/history.html' %}
     </section>
 </div>
@@ -201,5 +276,4 @@ document.querySelectorAll('.modal').forEach(modal => {
   });
 });
 </script>
-  
 {% endblock content%}
