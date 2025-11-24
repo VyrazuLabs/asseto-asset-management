@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
 from .models import TagConfiguration,Extensions
 from django.http import JsonResponse
-from .constants import COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES
+from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES
 
 @login_required
 def logo_upload(request):
@@ -24,7 +24,7 @@ def logo_upload(request):
 
     else:
         add_path_context=add_path(request.user.organization)
-        return render(request, 'configurations/logo.html',{'add_path_context':add_path_context})
+        return render(request, 'configurations/logo.html',{'add_path_context':add_path_context,'submenu':'branding','sidebar':'configurations'})
 
 
 
@@ -106,7 +106,7 @@ def update_tag_configuration(request, id=None):
 
 def list_tag_configurations(request):
     configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
-    return render(request, 'configurations/list_tag.html', {'configurations': configurations})
+    return render(request, 'configurations/list_tag.html', {'configurations': configurations,'submenu':'tag-configuration','sidebar':'configurations'})
 
 def toggle_default_settings(request, id):
     configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
@@ -118,16 +118,16 @@ def toggle_default_settings(request, id):
 @login_required
 def list_localizations(request):
     configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    get_default_language={}
+    get_default_language={"name": "English"}
     get_default_name_display_format={}
     get_default_time_format={}
     get_default_currency_format={}
     get_default_country_format={}
     if configurations:
-        for id,name in DEFAULT_LANGUAGE:
-            if id == configurations.default_language:
-                get_default_language= {'name':name,'id':id}
-        for id,name in NAME_FORMATS.items():
+        # for id,name in DEFAULT_LANGUAGE:
+        #     if id == configurations.default_language:
+        #         get_default_language= {'name':name,'id':id}
+        for id,name in NAME_FORMATS:
             if id == configurations.name_display_format:
                 get_default_name_display_format= {'name':name,'id':id}
         for id,name in DATETIME_CHOICES:
@@ -139,14 +139,13 @@ def list_localizations(request):
         for id,name in COUNTRY_CHOICES:
             if id == configurations.country_format:
                 get_default_country_format= {'name':name,'id':id}
-                print(get_default_country_format)
     else:
         get_default_language=None
         get_default_name_display_format=None
         get_default_time_format=None
         get_default_currency_format=None
         get_default_country_format=None
-    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS.items(),'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format})
+    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'default_country':DEFAULT_COUNTRY,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format,'submenu':'localization','sidebar':'configurations'})
 
 # def get_localization(request):
 #     context = {
@@ -208,7 +207,6 @@ def list_extensions(request):
 def extension_status(request, id):
     integration_choices=INTEGRATION_CHOICES
     status = request.POST.get('status')
-    print("choicessssssssss",status)
     # Convert to boolean or int safely
     status_bool = str(status).lower() in ['true', '1', 'yes',0]
     products=None
