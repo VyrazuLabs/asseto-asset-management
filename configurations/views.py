@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
 from .models import TagConfiguration,Extensions
 from django.http import JsonResponse
-from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES
+from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
 @login_required
 def logo_upload(request):
@@ -136,9 +136,9 @@ def list_localizations(request):
         for id,name in CURRENCY_CHOICES:
             if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
-        for id,name in COUNTRY_CHOICES:
-            if id == configurations.country_format:
-                get_default_country_format= {'name':name,'id':id}
+        # for id,name in COUNTRY_CHOICES:
+        #     if id == configurations.country_format:
+        #         get_default_country_format= {'name':name,'id':id}
     else:
         get_default_language=None
         get_default_name_display_format=None
@@ -154,6 +154,8 @@ def list_localizations(request):
 #     return render(request, 'configurations/add.html', context)
 
 def create_localization_configuration(request):
+    get_obj=LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    print("post------------------------,",request.POST)
     if request.method == 'POST':
         country_format = request.POST.get('country-format')
         currency_format = request.POST.get('currency-format')
@@ -161,18 +163,24 @@ def create_localization_configuration(request):
         default_language = request.POST.get('language-format')
         time_format = request.POST.get('time-format')
 
-        # Use update_or_create for atomic upsert operation
-        LocalizationConfiguration.objects.update_or_create(
-            organization=request.user.organization,
-            defaults={
-                'country_format': country_format,
-                'currency': currency_format,
-                'name_display_format': name_display_format,
-                'default_language': default_language,
-                'time_format': time_format,
-            }
-        )
-
+        if get_obj:
+            # Update existing configuration
+            get_obj.country_format = country_format
+            get_obj.currency = currency_format
+            get_obj.name_display_format = name_display_format
+            get_obj.default_language = default_language
+            get_obj.time_format = time_format
+            get_obj.save()
+        else:
+            # Create new configuration
+            LocalizationConfiguration.objects.create(
+                organization=request.user.organization,
+                country_format=country_format,
+                currency=currency_format,
+                name_display_format=name_display_format,
+                default_language=default_language,
+                time_format=time_format
+            )
         return redirect('configurations:list_localization')
 
     return redirect('configurations:list_localization')
