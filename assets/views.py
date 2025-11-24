@@ -169,7 +169,8 @@ def listed(request):
     #Function to get all the list data 
     tag=request.GET.get("tag")
     user_data=request.POST.get("user-data")
-    product=request.POST.get("product")# gts the id of the product
+    product=request.POST.get("product")# gets the id of the product
+    print("PRODUCT ID",product)
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
     status_id = request.POST.get("status")
@@ -178,7 +179,7 @@ def listed(request):
     location_id = request.POST.get("location")
     category_id = request.POST.get("category")
     type_id = request.POST.get("type")
-    filters = Q(organization=None)
+    filters = Q(organization=request.user.organization)
     if search_text:
         filters &= (
             Q(tag__icontains=search_text) |
@@ -205,14 +206,16 @@ def listed(request):
 
     # --- Base queryset ---
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
+    print("GET ASSETS",assets_qs)
     get_prod_type=None
     get_prod_category=None
     #Filter by product based on product type and category
     if product:
         assets_qs=assets_qs.filter(product_id=product)
-        if assets_qs.exists():
-            get_prod_category = assets_qs.first().product.product_category.name
-            get_prod_type = assets_qs.first().product.product_type.name
+        print("FILTERED ASSETS",assets_qs)
+        # if assets_qs.exists():
+        #     get_prod_category = assets_qs.first().product.product_category.name
+        #     get_prod_type = assets_qs.first().product.product_type.name
     if user_data:
         assigned_qs = AssignAsset.objects.filter(user_id=user_data).select_related("user").order_by("-assigned_date")
         assets_qs = (
@@ -233,12 +236,18 @@ def listed(request):
         organization=request.user.organization)).order_by('-created_at')
     deleted_asset_count=Asset.deleted_objects.count()
     get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+    # asset_user_map = {}
+    # for assign in get_assigned_asset_list:
+    #     if assign.asset_id not in asset_user_map:
+    #         asset_user_map[assign.asset_id] = None
+    #     if assign.user:  # avoid None users
+    #         asset_user_map[assign.asset_id]={"full_name":request,"fullname":assign.user.full_name,"image":assign.user.profile_pic}
     asset_user_map = {}
     for assign in get_assigned_asset_list:
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id]={"full_name":request,"fullname":assign.user.full_name,"image":assign.user.profile_pic}
+            asset_user_map[assign.asset_id]={"full_name":dynamic_display_name(request,fullname=assign.user.full_name),"image":assign.user.profile_pic}
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     if assets_qs.exists():
         paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
