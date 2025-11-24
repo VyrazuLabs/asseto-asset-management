@@ -9,11 +9,11 @@ from audit.utils import get_time_difference
 from audit.models import Audit,AuditImage
 from assets.models import AssetImage
 register = template.Library()
-
+ 
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)
-
+ 
 @register.filter
 def get_at_index(list_obj, index):
         try:
@@ -39,7 +39,7 @@ def format_datetime(context,x):
     # x = datetime.datetime.now()
     if isinstance(x, str):
         x = parse(x)
-
+ 
     formats = {
         'YYYY-MM-DD': '%Y-%m-%d',
         'Day Month DD, Year': '%A %B %d, %Y',   
@@ -47,10 +47,10 @@ def format_datetime(context,x):
         'DD/MM/YYYY': '%d/%m/%Y',
         'MM/DD/YYYY': '%m/%d/%Y'
     }
-
+ 
     if output_format not in formats:
         raise ValueError("Invalid format. Choose from: " + ", ".join(formats.keys()))
-
+ 
     return x.strftime(formats[output_format])
 @register.simple_tag(takes_context=True)
 def dynamic_display_name(context,fullname):
@@ -80,8 +80,11 @@ def dynamic_display_name(context,fullname):
         "first_initial": first_initial,
     }
     format_key=str(format_key)
-    fmt = NAME_FORMATS.get(format_key)
-
+    for it,data in NAME_FORMATS:
+        if str(it)==format_key:
+            format_key=data
+    fmt = format_key
+ 
     try:
         return fmt.format(**context).strip()
     except Exception:
@@ -97,30 +100,30 @@ def audit_time_diff(audit):
     audit_interval_days = audit.asset.product.audit_interval
     
     return get_time_difference(asset_creation_time, audit_interval_days)
-
+ 
 @register.filter
 def next_audit_due(audit_id):
     audit=Audit.objects.filter(id=audit_id).first()
     interval_days = audit.asset.product.get_audit_interval()
     today=datetime.today().date()
     if not interval_days:
-        return None 
+        return None
     # last_audit = audits.asset.order_by("-created_at").first()
     if not audit:
         base_date = audit.created_at.date()
     else:
         base_date = audit.created_at.date()
-
+ 
     # First due date after interval
     next_due = base_date + relativedelta(days=interval_days)
-
+ 
     # Grace period rule: If 30 days pass after due date → push to next interval
     days_remaining = (next_due - today).days
     return  next_due
     # else:
     #     days_remaining = (next_due - today).days
     #     return days_remaining
-
+ 
 # @register.filter
 # def get_audit_image(audit_history):
 #     # get_audit_by_asset_id=Audit.objects.filter(asset__id=id).first()
@@ -141,7 +144,7 @@ def next_audit_due(audit_id):
 #         .first()
 #     )
 #     return get_asset_image
-
+ 
 @register.filter
 def get_img_for_audit(audit):
     get_audit_image=audit.image
@@ -152,7 +155,7 @@ def get_img_for_audit(audit):
         .first()
     )
     return get_asset_image.image.url
-
+ 
 @register.filter
 def audit_image_url(audit):
     if audit:
