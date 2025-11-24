@@ -16095,6 +16095,10 @@ fieldset:disabled .btn {
   content: "\f4da";
 }
 
+.bi-sliders-fill::before{
+  content: "\F56B";
+}
+
 .bi-person-lines-fill::before {
   content: "\f4db";
 }
@@ -20609,5 +20613,145 @@ body[data-theme="dark"] {
   }
 }
 
+.intro-btn{
+  width: 60%;
+    font-weight: 600;
+    font-size: x-large;
+    background-color: #0dcaf0 !important;
+    color: #25396f !important;
+}
+.intro-btn:hover{
+  background-color: #0bb8dff0 !important;
+}
+/* Step Progress Bar Styles */
+.setup-progress-container {
+  width: 80%;
+  margin: 40px auto;
+  text-align: center;
+}
 
+.steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 20px;
+}
 
+.steps::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #e0e0e0;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.progress-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 4px;
+  background-color: #007bff;
+  transform: translateY(-50%);
+  z-index: 1;
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+.step {
+  position: relative;
+  z-index: 2;
+  background-color: #e0e0e0;
+  color: #555;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.step.active,
+.step.completed {
+  background-color: #007bff;
+  color: white;
+}
+
+.step.completed::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.step-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+/*RESPONSIVE STYLING */
+@media (max-width: 1175px) {
+  .step-labels span {
+    display: none;
+  }
+}
+
+.responsive-text {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  text-align: center;
+  line-height: 1.6;
+  color: #333;
+}
+
+.responsive-text p {
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.responsive-text b {
+  color: #007bff;
+}
+
+@media (max-width: 992px) {
+  .responsive-text p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-text {
+    margin: 1.5rem auto;
+    padding: 0 0.75rem;
+  }
+  .responsive-text p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-text {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+  .responsive-text p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+.company-name{
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+}
+.company-name a{
+  color: #007bff;
+  font-weight: 600;
+}

@@ -86,8 +86,8 @@
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div class="stats-icon green">
-                                       <i class="bi bi-pc-display"></i>
+                                    <div class="stats-icon green ">
+                                       <i class="bi bi-pc-display me-2 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -112,7 +112,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon purple">
-                                        <i class="bi bi-person-workspace"></i>
+                                        <i class="bi bi-person-workspace me-2 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -135,7 +135,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon blue">
-                                        <i class="bi bi-window-stack"></i>
+                                        <i class="bi bi-window-stack me-2 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -159,7 +159,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon red">
-                                        <i class="bi bi-person-badge"></i>
+                                        <i class="bi bi-person-badge ms-1 me-3 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -186,7 +186,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon blue">
-                                        <i class="bi bi-geo-alt-fill"></i>
+                                        <i class="bi bi-geo-alt-fill ms-1 me-3 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -211,7 +211,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon green">
-                                        <i class="bi bi-display"></i>
+                                        <i class="bi bi-display ms-1 me-3 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -236,7 +236,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon red">
-                                        <i class="bi bi-people-fill"></i>
+                                        <i class="bi bi-people-fill ms-1 me-3 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
@@ -262,13 +262,15 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon purple">
-                                        <i class="bi bi-currency-exchange"></i>
+                                        <i class="bi bi-currency-exchange ms-1 me-3 mb-3"></i>
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Total Asset Cost</h6>
-                                    {% if all_asset_cost %}
-                                       <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                    {% if all_asset_cost and currency %}
+                                       <h6 class="font-extrabold mb-0">{{currency}} {{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                    {% elif all_asset_cost %}
+                                        <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
                                     {% else %}
                                        <h6 class="font-extrabold mb-0">0</h6>
                                     {% endif %}
@@ -396,7 +398,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{vendor.created_at.date}}
+                                                        {{vendor.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -439,7 +441,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{product.created_at.date}}
+                                                        {{product.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -481,7 +483,7 @@
                                                 </td>                                
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{location.created_at.date}}
+                                                        {{location.created_at}}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -524,7 +526,7 @@
                                             </td>
                                             <td class="col-auto">
                                                 <p class="mb-0">
-                                                    {{users.created_at.date}}
+                                                    {{users.created_at}}
                                                 </p>
                                             </td>
                                         </tr>

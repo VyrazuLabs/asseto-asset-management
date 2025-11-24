@@ -20,9 +20,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from authentication.forms import UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetRequestForm
 from authentication.decorators import unauthenticated_user
-
-
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from assets.urls import api_url_patterns
+from users.urls import user_api_url_patterns
+from authentication.urls import authentication_url_patterns
+from vendors.urls import vendor_api_urlpatterns
 urlpatterns = [
+	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('audit/', include('audit.urls', namespace='audit')),
     path('secret/', admin.site.urls),
     path('', include('authentication.urls', namespace='authentication')),
     path('vendors/', include('vendors.urls', namespace='vendors')),
@@ -35,6 +42,7 @@ urlpatterns = [
     path('support/', include('support.urls', namespace='support')),
     path('users/', include('users.urls', namespace='users')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
+	path('configurations/',include('configurations.urls',namespace='configurations')),
 
     # django smart select urls
     path('chaining/', include('smart_selects.urls')),
@@ -58,7 +66,10 @@ urlpatterns = [
 
     path('reset/done/', unauthenticated_user(auth_views.PasswordResetCompleteView.as_view(
         template_name='auth/password/password-reset-complete.html')), name="password_reset_complete"),
+	
 ]
+
+urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

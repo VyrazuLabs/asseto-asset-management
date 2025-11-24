@@ -19,12 +19,40 @@
       <div class="row h-100">
         <div class="col-lg-6 col-12">
             <div id="auth-left">
+              {% if updated_login_page_logo %}
+                <div class="auth-logo">
+                    <a href="/"><img src="/media{{ updated_login_page_logo }}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
+                </div>
+              {% else %}
                 <div class="auth-logo">
                     <a href="/"><img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" style="max-width: 53%;  height: auto;"></a>
                 </div>
+              {% endif %}
         {% block content %}
         {% endblock %}
     </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+      console.log("Progress bar script loaded");
+      const container = document.getElementById("progress-bar");
+      const currentStep = parseInt(container.dataset.step);
+      const steps = container.querySelectorAll(".step");
+      const progressLine = container.querySelector(".progress-line");
 
+      // mark completed/active steps
+      steps.forEach(step => {
+      const stepNum = parseInt(step.dataset.step);
+      if (stepNum < currentStep) step.classList.add("completed");
+      if (stepNum === currentStep) step.classList.add("active");
+      });
+
+      // animate progress line
+      console.log("Current Step:", currentStep);
+      const percent = ((currentStep - 1) / (steps.length - 1)) * 100;
+      requestAnimationFrame(() => {
+      progressLine.style.width = percent + "%";
+      });
+  });
+</script>
 </html>
