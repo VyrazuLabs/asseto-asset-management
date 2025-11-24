@@ -8,7 +8,7 @@ from assets.models import AssignAsset
 from dashboard.models import Address
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
-from .utils import create_all_perm_role
+from .utils import assigned_asset_to_user, create_all_perm_role
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
@@ -16,7 +16,13 @@ from django.db.models import Q,Prefetch
 from django.contrib.auth.decorators import permission_required
 from datetime import date
 from assets.models import Asset,AssetImage
+from configurations.utils import dynamic_display_name
+from configurations.models import LocalizationConfiguration
+from configurations.constants import NAME_FORMATS
+from django.http import JsonResponse
 today = date.today()
+import os
+IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -44,43 +50,30 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = (
-        User.undeleted_objects
-        .filter(organization=request.user.organization, is_superuser=False)
-        .exclude(pk=request.user.id)
-        .order_by('-created_at')
-    )
-    deleted_user_count = User.deleted_objects.count()
+    users_list = User.undeleted_objects.filter(is_superuser=False).exclude(pk=request.user.id).order_by('-created_at')
+    
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    # 🔑 Collect all user IDs from this page
-    user_ids = [u.id for u in page_object]
+    # method to maop the assets with each users
+    user_asset_map=assigned_asset_to_user(page_object)
+    assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
 
-    # 🔑 Get assigned assets for those users
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
 
-    # 🔑 Build map { user_id: [asset1, asset2, ...] }
-    user_asset_map_count = {}
-    for aa in assigned_assets:
-        user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
-    
-    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
 
-    if request.method == "POST":
-        messages.success
-        (
-            request, 'User added successfully and Verification email sent to the user'
-        )
-        return redirect(request.META.get('HTTP_REFERER'))
     context = {
         'sidebar': 'users',
         'page_object': page_object,
-        'deleted_user_count': deleted_user_count,
         'title': 'Users',
-        'user_asset_map_count':user_asset_map_count,   # 👈 send to template
-        'user_asset_map_count_count':user_asset_map_count_count
+        'user_asset_map_count':user_asset_map,
+        'user_asset_map_count_count':assigned_assets_count,
+        'is_demo':is_demo,
     }
     return render(request, 'users/list.html', context=context)
 
@@ -95,13 +88,18 @@ def details(request, id):
     paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-
+    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    format_key= None
+    for id,it in NAME_FORMATS:
+        if obj.name_display_format == id:
+            format_key=id
     asset_paginator=Paginator(assigned_assets,10,orphans=1)
     asset_page_number=request.GET.get('assets_page')
     asset_page_object=asset_paginator.get_page(asset_page_number)
-
+    get_user_full_name=user.dynamic_display_name(user.full_name)
     context = {
         'sidebar': 'users',
+        'full_name': get_user_full_name,
         'user': user,
         'page_object': page_object,
         'assigned_assets': asset_page_object,
@@ -109,51 +107,6 @@ def details(request, id):
     }
                
     return render(request, 'users/detail.html',context)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    # for get_asset in get_assigned_assets:
-    #     get_obj['assigned_date']=get_asset['assigned_date']
-
-    # for it in get_assigned_assets:
-    #     get_asset_obj=Asset.objects.filter(id=it['asset_id'])
-    #     for asset_data in get_asset_obj:
-    #         get_obj['vendor']=asset_data.vendor.name if asset_data.vendor else 'N/A'
-    #         get_obj['type']=asset_data.product.product_type.name if asset_data.product.product_type else 'N/A'
-
-    #     get_asset=get_asset_obj.values()
-    #     for it in get_asset:
-    #         get_obj['asset_name']=it['name']
-    #         get_obj['serial_no']=it['serial_no']
-    #         get_obj['id']=it['id']
-
-    #     assigned_assets.append(get_obj)
-
- 
-
-
-    
-
 
 @login_required
 @permission_required('authentication.add_users')
@@ -215,7 +168,7 @@ def update(request, id):
 
     if request.method == "POST":
         form = UserUpdateForm(request.POST, request.FILES,
-                              instance=user, organization=request.user.organization)
+          instance=user, organization=request.user.organization)
         address_form = AddressForm(request.POST, instance=address)
 
         if form.is_valid() and address_form.is_valid():
@@ -268,7 +221,7 @@ def delete(request, id):
 def status(request, id):
     if request.method == "POST":
         user = get_object_or_404(
-            User.undeleted_objects, pk=id, organization=request.user.organization)
+            User.undeleted_objects, pk=id)
         user.is_active = False if user.is_active else True
         user.save()
 
@@ -350,7 +303,7 @@ def export_users_csv(request):
     header_list = ['Name', 'Email', 'Phone', 'Designation', 'Department', 'Address Line One',
                    'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Office']
     user_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(pk=request.user.id).order_by('-created_at').values_list('full_name', 'email', 'phone', 'role__related_name',
-                                                                                                                                                                          'department__name', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'location__office_name')
+    'department__name', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'location__office_name')
     context = {'header_list': header_list, 'rows': user_list}
     response = render_to_csv(context_dict=context)
     response['Content-Disposition'] = f'attachment; filename="export-users-{today}.csv"'
@@ -372,3 +325,9 @@ def user_assigned_assets(request, id):
     # user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
     get_user=AssignAsset.objects.filter(user_id=id)
     return render(request, 'users/assigned-asset-modal.html', {'get_user': get_user})
+
+def render_format_based_username(request):
+    user = request.user
+    get_user_full_name=dynamic_display_name(request=request,fullname=user.full_name)
+    new_username={"username":get_user_full_name}
+    return JsonResponse(new_username)

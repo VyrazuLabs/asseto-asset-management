@@ -1,0 +1,104 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">
+                Add Localizations
+            </h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Localizations
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <section class="section">
+        <form class="form row" 
+              action="{% url 'configurations:create_localization_configuration' %}"
+              method="POST" novalidate>
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for err in form.non_field_errors %}
+                                <li>{{ err }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <div class="row p-4">
+                        <div class="btn-group mt-2">
+                            <p style="margin-right: 150px;"><b>Default Language</b></p>
+                            <select name="language-format" class="form-control w-100 w-2" style="margin-right: 20px;" disabled>
+                                {% if get_default_language %}
+                                    <option value="" disabled selected>
+                                        {{ get_default_language.name }}
+                                    </option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="btn-group mt-4">
+                            <p style="margin-right: 130px;"><b>Name Display Format</b></p>
+                            <select name="name-format" class="form-control w-100" style="margin-right: 20px;">
+                                {% if get_default_name_display_format %}
+                                    <option value="{{ get_default_name_display_format.id }}" selected>
+                                        {{ get_default_name_display_format.name }}
+                                    </option>
+                                    {% for code, name in name_display_format %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for code, name in name_display_format %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="btn-group mt-4">
+                            <p style="margin-right: 120px;"><b>Time And Date Display</b></p>
+                            <select name="time-format" class="form-control w-100 w-2" style="margin-right: 20px;">
+                                {% if get_default_time_format %}
+                                    <option value="{{ get_default_time_format.id }}" selected>
+                                        {{ get_default_time_format.name }}
+                                    </option>
+                                    {% for code, name in datetime_choices %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for code, name in datetime_choices %}
+                                        <option value="{{ code }}">{{ name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="btn-group  mt-4">
+                            <p style="margin-right: 155px;"><b>Default Currency</b></p>
+                            <select name="currency-format" class="form-control w-100 w-2"  style="margin-right: 20px;">
+                                {% if get_default_currency_format %}
+                                    <option value="{{ get_default_currency_format.id }}" selected>
+                                        {{ get_default_currency_format.name }} 1234.55
+                                    </option>
+                                {% endif %}
+                                {% for code, name in currency_choices %}
+                                    <option value="{{ code }}">{{ name }} 1234.55</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end gap-3 p-4" style="padding-right: 20px;">
+                            <button type="button" class="btn btn-sm btn-danger" style="width: 100px">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-info" style="width: 100px;">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

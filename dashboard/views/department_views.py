@@ -11,7 +11,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset
+import os
 
+IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
 ORPHANS = 1
 
@@ -70,6 +72,11 @@ def departments(request):
         item["user__department"]: item["asset_count"]
         for item in asset_counts
     }
+    is_demo=IS_DEMO
+    if is_demo:
+        is_demo=True
+    else:
+        is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -78,6 +85,7 @@ def departments(request):
         'department_form': department_form,
         'deleted_department_count': deleted_department_count,
         'department_asset_count': department_asset_count,
+        'is_demo':is_demo,
         'title': 'Departments'
     }
     return render(request, 'dashboard/departments/list.html', context=context)
@@ -165,7 +173,7 @@ def department_status(request, id):
 
 @login_required
 def search_department(request, page):
-    search_text = request.GET.get('search_text').strip()
+    search_text = request.GET.get('search_text')
     if search_text:
         return render(request, 'dashboard/departments/departments-data.html', {
             'page_object': Department.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
@@ -178,4 +186,18 @@ def search_department(request, page):
     paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = page
     page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/departments/departments-data.html', {'page_object': page_object})
+    asset_counts = (
+        AssignAsset.objects
+        .filter(
+            asset__organization=request.user.organization,
+            user__department__in=department_list
+        )
+        .values("user__department")
+        .annotate(asset_count=Count("asset", distinct=True))
+    )
+    department_asset_count = {
+        item["user__department"]: item["asset_count"]
+        for item in asset_counts
+    }
+    return render(request, 'dashboard/departments/departments-data.html', {'page_object': page_object,
+                'department_asset_count': department_asset_count})
