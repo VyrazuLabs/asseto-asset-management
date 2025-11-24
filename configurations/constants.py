@@ -2,14 +2,14 @@
 
 # Example dropdown values
 COUNTRY_CHOICES = [
-    (0, 'United Arab Emirates'),
+    (0, 'India'),
     (1, 'Saudi Arabia'),
     (2, 'Kuwait'),
     (3, 'Qatar'),
     (4, 'Oman'),
-    (5, 'United States of America'),
+    (5, 'United Arab Emirates'),
     (6, 'United Kingdom'),
-    (7, 'India'),
+    (7, 'United States of America'),
     (8, 'Germany'),
     (9, 'France'),
     (10, 'Japan'),
@@ -44,6 +44,9 @@ CURRENCY_CHOICES = [
     (2, 'GBP'),
     (3, 'AED'),
     (4, 'SAR'),
+    (5, 'KWD'),
+    (6, 'INR'),
+    (7, 'JPY'),
 ]
 
 INTEGRATION_CHOICES = [
@@ -57,17 +60,16 @@ DATETIME_CHOICES=[
     (3, 'DD/MM/YYYY'),
     (4, 'MM/DD/YYYY'),
 ]
-
+DEFAULT_COUNTRY='India'
 DEFAULT_CURRENCY = 'USD'
 DATE_FORMAT = '%Y-%m-%d'
 TIME_FORMAT = '%H:%M:%S'
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 PAGE_SIZE = 10
 ORPHANS = 1
-NAME_FORMATS = {
-    "0": "{first} {last}",
-    "1": "{last} {first}",
-    "2": "{first_initial}. {last}",
-    "3": "{last}, {first}",
-    # Add more as needed
-}
+NAME_FORMATS = [
+    (0, '{first} {last}'),
+    (1, '{last} {first}'),
+    (2, '{first_initial}. {last}'),
+    (3, '{last}, {first}'),
+]

@@ -80,7 +80,7 @@ def departments(request):
 
     context = {
         'sidebar': 'admin',
-        # 'submenu': 'department',
+        'submenu': 'department',
         'page_object': page_object,
         'department_form': department_form,
         'deleted_department_count': deleted_department_count,

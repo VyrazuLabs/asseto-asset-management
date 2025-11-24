@@ -41,13 +41,6 @@
                                     <option value="" disabled selected>
                                         {{ get_default_language.name }}
                                     </option>
-                                    {% for code, name in default_language %}
-                                        <option value="{{ code }}" disabled>{{ name }}</option>
-                                    {% endfor %}
-                                {% else %}
-                                    {% for code, name in default_language %}
-                                        <option value="{{ code }}" disabled selected>{{ name }}</option>
-                                    {% endfor %}
                                 {% endif %}
                             </select>
                         </div>
@@ -85,17 +78,9 @@
                                 {% endif %}
                             </select>
                         </div>
-                        <div class="btn-group  mt-4 d-flex gap-5" style="padding-right: 40px;">
+                        <div class="btn-group  mt-4" style="padding-right: 40px;">
                             <p style="margin-right: 120px;"><b>Default Currency</b></p>
-                            <select name="country-format" class="form-control w-50" placeholder="{{ get_default_country_format}}" style="margin-right: 20px;">
-                                <option value="" disabled selected>
-                                    {{ get_default_country_format.name }}
-                                </option>
-                                {% for code, name in country_choices %}
-                                    <option value="{{ code }}">{{ name }}</option>
-                                {% endfor %}
-                            </select>
-                            <select name="currency-format" class="form-control w-50">
+                            <select name="currency-format" class="form-control w-100 ps-3" style="margin-left: 30px;">
                                 {% if get_default_currency_format %}
                                     <option value="" disabled selected>
                                     {{ get_default_currency_format.name }} 1234.55
