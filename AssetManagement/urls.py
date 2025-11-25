@@ -25,6 +25,9 @@ from assets.urls import api_url_patterns
 from users.urls import user_api_url_patterns
 from authentication.urls import authentication_url_patterns
 from vendors.urls import vendor_api_urlpatterns
+from products.urls import product_api_urlpattrens
+
+
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -69,7 +72,7 @@ urlpatterns = [
 	
 ]
 
-urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns
+urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
