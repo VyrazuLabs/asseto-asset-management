@@ -60,8 +60,8 @@
                     {% endwith %}
                 {% endwith %}
                 <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
-                        {% csrf_token %}
-                        <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                    {% csrf_token %}
+                    <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
                 </form>
             {% else %}
                 <div class="input-group">
@@ -113,7 +113,7 @@
                     {% else %}
                         <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
                             {% csrf_token %}
-                            <button type="submit" value="Delete" class="btn btn-sm btn-danger pt-2 pe-2"><i class="bi bi-trash3-fill ps-1 pe-1"></i></button>
+                            <button type="submit" value="Delete" class="btn btn-sm btn-danger pt-2 pe-2"><i class="bi bi-trash3-fill ps-2 pe-2"></i></button>
                         </form>
                     {% endif %}
                 {% endif %}
