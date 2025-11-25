@@ -102,13 +102,12 @@ def add_product_type(request):
     context = {'form': form, "modal_title": "Add Product Type"}
     return render(request, 'dashboard/product_type/product-type-modal.html', context)
 
-
 @login_required
 @user_passes_test(check_admin)
 def product_type_details(request, id):
 
     product_type = get_object_or_404(
-        ProductType.undeleted_objects, pk=id, organization=request.user.organization)
+        ProductType.undeleted_objects, pk=id)
 
     history_list = product_type.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
