@@ -41,7 +41,7 @@ pyHanko==0.30.0
 pyhanko-certvalidator==0.28.0
 PyJWT==2.10.1
 PyMySQL==1.1.1
-pypdf==6.1.3
+pypdf==6.4.0
 PyPDF3==1.0.6
 python-barcode==0.16.1
 python-bidi==0.6.6
@@ -55,8 +55,7 @@ qrcode==7.3.1
 referencing==0.37.0
 reportlab==4.4.3
 requests==2.32.5
-rpds-py==0.29.0
-setuptools==80.9.0
+rpds-py==0.28.0
 six==1.17.0
 sqlparse==0.5.2
 svglib==1.5.1

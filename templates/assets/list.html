@@ -275,7 +275,7 @@
                                                         />
                                                     </sup>
                                                 {% endif %}
-                                                {% with parts=map.full_name %}
+                                                {% with parts=map.full_name|split%}
                                                     {% for part in parts %}
                                                         <sup >{{ part }}</sup>
                                                     {% endfor %}
