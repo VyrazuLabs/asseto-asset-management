@@ -77,9 +77,21 @@ class AssetSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         image_data = validated_data.pop('images', None)
         for attribute, value in validated_data.items():
+            if value is None:
+                continue
             setattr(instance, attribute, value)
         instance.save()
         if image_data is not None:
             for image in image_data:
                 AssetImage.objects.create(asset=instance, image=image)
+        
+        custom_fields = self.initial_data.get("custom_fields",[])
+        custom_field_list = json.loads(f"[{custom_fields}]")
+        for custom_field in custom_field_list:
+            CustomField.objects.filter(
+                object_id=instance.id,
+                field_name=custom_field["field_name"]
+            ).update(
+                field_value=custom_field["field_value"]
+            )
         return instance
