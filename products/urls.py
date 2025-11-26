@@ -23,5 +23,6 @@ product_api_urlpattrens=[
     path('api/product/details/<uuid:id>',api_views.ProductDetails.as_view(),name='prdoct_details'),
     path('api/product/update/<uuid:id>',api_views.UpdateProduct.as_view(),name='update_prdoct'),
     path('api/product/delete/<uuid:id>',api_views.DeleteProduct.as_view(),name='delete_prdoct'),
-    path('api/product/search',api_views.SearchProduct.as_view(),name='search_prdoct')
+    path('api/product/search',api_views.SearchProduct.as_view(),name='search_prdoct'),
+    path('api/product/product-dropdown-list',api_views.ProductListForFormDropdown.as_view(),name='product_dropdown_list')
 ]

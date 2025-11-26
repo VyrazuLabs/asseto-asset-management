@@ -14,7 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
         allow_null=True,
         default=list,
         )
-    custom_fields = CustomFieldSerializer(required=False)
+    custom_fields = serializers.ListField(child=serializers.DictField(), required=False)
 
     def validate_name(self, value):
         if self.partial and value in (None, ""):
@@ -45,22 +45,26 @@ class ProductSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         images=validated_data.pop("images")
-        custom_fields = self.initial_data.get("custom_fields",[])
-        custom_field_list = json.loads(f"[{custom_fields}]")
+        custom_fields = validated_data.pop("custom_fields",None)
         product=Product.objects.create(**validated_data,organization=self.context['request'].user.organization)
+
         product_image=None
         for image in images:
             product_image=ProductImage.objects.create(image=image,product=product)
-        for custom_field in custom_field_list:
-            CustomField.objects.create(
-                name=custom_field['field_name'],
-                object_id=product.id,
-                field_type='text',
-                field_name=custom_field['field_name'],
-                field_value=custom_field['field_value'],
-                entity_type='product',
-                organization=self.context["request"].user.organization
-            )
+
+        if custom_fields is not None:
+            for custom_field in custom_fields:
+                field_name = list(custom_field.keys())[0]
+                field_value = custom_field[field_name]
+                CustomField.objects.create(
+                    name=field_name,
+                    object_id=product.id,
+                    field_type='text',
+                    field_name=field_name,
+                    field_value=field_value,
+                    entity_type='product',
+                    organization=self.context["request"].user.organization
+                )
         return product,product_image
     
     def update(self, instance, validated_data):
@@ -74,17 +78,13 @@ class ProductSerializer(serializers.ModelSerializer):
             for image in image_data:
                 ProductImage.objects.create(product=instance, image=image)
         
-        custom_fields = self.initial_data.get("custom_fields",[])
-        custom_field_list = json.loads(f"[{custom_fields}]")
-        for custom_field in custom_field_list:
-            CustomField.objects.filter(
-                object_id=instance.id,
-                field_name=custom_field["field_name"]
-            ).update(
-                field_value=custom_field["field_value"]
-            )
+        custom_fields = validated_data.pop("custom_fields",[])
+        for custom_field in custom_fields:
+            field_name=list(custom_field.keys())[0]
+            field_value=custom_field[field_name]
+            CustomField.objects.filter(object_id=instance.id,field_name=field_name).update(field_value=field_value)
         return instance
             
     class Meta:
         model=Product
-        fields=['name','manufacturer','model','eol','description','product_category','product_type','images','custom_fields']
+        fields=['name','manufacturer','model','eol','description','product_sub_category','product_type','images','custom_fields']
