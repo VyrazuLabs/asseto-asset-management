@@ -11,7 +11,7 @@ def convert_to_list(request,products):
             'id':product.id,
             'name':product.name,
             'type':product.product_type.name,
-            'category':product.product_category.name if product.product_category else None,
+            'category':product.product_sub_category.name if product.product_sub_category else None,
             'total_asset':Asset.objects.filter(product=product.id).count(),
             'status':product.status,
         }
@@ -30,8 +30,8 @@ def product_details(request,product):
         'id':product.id,
         'name':product.name,
         'type':product.product_type.name,
-        'category':product.product_category.name if product.product_category.name else None,
-        'parent_category':product.product_category.parent.name if product.product_category else None,
+        'category':product.product_sub_category.name if product.product_sub_category.name else None,
+        'parent_category':product.product_sub_category.parent.name if product.product_sub_category else None,
         'manufacture':product.manufacturer if product.manufacturer else None,
         'model_name':product. model if product. model else None,
         'status':product.status if product.status else None,
@@ -76,4 +76,13 @@ def product_details(request,product):
 
         product_detail['assets']=asset_list
     return product_detail
-            
+
+def product_list_for_form(products):
+    list=[]
+    for product in products:
+        products_dict={
+            'id':product.id,
+            'name':product.name
+        }
+        list.append(products_dict)
+    return list
