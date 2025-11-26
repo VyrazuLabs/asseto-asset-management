@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
 from products.serializers import ProductSerializer
-from products.utils import convert_to_list, product_details
+from products.utils import convert_to_list, product_details, product_list_for_form
 from .models import Product
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from rest_framework.permissions import IsAuthenticated
@@ -109,4 +109,14 @@ class SearchProduct(APIView):
         except Exception as e:
             return api_response(status=500,message=str(e))
 
-
+class ProductListForFormDropdown(APIView):
+    def get(self,request):
+        try:
+            get_prodcuts=Product.undeleted_objects.filter(status=True)
+            data=product_list_for_form(get_prodcuts)
+            return api_response(data=data, message='list of products')
+        except ValueError as e:
+            return api_response(status=400,error_message=str(e))
+        except Exception as e:
+            return api_response(status=500,system_message=str(e))
+    
