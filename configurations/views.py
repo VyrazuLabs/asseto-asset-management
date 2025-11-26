@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
 from .models import TagConfiguration,Extensions,SlackConfiguration
 from django.http import JsonResponse
+import base64
 from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
 @login_required
@@ -242,7 +243,6 @@ def list_extensions(request):
                 validity=0,
             )
     get_extensions=Extensions.objects.filter(organization=request.user.organization).first()
-    print()
     if get_extensions:
         request.session['slack'] = True
     else:
@@ -250,18 +250,13 @@ def list_extensions(request):
     return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions})
 
 def extension_status(request, id):
-    integration_choices = INTEGRATION_CHOICES
-    status = request.POST.get('status', 0) 
-    print(status,"===========================================")
-    status_bool = status == 'on'
-    get_extensions=Extensions.objects.filter(organization=request.user.organization,id=id).first()
-    if status_bool==0:
-        get_extensions.status=0
-        get_extensions.save()
-    else:
-        get_extensions.status=1
-        get_extensions.save()
-    return redirect('configurations:list_extensions')
+    status = request.POST.get("status", "off")  # will be "on" or "off"
+
+    ext = Extensions.objects.filter(id=id).first()
+    ext.status = 1 if status == "on" else 0
+    ext.save()
+
+    return redirect("configurations:list_extensions")
 
 @login_required
 def save_slack_configuration(request):
