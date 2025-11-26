@@ -30,53 +30,31 @@ a.disabled {
                     <div class="d-flex justify-content-between w-100 p-2">
                         <h4 class="mb-3">{{ integration_choices.entity_name }} Configurations</h4>
                         <div class="d-flex justify-content-end gap-2">
-                            {% if integration_choices.status == 0 %}
-                                <a id="slack-integration-btn-{{ forloop.counter }}"
-                                    type="button"
-                                    class="btn bg-transparent disabled"
-                                    href="{% url 'configurations:integration' %}">
-                                    <i class="bi bi-gear"></i>
-                                </a>
-                            {% else %}
-                                <a id="slack-integration-btn-{{ forloop.counter }}"
-                                    type="button"
-                                    class="btn bg-transparent"
-                                    href="{% url 'configurations:integration' %}">
-                                    <i class="bi bi-gear"></i>
-                                </a>
-                            {% endif %}
-                            {% if integration_choices.status == 0 %}
+                            <!-- Gear button wrapper -->
+                            <a id="slack-integration-btn-{{ forloop.counter }}"
+                            class="btn bg-transparent {% if integration_choices.status == 0 %}disabled{% endif %}"
+                            href="{% url 'configurations:integration' %}">
+                                <i class="bi bi-gear"></i>
+                            </a>
+
                             <div class="form-check form-switch">
                                 <input
                                     name="status"
                                     class="form-check-input"
                                     type="checkbox"
                                     role="switch"
-                                    hx-post="{% url 'configurations:extension_status' integration_choices.id %}"
-                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
                                     id="flexSwitchCheckDefault-{{ forloop.counter }}"
-                                    unchecked
+                                    hx-post="{% url 'configurations:extension_status' integration_choices.id %}"
+                                    hx-include="closest div"
+                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                    hx-trigger="change"
+                                    hx-on:htmx:afterOnLoad="location.reload()"
+                                    {% if integration_choices.status == 0 %} unchecked {% else %} checked {% endif %}
                                     style="cursor: pointer;"
                                 >
                             </div>
-                            {% else %}
-                            <div class="form-check form-switch">
-                                <input
-                                    name="status"
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    role="switch"
-                                    hx-post="{% url 'configurations:extension_status' integration_choices.id %}"
-                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                    id="flexSwitchCheckDefault-{{ forloop.counter }}"
-                                    checked
-                                    style="cursor: pointer;"
-                                >
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
-
                     <div class="mb-3 text-center d-flex gap-5 p-3">
                         {% if add_path_context.logo %}
                             <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg"
@@ -101,20 +79,23 @@ a.disabled {
     </section>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const toggles = document.querySelectorAll(".form-check-input");
+    document.addEventListener("DOMContentLoaded", function() {
+        const slackCheckbox = document.getElementById("slack-integration-btn-{{ forloop.counter }}");
+        const slackCredentials = document.getElementById("slack-button");
 
-    toggles.forEach((toggle, index) => {
-        const slackBtn = document.getElementById(`slack-integration-btn-${index + 1}`);
-
-        toggle.addEventListener("change", function() {
-            if (this.checked) {
-                slackBtn.classList.remove("disabled");
+        function showDiv() {
+            if (slackCheckbox.checked) {
+                slackCredentials.disabled= true;
             } else {
-                slackBtn.classList.add("disabled");
+                slackCredentials.disabled= false;
             }
-        });
+        }
+
+        // Initialize on page load
+        showDiv();
+
+        // Add change event listener
+        slackCheckbox.addEventListener("change", showDiv);
     });
-});
 </script>
 {% endblock %}
