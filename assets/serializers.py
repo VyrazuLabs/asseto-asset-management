@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from assets.models import Asset, AssetImage, AssetStatus
+from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
 from dashboard.models import CustomField
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
@@ -14,7 +14,9 @@ class AssetSerializer(serializers.ModelSerializer):
         allow_null=True,
         default=list,
     )
-    custom_fields = CustomFieldSerializer(required=False)
+    custom_fields = serializers.ListField(child=serializers.DictField(), required=False)
+    purchase_date = serializers.DateField(required=False, allow_null=True)
+    warranty_expiry_date = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Asset
@@ -29,9 +31,11 @@ class AssetSerializer(serializers.ModelSerializer):
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
-        custom_field_list = json.loads(f"[{data['custom_fields']}]")
-        data["custom_fields"] = custom_field_list
-        
+
+        for field in ["purchase_date", "warranty_expiry_date"]:
+            if data.get(field) == "":
+                data[field] = None
+
         return super().to_internal_value(data)
 
     def validate_tag(self, tag):
@@ -48,11 +52,23 @@ class AssetSerializer(serializers.ModelSerializer):
         if not product:
             raise serializers.ValidationError("Product can not be blank")
         return product
+    
+    def validate(self, attrs):
+        for field in ["purchase_date", "warranty_expiry_date"]:
+            if attrs.get(field) in ["", None]:
+                attrs[field] = None
+        return attrs
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
-        custom_fields = self.initial_data.get("custom_fields",[])
-        custom_field_list = json.loads(f"[{custom_fields}]")
+        custom_fields = validated_data.pop("custom_fields",None)
+
+        # if isinstance(custom_fields,str):
+        #     try:
+        #         custom_fields=json.loads(custom_fields)
+        #     except:
+        #         custom_fields=None
+
         get_asset_status = AssetStatus.objects.get(name="Available")
         asset = Asset.objects.create(
             **validated_data,
@@ -62,17 +78,21 @@ class AssetSerializer(serializers.ModelSerializer):
         asset_images = None
         for image in images:
             asset_images = AssetImage.objects.create(image=image, asset=asset)
-        for custom_field in custom_field_list:
-            CustomField.objects.create(
-                name=custom_field['field_name'],
-                object_id=asset.id,
-                field_type='text',
-                field_name=custom_field['field_name'],
-                field_value=custom_field['field_value'],
-                entity_type='asset',
-                organization=self.context["request"].user.organization
-            )
-        return asset
+        
+        if custom_fields is not None:
+            for custom_field in custom_fields:
+                field_name = list(custom_field.keys())[0]
+                field_value = custom_field[field_name]
+                CustomField.objects.create(
+                    name=field_name,
+                    object_id=asset.id,
+                    field_type='text',
+                    field_name=field_name,
+                    field_value=field_value,
+                    entity_type='asset',
+                    organization=self.context["request"].user.organization
+                )
+        return asset,asset_images
 
     def update(self, instance, validated_data):
         image_data = validated_data.pop('images', None)
@@ -85,13 +105,44 @@ class AssetSerializer(serializers.ModelSerializer):
             for image in image_data:
                 AssetImage.objects.create(asset=instance, image=image)
         
-        custom_fields = self.initial_data.get("custom_fields",[])
-        custom_field_list = json.loads(f"[{custom_fields}]")
-        for custom_field in custom_field_list:
-            CustomField.objects.filter(
-                object_id=instance.id,
-                field_name=custom_field["field_name"]
-            ).update(
-                field_value=custom_field["field_value"]
-            )
+        custom_fields = validated_data.pop("custom_fields",None)
+        if custom_fields is not None:
+            for custom_field in custom_fields:
+                field_name=list(custom_field.keys())[0]
+                field_value=custom_field[field_name]
+                CustomField.objects.filter(object_id=instance.id,field_name=field_name).update(field_value=field_value)
         return instance
+
+class AssignAssetSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(
+        child=serializers.ImageField(required=False, allow_null=True),
+        required=False,
+        allow_empty=True,
+        allow_null=True,
+        default=list,
+    )
+
+    def to_internal_value(self, data):
+        data=data.copy()
+        if (data.get('images')or "")=="":
+            data.pop('image',None)
+        return super().to_internal_value(data)
+    
+    def validate_user(self,user):
+        if not user:
+            raise serializers.ValidationError("User must needed")
+        return user
+        
+    def create(self, validated_data):
+        print(validated_data)
+        asset=validated_data.pop('asset',None)
+        asset_images=validated_data.pop('images',[])
+        assign_asset=AssignAsset.objects.create(asset=asset,**validated_data)
+        asset.is_assigned=True
+        asset.save()
+        for image in asset_images:
+            AssetImage.objects.create(asset=asset,image=image)
+        return assign_asset,
+    class Meta:
+        model=AssignAsset
+        fields=['user','images']
