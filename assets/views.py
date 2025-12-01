@@ -330,7 +330,7 @@ def details(request, id):
         #     })
     asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
     assiggned_asset=AssignAsset.objects.filter(asset=asset).first()
-    if assiggned_asset:
+    if assiggned_asset and assiggned_asset.user:
         assigned_user=assiggned_asset.user.full_name
     else:
         assigned_user=None
