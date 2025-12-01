@@ -46,7 +46,7 @@ api_url_patterns = [
     #api urls
     path('api/asset/list/',api_views.AssetList.as_view(),name="asset_list"),
     path('api/asset/add/',api_views.AddAsset.as_view(),name='add_asset'),
-    path('api/asset/details/<uuid:id>',api_views.AssetDetails.as_view(),name="asset_details"),
+    path('api/asset/details/<uuid:id>/',api_views.AssetDetails.as_view(),name="asset_details"),
     path('api/asset/update/<uuid:id>',api_views.UpdateAsset.as_view(),name='update_asset'),
     path('api/asset/delete/<uuid:id>',api_views.DeleteAsset.as_view(),name="delete_asset"),
     path('api/asset/search/',api_views.SearchAsset.as_view(),name='search_asset'),
