@@ -30,3 +30,4 @@ def generate_barcode(tag_id):
     barcode_svg = Code128(tag_id, writer=SVGWriter())
     svg_content = barcode_svg.render(writer_options={'write_text': False,'module_width': 0.8,'module_height': 25,},text=f'Asset-{tag_id}').decode('utf-8')
     return svg_content
+    
