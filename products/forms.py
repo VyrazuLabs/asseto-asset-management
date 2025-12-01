@@ -70,16 +70,14 @@ class AddProductsForm(forms.ModelForm):
         self.fields['product_sub_category'].queryset = ProductCategory.undeleted_objects.filter( Q(organization=None,status=True, parent__isnull=False)|Q(
             organization=self._organization, status=True, parent__isnull=False))
         
-        if self.instance.pk and self.instance.product_sub_category:
-            if self.instance.product_sub_category.parent:
-        if self.instance.pk and self.instance.product_sub_category:
-            if self.instance.product_sub_category.parent:
+        if self.instance.pk and self.instance.product_category:
+            if self.instance.product_category.parent:
                 # It's a sub-category — show parent and child
-                self.initial['product_category'] = self.instance.product_sub_category.parent
-                self.initial['product_sub_category'] = self.instance.product_sub_category
+                self.initial['product_category'] = self.instance.product_category.parent
+                self.initial['product_sub_category'] = self.instance.product_category
             else:
                 # It's a top-level category — only show it in product_category
-                self.initial['product_category'] = self.instance.product_sub_category
+                self.initial['product_category'] = self.instance.product_category
 
     class Meta:
         model = Product
