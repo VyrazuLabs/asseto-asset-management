@@ -25,7 +25,7 @@ def convert_to_list(request,queryset):
         asset_dict["image"]=f"http://{current_host}"+assetImage.image.url if assetImage else None
         if asset.is_assigned:
             assigned_asset = AssignAsset.objects.filter(asset=asset.id).select_related("user").first()
-            asset_dict["assignedTo"] = assigned_asset.user.id if assigned_asset else None
+            asset_dict["assignedTo"] = assigned_asset.user.id if assigned_asset and assigned_asset.user else None
         else:
             asset_dict["assignedTo"] = None
 
