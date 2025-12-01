@@ -43,7 +43,7 @@ def list(request):
 @user_passes_test(check_admin)
 def add(request):
     form = RoleForm(request.POST or None,
-                    organization=request.user.organization)
+    organization=request.user.organization)
 
     if request.method == 'POST':
         if form.is_valid():

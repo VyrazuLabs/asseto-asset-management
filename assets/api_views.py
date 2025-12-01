@@ -5,6 +5,7 @@ from assets.api_utils import asset_data, convert_to_list, get_asset
 from assets.barcode import generate_barcode
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, AssignAssetSerializer
+from authentication.models import User
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
 from rest_framework.permissions import IsAuthenticated
@@ -25,9 +26,9 @@ class AssetList(APIView):
             paginated_data=add_pagination(data,page=page)
             return api_response(data=paginated_data, message="List get Successfully")
         except ValueError as e:
-            api_response(status=400,error_message=str(e))
+            return api_response(status=400,error_message=str(e))
         except Exception as e:
-            api_response(status=500,system_message=str(e))
+            return api_response(status=500,system_message=str(e))
 
 class AddAsset(APIView):
     permission_classes=[IsAuthenticated]
@@ -171,6 +172,19 @@ class UnAssignAsset(APIView):
         get_asset.is_assigned=False
         get_asset.save()
         return api_response(status=200,message="asset unassigned successfully")
+
+class UserListForAssignAsset(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        try:
+            get_users=User.undeleted_objects.filter(status=True, organization=request.user.organization).exclude(pk=request.user.id)
+            data=[{'id':user.id,'name':user.full_name} for user in get_users]
+            return api_response(data=data, message="users for assign asset get successfully")
+        except ValueError as e:
+            return api_response(status=400, error_message=str(e))
+        except Exception as e:
+            return api_response(status=500, system_message=str(e))
+        
 
 
 
