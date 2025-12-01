@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from vendors.serializers import VendorSerializer
-from vendors.utils import convert_to_list, searched_data, vendor_details, vendor_list_for_form
+from vendors.utils import convert_to_list, searched_data, vendor_details
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
 from vendors.models import Vendor
@@ -106,17 +106,6 @@ class SearchVendor(APIView):
                 return api_response(status=404,message="Vendor not found")
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
-        except Exception as e:
-            return api_response(status=500,system_message=str(e))
-        
-class VendorListForFormDropdown(APIView):
-    def get(self,request):
-        try:
-            get_prodcuts=Vendor.undeleted_objects.filter(status=True)
-            data=vendor_list_for_form(get_prodcuts)
-            return api_response(data=data, message='list of vendors')
-        except ValueError as e:
-            return api_response(status=400,error_message=str(e))
         except Exception as e:
             return api_response(status=500,system_message=str(e))
 
