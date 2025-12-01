@@ -4,13 +4,12 @@ from rest_framework.views import APIView
 from assets.api_utils import asset_data, convert_to_list, get_asset
 from assets.barcode import generate_barcode
 from assets.models import Asset, AssetImage, AssetStatus
-from assets.serializers import AssetSerializer, AssignAssetSerializer
+from assets.serializers import AssetSerializer
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser,FormParser
 from drf_spectacular.utils import extend_schema,OpenApiParameter
-from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
 
 class AssetList(APIView):
@@ -19,7 +18,7 @@ class AssetList(APIView):
         OpenApiParameter(name="page",type=int,default=1,description="page number for pagination")])
     def get(self,request):
         try:
-            asset_queryset=Asset.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
+            asset_queryset=Asset.undeleted_objects.filter(organization=request.user.organization).order_by("created_at")
             data=convert_to_list(request,asset_queryset)
             page=int(request.GET.get('page'))
             paginated_data=add_pagination(data,page=page)
@@ -60,6 +59,8 @@ class AssetDetails(APIView):
             return api_response(status=400,error_message=str(e))
         except Exception as e:
             return api_response(status=500,system_message=str(e))
+
+
 class UpdateAsset(APIView):
     parser_class=[MultiPartParser,FormParser]
     permission_classes=[IsAuthenticated]
@@ -91,8 +92,9 @@ class DeleteAsset(APIView):
             return api_response(status=500, system_message=str(e))
         
 class SearchAsset(APIView):
-    permission_classes=[IsAuthenticated]
     parser_class=[FormParser]
+
+
     @extend_schema(description="From frontend the name of the form data name must be defined as search_text ")
     def get(self,request):
         search_text=request.data.get("search_text")
@@ -128,52 +130,4 @@ class Scan_api_barcode(APIView):
             return api_response(status=400, error_message=str(e))
         except Exception as e:
             return api_response(status=500, system_message=str(e))
-        
-class UpdateAssetStatus(APIView):
-    permission_classes=[IsAuthenticated]
-    @extend_schema(parameters=[OpenApiParameter(name='status_id',type=OpenApiTypes.UUID, location=OpenApiParameter.QUERY,required=True,
-        description='From frontend for the status id, name should come as "status_id"')])
-    def post(self,request,id):
-        status_id=request.GET.get('status_id')
-        try:
-            asset=get_object_or_404(Asset,pk=id)
-            asset.asset_status=AssetStatus.objects.get(id=status_id)
-            asset.save()
-            return api_response(status=200,message='Asset status updated successfully')
-        except ValueError as e:
-            return api_response(status=400, error_message=str(e))
-        except Exception as e:
-            return api_response(status=500, system_message=str(e))
-        
-class AssignAsset(APIView):
-    permission_classes=[IsAuthenticated]
-    @extend_schema(request={'multipart/form-data':AssignAssetSerializer})
-    def post(self,request,id):
-        try:
-            get_asset=get_object_or_404(Asset,pk=id)
-            if get_asset.is_assigned==True:
-                return api_response(status=400,message="this asset is already assigned")
-            
-            serializer=AssignAssetSerializer(data=request.data)
-            if not serializer.is_valid():
-                raise ValueError(serializer.errors)
-            serializer.save(asset=get_asset)
-            return api_response(status=200,message="asset assigned successfully")
-        except ValueError as e:
-            return api_response(status=400,error_message=str(e))
-        except Exception as e:
-            return api_response(status=500,message=str(e))
-        
-class UnAssignAsset(APIView):
-    permission_classes=[IsAuthenticated]
-    def post(self,request,id):
-        get_asset=get_object_or_404(Asset,pk=id)
-        get_asset.is_assigned=False
-        get_asset.save()
-        return api_response(status=200,message="asset unassigned successfully")
-
-
-
-
-
     
