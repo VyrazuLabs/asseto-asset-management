@@ -92,4 +92,14 @@ def searched_data(request,search_text):
         )
     ).order_by("-created_at")[:10]
     return vendor_list
-        
+
+
+def vendor_list_for_form(vendors):
+    list=[]
+    for vendor in vendors:
+        vendor_dict={
+            'id':vendor.id,
+            'name':vendor.name
+        }
+        list.append(vendor_dict)
+    return list

@@ -24,11 +24,10 @@ class Product(TimeStampModel, SoftDeleteModel):
     model=models.CharField(max_length=100,  blank=True, null=True)
     eol=models.IntegerField(blank=True,null=True)
     description = models.TextField(blank=True, null=True)
-    product_category = models.ForeignKey(ProductCategory, models.DO_NOTHING, blank=True, null=True)
-    product_type = models.ForeignKey(ProductType, models.DO_NOTHING, blank=True, null=True)
+    product_sub_category = models.ForeignKey(ProductCategory, models.DO_NOTHING, blank=True, null=True)
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, blank=True, null=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
-    audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
     audit_interval=models.IntegerField(choices=AUDIT_INTERVAL_VALUE, default=0)
 
     def __str__(self):
