@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
     profile_pic=serializers.ImageField(required=False)
     class Meta:
         model=User
-        fields=['full_name','email','phone','password','department','role','access_level','location','address','profile_pic','address_line_one','address_line_two','country',
+        fields=['full_name','email','phone','password','department','role','access_level','location','profile_pic','address_line_one','address_line_two','country',
             'state','city','pin_code']
     
     def validate_email(self,email):
@@ -46,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
             if "password" not in validate_data:
                 validate_data["password"] = ""
             address = Address.objects.create(**address_fields)
-            user=User.objects.create(address=address_fields, **validate_data,organization=self.context["request"].user.organization)
+            user=User.objects.create(address=address, **validate_data,organization=self.context["request"].user.organization)
             if user.password:
                 user.set_password(user.password)
         except Exception as e:

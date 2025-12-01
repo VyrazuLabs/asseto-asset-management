@@ -131,7 +131,6 @@ def add(request):
             user.organization = request.user.organization
             user.address = address
             user.save()
-            # form.instance.role.user_set.add(form.instance)
             messages.success(
                 request, 'User added successfully and Verification email sent to the user')
 
@@ -143,6 +142,7 @@ def add(request):
             else:
                 all_perms.user_set.remove(form.instance)
 
+            form.instance.role.user_set.add(form.instance)
             return HttpResponse(status=204)
 
     context = {

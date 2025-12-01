@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views
+from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -59,6 +59,9 @@ dashboard_api_urlpatterns=[
     path('api/admin/product-category/product-category-dropdown-list',api_product_category_views.ProductCategoryListForFormDropdown.as_view(),name='product_category-dropdown_list'),
 
     #for fetching the subcategory
-    path('api/admin/product-category/product-sub-category-dropdown-list',api_product_category_views.ProductSubCategoryListForFormDropdown.as_view(),name='product_sub_category-dropdown_list')
+    path('api/admin/product-category/product-sub-category-dropdown-list',api_product_category_views.ProductSubCategoryListForFormDropdown.as_view(),name='product_sub_category-dropdown_list'),
+
+    # Department api urls
+    path('api/admin/department/department-dropdown-list',api_department_views.DepartmentListForFormDropdown.as_view(),name='department_dropdown_list')
 
 ]
