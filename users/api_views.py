@@ -48,7 +48,7 @@ class AddUser(APIView):
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
         except Exception as e:
-            return api_response(status=500, system_message=str(e))        
+            return api_response(status=500, system_message=str(e))
 
 class UpdateUser(APIView):
     permission_classes=[IsAuthenticated]
