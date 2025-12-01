@@ -36,7 +36,7 @@ def global_search(request):
         (Q(organization=request.user.organization)|Q(organization=None)) & (
             Q(name__icontains=search_text) |
             Q(manufacturer__icontains=search_text) |
-            Q(product_category__name__icontains=search_text) |
+            Q(product_sub_category__name__icontains=search_text) |
             Q(product_type__name__icontains=search_text)
         )
     ).annotate(
