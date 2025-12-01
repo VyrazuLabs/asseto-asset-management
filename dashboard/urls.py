@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views
+from .views import global_search_views
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -42,26 +42,16 @@ urlpatterns = [
     path('product-categories/status/<uuid:id>', views.product_category_status, name='product_category_status'),
     path('product-categories/search/<str:page>', views.search_product_category, name='search_product_category'),
 
+
+    # #product sub category urls
+    # path('product-sub-categories/list', product_sub_category_views.product_sub_category_list, name='product_sub_category_list'),
+    # path('product-sub-categories/add', product_sub_category_views.add_product_sub_category, name='add_product_sub_category'),
+    # path('product-sub-categories/details/<uuid:id>', product_sub_category_views.product_sub_category_details, name='product_sub_category_details'),
+    # path('product-sub-categories/delete/<uuid:id>', product_sub_category_views.delete_product_sub_category, name='delete_product_sub_category'),
+    # path('product-sub-categories/update/<uuid:id>', product_sub_category_views.update_product_sub_category, name='update_product_sub_category'),
+    # path('product-sub-categories/status/<uuid:id>', product_sub_category_views.product_sub_category_status, name='product_sub_category_status'),
+    # path('product-sub-categories/search/<str:page>', product_sub_category_views.search_product_sub_category, name='search_product_sub_category'),
     path('get-subcategories/',views.get_subcategories, name='get_subcategories'),
      
     path('global-search/', global_search_views.global_search, name='global_search'),
-]
-
-
-dashboard_api_urlpatterns=[
-    #Location api urls
-    path('api/admin/location/location-dropdown-list',api_location_views.LocationListForFormDropdown.as_view(),name='location_dropdown_list'),
-
-    #Location api urls
-    path('api/admin/product-type/product-type-dropdown-list',api_product_type_views.ProductTypeListForFormDropdown.as_view(),name='product_type-dropdown_list'),
-
-    #Product Category urls
-    path('api/admin/product-category/product-category-dropdown-list',api_product_category_views.ProductCategoryListForFormDropdown.as_view(),name='product_category-dropdown_list'),
-
-    #for fetching the subcategory
-    path('api/admin/product-category/product-sub-category-dropdown-list',api_product_category_views.ProductSubCategoryListForFormDropdown.as_view(),name='product_sub_category-dropdown_list'),
-
-    # Department api urls
-    path('api/admin/department/department-dropdown-list',api_department_views.DepartmentListForFormDropdown.as_view(),name='department_dropdown_list')
-
 ]
