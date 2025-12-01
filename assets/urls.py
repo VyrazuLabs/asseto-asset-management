@@ -53,6 +53,7 @@ api_url_patterns = [
     path('api/asset/scan-barcode/<str:tag_id>',api_views.Scan_api_barcode.as_view(), name='scan_barcode'),
     path('api/asset/details/update-asset-status/<uuid:id>',api_views.UpdateAssetStatus.as_view(),name="update_asset_status"),
     path('api/asset/details/assign-asset/<uuid:id>',api_views.AssignAsset.as_view(),name="assign_asset"),
-    path('api/asset/details/unassign-asset/<uuid:id>',api_views.UnAssignAsset.as_view(),name="unassign_asset")
+    path('api/asset/details/unassign-asset/<uuid:id>',api_views.UnAssignAsset.as_view(),name="unassign_asset"),
+    path('api/asset/details/user-list-for-assign-asset',api_views.UserListForAssignAsset.as_view(),name="user_list_for_assign_asset")
 
 ]
