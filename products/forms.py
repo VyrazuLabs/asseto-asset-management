@@ -78,8 +78,6 @@ class AddProductsForm(forms.ModelForm):
             else:
                 # It's a top-level category — only show it in product_category
                 self.initial['product_category'] = self.instance.product_sub_category
- 
-
     class Meta:
         model = Product
         fields = ['name', 'product_picture', 'manufacturer',

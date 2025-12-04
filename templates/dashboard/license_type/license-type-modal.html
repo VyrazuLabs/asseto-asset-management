@@ -9,9 +9,8 @@
     <form hx-post='{{request.path}}' novalidate>
         {% csrf_token %}
         <div class="modal-body">
-            <label>Type Name</label>
+            <label>Type Name <span></span></label>
             <div class="form-group">
-                
                 {{form.name}}
                 {% for error in form.name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>
@@ -33,10 +32,11 @@
         </div>
     </form>
 </div>
+
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (
-            (e.detail.target.id == "add-product-type-modal-content" || e.detail.target.id == "update-product-type-modal-content") && !e.detail.xhr.response){
+            (e.detail.target.id == "add-license-type-modal-content" || e.detail.target.id == "update-license-type-modal-content") && !e.detail.xhr.response){
                 location.reload();
         }
     });

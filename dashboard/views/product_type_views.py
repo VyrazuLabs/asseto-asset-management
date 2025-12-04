@@ -106,8 +106,7 @@ def add_product_type(request):
 @user_passes_test(check_admin)
 def product_type_details(request, id):
 
-    product_type = get_object_or_404(
-        ProductType.undeleted_objects, pk=id)
+    product_type = get_object_or_404(ProductType, pk=id)
 
     history_list = product_type.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
@@ -116,7 +115,8 @@ def product_type_details(request, id):
 
     context = {'sidebar': 'admin', 'page_object': page_object,
                'submenu': 'product_type', 'product_type': product_type, 'title': f'Details-{ product_type.name}'}
-    return render(request, 'dashboard/product_type/detail.html', context=context)
+    
+    return render(request, 'dashboard/product_type/detail.html',context=context)
 
 
 @login_required
@@ -151,7 +151,7 @@ def update_product_type(request, id):
     product_type = get_object_or_404(
         ProductType.undeleted_objects, pk=id, organization=request.user.organization)
     form = ProductTypeForm(request.POST or None, instance=product_type,
-                           organization=request.user.organization,   pk=product_type.id)
+                           organization=request.user.organization,pk=product_type.id)
 
     if request.method == "POST":
         if form.is_valid():
