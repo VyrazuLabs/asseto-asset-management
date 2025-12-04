@@ -41,7 +41,7 @@ def convert_to_list(queryset,request):
             'contact_person':vendor.contact_person,
             'email':vendor.email,
             'phone':vendor.phone,
-            'GSITN_no.':vendor.gstin_number,
+            'gstin_number':vendor.gstin_number,
             'status':vendor.status
         }
         asset_count=Asset.objects.filter(vendor=vendor.id).count()
@@ -51,13 +51,14 @@ def convert_to_list(queryset,request):
 
 def vendor_details(get_vendor,request):
     vendor_details_dict={
+        'id':get_vendor.id,
         'name':get_vendor.name ,
         'email':get_vendor.email if get_vendor.email else None,
         'phone':get_vendor.phone if get_vendor.phone else None,
         'designation':get_vendor.designation if get_vendor.designation else None,
         'status':get_vendor.status,
         'contact_person':get_vendor.contact_person if get_vendor.contact_person else None,
-        'GSTIN Number':get_vendor.gstin_number if get_vendor.gstin_number else None,
+        'gstin_number':get_vendor.gstin_number if get_vendor.gstin_number else None,
         'address':get_vendor.address.address_line_one if get_vendor.address and get_vendor.address.address_line_one else None,
         'description':get_vendor.description if get_vendor.description else None
     }

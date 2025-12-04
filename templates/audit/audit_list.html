@@ -45,37 +45,44 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            {% if audits is not None %}
-                                {% for audit in audits %}
-                                <tbody id="search_result">
-                                    <tr style="height: 100px;">
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
-                                            {% with image_url=audit|audit_image_url %}
-                                                {% if image_url %}
-                                                    <img src="{{ audit|audit_image_url }}" height="100" width="100"/>
-                                                {% else %}
-                                                    <img src='{% static 'assets/images/No_Image.jpg' %}' height="100" width="100">
-                                                {% endif %}
-                                            {% endwith %}
-                                        </td>
-                                        <td>{{ audit.asset.name}}</td>
-                                        <td>{{ audit.condition_label }}</td>
-                                        <td>{{ audit.notes|truncatechars:30 }}</td>
-                                        <td>{{ audit.created_at }}</td>
-                                        <td>{{ audit.id|next_audit_due }}</td>
-                                        <td> 
-                                            <div class="d-flex gap-0"> 
-                                                <a href="{% url 'audit:details' audit.id %}" class="btn btn-sm btn-success pt-2"><i class="bi bi-eye-fill p-1"></i></a>
-                                                <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive p-1"></i></a></td>
-                                            </div>
-                                        </td>
+
+                            <tbody id="search_result">
+                                {% if audits %}
+                                    {% for audit in audits %}
+                                        <tr style="height: 100px;">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {% with image_url=audit|audit_image_url %}
+                                                    {% if image_url %}
+                                                        <img src="{{ image_url }}" height="100" width="100"/>
+                                                    {% else %}
+                                                        <img src="{% static 'assets/images/No_Image.jpg' %}" height="100" width="100">
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                            <td>{{ audit.asset.name }}</td>
+                                            <td>{{ audit.condition_label }}</td>
+                                            <td>{{ audit.notes|truncatechars:30 }}</td>
+                                            <td>{{ audit.created_at }}</td>
+                                            <td>{{ audit.id|next_audit_due }}</td>
+                                            <td>
+                                                <div class="d-flex gap-0">
+                                                    <a href="{% url 'audit:details' audit.id %}" class="btn btn-sm btn-success pt-2">
+                                                        <i class="bi bi-eye-fill p-1"></i>
+                                                    </a>
+                                                    <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary pt-2">
+                                                        <i class="bi bi-archive p-1"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No audit history found</td>
                                     </tr>
-                                </tbody>
-                                {% endfor %}
-                            {% else %}
-                                <p>No audit history found</p>
-                            {% endif %}
+                                {% endif %}
+                            </tbody>
                         </table>
                     </div>
                 </div>
