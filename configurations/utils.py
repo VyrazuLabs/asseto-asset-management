@@ -8,8 +8,6 @@ from .constants import DATETIME_CHOICES,CURRENCY_CHOICES,NAME_FORMATS
 from datetime import datetime
 from dateutil.parser import parse
 from authentication.models import User
-from assets.utils import get_host
-
 def update_files_name(request,logo,favicon,login_page_logo):
     max_file_size=5*1024*1024
     my_uuid=uuid.uuid4()
