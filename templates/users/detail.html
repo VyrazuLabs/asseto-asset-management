@@ -90,14 +90,14 @@
                 </div>
             </div>
         </div>
-        <div>   
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Assigned Assets</span>                       
-                    </h6>
-                    {% if assigned_assets %}
+        <div>
+            {% if assigned_assets %}   
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Assigned Assets</span>                       
+                        </h6>                        
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <tr>
@@ -138,7 +138,7 @@
                                     </tr>
                                 {% endfor %}
                             </table>
-                            <div class='dataTable-bottom'>
+                            <div class="dataTable-bottom">
                                 Showing {{ assigned_assets.start_index }} to {{ assigned_assets.end_index }} of {{ assigned_assets.paginator.count }} entries
                             </div>
 
@@ -170,56 +170,53 @@
                                 </ul>
                             </nav>
                         </div>
-                    {% else %}
-                        <p>No assets assigned to this user.</p>
-                    {% endif %}
-                    {% for assigned_asset in assigned_assets %}
-                        {% with assigned_asset.asset.images.all as images %}
-                            {% if images %}
-                                <div class="modal fade" id="carouselModal{{ assigned_asset.asset.id }}" tabindex="-1" aria-labelledby="carouselModalLabel{{ assigned_asset.asset.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content">
+                        {% for assigned_asset in assigned_assets %}
+                            {% with assigned_asset.asset.images.all as images %}
+                                {% if images %}
+                                    <div class="modal fade" id="carouselModal{{ assigned_asset.asset.id }}" tabindex="-1" aria-labelledby="carouselModalLabel{{ assigned_asset.asset.id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content">
 
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="carouselModalLabel{{ assigned_asset.asset.id }}">Asset Images</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-
-                                            <div class="modal-body p-0">
-                                                <div id="carousel{{ assigned_asset.asset.id }}" class="carousel slide" data-bs-ride="carousel">
-                                                    <div class="carousel-inner">
-                                                        {% for image in images %}
-                                                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                                                <img class="d-block w-100"
-                                                                    onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
-                                                                    src="{{ image.image.url }}"
-                                                                    alt="Asset Image"
-                                                                    style="object-fit: contain; max-height: 600px;">
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-
-                                                    {% if images|length > 1 %}
-                                                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="prev">
-                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                        </button>
-                                                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="next">
-                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                        </button>
-                                                    {% endif %}
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="carouselModalLabel{{ assigned_asset.asset.id }}">Asset Images</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                            </div>
 
+                                                <div class="modal-body p-0">
+                                                    <div id="carousel{{ assigned_asset.asset.id }}" class="carousel slide" data-bs-ride="carousel">
+                                                        <div class="carousel-inner">
+                                                            {% for image in images %}
+                                                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                                    <img class="d-block w-100"
+                                                                        onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                                                        src="{{ image.image.url }}"
+                                                                        alt="Asset Image"
+                                                                        style="object-fit: contain; max-height: 600px;">
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+
+                                                        {% if images|length > 1 %}
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="prev">
+                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                            </button>
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="next">
+                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
         {% include 'commons/history.html'  %}
     </section>
