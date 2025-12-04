@@ -43,6 +43,7 @@ urlpatterns = [
     path('upload/', include('upload.urls', namespace='upload')),
     path('recycle-bin/', include('recycle_bin.urls', namespace='recycle_bin')),
     path('assets/', include('assets.urls', namespace='assets')),
+	path('license/',include('license.urls',namespace='license')),
     path('roles/', include('roles.urls', namespace='roles')),
     path('support/', include('support.urls', namespace='support')),
     path('users/', include('users.urls', namespace='users')),

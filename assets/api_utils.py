@@ -42,7 +42,7 @@ def asset_data(request,asset,asset_images,asset_barcode,asset_statuses):
         "name":asset.name,
         "product":asset.product.name,
         "product type":asset.product.product_type.name,
-        "product_category":asset.product.product_category.name if asset.product.product_category else None,
+        "product_category":asset.product.product_sub_category.name if asset.product.product_sub_category else None,
         "serial no.":asset.serial_no if asset.serial_no else None,
         "price":asset.price if asset.price else None,
         "office_location":asset.location.office_name if asset.location else None,

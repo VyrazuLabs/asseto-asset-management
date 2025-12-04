@@ -51,7 +51,7 @@ def product_details(request,product):
     if get_custom_fields:
         for custom_field in get_custom_fields:
             custom_field_dict={
-                'filed_name':custom_field.field_name,
+                'field_name':custom_field.field_name,
                 'field_value':custom_field.field_value
             }
             custome_fields_list.append(custom_field_dict)

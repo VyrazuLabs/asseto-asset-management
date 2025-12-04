@@ -150,3 +150,10 @@ class CustomField(models.Model):
     entity_type = models.CharField(max_length=30, choices=ENTITY_CHOICES)
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE,null=True,blank=True)
     required = models.BooleanField(default=False)
+
+class LicenseType(TimeStampModel,SoftDeleteModel):
+    id=models.AutoField(primary_key=True, null=False)
+    name=models.CharField(max_length=255)
+    history = HistoricalRecords()
+    def __str__(self):
+        return self.name

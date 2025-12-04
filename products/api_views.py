@@ -53,6 +53,7 @@ class ProductDetails(APIView):
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:
+            raise e
             return api_response(status=500, system_message=str(e))
         
 
