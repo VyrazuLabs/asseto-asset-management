@@ -62,13 +62,6 @@ class AssetSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         images = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields",None)
-
-        # if isinstance(custom_fields,str):
-        #     try:
-        #         custom_fields=json.loads(custom_fields)
-        #     except:
-        #         custom_fields=None
-
         get_asset_status = AssetStatus.objects.get(name="Available")
         asset = Asset.objects.create(
             **validated_data,

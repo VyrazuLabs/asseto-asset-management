@@ -105,8 +105,7 @@ def add_vendor(request):
 def details(request, id):
     vendor = get_object_or_404(
         Vendor.undeleted_objects, pk=id, organization=request.user.organization)
-    address = Address.objects.get(id=vendor.address.id)
-    
+    address = Address.objects.get(id=vendor.address.id) if vendor.address else None
     assets=Asset.undeleted_objects.filter(vendor=vendor)
     asset_page_param = 'asset_page'
     assets_paginator=Paginator(assets,10,orphans=1)
