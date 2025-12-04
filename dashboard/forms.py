@@ -1,7 +1,7 @@
 from dataclasses import fields
 from django import forms
 from django.db.models import Q
-from .models import Location, Address, ProductType, Department, ProductCategory
+from .models import LicenseType, Location, Address, ProductType, Department, ProductCategory
 
 
 class LocationForm(forms.ModelForm):
@@ -182,32 +182,17 @@ class ProductCategoryForm(forms.ModelForm):
         model = ProductCategory
         fields = ['name', 'parent']
 
+class LicenseTypeForm(forms.ModelForm):
+    name=forms.CharField(required=True, widget=forms.TextInput(
+        attrs={'autocomplete':'off', 'placeholder':'Type Name',
+                'class':'form-control','required':'required'}
+    ))
+    def clean_name(self):
+        name=self.cleaned_data.get('name')
+        if LicenseType.undeleted_objects.filter(name__iexact=name).exists():
+            raise forms.ValidationError('Name must be unique!')
 
-# class ProductSubCategoryForm(forms.ModelForm):
-#     name = forms.CharField(required=True, widget=forms.TextInput(
-#         attrs={'autocomplete': 'off', 'class': 'form-control',
-#                'placeholder': 'Category Name'}
-#     ))
+    class Meta:
+        model=LicenseType
+        fields=['name']
 
-#     parent = forms.ModelChoiceField(
-#         queryset=None,
-#         empty_label="--SELECT--",
-#         widget=forms.Select(
-#             attrs={'class': 'form-select'}
-#         ))
-
-#     def __init__(self, *args, **kwargs):
-#         self._organization = kwargs.pop('organization', None)
-#         self._pk = kwargs.pop('pk', None)
-#         super(ProductSubCategoryForm, self).__init__(*args, **kwargs)
-#         self.fields['parent'].queryset = ProductCategory.undeleted_objects.filter(parent__isnull=True)
-
-#     def clean_name(self):
-#         name = self.cleaned_data.get('name')
-#         if ProductCategory.undeleted_objects.filter(name__iexact=name, organization=self._organization).exclude(pk=self._pk).exists():
-#             raise forms.ValidationError('Name must be unique!')
-#         return name
-
-#     class Meta:
-#         model = ProductCategory
-#         fields = ['name','parent']
