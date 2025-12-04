@@ -192,6 +192,8 @@ class LicenseTypeForm(forms.ModelForm):
         if LicenseType.undeleted_objects.filter(name__iexact=name).exists():
             raise forms.ValidationError('Name must be unique!')
 
+        return name
+
     class Meta:
         model=LicenseType
         fields=['name']
