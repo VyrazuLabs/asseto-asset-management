@@ -10,6 +10,10 @@ from common.API_custom_response import api_response
 from users.utils import user_data, user_details
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema,OpenApiParameter
+from configurations.models import LocalizationConfiguration
+from configurations.utils import dynamic_display_name
+from configurations.constants import NAME_FORMATS,CURRENCY_CHOICES
+from users.api_utils import get_profile_data
 
 class UserList(APIView):
     permission_classes=[IsAuthenticated]
@@ -103,6 +107,17 @@ class SearchUser(APIView):
                 return api_response(data=data,message='User fond')
             else:
                 return api_response(status=200,message="User not found")
+        except ValueError as e:
+            api_response(status=400,error_message=str(e))
+        except Exception as e:
+            api_response(status=500,system_message=str(e))
+
+class UserProfile(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        data=get_profile_data(request)
+        try:
+            return api_response(data=data, message="User profile fetched successfully")
         except ValueError as e:
             api_response(status=400,error_message=str(e))
         except Exception as e:
