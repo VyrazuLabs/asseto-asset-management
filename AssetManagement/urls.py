@@ -27,7 +27,8 @@ from authentication.urls import authentication_url_patterns
 from vendors.urls import vendor_api_urlpatterns
 from products.urls import product_api_urlpattrens
 from dashboard.urls import dashboard_api_urlpatterns
-
+from audit.urls import audit_api_url_patterns
+from configurations.urls import configuration_api_url_patterns
 
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -73,7 +74,7 @@ urlpatterns = [
 	
 ]
 
-urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns
+urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

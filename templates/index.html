@@ -268,7 +268,7 @@
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Total Asset Cost</h6>
                                     {% if all_asset_cost and currency %}
-                                       <h6 class="font-extrabold mb-0">{{currency}} {{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
+                                       <h6 class="font-extrabold mb-0">{{currency}} {{all_asset_cost}} </h6>
                                     {% elif all_asset_cost %}
                                         <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
                                     {% else %}

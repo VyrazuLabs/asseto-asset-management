@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import *
-from .api_views import UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,SearchUser
+from .api_views import UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,SearchUser
 
 app_name = 'users'
 
@@ -26,5 +26,6 @@ user_api_url_patterns=[
     path('api/user/details/<uuid:id>',UserDetails.as_view(),name='user_details'),
     path('api/user/update/<uuid:id>',UpdateUser.as_view(),name='update_user'),
     path('api/user/delete/<uuid:id>',DeleteUSer.as_view(),name='delete_user'),
-    path('api/user/search/',SearchUser.as_view(),name='search_user')
+    path('api/user/search/',SearchUser.as_view(),name='search_user'),
+    path('api/user/profile',UserProfile.as_view(),name='user_profile')
 ]

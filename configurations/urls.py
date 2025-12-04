@@ -2,6 +2,8 @@ from django.urls import path
 from django.views.generic import TemplateView
 # from .views import OrganizationLogo
 from . import views
+from . import api_views
+
 app_name = 'configurations'
 
 urlpatterns=[
@@ -19,4 +21,10 @@ urlpatterns=[
     path('integration/', views.integration, name='integration'),
     path('list_extensions/', views.list_extensions, name='list_extensions'),
     path('extension-status/<str:id>/', views.extension_status, name='extension_status'),
+]
+
+configuration_api_url_patterns = [
+    #api urls
+    path('api/configuration/tag/',api_views.GetTagConfiguration.as_view(),name="complete_audit_list"),
+    path('api/configuration/localization/',api_views.GetLocalizationConfiguration.as_view(),name='pending_audit_list'),
 ]
