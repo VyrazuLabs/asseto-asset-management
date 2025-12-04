@@ -214,7 +214,7 @@ def user_login(request):
 
 
 @unauthenticated_user
-def user_register(request):    
+def user_register(request):
     u_form = UserRegisterForm()
     o_form = OrganizationForm()
     if request.method == "POST":

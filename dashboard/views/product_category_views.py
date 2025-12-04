@@ -75,11 +75,11 @@ def product_category_list(request):
         item["product__product_category"]: item["asset_count"]
         for item in asset_counts
     }
-    is_demo=IS_DEMO
-    if is_demo==True:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo==True:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
     context = {
         'sidebar': 'admin',
         'submenu': 'product_category',
@@ -87,7 +87,7 @@ def product_category_list(request):
         'deleted_product_categories_count': deleted_product_categories_count,
         'product_category_asset_count': product_category_asset_count,
         'title': 'Product Categories',
-        'is_demo':is_demo
+        # 'is_demo':is_demo
     }
     return render(request, 'dashboard/product_category/list.html', context=context)
 
