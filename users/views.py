@@ -61,11 +61,11 @@ def list(request):
     assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
 
 
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
 
     context = {
         'sidebar': 'users',
@@ -73,7 +73,7 @@ def list(request):
         'title': 'Users',
         'user_asset_map_count':user_asset_map,
         'user_asset_map_count_count':assigned_assets_count,
-        'is_demo':is_demo,
+        # 'is_demo':is_demo,
     }
     return render(request, 'users/list.html', context=context)
 
@@ -89,10 +89,11 @@ def details(request, id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    format_key= None
-    for id,it in NAME_FORMATS:
-        if obj.name_display_format == id:
-            format_key=id
+    if obj is not None:
+        format_key= None
+        for id,it in NAME_FORMATS:
+            if obj.name_display_format == id:
+                format_key=id
     asset_paginator=Paginator(assigned_assets,10,orphans=1)
     asset_page_number=request.GET.get('assets_page')
     asset_page_object=asset_paginator.get_page(asset_page_number)
