@@ -119,7 +119,7 @@ def delete(request, id):
     return redirect('assets:list')
 
 @login_required
-def search(request):
+def search(request,page):
         list_of_audits=Audit.objects.all()
         list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
         list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
