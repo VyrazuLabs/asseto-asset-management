@@ -31,11 +31,24 @@
         </td>
         <td>
             {% if asset.is_assigned %}
-                <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}{% if map.image %}<img src='{{ map.image.url }}' class="rounded-circle" style="width: 20px; height: 20px "/> {% endif %} {{ map.full_name }}{% endwith %}</sup>
-                <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
-                        {% csrf_token %}
-                        <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
-                </form>
+                <div class="d-flex pb-1">
+                    {% with map=asset_user_map|get_item:asset.id %}
+                        {% if map.image %}
+                            <sup class="d-flex pe-1">
+                                <img src="{{ map.image.url }}"
+                                    onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';"
+                                    class="rounded-circle mb-1"
+                                    style="width: 20px; height: 20px;" 
+                                />
+                            </sup>
+                        {% endif %}
+                        {% with parts=map.full_name|split%}
+                            {% for part in parts %}
+                                <sup class="pt-2 pe-1">{{ part }}</sup>
+                            {% endfor %}
+                        {% endwith %}
+                    {% endwith %}
+                </div>
             {% else %}
                 <div class="input-group">
                     <button type="button"  
