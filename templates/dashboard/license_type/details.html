@@ -1,0 +1,40 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">License Type Details</h3>
+
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Product Types</li>
+                    <li class="breadcrumb-item active" aria-current="page">License Type Details</li>
+                </ol>
+            </nav>
+
+        </div>
+        <div>
+            <a href="{% url 'dashboard:license_type_list' %}" class="btn btn-sm btn-outline-info my-3">Back to License Type List</a>
+        </div>
+    </div>
+    <section class="section">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                        <tr>
+                            <th scope="row">License Type Name</th>
+                            <td>{{license_type.name}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+{% endblock content%}

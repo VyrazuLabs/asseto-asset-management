@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'configurations',
     'drf_spectacular',
     'audit',
+    'license'
 ]
 
 MIDDLEWARE = [
