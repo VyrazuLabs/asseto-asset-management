@@ -118,7 +118,7 @@ def add_product_category(request):
 def product_category_details(request, id):
 
     product_category = get_object_or_404(
-        ProductCategory.undeleted_objects, pk=id, organization=request.user.organization)
+        ProductCategory.undeleted_objects, pk=id)
 
     history_list = product_category.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
