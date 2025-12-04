@@ -53,11 +53,11 @@ def locations(request):
         .values("location")
         .annotate(asset_count=Count("id"))
     )
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
     location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
     context = {
         'sidebar': 'admin',
@@ -66,7 +66,7 @@ def locations(request):
         'deleted_location_count':deleted_location_count,
         'location_asset_count':location_asset_count,
         'title': 'Locations',
-        'is_demo':is_demo
+        # 'is_demo':is_demo
     }
 
     return render(request, 'dashboard/locations/list.html', context=context)
