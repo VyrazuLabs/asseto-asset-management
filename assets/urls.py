@@ -22,7 +22,8 @@ urlpatterns = [
     path('delete-assign-asset-list/<uuid:id>', views.delete_assign_asset_list, name='delete_assign_asset_list'),
     path('change-status/<str:id>/',views.change_status,name='change_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
-
+    path('assign_asset_search/<str:page>', views.assign_asset_search, name='assign_asset_search'),
+    path('reassign-asset/<uuid:id>', views.reassign_asset, name='reassign_asset'),
     # urls for pie chart
     path('piechart_status_data/', views.pie_chart_assigned_status, name='piechart_status_data'),
     path('assets_by_status', views.pie_chart_status, name='pie_chart_status'),
