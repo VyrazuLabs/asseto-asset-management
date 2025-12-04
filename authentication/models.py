@@ -133,8 +133,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
             if first and last:
                 result = f"{first} {last}"
             else:
-                result = first or last or fullname
-
+                result = first or last or fullname    
         return result
 
     def __str__(self):

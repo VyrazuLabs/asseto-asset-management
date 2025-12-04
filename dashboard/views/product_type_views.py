@@ -61,11 +61,11 @@ def product_type_list(request):
         item["product__product_type"]: item["asset_count"]
         for item in asset_counts
     }
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -74,7 +74,7 @@ def product_type_list(request):
         'page_object': page_object,
         'deleted_product_types_count':deleted_product_types_count,
         'user_product_type_asset_count':user_product_type_asset_count,
-        'is_demo':is_demo,
+        # 'is_demo':is_demo,
         'title': 'Product Types'
     }
 

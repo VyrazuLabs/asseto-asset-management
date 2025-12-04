@@ -54,14 +54,15 @@ def vendor_list(request):
         count_array.append(get_count)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
     context = {'sidebar': 'vendors','count_array': count_array,
                'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
-               'is_demo':is_demo}
+            #    'is_demo':is_demo
+               }
     return render(request, 'vendors/list.html', context=context)
 
 

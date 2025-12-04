@@ -63,17 +63,17 @@ def list(request):
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
     context = {
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
         'deleted_product_count':deleted_product_count,
-        'is_demo':is_demo,
+        # 'is_demo':is_demo,
         'title': 'Products'
     }
 

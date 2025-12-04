@@ -10,6 +10,8 @@ from datetime import datetime,timedelta,timezone
 from django.http import JsonResponse
 from audit.models import AuditImage
 from django.db.models import OuterRef, Subquery
+from django.core.paginator import Paginator
+from datetime import datetime, timedelta
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -58,7 +60,7 @@ def add_audit(request):
             notes= comments,
             audited_by=request.user if request.user.is_authenticated else None,
             created_at= datetime.now(),
-            organization=request.user.organization,
+            organization=request.user.organization if request.user.is_authenticated else None,
         )
         return redirect('audit:completed_audits')
 
@@ -140,14 +142,19 @@ def asset_audit_history(request,id):
 
 def completed_audits(request):
     thirty_days_ago = datetime.now() - timedelta(days=30)
+
     audits = Audit.objects.filter(
         created_at__gte=thirty_days_ago
     ).order_by('-created_at')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(audits, 10)
+    audits_page = paginator.get_page(page)
+
     return render(request, 'audit/audit_list.html', {
-        'audits': audits,
+        'audits': audits_page,
         'sidebar': 'audit'
     })
-
 def pending_audits(request):
     asset_list = Asset.undeleted_objects.all()
     data_set = []
