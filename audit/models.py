@@ -22,7 +22,6 @@ class Audit(models.Model):
         (3, 'Bad'),
         (4, 'Retired')
     ]
-
     assigned_to = models.CharField(max_length=150,blank=True, null=True)
     asset = models.ForeignKey(Asset, null=True, blank=True, related_name='audits', on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
@@ -33,6 +32,15 @@ class Audit(models.Model):
 
     def condition_label(self):
         return dict(self.CONDITION_CHOICES).get(self.condition)
+    
+    # @property
+    # def uuid(self):
+    #     # deterministic uuid based on numeric id
+    #     if not self.id:
+    #         return None
+    #     namespace = uuid4.UUID("12345678-1234-5678-1234-567812345678")
+    #     print(namespace,"------------------------------>>>>>>>>>>>>>>>>>>>>")
+    #     return uuid4.uuid5(namespace, str(self.id))
     
 class AuditImage(models.Model):
     audit = models.ForeignKey('Audit', on_delete=models.CASCADE, related_name='images')
