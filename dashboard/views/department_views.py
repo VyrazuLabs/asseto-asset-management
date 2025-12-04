@@ -72,11 +72,11 @@ def departments(request):
         item["user__department"]: item["asset_count"]
         for item in asset_counts
     }
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
 
     context = {
         'sidebar': 'admin',
@@ -85,7 +85,7 @@ def departments(request):
         'department_form': department_form,
         'deleted_department_count': deleted_department_count,
         'department_asset_count': department_asset_count,
-        'is_demo':is_demo,
+        # 'is_demo':is_demo,
         'title': 'Departments'
     }
     return render(request, 'dashboard/departments/list.html', context=context)
