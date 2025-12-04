@@ -98,6 +98,15 @@
                 </li>
                 {% endif %}
 
+                {% if perms.authentication.edit_license or perms.authentication.delete_license or perms.authentication.add_license %}
+                <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
+                    <a href="{% url 'license:license_list' %}" class="sidebar-link">
+                        <i class="bi bi-key-fill"></i>
+                        <span>License</span>
+                    </a>
+                </li>
+                {% endif %}
+
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
                     {% if request.user.is_superuser %}
                         <a href="javascript:void(0)" class="sidebar-link">
@@ -121,6 +130,13 @@
                                 <a href="{% url 'dashboard:product_type_list' %}">Product Types</a>
                             </li>
                         {% endif %}
+
+                        {% if perms.authentication.add_license_type or perms.authentication.edit_license_type %}
+                            <li class="submenu-item {% if submenu == 'license_type' %}active{% endif %}">
+                                <a href="{% url 'dashboard:license_type_list' %}">License Types</a>
+                            </li>
+                        {% endif %}
+
                         {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
                             <li class="submenu-item {% if submenu == 'product_category' %}active{% endif %}">
                                 <a href="{% url 'dashboard:product_category_list' %}">Product Categories</a>

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views
+from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views,license_type
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -41,6 +41,15 @@ urlpatterns = [
     path('product-categories/update/<uuid:id>', views.update_product_category, name='update_product_category'),
     path('product-categories/status/<uuid:id>', views.product_category_status, name='product_category_status'),
     path('product-categories/search/<str:page>', views.search_product_category, name='search_product_category'),
+
+    #License Type
+    path('license-type/list/',license_type.license_type_list,name='license_type_list'),
+    path('license-type/add/',license_type.license_type_add,name='add_license_type'),
+    path('license-types/details/<int:id>', license_type.license_type_details, name='license_type_details'),
+    path('license-type/add/<int:id>',license_type.update_license_type,name='update_license_type'),
+    path('license-type/status/<int:id>',license_type.license_type_status,name='license_type_status'),
+    path('license-type/delete/<int:id>',license_type.delete_license_type,name='delete_license_type'),
+    path('license-type/search/', license_type.search_license_type, name='search_license_type'),
 
     path('get-subcategories/',views.get_subcategories, name='get_subcategories'),
      
