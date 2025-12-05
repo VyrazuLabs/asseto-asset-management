@@ -77,7 +77,7 @@
                             <td>
                                 <a href="{% url 'assets:details' assign_asset.asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                 {% if perms.authentication.reassign_assign_asset %}
-                                    <button type="button" class="btn btn-info btn-sm" 
+                                    <button type="button" class="btn btn-info " 
                                         hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
                                         data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
                                     >Reassign</button>
@@ -86,7 +86,7 @@
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                         <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
                                             {% csrf_token %}
-                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                                            <button type="submit" value="Delete" class="btn  btn-danger">Unassign</button>
                                         </form>
                                     </div>
                                 {% endif %}

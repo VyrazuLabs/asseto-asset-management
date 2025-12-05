@@ -2,6 +2,7 @@ from django.utils import timezone
 from assets.models import Asset, AssetImage, AssignAsset
 from dateutil.relativedelta import relativedelta
 from dashboard.models import CustomField
+import re
 
 def convert_to_list(request,queryset):
     current_host=request.get_host()
@@ -105,3 +106,31 @@ def get_asset(tag_id):
         raise ValueError("Asset with this tag does not exists!")
  
     return {"asset_id": asset.id}
+
+MM_TO_PX = 3.7795275591  # 96 dpi standard
+
+def mm_to_px(value):
+    """Convert `12.34mm` → float(px)."""
+    return float(value.replace("mm", "")) * MM_TO_PX
+
+def convert_svg_mm_to_px(svg):
+    # Convert <svg width="XXmm" height="XXmm">
+    svg = re.sub(
+        r'width="([\d\.]+)mm"',
+        lambda m: f'width="{mm_to_px(m.group(1))}px"',
+        svg
+    )
+    svg = re.sub(
+        r'height="([\d\.]+)mm"',
+        lambda m: f'height="{mm_to_px(m.group(1))}px"',
+        svg
+    )
+
+    # Convert all <rect> x, y, width, height
+    svg = re.sub(
+        r'(x|y|width|height)="([\d\.]+)mm"',
+        lambda m: f'{m.group(1)}="{mm_to_px(m.group(2))}px"',
+        svg
+    )
+
+    return svg
