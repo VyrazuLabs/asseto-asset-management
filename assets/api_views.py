@@ -2,7 +2,7 @@ import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from assets.api_utils import asset_data, convert_to_list, get_asset
-from assets.barcode import generate_barcode
+from assets.barcode import generate_barcode_px
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, AssignAssetSerializer
 from authentication.models import User
@@ -53,7 +53,7 @@ class AssetDetails(APIView):
         try:
             asset=get_object_or_404(Asset,pk=id)
             asset_images=AssetImage.objects.filter(asset=asset.id).all()
-            asset_barcode = generate_barcode(asset.tag)
+            asset_barcode = generate_barcode_px(asset.tag)
             asset_statuses=AssetStatus.objects.all()
             data=asset_data(request,asset,asset_images,asset_barcode,asset_statuses)
             return api_response(data=data, message="Details retrived successfully")
