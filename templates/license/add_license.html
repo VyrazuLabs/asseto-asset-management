@@ -46,6 +46,15 @@
                         </div>
                         <div class="col-md-4 col-12">
                             <div class="form-group">
+                                <label for="city-column">Key</label>
+                                {{form.key}}
+                                {% for error in form.seats.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
                                 <label for="country-floating">License Type</label>
                                 {{form.license_type}}
                                 {% for error in form.license_type.errors %}
