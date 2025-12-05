@@ -69,7 +69,7 @@ class UpdateAsset(APIView):
     def patch(self,request,id):
         get_asset=get_object_or_404(Asset,pk=id)        
         try:
-            asset_data=AssetSerializer(get_asset,data=request.data,partial=True)
+            asset_data=AssetSerializer(get_asset,data=request.data,context={'request':request},partial=True)
             if not asset_data.is_valid():
                 raise ValueError(asset_data.errors)
             asset_data.save()
@@ -77,7 +77,6 @@ class UpdateAsset(APIView):
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:
-            raise e
             return api_response(status=500, system_message=str(e))
 
 class DeleteAsset(APIView):
