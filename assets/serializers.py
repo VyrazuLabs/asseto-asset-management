@@ -38,20 +38,20 @@ class AssetSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(data)
 
-    def validate_tag(self, tag):
-        if not tag:
+    def validate_tag(self, value):
+        if "tag" in self.initial_data and not value:
             raise serializers.ValidationError("Tag can not be empty")
-        return tag
+        return value
 
-    def validate_name(self, name):
-        if not name:
+    def validate_name(self, value):
+        if "name" in self.initial_data and not value:
             raise serializers.ValidationError("Name can not be blank")
-        return name
+        return value
 
-    def validate_product(self, product):
-        if not product:
+    def validate_product(self, value):
+        if "product" in self.initial_data and not value:
             raise serializers.ValidationError("Product can not be blank")
-        return product
+        return value
     
     def validate(self, attrs):
         for field in ["purchase_date", "warranty_expiry_date"]:
@@ -103,7 +103,8 @@ class AssetSerializer(serializers.ModelSerializer):
             for custom_field in custom_fields:
                 field_name=list(custom_field.keys())[0]
                 field_value=custom_field[field_name]
-                CustomField.objects.filter(object_id=instance.id,field_name=field_name).update(field_value=field_value)
+                CustomField.objects.update_or_create(object_id=instance.id,field_name=field_name,
+                defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name,"organization": self.context["request"].user.organization})
         return instance
 
 class AssignAssetSerializer(serializers.ModelSerializer):

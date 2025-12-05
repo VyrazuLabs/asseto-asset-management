@@ -253,7 +253,10 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assiggned_asse
         img_array.append(it)
     months_int=asset.product.eol
     today=timezone.now().date()
-    eol_date= today+relativedelta(months=months_int) if months_int is not None else None
+    if months_int: 
+        eol_date= today+relativedelta(months=months_int)
+    else:
+        eol_date=None
     arr_size=len(img_array)
     history_list = asset.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
