@@ -19,7 +19,7 @@
         <td>{{assign_asset.user.department.name}}</td>
         <td>
             {% if perms.authentication.reassign_assign_asset %}
-                <button type="button" class="btn btn-info btn-sm" 
+                <button type="button" class="btn btn-info" 
                     hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
                     data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
                 >Reassign</button>

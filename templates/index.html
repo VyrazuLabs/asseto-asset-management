@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% block content %}
 <style>
   .flex-container {
@@ -129,25 +130,29 @@
                         </a>    
                     </div>
                 </div>
+            {% endif %}
+            {% if perms.license.view_license or perms.license.add_license or perms.license.edit_license or perms.license.delete_license %}
                 <div class="col-6 col-lg-3 col-md-6">
                     <div class="card">
+                        <a href="{% url 'license:license_list' %}">
                         <div class="card-body px-3 py-4-5">
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="stats-icon blue">
-                                        <i class="bi bi-window-stack me-2 mb-3"></i>
+                                        <img src="{% static 'assets/images/license-logo.svg' %}" alt="License Image" style="max-width:25px; max-height:25px;">
                                     </div>
                                 </div>
                                 <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Unassigned Assets</h6>
-                                    {% if unassign_assets_count %}
-                                        <h6 class="font-extrabold mb-0">{{unassign_assets_count}}</h6>
+                                    <h6 class="text-muted font-semibold">License</h6>
+                                    {% if license_count %}
+                                        <h6 class="font-extrabold mb-0">{{license_count}}</h6>
                                     {% else %}
                                         <h6 class="font-extrabold mb-0">0</h6>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
+                        </a>
                     </div>
                 </div>
             {% endif %}
@@ -164,13 +169,11 @@
                                 </div>
                                 <div class="col-md-8">
                                     <h6 class="text-muted font-semibold">Vendors</h6>
-
                                     {% if vendor_count %}
                                         <h6 class="font-extrabold mb-0">{{vendor_count}}</h6>
                                     {% else %}
                                         <h6 class="font-extrabold mb-0">0</h6>
                                     {% endif %}
-
                                 </div>
                             </div>
                         </div>
@@ -280,6 +283,7 @@
                     </div>
                 </div>
             {% endif %}
+            </div>
             {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
                 <div class="page-heading">    
                     <h3>Asset Graphs</h3>
