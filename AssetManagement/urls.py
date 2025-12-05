@@ -29,7 +29,6 @@ from products.urls import product_api_urlpattrens
 from dashboard.urls import dashboard_api_urlpatterns
 from audit.urls import audit_api_url_patterns
 from configurations.urls import configuration_api_url_patterns
-
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
