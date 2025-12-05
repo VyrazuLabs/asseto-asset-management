@@ -37,6 +37,7 @@ from .constant import db_engines
 from configurations.models import LocalizationConfiguration
 from configurations.utils import dynamic_display_name
 from configurations.constants import NAME_FORMATS
+from license.models import License
 User = get_user_model()
 
 
@@ -116,6 +117,9 @@ def index(request):
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
     obj=get_currency_and_datetime_format(request.user.organization)
+
+    get_license=License.objects
+    get_license_count=get_license.count()
     for it in expiring_assets:
         if not obj['date_format']:
             it.warranty_expiry_date=it.warranty_expiry_date.date()
@@ -165,8 +169,8 @@ def index(request):
         'latest_users_list': latest_users_list,
         'users_count': users_count,
         'expiring_assets': expiring_assets,
-        'title': 'Dashboard'
- 
+        'title': 'Dashboard',
+        'license_count': get_license_count
     }
  
     return render(request, 'index.html', context=context)
