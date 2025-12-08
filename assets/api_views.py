@@ -1,7 +1,6 @@
-import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from assets.api_utils import asset_data, convert_to_list, get_asset
+from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
 from assets.barcode import generate_barcode_px
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, AssignAssetSerializer
@@ -13,7 +12,9 @@ from rest_framework.parsers import MultiPartParser,FormParser
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
+from django.http import HttpResponse
 
+from dashboard.models import CustomField
 class AssetList(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[
@@ -53,9 +54,10 @@ class AssetDetails(APIView):
         try:
             asset=get_object_or_404(Asset,pk=id)
             asset_images=AssetImage.objects.filter(asset=asset.id).all()
+            custom_fields=CustomField.objects.filter(object_id=asset.id)
             asset_barcode = generate_barcode_px(asset.tag)
             asset_statuses=AssetStatus.objects.all()
-            data=asset_data(request,asset,asset_images,asset_barcode,asset_statuses)
+            data=asset_data(request,asset,asset_images,asset_statuses,custom_fields)
             return api_response(data=data, message="Details retrived successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
@@ -67,6 +69,11 @@ class UpdateAsset(APIView):
 
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def patch(self,request,id):
+        print("--------------->",request.data)
+        deleted_image_ids=request.data.get('delete_image_ids',[])
+        if deleted_image_ids:
+            delete_images(deleted_image_ids)
+            print('deleted imagessssssssssssssssss')
         get_asset=get_object_or_404(Asset,pk=id)        
         try:
             asset_data=AssetSerializer(get_asset,data=request.data,context={'request':request},partial=True)
@@ -120,7 +127,7 @@ class SearchAsset(APIView):
 
 class Scan_api_barcode(APIView):
     @extend_schema(description="for the tag id, the variable name from frontend must be 'tag_id' ")
-    def get(self,request,**kwargs):
+    def get(self,request):
         try:
             tag_id=self.kwargs.get('tag_id')
             respones_data = get_asset(tag_id)
