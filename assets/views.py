@@ -300,7 +300,6 @@ def update_in_detail(request, id):
         entity_type='asset', object_id=asset.id, organization=org
     )
     if request.method == 'DELETE':
-        print('method called')
         return delete_asset_images(request, asset)
 
     if request.method == 'POST':
