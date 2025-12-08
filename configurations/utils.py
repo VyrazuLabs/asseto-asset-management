@@ -213,3 +213,6 @@ def dynamic_display_name(request,fullname):
     except Exception:
         # fallback to standard "First Last"
         return f"{first} {last}".strip()
+
+def hide_last_digits(value, last_digits=4):
+    return f"{value[:-last_digits]}{'X' * last_digits}"

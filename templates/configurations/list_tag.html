@@ -40,24 +40,30 @@
                                 </ul>
                             </div>
                         {% endif %}
-                        <div class="row">
-                            <div class="col-md-6 col-12">
-                                <label for="id_prefix"><b>Tag Prefix</b></label>
-                                <p>{{ configurations.prefix }}</p>
-                                {% for error in form.prefix.errors %}
-                                    <small class="text-danger">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                            <div class="col-md-6 col-12">
-                                <label for="id_number_suffix"><b>Tag Suffix</b></label>
-                                <p>{{ configurations.number_suffix }}</p>
-                                {% for error in form.number_suffix.errors %}
-                                    <small class="text-danger">{{ error }}</small>
-                                {% endfor %}
+                        <div class="card-body p-1">
+                            <div class="col gap-4 p-4 justify-content-around">
+                                <div class="col-md-4 col-12">
+                                    <div class="form-group d-flex gap-4">
+                                        <label for="id_prefix">Prefix</label>
+                                        <input class="form-control w-100" value="{{ configurations.prefix }}" disabled></input>
+                                        {% for error in form.prefix.errors %}
+                                            <small class="text-danger mb-3">{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-12">
+                                    <div class="form-group d-flex gap-4">
+                                        <label for="id_number_suffix">Suffix</label>
+                                        <input class="form-control w-100" value="{{ configurations.number_suffix }}" disabled></input>
+                                        {% for error in form.number_suffix.errors %}
+                                            <small class="text-danger mb-3">{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                       <div class="row mt-3">
-                            <div class="col-md-6 col-12 form-check">
+                       <div class="row m-4">
+                            <div class="col-md-6 col-12 form-check ">
                                 <input type="checkbox" 
                                     id="use_default_settings_{{ configurations.id }}"
                                     name="use_default_settings"

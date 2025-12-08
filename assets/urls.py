@@ -38,6 +38,8 @@ urlpatterns = [
 
     # url for generate barcodes
     path('scan-barcode/<str:tag_id>',Scan_barcode.as_view(), name='barcode'),
+    path('slack-authorize/', views.slack_authorize, name='slack_authorize'),
+    path('slack/oauth/callback/', views.slack_oauth_callback, name='slack_oauth_callback'),
 
 ]
 
