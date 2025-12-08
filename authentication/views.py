@@ -9,22 +9,20 @@ from django.shortcuts import render, HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from authentication.forms import (
-    UserRegisterForm, OrganizationForm, UserPasswordChangeForm, UserLoginForm, UserUpdateForm, OrganizationUpdateForm)
+from authentication.forms import (UserRegisterForm, OrganizationForm,UserLoginForm, UserUpdateForm, OrganizationUpdateForm)
 from authentication.decorators import unauthenticated_user
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
 from authentication.utils import create_db_connection
-from dashboard.forms import LocationForm, AddressForm
+from dashboard.forms import AddressForm
 from dashboard.models import Location, Address,ProductType,ProductCategory
 from django.contrib.auth import get_user_model
 from products.models import Product
 from vendors.models import Vendor
 from assets.models import *
 from django.db.models.signals import post_save 
-from django.dispatch import receiver
 from assets.seeders import seed_asset_statuses
 from assets.models import AssignAsset
 from django.views.decorators.cache import never_cache
@@ -35,13 +33,11 @@ from configurations.utils import format_datetime
 from django.contrib import messages
 from .constant import db_engines
 from configurations.models import LocalizationConfiguration
-from configurations.utils import dynamic_display_name
 from configurations.constants import NAME_FORMATS
+from dotenv import load_dotenv,set_key
+from django.conf import settings
 from license.models import License
 User = get_user_model()
-
-
-
 
 def introduce(request):
     return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})
@@ -62,12 +58,30 @@ def db_configure(request):
 
         if create_db_connection(request,db_data):
             messages.success(request, "Database configured successfully!")
-            return redirect('authentication:register')
+            return redirect('authentication:email_configure')
         else:
             messages.error(request, "Database connection failed. Please check your credentials.")
             return render(request, 'auth/first_time_installation/db_configure.html')
         
     return render(request,'auth/first_time_installation/db_configure.html',context={'current_step':2})
+
+def smtp_email_configure(request):
+    env_path=settings.BASE_DIR / ".env"
+
+    if request.method=="POST":
+        email_data={
+            'EMAIL_HOST': request.POST.get('email_host'),
+            'EMAIL_HOST_USER': request.POST.get('email_host_user'),
+            'EMAIL_HOST_PASSWORD': request.POST.get('email_host_password'),
+            'EMAIL_PORT':request.POST.get('email_port')
+        }
+        for key,value in email_data.items():
+            set_key(env_path,key,value)
+        messages.success(request,'Email Configuration Successfully')
+        load_dotenv(env_path,override=True)
+        return redirect ('authentication:register')
+    
+    return render(request,'auth/first_time_installation/email_configure.html',context={'current_step':3})
 
 @login_required
 def index(request):
@@ -213,7 +227,7 @@ def user_login(request):
                 messages.error(request, 'Invalid credentials!')
     last_logins=User.objects.values_list('last_login',flat=True)
 
-    return render(request, 'auth/login.html', context={'form': form,'current_step':4,'last_logins':last_logins})
+    return render(request, 'auth/login.html', context={'form': form,'current_step':5,'last_logins':last_logins})
 
 
 
@@ -242,7 +256,7 @@ def user_register(request):
                 return redirect('authentication:login')
             else:
                 messages.error(request, 'Please correct the below errors.')
-    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form,'current_step':3})
+    return render(request, 'auth/register.html', context={'u_form': u_form, 'o_form': o_form,'current_step':4})
 
 
 @unauthenticated_user
