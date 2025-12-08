@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from common.API_custom_response import api_response
 from common.pagination import add_pagination
 from products.serializers import ProductSerializer
-from products.utils import convert_to_list, product_details, product_list_for_form
+from products.utils import convert_to_list, delete_product_images, product_details, product_list_for_form
 from .models import Product
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from rest_framework.permissions import IsAuthenticated
@@ -53,16 +53,18 @@ class ProductDetails(APIView):
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:
-            raise e
             return api_response(status=500, system_message=str(e))
         
 
 class UpdateProduct(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(request={"multipart/form-data":ProductSerializer})
-    def post(self,request,id):
+    def patch(self,request,id):
         try:
             get_prodct=get_object_or_404(Product,pk=id)
+            deleted_image_ids=request.data.get('delete_image_ids',[])
+            if deleted_image_ids:
+                delete_product_images(deleted_image_ids)
             serializer=ProductSerializer(get_prodct,data=request.data,partial=True)
             if not serializer.is_valid():
                 raise ValueError(serializer.errors)
