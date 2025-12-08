@@ -59,7 +59,7 @@
 
                             <tr>
                                 <td><b>Product EOL</b></td>
-                                <td>{{ product.eol }} months</td>
+                                <td>{% if product.eol %} {{ product.eol }} months {% else %} Not Provided {% endif %}</td>
                             </tr>
                             {% if product.get_audit_duration %}
                                 <tr>
@@ -78,37 +78,39 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p ><b>Product Images</b></p>
-                    <div style="display: flex;">
-                        {% for it in img_array %}
-                            <div class="me-2">
-                                <img
-                                src="{% get_media_prefix %}{{ it.image }}" 
-                                alt="Product Image {{ forloop.counter }}"
-                                style="cursor: pointer; width: 150px;"
-                                class="clickable-image"
-                                data-image-src="{% get_media_prefix %}{{ it.image }}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#imageModal{{ forloop.counter }}"
-                                onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
-                                >
-                            </div>
-                            
-                            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    {% if img_array %}
+                        <p ><b>Product Images</b></p>
+                        <div style="display: flex;">
+                            {% for it in img_array %}
+                                <div class="me-2">
+                                    <img
+                                    src="{% get_media_prefix %}{{ it.image }}" 
+                                    alt="Product Image {{ forloop.counter }}"
+                                    style="cursor: pointer; width: 150px;"
+                                    class="clickable-image"
+                                    data-image-src="{% get_media_prefix %}{{ it.image }}"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#imageModal{{ forloop.counter }}"
+                                    onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                    >
+                                </div>
+                                
+                                <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                        <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                        </div>
                                     </div>
-                                    <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
                                     </div>
                                 </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
                 {% if get_custom_data %}
                 <div class="card mt-3">
@@ -141,56 +143,15 @@
                 {% endif %}
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                      <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
-                            Product Specifications
-                        </button>
-                      </h2>
-                      <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Specification Name</th>
-                                            <th>Specification Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% if assetSpecifications %}
-                                            {% for assetSpecification in assetSpecifications %}
-                                        <tr>
-                                            <th scope="row">
-                                                {{assetSpecification.name}}
-                                            </th>
-                                            <td>
-                                                {{assetSpecification.value}}
-                                            </td>
-                                        </tr>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         {% include 'commons/history.html' %}
     </section>
 </div>
 <script>
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('hidden.bs.modal', () => {
-    window.location.reload();
-  });
-});
+    document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('hidden.bs.modal', () => {
+        window.location.reload();
+    });
+    });
 </script>
   
 {% endblock content%}
