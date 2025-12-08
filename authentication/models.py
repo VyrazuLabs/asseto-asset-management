@@ -9,9 +9,9 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
-from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
-
+from django.apps import apps
+# from configurations.models import LocalizationConfiguration
 
 def path_and_rename(instance, filename):
     upload_to = 'profile/'
