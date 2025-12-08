@@ -74,7 +74,7 @@ class AddProductsForm(forms.ModelForm):
             if self.instance.product_sub_category.parent:
                 # It's a sub-category — show parent and child
                 self.initial['product_category'] = self.instance.product_sub_category.parent
-                self.initial['product_sub_category'] = self.instance.product_category
+                self.initial['product_sub_category'] = self.instance.product_sub_category
             else:
                 # It's a top-level category — only show it in product_category
                 self.initial['product_category'] = self.instance.product_sub_category

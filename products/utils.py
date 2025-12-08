@@ -50,11 +50,8 @@ def product_details(request,product):
     get_custom_fields=CustomField.objects.filter(object_id=product.id)
     if get_custom_fields:
         for custom_field in get_custom_fields:
-            custom_field_dict={
-                'field_name':custom_field.field_name,
-                'field_value':custom_field.field_value
-            }
-            custome_fields_list.append(custom_field_dict)
+            custom_fields_dict={custom_field.field_name:custom_field.field_value}
+            custome_fields_list.append(custom_fields_dict)
         product_detail['custom_fields']=custome_fields_list
 
 
@@ -86,3 +83,10 @@ def product_list_for_form(products):
         }
         list.append(products_dict)
     return list
+
+def delete_product_images(deleted_image_ids):
+    for id in deleted_image_ids:
+        try:
+            ProductImage.objects.filter(id=id).delete()
+        except Exception as e:
+            print(e)

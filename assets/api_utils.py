@@ -1,7 +1,6 @@
 from django.utils import timezone
 from assets.models import Asset, AssetImage, AssignAsset
 from dateutil.relativedelta import relativedelta
-from dashboard.models import CustomField
 import re
 
 def convert_to_list(request,queryset):
@@ -35,7 +34,7 @@ def convert_to_list(request,queryset):
     return asset_list
 
 
-def asset_data(request,asset,asset_images,asset_barcode,asset_statuses):
+def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     current_host=request.get_host()
     asset_data={
         "id":asset.id,
@@ -54,13 +53,20 @@ def asset_data(request,asset,asset_images,asset_barcode,asset_statuses):
         "asset_status":asset.asset_status.name if asset.asset_status else None,
         "serial_no":asset.serial_no if asset.serial_no else None,
         "description":asset.description if asset.description else None,
-        "barcode":asset_barcode
     }
     asset_image_list=[]
-    for images in asset_images:
-        add_path=f"http://{current_host}"+images.image.url
-        asset_image_list.append(add_path)
+    if asset_images:
+        for image in asset_images:
+            asset_images_dict={'image_id':image.id,'image_path':f"http://{current_host}"+image.image.url}
+            asset_image_list.append(asset_images_dict)
     asset_data['asset_images']=asset_image_list
+
+    custom_fields_list=[]
+    if custom_fields:
+        for custom_field in custom_fields:
+            custom_fields_dict={custom_field.field_name:custom_field.field_value}
+            custom_fields_list.append(custom_fields_dict)
+    asset_data['custom_fields']=custom_fields_list
 
     months_int=asset.product.eol if asset.product and asset.product.eol else None
     today=timezone.now().date()
@@ -106,6 +112,13 @@ def get_asset(tag_id):
         raise ValueError("Asset with this tag does not exists!")
  
     return {"asset_id": asset.id}
+
+def delete_images(deleted_image_ids):
+    for id in deleted_image_ids:
+        try:
+            AssetImage.objects.filter(id=id).delete()
+        except Exception as e:
+            print(e)
 
 MM_TO_PX = 3.7795275591  # 96 dpi standard
 
