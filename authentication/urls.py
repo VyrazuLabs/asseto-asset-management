@@ -9,6 +9,8 @@ urlpatterns = [
     # Template urls
     path('introduce/', views.introduce, name = 'introduce'),
     path('data-base-configure/',views.db_configure, name="db_configure"),
+    path('smtp-email-configure/',views.smtp_email_configure,name='email_configure'),
+
     path('', views.index, name = 'index'),
     path('login', views.user_login, name = 'login'),
     path('register', views.user_register, name = 'register'),

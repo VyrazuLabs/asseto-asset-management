@@ -433,7 +433,6 @@ def create_char_data(data):
 
 
 def delete_asset_images(request, asset):
-    print('calling this function')
     try:
         data = json.loads(request.body)
         delete_ids = data.get('delete_image_ids', [])
