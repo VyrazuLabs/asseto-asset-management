@@ -9,42 +9,49 @@ from django.db.backends.signals import connection_created
 from assets.models import AssignAsset
 from django.db import connection
 from assets.models import Asset
+from notifications.utils import notifications_call,send_email
 # User Notification
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def userNotification(sender, instance, created,  **kwargs):
     if instance.previous_role != instance.role:
-        notification = Notification.objects.create(
-            instance_id=instance.id,
-            notification_title='New User' if created else 'Updated User',
-            notification_text=f'{instance.full_name} has been added to your team ({instance.role})',
-            icon='bi-person-fill',
-        )
+        # notification = Notification.objects.create(
+        #     instance_id=instance.id,
+        #     notification_title='New User' if created else 'Updated User',
+        #     notification_text=f'{instance.full_name} has been added to your team ({instance.role})',
+        #     icon='bi-person-fill',
+        # )
 
-        users = User.objects.filter(
-            role=instance.role, organization=instance.organization).exclude(pk=instance.id)
-        for user in users:
-            UserNotification.objects.create(
-                user=user,
-                notification=notification
-            )
+        # users = User.objects.filter(
+        #     role=instance.role, organization=instance.organization).exclude(pk=instance.id)
+        # for user in users:
+        #     UserNotification.objects.create(
+        #         user=user,
+        #         notification=notification
+        #     )
+        notifications_call(user=instance,
+                           entity_type=2,
+                           notification_title='New User' if created else 'Updated User',
+                           notification_text=f'{instance.full_name} has been added to your team ({instance.role})'
+                        )
+        # send_email(instance.user.email,notifications_title='Updated asset',notification_text=f'{asset.name} is Updated.')
 
     if instance.previous_role is not None and instance.previous_role != instance.role and not created:
-        notification = Notification.objects.create(
-            instance_id=instance.id,
-            notification_title='Updated User',
-            notification_text=f'{instance.full_name} has been removed from your team ({instance.previous_role})',
-            icon='bi-person-fill',
-        )
+        notifications_call(user=instance,
+                            entity_type=2,
+                            notification_title='Updated User',
+                            notification_text=f'{instance.full_name} has been removed from your team ({instance.previous_role})',
+                            icon='bi-person-fill',
+                        )
 
-        users = User.objects.filter(
-            role=instance.previous_role, organization=instance.organization)
-        for user in users:
-            UserNotification.objects.create(
-                user=user,
-                notification=notification
-            )
+        # users = User.objects.filter(
+        #     role=instance.previous_role, organization=instance.organization)
+        # for user in users:
+        #     UserNotification.objects.create(
+        #         user=user,
+        #         notification=notification
+        #     )
 
 
 @receiver(post_init, sender=settings.AUTH_USER_MODEL)
@@ -91,35 +98,35 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
 def asset_notification(sender, instance, created,  **kwargs):
 
     if instance.previous_user != instance.user:
-
-        notification = Notification.objects.create(
-            instance_id=instance.id,
+        send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+        notifications_call(user=instance.user,
+            entity_type=2,
             notification_title='Assigned asset',
-            notification_text=f'{instance.asset.name} is assigned to you.',
-            icon='bi-person-workspace',
+            notification_text=f'{instance.asset.name} is assigned to you.'
         )
 
-        UserNotification.objects.create(
-            user=instance.user,
-            notification=notification
-        )
+        # UserNotification.objects.create(
+        #     user=instance.user,
+        #     notification=notification
+        # )
 
     if instance.previous_user != instance.user and not created:
-        notification = Notification.objects.create(
+        send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+        notifications_call(user=instance.user,
             instance_id=instance.id,
             notification_title='Assigned asset',
             notification_text=f'{instance.asset.name} is unassigned from you.',
-            icon='bi-person-workspace',
         )
 
-        UserNotification.objects.create(
-            user=instance.previous_user,
-            notification=notification
-        )
+        # UserNotification.objects.create(
+        #     user=instance.previous_user,
+        #     notification=notification
+        # )
 
 
 @receiver(post_delete, sender=AssignAsset)
 def asset_delete_notification(sender, instance, *args,  **kwargs):
+    send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
     notification = Notification.objects.create(
         instance_id=instance.id,
         notification_title='Asset Deleted',

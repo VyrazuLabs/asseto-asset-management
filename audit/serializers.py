@@ -6,10 +6,17 @@ from audit.models import Audit, AuditImage
 #     field_name = serializers.CharField()
 #     field_value = serializers.CharField()
 class AuditSerializer(serializers.ModelSerializer):
+    images = serializers.ListField(
+        child=serializers.ImageField(required=False, allow_null=True),
+        required=False,
+        allow_empty=True,
+        allow_null=True,
+        default=list,
+    )
     class Meta:
         model = Audit
         fields = [
-            'audited_by', 'created_at', 'assigned_to', 'asset', 'organization', 'condition', 'notes'
+            'images','audited_by', 'created_at', 'assigned_to', 'asset', 'organization', 'condition', 'notes'
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
@@ -17,9 +24,7 @@ class AuditSerializer(serializers.ModelSerializer):
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
-        # custom_field_list = json.loads(f"[{data['custom_fields']}]")
-        # data["custom_fields"] = custom_field_list
-        
+
         return super().to_internal_value(data)
 
     def validate_tag(self, tag):

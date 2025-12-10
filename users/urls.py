@@ -17,6 +17,8 @@ urlpatterns = [
     path('pdf', export_users_pdf, name='export_users_pdf'),
     path('assigned-assets/<uuid:id>', user_assigned_assets, name='user_assigned_assets'),
     path('render-username/', render_format_based_username, name='render_format_based_username'),
+    path('create-user-notification-type',create_user_notification_type,name='create_user_notification_type'),
+
 ]
 
 user_api_url_patterns=[

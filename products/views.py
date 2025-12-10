@@ -57,7 +57,7 @@ def list(request):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     product_ids_in_page = [product.id for product in page_object]
-    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
+    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('-uploaded_at')
     # Map asset ID to its first image
     product_images = {}
     for img in images_qs:
@@ -86,12 +86,12 @@ def details_product(request, id):
 
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
-
+    # product=Product.undeleted_objects.filter(pk=id,organization=request.user.organization).order_by('-created_at').first()
     history_list = product.history.all()
     paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    get_product_img=ProductImage.objects.filter(product=product).values()
+    get_product_img=ProductImage.objects.filter(product=product).order_by('-uploaded_at').values()
     img_array=[]
     for it in get_product_img:
         img_array.append(it)
@@ -206,7 +206,7 @@ def update_product(request, id):
     form = AddProductsForm(
         instance=product, organization=request.user.organization)
     img_form= ProductImageForm(request.POST, request.FILES)
-    get_product_img=ProductImage.objects.filter(product=product).values()
+    get_product_img=ProductImage.objects.filter(product=product).order_by('-uploaded_at').values()
     custom_fields = CustomField.objects.filter(
         entity_type='product', object_id=product.id, organization=request.user.organization)
     img_array=[]
