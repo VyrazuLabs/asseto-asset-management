@@ -60,8 +60,9 @@ class AssetSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        images = validated_data.pop("images", [])
-        custom_fields = validated_data.pop("custom_fields",None)
+        images = validated_data.pop("images", []) or []
+        custom_fields = validated_data.pop("custom_fields",[]) or []
+        print("custom_fields",custom_fields)
         get_asset_status = AssetStatus.objects.get(name="Available")
         asset = Asset.objects.create(
             **validated_data,
@@ -76,6 +77,7 @@ class AssetSerializer(serializers.ModelSerializer):
             for custom_field in custom_fields:
                 field_name = list(custom_field.keys())[0]
                 field_value = custom_field[field_name]
+                print(field_name,field_value,"---------------------->")
                 CustomField.objects.create(
                     name=field_name,
                     object_id=asset.id,
