@@ -15,11 +15,13 @@ class UserForm(forms.ModelForm):
         attrs={'class':  'form-control',
                'placeholder':  'Email', 'autocomplete': 'off'}
     ))
-    phone = forms.IntegerField(required=True, widget=forms.NumberInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Phone', 'autocomplete': 'off'}
-    ))
-
+    phone = forms.CharField(required=True,widget=forms.TextInput(attrs=
+        {
+        'class': 'form-control',
+        'placeholder': 'Phone',
+        'autocomplete': 'off'
+        })
+    )
     access_level = forms.ChoiceField(
         required=False,
         choices=(
@@ -98,6 +100,12 @@ class UserForm(forms.ModelForm):
         full_name = self.cleaned_data.get('full_name')
         return full_name.title()
     
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        return phone
+    
     # def clean_password1(self):
     #     password1=self.data.get('password1')
     #     if password1 in ("", None):
@@ -127,10 +135,11 @@ class UserUpdateForm(UserChangeForm):
         attrs={'class':  'form-control',
                'placeholder':  'Email', 'autocomplete': 'off'}
     ))
-    phone = forms.IntegerField(required=True, widget=forms.NumberInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Phone', 'autocomplete': 'off'}
-    ))
+    phone = forms.CharField(required=True,widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Phone',
+        'autocomplete': 'off'
+    }))
 
     access_level = forms.ChoiceField(
         # required=True,
@@ -186,6 +195,12 @@ class UserUpdateForm(UserChangeForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         return email.lower()
+    
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        return phone
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')
