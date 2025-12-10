@@ -31,6 +31,26 @@ ORPHANS = 1
 def check_admin(user):
     return user.is_superuser
 
+def create_user_notification_type(request):
+    if request.method == "POST":
+        # Convert checkbox values to booleans
+        email = request.POST.get("email_notification") == "on"
+        in_app = request.POST.get("in_app_notification") == "on"
+        browser = request.POST.get("browser_notification") == "on"
+        slack=request.POST.get("slack_notification") == "on"
+        get_user=User.objects.filter(id=request.user.id).first()
+        if get_user is not None:
+            User.objects.filter(id=request.user.id).update(
+                email_notification=email,
+                slack_notification=slack,
+                browser_notification=browser,
+                inapp_notification=in_app
+            )
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
 
 def manage_access(user):
     permissions_list = [
