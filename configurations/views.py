@@ -107,6 +107,10 @@ def update_tag_configuration(request, id=None):
 
 def list_tag_configurations(request):
     configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
+    if configurations is None:
+        instance=None
+        form = TagConfigurationForm(instance=instance)
+        return render(request, 'configurations/add_tag.html',{'form': form,'is_update': bool(instance),'configurations': instance,'submenu':'tag-configuration','sidebar':'configurations'})
     return render(request, 'configurations/list_tag.html', {'configurations': configurations,'submenu':'tag-configuration','sidebar':'configurations'})
 
 def toggle_default_settings(request, id):

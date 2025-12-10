@@ -1,11 +1,31 @@
 from django.shortcuts import render, redirect
-from .models import UserNotification
+from .models import UserNotification,Notification
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 import json
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Notification
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import Notification
+
+
+def browser_notification( request):
+    notifications = Notification.objects.filter(entity_type=0,user=request.user)
+    data = [
+        {
+            "title": n.notification_title,
+            "text": n.notification_text,
+            "icon": n.icon,
+            "link": n.link
+        }
+        for n in notifications
+    ]
+    return JsonResponse(data)
 
 
 PAGE_SIZE = 10
