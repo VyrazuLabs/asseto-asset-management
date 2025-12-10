@@ -1,5 +1,6 @@
 from socket import create_connection
 from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from datetime import datetime, timedelta
@@ -132,38 +133,37 @@ def index(request):
     users_count = users_list.count()
     obj=get_currency_and_datetime_format(request.user.organization)
 
-    get_license=License.objects
+    get_license=License.undeleted_objects.all()
     get_license_count=get_license.count()
     for it in expiring_assets:
         if not obj['date_format']:
             it.warranty_expiry_date=it.warranty_expiry_date.date()
-        if obj['date_format']:
+        else:
             it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
         # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
     for it in latest_vendor_list:
         if not obj['date_format']:
             it.created_at=it.created_at.date
-        if obj['date_format']:
+        else:
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
     for it in latest_product_list:
         if not obj['date_format']:
             it.created_at=it.created_at.date
-        if obj['date_format']:
+        else:
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
 
     for it in all_location_list:
         if not obj['date_format']:
             it.created_at=it.created_at.date
-        if obj['date_format']:
+        else:
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
     
     for it in latest_users_list:
-
         if not obj['date_format']:
             it.created_at=it.created_at.date
-        if obj['date_format']:
+        else:
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
     context = {
@@ -287,8 +287,15 @@ def profile(request):
     #     if format_key and obj.name_display_format == id:
     #         format_key=id
     user = request.user
+    print(request.user)
+    assigned_assets = AssignAsset.objects.filter(user=request.user).first()
+    print("_____________",assigned_assets)
+    # asset_paginator=Paginator(assigned_assets,10,orphans=1)
+    # asset_page_number=request.GET.get('assets_page')
+    # asset_page_object=asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
-    context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name}
+    context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,
+               'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification}
     return render(request, 'auth/profile.html', context=context)
 
 

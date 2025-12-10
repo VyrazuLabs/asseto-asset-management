@@ -12,10 +12,12 @@ from audit.models import AuditImage
 from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
 
 PAGE_SIZE = 10
 ORPHANS = 1
 
+@login_required
 def add_audit(request):
     id = request.GET.get('id', None)
     get_audit = Audit.objects.filter(id=id).first() if id else None
@@ -69,7 +71,7 @@ def add_audit(request):
         context = {'get_audit': get_audit, 'assigned_users': user_list}
         return render(request, 'audit/add_audit.html', context)
 
-
+@login_required
 def get_audits_by_id(request, id):
     # Get the audit id
     get_asset = get_object_or_404(Asset, id=id)
@@ -119,13 +121,14 @@ def get_audits_by_id(request, id):
             context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name}
         return render(request, 'audit/add_audit.html', context)
 
+@login_required
 def audit_list(request):
     audits = Audit.objects.all()
     return render(request, 'audit/audit_list.html',context={
         'audits': audits
     })
 
-
+@login_required
 def asset_audit_history(request,id):
     audit_list = Audit.objects.filter(asset__id=id).order_by('-created_at')
     paginator = Paginator(audit_list, PAGE_SIZE, orphans=ORPHANS)
@@ -140,6 +143,7 @@ def asset_audit_history(request,id):
     }
     return render(request, 'audit/asset-audit-history.html', context=context)
 
+@login_required
 def completed_audits(request):
     thirty_days_ago = datetime.now() - timedelta(days=30)
 
@@ -155,6 +159,8 @@ def completed_audits(request):
         'audits': audits_page,
         'sidebar': 'audit'
     })
+
+@login_required
 def pending_audits(request):
     asset_list = Asset.undeleted_objects.all()
     data_set = []
@@ -174,6 +180,7 @@ def pending_audits(request):
         'data_set': data_set
     })
 
+@login_required
 def get_assigned_user(request, tag=None):
     if not tag:
         return JsonResponse({"error": "No tag provided"}, status=400)
@@ -191,6 +198,7 @@ def get_assigned_user(request, tag=None):
         "assigned_user_id": assign_record.user.id if assign_record else None
     })
 
+@login_required
 def audit_details(request, id=None):
     audit = Audit.objects.filter(id=id).first()
     data = {
