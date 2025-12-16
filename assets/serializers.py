@@ -35,6 +35,7 @@ class AssetSerializer(serializers.ModelSerializer):
         for field in ["purchase_date", "warranty_expiry_date"]:
             if data.get(field) == "":
                 data[field] = None
+        print("data is-->",data)
 
         return super().to_internal_value(data)
 
@@ -60,8 +61,8 @@ class AssetSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        images = validated_data.pop("images", []) or []
-        custom_fields = validated_data.pop("custom_fields",[]) or []
+        images = validated_data.pop("images") or []
+        custom_fields = validated_data.pop("custom_fields") or []
         print("custom_fields",custom_fields)
         get_asset_status = AssetStatus.objects.get(name="Available")
         asset = Asset.objects.create(
@@ -77,7 +78,6 @@ class AssetSerializer(serializers.ModelSerializer):
             for custom_field in custom_fields:
                 field_name = list(custom_field.keys())[0]
                 field_value = custom_field[field_name]
-                print(field_name,field_value,"---------------------->")
                 CustomField.objects.create(
                     name=field_name,
                     object_id=asset.id,
@@ -90,6 +90,7 @@ class AssetSerializer(serializers.ModelSerializer):
         return asset,asset_images
 
     def update(self, instance, validated_data):
+        print('validate_data is------->',validated_data)
         image_data = validated_data.pop('images', None)
         for attribute, value in validated_data.items():
             if value is None:
@@ -99,12 +100,13 @@ class AssetSerializer(serializers.ModelSerializer):
         if image_data is not None:
             for image in image_data:
                 AssetImage.objects.create(asset=instance, image=image)
-        
         custom_fields = validated_data.pop("custom_fields",None)
+        print(custom_fields)
         if custom_fields is not None:
             for custom_field in custom_fields:
                 field_name=list(custom_field.keys())[0]
                 field_value=custom_field[field_name]
+                print("field name is:",field_name,"\n","filed_value:",field_value)
                 CustomField.objects.update_or_create(object_id=instance.id,field_name=field_name,
                 defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name,"organization": self.context["request"].user.organization})
         return instance
