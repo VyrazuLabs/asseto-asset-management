@@ -5,16 +5,15 @@ from assets.barcode import generate_barcode_px
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, AssignAssetSerializer
 from authentication.models import User
-from common.API_custom_response import api_response
+from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
 from common.pagination import add_pagination
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser,FormParser
+from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
-from django.http import HttpResponse
-
 from dashboard.models import CustomField
+
 class AssetList(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[
@@ -33,20 +32,28 @@ class AssetList(APIView):
 
 class AddAsset(APIView):
     permission_classes=[IsAuthenticated]
-    parser_class=[MultiPartParser,FormParser]
+    parser_classes=[JSONParser,MultiPartParser,FormParser]
 
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def post(self,request):
+        print(request.data)
         try:
             add_asset=AssetSerializer(data=request.data,context={'request':request})
             if not add_asset.is_valid():
-                raise ValueError(add_asset.errors)
+                return api_response(
+                    status=400,error_type="Validation_error",
+                    error_location="Serializer",
+                    validation_errors=format_validation_errors(add_asset.errors,Asset)
+                )
             add_asset.save()
             return api_response(status=200,message='Asset data saved successfully')
-        except ValueError as e:
-            return api_response(status=400, error_message=str(e))
+        
         except Exception as e:
-            return api_response(status=500,system_message=str(e))
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal()
+
+            return api_response(status=500,error_type="server_error",error_location=error_info['location'],
+                system_message=error_info["message"], trace_back=error_info['traceback'])
 
 class AssetDetails(APIView):
     permission_classes=[IsAuthenticated]
@@ -69,11 +76,10 @@ class UpdateAsset(APIView):
 
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def patch(self,request,id):
-        print("--------------->",request.data)
+        print(request.data)
         deleted_image_ids=request.data.get('delete_image_ids',[])
         if deleted_image_ids:
             delete_images(deleted_image_ids)
-            print('deleted imagessssssssssssssssss')
         get_asset=get_object_or_404(Asset,pk=id)        
         try:
             asset_data=AssetSerializer(get_asset,data=request.data,context={'request':request},partial=True)
