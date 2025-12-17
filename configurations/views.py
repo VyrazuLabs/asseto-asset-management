@@ -85,6 +85,7 @@ def create_or_update_tag_configuration(request, id=None):
     }
     template_name = 'configurations/add_tag.html' if instance else 'configurations/add_tag.html'
     return render(request, template_name, context)
+
 @csrf_exempt
 def update_tag_configuration(request, id=None):
     config = get_object_or_404(TagConfiguration, pk=id)
@@ -160,7 +161,6 @@ def list_localizations(request):
 
 def create_localization_configuration(request):
     get_obj=LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    print("post------------------------,",request.POST)
     if request.method == 'POST':
         country_format = request.POST.get('country-format')
         currency_format = request.POST.get('currency-format')
@@ -214,13 +214,8 @@ def integration(request):
         slack_config=SlackConfiguration.objects.filter(user=request.user).first()
         client_id=base64.b64decode(slack_config.client_id).decode() if slack_config else None
         client_secret=base64.b64decode(slack_config.client_secret).decode() if slack_config else None
-        print(client_id,client_secret,"--------------------++++++++++++++++++++++++++++++")
         if client_id is not None:   
             client_id=hide_last_digits(client_id)
-        # if not client_id:
-        #     client_id=""
-        # if not client_secret:
-        #     client_secret=""
         context={
             'client_id':client_id,
             'client_secret':client_secret
@@ -286,6 +281,5 @@ def save_slack_configuration(request):
             'client_id':client_id,
             'client_secret':client_secret
         }
-        print(context)
         # On GET or other methods, you may render the form page or handle differently
         return redirect("configurations:integration")

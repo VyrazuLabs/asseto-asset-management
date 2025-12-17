@@ -454,54 +454,6 @@ def reassign_asset(request, id):
 
     return render(request, 'configurations/integrations.html', {'form': form})
 
-
-# @login_required 
-# def slack_oauth_callback(request):
-#     user_id=request.user
-#     request.session['user_id']=user_id
-#     code = request.GET.get("code")
-#     client_id = "9657988599239.9670790594597"
-#     client_secret = "1d21733a257df76a6f87592bad66798c"
-#     redirect_uri = "https://67247d344888.ngrok-free.app/assets/slack/oauth/callback/"
-#     request.session['client_id']=client_id
-#     response = requests.post(
-#         "https://slack.com/api/oauth.v2.access",
-#         data={
-#             "code": code,
-#             "client_id": client_id,
-#             "client_secret": client_secret,
-#             "redirect_uri": redirect_uri,
-#         }
-#     )
-
-#     data = response.json()
-#     webhook_info = data.get("incoming_webhook", {})
-#     channel_id_webhook = webhook_info.get("channel_id")
-
-#     access_token = data.get("access_token")
-#     team_id = data.get("team", {}).get("id")
-#     authed_user = data.get("authed_user", {}).get("id")
-
-#     user = request.user  # Now guaranteed to be a logged-in user
-#     webhook_data = {
-#         "user": user,
-#         "slack_user_id": authed_user,
-#         "access_token": access_token,
-#         "team_id": team_id,
-#         "channel_id": channel_id_webhook,
-#     }
-
-#     obj, created = SlackWebhook.objects.update_or_create(
-#         user=user,
-#         defaults=webhook_data,
-#     )
-#     if created:
-#         messages.success(request, "Slack integration successful!")
-#     else:
-#         messages.success(request, "Slack integration updated successfully!")
-
-#     return redirect('http://127.0.0.1:8001/assets/list')
-
 # SLACK IN TEGRATION OAUTH CALL
 @login_required
 def slack_oauth_callback(request):
@@ -565,23 +517,18 @@ def slack_oauth_callback(request):
     get_user=User.objects.filter(id=user_id).first()
     if not get_user:
         return HttpResponse("User not found", status=404)
-    # Save or update token (associate with logged-in user, or use state parameter)
     SlackConfiguration.objects.update_or_create(
         user=get_user,  # Or use session/state logic
         defaults={
             "access_token": bot_token,
             "team_id": team_id,
             "slack_user_id": slack_user_id,
-            # "channel_id": "C09KTE0DRMG",
             "channel_id": channel_id, 
             "client_id": get_connection_data.client_id,
             "client_secret": get_connection_data.client_secret
         }
     )
     host=get_host(request)
-    print(host,"--------------------------------------------------------------------")
-    # redirect_url="http://127.0.0.1:9000/"
-    # return redirect(f"{host}")
     if settings.DEBUG:
         redirect_url = "http://127.0.0.1:8000/"
     else:
@@ -599,119 +546,6 @@ def automated_tag(request):
     messages.success(request, "Automated tags assigned successfully.")
     return redirect(request.META.get('HTTP_REFERER'))
 
-# After the tag is created we will be having an option to use the generated tag or use custom tag(by the user/admin) while adding the asset.
-# So when a user will try to add an asset the tag which was created recently that type of tag will be prepopulated in the tag field of the add 
-# asset form or if we want out custom tag we can erase it and write one of our own.
-
-# def slack_oauth_callback(request):
-#     code = request.GET.get("code")
-#     if not code:
-#         return HttpResponse("Missing code parameter", status=400)
-
-#     client_id = "9701335130115.9711337126596"
-#     client_secret = "720a47b8dcf5e14df9f2284882e84d73"
-#     redirect_uri = "https://d9070ca62851.ngrok-free.app/assets/slack/oauth/callback/"
-
-#     # Step 1: Exchange code for OAuth token
-#     response = requests.post(
-#         "https://slack.com/api/oauth.v2.access",
-#         data={
-#             "client_id": client_id,
-#             "client_secret": client_secret,
-#             "code": code,
-#             "redirect_uri": redirect_uri,
-#         }
-#     )
-
-#     data = response.json()
-
-#     if not data.get("ok"):
-#         return HttpResponse(f"Slack OAuth failed: {data.get('error')}", status=400)
-
-#     # Step 2: Extract the correct bot token
-#     bot_token = (
-#         data.get("access_token")
-#         or data.get("bot", {}).get("bot_access_token")
-#     )
-#     if not bot_token:
-#         return HttpResponse("No bot access token found.", status=400)
-
-#     team_id = data.get("team", {}).get("id")
-#     slack_user_id = data.get("authed_user", {}).get("id")
-
-#     # Step 3: Ensure the channel exists or create it
-#     channel_name = "second-test-channel"
-#     channel_id = None
-
-#     channels_resp = requests.get(
-#         "https://slack.com/api/conversations.list",
-#         headers={"Authorization": f"Bearer {bot_token}"}
-#     ).json()
-
-#     for ch in channels_resp.get("channels", []):
-#         if ch["name"] == channel_name:
-#             channel_id = ch["id"]
-#             break
-
-#     # Step 4: Create the channel if not found
-#     if channel_id is None:
-#         create_resp = requests.post(
-#             "https://slack.com/api/conversations.create",
-#             headers={
-#                 "Authorization": f"Bearer {bot_token}",
-#                 "Content-Type": "application/json"
-#             },
-#             json={"name": channel_name}
-#         ).json()
-
-#         if create_resp.get("ok"):
-#             channel_id = create_resp["channel"]["id"]
-#         elif create_resp.get("error") == "name_taken":
-#             for ch in channels_resp.get("channels", []):
-#                 if ch["name"] == channel_name:
-#                     channel_id = ch["id"]
-#                     break
-#         else:
-#             return HttpResponse(f"Error creating channel: {create_resp.get('error')}", status=400)
-
-#     # Step 5: Invite bot to the channel
-    # auth_test = requests.get(
-    #     "https://slack.com/api/auth.test",
-    #     headers={"Authorization": f"Bearer {bot_token}"}
-    # ).json()
-
-    # bot_user_id = auth_test.get("user_id")
-    # if bot_user_id and channel_id:
-    #     invite_resp = requests.post(
-    #         "https://slack.com/api/conversations.invite",
-    #         headers={
-    #             "Authorization": f"Bearer {bot_token}",
-    #             "Content-Type": "application/json"
-    #         },
-    #         json={"channel": channel_id, "users": bot_user_id}
-    #     ).json()
-
-    #     # Ignore if already in channel
-    #     if not invite_resp.get("ok") and invite_resp.get("error") != "already_in_channel":
-
-#     # Step 6: Store the Slack credentials for your user
-#     user_id = cache.get('user_id')
-#     get_user = User.objects.filter(id=user_id).first()
-#     if not get_user:
-#         return HttpResponse("User not found", status=404)
-
-#     SlackWebhook.objects.update_or_create(
-#         user=get_user,
-#         defaults={
-#             "access_token": bot_token,
-#             "team_id": team_id,
-#             "slack_user_id": slack_user_id,
-#             "channel_id": channel_id,
-#         }
-#     )
-
-
-#     return redirect("http://127.0.0.1:8001/assets/list")
 def slack_authorize(request):
     print("inside slack authorize")
     user_id=request.user.id

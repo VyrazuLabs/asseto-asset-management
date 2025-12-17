@@ -111,6 +111,16 @@ class AssetSerializer(serializers.ModelSerializer):
                 defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name,"organization": self.context["request"].user.organization})
         return instance
 
+
+class SearchAssetSerializer(serializers.Serializer):
+    search_text=serializers.CharField(required=True)
+    class Meta:
+        fields=['search_tesxt']
+    
+    def validate(self, search_text):
+        if not search_text:
+            return None
+        return search_text
 class AssignAssetSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(required=False, allow_null=True),
