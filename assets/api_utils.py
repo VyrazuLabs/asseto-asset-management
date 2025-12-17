@@ -46,7 +46,7 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "product_category":asset.product.product_sub_category.name if asset.product.product_sub_category else None,
         "serial no.":asset.serial_no if asset.serial_no else None,
         "price":asset.price if asset.price else None,
-        "office_location_id":asset.location.id,
+        "office_location_id":asset.location.id if asset.location else None,
         "office_location":asset.location.office_name if asset.location else None,
         "purchase type":asset.purchase_type if asset.purchase_type else None,
         "purchase_date":asset.purchase_date if asset.purchase_date else None,
