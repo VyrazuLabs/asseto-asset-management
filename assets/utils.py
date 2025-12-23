@@ -149,7 +149,7 @@ def filtered_asset(request):
     if status_id:
         filters &= Q(asset_status_id=status_id)
     if category_id:
-        filters &= Q(product__product_category_id=category_id)
+        filters &= Q(product__product_sub_category_id=category_id)
     if type_id:
         filters &= Q(product__product_type_id=type_id)
     if location_id:

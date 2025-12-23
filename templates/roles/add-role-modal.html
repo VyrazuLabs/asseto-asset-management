@@ -19,6 +19,7 @@
             <div class="row">
                 <div class="form-group">
                     <label for="name" class="form-label">Role</label>
+                    <span class="text-danger">*</span>
                     {{form.related_name}}
                     {% for error in form.related_name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>
@@ -769,6 +770,67 @@
         </div>
     </form>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.ischeck').forEach(parentCheckbox => {
+
+                parentCheckbox.addEventListener('change', function () {
+                    const module = this.dataset.id; // Vendors
+                    const isChecked = this.checked;
+
+                    document
+                        .querySelectorAll('.isscheck_' + module)
+                        .forEach(childCheckbox => {
+                            childCheckbox.checked = isChecked;
+                        });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.ischeck').forEach(parentCheckbox => {
+
+                parentCheckbox.addEventListener('change', function () {
+                    const module = this.dataset.id; // Vendors
+                    const isChecked = this.checked;
+
+                    document
+                        .querySelectorAll('.isscheck_' + module)
+                        .forEach(childCheckbox => {
+                            childCheckbox.checked = isChecked;
+                        });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+            document.querySelectorAll('.ischeck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck_Vendors').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+            document.querySelectorAll('.ischeck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
         $(document).ready(function () {
             $("#checkall").click(function () {
                 $("input:checkbox")

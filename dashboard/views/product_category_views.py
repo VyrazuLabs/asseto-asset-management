@@ -64,15 +64,15 @@ def product_category_list(request):
         Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
-            product__product_category__in=all_product_category_list
+            product__product_sub_category__in=all_product_category_list
         )
-        .values("product__product_category")
+        .values("product__product_sub_category")
         .annotate(asset_count=Count("id", distinct=True))   # ✅ distinct asset count
     )
 
     # Map: {product_category_id: asset_count}
     product_category_asset_count = {
-        item["product__product_category"]: item["asset_count"]
+        item["product__product_sub_category"]: item["asset_count"]
         for item in asset_counts
     }
     # is_demo=IS_DEMO
