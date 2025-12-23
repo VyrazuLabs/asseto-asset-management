@@ -121,7 +121,7 @@ def index(request):
     location_count = location_list.count()
  
     assign_assets = AssignAsset.objects.filter(Q(asset__organization=None) | Q(
-        asset__organization=request.user.organization))
+        asset__organization=request.user.organization,asset__is_assigned=True))
     assign_assets_counts = assign_assets.count()
  
     unassign_assets_count = asset_count - assign_assets_counts

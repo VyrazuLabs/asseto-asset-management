@@ -16,7 +16,7 @@ def license_list(request):
     page_oject=paginator.get_page(page_number)
     context={
         'page_object':page_oject,
-        'sidebar':'License',
+        'sidebar':'license',
         'title':'License'
     }
     return render(request,'license/license_list.html',context=context)
@@ -33,7 +33,7 @@ def add_license(request):
     else:
         license_form=LicenseForm()
     
-    return render(request,'license/add_license.html',context={'form':license_form,'title':'Add License'})
+    return render(request,'license/add_license.html',context={'form':license_form,'title':'Add License','sidebar':'license'})
 
 
 
@@ -41,15 +41,13 @@ def add_license(request):
 @permission_required('authentication.view_license')
 def license_details(request,id):
     license=get_object_or_404(License,pk=id)
-
     history_list = License.history.filter(id=license.id)
     paginator = Paginator(history_list, 5, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    context={'license':license,'pag_object':page_object,'title':f'Detail-{license.name}'}
+    context={'license':license,'pag_object':page_object,'title':f'Detail-{license.name}','sidebar':'license'}
     return render(request,'license/license-details.html',context=context)
-
 
 @login_required
 @permission_required('authentication.edit_license')
@@ -64,7 +62,7 @@ def update_license(request,id):
     else:
         license_form=LicenseForm(instance=get_license)
     
-    return render(request,'license/update-license.html',context={'form':license_form,'title':f'Update-{get_license.name}'})
+    return render(request,'license/update-license.html',context={'form':license_form,'title':f'Update-{get_license.name}','sidebar':'license'})
 
 
 @login_required

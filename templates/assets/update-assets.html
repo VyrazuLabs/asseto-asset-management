@@ -391,4 +391,30 @@ function removeCustomField(el) {
     el.closest(".rm-custom-field").remove();
 }
 </script>
+<script>
+requestAndSendNotification()
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  } else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+function sendNotification() {
+  const title = "Asset Updated Post";
+  const options = {
+    body: "Asset has been updated.", // Main text
+    icon: "path/to/your/icon.png", // URL of an icon to display
+    // Other optional properties 
+  };
+
+  new Notification(title, options);
+}
+</script>
 {% endblock content%}

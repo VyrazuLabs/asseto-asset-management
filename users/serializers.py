@@ -11,11 +11,11 @@ class UserListSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     address_line_one = serializers.CharField(required=False)
     address_line_two = serializers.CharField(required=False)
+    email=serializers.EmailField(required=False)
     country = serializers.CharField(required=False)
     state = serializers.CharField(required=False)
     city = serializers.CharField(required=False)
     pin_code = serializers.CharField(required=False)
-    
     password = serializers.CharField(required=False)
     access_level = serializers.BooleanField(required=False)
     profile_pic=serializers.ImageField(required=False)
@@ -74,4 +74,22 @@ class UserSerializer(serializers.ModelSerializer):
             raise ValueError("User data didnt update")
         
         return instance
+    # Search based on user name ,email,role,department,status
+    # def search(self,search_text):
+    #     full_name=
+    #     if search_text:
+    #     else:
+    #         return None
+    #     return search_text
 
+
+class SearchUserSerializer(serializers.ModelSerializer):
+    search_text=serializers.CharField(required=True)
+    class Meta:
+        model=User
+        fields=['search_text']
+    
+    def validate(self, search_text):
+        if not search_text:
+            return None
+        return search_text

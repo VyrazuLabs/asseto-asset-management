@@ -100,8 +100,8 @@ def asset_status_details(request,id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'asset_status', 'asset_status': asset_status, 'title': f'Details-{asset_status.name}'}
+    context = {'page_object': page_object,
+               'sidebar': 'admin','submenu': 'Asset_Status', 'asset_status': asset_status, 'title': f'Details-{asset_status.name}'}
     return render(request, 'assets/asset_status_details.html', context=context)
 
 @login_required

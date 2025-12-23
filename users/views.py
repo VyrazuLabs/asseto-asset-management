@@ -77,10 +77,11 @@ def list(request):
     page_object = paginator.get_page(page_number)
 
     # method to maop the assets with each users
+    # print()
     user_asset_map=assigned_asset_to_user(page_object)
+    print(user_asset_map,"MAPPED")
     assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
-
-
+    print(assigned_assets_count,"COUNT")
     # is_demo=IS_DEMO
     # if is_demo:
     #     is_demo=True

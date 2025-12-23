@@ -101,7 +101,7 @@ def add(request):
                 
             create_custom_fileds(request,asset)
             slack_notification(request,f"{asset.name}  added successfully",asset.id,asset.tag)
-            notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  added successfully",notification_title="Asset Added")
+            # notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  added successfully",notification_title="Asset Added")
             messages.success(request, "Asset added successfully.")
             return redirect('assets:list')
     else:
@@ -129,7 +129,7 @@ def delete(request, id):
             history_id = asset.history.first().history_id
             asset.history.filter(pk=history_id).update(history_type='-')
             slack_notification(request,f"{asset.name}  deleted successfully",asset.id,asset.tag)
-            notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  deleted successfully",notification_title="Asset Deleted")
+            # notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  deleted successfully",notification_title="Asset Deleted")
             messages.success(request, 'Asset deleted successfully.')
 
     return redirect('assets:list')
@@ -147,9 +147,8 @@ def search(request,page):
 @login_required
 @user_passes_test(manage_access_for_assign_assets)
 def assigned_list(request):
-
     assign_asset_list = AssignAsset.objects.filter(
-        asset__organization=request.user.organization or None).order_by('-asset__created_at')
+        asset__is_assigned=True,asset__organization=request.user.organization or None).order_by('-asset__created_at')
     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -313,17 +312,17 @@ def update_in_detail(request, id):
 
         if form.is_valid() and image_form.is_valid():
             form.save()
-
             save_new_images(request, asset)
             update_existing_custom_fields(request, custom_fields)
 
             messages.success(request, "Asset updated successfully.")
-            send_email(request.user.email,notifications_title='Updated asset',notification_text=f'{asset.name} is Updated.')
-            slack_notification(request,f"{asset.name}  updated successfully",asset.id,asset.tag)
-            notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  updated successfully",notification_title="Asset Updated")
+            if request.user.email_notification==True:
+                send_email(request.user.email,notifications_title='Updated asset',notification_text=f'{asset.name} is Updated.')
+            if request.user.slack_notification==True:
+                slack_notification(request,f"{asset.name}  updated successfully",asset.id,asset.tag)
+            # notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  updated successfully",notification_title="Asset Updated")
             # return redirect('assets:update_in_detail', id=asset.id)
             return redirect(f'/assets/details/{asset.id}')
-
     else:
         form = AssetForm(instance=asset, organization=org)
         image_form = AssetImageForm()

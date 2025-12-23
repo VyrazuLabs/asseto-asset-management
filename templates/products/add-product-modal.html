@@ -32,6 +32,7 @@
                         <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label>Product Name</label>
+                                <span class="text-danger">*</span>
                                 {{form.name}}
                                 {% for error in form.name.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -41,6 +42,7 @@
                         <div class="col-md-6 col-12">
                             <div class="form-group">
                                 <label>Product Type</label>
+                                <span class="text-danger">*</span>
                                 {{form.product_type}}
                                 {% for error in form.product_type.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -50,6 +52,7 @@
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
                                 <label>Product Category</label>
+                                <span class="text-danger">*</span>
                                 {{form.product_category}}
                                 {% for error in form.product_category.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>

@@ -10,6 +10,7 @@ from assets.models import AssignAsset
 from django.db import connection
 from assets.models import Asset
 from notifications.utils import notifications_call,send_email
+from assets.utils import slack_notification
 # User Notification
 
 
@@ -92,11 +93,26 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             admins = User.objects.filter(is_superuser=True)
             for admin in admins:
                 UserNotification.objects.create(user=admin, notification=notification)
+            user = instance.updated_by
+            print("USER --------->",instance)
+            if user:
+                if user.email_notification:
+                    send_email(
+                        user.email,
+                        notification_title="Updated asset",
+                        notification_text=f"{instance.name} status changed to {new_status}."
+                    )
 
+                if user.slack_notification:
+                    slack_notification(
+                        user,
+                        f"{instance.name} status updated to {new_status}.",
+                        instance.id,
+                        instance.tag
+                    )
 
 @receiver(post_save, sender=AssignAsset)
 def asset_notification(sender, instance, created,  **kwargs):
-
     if instance.previous_user != instance.user:
         send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
         notifications_call(user=instance.user,
@@ -155,9 +171,6 @@ def expiring_asset(days):
         time_threshold = datetime.now() + timedelta(days=days)
         expiring_assets = AssignAsset.objects.filter(
             asset__warranty_expiry_date=time_threshold)
-
-
-
 
         for expiring_asset in expiring_assets:
 

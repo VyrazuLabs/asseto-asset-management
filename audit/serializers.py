@@ -1,6 +1,8 @@
 import json
 from rest_framework import serializers
 from audit.models import Audit, AuditImage
+from common.convert_base64_image import convert_image
+from assets.models import Asset
 # from dashboard.models import CustomField
 # class CustomFieldSerializer(serializers.Serializer):
 #     field_name = serializers.CharField()
@@ -21,6 +23,7 @@ class AuditSerializer(serializers.ModelSerializer):
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
     def to_internal_value(self, data):
+        print(type(data), "/////data in to_internal_value", data)
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
@@ -28,6 +31,7 @@ class AuditSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def validate_tag(self, tag):
+        get_tag=Asset.objects.filter(tag=tag).exists()
         if not tag:
             raise serializers.ValidationError("Tag can not be empty")
         return tag
@@ -44,13 +48,16 @@ class AuditSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
+        print("images",images)
         # custom_fields = self.initial_data.get("custom_fields",[])
         audit = Audit.objects.create(
             **validated_data,
             # organization=self.context["request"].user.organization,
         )
+        print("audit",validated_data,audit)
         asset_images = None
         for image in images:
+            # image=convert_image(image)
             AuditImage.objects.create(image=image, audit=audit)
         return audit
 

@@ -11,8 +11,13 @@ def send_email(user_email,notifications_title,notification_text):
     message = notification_text
     from_email = "sghosh@gmail.com"
     recipient_list = [user_email]
-    print("MAIL            SEND --------->")
-    return send_mail(subject=subject, message=message, recipient_list=recipient_list,from_email=from_email)
+    html_message= f"""
+        <h3>Hello User!</h3>
+        <p>{notifications_title}</p>
+        <p><strong>{notification_text}</strong></p>
+    """
+    print("MAIL SEND --------->")
+    return send_mail(subject=subject, message=message, recipient_list=recipient_list,from_email=from_email,html_message = html_message)
 
 def notifications_call(user,entity_type,notification_title,notification_text):
     # We receive the entity_type that is stored in the django sessions.

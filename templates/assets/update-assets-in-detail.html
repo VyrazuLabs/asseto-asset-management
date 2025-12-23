@@ -15,9 +15,7 @@
                     <li class="breadcrumb-item active" aria-current="page">Update Asset</li>
                 </ol>
             </nav>
-
         </div>
-
         <div class="d-flex justify-content-end align-items-center">
             <div class="me-2">
                 <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
@@ -36,7 +34,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4 col-12">
+                        <div class="col-md-4 col-12"> 
                             <div class="form-group">
                                 <label for="city-column">Tag</label>
                                 {{form.tag}}
@@ -138,31 +136,33 @@
                     </div>
                 </div>
                 <div class="row">
-                            <div class="col-md-12">
-                            <label>Update/Add Images</label>
-                            {{ image_form.image }}
-                            {% for error in image_form.image.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                            {% endfor %}
-                        </div>
+                    <div class="col-md-12 w-100" >
+                        <label>Update/Add Images</label>
+                        {{ image_form.image }}
+                        {% for error in image_form.image.errors %}
+                            <small class="text-danger mb-3">{{ error }}</small>
+                        {% endfor %}
                     </div>
-                <div class="row my-3">
+                </div>
+                <div class="row my-3 mx-0">
                     {% for img in asset_images %}
-                        <div class="col-auto text-center asst-prd-img-div">
-                            <img 
-                                src="{{ img.image.url }}" 
-                                alt="Asset Image" 
-                                class="asst-prd-img"
-                                onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
-                            >
-                            <br>
-                            <button name="delete_image_ids" value="{{ img.id }}" class="btn delete-img-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-trash">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                    <path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" />
-                                    <path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" />
-                                </svg>
-                            </button>
+                        <div class="col-auto asst-prd-img-div" style="width: 150px; height: 150px;padding-bottom: 30px;" >
+                            <div class="col-auto">
+                                <img 
+                                    src="{{ img.image.url }}" 
+                                    alt="Asset Image" 
+                                    class="asst-prd-img"
+                                    onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                >
+                                <br>
+                                <button name="delete_image_ids" value="{{ img.id }}" class="btn delete-img-btn mb-5 mx-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-trash">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" />
+                                        <path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     {% endfor %}
 
@@ -404,6 +404,33 @@ document.getElementById("addCustomFieldBtn").onclick = function() {
 // Remove a custom field row
 function removeCustomField(el) {
     el.closest(".rm-custom-field").remove();
+}
+</script>
+
+<script>
+requestAndSendNotification()
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  } else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+function sendNotification() {
+  const title = "Asset Updated";
+  const options = {
+    body: "Asset has been updated.", // Main text
+    icon: "path/to/your/icon.png", // URL of an icon to display
+    // Other optional properties 
+  };
+
+  new Notification(title, options);
 }
 </script>
 {% endblock content%}
