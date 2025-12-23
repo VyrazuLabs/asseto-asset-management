@@ -105,20 +105,6 @@ class UserForm(forms.ModelForm):
         if not phone.isdigit():
             raise forms.ValidationError("Phone number must contain only digits")
         return phone
-    
-    # def clean_password1(self):
-    #     password1=self.data.get('password1')
-    #     if password1 in ("", None):
-    #         return password1
-    #     else:
-    #         return password1
-
-    # def clean_password2(self):
-    #     password2=self.data.get('password2')
-    #     if password2 in ("", None):
-    #         return password2
-    #     else:
-    #         return password2
     class Meta:
         model = User
         fields = ['full_name', 'email', 'phone', 'access_level',
