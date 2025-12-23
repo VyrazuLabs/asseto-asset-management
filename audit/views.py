@@ -5,7 +5,7 @@ from .forms import AuditForm
 from django.core.paginator import Paginator
 from assets.models import AssignAsset,Asset
 from authentication.models import User
-from audit.utils import next_audit_due, next_audit_due_for_asset
+from audit.utils import next_audit_due, next_audit_due_for_asset,get_tag_list
 from datetime import datetime,timedelta,timezone 
 from django.http import JsonResponse
 from audit.models import AuditImage
@@ -54,7 +54,7 @@ def add_audit(request):
             if file:
                 files = [file]
         for f in files:
-            AuditImage.objects.create(asset=get_audit, image=f)
+            AuditImage.objects.create(audit=get_audit, image=f)
         Audit.objects.create(
             asset=get_asset,
             assigned_to=assigned_to,
@@ -68,7 +68,7 @@ def add_audit(request):
 
     elif request.method == 'GET':
         user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
-        context = {'get_audit': get_audit, 'assigned_users': user_list}
+        context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
         return render(request, 'audit/add_audit.html', context)
 
 @login_required
@@ -116,9 +116,9 @@ def get_audits_by_id(request, id):
     elif request.method == 'GET':
         if get_assigned_user is None:
             user_list = list(User.undeleted_objects.all())
-            context = {'get_asset': get_asset, 'assigned_users': user_list}
+            context = {'get_asset': get_asset, 'assigned_users': user_list,'sidebar': 'audit'}
         else:
-            context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name}
+            context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name,'sidebar': 'audit'}
         return render(request, 'audit/add_audit.html', context)
 
 @login_required
@@ -167,7 +167,7 @@ def pending_audits(request):
     for asset in asset_list:
         has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
         next_due_date = next_audit_due_for_asset(asset)
-        if has_audit:
+        if has_audit and next_due_date:
             if (next_due_date > datetime.now().date()):
                 continue
         data = {}
@@ -177,7 +177,8 @@ def pending_audits(request):
         data_set.append(data)
 
     return render(request, 'audit/pending_audits.html', {
-        'data_set': data_set
+        'data_set': data_set,
+        'sidebar': 'audit'
     })
 
 @login_required
@@ -210,4 +211,10 @@ def audit_details(request, id=None):
         "created_at": audit.created_at.strftime("%Y-%m-%d %H:%M:%S"),
     }
     images=AuditImage.objects.filter(audit=audit)
-    return render(request, 'audit/details.html', context={'audit': audit, 'data': data,'images':images})
+    return render(request, 'audit/details.html', context={'audit': audit, 'data': data,'images':images,'sidebar': 'audit'})
+
+def get_asset_tag_list(request):
+    tag = request.GET.get('tag')
+    tags = get_tag_list(tag)
+    print(tags,"/ntagsview")
+    return JsonResponse({"tags": tags})

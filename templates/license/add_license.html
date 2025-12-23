@@ -29,6 +29,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="company-column">License Name</label>
+                                <span class="text-danger">*</span>
                                 {{form.name}}
                                 {% for error in form.name.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -38,6 +39,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="city-column">Seats</label>
+                                <span class="text-danger">*</span>
                                 {{form.seats}}
                                 {% for error in form.seats.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -47,6 +49,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="city-column">Key</label>
+                                <span class="text-danger">*</span>
                                 {{form.key}}
                                 {% for error in form.seats.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -56,6 +59,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="country-floating">License Type</label>
+                                <span class="text-danger">*</span>
                                 {{form.license_type}}
                                 {% for error in form.license_type.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
