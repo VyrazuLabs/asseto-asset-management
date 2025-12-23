@@ -62,7 +62,12 @@ def import_departments_csv(request):
         return render(request, "upload/map-department-modal.html", {
             "headers": headers,
             'fields' : ['Department Name', 'Contact Person Name',
-            'Contact Person Email', 'Contact Person Phone']})
+            'Contact Person Email', 'Contact Person Phone'],
+            'required_fields':['Department Name', 'Contact Person Name',
+            'Contact Person Email', 'Contact Person Phone'],
+
+            }
+        )
 
     else:
         return render(request, "upload/upload-csv-modal.html", {"page": "Department","hx_target": "#upload-departments-modal-content"})
