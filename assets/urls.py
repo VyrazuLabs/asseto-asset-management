@@ -3,6 +3,7 @@ from .barcode import Scan_barcode
 from . import views
 from . import asset_status_views
 from . import api_views
+from .api_views import GetNotifications
 app_name = 'assets'
 
 urlpatterns = [
@@ -14,7 +15,6 @@ urlpatterns = [
     path('update-assets-details/<str:id>/',views.update_in_detail,name='update_in_detail'),
     path('add', views.add, name='add'),
     path('search/<str:page>', views.search, name='search'),
-
     #assigned assets
     path('assigned-list', views.assigned_list, name='assigned_list'),
     path('assign-asset', views.assign_assets, name='assign_asset'),
@@ -40,7 +40,6 @@ urlpatterns = [
     path('scan-barcode/<str:tag_id>',Scan_barcode.as_view(), name='barcode'),
     path('slack-authorize/', views.slack_authorize, name='slack_authorize'),
     path('slack/oauth/callback/', views.slack_oauth_callback, name='slack_oauth_callback'),
-
 ]
 
 api_url_patterns = [
@@ -55,6 +54,6 @@ api_url_patterns = [
     path('api/asset/details/update-asset-status/<uuid:id>',api_views.UpdateAssetStatus.as_view(),name="update_asset_status"),
     path('api/asset/details/assign-asset/<uuid:id>',api_views.AssignAsset.as_view(),name="assign_asset"),
     path('api/asset/details/unassign-asset/<uuid:id>',api_views.UnAssignAsset.as_view(),name="unassign_asset"),
-    path('api/asset/details/user-list-for-assign-asset',api_views.UserListForAssignAsset.as_view(),name="user_list_for_assign_asset")
-
+    path('api/asset/details/user-list-for-assign-asset',api_views.UserListForAssignAsset.as_view(),name="user_list_for_assign_asset"),
+    path('api/asset/get-notifications',GetNotifications,name="get_notifications")
 ]

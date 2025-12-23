@@ -11,6 +11,7 @@
         <div class="modal-body">
             <div class="form-group">
                 <label for="first-name-column">Department Name</label>
+                <span class="text-danger">*</span>
                 {{form.name}}
                 {% for error in form.name.errors %}
                 <small class="text-danger mb-3">{{ error }}</small>
@@ -18,6 +19,7 @@
             </div>
             <div class="form-group">
                 <label for="email-id-column">Contact Person Name</label>
+                <span class="text-danger">*</span>
                 {{form.contact_person_name}}
                 {% for error in form.contact_person_name.errors %}
                 <small class="text-danger mb-3">{{ error }}</small>
@@ -25,6 +27,7 @@
             </div>
             <div class="form-group">
                 <label for="email-id-column">Contact Person Email</label>
+                <span class="text-danger">*</span>
                 {{form.contact_person_email}}
                 {% for error in form.contact_person_email.errors %}
                 <small class="text-danger mb-3">{{ error }}</small>
@@ -32,6 +35,7 @@
             </div>
             <div class="form-group">
                 <label for="email-id-column">Contact Person Number</label>
+                <span class="text-danger">*</span>
                 {{form.contact_person_phone}}
                 {% for error in form.contact_person_phone.errors %}
                 <small class="text-danger mb-3">{{ error }}</small>

@@ -22,6 +22,7 @@ urlpatterns=[
     path('list_extensions/', views.list_extensions, name='list_extensions'),
     path('extension-status/<str:id>/', views.extension_status, name='extension_status'),
     path('add-configurations/',views.save_slack_configuration,name='save_slack_configuration'),
+    path('add-organization/',views.add_organization,name='add_organization'),
     # path('create-extension/', views.create_extension, name='create_extension'),
 ]
 

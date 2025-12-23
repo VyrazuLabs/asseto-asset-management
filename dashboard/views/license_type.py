@@ -20,7 +20,8 @@ def license_type_list(request):
     page_object=paginator.get_page(page_number)
     context={
         'page_object':page_object,
-        'sidebar':'License_type',
+        'sidebar': 'admin',
+        'submenu': 'license_type',
         'title':'License Type'
     }
     return render(request,'dashboard/license_type/list.html',context=context)
@@ -37,7 +38,7 @@ def license_type_add(request):
             return HttpResponse(status=204)
     else:
         license_type_form=LicenseTypeForm()
-    return render(request,'dashboard/license_type/license-type-modal.html',context={'form':license_type_form})
+    return render(request,'dashboard/license_type/license-type-modal.html',context={'form':license_type_form,'sidebar': 'admin','submenu': 'license_type',})
 
 
 @login_required
@@ -50,7 +51,7 @@ def license_type_details(request,id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    context={'page_object':page_object,'license_type':get_license_type,'title':f'Details-{get_license_type.name}'}
+    context={'page_object':page_object,'license_type':get_license_type,'title':f'Details-{get_license_type.name}','sidebar': 'admin','submenu': 'license_type',}
     return render(request,'dashboard/license_type/details.html',context=context)
 
 
@@ -69,7 +70,9 @@ def update_license_type(request,id):
         
     context={
         'form':license_type_form,
-        'modal_title':'Update License Type'
+        'modal_title':'Update License Type',
+        'sidebar': 'admin',
+        'submenu': 'license_type',
     }
     return render(request,'dashboard/license_type/license-type-modal.html',context=context)
 
@@ -97,4 +100,4 @@ def delete_license_type(request,id):
 def search_license_type(request):
     search_text=request.GET.get('search_text')
     get_license_types=LicenseType.undeleted_objects.filter(name__icontains=search_text).order_by('-created_at')[:10]
-    return render(request, 'dashboard/license_type/license-types-data.html', {'get_license_types': get_license_types})
+    return render(request, 'dashboard/license_type/license-types-data.html', {'get_license_types': get_license_types,'sidebar': 'admin','submenu': 'license_type',})

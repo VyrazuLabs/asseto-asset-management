@@ -83,7 +83,6 @@ class Location(TimeStampModel, SoftDeleteModel):
     def __str__(self):
         return f'{self.office_name} - {self.address.address_line_one}'
     
-
 class Organization(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
