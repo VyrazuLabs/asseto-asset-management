@@ -56,7 +56,8 @@ def import_user_csv(request):
             headers=next(reader)
         context={
         'headers':headers,
-        'fields':['Employee ID','User Name','Name','Email','Phone','Department','Office Location','Address','City','State','Country','Zip Code']
+        'fields':['Employee ID','User Name','Name','Email','Phone','Department','Office Location','Address','City','State','Country','Zip Code'],
+        'required_fields':['Employee ID','User Name','Name','Email','Phone']
         }
         return render(request,'upload/map-user-modal.html',context)
     else:

@@ -62,22 +62,24 @@ def import_vendors_csv(request):
             reader = csv.reader(f)
             headers = next(reader)
 
-        return render(request, "upload/map-vendor-modal.html", {
+        return render(request, "upload/map-vendor-modal.html", context={
             "headers": headers,
             "fields": [
                 "name", "email", "phone", "contact_person",
                 "designation", "gstin_number", "address_line_one",
                 "address_line_two", "city", "pin_code", "state",
                 "country", "description",
-            ]
+            ],
+            'required_fields':['name']            
         })
     else:
-        return render(request, "upload/upload-csv-modal.html", {"page": "Vendors","hx_target": "#mapping-vendors-modal-content"})
+        return render(request, "upload/upload-csv-modal.html",{"page": "Vendors","hx_target": "#mapping-vendors-modal-content"})
 
 
 @login_required
 @permission_required('authentication.add_vendor')
 def vendor_render_to_mapper_modal(request):
+    required_fields = ["Name", "Email", "Phone"]
     if request.method == "POST":
         file_path = request.session.get("uploaded_csv")
         if not file_path:
