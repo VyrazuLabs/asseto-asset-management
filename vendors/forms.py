@@ -8,7 +8,7 @@ class VendorForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'placeholder': 'Vendor Name', 'class': 'form-control'}))
     email = forms.EmailField(required=False, widget=forms.EmailInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Email', 'class': 'form-control'}))
-    phone = forms.IntegerField(required=False, widget=forms.NumberInput(
+    phone = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Phone number', 'class': 'form-control'}))
     contact_person = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Contact Person', 'class': 'form-control'}))
@@ -18,7 +18,7 @@ class VendorForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'placeholder': 'GSTIN Number', 'class': 'form-control'}))
     description = forms.CharField(required=False, widget=forms.Textarea(
         attrs={'autocomplete': 'off', 'rows': '2', 'placeholder': 'Description', 'class': 'form-control'}))
-
+    
     def clean_name(self):
         name = self.cleaned_data.get('name')
         return name.title()
@@ -30,6 +30,13 @@ class VendorForm(forms.ModelForm):
     def clean_contact_person(self):
         contact_person = self.cleaned_data.get('contact_person')
         return contact_person.title()
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        return phone
+            
 
     class Meta:
         model = Vendor
