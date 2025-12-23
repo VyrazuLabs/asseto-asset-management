@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
@@ -8,10 +9,36 @@ from common.API_custom_response import api_response, format_validation_errors, g
 from common.pagination import add_pagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
+from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
+from django.http import HttpResponse
+
 from dashboard.models import CustomField
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from notifications.models import UserNotification
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def GetNotifications(request):
+    notifications = UserNotification.objects.filter(
+        user=request.user,
+        is_sent=False,
+        notification__entity_type=0
+    )
+    data = [
+        {"id": n.id, "title": n.notification.notification_title, "body": n.notification.notification_text}
+        for n in notifications
+    ]
+
+    # Mark as sent
+    # notifications.update(is_sent=True)
+
+    return Response({"notifications": data})
+
 
 class AssetList(APIView):
     permission_classes=[IsAuthenticated]
@@ -38,9 +65,10 @@ class AddAsset(APIView):
 
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def post(self,request):
-        print(request.data)
+        add_asset=None
         try:
             add_asset=AssetSerializer(data=request.data,context={'request':request})
+            # print(add_asset)
             if not add_asset.is_valid():
                 return api_response(
                     status=400,error_type="Validation_error",
@@ -49,7 +77,8 @@ class AddAsset(APIView):
                 )
             add_asset.save()
             return api_response(status=200,message='Asset data saved successfully')
-        
+        except ValueError as e:
+            return api_response(status=400, error_message=str(e))
         except Exception as e:
             error_info=get_detailed_errors_info(e)
             log_error_to_terminal(error_info)
@@ -76,14 +105,16 @@ class AssetDetails(APIView):
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
 class UpdateAsset(APIView):
-    parser_class=[MultiPartParser,FormParser]
+    parser_class=[JSONParser,MultiPartParser,FormParser]
     permission_classes=[IsAuthenticated]
 
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def patch(self,request,id):
         deleted_image_ids=request.data.get('delete_image_ids',[])
         if deleted_image_ids:
+            print('deleted imagessssssssssssssssss',deleted_image_ids)
             delete_images(deleted_image_ids)
+            print('deleted imagessssssssssssssssss')
         get_asset=get_object_or_404(Asset,pk=id)        
         try:
             asset_data=AssetSerializer(get_asset,data=request.data,context={'request':request},partial=True)
@@ -157,16 +188,16 @@ class SearchAsset(APIView):
 
 class Scan_api_barcode(APIView):
     @extend_schema(description="for the tag id, the variable name from frontend must be 'tag_id' ")
-    def get(self,request):
+    def get(self,request,tag_id):
         try:
-            tag_id=self.kwargs.get('tag_id')
-            respones_data = get_asset(tag_id)
-            return api_response(data=respones_data,message="Tag id found")
+            # tag_id=self.kwargs.get('tag_id')
+            response_data = get_asset(tag_id)
+            return api_response(data=response_data,message="Tag id found")
         
         except Exception as e:
             error_info=get_detailed_errors_info(e)
             log_error_to_terminal(error_info)
-
+ 
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
         
