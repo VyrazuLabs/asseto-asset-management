@@ -75,6 +75,10 @@ INSTALLED_APPS = [
     'audit',
     'license'
 ]
+ENABLE_TRACEBACK=True
+TRACEBACK_SHOW_LOCALS=True
+TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
+PRINT_TRACEBACK_INFO_TO_CONSOLE=True # Set to False if not required
 
 MIDDLEWARE = [
     "authentication.middleware.DBConnectionMiddleware",
@@ -264,7 +268,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5) if not DEBUG else timedelta(minutes=50),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=720) if not DEBUG else timedelta(minutes=50),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
