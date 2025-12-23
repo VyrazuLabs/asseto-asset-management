@@ -2,18 +2,20 @@ import json
 from rest_framework import serializers
 from dashboard.models import CustomField
 from products.models import Product, ProductImage
+from common.convert_base64_image import convert_image
 
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
     field_value = serializers.CharField()
 
 class ProductSerializer(serializers.ModelSerializer):
-    images=serializers.ListField(child=serializers.ImageField(required=False, allow_null=True),
+    images = serializers.ListField(
+        child=serializers.CharField(),
         required=False,
         allow_empty=True,
         allow_null=True,
         default=list,
-        )
+    )
     custom_fields = serializers.ListField(child=serializers.DictField(), required=False)
 
     def validate_name(self, value):
@@ -50,6 +52,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
         product_image=None
         for image in images:
+            # image=convert_image(image)
             product_image=ProductImage.objects.create(image=image,product=product)
 
         if custom_fields is not None:

@@ -29,6 +29,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="city-column" value="{{ form.data.tag }}">Tag</label>
+                                <span class="text-danger">*</span>
                                 <input type="text" id="city-column" class="form-control" name="tag" value="{{ form.data.tag }}">
                                 {% for error in form.tag.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -38,6 +39,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="company-column">Asset Name</label>
+                                <span class="text-danger">*</span>
                                 {{form.name}}
                                 {% for error in form.name.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -47,6 +49,7 @@
                         <div class="col-md-4 col-12">
                             <div class="form-group">
                                 <label for="city-column">Product</label>
+                                <span class="text-danger">*</span>
                                 {{form.product}}
                                 {% for error in form.product.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -269,6 +272,33 @@ document.getElementById("addCustomFieldBtn").onclick = function() {
 // Remove a custom field row
 function removeCustomField(el) {
     el.closest(".rm-custom-field").remove();
+}
+</script>
+<script>
+requestAndSendNotification()
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  } else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Asset Added";
+  const options = {
+    body: "New Asset has been added.", // Main text
+    icon: "path/to/your/icon.png", // URL of an icon to display
+    // Other optional properties 
+  };
+
+  new Notification(title, options);
 }
 </script>
 {% endblock content%}
