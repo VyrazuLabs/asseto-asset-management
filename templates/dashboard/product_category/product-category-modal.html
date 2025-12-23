@@ -18,6 +18,7 @@
             </div>
             <div class="form-group">
                 <label>Parent Name</label>
+                <span class="text-danger">*</span>
                 {{form.parent}} 
                 {% for error in form.parent.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>

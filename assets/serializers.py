@@ -2,6 +2,7 @@ import json
 from rest_framework import serializers
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
 from dashboard.models import CustomField
+from common.convert_base64_image import convert_image
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
     field_value = serializers.CharField()
@@ -23,11 +24,12 @@ class AssetSerializer(serializers.ModelSerializer):
         fields = [
             'tag', 'name', 'product', 'vendor', 'location', 'serial_no',
             'price', 'purchase_type', 'purchase_date', 'warranty_expiry_date',
-            'images', 'custom_fields'
+            'images', 'custom_fields','description'
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
     def to_internal_value(self, data):
+        print("to_internal_value",data,"\n")
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
@@ -35,17 +37,24 @@ class AssetSerializer(serializers.ModelSerializer):
         for field in ["purchase_date", "warranty_expiry_date"]:
             if data.get(field) == "":
                 data[field] = None
-        print("data is-->",data)
+        if data.get("custom_fields") in ["", None]:
+            data.pop("custom_fields", None)
+        elif isinstance(data.get("custom_fields"), str):
+            data["custom_fields"] = json.loads(data.get("custom_fields"))[0]
 
         return super().to_internal_value(data)
 
     def validate_tag(self, value):
-        if "tag" in self.initial_data and not value:
+        if self.partial and value in (None, ""):
+            return value
+        if not value:
             raise serializers.ValidationError("Tag can not be empty")
         return value
 
     def validate_name(self, value):
-        if "name" in self.initial_data and not value:
+        if self.partial and value in (None, ""):
+            return value
+        if not value:
             raise serializers.ValidationError("Name can not be blank")
         return value
 
@@ -61,23 +70,27 @@ class AssetSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        images = validated_data.pop("images") or []
-        custom_fields = validated_data.pop("custom_fields") or []
+        images = validated_data.pop("images", []) or []
+        #custom_fields_raw = request.data.get("custom_fields", "[]")
+        #custom_fields = json.loads(custom_fields_raw)
+        custom_fields = validated_data.pop("custom_fields", []) or []
         print("custom_fields",custom_fields)
-        get_asset_status = AssetStatus.objects.get(name="Available")
         asset = Asset.objects.create(
             **validated_data,
             organization=self.context["request"].user.organization,
-            asset_status=get_asset_status
+            asset_status=AssetStatus.objects.get(name="Available")
         )
-        asset_images = None
+
         for image in images:
-            asset_images = AssetImage.objects.create(image=image, asset=asset)
-        
-        if custom_fields is not None:
+            AssetImage.objects.create(image=image, asset=asset)
+
+        if custom_fields:
             for custom_field in custom_fields:
-                field_name = list(custom_field.keys())[0]
-                field_value = custom_field[field_name]
+                if not custom_field:
+                    continue
+
+                field_name, field_value = next(iter(custom_field.items()))
+
                 CustomField.objects.create(
                     name=field_name,
                     object_id=asset.id,
@@ -87,7 +100,9 @@ class AssetSerializer(serializers.ModelSerializer):
                     entity_type='asset',
                     organization=self.context["request"].user.organization
                 )
-        return asset,asset_images
+
+        return asset
+
 
     def update(self, instance, validated_data):
         print('validate_data is------->',validated_data)
@@ -99,6 +114,7 @@ class AssetSerializer(serializers.ModelSerializer):
         instance.save()
         if image_data is not None:
             for image in image_data:
+                # image=convert_image(image)
                 AssetImage.objects.create(asset=instance, image=image)
         custom_fields = validated_data.pop("custom_fields",None)
         print(custom_fields)
@@ -108,14 +124,14 @@ class AssetSerializer(serializers.ModelSerializer):
                 field_value=custom_field[field_name]
                 print("field name is:",field_name,"\n","filed_value:",field_value)
                 CustomField.objects.update_or_create(object_id=instance.id,field_name=field_name,
-                defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name,"organization": self.context["request"].user.organization})
+                defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name})
         return instance
 
 
 class SearchAssetSerializer(serializers.Serializer):
     search_text=serializers.CharField(required=True)
     class Meta:
-        fields=['search_tesxt']
+        fields=['search_text']
     
     def validate(self, search_text):
         if not search_text:
@@ -131,9 +147,10 @@ class AssignAssetSerializer(serializers.ModelSerializer):
     )
 
     def to_internal_value(self, data):
-        data=data.copy()
-        if (data.get('images')or "")=="":
-            data.pop('image',None)
+        print("to_internal_value",data,"\n")
+        data = data.copy()
+        if (data.get("images") or "") == "":
+            data.pop("images", None)
         return super().to_internal_value(data)
     
     def validate_user(self,user):
@@ -150,7 +167,7 @@ class AssignAssetSerializer(serializers.ModelSerializer):
         asset.save()
         for image in asset_images:
             AssetImage.objects.create(asset=asset,image=image)
-        return assign_asset,
+        return assign_asset
     class Meta:
         model=AssignAsset
         fields=['user','images']
