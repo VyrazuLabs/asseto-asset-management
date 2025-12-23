@@ -9,6 +9,7 @@
 
             <div class="form-group mb-3">
                 <label>Asset Status</label>
+                <span class="text-danger">*</span>
                 {{ form.name }}
                 {% for error in form.name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>
