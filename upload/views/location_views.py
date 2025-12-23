@@ -60,9 +60,10 @@ def import_locations_csv(request):
         return render(request, "upload/map-location-modal.html", {
             "headers": headers,
             'fields' : [
-                'Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
+                'Office Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
                 'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country'
-            ]
+            ],
+            'required_fields':['Office Name']
         })
     else:
         return render(request, "upload/upload-csv-modal.html", {"page": "Locations ","hx_target": "#upload-locations-modal-content"})
