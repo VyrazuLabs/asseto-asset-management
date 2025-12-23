@@ -2,6 +2,7 @@ from datetime import datetime, timedelta,timezone
 from .constants import AUDIT_INTERVAL_VALUE
 from dateutil.relativedelta import relativedelta
 from .models import Audit
+from assets.models import Asset
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:
@@ -111,3 +112,11 @@ def next_audit_due(audit):
 
 # def get_condition_type(index):
     return days_remaining, is_pending
+
+def get_tag_list(tag):
+    tags = Asset.undeleted_objects.filter(tag__icontains=tag)
+    arr=[]
+    for t in tags:
+        arr.append(t.tag)
+    print("ARRRRRRRRRRRRRRRRRRRRRRRRR",arr)
+    return arr

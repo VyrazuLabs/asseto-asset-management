@@ -172,6 +172,9 @@
                             <li class="submenu-item {% if submenu == 'localization' %}active{% endif %}">
                                 <a href="{% url 'configurations:list_localization' %}">Localizations</a>
                             </li>
+                            <li class="submenu-item {% if submenu == 'organization' %}active{% endif %}">
+                                <a href="{% url 'configurations:add_organization' %}">Organizations</a>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}

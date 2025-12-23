@@ -10,8 +10,8 @@
         {% csrf_token %}
         <div class="modal-body">
             <label>Type Name</label>
+            <span class="text-danger">*</span>
             <div class="form-group">
-                
                 {{form.name}}
                 {% for error in form.name.errors %}
                     <small class="text-danger mb-3">{{ error }}</small>

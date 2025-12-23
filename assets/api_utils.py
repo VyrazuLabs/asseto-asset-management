@@ -25,20 +25,36 @@ def convert_to_list(request,queryset):
         asset_dict["image"]=f"http://{current_host}"+assetImage.image.url if assetImage else None
         if asset.is_assigned:
             assigned_asset = AssignAsset.objects.filter(asset=asset.id).select_related("user").first()
-            asset_dict["assignedTo"] = assigned_asset.user.id if assigned_asset and assigned_asset.user else None
+            asset_dict["assigned_to_name"] = assigned_asset.user.full_name if assigned_asset and assigned_asset.user else None
+            asset_dict["assigned_to_image"] = f"http://{current_host}"+assigned_asset.user.profile_pic.url if assigned_asset and assigned_asset.user and assigned_asset.user.profile_pic else None
         else:
-            asset_dict["assignedTo"] = None
+            asset_dict["assigned_to_name"] = None
+            asset_dict["assigned_to_image"] = None
 
         asset_list.append(asset_dict)
 
     return asset_list
 
-
+def get_assigned_user(asset):
+    assigned_user=None
+    if asset.is_assigned:
+        assigned_asset=AssignAsset.objects.filter(asset=asset).select_related("user").first()
+        if assigned_asset:
+            assigned_user={
+                "id":assigned_asset.user.id,
+                "full_name":assigned_asset.user.full_name,
+                "email":assigned_asset.user.email
+            }
+    return assigned_user
 def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     current_host=request.get_host()
+    assign_info=None
+    if asset.is_assigned is True:
+        assign_info=get_assigned_user(asset)
     asset_data={
         "id":asset.id,
         "tag":asset.tag,
+        "assigned_status":asset.is_assigned,
         "name":asset.name,
         "product_id":asset.product.id,
         "product":asset.product.name,
@@ -57,6 +73,9 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "asset_status":asset.asset_status.name if asset.asset_status else None,
         "serial_no":asset.serial_no if asset.serial_no else None,
         "description":asset.description if asset.description else None,
+        "is_assigned":asset.is_assigned if asset.is_assigned else None,
+        "assigned_to":assign_info["full_name"] if assign_info else None,
+        "assigned_to_id":assign_info["id"] if assign_info else None,
     }
     asset_image_list=[]
     if asset_images:
@@ -112,10 +131,12 @@ def get_asset_id(tag_id):
 
 def get_asset(tag_id):
     asset=Asset.objects.filter(tag=tag_id).first()
+    get_assign_asset=AssignAsset.objects.filter(asset=asset).first() if asset else None
+    print("asset",asset)
     if not asset:
         raise ValueError("Asset with this tag does not exists!")
  
-    return {"asset_id": asset.id}
+    return {"asset_id": asset.id,"assigned_to_id":get_assign_asset.id,"assigned_to_name":get_assign_asset.user.full_name} if get_assign_asset else {"asset_id": asset.id,"assigned_to_id":None,"assigned_to_name":None}
 
 def delete_images(deleted_image_ids):
     for id in deleted_image_ids:
