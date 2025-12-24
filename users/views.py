@@ -163,8 +163,9 @@ def add(request):
                 all_perms.user_set.add(form.instance)
             else:
                 all_perms.user_set.remove(form.instance)
-
-            form.instance.role.user_set.add(form.instance)
+            
+            if form.instance.role:
+                form.instance.role.user_set.add(form.instance)
             return HttpResponse(status=204)
 
     context = {
