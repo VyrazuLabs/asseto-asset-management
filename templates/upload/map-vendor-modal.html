@@ -26,8 +26,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        <select name="mapping_{{ field }}" class="form-select mapping-select" {% if field in required_fields
-                            %}data-required="true" {% endif %}>
+                        <select name="mapping_{{ field }}" class="form-select mapping-select" 
+                        {% if field in required_fields %}data-required="true" {% endif %}>
                             <option value="">-- Select --</option>
                             {% for header in headers %}
                             <option value="{{ header }}">{{ header }}</option>
