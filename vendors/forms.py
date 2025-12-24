@@ -8,7 +8,7 @@ class VendorForm(forms.ModelForm):
         attrs={'autocomplete': 'off', 'placeholder': 'Vendor Name', 'class': 'form-control'}))
     email = forms.EmailField(required=False, widget=forms.EmailInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Email', 'class': 'form-control'}))
-    phone = forms.IntegerField(required=False, widget=forms.NumberInput(
+    phone = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Phone number', 'class': 'form-control'}))
     contact_person = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'placeholder': 'Contact Person', 'class': 'form-control'}))
