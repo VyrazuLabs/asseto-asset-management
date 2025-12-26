@@ -282,17 +282,9 @@ def activate(request, uidb64, token):
 @login_required
 def profile(request):
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    format_key= None
-    # for id,it in NAME_FORMATS:
-    #     if format_key and obj.name_display_format == id:
-    #         format_key=id
     user = request.user
     print(request.user)
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
-    print("_____________",assigned_assets)
-    # asset_paginator=Paginator(assigned_assets,10,orphans=1)
-    # asset_page_number=request.GET.get('assets_page')
-    # asset_page_object=asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,
                'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification}
