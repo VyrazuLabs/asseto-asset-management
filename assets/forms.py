@@ -130,10 +130,10 @@ class AssetImageForm(forms.ModelForm):
     class Meta:
             model = AssetImage
             fields = ['image', ]
-    # def __init__(self, *args, **kwargs):
-    #         super().__init__(*args, **kwargs)
-    #         # Add the `multiple` attribute to allow selecting multiple files
-    #         self.fields["image"].widget.attrs.update({"multiple": "true"})
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Add the `multiple` attribute to allow selecting multiple files
+            self.fields["image"].widget.attrs.update({"multiple": "true"})
 
 class AssignedAssetForm(forms.ModelForm):
     asset = forms.ModelChoiceField(
