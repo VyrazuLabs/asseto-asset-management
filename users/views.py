@@ -77,16 +77,8 @@ def list(request):
     page_object = paginator.get_page(page_number)
 
     # method to maop the assets with each users
-    # print()
     user_asset_map=assigned_asset_to_user(page_object)
-    print(user_asset_map,"MAPPED")
     assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
-    print(assigned_assets_count,"COUNT")
-    # is_demo=IS_DEMO
-    # if is_demo:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
 
     context = {
         'sidebar': 'users',
@@ -94,7 +86,6 @@ def list(request):
         'title': 'Users',
         'user_asset_map_count':user_asset_map,
         'user_asset_map_count_count':assigned_assets_count,
-        # 'is_demo':is_demo,
     }
     return render(request, 'users/list.html', context=context)
 
@@ -147,14 +138,14 @@ def add(request):
             password1 = form.cleaned_data.get('password1', '')
             password2 = form.cleaned_data.get('password2', '')
 
-            if password1 and password1 == password2:
+            if password1 == password2:
                 user.set_password(password1)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
             user.save()
             messages.success(
-                request, 'User added successfully and Verification email sent to the user')
+                request, 'User added successfully')
 
             all_perms, created = Group.objects.get_or_create(
                 name='all_perms')
@@ -166,7 +157,7 @@ def add(request):
             
             if form.instance.role:
                 form.instance.role.user_set.add(form.instance)
-            return HttpResponse(status=204)
+            return HttpResponse('',status=204)
 
     context = {
         'form': form,
@@ -291,13 +282,10 @@ def search(request, page):
         paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
         page_object = paginator.get_page(page)
 
-    # 🔑 Collect all user IDs from this page
     user_ids = [u.id for u in page_object]
 
-    # 🔑 Get assigned assets for those users
     assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
 
-    # 🔑 Build map { user_id: [asset1, asset2, ...] }
     user_asset_map_count = {}
     for aa in assigned_assets:
         user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)

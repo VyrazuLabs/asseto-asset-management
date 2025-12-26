@@ -156,7 +156,7 @@
                         {% endif %}
                     </ul>
                 </li>
-                {% if perms.authentication.add_vendor or perms.authentication.add_location or perms.authentication.add_department or perms.authentication.add_product_type or perms.authentication.add_product_category %}
+                {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'configurations' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-sliders2-vertical"></i>
@@ -219,35 +219,15 @@
                         </ul>
                     </li>
                 {% endif %}
-                <!-- {% if request.user.is_superuser %}
-                    <li class="sidebar-item has-sub {% if sidebar == 'trash' %}active{% endif %}">
-                        <a href="javascript:void(0)" class="sidebar-link">
-                            <i class="bi bi-trash3-fill"></i>
-                            <span>Recycle Bin</span>
-                        </a>
-                        <ul class="submenu {% if sidebar == 'trash' %}active{% endif %}">
-                            <li class="submenu-item {% if submenu == 'vendors' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_vendors' %}">Vendors</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'products' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_products' %}">Products</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'users' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_users' %}">Users</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'assets' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_assets' %}">Assets</a>
-                            </li>
-                        </ul>
-                    </li>
-                {% endif %} -->
-                <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
-                    <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg>
-                        <span>Extensions</span>
-                    </a>
-                </li>
                 {% if request.user.is_superuser %}
+                    <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
+                        <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg>
+                            <span>Extensions</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'support' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-person-video3"></i>
@@ -265,7 +245,7 @@
                             </li>
                         </ul>
                     </li>
-                {% endif %}
+                {% endif %} -->
             </ul>
         </div>
     </div>
