@@ -1,20 +1,19 @@
 <div class="modal-content">
     <div class="modal-header bg-dark text-center">
         <h5 class="modal-title white w-100" id="myModalLabel160">Add User</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-            aria-label="Close">
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
+    <form hx-post="{{ request.path }}" hx-encoding="multipart/form-data" novalidate>
         {% csrf_token %}
         <div class="modal-body">
             <div class="row">
-                <div><p><b>Personal Information</b></p></div>
+                <div>
+                    <p><b>Personal Information</b></p>
+                </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="first-name-column">Name</label>
-                        <span class="text-danger">*</span>
-                        {{form.full_name}}
+                        <label for="{{ form.full_name.id_for_label }}">Name</label><span class="text-danger">*</span>
+                        {{ form.full_name }}
                         {% for error in form.full_name.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -22,9 +21,8 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="last-name-column">Email</label>
-                        <span class="text-danger">*</span>
-                        {{form.email}}
+                        <label for="{{ form.email.id_for_label }}">Email</label><span class="text-danger">*</span>
+                        {{ form.email }}
                         {% for error in form.email.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -32,9 +30,8 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Phone</label>
-                        <span class="text-danger">*</span>
-                        {{form.phone}}
+                        <label for="{{ form.phone.id_for_label }}">Phone</label><span class="text-danger">*</span>
+                        {{ form.phone }}
                         {% for error in form.phone.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -42,8 +39,8 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Department</label>
-                        {{form.department}}
+                        <label for="{{ form.department.id_for_label }}">Department</label>
+                        {{ form.department }}
                         {% for error in form.department.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -51,8 +48,8 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Role</label>
-                        {{form.role}}
+                        <label for="{{ form.role.id_for_label }}">Role</label>
+                        {{ form.role }}
                         {% for error in form.role.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -60,82 +57,88 @@
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Access Level</label>
-                        {{form.access_level}}
+                        <label for="{{ form.access_level.id_for_label }}">Access Level</label>
+                        {{ form.access_level }}
                         {% for error in form.access_level.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="form-group form-check" style="margin-left: 15px;">
-                    <input type="checkbox" class="form-check-input" id="toggle_password">
+
+                <!-- Password Toggle -->
+                <div class="col-12 form-group form-check" style="margin-left: 15px;">
+                    <input type="checkbox" class="form-check-input" id="toggle_password" name="can_login">
                     <label class="form-check-label" for="toggle_password">Can Login?</label>
                 </div>
-                <div id="password_fields" class="d-none">
-                    <div class="col-md-6 col-11">
-                        <div class="form-group" style="padding-right: 10px;">
-                            <label for="company-column">Password</label>
+                <div id="password_fields" class="d-none col-12 row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}">Password</label>
                             {{ form.password1 }}
                             {% for error in form.password1.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
+                            <small class="text-danger mb-3">{{ error }}</small>
                             {% endfor %}
                         </div>
                     </div>
-
-                    <div class="col-md-6 col-11">
-                        <div class="form-group" style="padding-left: 10px;">
-                            <label for="company-column">Repeat Password</label>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}">Repeat Password</label>
                             {{ form.password2 }}
                             {% for error in form.password2.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
+                            <small class="text-danger mb-3">{{ error }}</small>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                <div><p><b>Office Information</b></p></div>
+                <div>
+                    <p><b>Office Information</b></p>
+                </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Office Location</label>
-                        {{form.location}}
+                        <label for="{{ form.location.id_for_label }}">Office Location</label>
+                        {{ form.location }}
                         {% for error in form.location.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
-                    </div>             
+                    </div>
                 </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label for="company-column">Profile Picture</label>
-                        {{form.profile_pic}}
+                        <label for="{{ form.profile_pic.id_for_label }}">Profile Picture</label>
+                        {{ form.profile_pic }}
                         {% for error in form.profile_pic.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
                     </div>
-                    <div class="form-group rounded ml-2" id="imagePreview"></div>                    
+                    <div class="form-group rounded ml-2" id="imagePreview"></div>
                 </div>
-                <div><p><b>Address Information</b></p></div>
+
+                <div>
+                    <p><b>Address Information</b></p>
+                </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>Address Line 1</label>
-                        {{address_form.address_line_one}}
+                        {{ address_form.address_line_one }}
                         {% for error in address_form.address_line_one.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
-                <!-- <div class="col-md-6 col-12">
+                <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>Address Line 2</label>
-                        {{address_form.address_line_two}}
+                        {{ address_form.address_line_two }}
                         {% for error in address_form.address_line_two.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
                     </div>
-                </div> -->
+                </div>
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>Country</label>
-                        {{address_form.country}}
+                        {{ address_form.country }}
                         {% for error in address_form.country.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -144,7 +147,7 @@
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>State</label>
-                        {{address_form.state}}
+                        {{ address_form.state }}
                         {% for error in address_form.state.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -153,7 +156,7 @@
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>City</label>
-                        {{address_form.city}}
+                        {{ address_form.city }}
                         {% for error in address_form.city.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -162,7 +165,7 @@
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>Zip Code</label>
-                        {{address_form.pin_code}}
+                        {{ address_form.pin_code }}
                         {% for error in address_form.pin_code.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>
                         {% endfor %}
@@ -170,22 +173,31 @@
                 </div>
             </div>
         </div>
+
+        <!-- HTMX Loading Indicator -->
+        <div id="saving-indicator" class="htmx-indicator position-fixed top-50 start-50 translate-middle"
+            style="display: none; z-index: 9999;">
+            <div class="spinner-border text-info" role="status">
+                <span class="visually-hidden">Saving...</span>
+            </div>
+            <div class="mt-2">Saving...</div>
+        </div>
+
         <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-light-secondary"
-                data-bs-dismiss="modal">
+            <button type="button" class="btn btn-sm btn-light-secondary" data-bs-dismiss="modal">
                 <i class="bx bx-x d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">Close</span>
             </button>
-            <button type="submit" class="btn btn-sm btn-info ml-1" 
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"> 
+            <button type="submit" class="btn btn-sm btn-info ml-1" hx-indicator="#saving-indicator" hx-trigger="click"
+                hx-on::after-request="closeModalIfSuccess(event)">
                 <i class="bx bx-check d-block d-sm-none"></i>
                 <span class="d-none d-sm-block">Save</span>
             </button>
         </div>
     </form>
 </div>
-<script>
 
+<script>
     function initializePasswordToggle() {
         const togglePasswordCheckbox = document.getElementById('toggle_password');
         const passwordFields = document.getElementById('password_fields');
@@ -199,37 +211,32 @@
         const toggleFields = () => {
             if (togglePasswordCheckbox.checked) {
                 passwordFields.classList.remove('d-none');
-                passwordFields.classList.add('d-flex');
+                passwordFields.classList.add('row');
             } else {
                 passwordFields.classList.add('d-none');
-                passwordFields.classList.remove('d-flex');
+                passwordFields.classList.remove('row');
             }
         };
 
         togglePasswordCheckbox.addEventListener('change', toggleFields);
         toggleFields(); // Apply initial state
     }
+</script>
 
-    // Use htmx:load for swapped content + fallback
-    document.addEventListener('htmx:load', initializePasswordToggle);
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePasswordToggle);
-    } else {
-        initializePasswordToggle();
+<script>
+    function closeModalIfSuccess(event) {
+        if (event.detail.successful) {
+            const modalEl = document.querySelector('.modal.show');
+            if (!modalEl) return;
+
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            // Safety cleanup
+            document.querySelectorAll('.modal-backdrop').forEach(e => e.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.removeProperty("overflow");
+            document.body.style.removeProperty("padding-right");
+        }
     }
-
-    // function filePreview(input){
-    //     if (input.files && input.files[0]) {
-    //         var reader = new FileReader();
-    //         reader.onload = function(e) {
-    //             $('#imagePreview + img').remove();
-    //             $('#imagePreview').after('<img src="'+e.target.result+'" class="rounded" width="100" height="80"/>');
-    //         };
-    //         reader.readAsDataURL(input.files[0]);
-    //     }
-    // }
-    // $("#inputFile").change(function () {
-    //     filePreview(this);
-    // });
-
 </script>
