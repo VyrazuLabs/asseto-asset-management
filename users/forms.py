@@ -104,6 +104,8 @@ class UserForm(forms.ModelForm):
         phone = self.cleaned_data['phone']
         if not phone.isdigit():
             raise forms.ValidationError("Phone number must contain only digits")
+        elif len(phone)>10:
+            raise forms.ValidationError("Phone number is more than 10 digits")
         return phone
     class Meta:
         model = User
