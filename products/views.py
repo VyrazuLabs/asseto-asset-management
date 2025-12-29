@@ -63,17 +63,11 @@ def list(request):
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
-    # is_demo=IS_DEMO
-    # if is_demo:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
     context = {
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
         'deleted_product_count':deleted_product_count,
-        # 'is_demo':is_demo,
         'title': 'Products'
     }
 
@@ -86,7 +80,6 @@ def details_product(request, id):
 
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
-    # product=Product.undeleted_objects.filter(pk=id,organization=request.user.organization).order_by('-created_at').first()
     history_list = product.history.all()
     paginator = Paginator(history_list, 10, orphans=1)
     page_number = request.GET.get('page')
@@ -128,7 +121,6 @@ def add_product(request):
             product.organization = request.user.organization
             product.save()
             form.save_m2m()
-#             # product = form.save()
             files=request.FILES
             for f in files.getlist('image'): # 'image' is the name of your file input
                 ProductImage.objects.create(product=product, image=f)
@@ -171,16 +163,6 @@ def add_product(request):
     context = {'form': form,
                'image_form': image_form,}
     return render(request, 'products/add-product-modal.html', context)
-# if form.is_valid() and image_form.is_valid():
-#             asset = form.save(commit=False)
-#             asset.organization = request.user.organization
-#             asset.save()
-
-#             form.save_m2m()
-#             # product = form.save()
-#             for f in request.FILES.getlist('image'): # 'image' is the name of your file input
-#                 AssetImage.objects.create(asset=asset, image=f)
-#             return redirect('assets:list')
 
 @login_required
 @permission_required('authentication.delete_product')
@@ -200,7 +182,6 @@ def delete_product(request, id):
 @login_required
 @permission_required('authentication.edit_product')
 def update_product(request, id):
-    audit_interval = request.POST.get("audit_interval")
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization)
     form = AddProductsForm(
@@ -312,7 +293,7 @@ def search(request, page):
     if search_text:
         return render(request, 'products/products-data.html', {
             'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
+                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_sub_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
             )).annotate(
             total_assets=Count('asset'),
             available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
