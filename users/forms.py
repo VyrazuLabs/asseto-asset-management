@@ -2,7 +2,7 @@ from django import forms
 from authentication.models import User
 from roles.models import Role
 from dashboard.models import Department, Location
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from dashboard.models import Address
 
 
@@ -104,8 +104,8 @@ class UserForm(forms.ModelForm):
         phone = self.cleaned_data['phone']
         if not phone.isdigit():
             raise forms.ValidationError("Phone number must contain only digits")
-        elif len(phone)>10:
-            raise forms.ValidationError("Phone number is more than 10 digits")
+        elif not len(phone)==10:
+            raise forms.ValidationError("Phone number does not have 10 digits")
         return phone
     class Meta:
         model = User

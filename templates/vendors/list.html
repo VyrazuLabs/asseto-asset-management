@@ -18,13 +18,6 @@
                     <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
                         hx-get="{% url 'vendors:add' %}" hx-target="#add-vendor-modal-content"
                         data-bs-toggle="modal" data-bs-target="#add-vendor-modal">Add Vendor</button>
-
-                    <div class="modal fade text-left" id="add-vendor-modal" tabindex="-1" role="dialog"
-                        aria-labelledby="myModalLabel160" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                            <div id="add-vendor-modal-content" class="modal-content" hx-target="this"></div>
-                        </div>
-                    </div>
                 </div>
             {% endif %}
             <a href="{% url 'recycle_bin:deleted_vendors' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
@@ -33,6 +26,12 @@
         </div>
     </div>
     <section class="section">
+        <div class="modal fade text-left" id="add-vendor-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div id="add-vendor-modal-content" class="modal-content" hx-target="this"></div>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 {% if page_object %}
