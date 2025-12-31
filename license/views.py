@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib import messages
 from django.db.models import Q
+
+from license.utils import get_assigned_users
 @login_required
 @permission_required('authentication.view_license')
 def license_list(request):
@@ -14,10 +16,12 @@ def license_list(request):
     paginator=Paginator(licenses,PAGE_SIZE,orphans=ORPHANS)
     page_number=request.GET.get('page')
     page_oject=paginator.get_page(page_number)
+    assigned_user=get_assigned_users()
     context={
         'page_object':page_oject,
         'sidebar':'license',
-        'title':'License'
+        'title':'License',
+        'assigned_user':assigned_user
     }
     return render(request,'license/license_list.html',context=context)
 
@@ -34,8 +38,6 @@ def add_license(request):
         license_form=LicenseForm()
     
     return render(request,'license/add_license.html',context={'form':license_form,'title':'Add License','sidebar':'license'})
-
-
 
 @login_required
 @permission_required('authentication.view_license')
@@ -77,6 +79,6 @@ def delete_license(request,id):
 @permission_required('authentication.view_license')
 def search_license(request):
     search_text=request.GET.get('search_text')
-    licenses=License.objects.filter(Q(name__icontains=search_text)|Q(license_type__name__icontains=search_text)|Q(vendor__name__icontains=search_text)|Q(seats__icontains=search_text))
-    print(licenses)
-    return render(request,'license/searched_data.html',{'licenses':licenses})
+    licenses=License.undeleted_objects.filter(Q(name__icontains=search_text)|Q(license_type__name__icontains=search_text)|Q(vendor__name__icontains=search_text)|Q(seats__icontains=search_text))
+    assigned_user=get_assigned_users()
+    return render(request,'license/searched_data.html',context={'licenses':licenses,'assigned_user':assigned_user})

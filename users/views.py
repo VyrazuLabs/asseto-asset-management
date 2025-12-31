@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+
+from license.models import AssignLicense
 from .forms import UserForm, UserUpdateForm, AddressForm
 from django.contrib import messages
 from django.http import HttpResponse
@@ -8,7 +10,7 @@ from assets.models import AssignAsset
 from dashboard.models import Address
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
-from .utils import assigned_asset_to_user, create_all_perm_role
+from .utils import assigned_asset_to_user, create_all_perm_role, get_all_assigned_license
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
@@ -110,12 +112,16 @@ def details(request, id):
     asset_page_number=request.GET.get('assets_page')
     asset_page_object=asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
+    assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
+    print(assigned_licenses.values())
+    assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
     context = {
         'sidebar': 'users',
         'full_name': get_user_full_name,
         'user': user,
         'page_object': page_object,
         'assigned_assets': asset_page_object,
+        'assigned_licenses': assigned_licenses_object,
         'title': f'Details-{user.full_name}'
     }
                

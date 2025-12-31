@@ -41,7 +41,6 @@
                 <div id="update-product-modal-content" class="modal-content" hx-target="this"></div>
             </div>
         </div>
-
         <div class="card">
             <div class="card-body">
                 {% if page_object %}
@@ -63,7 +62,7 @@
                         {% endif %}
                     </div>
                 {% endif %}
-                <div class="table-responsive">
+                <div id="license-table" hx-get="{% url 'license:license_list' %}" hx-trigger="refresh" hx-target="this" class="table-responsive">
                     <table class="table table-hover" id="table1">
                         <thead>
                             <tr>
@@ -72,6 +71,7 @@
                                 <th>Type</th>
                                 <th>Seats</th>
                                 <th>Vendor</th>
+                                <th>Assigned</th>
                                 <th>Start Date</th>
                                 <th>Expiry Date</th>
                                 <th>Actions</th>
@@ -86,6 +86,57 @@
                                         <td>{{ license.license_type.name }}</td>
                                         <td>{{ license.seats }}</td>
                                         <td>{% if not license.vendor %}-{% else %} {{ license.vendor.name }} {% endif %}</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                {% if license.is_assigned %}
+                                                    <div class="d-flex pb-1">
+                                                        {% with map=assigned_user|get_item:license.id %}
+                                                            {% if map.image %}
+                                                                <span class="me-2">
+                                                                    <img src="{{ map.image.url }}"
+                                                                        onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';"
+                                                                        class="rounded-circle mb-1" style="width: 20px; height: 20px;" />
+                                                                </span>
+                
+                                                            {% else %}
+                                                                <span class="me-2">
+                                                                    <img src="{% static 'assets/images/faces/1.jpg' %}"
+                                                                        class="rounded-circle mb-1" style="width: 20px; height: 20px;" />
+                                                                </span>
+                                                            {% endif %}
+
+                                                            {% with parts=map.name|split%}
+                                                                {% for part in parts %}
+                                                                    <span>{{ part }}</span>
+                                                                {% endfor %}
+                                                            {% endwith %}
+                                                        {% endwith %}
+                                                    </div>
+                                                    <form action="{% url 'license:unassign_license' license.id %}" method="post"
+                                                        onsubmit="return confirm('Are you sure you want to unassign this?')">
+                                                        {% csrf_token %}
+                                                        <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                                                    </form>
+                                                {% else %}
+                                                    <div class="input-group">
+                                                        <button type="button" class="btn btn-info btn-sm" hx-get="{% url 'license:assign_license' license.id %}"
+                                                            hx-target="#assign-license-modal-content" hx-trigger="click" data-bs-toggle="modal"
+                                                            data-bs-target="#assign-license-list-modal">
+                                                            Assign
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="modal fade" id="assign-license-list-modal" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" id="assign-license-modal-content"
+                                                        hx-get="{% url 'license:assign_license' license.id %}" hx-trigger="revealed" hx-target="this"
+                                                        hx-swap="innerHTML">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td>{% if not license.start_date %}-{% else %} {{ license.start_date|date:"M d, Y" }} {% endif %}</td>
                                         <td>{% if not license.expiry_date %}-{% else %} {{ license.expiry_date|date:"M d, Y" }} {% endif %}</td>                                          
                                         <td>
@@ -115,6 +166,7 @@
                             </div>
                         {% endif %}
                     </table>
+                    <!-- assign license modal -->
                 </div>
                 {% include 'commons/pagination.html' %}
             </div>

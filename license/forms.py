@@ -1,7 +1,8 @@
 from django import forms
 
+from authentication.models import User
 from dashboard.models import LicenseType
-from license.models import License
+from license.models import AssignLicense, License
 from vendors.models import Vendor
 
 class LicenseForm(forms.ModelForm):
@@ -54,3 +55,17 @@ class LicenseForm(forms.ModelForm):
     class Meta:
         model=License
         fields=['name','license_type','vendor','seats','start_date','expiry_date','key','notes']
+
+class AssignLicenseForm(forms.ModelForm):
+
+    user=forms.ModelChoiceField(required=True,queryset=None,empty_label='--SELECT--', widget=forms.Select(attrs={'class':'form-control'}))
+    notes=forms.CharField(required=False, widget=forms.TextInput(attrs={'autocomplete':'off', 'placeholder':'Notes','class':'form-control'}))
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fields['user'].queryset=User.undeleted_objects.filter(is_active=True)
+    class Meta:
+        model=AssignLicense
+        fields=['user','notes']
+    
+    
