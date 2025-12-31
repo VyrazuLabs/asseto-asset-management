@@ -7,17 +7,6 @@ from authentication.models import User
 from django.forms import ModelForm
 
 class AssetForm(forms.ModelForm):
-    # status = forms.ChoiceField(
-    #     required=False,
-    #     choices=((0, 'Assigned'),
-    #     (1, 'Available'),
-    #     (2, 'Repair Required'),
-    #     (3, 'Lost/Stolen'),
-    #     (4, 'Broken'),
-    #     (5, 'Ready To Deploy'),
-    #     (6, 'Out for Repair')),
-    #     widget=forms.Select(attrs={'class': 'form-select'})
-    # )
     status = forms.ModelChoiceField(
         required=False,
         queryset=AssetStatus.undeleted_objects.all().values_list('name', flat=True),
@@ -90,7 +79,6 @@ class AssetForm(forms.ModelForm):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['product'].queryset = Product.objects.filter(organization=self._organization, status=True)
-        # self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
         self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
         self.fields['location'].queryset = Location.undeleted_objects.filter(organization=self._organization, status=True)
     

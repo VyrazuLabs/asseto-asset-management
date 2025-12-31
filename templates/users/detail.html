@@ -218,6 +218,67 @@
                 </div>
             {% endif %}
         </div>
+        <div>
+            {% if assigned_licenses %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Assigned Licenses</span>
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><b>Sl No.</b></td>
+                                    <td><b>License Name</b></td>
+                                    <td>Type</td>
+                                    <td>License Key</td>
+                                    <td>Vendor Name</td>
+                                    <td><b>Assigned Date</b></td>
+                                </tr>
+                                {% for assigned_license in assigned_licenses %}
+                                <tr>
+                                    <td>{{assigned_licenses.start_index|add:forloop.counter0}}</td>
+                                    <td>{{assigned_license.license.name}}</td>
+                                    <td>{{assigned_license.license.license_type.name}}</td>
+                                    <td>{{assigned_license.license.key}}</td>
+                                    <td>{{assigned_license.license.vendor.name}}</td>
+                                    <td>{{assigned_license.assigned_date|date:"D, M d, Y"}}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            <div class="dataTable-bottom">
+                                Showing {{ assigned_licenses.start_index }} to {{ assigned_licenses.end_index }} of {{assigned_licenses.paginator.count }} entries
+                            </div>
+            
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination pagination-primary justify-content-end">
+            
+                                    <li class="page-item {% if not assigned_licenses.has_previous %} disabled {% endif %}">
+                                        <a class="page-link" {% if assigned_licenses.has_previous %}
+                                            href="?assets_page={{ assigned_licenses.previous_page_number }}&page={{ page_object.number }}"
+                                            {% endif %} tabindex="-1" aria-disabled="true">« Previous</a>
+                                    </li>
+            
+                                    {% for i in assigned_licenses.paginator.page_range %}
+                                    <li class="page-item {% if assigned_licenses.number == i %} active {% endif %}">
+                                        <a class="page-link" href="?assets_page={{ i }}&page={{ page_object.number }}">{{ i }}</a>
+                                    </li>
+                                    {% endfor %}
+
+                                    <li class="page-item {% if not assigned_licenses.has_next %} disabled {% endif %}">
+                                        <a class="page-link" {% if assigned_licenses.has_next %}
+                                            href="?assets_page={{ assigned_licenses.next_page_number }}&page={{ page_object.number }}"
+                                            {% endif %}>Next »</a>
+                                    </li>
+            
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
         {% include 'commons/history.html'  %}
     </section>
 </div>

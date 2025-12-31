@@ -1,10 +1,10 @@
-
 from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
-from django.http import JsonResponse
-from configurations.utils import dynamic_display_name
+from django.core.paginator import Paginator
+
+
 PERMISSION_LIST = [
     # products
     'view_product',
@@ -128,6 +128,12 @@ def assigned_asset_to_user(page_object):
     
     return user_asset_map
 
+def get_all_assigned_license(request,assigned_licenses):
+    license_paginator=Paginator(assigned_licenses,10,orphans=1)
+    license_page_number=request.GET.get('license_page')
+    license_page_object=license_paginator.get_page(license_page_number)
+
+    return license_page_object
 
 def user_data(request,user_list):
     current_host=request.get_host()                                                                                                           
