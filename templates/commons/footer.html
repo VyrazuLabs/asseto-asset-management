@@ -304,5 +304,20 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(() => window.location.href = href, 150);
     });
 </script>
+
+<!-- assign license modal success handler -->
+<script>
+    function handleAssignSuccess(evt) {
+        if (evt.detail.xhr.status === 204) {
+            const modalEl = document.getElementById("assign-license-list-modal");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            // Refresh only the table
+            htmx.trigger("#license-table", "refresh");
+        }
+    }
+</script>
+
 </body>
 </html>
