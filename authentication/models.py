@@ -9,9 +9,8 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
-from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
-
+from django.apps import apps
 
 def path_and_rename(instance, filename):
     upload_to = 'profile/'
@@ -82,6 +81,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     department = models.ForeignKey(Department, models.DO_NOTHING, blank=True, null=True)
     access_level = models.BooleanField(choices=BOOL_CHOICES,default=False)
     role = models.ForeignKey(Role, models.DO_NOTHING, related_name='role', blank=True, null=True)
+    email_notification=models.BooleanField(default=False)
+    browser_notification=models.BooleanField(default=False)
+    slack_notification=models.BooleanField(default=False)
+    inapp_notification=models.BooleanField(default=False)
     objects = UserManager()
     history = HistoricalRecords()
 
@@ -97,6 +100,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         # Get organization's configured format key (safe)
         format_key_value = None
         try:
+            LocalizationConfiguration = apps.get_model('configurations', 'LocalizationConfiguration')
             config = LocalizationConfiguration.objects.filter(
                 organization=self.organization
             ).values_list("name_display_format", flat=True).first()
@@ -133,8 +137,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
             if first and last:
                 result = f"{first} {last}"
             else:
-                result = first or last or fullname
-
+                result = first or last or fullname    
         return result
 
     def __str__(self):

@@ -16,56 +16,66 @@
                 </ol>
             </nav>
             <div>
-                <a href="{% url 'configurations:list_tag' %}" class="btn btn-sm btn-outline-info my-3">Back to Configuration List</a>
+                {% if configurations %}<a href="{% url 'configurations:list_tag' %}" class="btn btn-sm btn-outline-info my-3">Back to Configuration List</a>{% endif %}
             </div>
         </div>
     </div>
-    <section class="section">
-        <form class="form row" 
+    <section class="section d-flex justify-content-center">
+        <form class="form col" 
               action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}" 
               method="POST" novalidate>
             {% csrf_token %}
-            <div class="card">
-                <div class="card-header">
+            <div class="d-flex gap-2">
+                <div class="card w-50">
+                    <div class="card-body">
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                <ul>
+                                    {% for err in form.non_field_errors %}
+                                    <li>{{ err }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <label for="id_prefix">Tag Prefix</label>
+                                {{ form.prefix }}
+                                {% for error in form.prefix.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card w-50">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-12 w-100">
+                                <label for="id_number_suffix">Tag Suffix</label>
+                                {{ form.number_suffix }}
+                                {% for error in form.number_suffix.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="col mt-3">
+                            <div class="col-md-6 col-12 form-check">
+                                {{ form.use_default_settings }}
+                                <label for="id_use_default_settings" class="form-check-label">Use This As Default Settings</label>
+                                {% for error in form.use_default_settings.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                <div class="col mt-3">
                     <button type="submit" class="btn btn-sm btn-info float-end">
                         {% if is_update %}Update{% else %}Create{% endif %}
                     </button>
-                </div>
-                <div class="card-body">
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            <ul>
-                                {% for err in form.non_field_errors %}
-                                <li>{{ err }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    <div class="row">
-                        <div class="col-md-6 col-12">
-                            <label for="id_prefix">Tag Prefix</label>
-                            {{ form.prefix }}
-                            {% for error in form.prefix.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6 col-12">
-                            <label for="id_number_suffix">Tag Suffix</label>
-                            {{ form.number_suffix }}
-                            {% for error in form.number_suffix.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6 col-12 form-check">
-                            {{ form.use_default_settings }}
-                            <label for="id_use_default_settings" class="form-check-label">Use This As Default Settings</label>
-                            {% for error in form.use_default_settings.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
-                        </div>
-                    </div>
                 </div>
             </div>
         </form>

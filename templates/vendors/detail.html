@@ -109,94 +109,96 @@
             </tbody>
         </table> 
         {% endif %}
-        <div class="card">
-            <div class="card-header">
-                <h4>Asset List</h4>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-lg table-borderless">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Asset Serial Number</th>
-                                <th>Asset Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for asset in assets_page_object %}
-                            <tr>
-                                <td class="col-3">
-                                    <div class="d-flex align-items-center">
-                                        <p class="font-bold ms-3 mb-0">
-                                            {{ assets_page_object.start_index|add:forloop.counter0 }}
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="col-auto">
-                                    {{ asset.serial_no|default:"######" }}
-                                </td>
+        {% if assets_page_object %}
+            <div class="card">
+                <div class="card-header">
+                    <h4>Asset List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-lg table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Sl No.</th>
+                                    <th>Asset Serial Number</th>
+                                    <th>Asset Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in assets_page_object %}
+                                <tr>
+                                    <td class="col-3">
+                                        <div class="d-flex align-items-center">
+                                            <p class="font-bold ms-3 mb-0">
+                                                {{ assets_page_object.start_index|add:forloop.counter0 }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td class="col-auto">
+                                        {{ asset.serial_no|default:"######" }}
+                                    </td>
 
-                                <td class="col-auto">
-                                    {{ asset.name|default:"Unnamed Asset" }}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2">No assets assigned to this vendor.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    <td class="col-auto">
+                                        {{ asset.name|default:"Unnamed Asset" }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2">No assets assigned to this vendor.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
 
-                    <!-- Explicit Pagination for assets_page_object -->
-                    {% if assets_page_object.has_other_pages %}
-                        <nav aria-label="Asset pagination">
-                            <ul class="pagination justify-content-end">
+                        <!-- Explicit Pagination for assets_page_object -->
+                        {% if assets_page_object.has_other_pages %}
+                            <nav aria-label="Asset pagination">
+                                <ul class="pagination justify-content-end">
 
-                                <!-- Previous -->
-                                {% if assets_page_object.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.previous_page_number }}">
-                                        &laquo; Previous
-                                    </a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link bg-dark text-muted">
-                                        &laquo; Previous
-                                    </span>
-                                </li>
-                                {% endif %}
+                                    <!-- Previous -->
+                                    {% if assets_page_object.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.previous_page_number }}">
+                                            &laquo; Previous
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link bg-dark text-muted">
+                                            &laquo; Previous
+                                        </span>
+                                    </li>
+                                    {% endif %}
 
-                                <!-- Current Page -->
-                                <li class="page-item active">
-                                    <span class="page-link bg-primary text-white border-0">
-                                        {{ assets_page_object.number }}
-                                    </span>
-                                </li>
+                                    <!-- Current Page -->
+                                    <li class="page-item active">
+                                        <span class="page-link bg-primary text-white border-0">
+                                            {{ assets_page_object.number }}
+                                        </span>
+                                    </li>
 
-                                <!-- Next -->
-                                {% if assets_page_object.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.next_page_number }}">
-                                        Next &raquo;
-                                    </a>
-                                </li>
-                                {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link bg-dark text-muted">
-                                        Next &raquo;
-                                    </span>
-                                </li>
-                                {% endif %}
+                                    <!-- Next -->
+                                    {% if assets_page_object.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link bg-dark text-white" href="?asset_page={{ assets_page_object.next_page_number }}">
+                                            Next &raquo;
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link bg-dark text-muted">
+                                            Next &raquo;
+                                        </span>
+                                    </li>
+                                    {% endif %}
 
-                            </ul>
-                        </nav>
-                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
 
         {% include 'commons/history.html' %}
     </section>

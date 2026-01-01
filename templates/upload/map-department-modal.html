@@ -2,7 +2,7 @@
     <h5 class="modal-title">Map CSV Fields to Department Fields</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
-<form method="post" action="{% url 'upload:department_compare_data' %}">
+<form method="post" action="{% url 'upload:department_compare_data' %}" id="mappingForm">
     {% csrf_token %}
     <div class="modal-body">
         <table class="table">
@@ -15,9 +15,21 @@
             <tbody>
                 {% for field in fields %}
                 <tr>
-                    <td>{{ field }}</td>
                     <td>
-                        <select name="mapping_{{ field }}" class="form-select">
+                        {{ field }}
+
+                        {% if field in required_fields %}
+                        <span class="text-danger">*</span>
+                        <div class="text-danger small mt-1 d-none" id="error-{{ forloop.counter }}">
+                            This field is required
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <select name="mapping_{{ field }}" class="form-select mapping-select"
+                            data-error-id="error-{{ forloop.counter }}" 
+                            {% if field in required_fields %}data-required="true" {% endif %}>
                             <option value="">-- Select --</option>
                             {% for header in headers %}
                             <option value="{{ header }}">{{ header }}</option>
@@ -31,6 +43,67 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success">Import Departments</button>
+        <button type="submit" class="btn btn-success" id="importBtn" disabled>
+            Import Departments
+        </button>
     </div>
 </form>
+
+<script>
+    (function () {
+        const form = document.getElementById("mappingForm");
+        const importBtn = document.getElementById("importBtn");
+        const selects = document.querySelectorAll(".mapping-select");
+
+        function hasAnySelection() {
+            return Array.from(selects).some(s => s.value !== "");
+        }
+
+        function allRequiredSelected() {
+            return Array.from(selects).every(select => {
+                if (select.dataset.required === "true") {
+                    return select.value !== "";
+                }
+                return true;
+            });
+        }
+
+        function validateRequiredFields(showErrors = false) {
+            let isValid = true;
+
+            selects.forEach(select => {
+                if (select.dataset.required === "true") {
+                    const errorDiv = document.getElementById(select.dataset.errorId);
+
+                    if (select.value === "") {
+                        isValid = false;
+                        if (showErrors) errorDiv.classList.remove("d-none");
+                    } else {
+                        errorDiv.classList.add("d-none");
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        function updateButtonState() {
+            importBtn.disabled = !(hasAnySelection() && allRequiredSelected());
+        }
+
+        selects.forEach(select => {
+            select.addEventListener("change", () => {
+                validateRequiredFields(false);
+                updateButtonState();
+            });
+        });
+
+        form.addEventListener("submit", function (e) {
+            if (!validateRequiredFields(true)) {
+                e.preventDefault();
+            }
+        });
+
+        updateButtonState(); // initial
+    })();
+</script>
