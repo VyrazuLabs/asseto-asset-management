@@ -27,7 +27,7 @@ load_dotenv(BASE_DIR / '.env', override=True)
 
 LOGIN_REDIRECT_URL = '/'
 
-
+DEBUG=True 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -73,7 +73,12 @@ INSTALLED_APPS = [
     'configurations',
     'drf_spectacular',
     'audit',
+    'license'
 ]
+ENABLE_TRACEBACK=True
+TRACEBACK_SHOW_LOCALS=True
+TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
+PRINT_TRACEBACK_INFO_TO_CONSOLE=True # Set to False if not required
 
 MIDDLEWARE = [
     "authentication.middleware.DBConnectionMiddleware",
@@ -154,9 +159,6 @@ DATABASES = {
         'PASSWORD':  os.environ.get('DB_PASSWORD'),
         'HOST':  os.environ.get('DB_HOST'),
         'PORT':  os.environ.get('DB_PORT'),
-        "TEST": {
-            "NAME": "test_asseto",
-        },
     }
 }
 # DATABASES = {
@@ -266,7 +268,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5) if not DEBUG else timedelta(minutes=50),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=720) if not DEBUG else timedelta(minutes=50),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,

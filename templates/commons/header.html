@@ -32,7 +32,7 @@
         integrity="sha384-HoA5keKvA3TtH8+Xae7Hi3yI0CGMBLgY0uJjl2CUQThYurW8Mu9uKdB7CpZl1Fcf"
         crossorigin="anonymous"></script>
 
-    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 
     <!-- Other JS -->
     <script src="{% static 'assets/js/htmx.min.js' %}"></script>
@@ -68,18 +68,48 @@
                         <div class="col-md-12 col-xl-6">
                             <div class="row">
                                 <div class="col-md-12 ps-0">
-                                    <!-- 🔍 Search Form -->
+                                    <!-- Search Form -->
                                     <div class="input-group mb-3" style="margin-top: 18px;">
                                         <span class="input-group-text bg-transparent border-end-0" id="basic-addon1">
                                             <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-search"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
                                         </span>
-                                        <form onsubmit="performSearch(); return false;">
-                                            <input type="search" id="global-search" class="form-control bg-transparent border-start-0 ps-0" placeholder="Search by Asset name" aria-label="Username" aria-describedby="basic-addon1">
-                                        </form>
+                                        <button class="input-group-text bg-transparent" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" style="padding-right: 18%;">
+                                            Search...
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                          <div class="modal fade search-modal" id="searchModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                    <div class="search-header">
+                                        <i class="bi bi-search text-muted"></i>
+                                        <input 
+                                        type="text" 
+                                        id="globalSearch"
+                                        name="search_text"
+                                        placeholder="Search assets, products, users..."
+                                        autocomplete="off"
+                                        hx-get="{% url 'dashboard:global_search' %}"
+                                        hx-trigger="keyup changed delay:300ms"
+                                        hx-target="#searchResults"
+                                        >
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="search-results-container" id="searchResults">
+                                        <div id="recentSearches"></div>
+                                        <div class="empty-state">
+                                        <i class="bi bi-search d-block"></i>
+                                        <p class="mb-0">Start typing to search</p>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
                         <div class="col-md-12 col-xl-6">
                             <div class="d-flex justify-content-between" style="margin-top: 18px;">
                                 <div class="hamburger-btn-wrap">
@@ -130,8 +160,6 @@
                                             </li>
                                         </ul>
                                     </div>
-
-
                                     <div class="user-avatar-area">
                                         <div class="dropdown">
                                             <a href="#" class="d-flex align-items-center justify-content-end" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">

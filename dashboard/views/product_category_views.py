@@ -64,22 +64,22 @@ def product_category_list(request):
         Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
-            product__product_category__in=all_product_category_list
+            product__product_sub_category__in=all_product_category_list
         )
-        .values("product__product_category")
+        .values("product__product_sub_category")
         .annotate(asset_count=Count("id", distinct=True))   # ✅ distinct asset count
     )
 
     # Map: {product_category_id: asset_count}
     product_category_asset_count = {
-        item["product__product_category"]: item["asset_count"]
+        item["product__product_sub_category"]: item["asset_count"]
         for item in asset_counts
     }
-    is_demo=IS_DEMO
-    if is_demo==True:
-        is_demo=True
-    else:
-        is_demo=False
+    # is_demo=IS_DEMO
+    # if is_demo==True:
+    #     is_demo=True
+    # else:
+    #     is_demo=False
     context = {
         'sidebar': 'admin',
         'submenu': 'product_category',
@@ -87,7 +87,7 @@ def product_category_list(request):
         'deleted_product_categories_count': deleted_product_categories_count,
         'product_category_asset_count': product_category_asset_count,
         'title': 'Product Categories',
-        'is_demo':is_demo
+        # 'is_demo':is_demo
     }
     return render(request, 'dashboard/product_category/list.html', context=context)
 
@@ -118,7 +118,7 @@ def add_product_category(request):
 def product_category_details(request, id):
 
     product_category = get_object_or_404(
-        ProductCategory.undeleted_objects, pk=id, organization=request.user.organization)
+        ProductCategory.undeleted_objects, pk=id)
 
     history_list = product_category.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
