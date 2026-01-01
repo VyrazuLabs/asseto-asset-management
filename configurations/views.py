@@ -1,14 +1,20 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.models import BrandingImages,LocalizationConfiguration
-from configurations.utils import add_path, create_or_update_image, update_files_name
+from configurations.utils import add_path, create_or_update_image, update_files_name,hide_last_digits
 from django.contrib import messages
 from configurations.models import BrandingImages,LocalizationConfiguration
 from configurations.utils import add_path, update_files_name
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
-from .models import TagConfiguration,Extensions
+from .models import TagConfiguration,Extensions,SlackConfiguration
 from django.http import JsonResponse
+import base64
+from dashboard.models import Organization
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponse
+from django.contrib import messages
+
 from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
 @login_required
@@ -27,7 +33,7 @@ def logo_upload(request):
         return render(request, 'configurations/logo.html',{'add_path_context':add_path_context,'submenu':'branding','sidebar':'configurations'})
 
 
-
+@login_required
 def delete_logo(request, id):
     try:
         get_logo=get_object_or_404(BrandingImages,pk=id)
@@ -37,6 +43,7 @@ def delete_logo(request, id):
         print(e)
     return redirect('configurations:upload_logo')
 
+@login_required
 def delete_favicon(request, id):
     try:
         get_logo=get_object_or_404(BrandingImages,pk=id)
@@ -46,6 +53,7 @@ def delete_favicon(request, id):
         print(e)
     return redirect('configurations:upload_logo')
 
+@login_required
 def delete_login_page_logo(request, id):
     try:
         get_logo=get_object_or_404(BrandingImages,pk=id)
@@ -56,6 +64,7 @@ def delete_login_page_logo(request, id):
     return redirect('configurations:upload_logo')
 
 @csrf_exempt
+@login_required
 def create_or_update_tag_configuration(request, id=None):
     user_default_settings = request.GET.get('user_default_settings')
     # Check if we're editing an existing configuration
@@ -84,7 +93,9 @@ def create_or_update_tag_configuration(request, id=None):
     }
     template_name = 'configurations/add_tag.html' if instance else 'configurations/add_tag.html'
     return render(request, template_name, context)
+
 @csrf_exempt
+@login_required
 def update_tag_configuration(request, id=None):
     config = get_object_or_404(TagConfiguration, pk=id)
 
@@ -104,10 +115,16 @@ def update_tag_configuration(request, id=None):
     }
     return render(request, 'configurations/add_tag.html', context)
 
+@login_required
 def list_tag_configurations(request):
     configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
+    if configurations is None:
+        instance=None
+        form = TagConfigurationForm(instance=instance)
+        return render(request, 'configurations/add_tag.html',{'form': form,'is_update': bool(instance),'configurations': instance,'submenu':'tag-configuration','sidebar':'configurations'})
     return render(request, 'configurations/list_tag.html', {'configurations': configurations,'submenu':'tag-configuration','sidebar':'configurations'})
 
+@login_required
 def toggle_default_settings(request, id):
     configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
     config = get_object_or_404(TagConfiguration, pk=id, organization=request.user.organization)
@@ -153,9 +170,9 @@ def list_localizations(request):
 #     }
 #     return render(request, 'configurations/add.html', context)
 
+@login_required
 def create_localization_configuration(request):
     get_obj=LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    print("post------------------------,",request.POST)
     if request.method == 'POST':
         country_format = request.POST.get('country-format')
         currency_format = request.POST.get('currency-format')
@@ -185,9 +202,7 @@ def create_localization_configuration(request):
 
     return redirect('configurations:list_localization')
 
-
-
-
+@login_required
 def integration(request):
     if request.method == 'POST':
         integration_type = request.POST.get('integration_type')
@@ -203,31 +218,127 @@ def integration(request):
                 request.session['slack'] = False
             # Save logic here...
             return redirect('configurations:integration')
-    else:
+    elif request.method == 'GET':
         form = ClientCredentialsForm()
         integration_choices=INTEGRATION_CHOICES
+        slack_config=SlackConfiguration.objects.filter(user=request.user).first()
+        client_id=base64.b64decode(slack_config.client_id).decode() if slack_config else None
+        client_secret=base64.b64decode(slack_config.client_secret).decode() if slack_config else None
+        if client_id is not None:   
+            client_id=hide_last_digits(client_id)
+        context={
+            'client_id':client_id,
+            'client_secret':client_secret
+        }
+        print(context)
+    # On GET or other methods, you may render the form page or handle differently
+        return render(request, "configurations/integrations.html", context=context)
+
+        print(integration_choices)
     return render(request, 'configurations/integrations.html', {'form': form,'integration_choices':integration_choices})
 
+@login_required
 def list_extensions(request):
-    integration_choices=INTEGRATION_CHOICES
-    return render(request, 'configurations/list-extensions.html',{'integration_choices':integration_choices})
-
-def extension_status(request, id):
-    integration_choices=INTEGRATION_CHOICES
-    status = request.POST.get('status')
-    # Convert to boolean or int safely
-    status_bool = str(status).lower() in ['true', '1', 'yes',0]
-    products=None
-    for choice_id, entity_name in integration_choices:
-        if choice_id == id:
-            products, created = Extensions.objects.get_or_create(
+    # integration_choices=INTEGRATION_CHOICES
+    for choice_id, (entity_name, description) in INTEGRATION_CHOICES:
+        existing_extension = Extensions.objects.filter(
+            organization=request.user.organization, entity_name=entity_name
+        ).first()
+        if not existing_extension:
+            Extensions.objects.create(
                 organization=request.user.organization,
+                description=description,
                 entity_name=entity_name,
-                status=status
-                # defaults={"status": 0}
+                status=0,  # Inactive by default
+                validity=0,
             )
-            # Update status with incoming boolean
-            products.status = 1 if status_bool else 0
-            products.save()
-            break
-    return redirect('configurations:list_extensions')
+    get_extensions=Extensions.objects.filter(organization=request.user.organization).first()
+    if get_extensions:
+        request.session['slack'] = True
+    else:
+        request.session['slack'] = False
+    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions})
+
+@login_required
+def extension_status(request, id):
+    status = request.POST.get("status", "off")  # will be "on" or "off"
+
+    ext = Extensions.objects.filter(id=id).first()
+    ext.status = 1 if status == "on" else 0
+    ext.save()
+
+    return redirect("configurations:list_extensions")
+
+@login_required
+def save_slack_configuration(request):
+    if request.method == "POST":
+        client_id = request.POST.get("client_id", "").strip()
+        client_secret = request.POST.get("client_secret", "").strip()
+        client_id = base64.b64encode(client_id.encode()).decode()
+        client_secret = base64.b64encode(client_secret.encode()).decode()
+        # Encode client_id and client_secret in base64
+
+        slack_config, created = SlackConfiguration.objects.get_or_create(user=request.user)
+        slack_config.client_id = client_id
+        slack_config.client_secret = client_secret
+        slack_config.save()
+        print("Slack configuration saved successfully")
+        # Redirect or render success message as needed
+        return redirect("configurations:integration")
+    if request.method == "GET":
+        slack_config=SlackConfiguration.objects.filter(user=request.user).first()
+        client_id=base64.b64decode(slack_config.client_id).decode() 
+        client_secret=base64.b64decode(slack_config.client_secret).decode()
+        context={
+            'client_id':client_id,
+            'client_secret':client_secret
+        }
+        # On GET or other methods, you may render the form page or handle differently
+        return redirect("configurations:integration")
+    
+# def add_organization(request):
+#     context={
+#         # 'organization_choices':ORGANIZATION_CHOICES,
+#         'currency_choices':CURRENCY_CHOICES,
+#         'submenu':'organization',
+#         'sidebar':'configurations'
+#     }
+#     return render(request,'configurations/add_organization.html',context=context)
+
+@login_required
+@permission_required('authentication.delete_location')
+def add_organization(request):
+    name=request.POST.get('organization_name')
+    website=request.POST.get('organization_website')
+    email=request.POST.get('organization_email')
+    currency=request.POST.get('currency-format')
+    phone=request.POST.get('organization_phone')
+    get_organization_id=request.user.organization.id
+    if request.method=="POST":
+        if get_organization_id is not None:
+            Organization.objects.update(
+                id=get_organization_id,
+                name=name,
+                website=website,
+                email=email,    
+                currency=currency,
+                phone=phone
+            )
+        else:
+            Organization.objects.create(
+                name=name,
+                website=website,
+                email=email,
+                currency=currency,
+                phone=phone
+            )
+        messages.success(request, 'Organization added successfully')
+        return redirect('configurations:add_organization')
+    elif request.method=="GET":
+        get_user_organization_id=request.user.organization.id
+        if get_user_organization_id:
+            get_org_data=Organization.objects.filter(id=get_user_organization_id).first()
+            print("get_org_data",get_org_data.id)
+        else:
+            get_org_data=None
+        return render(request, 'configurations/add_organization.html', context={'org_data': get_org_data,'currency_choices':CURRENCY_CHOICES,'submenu':'organization','sidebar':'configurations'})

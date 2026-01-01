@@ -1,0 +1,57 @@
+<div class="modal-header bg-dark text-center">
+    <h5 class="modal-title white w-100">Assign License</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+
+<form id="assign-license-form" method="POST">
+    {% csrf_token %}
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label>License</label>
+            <input type="text" class="form-control" value="{{ license.name }}" disabled>
+        </div>
+
+        <div class="form-group mt-2">
+            <label>Assign To</label>
+            {{ form.user }}
+            {% if form.user.errors %}
+            <div class="text-danger">{{ form.user.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-info">Assign</button>
+    </div>
+</form>
+<script>
+
+    document.getElementById("assign-license-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let form = e.target;
+        let formData = new FormData(form);
+
+        fetch("{% url 'license:assign_license' license.id %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value
+            }
+        })
+            .then(res => {
+                if (res.ok) return res.json();
+                return res.text().then(html => { throw html; });
+            })
+            .then(data => {
+                let modal = bootstrap.Modal.getInstance(document.getElementById("assign-license-list-modal"));
+                modal.hide();
+                location.reload();
+            })
+            .catch(html => {
+                document.getElementById("assign-license-modal-content").innerHTML = html;
+            });
+    });
+</script>

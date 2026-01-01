@@ -188,7 +188,209 @@
                     </div>
                 </div>
             {% endif %}
+            {% if request.user.is_superuser %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-gear-wide"></i>
+                            <span>Notification Settings</span>
+                        </h6>
+                        <form 
+                            hx-post="{% url 'users:create_user_notification_type' %}" 
+                            hx-trigger="change" 
+                            hx-include="this" 
+                            hx-swap="none"
+                        >
+                            {% csrf_token %}
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><b>Email Notification</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="email_notification"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if email_notification is True %} checked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>In-App Notification</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="in_app_notification"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if inapp_notification is True %} checked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>Browser Notification</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="browser_notification"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if browser_notification is True %} checked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><b>Slack Notification</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="slack_notification"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if slack_notification is True %} checked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            {% if assigned_assets is not None %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="my-3">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Assigned Assets</span>                       
+                        </h6>                        
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><b>Sl No.</b></td>
+                                    <td>Asset Images</td>
+                                    <td><b>Asset Tag</b></td>
+                                    <td><b>Asset Name</b></td>
+                                    <td>Type</td>
+                                    <td>Vendor Name</td>
+                                    <td><b>Assigned Date</b></td>
+                                </tr>
+                                {% for assigned_asset in assigned_assets %}
+                                    <tr>
+                                        <td>{{assigned_assets.start_index|add:forloop.counter0}}</td>
+                                    
+                                        <td>
+                                            {% with assigned_asset.asset.images.all as images %}
+                                                <div class="asset-thumbnail">
+                                                    {% if images %}
+                                                        <img src="{{ images.0.image.url }}"
+                                                            onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                                            class="img-fluid"
+                                                            style="width: 150px; height: 150px; object-fit: cover; border: none; cursor: pointer;"
+                                                            onclick="openAssetModal('carouselModal{{ assigned_asset.asset.id }}')"
+                                                            >
+                                                    {% else %}
+                                                        <img src="{% static 'assets/images/No_Image.jpg' %}"
+                                                            style="width: 150px; height: 150px; object-fit: cover; border: none;">
+                                                    {% endif %}
+                                                </div>
+                                            {% endwith %}
+                                        </td>
+                                        <td>{{assigned_asset.asset.tag}}</td>
+                                        <td>{{assigned_asset.asset.name}}</td>
+                                        <td>{{assigned_asset.asset.product.name}}</td>
+                                        <td>{{assigned_asset.asset.vendor}}</td>
+                                        <td>{{assigned_asset.assigned_date|date:"D, M d, Y"}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            <div class="dataTable-bottom">
+                                Showing {{ assigned_assets.start_index }} to {{ assigned_assets.end_index }} of {{ assigned_assets.paginator.count }} entries
+                            </div>
 
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination pagination-primary justify-content-end">
+
+                                    <li class="page-item {% if not assigned_assets.has_previous %} disabled {% endif %}">
+                                    <a class="page-link" 
+                                        {% if assigned_assets.has_previous %}
+                                        href="?assets_page={{ assigned_assets.previous_page_number }}&page={{ page_object.number }}"
+                                        {% endif %}
+                                        tabindex="-1" aria-disabled="true">« Previous</a>
+                                    </li>
+
+                                    {% for i in assigned_assets.paginator.page_range %}
+                                    <li class="page-item {% if assigned_assets.number == i %} active {% endif %}">
+                                        <a class="page-link" href="?assets_page={{ i }}&page={{ page_object.number }}">{{ i }}</a>
+                                    </li>
+                                    {% endfor %}
+
+                                    <li class="page-item {% if not assigned_assets.has_next %} disabled {% endif %}">
+                                    <a class="page-link" 
+                                        {% if assigned_assets.has_next %}
+                                        href="?assets_page={{ assigned_assets.next_page_number }}&page={{ page_object.number }}"
+                                        {% endif %}
+                                    >Next »</a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        </div>
+                        {% for assigned_asset in assigned_assets %}
+                            {% with assigned_asset.asset.images.all as images %}
+                                {% if images %}
+                                    <div class="modal fade" id="carouselModal{{ assigned_asset.asset.id }}" tabindex="-1" aria-labelledby="carouselModalLabel{{ assigned_asset.asset.id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="carouselModalLabel{{ assigned_asset.asset.id }}">Asset Images</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+
+                                                <div class="modal-body p-0">
+                                                    <div id="carousel{{ assigned_asset.asset.id }}" class="carousel slide" data-bs-ride="carousel">
+                                                        <div class="carousel-inner">
+                                                            {% for image in images %}
+                                                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                                                    <img class="d-block w-100"
+                                                                        onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                                                        src="{{ image.image.url }}"
+                                                                        alt="Asset Image"
+                                                                        style="object-fit: contain; max-height: 600px;">
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+
+                                                        {% if images|length > 1 %}
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="prev">
+                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                            </button>
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="next">
+                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
         </div>
     </section>
 </div>

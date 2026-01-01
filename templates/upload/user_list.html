@@ -64,7 +64,7 @@
                                 <td>{{ user.full_name }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ user.phone }}</td>
-                                <td>{{ user.department }}</td>
+                                <td>{% if user.department %}{{ user.department.name }}{% else %}-{% endif %}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

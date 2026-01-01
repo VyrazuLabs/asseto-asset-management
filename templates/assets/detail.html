@@ -65,7 +65,11 @@
                                 <th scope="row">Price</th>
                                 {% if asset.price == None %} <td>Not Available</td> 
                                 {% else %}
-                                <td>{{get_currency}} {{asset.price}}</td>
+                                    {% if get_currency is not None %}
+                                    <td>{{get_currency}} {{asset.price}}</td>
+                                    {% else %}
+                                    <td>{{asset.price}}</td>
+                                    {% endif %}
                                 {% endif %}
                                 <th scope="row">Office Location</th>
                                 <td>{{asset.location.address.address_line_one}}</td>
@@ -91,9 +95,6 @@
                             <tr>
                                 <th scope="row">Status</th>
                                 <td>{{asset.asset_status.name}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
-                                
                             </tr>
                             <tr>
                                 <th scope="row">Description</th>
@@ -102,42 +103,44 @@
 
                             </tbody>
                     </table>
-                    <p ><b>Asset Images</b></p>
-                    <div class="d-flex gap-2">
-                        {% for it in get_asset_img %}
-                            {% if it.image %}
-                                <div >
-                                    <img
-                                    src="{% get_media_prefix %}{{ it.image }}" 
-                                    alt="Asset Image {{ forloop.counter }}"
-                                    style="cursor: pointer; width: 150px;"
-                                    class="clickable-image"
-                                    data-image-src="{% get_media_prefix %}{{ it.image }}"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#imageModal{{ forloop.counter }}"
-                                    onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
-                                    >
-                                </div>
-                            {% elif not it.image.url %}
-                                <div >
-                                    <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
-                                </div>
-                            {% endif %}
-                            <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    {% if get_asset_img %}
+                        <p ><b>Asset Images</b></p>
+                        <div class="d-flex gap-2">
+                            {% for it in get_asset_img %}
+                                {% if it.image %}
+                                    <div >
+                                        <img
+                                        src="{% get_media_prefix %}{{ it.image }}" 
+                                        alt="Asset Image {{ forloop.counter }}"
+                                        style="cursor: pointer; width: 150px;"
+                                        class="clickable-image"
+                                        data-image-src="{% get_media_prefix %}{{ it.image }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#imageModal{{ forloop.counter }}"
+                                        onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                        >
                                     </div>
-                                    <div class="modal-body text-center">
-                                    <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                {% elif not it.image.url %}
+                                    <div >
+                                        <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                    </div>
+                                {% endif %}
+                                <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                        <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     {% if get_custom_data %}
                     <div class="card mt-3">
                         <div class="card-header">

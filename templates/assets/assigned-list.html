@@ -7,7 +7,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Assign Asset</li>
+                    <li class="breadcrumb-item active" aria-current="page">Assigned Asset</li>
                 </ol>
             </nav>
         </div>
@@ -20,7 +20,7 @@
                     hx-target="#assign-asset-modal-content"
                     data-bs-toggle="modal" 
                     data-bs-target="#assign-asset-modal"
-                >Assign Asset</button>
+                >Assigned Asset</button>
             </div>
         {% endif %}
     </div>
@@ -39,7 +39,6 @@
                 <div id="reassign-asset-modal-content" class="modal-content" hx-target="this"></div>
             </div>
         </div>
-
         <div class="card">
             <div class="card-body">
                 {% if page_object %}
@@ -53,7 +52,7 @@
                         <tr>
                             <th>Sl No.</th>
                             <th>Asset Name</th>
-                            <th>Serial No.</th>
+                            <th>Tag</th>
                             <th>Assigned To</th>
                             <th>Department</th>
                             {% if perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset%}
@@ -67,7 +66,7 @@
                         <tr>
                             <td>{{page_object.start_index|add:forloop.counter0}}</td>
                             <td>{{assign_asset.asset.name}}</td>
-                            <td>{{assign_asset.asset.serial_no}}</td>
+                            <td>{{assign_asset.asset.tag}}</td>
                             <td>
                                 {{assign_asset.user.full_name}}
                                 {% if assign_asset.user.is_deleted %}
@@ -76,9 +75,9 @@
                             </td>
                             <td>{{assign_asset.user.department.name}}</td>
                             <td>
-                                <a href="{% url 'assets:details' assign_asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
+                                <a href="{% url 'assets:details' assign_asset.asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                 {% if perms.authentication.reassign_assign_asset %}
-                                    <button type="button" class="btn btn-info btn-sm" 
+                                    <button type="button" class="btn btn-info " 
                                         hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
                                         data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
                                     >Reassign</button>
@@ -87,7 +86,7 @@
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                         <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
                                             {% csrf_token %}
-                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
+                                            <button type="submit" value="Delete" class="btn  btn-danger">Unassign</button>
                                         </form>
                                     </div>
                                 {% endif %}
