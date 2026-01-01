@@ -54,14 +54,9 @@ def vendor_list(request):
         count_array.append(get_count)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
     context = {'sidebar': 'vendors','count_array': count_array,
                'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
-               'is_demo':is_demo}
+               }
     return render(request, 'vendors/list.html', context=context)
 
 
@@ -105,10 +100,8 @@ def add_vendor(request):
 def details(request, id):
     vendor = get_object_or_404(
         Vendor.undeleted_objects, pk=id, organization=request.user.organization)
-    address = Address.objects.get(id=vendor.address.id)
-    
+    address = Address.objects.get(id=vendor.address.id) if vendor.address else None
     assets=Asset.undeleted_objects.filter(vendor=vendor)
-    asset_page_param = 'asset_page'
     assets_paginator=Paginator(assets,10,orphans=1)
     assets_page_number=request.GET.get('asset_page')
     assets_page_object=assets_paginator.get_page(assets_page_number)

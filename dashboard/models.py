@@ -83,7 +83,6 @@ class Location(TimeStampModel, SoftDeleteModel):
     def __str__(self):
         return f'{self.office_name} - {self.address.address_line_one}'
     
-
 class Organization(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -132,8 +131,8 @@ class Address(TimeStampModel):
     city = models.CharField(max_length=255, blank=True, null=True)
     pin_code = models.CharField(max_length=255, blank=True, null=True)
 
-    # def __str__(self):
-    #     return f'{self.address_line_one}, {self.address_line_two}, {self.country}, {self.state}, {self.city}, {self.pin_code}'    
+    def __str__(self):
+        return f'{self.address_line_one}, {self.address_line_two}, {self.country}, {self.state}, {self.city}, {self.pin_code}'    
 
 class CustomField(models.Model):
     ENTITY_CHOICES = [
@@ -150,3 +149,10 @@ class CustomField(models.Model):
     entity_type = models.CharField(max_length=30, choices=ENTITY_CHOICES)
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE,null=True,blank=True)
     required = models.BooleanField(default=False)
+
+class LicenseType(TimeStampModel,SoftDeleteModel):
+    id=models.AutoField(primary_key=True, null=False)
+    name=models.CharField(max_length=255)
+    history = HistoricalRecords()
+    def __str__(self):
+        return self.name

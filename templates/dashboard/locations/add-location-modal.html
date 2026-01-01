@@ -13,6 +13,7 @@
                 <div class="col-md-6 col-12">
                     <div class="form-group">
                         <label>Office Name</label>
+                        <span class="text-danger">*</span>
                         {{location_form.office_name}}
                         {% for error in location_form.office_name.errors %}
                         <small class="text-danger mb-3">{{ error }}</small>

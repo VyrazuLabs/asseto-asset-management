@@ -61,6 +61,9 @@ class Asset(TimeStampModel, SoftDeleteModel):
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
+    def get_status(self):
+        return dict(self.STATUS_CHOICES).get(self.status, 'Unknown')
+
     def __str__(self):
         return self.name
 

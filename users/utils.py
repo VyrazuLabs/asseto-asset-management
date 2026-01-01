@@ -1,10 +1,10 @@
-
 from django.contrib.auth.models import Permission, Group
 from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
-from django.http import JsonResponse
-from configurations.utils import dynamic_display_name
+from django.core.paginator import Paginator
+
+
 PERMISSION_LIST = [
     # products
     'view_product',
@@ -128,6 +128,12 @@ def assigned_asset_to_user(page_object):
     
     return user_asset_map
 
+def get_all_assigned_license(request,assigned_licenses):
+    license_paginator=Paginator(assigned_licenses,10,orphans=1)
+    license_page_number=request.GET.get('license_page')
+    license_page_object=license_paginator.get_page(license_page_number)
+
+    return license_page_object
 
 def user_data(request,user_list):
     current_host=request.get_host()                                                                                                           
@@ -135,31 +141,49 @@ def user_data(request,user_list):
     for user in user_list:
         user_data_list.append({
             'id':user.id,
+            'department_id':user.department.id if user.department else None,
+            'location_id':user.location.id if user.location else None,
+            'role_id':user.role.id if user.role else None,
             'fullName':user.full_name,
             'email':user.email,
             'role':user.role.related_name if user.role else None,
             'isActive':user.is_active,
             'lastLogin':user.last_login,
             'profilePicture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
-            'assetCount':AssignAsset.objects.filter(user=user.id).count()
+            'assetCount':AssignAsset.objects.filter(user=user.id).count(),
+            'department':user.department.name if user.department else None,
+            'location':user.location.office_name if user.location else None,
         })
     return user_data_list
 
 def user_details(request,get_user,assigned_assets):
     current_host=request.get_host()
     user_details={
+        'user_id':get_user.id,
         'name':get_user.full_name,
+        'department_id':get_user.department.id if get_user.department else None,
+        'location_id':get_user.location.id if get_user.location else None,
+        'role_id':get_user.role.id if get_user.role else None,
         'email':get_user.email,
         'isActive':get_user.is_active,
         'phone_number':get_user.phone,
-        'profilePicture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
+        'profile_picture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
         'department':get_user.department.name if get_user.department else None,
+        'location':get_user.location.office_name if get_user.location else None,
         'role':get_user.role.related_name if get_user.role else None,
+        'address_line_one':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None,
+        'address_line_two':get_user.address.address_line_two if get_user.address and get_user.address.address_line_two else None,
+        'city':get_user.address.city if get_user.address and get_user.address.city else None,
+        'country':get_user.address.country if get_user.address and get_user.address.country else None,
+        'state':get_user.address.state if get_user.address and get_user.address.state else None,
+        'pin_code':get_user.address.pin_code if get_user.address and get_user.address.pin_code else None,
         'address':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None
-    }   
+    }
     assigned_assets_list=[]
     for assigned_asset in assigned_assets:
         assigned_assets_data={
+            'assigned_asset_id':assigned_asset.id,
+            'asset_id':assigned_asset.asset.id,
             'assigned_asset_name':assigned_asset.asset.name,
             'asset_tag':assigned_asset.asset.tag,
             'vendor':assigned_asset.asset.vendor.name if assigned_asset.asset and assigned_asset.asset.vendor else None,
