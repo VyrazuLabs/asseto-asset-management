@@ -9,5 +9,4 @@ def get_assigned_users():
             'name':assigned_licnese.user.full_name,
             'image':assigned_licnese.user.profile_pic
         }
-    print(license_and_user_details)
     return license_and_user_details
