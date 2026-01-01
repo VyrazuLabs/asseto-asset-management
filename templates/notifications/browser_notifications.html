@@ -1,0 +1,34 @@
+<script>
+// Asking for permission to show notifications
+document.addEventListener("DOMContentLoaded", function () {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+});
+
+function showBrowserNotification(title, body, icon, link) {
+    if (Notification.permission !== "granted") return;
+
+    const notification = new Notification(title, {
+        body: body,
+        icon: icon || undefined
+    });
+
+    notification.onclick = function () {
+        if (link) window.open(link, "_blank");
+    };
+}
+
+function fetchNotifications() {
+    fetch("/api/browser/notifications/")
+        .then(response => response.json())
+        .then(notifications => {
+            notifications.forEach(n => {
+                showBrowserNotification(n.title, n.text, n.icon, n.link);
+            });
+        });
+}
+
+// Poll the API every 5 seconds
+setInterval(fetchNotifications, 5000);
+</script>

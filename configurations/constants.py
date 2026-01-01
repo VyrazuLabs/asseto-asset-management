@@ -50,7 +50,7 @@ CURRENCY_CHOICES = [
 ]
 
 INTEGRATION_CHOICES = [
-    (0, 'Slack')
+    (0, ['Slack','Install the slack to get real time updates about any addition or updation in your asset application'])
 ]
 
 DATETIME_CHOICES=[

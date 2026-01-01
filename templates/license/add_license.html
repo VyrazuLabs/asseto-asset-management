@@ -1,0 +1,111 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Add License</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Licenses</li>
+                    <li class="breadcrumb-item active" aria-current="page">Add License</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'license:license_list' %}" class="btn btn-sm btn-outline-info my-3">Back to License List</a>
+        </div>
+    </div>
+
+    <section class="section">
+        <form class="form row" action="{% url 'license:add_license' %}" method="POST" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-header">
+                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="company-column">License Name</label>
+                                <span class="text-danger">*</span>
+                                {{form.name}}
+                                {% for error in form.name.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="city-column">Seats</label>
+                                <span class="text-danger">*</span>
+                                {{form.seats}}
+                                {% for error in form.seats.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="city-column">Key</label>
+                                <span class="text-danger">*</span>
+                                {{form.key}}
+                                {% for error in form.seats.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="country-floating">License Type</label>
+                                <span class="text-danger">*</span>
+                                {{form.license_type}}
+                                {% for error in form.license_type.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Vendor</label>
+                                {{form.vendor}}
+                                {% for error in form.vendor.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Start Date</label>
+                                {{form.start_date}}
+                                {% for error in form.start_date.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="email-id-column">Expiry Date</label>
+                                {{form.expiry_date}}
+                                {% for error in form.expiry_date.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <div class="form-group">
+                                <label for="country-floating">Description</label>
+                                {{form.notes}}
+                                {% for error in form.notes.errors %}
+                                <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock content %}

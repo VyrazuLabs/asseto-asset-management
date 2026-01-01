@@ -5,10 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from configurations.models import BrandingImages,LocalizationConfiguration
 from .constants import DATETIME_CHOICES,CURRENCY_CHOICES,NAME_FORMATS
-from datetime import datetime
 from dateutil.parser import parse
-from authentication.models import User
-from assets.utils import get_host
 
 def update_files_name(request,logo,favicon,login_page_logo):
     max_file_size=5*1024*1024
@@ -147,7 +144,7 @@ def get_currency_and_datetime_format(organization):
         if it==get_time:
             date_format=data
             break
-    # new_date_format=format_datetime(output_format=date_format)
+        
     obj={'currency':currency_format,'date_format':date_format}
     return obj
     # return organization.currency, organization.date_format
@@ -155,6 +152,7 @@ def get_currency_and_datetime_format(organization):
 def format_datetime(x,output_format):
     """Convert datetime object to the specified output format."""
     # x = datetime.datetime.now()
+    print(x)
     if isinstance(x, str):
         x = parse(x)
 
@@ -171,25 +169,6 @@ def format_datetime(x,output_format):
 
     return x.strftime(formats[output_format])
     
-# def dynamic_display_name(request, format_key="first_last"):
-#     user_id=request.user
-#     user=User.objects.filter(id=user_id.id).first()
-#     if not user:
-#         return ""
-#     # For generalized templates, support initials and such
-#     formats = NAME_FORMATS
-#     # Prepare mapping with all possible user name parts
-#     context = {
-#         "first": getattr(user, "first_name", "") or "",
-#         "last": getattr(user, "last_name", "") or "",
-#     }
-#     try:
-#         fmt = formats.get(format_key, formats["first_last"])
-#         return fmt.format(**context)
-#     except Exception:
-#         # fallback to simple "first last"
-#         return f'{context["first"]} {context["last"]}'
-
 def dynamic_display_name(request,fullname):
     format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
 
@@ -214,3 +193,6 @@ def dynamic_display_name(request,fullname):
     except Exception:
         # fallback to standard "First Last"
         return f"{first} {last}".strip()
+
+def hide_last_digits(value, last_digits=4):
+    return f"{value[:-last_digits]}{'X' * last_digits}"

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import *
-from .api_views import UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,SearchUser
+from .api_views import UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,UserSearch,GetUserName,GetRoles
 
 app_name = 'users'
 
@@ -17,6 +17,8 @@ urlpatterns = [
     path('pdf', export_users_pdf, name='export_users_pdf'),
     path('assigned-assets/<uuid:id>', user_assigned_assets, name='user_assigned_assets'),
     path('render-username/', render_format_based_username, name='render_format_based_username'),
+    path('create-user-notification-type',create_user_notification_type,name='create_user_notification_type'),
+
 ]
 
 user_api_url_patterns=[
@@ -26,5 +28,8 @@ user_api_url_patterns=[
     path('api/user/details/<uuid:id>',UserDetails.as_view(),name='user_details'),
     path('api/user/update/<uuid:id>',UpdateUser.as_view(),name='update_user'),
     path('api/user/delete/<uuid:id>',DeleteUSer.as_view(),name='delete_user'),
-    path('api/user/search/',SearchUser.as_view(),name='search_user')
+    path('api/user/search/',UserSearch.as_view(),name='search_user'),
+    path('api/user/profile',UserProfile.as_view(),name='user_profile'),
+    path('api/user/user-name-info/<uuid:id>',GetUserName.as_view(),name='user_name_info'),
+    path('api/user/roles/',GetRoles.as_view(),name='user_roles'),
 ]

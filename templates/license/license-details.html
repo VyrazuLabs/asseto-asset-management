@@ -1,0 +1,98 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">Licnese Details</h3>
+
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">License</li>
+                    <li class="breadcrumb-item active" aria-current="page">License Details</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <div class="me-2">
+                <a href="{% url 'license:license_list' %}" class="btn btn-sm btn-outline-info my-3">Back to License List</a>
+            </div>
+            <div>
+                <a href="{% url 'license:update_license' license.id %}" class="btn btn-sm btn-outline-info my-3">Update License</a>
+            </div>
+
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="my-3">
+                    <i class="bi bi-pc-display"></i>
+                    <span>License Information</span>                       
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th scope="row">License Name</th>
+                                <td>{{license.name}}</td>
+
+                                <th scope="row">Key</th>
+                                {% if not license.key %} <td>Not Provided</td>
+                                {% else %}
+                                <td>{{license.key}}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th scope="row">License Type</th>
+                                <td>{{license.license_type.name}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">Vendor</th>
+                                <td>{{license.vendor.name}}</td>
+                            </tr>
+                            
+                            <tr>
+                                <th scope="row">Seats</th>
+                                {% if not license.seats %} <td>Not Provided</td> 
+                                {% else %}
+                                <td>{{license.seats}}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th scope="row">Start Date</th>
+                                {% if license.start_date == None %} <td>Not Provided</td> 
+                                {% else %}
+                                <td>{{license.start_date}}</td>
+                                {% endif %}
+                                <th scope="row">Expiry Date</th>
+                                {% if license.expiry_date == None %} <td>Not Provided</td> 
+                                {% else %}
+                                <td>{{license.expiry_date}}</td>
+                                {% endif %}
+                            </tr>
+                            <tr>
+                                <th scope="row">Notes</th>
+                                <td colspan="3">{{license.notes|urlize}}</td>
+                            </tr>
+
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% include 'commons/history.html' %}
+    </section>
+</div>
+
+<script>
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('hidden.bs.modal', () => {
+    window.location.reload();
+  });
+});
+</script>  
+{% endblock content%}

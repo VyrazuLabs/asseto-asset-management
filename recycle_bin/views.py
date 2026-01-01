@@ -1,7 +1,7 @@
 from itertools import product
 from django.shortcuts import render, redirect
 from authentication.models import User
-from dashboard.models import Department, Location, ProductCategory, ProductType
+from dashboard.models import Department, LicenseType, Location, ProductCategory, ProductType
 from vendors.models import Vendor
 from assets.models import Asset, AssetStatus
 from django.core.paginator import Paginator
@@ -786,3 +786,82 @@ def deleted_roles_status_restore(request, id):
         messages.error(request, 'Asset Status can not be restored')
 
     return redirect('recycle_bin:deleted_asset_status')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_license_types(request):
+
+    product_category_list = LicenseType.deleted_objects.all().order_by('-updated_at')
+    paginator = Paginator(product_category_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'Roles',
+        'page_object': page_object,
+        'title': 'Deleted License Types'
+    }
+
+    return render(request, 'recycle_bin/deleted-license-type.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_license_types_permanently(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            license_type = get_object_or_404(
+                LicenseType.deleted_objects, pk=id)
+            license_type.delete()
+            messages.success(request, 'License Type deleted permanently')
+
+    except ProtectedError:
+
+        messages.error(
+            request, 'Error! License Type  is used in License')
+
+    except Exception as e:
+        print(e)
+        messages.error(request, 'License Type can not be deleted')
+
+    return redirect('recycle_bin:deleted_license_types')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_license_types_restore(request, id):
+
+    try:
+
+        if request.method == 'POST':
+            license_type = get_object_or_404(LicenseType.deleted_objects, pk=id)
+            license_type.restore()
+
+            history_id = LicenseType.history.first().history_id
+            LicenseType.history.filter(pk=history_id).update(history_type='^')
+            messages.success(request, 'License Type restored successfully')
+
+    except Exception as e:
+        print(e)
+        messages.error(request, 'License Type can not be restored')
+
+    return redirect('recycle_bin:deleted_license_types')
+
+@login_required
+def deleted_license_types_search(request, page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-asset-status-data.html', {
+            'page_object': AssetStatus.deleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
+        })
+
+    status_list = AssetStatus.deleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(status_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-asset-status-data.html', {'page_object': page_object})

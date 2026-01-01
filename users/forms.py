@@ -2,7 +2,7 @@ from django import forms
 from authentication.models import User
 from roles.models import Role
 from dashboard.models import Department, Location
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from dashboard.models import Address
 
 
@@ -15,11 +15,13 @@ class UserForm(forms.ModelForm):
         attrs={'class':  'form-control',
                'placeholder':  'Email', 'autocomplete': 'off'}
     ))
-    phone = forms.IntegerField(required=True, widget=forms.NumberInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Phone', 'autocomplete': 'off'}
-    ))
-
+    phone = forms.CharField(required=True,widget=forms.TextInput(attrs=
+        {
+        'class': 'form-control',
+        'placeholder': 'Phone',
+        'autocomplete': 'off'
+        })
+    )
     access_level = forms.ChoiceField(
         required=False,
         choices=(
@@ -98,19 +100,13 @@ class UserForm(forms.ModelForm):
         full_name = self.cleaned_data.get('full_name')
         return full_name.title()
     
-    # def clean_password1(self):
-    #     password1=self.data.get('password1')
-    #     if password1 in ("", None):
-    #         return password1
-    #     else:
-    #         return password1
-
-    # def clean_password2(self):
-    #     password2=self.data.get('password2')
-    #     if password2 in ("", None):
-    #         return password2
-    #     else:
-    #         return password2
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        elif not len(phone)==10:
+            raise forms.ValidationError("Phone number does not have 10 digits")
+        return phone
     class Meta:
         model = User
         fields = ['full_name', 'email', 'phone', 'access_level',
@@ -127,10 +123,11 @@ class UserUpdateForm(UserChangeForm):
         attrs={'class':  'form-control',
                'placeholder':  'Email', 'autocomplete': 'off'}
     ))
-    phone = forms.IntegerField(required=True, widget=forms.NumberInput(
-        attrs={'class': 'form-control',
-               'placeholder': 'Phone', 'autocomplete': 'off'}
-    ))
+    phone = forms.CharField(required=True,widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Phone',
+        'autocomplete': 'off'
+    }))
 
     access_level = forms.ChoiceField(
         # required=True,
@@ -186,6 +183,14 @@ class UserUpdateForm(UserChangeForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         return email.lower()
+    
+    def clean_phone(self):
+        phone = self.cleaned_data['phone']
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        elif len(phone)>10: 
+            raise forms.ValidationError("Phone number can not be more than 10 digits")
+        return phone
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')

@@ -1,5 +1,16 @@
 {% extends 'layouts/main-layout.html' %}
+
 {% block content %}
+<style>
+a.disabled {
+    pointer-events: none;
+    color: gray !important; /* Or any muted color */
+    opacity: 0.5;
+    cursor: default;
+    text-decoration: none;
+}
+</style>
+
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
@@ -7,83 +18,84 @@
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Admin</li>
-                    <li class="breadcrumb-item active" aria-current="page">Extensions</li>
+                    <li class="breadcrumb-item" aria-current="page">Extensions</li>
+                    <li class="breadcrumb-item active" aria-current="page">Slack</li>
                 </ol>
             </nav>
         </div>
     </div>
-    <section class="section">
-        <form class="form row" 
-              action="{% url 'configurations:integration' %}" 
-              method="POST" novalidate>
-            {% csrf_token %}
-            <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card p-3 h-100 w-100">
-                        <div class="d-flex justify-content-between">
-                            <h4 class="mb-3">Slack</h4>
-                            <a href="{% url 'configurations:integration' %}" class="btn btn-primary justify-content-center w-25">Enable</a>
-                        </div>
-                        <br>
-                        <div class="mb-3 text-center d-flex gap-5">
-                            {% if add_path_context.logo %}
-                                <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg" alt="logo_image" class="img-fluid" style="max-height: 90px;">
-                                <a class="btn btn-sm btn-danger ms-2 " href="{% url 'configurations:delete_logo' add_path_context.id %}">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </a>
-                            {% else %}
-                                <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg" alt="logo_image" class="img-fluid" style="max-height: 90px;">
-                            {% endif %}
-                            <div class="mt-3">Install the slack to get real time updates about any addition or updation in your asset application</div>
-                        </div>
-                        <div class="d-flex align-items-center mt-3 mb-2">
+    <section class="section row">
+            <div class="col-12 col-md-6 col-lg-4 m-3">
+                <div class="card p-3 h-75 w-100 p-2">
+                    <div class="d-flex justify-content-between w-100 p-2">
+                        <h4 class="mb-3">{{ integration_choices.entity_name }} Configurations</h4>
+                        <div class="d-flex justify-content-end gap-2">
+                            <!-- Gear button wrapper -->
+                            <a id="slack-integration-btn-{{ forloop.counter }}"
+                            class="btn bg-transparent {% if integration_choices.status == 0 %}disabled{% endif %}"
+                            href="{% url 'configurations:integration' %}">
+                                <i class="bi bi-gear"></i>
+                            </a>
+
+                            <div class="form-check form-switch">
+                                <input
+                                    name="status"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id="flexSwitchCheckDefault-{{ forloop.counter }}"
+                                    hx-post="{% url 'configurations:extension_status' integration_choices.id %}"
+                                    hx-include="closest div"
+                                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                    hx-trigger="change"
+                                    hx-on:htmx:afterOnLoad="location.reload()"
+                                    {% if integration_choices.status == 0 %} unchecked {% else %} checked {% endif %}
+                                    style="cursor: pointer;"
+                                >
+                            </div>
                         </div>
                     </div>
+                    <div class="mb-3 text-center d-flex gap-5 p-3">
+                        {% if add_path_context.logo %}
+                            <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg"
+                                 alt="logo_image"
+                                 class="img-fluid"
+                                 style="max-height: 90px;">
+                            <a class="btn btn-sm btn-danger ms-2"
+                               href="{% url 'configurations:delete_logo' add_path_context.id %}">
+                                <i class="bi bi-trash3-fill"></i>
+                            </a>
+                        {% else %}
+                            <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg"
+                                 alt="logo_image"
+                                 class="img-fluid"
+                                 style="max-height: 90px;">
+                        {% endif %}
+                        <span class="p-1">{{ integration_choices.description }}</span>
+                    </div>
                 </div>
-        </form>
+            </div>
+       
     </section>
 </div>
-{% endblock %}
 <script>
-function toggleExtensionStatus(checkbox, id) {
-    const status = checkbox.checked ? 1 : 0;
+    document.addEventListener("DOMContentLoaded", function() {
+        const slackCheckbox = document.getElementById("slack-integration-btn-{{ forloop.counter }}");
+        const slackCredentials = document.getElementById("slack-button");
 
-    fetch(`/extension-status/${id}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': getCookie('csrftoken'), // Function to get CSRF token from cookie
-        },
-        body: new URLSearchParams({
-            'status': status
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Status updated:', data);
-        // Optionally, update UI or show notification based on success
-    })
-    .catch(error => {
-        console.error('Error updating status:', error);
-        // Optionally, revert the checkbox state on error
-        checkbox.checked = !checkbox.checked;
-    });
-}
-
-// Helper to fetch CSRF token (Django default)
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            cookie = cookie.trim();
-            if (cookie.startsWith(name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        function showDiv() {
+            if (slackCheckbox.checked) {
+                slackCredentials.disabled= true;
+            } else {
+                slackCredentials.disabled= false;
             }
         }
-    }
-    return cookieValue;
-}
-</script>
 
+        // Initialize on page load
+        showDiv();
+
+        // Add change event listener
+        slackCheckbox.addEventListener("change", showDiv);
+    });
+</script>
+{% endblock %}

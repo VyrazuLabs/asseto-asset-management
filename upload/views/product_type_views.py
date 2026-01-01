@@ -63,7 +63,8 @@ def import_product_types_csv(request):
 
         return render(request, "upload/map-product-type-modal.html", {
             "headers": headers,
-            "fields": ["name"]
+            "fields": ["name"],
+            'required_fields':['name']
         })
     else:
         return render(request, "upload/upload-csv-modal.html", {"page": "Product Type","hx_target": "#upload-product-types-modal-content"})
