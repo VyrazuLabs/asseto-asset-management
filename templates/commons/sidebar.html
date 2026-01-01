@@ -98,6 +98,15 @@
                 </li>
                 {% endif %}
 
+                {% if perms.authentication.edit_license or perms.authentication.delete_license or perms.authentication.add_license %}
+                <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
+                    <a href="{% url 'license:license_list' %}" class="sidebar-link">
+                        <i class="bi bi-key-fill"></i>
+                        <span>License</span>
+                    </a>
+                </li>
+                {% endif %}
+
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
                     {% if request.user.is_superuser %}
                         <a href="javascript:void(0)" class="sidebar-link">
@@ -121,6 +130,13 @@
                                 <a href="{% url 'dashboard:product_type_list' %}">Product Types</a>
                             </li>
                         {% endif %}
+
+                        {% if perms.authentication.add_license_type or perms.authentication.edit_license_type %}
+                            <li class="submenu-item {% if submenu == 'license_type' %}active{% endif %}">
+                                <a href="{% url 'dashboard:license_type_list' %}">License Types</a>
+                            </li>
+                        {% endif %}
+
                         {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
                             <li class="submenu-item {% if submenu == 'product_category' %}active{% endif %}">
                                 <a href="{% url 'dashboard:product_category_list' %}">Product Categories</a>
@@ -140,7 +156,7 @@
                         {% endif %}
                     </ul>
                 </li>
-                {% if perms.authentication.add_vendor or perms.authentication.add_location or perms.authentication.add_department or perms.authentication.add_product_type or perms.authentication.add_product_category %}
+                {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'configurations' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-sliders2-vertical"></i>
@@ -155,6 +171,9 @@
                             </li>
                             <li class="submenu-item {% if submenu == 'localization' %}active{% endif %}">
                                 <a href="{% url 'configurations:list_localization' %}">Localizations</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'organization' %}active{% endif %}">
+                                <a href="{% url 'configurations:add_organization' %}">Organizations</a>
                             </li>
                         </ul>
                     </li>
@@ -200,29 +219,15 @@
                         </ul>
                     </li>
                 {% endif %}
-                <!-- {% if request.user.is_superuser %}
-                    <li class="sidebar-item has-sub {% if sidebar == 'trash' %}active{% endif %}">
-                        <a href="javascript:void(0)" class="sidebar-link">
-                            <i class="bi bi-trash3-fill"></i>
-                            <span>Recycle Bin</span>
-                        </a>
-                        <ul class="submenu {% if sidebar == 'trash' %}active{% endif %}">
-                            <li class="submenu-item {% if submenu == 'vendors' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_vendors' %}">Vendors</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'products' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_products' %}">Products</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'users' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_users' %}">Users</a>
-                            </li>
-                            <li class="submenu-item {% if submenu == 'assets' %}active{% endif %}">
-                                <a href="{% url 'recycle_bin:deleted_assets' %}">Assets</a>
-                            </li>
-                        </ul>
-                    </li>
-                {% endif %} -->
                 {% if request.user.is_superuser %}
+                    <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
+                        <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg>
+                            <span>Extensions</span>
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- {% if request.user.is_superuser %}
                     <li class="sidebar-item has-sub {% if sidebar == 'support' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-person-video3"></i>
@@ -240,7 +245,7 @@
                             </li>
                         </ul>
                     </li>
-                {% endif %}
+                {% endif %} -->
             </ul>
         </div>
     </div>

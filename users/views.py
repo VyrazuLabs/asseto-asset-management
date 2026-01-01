@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+
+from license.models import AssignLicense
 from .forms import UserForm, UserUpdateForm, AddressForm
 from django.contrib import messages
 from django.http import HttpResponse
@@ -8,7 +10,7 @@ from assets.models import AssignAsset
 from dashboard.models import Address
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
-from .utils import assigned_asset_to_user, create_all_perm_role
+from .utils import assigned_asset_to_user, create_all_perm_role, get_all_assigned_license
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
@@ -30,6 +32,26 @@ ORPHANS = 1
 
 def check_admin(user):
     return user.is_superuser
+
+def create_user_notification_type(request):
+    if request.method == "POST":
+        # Convert checkbox values to booleans
+        email = request.POST.get("email_notification") == "on"
+        in_app = request.POST.get("in_app_notification") == "on"
+        browser = request.POST.get("browser_notification") == "on"
+        slack=request.POST.get("slack_notification") == "on"
+        get_user=User.objects.filter(id=request.user.id).first()
+        if get_user is not None:
+            User.objects.filter(id=request.user.id).update(
+                email_notification=email,
+                slack_notification=slack,
+                browser_notification=browser,
+                inapp_notification=in_app
+            )
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 
 def manage_access(user):
@@ -60,20 +82,12 @@ def list(request):
     user_asset_map=assigned_asset_to_user(page_object)
     assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
 
-
-    is_demo=IS_DEMO
-    if is_demo:
-        is_demo=True
-    else:
-        is_demo=False
-
     context = {
         'sidebar': 'users',
         'page_object': page_object,
         'title': 'Users',
         'user_asset_map_count':user_asset_map,
         'user_asset_map_count_count':assigned_assets_count,
-        'is_demo':is_demo,
     }
     return render(request, 'users/list.html', context=context)
 
@@ -89,20 +103,25 @@ def details(request, id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    format_key= None
-    for id,it in NAME_FORMATS:
-        if obj.name_display_format == id:
-            format_key=id
+    if obj is not None:
+        format_key= None
+        for id,it in NAME_FORMATS:
+            if obj.name_display_format == id:
+                format_key=id
     asset_paginator=Paginator(assigned_assets,10,orphans=1)
     asset_page_number=request.GET.get('assets_page')
     asset_page_object=asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
+    assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
+    print(assigned_licenses.values())
+    assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
     context = {
         'sidebar': 'users',
         'full_name': get_user_full_name,
         'user': user,
         'page_object': page_object,
         'assigned_assets': asset_page_object,
+        'assigned_licenses': assigned_licenses_object,
         'title': f'Details-{user.full_name}'
     }
                
@@ -125,15 +144,14 @@ def add(request):
             password1 = form.cleaned_data.get('password1', '')
             password2 = form.cleaned_data.get('password2', '')
 
-            if password1 and password1 == password2:
+            if password1 == password2:
                 user.set_password(password1)
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
             user.save()
-            # form.instance.role.user_set.add(form.instance)
             messages.success(
-                request, 'User added successfully and Verification email sent to the user')
+                request, 'User added successfully')
 
             all_perms, created = Group.objects.get_or_create(
                 name='all_perms')
@@ -142,8 +160,10 @@ def add(request):
                 all_perms.user_set.add(form.instance)
             else:
                 all_perms.user_set.remove(form.instance)
-
-            return HttpResponse(status=204)
+            
+            if form.instance.role:
+                form.instance.role.user_set.add(form.instance)
+            return HttpResponse('',status=204)
 
     context = {
         'form': form,
@@ -268,13 +288,10 @@ def search(request, page):
         paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
         page_object = paginator.get_page(page)
 
-    # 🔑 Collect all user IDs from this page
     user_ids = [u.id for u in page_object]
 
-    # 🔑 Get assigned assets for those users
     assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
 
-    # 🔑 Build map { user_id: [asset1, asset2, ...] }
     user_asset_map_count = {}
     for aa in assigned_assets:
         user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)

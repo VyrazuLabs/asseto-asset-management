@@ -37,6 +37,7 @@ class VendorSerializer(serializers.ModelSerializer):
             organization=self.context['request'].user.organization
         )
         return vendor
+    
     def update(self, instance, validated_data):
 
         address_data = {
@@ -47,19 +48,14 @@ class VendorSerializer(serializers.ModelSerializer):
             'city': validated_data.pop('city', None),
             'pin_code': validated_data.pop('pin_code', None),
         }
-
         for attributes,value in validated_data.items():
+            if value is None:
+                continue
             setattr(instance,attributes,value)
-        instance.save()
         address_instance=instance.address if instance.address else None
+        print(address_instance,address_data)
+        for key, value in address_data.items():
+            setattr(address_instance,key,value)
+        address_instance.save()
 
-        if address_instance is None:
-            address=Address.objects.create(**address_data)
-            instance.address=address
-            instance.save()
-            return instance
-        else:
-            for key, vlaue in address_data.items():
-                setattr(address_instance,key,value)
-            instance.save()
-            return instance
+        return instance

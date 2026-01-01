@@ -241,6 +241,83 @@ document.addEventListener("DOMContentLoaded", function() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+    
 </script>
+
+<script>
+    const searchModal = document.getElementById('searchModal');
+    const global_searchInput = document.getElementById('globalSearch');
+    const searchResults = document.getElementById('searchResults');
+
+    searchModal.addEventListener('shown.bs.modal', () => global_searchInput.focus());
+
+    searchModal.addEventListener('hidden.bs.modal', () => {
+        global_searchInput.value = '';
+        searchResults.innerHTML = `
+        <div class="empty-state">
+            <i class="bi bi-search d-block"></i>
+            <p class="mb-0">Start typing to search</p>
+        </div>
+        `;
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            e.preventDefault();
+            bootstrap.Modal.getOrCreateInstance(searchModal).show();
+        }
+    });
+    document.addEventListener("htmx:afterSwap", function (event) {
+        if (event.detail.target.id !== "searchResults") return;
+
+        const query = global_searchInput.value.trim();
+        if (!query) return;
+
+        highlightSearch(query);
+    });
+
+    function highlightSearch(query) {
+        const safe = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(safe, "gi");
+
+        const elements = searchResults.querySelectorAll(
+            ".result-title, .result-meta"
+        );
+
+        elements.forEach(el => {
+            const cleaned = el.innerHTML.replace(/<mark class="search-highlight">|<\/mark>/g, "");
+            el.innerHTML = cleaned.replace(regex, m =>
+                `<mark class="search-highlight">${m}</mark>`
+            );
+        });
+    }
+    document.addEventListener("click", function (event) {
+        const link = event.target.closest("a.result-item");
+        if (!link) return;
+
+        event.preventDefault();
+
+        const href = link.href;
+        const modal = bootstrap.Modal.getInstance(searchModal);
+        if (modal) modal.hide();
+
+        // allow modal to close smoothly before redirect
+        setTimeout(() => window.location.href = href, 150);
+    });
+</script>
+
+<!-- assign license modal success handler -->
+<script>
+    function handleAssignSuccess(evt) {
+        if (evt.detail.xhr.status === 204) {
+            const modalEl = document.getElementById("assign-license-list-modal");
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            // Refresh only the table
+            htmx.trigger("#license-table", "refresh");
+        }
+    }
+</script>
+
 </body>
 </html>
