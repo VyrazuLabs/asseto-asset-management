@@ -580,7 +580,7 @@
 
   // Fetch data from the API endpoint and draw the chart
   function loadAndDrawChart() {
-    fetch('assets/assets_by_status')
+    fetch("{% url 'assets:pie_chart_status' %}")
       .then(response => response.json())
       .then(json => {
         console.log(Array.isArray(json.chart_data));
