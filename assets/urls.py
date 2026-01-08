@@ -20,7 +20,6 @@ urlpatterns = [
     path('assign-asset', views.assign_assets, name='assign_asset'),
     path('delete-assign/<uuid:id>', views.delete_assign, name='delete_assign'),
     path('delete-assign-asset-list/<uuid:id>', views.delete_assign_asset_list, name='delete_assign_asset_list'),
-    path('change-status/<str:id>/',views.change_status,name='change_status'),
     path('assign-asset-in-asset-list/<uuid:id>', views.assign_asset_in_asset_list, name='assign_asset_in_asset_list'),
     path('assign_asset_search/<str:page>', views.assign_asset_search, name='assign_asset_search'),
     path('reassign-asset/<uuid:id>', views.reassign_asset, name='reassign_asset'),
@@ -29,6 +28,7 @@ urlpatterns = [
     path('assets_by_status', views.pie_chart_status, name='pie_chart_status'),
 
     #asset status urls
+    path('change-status/<uuid:id>/',views.change_status,name='change_status'),
     path('add_status',asset_status_views.add_asset_status,name='add_asset_status'),
     path('asset_status_list',asset_status_views.asset_status_list,name='asset_status_list'),
     path('asset_status_details/<uuid:id>',asset_status_views.asset_status_details,name='asset_status_details'),

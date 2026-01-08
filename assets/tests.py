@@ -47,7 +47,7 @@ class Asseto_test(TestCase):
             product_picture = "test.jpg",
             manufacturer = "Manufacturer 1",
             description = "Description 1",
-            product_category = product_category,
+            product_sub_category = product_category,
             product_type = product_type,
             organization = user_organization
         )
@@ -80,8 +80,8 @@ class Asseto_test(TestCase):
         self.assertEqual(asset.serial_no, "1234567890")
         self.assertEqual(asset.description, "Description 1")
         self.assertEqual(asset.price, 1000.00)
-        # self.assertEqual(asset.purchase_date, "2020-01-01")
-        # self.assertEqual(asset.warranty_expiry_date, "2021-01-01")
+        self.assertEqual(str(asset.purchase_date), "2020-01-01")
+        self.assertEqual(str(asset.warranty_expiry_date), "2021-01-01")
         self.assertEqual(asset.purchase_type, "Warranty")
         self.assertEqual(asset.is_assigned, False)
         self.assertEqual(asset.location.office_name, "Office 1")
@@ -98,7 +98,7 @@ class Asseto_test(TestCase):
         self.assertEqual(asset.product.product_picture, "test.jpg")
         self.assertEqual(asset.product.manufacturer, "Manufacturer 1")
         self.assertEqual(asset.product.description, "Description 1")
-        self.assertEqual(asset.product.product_category.name, "Category 1")
+        self.assertEqual(asset.product.product_sub_category.name, "Category 1")
         self.assertEqual(asset.product.product_type.name, "Type 1")
         self.assertEqual(asset.vendor.email, "vendor1@asseto.com")
         self.assertEqual(asset.vendor.name, "Vendor 1")
@@ -109,7 +109,7 @@ class Asseto_test(TestCase):
         self.assertEqual(asset.vendor.description, "Description 1")
 
 
-    def edit_asset(self):
+    def test_edit_asset(self):
         self.asset.name = "Asset 2"
         self.asset.serial_no = "1234567892"
         self.asset.description = "Description 2"
@@ -121,11 +121,14 @@ class Asseto_test(TestCase):
         self.asset.organization.currency = "INR"
         self.asset.organization.date_format = "dd-mm-yyyy"
         self.asset.organization.logo = "logo2.png"
+        self.asset.location.contact_person_name= "Person 2"
+        self.asset.location.contact_person_email= "person2@asseto.com"
+        self.asset.location.contact_person_phone="1234565460"
         self.asset.product.name = "Product 2"
         self.asset.product.product_picture = "test2.jpg"
         self.asset.product.manufacturer = "Manufacturer 2"
         self.asset.product.description = "Description 2"
-        self.asset.product.product_category.name = "Category 2"
+        self.asset.product.product_sub_category.name = "Category 2"
         self.asset.product.product_type.name = "Type 2"
         self.asset.vendor.name = "Vendor 2"
         self.asset.vendor.email = "vendor2@asseto.com"
@@ -154,12 +157,12 @@ class Asseto_test(TestCase):
         self.assertEqual(self.asset.organization.logo, "logo2.png")
         self.assertEqual(self.asset.location.contact_person_name, "Person 2")
         self.assertEqual(self.asset.location.contact_person_email, "person2@asseto.com")
-        self.assertEqual(self.asset.location.contact_person_phone, "1234567892")
+        self.assertEqual(self.asset.location.contact_person_phone, "1234565460")
         self.assertEqual(self.asset.product.name, "Product 2")
         self.assertEqual(self.asset.product.product_picture, "test2.jpg")
         self.assertEqual(self.asset.product.manufacturer, "Manufacturer 2")
         self.assertEqual(self.asset.product.description, "Description 2")
-        self.assertEqual(self.asset.product.product_category.name, "Category 2")
+        self.assertEqual(self.asset.product.product_sub_category.name, "Category 2")
         self.assertEqual(self.asset.product.product_type.name, "Type 2")
         self.assertEqual(self.asset.vendor.name, "Vendor 2")
         self.assertEqual(self.asset.vendor.email, "vendor2@asseto.com")
@@ -175,7 +178,7 @@ class Asseto_test(TestCase):
         self.assertEqual(self.asset.is_assigned, False)
 
 
-    def delete_asset(self):
+    def test_delete_asset(self):
         self.asset.delete()
         with self.assertRaises(Asset.DoesNotExist):
             Asset.objects.get(id=self.asset.id)

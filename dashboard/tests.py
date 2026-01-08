@@ -72,7 +72,7 @@ class Asseto_test_location(TestCase):
         )
 
     def test_location(self):
-        # location = Location.objects.get(office_name="Office 1")
+        self.location = Location.objects.get(office_name="Office 1")
         self.assertEqual(self.location.contact_person_name, "Person 1")
         self.assertEqual(self.location.contact_person_email, "person1@asseto.com")
         self.assertEqual(self.location.contact_person_phone, "1234567890")
