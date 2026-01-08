@@ -22,6 +22,7 @@ from configurations.utils import dynamic_display_name
 from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
 from django.http import JsonResponse
+
 today = date.today()
 import os
 IS_DEMO = os.environ.get('IS_DEMO')
