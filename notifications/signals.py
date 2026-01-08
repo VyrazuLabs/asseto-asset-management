@@ -94,22 +94,21 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             for admin in admins:
                 UserNotification.objects.create(user=admin, notification=notification)
             user = instance.updated_by
-            print("USER --------->",instance)
-            if user:
-                # if user.email_notification:
-                #     # send_email(
-                #     #     user.email,
-                #     #     notification_title="Updated asset",
-                #     #     notification_text=f"{instance.name} status changed to {new_status}."
-                #     # )
+            # if user:
+            #     if user.email_notification:
+            #         send_email(
+            #             user.email,
+            #             notification_title="Updated asset",
+            #             notification_text=f"{instance.name} status changed to {new_status}."
+            #         )
 
-                if user.slack_notification:
-                    slack_notification(
-                        user,
-                        f"{instance.name} status updated to {new_status}.",
-                        instance.id,
-                        instance.tag
-                    )
+            #     if user.slack_notification:
+            #         slack_notification(
+            #             user,
+            #             f"{instance.name} status updated to {new_status}.",
+            #             instance.id,
+            #             instance.tag
+            #         )
 
 @receiver(post_save, sender=AssignAsset)
 def asset_notification(sender, instance, created,  **kwargs):

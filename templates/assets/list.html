@@ -304,57 +304,32 @@
                                 <td>
                                     <div class="d-flex justify-content-between gap-2" style="width: 193px;">
                                         {% if not asset.is_assigned %}
-                                            <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}">
-                                                <option id="selected-val" disabled selected>{{ asset.asset_status.name }}</option>
-                                                {% for value, label in asset_form.fields.status.choices %}
-                                                    <option value="{{ value }}" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        {% elif asset.is_assigned %}
-                                            <select class="status-select form-select" data-asset-id="{{ asset.id }}" id="status-id-{{ asset.id }}" disabled>
-                                                <option value="Assigned" {% if asset.status|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>Assigned</option>
-                                            </select>
+                                        <select class="status-select form-select" data-asset-id="{{ asset.id }}">
+                                
+                                            <!-- current status -->
+                                            <option value="{{ asset.asset_status.name }}" selected>
+                                                {{ asset.asset_status.name }}
+                                            </option>
+                                
+                                            {% for value, label in asset_form.fields.status.choices %}
+                                            {% if value != asset.asset_status.name %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        {% else %}
+                                        <select class="form-select" disabled>
+                                            <option selected>Assigned</option>
+                                        </select>
                                         {% endif %}
-                                    </div>
-                                <div style="display: none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
-                                    <div class="input-group">
-                                        <button type="button" class="btn btn-warning release-asset-btn"
-                                                data-asset-id="{{ asset.id }}">
-                                            Release
-                                        </button>
-                                    </div>
-                                </div>
-
-                                    <!-- {% if asset.asset_status.name == "Ready To Deploy" %}
-                                        <form method="post" action="{% url 'assets:release' asset.id %}">
-                                        {% csrf_token %}
-                                        <button 
-                                            type="button" 
-                                            class="btn btn-warning btn-sm release-asset-btn" 
-                                            data-asset-id="{{ asset.id }}"
-                                            data-csrf-token="{{ csrf_token }}">
-                                            Release
-                                        </button>
-                                        </form>
-                                    {% elif asset.asset_status.name == "Available" %}
-                                        <form 
-                                            method="post" 
-                                            action="{% url 'assets:change_status' asset.id %}" 
-                                            class="assign-user-form" 
-                                            data-asset-id="{{ asset.id }}"
-                                        >
-                                            {% csrf_token %}
-                                            <div class="input-group">
-                                                <select name="user_id" class="form-select" required>
-                                                    <option value="">Select User</option>
-                                                    {% for user in active_user %}
-                                                        <option value="{{ user.id }}">{{ user.full_name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <button type="submit" class="btn btn-primary btn-sm">Assign</button>
-                                            </div>
-                                        </form>
-                                    {% endif %} -->
+                                    </div>                                
+                                    <!-- <div style="display:none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
+                                        <div class="input-group">
+                                            <button type="button" class="btn btn-warning release-asset-btn" data-asset-id="{{ asset.id }}">
+                                                Release
+                                            </button>
+                                        </div>
+                                    </div> -->
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm d-flex " role="group" aria-label="Basic example">
@@ -406,41 +381,54 @@
     </section>
 </div>
 
-<script>
-    document.querySelectorAll('.status-select').forEach(function(select) {
-        select.addEventListener('change', function() {
-            const get_selected_val = document.getElementById('selected-val').value;
-            // const assetIdRaw = this.getAttribute('data-asset-id');
-            // const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
-            const assetId = this.getAttribute('data-asset-id');
-            const statusValue = this.value;
-            const currentSelect = this; // for UI updates later
-            if (!assetId) {
-                console.error("Asset ID missing");
-                return;
-            }
 
-            fetch(`/assets/change-status/${assetId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({status: statusValue})
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to update status');
-                return response.json();
-            })
-            .then(data => {
-                console.log('Status updated', data);
-                updateStatusUI(assetId, statusValue, currentSelect);  // Update UI dynamically
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert(error.message);
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<script>
+    console.log("Document loaded, setting up status change handlers.");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.status-select').forEach(function (select) {
+
+            select.addEventListener('change', function () {
+
+                const assetId = this.dataset.assetId;   // UUID with dashes
+                const statusValue = this.value;
+                const currentSelect = this;
+
+                fetch(`/assets/change-status/${assetId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie("csrftoken"),
+                    },
+                    body: JSON.stringify({ status: statusValue })
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Status update failed");
+                        return response.json();
+                    })
+                    .catch(error => {
+                        alert(error.message);
+                        location.reload();  // rollback UI on error
+                    });
             });
+
         });
     });
 </script>
+
 {% endblock %}

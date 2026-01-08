@@ -27,10 +27,7 @@ class Asseto_test_add(TestCase):
 
 class EditRoleTest(TestCase):
     def setUp(self):
-        self.organization = Organization.objects.create(name='Organization 1',
-                                                        website='www.example.com',
-                                                        email='organization@example.com', 
-                                                        phone='1234567890')
+        self.organization = Organization.objects.create(name='Organization 1',website='www.example.com',email='organization@example.com', phone='1234567890')
         self.role = Role.objects.create(related_name='Role 1', organization=self.organization)
 
     def test_edit_role(self):

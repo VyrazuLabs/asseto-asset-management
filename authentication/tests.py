@@ -1,12 +1,8 @@
 from django.test import TestCase
-from django.contrib.auth import get_user_model
 from dashboard.models import Organization,Address,Location,Department
 from roles.models import Role
 from authentication.models import User
-from vendors.models import Vendor
-import uuid
 # Create your tests here.
-
 class User_Test(TestCase):
     def setUp(self):
         self.user_organization = Organization.objects.create(
@@ -78,10 +74,6 @@ class User_Test(TestCase):
             city = "Kolkata",
             pin_code = "700018"
         )
-        # self.edit_user_role=Role.objects.create(
-        #     related_name= "Role 2",
-        #     organization=self.edit_user_organization,
-        # )
         self.edit_user_location=Location.objects.create(
             office_name = "Office 2",
             address = self.edit_user_address,
@@ -116,7 +108,7 @@ class User_Test(TestCase):
 
 
     def test_user(self):
-        # self.user = User.objects.get(email = "mail@gmail.com")
+        self.user = User.objects.get(email = "mail@gmail.com")
         self.assertEqual(self.user.full_name, "test")
         self.assertEqual(self.user.username, "usertest")
         self.assertEqual(self.user.profile_pic, "test.jpg")
@@ -132,9 +124,6 @@ class User_Test(TestCase):
         self.assertEqual(self.user.address.state, "Rajasthan")
         self.assertEqual(self.user.address.country, "India")
         self.assertEqual(self.user.location.office_name, "Office 1")
-        # self.assertEqual(user.location.contact_person_name, "Person 1")
-        # self.assertEqual(user.location.contact_person_email, "person1@asseto.com")
-        # self.assertEqual(user.location.contact_person_phone, "1234567890")
         self.assertEqual(self.user.role.related_name, "Role 1")
         self.assertEqual(self.user.department.name, "Department 1")
         self.assertEqual(self.user.department.contact_person_name, "Person 1")
@@ -150,7 +139,7 @@ class User_Test(TestCase):
 
 
     def test_edit_user(self):
-        # user = User.objects.get(email="mail2@gmail.com")
+        self.user = User.objects.get(email="mail2@gmail.com")
         self.user.username = "usertest2"
         self.user.full_name = "test2"
         self.user.phone = "1234567890"
@@ -214,7 +203,6 @@ class User_Test(TestCase):
     def delete_user(self):
         self.user.delete()
 
-        # Check if the vendor object is deleted from the database
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(id=self.product.id)
 
