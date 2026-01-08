@@ -53,9 +53,7 @@ def add_audit(request):
             file = request.FILES.get("image")
             if file:
                 files = [file]
-        for f in files:
-            AuditImage.objects.create(audit=get_audit, image=f)
-        Audit.objects.create(
+        audit_create=Audit.objects.create(
             asset=get_asset,
             assigned_to=assigned_to,
             condition= condition,
@@ -64,6 +62,12 @@ def add_audit(request):
             created_at= datetime.now(),
             organization=request.user.organization if request.user.is_authenticated else None,
         )
+        if get_audit:
+            for f in files:
+                AuditImage.objects.create(audit=get_audit, image=f)
+        else:
+            for f in files:
+                AuditImage.objects.create(audit=audit_create, image=f)
         return redirect('audit:completed_audits')
 
     elif request.method == 'GET':
@@ -81,6 +85,8 @@ def get_audits_by_id(request, id):
         errors={}
         comments = request.POST.get('comments', None)
         condition = request.POST.get('condition', None)
+        print(condition,"/ncondition")
+        print(comments,"/ncomments")
         if not condition:
             errors["condition"] = "Condition is required."
 
