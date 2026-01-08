@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema,OpenApiParameter
 from rest_framework.parsers import MultiPartParser,FormParser
 from drf_spectacular.types import OpenApiTypes
+from common.API_custom_response import format_validation_errors,get_detailed_errors_info,log_error_to_terminal
 class VendorList(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[
@@ -70,7 +71,9 @@ class UpdateVendor(APIView):
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:
-            return api_response(status=500, system_message=str(e))
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500,system_message=str(e))
 
 
 class DeleteVendor(APIView):
@@ -88,8 +91,7 @@ class DeleteVendor(APIView):
 class SearchVendor(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(description='from frontend the search field name must be "search_text"',
-        parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination"),
-                    OpenApiParameter(name='search_text',type=OpenApiTypes.STR,location=OpenApiParameter.QUERY,required=False,
+        parameters=[OpenApiParameter(name='search_text',type=OpenApiTypes.STR,location=OpenApiParameter.QUERY,required=False,
                         description='Text to search across vendor fields',
                     ),],
     )
@@ -99,9 +101,9 @@ class SearchVendor(APIView):
             vendors_list = searched_data(request,search_text)
             if vendors_list:
                 data=convert_to_list(vendors_list,request)
-                page=int(request.GET.get('page',1))
-                paginated_searched_data=add_pagination(data,page=page)
-                return api_response(data=paginated_searched_data,message="Vendor found successfully")
+                # page=int(request.GET.get('page',1))
+                # paginated_searched_data=add_pagination(data,page=page)
+                return api_response(data=data,message="Vendor found successfully")
             else:
                 return api_response(status=404,message="Vendor not found")
         except ValueError as e:

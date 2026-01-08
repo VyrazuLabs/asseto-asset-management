@@ -96,12 +96,12 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             user = instance.updated_by
             print("USER --------->",instance)
             if user:
-                if user.email_notification:
-                    send_email(
-                        user.email,
-                        notification_title="Updated asset",
-                        notification_text=f"{instance.name} status changed to {new_status}."
-                    )
+                # if user.email_notification:
+                #     # send_email(
+                #     #     user.email,
+                #     #     notification_title="Updated asset",
+                #     #     notification_text=f"{instance.name} status changed to {new_status}."
+                #     # )
 
                 if user.slack_notification:
                     slack_notification(
@@ -114,7 +114,7 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
 @receiver(post_save, sender=AssignAsset)
 def asset_notification(sender, instance, created,  **kwargs):
     if instance.previous_user != instance.user:
-        send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+        # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
         notifications_call(user=instance.user,
             entity_type=2,
             notification_title='Assigned asset',
@@ -127,7 +127,7 @@ def asset_notification(sender, instance, created,  **kwargs):
         # )
 
     if instance.previous_user != instance.user and not created:
-        send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+        # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
         notifications_call(user=instance.user,
             instance_id=instance.id,
             notification_title='Assigned asset',
@@ -142,7 +142,7 @@ def asset_notification(sender, instance, created,  **kwargs):
 
 @receiver(post_delete, sender=AssignAsset)
 def asset_delete_notification(sender, instance, *args,  **kwargs):
-    send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
+    # send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
     notification = Notification.objects.create(
         instance_id=instance.id,
         notification_title='Asset Deleted',
