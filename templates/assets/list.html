@@ -399,7 +399,7 @@
             <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this">
-                    </div>
+                    </div>data-asset-id
                 </div>
             </div>
         </div>
@@ -410,8 +410,9 @@
     document.querySelectorAll('.status-select').forEach(function(select) {
         select.addEventListener('change', function() {
             const get_selected_val = document.getElementById('selected-val').value;
-            const assetIdRaw = this.getAttribute('data-asset-id');
-            const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
+            // const assetIdRaw = this.getAttribute('data-asset-id');
+            // const assetId = assetIdRaw ? assetIdRaw.replace(/-/g, "") : null;
+            const assetId = this.getAttribute('data-asset-id');
             const statusValue = this.value;
             const currentSelect = this; // for UI updates later
             if (!assetId) {

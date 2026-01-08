@@ -3,6 +3,22 @@ from rest_framework import serializers
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
 from dashboard.models import CustomField
 from common.convert_base64_image import convert_image
+from django.utils import timezone
+from datetime import timedelta
+
+class DictionaryListField(serializers.ListField):
+    def get_value(self, dictionary):
+        if isinstance(dictionary.get(self.field_name), list) and all(isinstance(item, dict) for item in dictionary[self.field_name]):
+            return dictionary[self.field_name]
+        elif isinstance(dictionary.get(self.field_name), list):
+            # There can be some cases where custom fields will be a list of list of dictionaries
+            # The following remedies it
+            dictionary_copy = dictionary.copy()
+            print("custom fields:", dictionary[self.field_name])
+            dictionary_copy[self.field_name] = next(iter(dictionary[self.field_name]), [])
+            return dictionary_copy[self.field_name]
+        return super().get_value(dictionary)
+    
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
     field_value = serializers.CharField()
@@ -15,7 +31,7 @@ class AssetSerializer(serializers.ModelSerializer):
         allow_null=True,
         default=list,
     )
-    custom_fields = serializers.ListField(child=serializers.DictField(), required=False)
+    custom_fields = DictionaryListField(child=serializers.DictField(), required=False)
     purchase_date = serializers.DateField(required=False, allow_null=True)
     warranty_expiry_date = serializers.DateField(required=False, allow_null=True)
 
@@ -29,6 +45,7 @@ class AssetSerializer(serializers.ModelSerializer):
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
     def to_internal_value(self, data):
+        # Internal value contains the list of all the items in the custom fields.
         print("to_internal_value",data,"\n")
         data = data.copy()
         if (data.get("images") or "") == "":
@@ -40,8 +57,8 @@ class AssetSerializer(serializers.ModelSerializer):
         if data.get("custom_fields") in ["", None]:
             data.pop("custom_fields", None)
         elif isinstance(data.get("custom_fields"), str):
-            data["custom_fields"] = json.loads(data.get("custom_fields"))[0]
-
+            data["custom_fields"] = json.loads(data.get("custom_fields"))
+        print("to_internal_value-after",data,"\n")
         return super().to_internal_value(data)
 
     def validate_tag(self, value):
@@ -49,6 +66,7 @@ class AssetSerializer(serializers.ModelSerializer):
             return value
         if not value:
             raise serializers.ValidationError("Tag can not be empty")
+        print("true-value-tag",value)
         return value
 
     def validate_name(self, value):
@@ -63,16 +81,73 @@ class AssetSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Product can not be blank")
         return value
     
-    def validate(self, attrs):
-        for field in ["purchase_date", "warranty_expiry_date"]:
-            if attrs.get(field) in ["", None]:
-                attrs[field] = None
-        return attrs
+    def validate_price(self, value):
+        print("value-price", value)
+        if value is not None and value < 0:
+            raise serializers.ValidationError("Price cannot be negative.")
+        return value
+    
+    def validate_purchase_date(self, value):
+        if value:
+            today = timezone.now().date()
+            if value > today:
+                print("value-purchase",value)
+                raise serializers.ValidationError(
+                    "Purchase date must be today or less than today's date."
+                )
+            print("true-value-purchase",value)
+        return value
 
     def create(self, validated_data):
         images = validated_data.pop("images", []) or []
-        #custom_fields_raw = request.data.get("custom_fields", "[]")
-        #custom_fields = json.loads(custom_fields_raw)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        # custom_fields_raw = request.data.get("custom_fields", "[]")
+        # custom_fields = json.loads(custom_fields_raw)
         custom_fields = validated_data.pop("custom_fields", []) or []
         print("custom_fields",custom_fields)
         asset = Asset.objects.create(
@@ -105,27 +180,106 @@ class AssetSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        print('validate_data is------->',validated_data)
-        image_data = validated_data.pop('images', None)
+        image_data = validated_data.pop("images", [])
+        custom_fields = validated_data.pop("custom_fields", [])
+
+        # 🔹 Update normal fields
         for attribute, value in validated_data.items():
-            if value is None:
-                continue
-            setattr(instance, attribute, value)
+            if value is not None:
+                setattr(instance, attribute, value)
         instance.save()
-        if image_data is not None:
-            for image in image_data:
-                # image=convert_image(image)
-                AssetImage.objects.create(asset=instance, image=image)
-        custom_fields = validated_data.pop("custom_fields",None)
-        print(custom_fields)
-        if custom_fields is not None:
-            for custom_field in custom_fields:
-                field_name=list(custom_field.keys())[0]
-                field_value=custom_field[field_name]
-                print("field name is:",field_name,"\n","filed_value:",field_value)
-                CustomField.objects.update_or_create(object_id=instance.id,field_name=field_name,
-                defaults={'field_value':field_value,"entity_type": "asset","field_type": "text","name": field_name})
+
+        # 🔹 Save images
+        for image in image_data:
+            AssetImage.objects.create(asset=instance, image=image)
+
+        # 🔹 Existing custom fields from DB
+        existing_qs = CustomField.objects.filter(
+            object_id=instance.id,
+            entity_type="asset"
+        )
+        existing_field_names = {cf.field_name for cf in existing_qs}
+
+        # 🔹 Incoming field names
+        incoming_field_names = {
+            next(iter(cf.keys()))
+            for cf in custom_fields
+            if isinstance(cf, dict) and cf
+        }
+
+        # 🔥 Delete removed fields
+        deleted_field_names = existing_field_names - incoming_field_names
+        if deleted_field_names:
+            CustomField.objects.filter(
+                object_id=instance.id,
+                field_name__in=deleted_field_names,
+                entity_type="asset"
+            ).delete()
+
+        # 🔹 Create / Update incoming fields
+        for custom_field in custom_fields:
+            if not isinstance(custom_field, dict):
+                continue
+
+            field_name = next(iter(custom_field.keys()), None)
+            field_value = custom_field.get(field_name)
+
+            if not field_name:
+                continue
+
+            qs = CustomField.objects.filter(
+                object_id=instance.id,
+                field_name=field_name,
+                entity_type="asset"
+            )
+
+            if field_value is None:
+                qs.delete()
+            elif qs.exists():
+                qs.update(
+                    field_value=field_value,
+                    field_type="text",
+                    name=field_name
+                )
+            else:
+                CustomField.objects.create(
+                    object_id=instance.id,
+                    field_name=field_name,
+                    field_value=field_value,
+                    entity_type="asset",
+                    field_type="text",
+                    name=field_name
+                )
+
         return instance
+    
+    # def validate(self, attrs):
+    #     for field in ["purchase_date", "warranty_expiry_date"]:
+    #         if attrs.get(field) in ["", None]:
+    #             attrs[field] = None
+    #     purchase_date = attrs.get("purchase_date")
+    #     warranty_expiry_date = attrs.get("warranty_expiry_date")
+
+    #     # Cross-field validation
+    #     if purchase_date and warranty_expiry_date:
+    #         if warranty_expiry_date <= purchase_date:
+    #             raise serializers.ValidationError({
+    #                 "warranty_expiry_date": (
+    #                     "Warranty expiry date must be greater than purchase date."
+    #                 )
+    #             })
+    #     return attrs
+    
+    def validate_warranty_expiry_date(self, value):
+        if value:
+            tomorrow = timezone.now().date() + timedelta(days=1)
+            if value < tomorrow:
+                print("value",value)
+                raise serializers.ValidationError(
+                    "Warranty expiry date must be at least tomorrow."
+                )
+            print("true-value",value)
+        return value
 
 
 class SearchAssetSerializer(serializers.Serializer):
