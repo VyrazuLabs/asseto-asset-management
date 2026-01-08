@@ -2,6 +2,9 @@ from rest_framework import serializers
 
 from authentication.models import User
 from dashboard.models import Address, Location
+# from dashboard.serializers import AddressSerializer
+from roles.models import Role
+from rest_framework.exceptions import ValidationError
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,6 +12,7 @@ class UserListSerializer(serializers.ModelSerializer):
         fields="__all__"
 
 class UserSerializer(serializers.ModelSerializer):
+    role=serializers.CharField(required=False)
     address_line_one = serializers.CharField(required=False)
     address_line_two = serializers.CharField(required=False)
     email=serializers.EmailField(required=False)
@@ -23,6 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
         model=User
         fields=['full_name','email','phone','password','department','role','access_level','location','profile_pic','address_line_one','address_line_two','country',
             'state','city','pin_code']
+        
+    # def format_role_type(self,role):
+    #     if role:
+    #         return role.id
+    #     return None
     
     def validate_email(self,email):
         domain='@'
@@ -32,48 +41,101 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email already exists")
         return email
     
-    def create(self,validate_data):
+    def create(self, validated_data):
+        role_id = validated_data.pop('role', None)
 
         address_fields = {
-            'address_line_one': validate_data.pop('address_line_one', None),
-            'address_line_two': validate_data.pop('address_line_two', None),
-            'country': validate_data.pop('country', None),
-            'state': validate_data.pop('state', None),
-            'city': validate_data.pop('city', None),
-            'pin_code': validate_data.pop('pin_code', None),
+            'address_line_one': validated_data.pop('address_line_one', None),
+            'address_line_two': validated_data.pop('address_line_two', None),
+            'country': validated_data.pop('country', None),
+            'state': validated_data.pop('state', None),
+            'city': validated_data.pop('city', None),
+            'pin_code': validated_data.pop('pin_code', None),
         }
+
         try:
-            if "password" not in validate_data:
-                validate_data["password"] = ""
+            # password handling
+            password = validated_data.get("password", "")
+
+            # role handling
+            role = None
+            if role_id:
+                role = Role.objects.filter(
+                    id=int(role_id),
+                    organization=self.context["request"].user.organization
+                ).first()
+
+                if not role:
+                    raise ValueError("Invalid role selected")
+
             address = Address.objects.create(**address_fields)
-            user=User.objects.create(address=address, **validate_data,organization=self.context["request"].user.organization)
-            if user.password:
-                user.set_password(user.password)
+
+            user = User.objects.create(
+                **validated_data,
+                role=role,
+                address=address,
+                organization=self.context["request"].user.organization
+            )
+
+            if password:
+                user.set_password(password)
+                user.save()
+
+            return user
+
         except Exception as e:
-            raise ValueError("Data did not add for user",e)
-        
-        user.save()
-        return user
+            raise ValueError(str(e))
+
     
     def update(self, instance, validated_data):
-        address_data=validated_data.pop('address',None)
-        address=instance.address
-        if address_data:
-            try:
-                for attributes,value in address_data.items():
-                    setattr(address,attributes,value)
-                address.save()
-            except:
-                raise ValueError("Address didn't update")
-   
-        try:
-            for attributes,value in validated_data.items():
-                setattr(instance,attributes,value)
-            instance.save()
-        except:
-            raise ValueError("User data didnt update")
-        
+        request = self.context["request"]
+
+        # Extract fields
+        role_value = validated_data.pop("role", None)
+
+        address_fields = {
+            "address_line_one": validated_data.pop("address_line_one", None),
+            "address_line_two": validated_data.pop("address_line_two", None),
+            "country": validated_data.pop("country", None),
+            "state": validated_data.pop("state", None),
+            "city": validated_data.pop("city", None),
+            "pin_code": validated_data.pop("pin_code", None),
+        }
+
+        # ROLE HANDLING (string → int)
+        if role_value not in [None, ""]:
+            if not str(role_value).isdigit():
+                raise ValidationError({"role": "Role must be a numeric value"})
+
+            role = Role.objects.filter(
+                id=int(role_value),
+                organization=request.user.organization
+            ).first()
+
+            if not role:
+                raise ValidationError({"role": "Invalid role selected"})
+
+            instance.role = role
+
+        # ADDRESS UPDATE
+        if any(address_fields.values()):
+            address = instance.address
+            if not address:
+                raise ValidationError({"address": "User has no address"})
+
+            for attr, value in address_fields.items():
+                if value is not None:
+                    setattr(address, attr, value)
+            address.save()
+
+        # USER FIELDS UPDATE
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
         return instance
+
+
     # Search based on user name ,email,role,department,status
     # def search(self,search_text):
     #     full_name=
@@ -84,10 +146,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SearchUserSerializer(serializers.ModelSerializer):
-    search_text=serializers.CharField(required=True)
+    search_text=serializers.CharField(required=False)
+    role=serializers.CharField(required=False)
+    status=serializers.CharField(required=False)
     class Meta:
         model=User
-        fields=['search_text']
+        fields=['search_text','role','status']
     
     def validate(self, search_text):
         if not search_text:

@@ -40,7 +40,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def locations(request):
-    location_list = Location.objects.filter(
+    location_list = Location.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
     deleted_location_count=Location.deleted_objects.count()
     paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)

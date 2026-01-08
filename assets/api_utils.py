@@ -143,7 +143,7 @@ def delete_images(deleted_image_ids):
         try:
             AssetImage.objects.filter(id=id).delete()
         except Exception as e:
-            print(e)
+            print("exception",e)
 
 MM_TO_PX = 3.7795275591  # 96 dpi standard
 

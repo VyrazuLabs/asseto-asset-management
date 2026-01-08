@@ -62,8 +62,7 @@
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
                                 <label>Assigned To</label>
-                                <span class="text-danger">*</span>
-                                {{form.product_sub_category}}         
+                                <span class="text-danger">*</span>         
                                 {% if get_asset is not None and  asset_assigned_users is not None %}
                                     <input type="text" class="form-control w-100" name="assigned-to" id="assigned-to-input" value="{{asset_assigned_users}}" disabled/>
                                 {% elif get_audit is not None  %}
@@ -82,7 +81,6 @@
                             <div class="form-group mb-2">
                                 <label class="">Condition Status</label>
                                 <span class="text-danger">*</span>
-                                {{form.product_category}}
                                 <div class="d-flex gap-3 p-1">
                                     <button type="button" data-value="0" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Excellent</button>
                                     <button type="button" data-value="1" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Good</button>
@@ -90,7 +88,7 @@
                                     <button type="button" data-value="3" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Bad</button>
                                     <button type="button" data-value="4" class="btn btn-outline-secondary rounded-3" style="width: 120px;">Retired</button>
                                 </div>
-                                <input type="hidden" name="condition" id="condition-input" value="">
+                                <input type="hidden" name="condition" id="condition-input">
                                 {% if errors.condition %}
                                     <small class="text-danger">{{ errors.condition }}</small>
                                 {% endif %}
@@ -99,7 +97,6 @@
                         <div class="col-md-6 col-12 mt-2">
                             <div class="form-group">
                                 <label>Asset Image</label>
-                                {{form.product_sub_category}}
                                 <input type="file" class="form-control w-100" name="image" multiple />
                                 <sub >The number of file selected will be logged</sub>
                                 {% for error in form.product_sub_category.errors %}
@@ -111,7 +108,6 @@
                             <div class="form-group mb-2">
                                 <label>Detailed Observations/Comments</label>
                                 <span class="text-danger">*</span>
-                                {{ form.model }}
                                 {% if not get_audit.comments %}
                                     <textarea  class="form-control" name="comments" placeholder="Enter comments" value="{{ get_audit.comments }}"></textarea>
                                 {% else %}
@@ -170,8 +166,6 @@ input.addEventListener("input", function () {
 
                 li.onclick = () => {
                     input.value = tag;
-
-                    // 🔥 manually trigger keyup
                     input.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
 
                     suggestionBox.innerHTML = "";
@@ -184,14 +178,6 @@ input.addEventListener("input", function () {
     }, 300); // debounce
 });
 
-document.querySelectorAll('button[data-value]').forEach(button => {
-    button.addEventListener('click', () => {
-        document.getElementById('condition-input').value = button.getAttribute('data-value');
-        // Optionally visually highlight selected button:
-        document.querySelectorAll('button[data-value]').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-    });
-});
 document.getElementById("tag-input").addEventListener("keyup", function () {
 const tag = this.value.trim();
 if (tag.length === 0) return;
@@ -220,7 +206,28 @@ fetch(`/audit/get-assigned-user/${tag}`)
     })
     .catch(error => console.error("Error:", error));
 });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const conditionInput = document.getElementById('condition-input');
 
+    document.querySelectorAll('button[data-value]').forEach(button => {
+        // Click handler
+        button.addEventListener('click', () => {
+            const value = button.getAttribute('data-value');
+            conditionInput.value = value;
 
+            document.querySelectorAll('button[data-value]')
+                .forEach(btn => btn.classList.remove('active'));
+
+            button.classList.add('active');
+        });
+
+        // 🔹 Preselect on update
+        if (conditionInput.value === button.getAttribute('data-value')) {
+            button.classList.add('active');
+        }
+    });
+});
 </script>
 {% endblock content %}

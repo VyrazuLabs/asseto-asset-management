@@ -50,7 +50,7 @@ def list(request):
     product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
             organization=request.user.organization)).annotate(
             total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
+            available_assets=Count('asset', filter=Q(asset__is_assigned=True) and Q(asset__organization=request.user.organization)),
         ).order_by('-created_at')
     deleted_product_count=Product.deleted_objects.count()
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
@@ -290,6 +290,7 @@ def status(request, id):
 @login_required
 def search(request, page):
     search_text = request.GET.get('search_text').strip()
+    print("search_text",search_text)
     if search_text:
         return render(request, 'products/products-data.html', {
             'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(

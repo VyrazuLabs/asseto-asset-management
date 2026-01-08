@@ -3,7 +3,13 @@ from vendors.models import Vendor
 from rest_framework import serializers
 
 class VendorSerializer(serializers.ModelSerializer):
-
+    name=serializers.CharField(required=True)
+    email=serializers.EmailField(required=False)
+    phone=serializers.CharField(required=False)
+    contact_person=serializers.CharField(required=False)
+    designation=serializers.CharField(required=False)
+    gstin_number=serializers.CharField(required=False)
+    description=serializers.CharField(required=False)
     address_line_one = serializers.CharField(required=False)
     address_line_two = serializers.CharField(required=False)
     country = serializers.CharField(required=False)
@@ -39,7 +45,14 @@ class VendorSerializer(serializers.ModelSerializer):
         return vendor
     
     def update(self, instance, validated_data):
-
+        name=validated_data.pop('name',None)
+        print(validated_data.pop('name',None))
+        email=validated_data.pop('email',None)
+        phone=validated_data.pop('phone',None)
+        contact_person=validated_data.pop('contact_person',None)
+        designation=validated_data.pop('designation',None)
+        gstin_number=validated_data.pop('gstin_number',None)
+        description=validated_data.pop('description',None)
         address_data = {
             'address_line_one': validated_data.pop('address_line_one', None),
             'address_line_two': validated_data.pop('address_line_two', None),
@@ -57,5 +70,18 @@ class VendorSerializer(serializers.ModelSerializer):
         for key, value in address_data.items():
             setattr(address_instance,key,value)
         address_instance.save()
-
+        get_vendor=Vendor.objects.filter(id=instance.id).first()
+        if get_vendor:
+            vendor=Vendor.objects.filter(id=instance.id).update(
+                name=name,
+                email=email,
+                phone=phone,
+                contact_person=contact_person,
+                designation=designation,
+                gstin_number=gstin_number,
+                description=description
+            )
+            print("vendor------>",vendor)
+            # vendor.save()
+        print(instance)
         return instance
