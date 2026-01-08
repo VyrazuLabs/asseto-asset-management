@@ -33,7 +33,7 @@ class ProductSubCategoryListForFormDropdown(APIView):
             if product_sub_categories:
                 data=[{'id':product_sub_category.id,'name':product_sub_category.name} for product_sub_category in product_sub_categories]
             else:
-                data=[]
+                data=[{'id':'01ca6eefa32b4e26b5162c50f8de3d89','name':'Product Category One'}]
             return api_response(data=data, message='list of Product sub Category')
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
