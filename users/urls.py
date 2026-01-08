@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import *
-from .api_views import UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,UserSearch,GetUserName,GetRoles
-
+from .api_views import UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,UserSearch,GetUserName,GetRoles,ForgotPassword,ResetPassword
 app_name = 'users'
 
 urlpatterns = [
@@ -32,4 +31,6 @@ user_api_url_patterns=[
     path('api/user/profile',UserProfile.as_view(),name='user_profile'),
     path('api/user/user-name-info/<uuid:id>',GetUserName.as_view(),name='user_name_info'),
     path('api/user/roles/',GetRoles.as_view(),name='user_roles'),
+    path('api/user/forgot-password/',ForgotPassword.as_view(),name='forgot_password'),
+    path('api/user/reset-password/',ResetPassword.as_view(),name='reset_password'),
 ]

@@ -21,23 +21,33 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def GetNotifications(request):
-    notifications = UserNotification.objects.filter(
-        user=request.user,
-        is_sent=False,
-        notification__entity_type=0
-    )
-    data = [
-        {"id": n.id, "title": n.notification.notification_title, "body": n.notification.notification_text}
-        for n in notifications
-    ]
-
-    # Mark as sent
-    # notifications.update(is_sent=True)
-
-    return Response({"notifications": data})
+class GetNotifications(APIView):
+    permission_classes=[IsAuthenticated]
+    @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
+    def get(self,request):
+        try:
+            notifications = UserNotification.objects.filter(
+                user=request.user,
+                is_seen=False,
+                notification__entity_type=0
+            )
+            data = [
+                {"id": n.id, "title": n.notification.notification_title, "body": n.notification.notification_text}
+                for n in notifications
+            ]
+            page = int(request.GET.get('page', 1))
+            paginated_data=add_pagination(data,page=page)
+            print("NOTIIIIIIIIIIIIIIIIIIIII",data)
+            return api_response(data=paginated_data, message="List get Successfully")
+            # Mark as sent
+            # notifications.update(is_sent=True)
+        except ValueError as e:
+            return api_response(status=400,error_message=str(e))
+        except Exception as e:
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500,error_type="server_error",error_location=error_info['location'],
+                system_message=error_info["message"], trace_back=error_info['traceback'])
 
 
 class AssetList(APIView):
@@ -91,7 +101,7 @@ class AssetDetails(APIView):
     def get(self,request,id):
         try:
             asset=get_object_or_404(Asset,pk=id)
-            asset_images=AssetImage.objects.filter(asset=asset.id).all()
+            asset_images=AssetImage.objects.filter(asset=asset).all()
             custom_fields=CustomField.objects.filter(object_id=asset.id)
             asset_statuses=AssetStatus.objects.all()
             data=asset_data(request,asset,asset_images,asset_statuses,custom_fields)
@@ -111,6 +121,7 @@ class UpdateAsset(APIView):
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def patch(self,request,id):
         deleted_image_ids=request.data.get('delete_image_ids',[])
+        deleted_image_ids= json.loads(deleted_image_ids) if isinstance(deleted_image_ids,str) else deleted_image_ids
         if deleted_image_ids:
             print('deleted imagessssssssssssssssss',deleted_image_ids)
             delete_images(deleted_image_ids)
@@ -172,13 +183,11 @@ class SearchAsset(APIView):
             Q(vendor__gstin_number__icontains=search_text) |
             Q(location__office_name__icontains=search_text) |
             Q(product__product_type__name__icontains=search_text)).order_by("-created_at")
-
             if get_asset_queryset:
                 data=convert_to_list(request,get_asset_queryset)
                 return api_response(data=data,message="Asset found")
             else:
                 return api_response(status=200,message="Asset not found")
-    
         except Exception as e:
             error_info=get_detailed_errors_info(e)
             log_error_to_terminal(error_info)
