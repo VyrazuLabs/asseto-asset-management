@@ -22,7 +22,6 @@ def path_and_rename(instance, filename):
     return os.path.join(upload_to, filename)
 
 class UserManager(BaseUserManager):
-
     def create_user(self, email, full_name, username, phone, password, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address.')
@@ -85,6 +84,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     browser_notification=models.BooleanField(default=False)
     slack_notification=models.BooleanField(default=False)
     inapp_notification=models.BooleanField(default=False)
+    password_reset_token = models.CharField(max_length=255, blank=True, null=True)
+    password_reset_expires = models.DateTimeField(blank=True, null=True)
     objects = UserManager()
     history = HistoricalRecords()
 
