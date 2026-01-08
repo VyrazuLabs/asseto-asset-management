@@ -64,7 +64,7 @@ class VendorData(APIView):
             vendor_count = Vendor.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).count()
             latest_vendor_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('created_at').reverse()[0:5]
             data=vendor_datas(vendor_count,latest_vendor_list)
-            return api_response(data=data, message="Venodrs data for dashboard get successfully")
+            return api_response(data=data, message="Vendors data for dashboard get successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
         except Exception as e:

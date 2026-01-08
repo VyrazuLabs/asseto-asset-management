@@ -231,6 +231,7 @@ def change_status(request, id):
     if request.method in ['PATCH', 'POST']:
         try:
             asset = Asset.objects.filter(id=id).first()
+            print("ASSET ----->",asset)
         except Asset.DoesNotExist:
             return JsonResponse({'error': 'Asset not found'}, status=404)
         try:
@@ -246,8 +247,8 @@ def change_status(request, id):
             # delete the assigned asset from the asigned asset list
             AssignAsset.objects.filter(asset=asset).delete()
         asset.save()
-        slack_notification(request,f"{asset.name} status changed to {new_status}",asset.id,asset.tag)
-        notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name} status changed to {new_status}",notification_title="Asset Status Changed")
+        # slack_notification(request,f"{asset.name} status changed to {new_status}",asset.id,asset.tag)
+        # notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name} status changed to {new_status}",notification_title="Asset Status Changed")
         return JsonResponse({'success': True, 'new_status': new_status})
 
     return JsonResponse({'error': 'Invalid method'}, status=405)
