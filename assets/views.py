@@ -251,7 +251,6 @@ def change_status(request, id):
         # notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name} status changed to {new_status}",notification_title="Asset Status Changed")
         return JsonResponse({'success': True, 'new_status': new_status})
 
-    return JsonResponse({'error': 'Invalid method'}, status=405)
 
 @login_required
 def delete_assign_asset_list(request, id):
