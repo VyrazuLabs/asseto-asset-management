@@ -790,6 +790,29 @@
         });
     </script>
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Master checkbox in each row
+            document.querySelectorAll('input[name="checkall"]').forEach(master => {
+
+                master.addEventListener("change", function () {
+                    const row = this.closest("tr");
+
+                    // Find all checkboxes in the same row except the master
+                    const checkboxes = row.querySelectorAll(
+                        'input[type="checkbox"]:not([name="checkall"])'
+                    );
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
 
             document.querySelectorAll('.ischeck').forEach(parentCheckbox => {
@@ -844,6 +867,27 @@
         });
     </script>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll('input[name="checkall"]').forEach(master => {
+            const module = master.dataset.id;
+
+            const checkboxes = document.querySelectorAll(`.isscheck_${module}`);
+
+            master.addEventListener("change", function () {
+                checkboxes.forEach(cb => cb.checked = master.checked);
+            });
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener("change", function () {
+                    master.checked = [...checkboxes].every(c => c.checked);
+                });
+            });
+        });
+
+    });
+</script>
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (e.detail.target.id == "add-role-modal-content" && !e.detail.xhr.response) {

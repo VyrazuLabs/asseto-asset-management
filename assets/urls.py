@@ -55,5 +55,5 @@ api_url_patterns = [
     path('api/asset/details/assign-asset/<uuid:id>',api_views.AssignAsset.as_view(),name="assign_asset"),
     path('api/asset/details/unassign-asset/<uuid:id>',api_views.UnAssignAsset.as_view(),name="unassign_asset"),
     path('api/asset/details/user-list-for-assign-asset',api_views.UserListForAssignAsset.as_view(),name="user_list_for_assign_asset"),
-    path('api/asset/get-notifications',GetNotifications,name="get_notifications")
+    path('api/asset/get-notifications',api_views.GetNotifications.as_view(),name="get_notifications")
 ]

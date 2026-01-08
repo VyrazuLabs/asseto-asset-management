@@ -13,6 +13,7 @@
         <td>
             {% with img=product_images|get_at_index:products.id %}
                 {% if img %}
+                    {{img.image.url}}
                     <img src="{{ img.image.url }}" alt="{{ products.name }}" style="max-width:100px; max-height:100px;" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';">
                 {% elif not img.image.url %}
                     <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
@@ -36,7 +37,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">   
                 {% if products.total_assets != 0 %}   
                 {{ product.id }}
-                <form method="get" action="{% url 'assets:search_assets' 1 %}">
+                <form method="get" action="{% url 'assets:search' 1 %}">
                     <input type="hidden" name="product" value="{{ products.id }}">
                     <button type="submit" 
                             class="btn btn-sm text-white"
