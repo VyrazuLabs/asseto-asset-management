@@ -5,6 +5,7 @@ from dashboard.models import CustomField
 from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework import serializers
 
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
@@ -283,13 +284,13 @@ class AssetSerializer(serializers.ModelSerializer):
 
 
 class SearchAssetSerializer(serializers.Serializer):
-    search_text=serializers.CharField(required=True)
+    search_text=serializers.CharField(required=False)
     class Meta:
         fields=['search_text']
     
     def validate(self, search_text):
         if not search_text:
-            return None
+            return []
         return search_text
 class AssignAssetSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
