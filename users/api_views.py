@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from assets.models import AssetImage, AssignAsset
 from authentication.models import User
 from common.pagination import add_pagination
-from users.serializers import UserSerializer,SearchUserSerializer
-from rest_framework.permissions import IsAuthenticated
+from users.serializers import UserSerializer,SearchUserSerializer,ResetPasswordSerializer
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
 from common.API_custom_response import api_response,format_validation_errors
 from users.utils import user_data, user_details
@@ -21,9 +21,10 @@ from common.API_custom_response import format_validation_errors,get_detailed_err
 from datetime import datetime
 from django.utils import timezone
 from django.shortcuts import render
+
 # @api_view(["POST"])
-class ResetPassword(APIView):
-    permission_classes = []
+class ChangePassword(APIView):
+    permission_classes=[AllowAny]
 
     def post(self, request):
         # token = request.data.get("token")
@@ -61,9 +62,36 @@ class ResetPassword(APIView):
     def get(self, request):
         token=request.query_params.get("token")
         return render(request, "users/password-reset-entry.html", {"token": token})
+    
+class ResetPassword(APIView):
+    permission_classes = [IsAuthenticated]
+    @extend_schema(request={"multipart/form-data":ResetPasswordSerializer})
+    # @extend_schema(parameters=[
+    #     OpenApiParameter(name="password-payload",type=str,description="Enter Password Payload")])
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        current_password = serializer.validated_data["current_password"]
+        new_password = serializer.validated_data["new_password"]
+
+        if not user.check_password(current_password):
+            return Response(
+                {"success": False, "message": "Current password is incorrect."},
+                status=400
+            )
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            {"success": True, "message": "Password changed successfully."},
+            status=200
+        )
 
 class ForgotPassword(APIView):
-    # permission_classes=[AllowAny]
+    permission_classes=[AllowAny]
     @extend_schema(parameters=[
         OpenApiParameter(name="email",type=str,description="Enter Email")])
     def post(self,request):
