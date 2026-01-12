@@ -42,7 +42,12 @@ class AddProduct(APIView):
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:
-            return api_response(status=500,system_message=str(e))
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+
+            return api_response(status=500,error_type="server_error",error_location=error_info['location'],
+                system_message=error_info["message"], trace_back=error_info['traceback'])
+
 
 
 class ProductDetails(APIView):
@@ -107,6 +112,8 @@ class SearchProduct(APIView):
     )
     def get(self,request):
         search_text=request.GET.get('search_text')
+        if search_text is None:
+            return api_response(data=[],message="No Product found")
         status=request.GET.get('status')
         vendor=request.GET.get('vendor')
         product_type=request.GET.get('product_type')
