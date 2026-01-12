@@ -5,6 +5,19 @@ from dashboard.models import Address, Location
 # from dashboard.serializers import AddressSerializer
 from roles.models import Role
 from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
+
+class ResetPasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    rewrite_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        if attrs["current_password"] != attrs["rewrite_password"]:
+            raise serializers.ValidationError(
+                {"rewrite_password": "Passwords do not match."}
+            )
+        return attrs
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
