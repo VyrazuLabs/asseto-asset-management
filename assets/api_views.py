@@ -166,6 +166,9 @@ class SearchAsset(APIView):
     @extend_schema(request=SearchAssetSerializer)
     def post(self,request):
         serializer=SearchAssetSerializer(data=request.data)
+        search_text=request.POST.get('search_text')
+        if search_text is None:
+            return api_response(data=[],message="No Asset found")
         if not serializer.is_valid():
             return api_response(
                     status=400,error_type="Validation_error",
@@ -173,6 +176,8 @@ class SearchAsset(APIView):
                     validation_errors=format_validation_errors(serializer.errors)
                 )
         search_text=serializer.validated_data["search_text"]
+        if search_text is None:
+            return api_response(data=[],message="No Asset found")
         try:
             get_asset_queryset=Asset.objects.filter(Q(tag__icontains=search_text) |
             Q(name__icontains=search_text) |
