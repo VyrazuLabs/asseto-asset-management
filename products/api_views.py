@@ -112,6 +112,8 @@ class SearchProduct(APIView):
     )
     def get(self,request):
         search_text=request.GET.get('search_text')
+        if search_text is None:
+            return api_response(data=[],message="No Product found")
         status=request.GET.get('status')
         vendor=request.GET.get('vendor')
         product_type=request.GET.get('product_type')
