@@ -5,6 +5,7 @@ from dashboard.models import CustomField
 from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework import serializers
 
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
