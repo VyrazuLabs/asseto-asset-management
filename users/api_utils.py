@@ -29,7 +29,7 @@ def forgot_password(request,email):
         # host=request.build_absolute_uri(endpoint)
         get_host = lambda request: request.build_absolute_uri('/')
         host=get_host(request)
-        reset_link = host+f"api/user/reset-password?token={token}"
+        reset_link = host+f"api/user/change-password?token={token}"
 
         # Send email
         html_content = render_to_string(
