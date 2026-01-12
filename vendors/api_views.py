@@ -97,6 +97,8 @@ class SearchVendor(APIView):
     )
     def get(self,request):
         search_text=request.GET.get('search_text')
+        if search_text is None:
+            return api_response(data=[],message="No Vendor found")
         try:
             vendors_list = searched_data(request,search_text)
             if vendors_list:
