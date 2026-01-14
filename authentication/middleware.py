@@ -13,10 +13,12 @@ class DBConnectionMiddleware:
             reverse('authentication:db_configure'),
             reverse('authentication:email_configure'),
             reverse('authentication:register'),
+            '/api/authentication/token/refresh/'
         ]
 
 
         if request.path in skip_paths:
+            print(request.path)
             return self.get_response(request)
         
         if not os.environ.get('EMAIL_HOST'):
