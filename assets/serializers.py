@@ -284,7 +284,11 @@ class AssetSerializer(serializers.ModelSerializer):
 
 
 class SearchAssetSerializer(serializers.Serializer):
-    search_text=serializers.CharField(required=False)
+    search_text = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True
+    )
     class Meta:
         fields=['search_text']
     
