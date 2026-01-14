@@ -96,7 +96,7 @@ class DeleteProduct(APIView):
         try:
             get_product=get_object_or_404(Product,pk=id)
             get_product.soft_delete()
-            return api_response(status=200, message='Product sent to tarsh')
+            return api_response(status=200, message='Product sent to trash')
         except ValueError as e:
             return api_response(status=400, error_message=str(e))
         except Exception as e:

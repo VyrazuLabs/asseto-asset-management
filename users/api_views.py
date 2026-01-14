@@ -115,7 +115,8 @@ class UserList(APIView):
         OpenApiParameter(name="page",type=int,default=1,description="page number for pagination")])
     def get(self, request):
         try:
-            user_list=User.undeleted_objects.all().exclude(pk=request.user.id).order_by("-created_at")
+            # user_list=User.undeleted_objects.all().exclude(pk=request.user.id).order_by("-created_at")
+            user_list=User.undeleted_objects.filter(is_superuser=False).exclude(pk=request.user.id).order_by('-created_at')
             data=user_data(request,user_list)
             page=int(request.GET.get('page',1))
             paginated_data=add_pagination(data,page=page)

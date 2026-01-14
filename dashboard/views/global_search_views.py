@@ -45,7 +45,7 @@ def global_search(request):
     assets = Asset.undeleted_objects.filter(
         (Q(organization=request.user.organization)|Q(organization=None)) & (
             Q(tag__icontains=search_text) |
-            Q(name__icontains=search_text)            
+            Q(name__icontains=search_text)
         )
     ).order_by('-created_at')[:10]
 

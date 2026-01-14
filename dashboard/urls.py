@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views,license_type
+from .views import api_view,global_search_views,api_location_views,api_product_type_views,api_product_category_views, api_department_views,license_type
 app_name = 'dashboard'
 
 urlpatterns = [
@@ -71,6 +71,7 @@ dashboard_api_urlpatterns=[
     path('api/admin/product-category/product-sub-category-dropdown-list',api_product_category_views.ProductSubCategoryListForFormDropdown.as_view(),name='product_sub_category-dropdown_list'),
 
     # Department api urls
-    path('api/admin/department/department-dropdown-list',api_department_views.DepartmentListForFormDropdown.as_view(),name='department_dropdown_list')
+    path('api/admin/department/department-dropdown-list',api_department_views.DepartmentListForFormDropdown.as_view(),name='department_dropdown_list'),
 
+    path('api/global-search/', api_view.GlobalSearch.as_view(), name='global_search_api'),
 ]
