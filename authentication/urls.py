@@ -25,6 +25,7 @@ authentication_url_patterns=[
     #api urls
     path('api/authentication/login/', TokenObtainPairView.as_view(),name='login'),
     path('api/authentication/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
+    # path('api/authentication/token/refresh/',views.get_refresh_token,name='token_refresh'),
     path('api/authentication/logout/',TokenBlacklistView.as_view(),name='logout'),
 
     #dashboard api urls
