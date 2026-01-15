@@ -1,8 +1,13 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.db import connections, DEFAULT_DB_ALIAS
+from django.conf import settings
 from django.db.utils import OperationalError, ConnectionDoesNotExist
+from configurations.models import Extensions
 import os
+
+
 class DBConnectionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -33,5 +38,11 @@ class DBConnectionMiddleware:
             return redirect('authentication:introduce')
         except Exception as e:
             return redirect('authentication:introduce')
+        
+        api_extension=Extensions.objects.get(entity_name="API")
+        all_paths=request.get_full_path("/")
+        if api_extension.status == 0 and "api" in all_paths.split("/"):
+            return JsonResponse(data={'messgae':'API access not allowed','status':401})
 
         return self.get_response(request)
+    
