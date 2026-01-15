@@ -1,101 +1,116 @@
 {% extends 'layouts/main-layout.html' %}
-
+{% load static %}
 {% block content %}
+
 <style>
-a.disabled {
-    pointer-events: none;
-    color: gray !important; /* Or any muted color */
-    opacity: 0.5;
-    cursor: default;
-    text-decoration: none;
-}
+    a.disabled {
+        pointer-events: none;
+        color: gray !important;
+        opacity: 0.5;
+        cursor: default;
+        text-decoration: none;
+    }
+
+    @media (max-width: 576px) {
+        .page-name {
+            font-size: 1.3rem;
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+        }
+
+        .card {
+            border-radius: 12px;
+        }
+    }
 </style>
 
 <div class="page-heading">
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between flex-wrap">
         <div class="page-title">
             <h3 class="page-name">Extensions</h3>
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+            <nav aria-label="breadcrumb" class="breadcrumb-header d-none d-md-block">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Extensions</li>
-                    <li class="breadcrumb-item active" aria-current="page">Slack</li>
+                    <li class="breadcrumb-item">Extensions</li>
+                    <li class="breadcrumb-item active">Slack</li>
                 </ol>
             </nav>
         </div>
     </div>
-    <section class="section row">
-            <div class="col-12 col-md-6 col-lg-4 m-3">
-                <div class="card p-3 h-75 w-100 p-2">
-                    <div class="d-flex justify-content-between w-100 p-2">
-                        <h4 class="mb-3">{{ integration_choices.entity_name }} Configurations</h4>
-                        <div class="d-flex justify-content-end gap-2">
-                            <!-- Gear button wrapper -->
+
+    <section class="section">
+        <div class="row g-4">
+
+            <!-- SLACK CARD -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+
+                    <div
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 p-2 gap-2">
+                        <h4 class="mb-0">{{ integration_choices.entity_name }} Configurations</h4>
+
+                        <div class="d-flex gap-2 align-items-center">
                             <a id="slack-integration-btn-{{ forloop.counter }}"
-                            class="btn bg-transparent {% if integration_choices.status == 0 %}disabled{% endif %}"
-                            href="{% url 'configurations:integration' %}">
+                                class="btn bg-transparent {% if integration_choices.status == 0 %}disabled{% endif %}"
+                                href="{% url 'configurations:integration' %}">
                                 <i class="bi bi-gear"></i>
                             </a>
 
                             <div class="form-check form-switch">
-                                <input
-                                    name="status"
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    role="switch"
-                                    id="flexSwitchCheckDefault-{{ forloop.counter }}"
+                                <input name="status" class="form-check-input" type="checkbox" role="switch"
                                     hx-post="{% url 'configurations:extension_status' integration_choices.id %}"
-                                    hx-include="closest div"
                                     hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                    hx-trigger="change"
-                                    hx-on:htmx:afterOnLoad="location.reload()"
-                                    {% if integration_choices.status == 0 %} unchecked {% else %} checked {% endif %}
-                                    style="cursor: pointer;"
-                                >
+                                    {% if integration_choices.status == 1 %}checked{% endif %}>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3 text-center d-flex gap-5 p-3">
-                        {% if add_path_context.logo %}
+
+                    <div
+                        class="p-3 d-flex flex-column flex-sm-row align-items-center gap-3 text-center text-sm-start">
                             <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg"
-                                 alt="logo_image"
-                                 class="img-fluid"
-                                 style="max-height: 90px;">
-                            <a class="btn btn-sm btn-danger ms-2"
-                               href="{% url 'configurations:delete_logo' add_path_context.id %}">
+                                class="img-fluid w-100 w-sm-auto" style="max-height: 90px; object-fit: contain;">
+                            {% if add_path_context.logo %}
+                            <a class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                href="{% url 'configurations:delete_logo' add_path_context.id %}">
                                 <i class="bi bi-trash3-fill"></i>
                             </a>
-                        {% else %}
-                            <img src="https://media.designrush.com/inspirations/343049/conversions/slack_logo-preview.jpg"
-                                 alt="logo_image"
-                                 class="img-fluid"
-                                 style="max-height: 90px;">
-                        {% endif %}
-                        <span class="p-1">{{ integration_choices.description }}</span>
+                            {% endif %}
+
+                        <span>{{ integration_choices.description }}</span>
                     </div>
                 </div>
             </div>
-       
+
+            <!-- API CARD -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+
+                    <div
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 p-2 gap-2">
+                        <h4 class="mb-0">API Configurations</h4>
+
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="api_status" value="off">
+                            <input name="api_status" type="checkbox" value="on" class="form-check-input"
+                                hx-post="{% url 'configurations:api_extension-status' api_extension.id %}"
+                                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                                {% if api_extension.status == 1 %}checked{% endif %}>
+                        </div>
+                    </div>
+
+                    <div
+                        class="p-3 d-flex flex-column flex-sm-row align-items-center gap-3 text-center text-sm-start">
+                        <img src="{% static 'assets/images/api_logo.jpeg' %}" class="img-fluid w-10 w-sm-auto"
+                            style="max-height: 90px; object-fit: contain;">
+                        <span>Enable the button to access the Mobile Application</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </section>
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const slackCheckbox = document.getElementById("slack-integration-btn-{{ forloop.counter }}");
-        const slackCredentials = document.getElementById("slack-button");
 
-        function showDiv() {
-            if (slackCheckbox.checked) {
-                slackCredentials.disabled= true;
-            } else {
-                slackCredentials.disabled= false;
-            }
-        }
-
-        // Initialize on page load
-        showDiv();
-
-        // Add change event listener
-        slackCheckbox.addEventListener("change", showDiv);
-    });
-</script>
 {% endblock %}
