@@ -24,7 +24,7 @@ urlpatterns=[
     path('add-organization/',views.add_organization,name='add_organization'),
 
     #for api extension
-    path('api-extension-status/<uuid:id>',views.api_extension_status,name='api_extension-status')
+    path('api-extension-status/<uuid:id>',views.api_extension_status,name='api_extension_status')
 ]
 
 configuration_api_url_patterns = [

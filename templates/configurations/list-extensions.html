@@ -94,7 +94,7 @@
                         <div class="form-check form-switch">
                             <input type="hidden" name="api_status" value="off">
                             <input name="api_status" type="checkbox" value="on" class="form-check-input"
-                                hx-post="{% url 'configurations:api_extension-status' api_extension.id %}"
+                                hx-post="{% url 'configurations:api_extension_status' api_extension.id %}"
                                 hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
                                 {% if api_extension.status == 1 %}checked{% endif %}>
                         </div>
