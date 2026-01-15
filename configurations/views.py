@@ -8,13 +8,10 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm,ClientCredentialsForm
 from .models import TagConfiguration,Extensions,SlackConfiguration
-from django.http import JsonResponse
 import base64
 from dashboard.models import Organization
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponse
 from django.contrib import messages
-
 from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
 @login_required
@@ -66,7 +63,6 @@ def delete_login_page_logo(request, id):
 @csrf_exempt
 @login_required
 def create_or_update_tag_configuration(request, id=None):
-    user_default_settings = request.GET.get('user_default_settings')
     # Check if we're editing an existing configuration
     instance = None
     if id:
@@ -126,7 +122,6 @@ def list_tag_configurations(request):
 
 @login_required
 def toggle_default_settings(request, id):
-    configurations = TagConfiguration.objects.filter(organization=request.user.organization).first()
     config = get_object_or_404(TagConfiguration, pk=id, organization=request.user.organization)
     config.use_default_settings = not config.use_default_settings
     config.save()
@@ -141,9 +136,6 @@ def list_localizations(request):
     get_default_currency_format={}
     get_default_country_format={}
     if configurations:
-        # for id,name in DEFAULT_LANGUAGE:
-        #     if id == configurations.default_language:
-        #         get_default_language= {'name':name,'id':id}
         for id,name in NAME_FORMATS:
             if id == configurations.name_display_format:
                 get_default_name_display_format= {'name':name,'id':id}
@@ -153,9 +145,6 @@ def list_localizations(request):
         for id,name in CURRENCY_CHOICES:
             if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
-        # for id,name in COUNTRY_CHOICES:
-        #     if id == configurations.country_format:
-        #         get_default_country_format= {'name':name,'id':id}
     else:
         get_default_language=None
         get_default_name_display_format=None
@@ -163,12 +152,6 @@ def list_localizations(request):
         get_default_currency_format=None
         get_default_country_format=None
     return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'default_country':DEFAULT_COUNTRY,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format,'submenu':'localization','sidebar':'configurations'})
-
-# def get_localization(request):
-#     context = {
-#         'country_choices': COUNTRY_CHOICES
-#     }
-#     return render(request, 'configurations/add.html', context)
 
 @login_required
 def create_localization_configuration(request):
@@ -252,12 +235,14 @@ def list_extensions(request):
                 status=0,  # Inactive by default
                 validity=0,
             )
-    get_extensions=Extensions.objects.filter(organization=request.user.organization).first()
+    get_extensions=Extensions.objects.get(entity_name="Slack",organization=request.user.organization)
+
+    get_api_extension=Extensions.objects.get(entity_name="API")
     if get_extensions:
         request.session['slack'] = True
     else:
         request.session['slack'] = False
-    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions})
+    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions,'api_extension':get_api_extension})
 
 @login_required
 def extension_status(request, id):
@@ -296,15 +281,6 @@ def save_slack_configuration(request):
         # On GET or other methods, you may render the form page or handle differently
         return redirect("configurations:integration")
     
-# def add_organization(request):
-#     context={
-#         # 'organization_choices':ORGANIZATION_CHOICES,
-#         'currency_choices':CURRENCY_CHOICES,
-#         'submenu':'organization',
-#         'sidebar':'configurations'
-#     }
-#     return render(request,'configurations/add_organization.html',context=context)
-
 @login_required
 @permission_required('authentication.delete_location')
 def add_organization(request):
@@ -342,3 +318,11 @@ def add_organization(request):
         else:
             get_org_data=None
         return render(request, 'configurations/add_organization.html', context={'org_data': get_org_data,'currency_choices':CURRENCY_CHOICES,'submenu':'organization','sidebar':'configurations'})
+
+@login_required  
+def api_extension_status(request,id):
+    status = request.POST.get("api_status", "off")
+    ext = get_object_or_404(Extensions,pk=id)
+    ext.status = 1 if status == "on" else 0
+    ext.save()
+    return redirect("configurations:list_extensions")
