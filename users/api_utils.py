@@ -84,7 +84,7 @@ def get_profile_data(request):
     get_user_full_name=user.dynamic_display_name(user.full_name)
     get_currency_format=None
     for id,it in CURRENCY_CHOICES:
-        if obj.currency == id:
+        if obj and obj.currency == id:
             get_currency_format=it
     print(request.user)
     arr=[]
@@ -98,7 +98,6 @@ def get_profile_data(request):
         "profilePicture":f"http://{current_host}"+user.profile_pic.url if user.profile_pic else None,
         "phone":user.phone if user.phone else None,
         "username":user.username if user.username else None,
-        # "designation":"Administrator" if request.user.is_superuser else None,
         "address":user.address if user.address else None,
         "department":user.department.name if user.department else None,
         "contact_person_name":user.department.contact_person_name if user.department else None,
@@ -108,7 +107,7 @@ def get_profile_data(request):
         "organization_website":request.user.organization.website if request.user.organization.website else None,
         "organization_email":request.user.organization.email if request.user.organization.email else None,
         "organization_phone":request.user.organization.phone if request.user.organization.phone else None,
-        "organization_currency":get_currency_format if obj.currency else None
+        "organization_currency":get_currency_format if obj and obj.currency else None
     }
     arr.append(dict)
     return arr
