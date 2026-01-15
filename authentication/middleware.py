@@ -28,6 +28,11 @@ class DBConnectionMiddleware:
         
         if not os.environ.get('EMAIL_HOST'):
             return redirect('authentication:introduce')
+        
+        if "api/" in request.get_full_path("/"):
+            api_extension=Extensions.objects.filter(entity_name="API").first()
+            if (not api_extension) or (api_extension.status == 0):
+                return JsonResponse(data={'messgae':'API access not allowed','status':401})
 
         try:
             conn = connections[DEFAULT_DB_ALIAS]
