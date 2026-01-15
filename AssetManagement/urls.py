@@ -22,6 +22,7 @@ from authentication.forms import UserPasswordChangeForm, UserPasswordResetForm, 
 from authentication.decorators import unauthenticated_user
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from assets.urls import api_url_patterns
+from configurations.models import Extensions
 from users.urls import user_api_url_patterns
 from authentication.urls import authentication_url_patterns
 from vendors.urls import vendor_api_urlpatterns
@@ -29,6 +30,7 @@ from products.urls import product_api_urlpattrens
 from dashboard.urls import dashboard_api_urlpatterns
 from audit.urls import audit_api_url_patterns
 from configurations.urls import configuration_api_url_patterns
+
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
@@ -74,7 +76,7 @@ urlpatterns = [
 	
 ]
 
-urlpatterns = urlpatterns + api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns
+urlpatterns=urlpatterns+api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns
 
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

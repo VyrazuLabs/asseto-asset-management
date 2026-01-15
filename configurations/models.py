@@ -44,24 +44,14 @@ class LocalizationConfiguration(models.Model):
         return f"{self.organization.name} - Localization Settings"
 
 class Extensions(models.Model):
-    STATUS_CHOICES = [
-        (0, 'Inactive'),
-        (1, 'Active'),
-    ]
+    STATUS_CHOICES = [(0, 'Inactive'),(1, 'Active')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description=models.TextField(blank=True, null=True)
-    organization = models.ForeignKey(
-        Organization,
-        on_delete=models.CASCADE,
-        related_name='integrations'
-    )
-    entity_name = models.CharField(
-        max_length=150,
-    )
+    organization = models.ForeignKey(Organization,on_delete=models.CASCADE,related_name='integrations')
+    entity_name = models.CharField(max_length=150,)
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     payment_date = models.DateTimeField(auto_now_add=True)
     validity= models.IntegerField( default=0)
-
 class SlackConfiguration(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="slack_configuration")
     slack_user_id = models.CharField(max_length=100, null=True, blank=True)
@@ -72,28 +62,3 @@ class SlackConfiguration(models.Model):
     channel_id=models.CharField(max_length=100, null=True, blank=True)
     client_id=models.CharField(max_length=100, null=True, blank=True)
     client_secret=models.CharField(max_length=100, null=True, blank=True)
-
-    # @staticmethod
-    # def is_valid_base64(string):
-    #     try:
-    #         return string == base64.b64encode(base64.b64decode(string.encode())).decode()
-    #     except Exception:
-    #         return False
-
-    # def save(self, *args, client_id=None, client_secret=None, **kwargs):
-    #     import pdb; pdb.set_trace();
-    #     try:
-    #         client_id = client_id or self.client_id
-    #         if client_id is not None and not self.is_valid_base64(client_id):
-    #             self.client_id = base64.b64encode(client_id.encode()).decode()
-    #     except (TypeError, ValueError, AttributeError, binascii.Error):
-    #         pass
-
-    #     try:
-    #         client_secret = client_secret or self.client_secret
-    #         if client_secret is not None and not self.is_valid_base64(client_secret): 
-    #             self.client_secret = base64.b64encode(client_secret.encode()).decode()
-    #     except (TypeError, ValueError, AttributeError, binascii.Error):
-    #         pass
-
-    #     super().save(*args, **kwargs)
