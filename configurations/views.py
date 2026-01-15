@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.models import BrandingImages,LocalizationConfiguration
 from configurations.utils import add_path, create_or_update_image, update_files_name,hide_last_digits
