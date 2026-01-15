@@ -109,7 +109,7 @@ def generate_asset_tag(prefix, number_suffix):
     size = len(number_suffix)
 
     # Get last asset tag that starts with prefix
-    last_tag = Asset.undeleted_objects.filter(tag__startswith=prefix,).order_by('-created_at').first()
+    last_tag = Asset.objects.filter(tag__startswith=prefix,).order_by('-created_at').first()
     if last_tag:
         # Extract numeric part after prefix
         numeric_part = last_tag.tag[len(prefix):]

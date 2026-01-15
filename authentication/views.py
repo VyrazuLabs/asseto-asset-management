@@ -38,7 +38,32 @@ from configurations.constants import NAME_FORMATS
 from dotenv import load_dotenv,set_key
 from django.conf import settings
 from license.models import License
+from .utils import get_tokens_for_user
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 User = get_user_model()
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+# @authentication_classes([])
+def get_refresh_token(request):
+    user = request.user
+
+    if not user.is_active:
+        raise AuthenticationFailed("User is not active")
+
+    refresh = RefreshToken.for_user(user)
+
+    return Response(
+        {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        },
+        status=200,
+    )
 
 def introduce(request):
     return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})

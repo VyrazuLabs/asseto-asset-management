@@ -4,8 +4,19 @@ from django.conf import settings
 from django.db import connections
 from dotenv import load_dotenv, set_key
 import os
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
 
+def get_tokens_for_user(user):
+    if not user.is_active:
+      raise AuthenticationFailed("User is not active")
 
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 def create_db_connection(request, db_data):
     env_path = settings.BASE_DIR / ".env"
 
