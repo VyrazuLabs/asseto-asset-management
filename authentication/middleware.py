@@ -43,11 +43,6 @@ class DBConnectionMiddleware:
             return redirect('authentication:introduce')
         except Exception as e:
             return redirect('authentication:introduce')
-        
-        api_extension=Extensions.objects.get(entity_name="API")
-        all_paths=request.get_full_path("/")
-        if api_extension.status == 0 and "api" in all_paths.split("/"):
-            return JsonResponse(data={'messgae':'API access not allowed','status':401})
 
         return self.get_response(request)
     
