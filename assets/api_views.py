@@ -14,27 +14,44 @@ from drf_spectacular.utils import extend_schema,OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
 from django.http import HttpResponse
-
+import requests
 from dashboard.models import CustomField
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
+# from .api_utils import get_push_notification_data
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_push_notification(request):
+#     data=get_push_notification_data(request.user)
+#     print("inside push notification api view=======================================================")
+#     return Response(data) 
 
 class GetNotifications(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
     def get(self,request):
+        # current_host=request.get_host()
+        # external_api_url = f'http://{current_host}'+'/api/asset/push-notification/'
         try:
             notifications = UserNotification.objects.filter(
                 user=request.user,
                 is_seen=False,
                 notification__entity_type=0
             )
+            # get_recent_notification=notifications.order_by('-created_at')[:1]
             data = [
-                {"id": n.id, "title": n.notification.notification_title, "body": n.notification.notification_text}
+                # {"recent_notification":get_recent_notification},
+                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text}
                 for n in notifications
+                # "recent_notification":get_recent_notification
             ]
+            # external_response = requests.get(external_api_url)
+            # external_response.raise_for_status()
+            # # Process the response data (assuming JSON)
+            # datas = external_response.json()
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
             print("NOTIIIIIIIIIIIIIIIIIIIII",data)
