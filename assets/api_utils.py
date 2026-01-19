@@ -2,7 +2,14 @@ from django.utils import timezone
 from assets.models import Asset, AssetImage, AssignAsset
 from dateutil.relativedelta import relativedelta
 import re
+from configurations.utils import get_currency_and_datetime_format, format_datetime
+from configurations.utils import dynamic_display_name
 
+# def get_push_notification_data(user):
+#     return {
+#         "message": "Success",
+#         "user": user.username
+#     }
 def convert_to_list(request,queryset):
     current_host=request.get_host()
     asset_list = []
@@ -11,21 +18,22 @@ def convert_to_list(request,queryset):
             'id': asset.id,
             'name': asset.name,
             'tag': asset.tag if asset.tag else None,
-            "vendorName": asset.vendor.name if asset.vendor else None,
-            "vendorId": asset.vendor.id if asset.vendor else None,
-            'productId':asset.product.id if asset.product else None,
-            'productName':asset.product.name if asset.product else None,
+            "vendor_name": asset.vendor.name if asset.vendor else None,
+            "vendor_id": asset.vendor.id if asset.vendor else None,
+            'produc_id':asset.product.id if asset.product else None,
+            'product_name':asset.product.name if asset.product else None,
             'product_type_id':asset.product.product_type.id if asset.product and asset.product.product_type else None,
             'product_type':asset.product.product_type.name if asset.product and asset.product.product_type else None,
-            "isAssigned": asset.is_assigned,
-            "assetStatus": asset.asset_status.name if asset.asset_status else None,
-            "assetStatusId": asset.asset_status.id if asset.asset_status else None,
+            "is_assigned": asset.is_assigned,
+            "asset_status": asset.asset_status.name if asset.asset_status else None,
+            "asset_status_id": asset.asset_status.id if asset.asset_status else None,
         }
         assetImage=AssetImage.objects.filter(asset=asset.id).first()
         asset_dict["image"]=f"http://{current_host}"+assetImage.image.url if assetImage else None
+        user=request.user
         if asset.is_assigned:
             assigned_asset = AssignAsset.objects.filter(asset=asset.id).select_related("user").first()
-            asset_dict["assigned_to_name"] = assigned_asset.user.full_name if assigned_asset and assigned_asset.user else None
+            asset_dict["assigned_to_name"] = dynamic_display_name(request,fullname=assigned_asset.user.full_name) if assigned_asset and assigned_asset.user else None,
             asset_dict["assigned_to_image"] = f"http://{current_host}"+assigned_asset.user.profile_pic.url if assigned_asset and assigned_asset.user and assigned_asset.user.profile_pic else None
         else:
             asset_dict["assigned_to_name"] = None
@@ -34,23 +42,28 @@ def convert_to_list(request,queryset):
         asset_list.append(asset_dict)
 
     return asset_list
-
-def get_assigned_user(asset):
+# dynamic_display_name(user.full_name)
+def get_assigned_user(request,asset):
+    user=request.user
     assigned_user=None
     if asset.is_assigned:
         assigned_asset=AssignAsset.objects.filter(asset=asset).select_related("user").first()
         if assigned_asset:
             assigned_user={
                 "id":assigned_asset.user.id,
-                "full_name":assigned_asset.user.full_name,
+                "full_name":dynamic_display_name(request,fullname=assigned_asset.user.full_name) if assigned_asset and assigned_asset.user else None,
                 "email":assigned_asset.user.email
             }
     return assigned_user
 def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     current_host=request.get_host()
+    obj=get_currency_and_datetime_format(request.user.organization)
+    format_currency=obj['currency'] if obj['currency'] else None
+    format_date=obj['date_format'] if obj['date_format'] else None
+    # formatted_currency= format_currency.format(asset.price) if asset.price else None
     assign_info=None
     if asset.is_assigned is True:
-        assign_info=get_assigned_user(asset)
+        assign_info=get_assigned_user(request,asset)
     asset_data={
         "id":asset.id,
         "tag":asset.tag,
@@ -58,15 +71,15 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "name":asset.name,
         "product_id":asset.product.id,
         "product":asset.product.name,
-        "product type":asset.product.product_type.name,
+        "product_type":asset.product.product_type.name,
         "product_category":asset.product.product_sub_category.name if asset.product.product_sub_category else None,
-        "serial no.":asset.serial_no if asset.serial_no else None,
-        "price":asset.price if asset.price else None,
+        "serial_no":asset.serial_no if asset.serial_no else None,
+        "price":format_currency+" "+str(asset.price) if asset.price else None,#asset.price if asset.price else None,
         "office_location_id":asset.location.id if asset.location else None,
         "office_location":asset.location.office_name if asset.location else None,
-        "purchase type":asset.purchase_type if asset.purchase_type else None,
-        "purchase_date":asset.purchase_date if asset.purchase_date else None,
-        "warranty_expiry_date":asset.warranty_expiry_date if asset.warranty_expiry_date else None,
+        "purchase_type":asset.purchase_type if asset.purchase_type else None,
+        "purchase_date":format_datetime(asset.purchase_date,format_date) if asset.purchase_date else None,
+        "warranty_expiry_date":format_datetime(asset.warranty_expiry_date,format_date) if asset.warranty_expiry_date else None,
         "vendor_id":asset.vendor.id if asset.vendor else None,
         "vendor":asset.vendor.name if asset.vendor else None,
         "asset_status_id":asset.asset_status.id,
@@ -99,15 +112,15 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
 
     asset_data['eol']=eol_date
 
-    asset_status_list=[]
-    for asset_status in asset_statuses:
-        asset_status_dict={
-            'id':asset_status.id,
-            'name':asset_status.name
-        }
-        asset_status_list.append(asset_status_dict)
+    # asset_status_list=[]
+    # for asset_status in asset_statuses:
+    #     asset_status_dict={
+    #         'id':asset_status.id,
+    #         'name':asset_status.name
+    #     }
+    #     asset_status_list.append(asset_status_dict)
     
-    asset_data['asset_statuses']=asset_status_list
+    # asset_data['asset_statuses']=asset_status_list
 
     return asset_data
 
