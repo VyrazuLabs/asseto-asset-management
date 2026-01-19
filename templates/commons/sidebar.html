@@ -62,7 +62,7 @@
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/vendor_quick.svg' %}" alt="Vendors" width="20" height="20"></image></i>
+                            <i><image src="{% static 'assets/images/new_logo/vendor_new.svg' %}" alt="Vendors" width="20" height="20"></image></i>
                             <span>Vendors</span>
                         </a>
                     </li>
@@ -70,7 +70,7 @@
                 {% if perms.authentication.view_product or perms.authentication.delete_product or perms.authentication.edit_product or perms.authentication.add_product %}
                     <li class="sidebar-item {% if sidebar == 'products' %}active{% endif %}">
                         <a href="{% url 'products:list' %}" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/product.svg' %}" alt="Products" width="20" height="20"></image></i>
+                            <i><image src="{% static 'assets/images/new_logo/product_new.svg' %}" alt="Products" width="20" height="20"></image></i>
                             <span>Products</span>
                         </a>
                     </li>
