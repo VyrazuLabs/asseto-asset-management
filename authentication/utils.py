@@ -12,7 +12,7 @@ def get_tokens_for_user(user):
       raise AuthenticationFailed("User is not active")
 
     refresh = RefreshToken.for_user(user)
-
+    print(refresh.access_token,"---refresh.access_token---")
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),

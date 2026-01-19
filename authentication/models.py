@@ -92,6 +92,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
 
+    # def __init__(self, *args, **kwargs):
+    #     self.full_name=kwargs.pop('full_name', None)
+    #     format_key= LocalizationConfiguration.objects.filter(organization=self.user.organization).first()
+    #     format_key=format_key.name_display_format if format_key else "0"
+    #     super().__init__(*args, **kwargs)
+
     def dynamic_display_name(self, fullname):
         # Normalize fullname
         fullname = (fullname or "").strip()
