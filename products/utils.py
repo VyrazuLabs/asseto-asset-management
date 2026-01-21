@@ -10,11 +10,12 @@ def convert_to_list(request,products):
         product_dict={
             'id':product.id,
             'name':product.name,
-            'type':product.product_type.name,
+            'type':product.product_type.name if product.product_type else None,
             'category':product.product_sub_category.name if product.product_sub_category else None,
             'total_asset':Asset.objects.filter(product=product.id).count(),
             'status':product.status,
         }
+        print("pro------->",product_dict)
         get_product_image=ProductImage.objects.filter(product=product.id).first()
         if get_product_image:
             product_dict['image']=f"http://{current_host}"+get_product_image.image.url
@@ -26,12 +27,16 @@ def convert_to_list(request,products):
 
 def product_details(request,product):
     current_host=request.get_host()
+    print(product)
     product_detail={
         'id':product.id,
         'name':product.name,
         'type':product.product_type.name,
+        'type_id':product.product_type.id,
         'category':product.product_sub_category.name if product.product_sub_category.name else None,
+        'category_id':product.product_sub_category.id if product.product_sub_category.name else None,
         'parent_category':product.product_sub_category.parent.name if product.product_sub_category else None,
+        'parent_category_id':product.product_sub_category.parent.id if product.product_sub_category else None,
         'manufacture':product.manufacturer if product.manufacturer else None,
         'model_name':product. model if product. model else None,
         'status':product.status if product.status else None,
@@ -40,11 +45,15 @@ def product_details(request,product):
         'asset_count':Asset.undeleted_objects.filter(product=product.id).count()
     }
     get_product_image=ProductImage.objects.filter(product=product.id)
-    product_detail['images']=image_list=[]
+    product_detail['product_images']=image_list=[]
     if get_product_image:
         for product_image in get_product_image:
-            image_list.append(f"http://{current_host}"+product_image.image.url)
-        product_detail['images']=image_list
+            obj={}
+            # image_list.append(f"http://{current_host}"+product_image.image.url)
+            obj['image_path']=f"http://{current_host}"+product_image.image.url
+            obj['image_id']=product_image.id
+            image_list.append(obj)
+    product_detail['product_images']=image_list
     
     product_detail['custom_fields']=custome_fields_list=[]
     get_custom_fields=CustomField.objects.filter(object_id=product.id)
@@ -55,23 +64,23 @@ def product_details(request,product):
         product_detail['custom_fields']=custome_fields_list
 
 
-    get_asset=Asset.objects.filter(product=product.id,organization=request.user.organization)
-    asset_list=[]
-    product_detail['assets']=asset_list
-    if get_asset:
-        for asset in get_asset:
-            asset_dict={
-                'id':asset.id,
-                'name':asset.name,
-                'status':asset.asset_status.name
-            }
-            asset_dict['assigned_user']=None
-            assigned_user=AssignAsset.objects.get(asset=asset.id)
-            if assigned_user:
-                asset_dict['assigned_user']=assigned_user.user.full_name
-            asset_list.append(asset_dict)
+    # get_asset=Asset.objects.filter(product=product.id,organization=request.user.organization)
+    # asset_list=[]
+    # product_detail['assets']=asset_list
+    # if get_asset:
+    #     for asset in get_asset:
+    #         asset_dict={
+    #             'id':asset.id,
+    #             'name':asset.name,
+    #             'status':asset.asset_status.name
+    #         }
+    #         asset_dict['assigned_user']=None
+    #         assigned_user=AssignAsset.objects.get(asset=asset.id)
+    #         if assigned_user:
+    #             asset_dict['assigned_user']=assigned_user.user.full_name
+    #         asset_list.append(asset_dict)
 
-        product_detail['assets']=asset_list
+    #     product_detail['assets']=asset_list
     return product_detail
 
 def product_list_for_form(products):
@@ -90,3 +99,5 @@ def delete_product_images(deleted_image_ids):
             ProductImage.objects.filter(id=id).delete()
         except Exception as e:
             print(e)
+
+# def deleted
