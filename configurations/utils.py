@@ -146,6 +146,7 @@ def get_currency_and_datetime_format(organization):
             break
         
     obj={'currency':currency_format,'date_format':date_format}
+    print('obj-----',obj)
     return obj
     # return organization.currency, organization.date_format
 
