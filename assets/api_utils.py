@@ -1,7 +1,9 @@
 from django.utils import timezone
+from datetime import datetime, timedelta
 from assets.models import Asset, AssetImage, AssignAsset
 from dateutil.relativedelta import relativedelta
 import re
+from datetime import date
 from configurations.utils import get_currency_and_datetime_format, format_datetime
 from configurations.utils import dynamic_display_name
 
@@ -20,7 +22,7 @@ def convert_to_list(request,queryset):
             'tag': asset.tag if asset.tag else None,
             "vendor_name": asset.vendor.name if asset.vendor else None,
             "vendor_id": asset.vendor.id if asset.vendor else None,
-            'produc_id':asset.product.id if asset.product else None,
+            'product_id':asset.product.id if asset.product else None,
             'product_name':asset.product.name if asset.product else None,
             'product_type_id':asset.product.product_type.id if asset.product and asset.product.product_type else None,
             'product_type':asset.product.product_type.name if asset.product and asset.product.product_type else None,
@@ -58,8 +60,9 @@ def get_assigned_user(request,asset):
 def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     current_host=request.get_host()
     obj=get_currency_and_datetime_format(request.user.organization)
-    format_currency=obj['currency'] if obj['currency'] else None
+    format_currency=obj['currency'] if obj['currency'] else 'INR'
     format_date=obj['date_format'] if obj['date_format'] else None
+    print('format_date-----',format_date)
     # formatted_currency= format_currency.format(asset.price) if asset.price else None
     assign_info=None
     if asset.is_assigned is True:
@@ -70,7 +73,7 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "assigned_status":asset.is_assigned,
         "name":asset.name,
         "product_id":asset.product.id,
-        "product":asset.product.name,
+        "product":asset.product.name, 
         "product_type":asset.product.product_type.name,
         "product_category":asset.product.product_sub_category.name if asset.product.product_sub_category else None,
         "serial_no":asset.serial_no if asset.serial_no else None,
@@ -79,16 +82,20 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "office_location":asset.location.office_name if asset.location else None,
         "purchase_type":asset.purchase_type if asset.purchase_type else None,
         "purchase_date":format_datetime(asset.purchase_date,format_date) if asset.purchase_date else None,
+        "original_purchase_date":datetime.strptime(str(asset.purchase_date), "%Y-%m-%d").isoformat() if asset.purchase_date else None,
+        # datetime.strptime(str(asset.warranty_expiry_date), "%Y-%m-%d").isoformat()
         "warranty_expiry_date":format_datetime(asset.warranty_expiry_date,format_date) if asset.warranty_expiry_date else None,
+        "original_warranty_expiry_date":datetime.strptime(str(asset.warranty_expiry_date), "%Y-%m-%d").isoformat() if asset.warranty_expiry_date else None,
         "vendor_id":asset.vendor.id if asset.vendor else None,
         "vendor":asset.vendor.name if asset.vendor else None,
-        "asset_status_id":asset.asset_status.id,
+        "asset_status_id":asset.asset_status.id if asset.asset_status else None,
         "asset_status":asset.asset_status.name if asset.asset_status else None,
         "serial_no":asset.serial_no if asset.serial_no else None,
         "description":asset.description if asset.description else None,
         "is_assigned":asset.is_assigned if asset.is_assigned else None,
         "assigned_to":assign_info["full_name"] if assign_info else None,
         "assigned_to_id":assign_info["id"] if assign_info else None,
+        "date_format":format_date if format_date else None,
     }
     asset_image_list=[]
     if asset_images:
