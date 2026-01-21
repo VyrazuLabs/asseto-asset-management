@@ -33,8 +33,8 @@ class AssetSerializer(serializers.ModelSerializer):
         default=list,
     )
     custom_fields = DictionaryListField(child=serializers.DictField(), required=False)
-    purchase_date = serializers.DateField(required=False, allow_null=True)
-    warranty_expiry_date = serializers.DateField(required=False, allow_null=True)
+    purchase_date = serializers.DateTimeField(format='iso-8601', required=False, allow_null=True)
+    warranty_expiry_date = serializers.DateTimeField(format='iso-8601', required=False, allow_null=True)
 
     class Meta:
         model = Asset
@@ -90,7 +90,7 @@ class AssetSerializer(serializers.ModelSerializer):
     
     def validate_purchase_date(self, value):
         if value:
-            today = timezone.now().date()
+            today = timezone.now()
             if value > today:
                 print("value-purchase",value)
                 raise serializers.ValidationError(
@@ -101,52 +101,6 @@ class AssetSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop("images", []) or []
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
         # custom_fields_raw = request.data.get("custom_fields", "[]")
         # custom_fields = json.loads(custom_fields_raw)
         custom_fields = validated_data.pop("custom_fields", []) or []
@@ -273,7 +227,7 @@ class AssetSerializer(serializers.ModelSerializer):
     
     def validate_warranty_expiry_date(self, value):
         if value:
-            tomorrow = timezone.now().date() + timedelta(days=1)
+            tomorrow = timezone.now() + timedelta(days=1)
             if value < tomorrow:
                 print("value",value)
                 raise serializers.ValidationError(
@@ -323,6 +277,9 @@ class AssignAssetSerializer(serializers.ModelSerializer):
         asset_images=validated_data.pop('images',[])
         assign_asset=AssignAsset.objects.create(asset=asset,**validated_data)
         asset.is_assigned=True
+        status="Assigned"
+        get_status=AssetStatus.objects.filter(name=status).first()
+        asset.asset_status = get_status
         asset.save()
         for image in asset_images:
             AssetImage.objects.create(asset=asset,image=image)
