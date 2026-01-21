@@ -25,7 +25,7 @@
         <td>{{user.email}}</td>
         <td><div style="display: flex; align-items: center; gap: 10px">
             {% if user.id in user_asset_map_count %}
-                <form method="get" action="{% url 'assets:search_assets' 1 %}">
+                <form method="get" action="{% url 'assets:search' 1 %}">
                     <input type="hidden" name="user-data" value="{{ user.id }}">
                     <button type="submit" 
                             class="btn btn-sm text-white"

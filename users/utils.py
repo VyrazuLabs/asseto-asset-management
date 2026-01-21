@@ -3,6 +3,7 @@ from authentication.models import User
 from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
 from django.core.paginator import Paginator
+from configurations.utils import dynamic_display_name
 
 
 PERMISSION_LIST = [
@@ -143,14 +144,14 @@ def user_data(request,user_list):
             'id':user.id,
             'department_id':user.department.id if user.department else None,
             'location_id':user.location.id if user.location else None,
-            'role_id':user.role.id if user.role else None,
-            'fullName':user.full_name,
+            'role_id':str(user.role.id) if user.role else None,
+            'full_name':dynamic_display_name(request,fullname=user.full_name) if user.full_name else None,
             'email':user.email,
             'role':user.role.related_name if user.role else None,
-            'isActive':user.is_active,
-            'lastLogin':user.last_login,
-            'profilePicture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
-            'assetCount':AssignAsset.objects.filter(user=user.id).count(),
+            'is_active':user.is_active,
+            'last_login':user.last_login,
+            'profile_picture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
+            'asset_count':AssignAsset.objects.filter(user=user.id).count(),
             'department':user.department.name if user.department else None,
             'location':user.location.office_name if user.location else None,
         })

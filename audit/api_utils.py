@@ -3,6 +3,8 @@ from .models import Audit,AuditImage
 from assets.models import Asset,AssetImage,AssignAsset
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from configurations.utils import get_currency_and_datetime_format, format_datetime
+from configurations.utils import dynamic_display_name
 get_host = lambda request: request.build_absolute_uri('/')
 
 def next_audit_due(audit_id):
@@ -39,6 +41,9 @@ def audit_image_url(audit,host=""):
 def get_completed_audits(request,audit_queryset):
     host=get_host(request)
     obj=[]
+    objs=get_currency_and_datetime_format(request.user.organization)
+    format_currency=objs['currency']
+    format_date=objs['date_format']
     for it in audit_queryset:
         dict={
         'id':it.id,
@@ -48,8 +53,8 @@ def get_completed_audits(request,audit_queryset):
         'condition':it.condition_label(),
         'created_at':it.created_at,
         'notes':it.notes,
-        'next_audit_date':next_audit_due(it.id),
-        'assigned_to':it.assigned_to,
+        'next_audit_date':format_datetime(next_audit_due(it.id),format_date) if next_audit_due(it.id) else "",
+        'assigned_to':dynamic_display_name(request,fullname=it.assigned_to) if it.assigned_to else "",
         'audit_image_url':audit_image_url(it,host),
         }
         obj.append(dict)
@@ -58,7 +63,10 @@ def get_completed_audits(request,audit_queryset):
 
 def get_pending_audits(request):
     asset_list = Asset.undeleted_objects.all()
-    obj=[]
+    objs=[]
+    obj=get_currency_and_datetime_format(request.user.organization)
+    format_currency=obj['currency']
+    format_date=obj['date_format']
     current_host=request.get_host()
     for asset in asset_list:
         assigned_asset=AssignAsset.objects.filter(asset=asset).first()
@@ -77,8 +85,8 @@ def get_pending_audits(request):
         "product_name": asset.product.name if asset and asset.product else "",
         "product_category": asset.product.product_sub_category.name if asset and asset.product and asset.product.product_sub_category else "",
         "asset_status": asset.status if asset else "",
-        "expected_audit_date": next_due_date if next_due_date else "",
-        "last_audit_date": has_audit.created_at.date() if has_audit else "",
+        "expected_audit_date": format_datetime(next_due_date,format_date) if next_due_date else "",
+        "last_audit_date": format_datetime(has_audit.created_at.date(),format_date) if has_audit else "",
         
         # "last_audit_date": has_audit.last_audit_date.created_at.date if has_audit else "",
         # "last_audit_date": (
@@ -87,9 +95,9 @@ def get_pending_audits(request):
         #     else ""
         # )
         }
-        obj.append(dict)
+        objs.append(dict)
     print("objjjjjjjjjjjjjjjjjjjjjj",obj)
-    return obj
+    return objs
 
 def audit_data_by_id(request,id):
     audit=Audit.objects.filter(id=id).first()
