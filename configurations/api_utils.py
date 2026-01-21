@@ -1,4 +1,5 @@
 from configurations.models import TagConfiguration,LocalizationConfiguration
+from configurations.utils import get_currency_and_datetime_format
 
 def get_tag_configurations(request):
     get_tag_configurations_data=TagConfiguration.objects.filter(organization=request.user.organization).first()
@@ -23,6 +24,7 @@ def get_tag_configurations(request):
 
 def get_localization_configurations(request):
     get_localization_configurations_data=LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    get_val=get_currency_and_datetime_format(request.user.organization)
     obj=[]
     if get_localization_configurations_data is not None:
         dict = {
@@ -31,8 +33,10 @@ def get_localization_configurations(request):
             'time_format': get_localization_configurations_data.time_format,
             'timezone': get_localization_configurations_data.timezone,
             'currency': get_localization_configurations_data.currency,
-            'name_display_format': get_localization_configurations_data.name_display_format
+            'name_display_format': get_localization_configurations_data.name_display_format,
             # 'use_default_settings': get_tag_configurations_data.use_default_settings,
+            'currency_value': get_val['currency'],
+            'date_format_value': get_val['date_format'],
         }
         print(dict)
     else:
