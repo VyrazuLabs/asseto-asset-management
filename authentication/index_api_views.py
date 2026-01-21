@@ -21,9 +21,9 @@ class AssetData(APIView):
                 warranty_expiry_date__lt=today)|Q(warranty_expiry_date=None)).order_by('warranty_expiry_date')    
             all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
             asset_count = all_asset_list.count()
-            assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None) | Q(
-            asset__organization=request.user.organization)).count()
-            
+            assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None,asset__is_assigned=True) | Q(
+            asset__organization=request.user.organization,asset__is_assigned=True) ).count()
+            print(assign_assets_counts,"----assign_assets_counts---")
             data=asset_datas(expiring_assets,all_asset_list,asset_count,assign_assets_counts)
             return api_response(data=data, message="asset data for dashboard get successfully")
         except ValueError as e:
@@ -64,7 +64,7 @@ class VendorData(APIView):
             vendor_count = Vendor.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).count()
             latest_vendor_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('created_at').reverse()[0:5]
             data=vendor_datas(vendor_count,latest_vendor_list)
-            return api_response(data=data, message="Venodrs data for dashboard get successfully")
+            return api_response(data=data, message="Vendors data for dashboard get successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
         except Exception as e:
