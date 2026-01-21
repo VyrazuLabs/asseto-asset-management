@@ -14,30 +14,57 @@ from drf_spectacular.utils import extend_schema,OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from django.db.models import Q
 from django.http import HttpResponse
-
+import requests
 from dashboard.models import CustomField
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
+# from .api_utils import get_push_notification_data
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def GetNotifications(request):
-    notifications = UserNotification.objects.filter(
-        user=request.user,
-        is_sent=False,
-        notification__entity_type=0
-    )
-    data = [
-        {"id": n.id, "title": n.notification.notification_title, "body": n.notification.notification_text}
-        for n in notifications
-    ]
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_push_notification(request):
+#     data=get_push_notification_data(request.user)
+#     print("inside push notification api view=======================================================")
+#     return Response(data) 
 
-    # Mark as sent
-    # notifications.update(is_sent=True)
-
-    return Response({"notifications": data})
+class GetNotifications(APIView):
+    permission_classes=[IsAuthenticated]
+    @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
+    def get(self,request):
+        # current_host=request.get_host()
+        # external_api_url = f'http://{current_host}'+'/api/asset/push-notification/'
+        try:
+            notifications = UserNotification.objects.filter(
+                user=request.user,
+                is_seen=False,
+                notification__entity_type=0
+            )
+            # get_recent_notification=notifications.order_by('-created_at')[:1]
+            data = [
+                # {"recent_notification":get_recent_notification},
+                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text}
+                for n in notifications
+                # "recent_notification":get_recent_notification
+            ]
+            # external_response = requests.get(external_api_url)
+            # external_response.raise_for_status()
+            # # Process the response data (assuming JSON)
+            # datas = external_response.json()
+            page = int(request.GET.get('page', 1))
+            paginated_data=add_pagination(data,page=page)
+            print("NOTIIIIIIIIIIIIIIIIIIIII",data)
+            return api_response(data=paginated_data, message="List get Successfully")
+            # Mark as sent
+            # notifications.update(is_sent=True)
+        except ValueError as e:
+            return api_response(status=400,error_message=str(e))
+        except Exception as e:
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500,error_type="server_error",error_location=error_info['location'],
+                system_message=error_info["message"], trace_back=error_info['traceback'])
 
 
 class AssetList(APIView):
@@ -91,7 +118,7 @@ class AssetDetails(APIView):
     def get(self,request,id):
         try:
             asset=get_object_or_404(Asset,pk=id)
-            asset_images=AssetImage.objects.filter(asset=asset.id).all()
+            asset_images=AssetImage.objects.filter(asset=asset).all()
             custom_fields=CustomField.objects.filter(object_id=asset.id)
             asset_statuses=AssetStatus.objects.all()
             data=asset_data(request,asset,asset_images,asset_statuses,custom_fields)
@@ -111,6 +138,7 @@ class UpdateAsset(APIView):
     @extend_schema(request={"multipart/form-data":AssetSerializer})
     def patch(self,request,id):
         deleted_image_ids=request.data.get('delete_image_ids',[])
+        deleted_image_ids= json.loads(deleted_image_ids) if isinstance(deleted_image_ids,str) else deleted_image_ids
         if deleted_image_ids:
             print('deleted imagessssssssssssssssss',deleted_image_ids)
             delete_images(deleted_image_ids)
@@ -154,6 +182,7 @@ class SearchAsset(APIView):
 
     @extend_schema(request=SearchAssetSerializer)
     def post(self,request):
+        print("request data",request.data)
         serializer=SearchAssetSerializer(data=request.data)
         if not serializer.is_valid():
             return api_response(
@@ -161,7 +190,10 @@ class SearchAsset(APIView):
                     error_location="Serializer",
                     validation_errors=format_validation_errors(serializer.errors)
                 )
-        search_text=serializer.validated_data["search_text"]
+        # search_text=serializer.validated_data["search_text"]
+        search_text = serializer.validated_data.get("search_text")
+        if not search_text or not search_text.strip():
+            return api_response(data=[], message="No Asset found")
         try:
             get_asset_queryset=Asset.objects.filter(Q(tag__icontains=search_text) |
             Q(name__icontains=search_text) |
@@ -172,17 +204,16 @@ class SearchAsset(APIView):
             Q(vendor__gstin_number__icontains=search_text) |
             Q(location__office_name__icontains=search_text) |
             Q(product__product_type__name__icontains=search_text)).order_by("-created_at")
-
             if get_asset_queryset:
                 data=convert_to_list(request,get_asset_queryset)
+                print("data",data)
                 return api_response(data=data,message="Asset found")
             else:
                 return api_response(status=200,message="Asset not found")
-    
         except Exception as e:
             error_info=get_detailed_errors_info(e)
             log_error_to_terminal(error_info)
-
+ 
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
 
@@ -228,7 +259,6 @@ class AssignAsset(APIView):
             get_asset=get_object_or_404(Asset,pk=id)
             if get_asset.is_assigned==True:
                 return api_response(status=400,message="this asset is already assigned")
-            
             serializer=AssignAssetSerializer(data=request.data)
             if not serializer.is_valid():
                 raise ValueError(serializer.errors)
@@ -241,7 +271,7 @@ class AssignAsset(APIView):
 
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
-        
+
 class UnAssignAsset(APIView):
     permission_classes=[IsAuthenticated]
     def post(self,request,id):
