@@ -259,7 +259,6 @@ class AssignAsset(APIView):
             get_asset=get_object_or_404(Asset,pk=id)
             if get_asset.is_assigned==True:
                 return api_response(status=400,message="this asset is already assigned")
-            
             serializer=AssignAssetSerializer(data=request.data)
             if not serializer.is_valid():
                 raise ValueError(serializer.errors)
