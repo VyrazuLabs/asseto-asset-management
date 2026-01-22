@@ -1,4 +1,13 @@
 {% load static %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+>
+
 <div id="sidebar" class="active">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header position-relative mt-2">
@@ -9,7 +18,7 @@
                     </div>
                 {% else %}
                     <div class="logo">
-                        <a href="/"><img src="{% static 'assets/images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="max-width: 90%;  height: auto;"/></a>
+                        <a href="/"><img src="{% static 'images/logo/asset_logo.png' %}" alt="Logo" srcset="" style="max-width: 90%;  height: auto;"/></a>
                     </div>
                 {% endif %}
 
@@ -54,7 +63,7 @@
                 <li class="sidebar-item {% if sidebar == 'index' %}active{% endif %}">
                     {% if request.user.is_superuser %}
                         <a href="/" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/dash.svg' %}" alt="Dashboard" width="20" height="20"></image></i>
+                            <i><image src="{% static 'images/new_logo/dash.svg' %}" alt="Dashboard" width="20" height="20"></image></i>
                             <span>Dashboard</span>
                         </a>
                     {% endif %}
@@ -62,7 +71,7 @@
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/vendor_new.svg' %}" alt="Vendors" width="20" height="20"></image></i>
+                            <i><image src="{% static 'images/new_logo/vendor_new.svg' %}" alt="Vendors" width="20" height="20"></image></i>
                             <span>Vendors</span>
                         </a>
                     </li>
@@ -70,7 +79,7 @@
                 {% if perms.authentication.view_product or perms.authentication.delete_product or perms.authentication.edit_product or perms.authentication.add_product %}
                     <li class="sidebar-item {% if sidebar == 'products' %}active{% endif %}">
                         <a href="{% url 'products:list' %}" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/product_new.svg' %}" alt="Products" width="20" height="20"></image></i>
+                            <i><image src="{% static 'images/new_logo/product_new.svg' %}" alt="Products" width="20" height="20"></image></i>
                             <span>Products</span>
                         </a>
                     </li>
@@ -78,21 +87,21 @@
                 {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
                     <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
                         <a href="{% url 'users:list' %}" class="sidebar-link">
-                            <i><image src="{% static 'assets/images/new_logo/user.svg' %}" fill="#A9A9A9" alt="Users" width="20" height="20"></image></i>
+                            <i><image src="{% static 'images/new_logo/user.svg' %}" fill="#A9A9A9" alt="Users" width="20" height="20"></image></i>
                             <span>Users</span>
                         </a>
                     </li>
                 {% endif %}
                 <li class="sidebar-item {% if sidebar == 'audit' %}active{% endif %}">
                     <a href="{% url 'audit:completed_audits' %}" class="sidebar-link">
-                        <i><image src="{% static 'assets/images/new_logo/hourglass.svg' %}" alt="Audit" width="20" height="20"></image></i>
+                        <i><image src="{% static 'images/new_logo/hourglass.svg' %}" alt="Audit" width="20" height="20"></image></i>
                         <span>Audit</span>
                     </a>
                 </li>
                 {% if perms.authentication.edit_asset or perms.authentication.delete_asset or perms.authentication.delete_assign_asset or perms.authentication.add_assign_asset or perms.authentication.add_asset or perms.authentication.reassign_assign_asset %}
                 <li class="sidebar-item {% if sidebar == 'assets' %}active{% endif %}">
                     <a href="{% url 'assets:list' %}" class="sidebar-link">
-                        <i><image src="{% static 'assets/images/new_logo/asset.svg' %}" alt="Assets" width="20" height="20"></image></i>
+                        <i><image src="{% static 'images/new_logo/asset.svg' %}" alt="Assets" width="20" height="20"></image></i>
                         <span>Assets</span>
                     </a>
                 </li>
