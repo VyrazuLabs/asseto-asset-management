@@ -99,9 +99,9 @@
                                                     {% if user.profile_pic %}
                                                         <img src="{{ user.profile_pic.url }}"
                                                             alt="{{ user.get_full_name|default:user.username }}"
-                                                            onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';">
+                                                            onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';">
                                                     {% else %}
-                                                        <img src="{% static 'assets/images/faces/1.jpg' %}"
+                                                        <img src="{% static 'images/faces/1.jpg' %}"
                                                             alt="Default user">
                                                     {% endif %}
                                                 </div>
