@@ -161,6 +161,6 @@ def log_error_to_terminal(error_info):
     print(f"Line      : {loc['line']}")
     print(f"Code      : {loc['code']}")
 
-    print("\TRACEBACK")
+    print("\nTRACEBACK")
     print(error_info["traceback"])
     print("=" * 60 + "\n")
