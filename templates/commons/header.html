@@ -7,17 +7,17 @@
     <title>{{ title }}</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="{% static 'assets/css/main/app.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/main/app-dark.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/main/app.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/main/app-dark.css' %}" />
     {% if get_favicon %}
         <link rel="shortcut icon" href="/media{{ get_favicon }}" type="image/x-icon" />
     {% else %}
-        <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.svg' %}" type="image/x-icon" />
+        <link rel="shortcut icon" href="{% static 'images/logo/Logo.svg' %}" type="image/x-icon" />
     {% endif %}
 
-    <link rel="shortcut icon" href="{% static 'assets/images/logo/Logo.png' %}" type="image/png" />
-    <link rel="stylesheet" href="{% static 'assets/css/shared/iconly.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/pages/simple-datatables.css' %}" />
+    <link rel="shortcut icon" href="{% static 'images/logo/Logo.png' %}" type="image/png" />
+    <link rel="stylesheet" href="{% static 'css/shared/iconly.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/pages/simple-datatables.css' %}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 
     <!-- JS: Toastify -->
@@ -35,8 +35,8 @@
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 
     <!-- Other JS -->
-    <script src="{% static 'assets/js/htmx.min.js' %}"></script>
-    <script defer src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script defer src="{% static 'js/app.js' %}"></script>
 </head>
 <style>
     .user-dropdown-menu {
@@ -175,7 +175,7 @@
                                                             {% if request.user.profile_pic %}
                                                                 <img src="{{request.user.profile_pic.url}}" />
                                                             {% else %}
-                                                                <img src="{% static 'assets/images/faces/1.jpg' %}" />
+                                                                <img src="{% static 'images/faces/1.jpg' %}" />
                                                             {% endif %}
                                                         </div>
                                                     </div>
