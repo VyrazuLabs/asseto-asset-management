@@ -234,9 +234,9 @@
                                         {% if img %}
                                             <img src="{{ img.image.url }}" alt="{{ asset.name }}"
                                                 style="max-width:100px; max-height:100px;"
-                                                onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';">
+                                                onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';">
                                         {% else %}
-                                            <img src="{% static 'assets/images/No_Image.jpg' %}"
+                                            <img src="{% static 'images/No_Image.jpg' %}"
                                                 alt="No image"
                                                 style="max-width:100px; max-height:100px;">
                                         {% endif %}
@@ -270,7 +270,7 @@
                                                     {% if map.image %}
                                                         <sup class="d-flex pe-1">
                                                             <img src="{{ map.image.url }}"
-                                                                onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';"
+                                                                onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';"
                                                                 class="rounded-circle mb-1"
                                                                 style="width: 20px; height: 20px;" 
                                                             />
