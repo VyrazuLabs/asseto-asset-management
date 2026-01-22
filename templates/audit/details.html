@@ -67,7 +67,7 @@
                                         data-image-src="{% get_media_prefix %}{{ images.image }}"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#imageModal{{ forloop.counter }}"
-                                        onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';"
                                         >
                                     </div>
                                     <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -78,7 +78,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body text-center">
-                                                <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ images.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                                <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ images.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
                                                 </div>
                                             </div>
                                         </div>
@@ -87,7 +87,7 @@
                             </div>
                             {% elif not images %}
                                 <div >
-                                    <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                    <img src="{% static 'images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                 </div>
                             {% endif %}
                     </div>
