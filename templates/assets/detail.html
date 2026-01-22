@@ -117,12 +117,12 @@
                                         data-image-src="{% get_media_prefix %}{{ it.image }}"
                                         data-bs-toggle="modal" 
                                         data-bs-target="#imageModal{{ forloop.counter }}"
-                                        onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';"
                                         >
                                     </div>
                                 {% elif not it.image.url %}
                                     <div >
-                                        <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                        <img src="{% static 'images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                     </div>
                                 {% endif %}
                                 <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -133,7 +133,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body text-center">
-                                        <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'assets/images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
+                                        <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
                                         </div>
                                     </div>
                                     </div>
@@ -248,7 +248,7 @@
                                     <td>{% if audit.audit_image %}
                                             <img src="{{ audit.id|audit_image_url}}" height="100" width="100" />
                                         {% else %}
-                                            <img src="{% static 'assets/images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
+                                            <img src="{% static 'images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
                                         {% endif %}
                                         </td>
                                     <td>{{ audit.condition_label }}</td>

@@ -29,9 +29,9 @@
                         <div class="col-12 mb-2 py-2 px-2 border">
                         {% if user.profile_pic %}
                             <img class="w-100 active" src="{{user.profile_pic.url}}"
-                            onerror="this.onerror=null; this.src='{% static 'assets/images/faces/1.jpg' %}';">               
+                            onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';">               
                         {% else %}
-                            <img class="w-100 active" src="{% static 'assets/images/faces/1.jpg' %}">
+                            <img class="w-100 active" src="{% static 'images/faces/1.jpg' %}">
                         {% endif %}
                         </div>
                         <h6 class="my-3">
@@ -118,13 +118,13 @@
                                                 <div class="asset-thumbnail">
                                                     {% if images %}
                                                         <img src="{{ images.0.image.url }}"
-                                                            onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                                            onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
                                                             class="img-fluid"
                                                             style="width: 150px; height: 150px; object-fit: cover; border: none; cursor: pointer;"
                                                             onclick="openAssetModal('carouselModal{{ assigned_asset.asset.id }}')"
                                                             >
                                                     {% else %}
-                                                        <img src="{% static 'assets/images/No_Image.jpg' %}"
+                                                        <img src="{% static 'images/No_Image.jpg' %}"
                                                             style="width: 150px; height: 150px; object-fit: cover; border: none;">
                                                     {% endif %}
                                                 </div>
@@ -188,7 +188,7 @@
                                                             {% for image in images %}
                                                                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                                                                     <img class="d-block w-100"
-                                                                        onerror="this.onerror=null; this.src='{% static 'assets/images/No_Image.jpg' %}';"
+                                                                        onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
                                                                         src="{{ image.image.url }}"
                                                                         alt="Asset Image"
                                                                         style="object-fit: contain; max-height: 600px;">
