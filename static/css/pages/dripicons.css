@@ -13,7 +13,7 @@
 
     url(../../../assets/fonts/vendor/@icon/dripicons/dripicons.woff?f19dcc0358afed69d2775da7999aa743) format('woff'),
     url(../../../assets/fonts/vendor/@icon/dripicons/dripicons.ttf?09c9c870ef8f9cffcc8faf6091535231) format('truetype'),
-    url(../../../assets/images/vendor/@icon/dripicons/dripicons.svg?4cecedd188b606da855d20edfa03e154#dripicons) format('svg');
+    url(../../../images/vendor/@icon/dripicons/dripicons.svg?4cecedd188b606da855d20edfa03e154#dripicons) format('svg');
 }
 
 .dripicons {
