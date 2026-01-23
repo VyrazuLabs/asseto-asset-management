@@ -162,7 +162,7 @@ def index(request):
     get_license_count=get_license.count()
     for it in expiring_assets:
         if not obj['date_format']:
-            it.warranty_expiry_date=it.warranty_expiry_date.date()
+            it.warranty_expiry_date=it.warranty_expiry_date
         else:
             it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
         # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
