@@ -2,7 +2,7 @@
     width: 0;
     position: relative;
     display:inline-block;
-    background-image: url(../../../assets/images/vendor/rater-js/lib/star_0.svg?494b2810cf2dc00c305ba4fc0de9f1c2);
+    background-image: url(../../../images/vendor/rater-js/lib/star_0.svg?494b2810cf2dc00c305ba4fc0de9f1c2);
     background-position: 0 0;
     background-repeat: repeat-x;
     cursor: pointer;
@@ -12,7 +12,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background: url(../../../assets/images/vendor/rater-js/lib/star_1.svg?896e7fa54a15637c49aec0f0faff59be) ;
+    background: url(../../../images/vendor/rater-js/lib/star_1.svg?896e7fa54a15637c49aec0f0faff59be) ;
     background-repeat: repeat-x;
 }
 
