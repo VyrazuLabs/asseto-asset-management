@@ -19,31 +19,30 @@ from datetime import timedelta
 import pymysql
 pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
+import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env', override=True)
-# os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+load_dotenv(BASE_DIR / ".env")
 
-LOGIN_REDIRECT_URL = '/'
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is not set")
 
-DEBUG=True 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+DEBUG = os.environ.get("DEBUG") == "True"
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+if DEBUG:
+    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+else:   
+    ORIGIN_HOST = os.environ.get("ORIGIN_HOST")
+    print("ORIGIN_HOST",ORIGIN_HOST)
+    ALLOWED_HOSTS = [".up.railway.app",ORIGIN_HOST]
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
-
-ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
 
 CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
 
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -73,7 +72,7 @@ INSTALLED_APPS = [
     'configurations',
     'drf_spectacular',
     'audit',
-    'license'
+    'license',
 ]
 ENABLE_TRACEBACK=True
 TRACEBACK_SHOW_LOCALS=True
@@ -275,7 +274,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY":SECRET_KEY ,
+    "SIGNING_KEY":SECRET_KEY,
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,

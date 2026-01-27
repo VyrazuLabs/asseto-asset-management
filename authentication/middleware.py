@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.utils import OperationalError, ConnectionDoesNotExist
 from configurations.models import Extensions
 import os
-
+from django.conf import settings
 
 class DBConnectionMiddleware:
     def __init__(self, get_response):
@@ -20,8 +20,6 @@ class DBConnectionMiddleware:
             reverse('authentication:register'),
             '/api/authentication/token/refresh/'
         ]
-
-
         if request.path in skip_paths:
             print(request.path)
             return self.get_response(request)

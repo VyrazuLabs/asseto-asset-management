@@ -66,7 +66,25 @@ def get_refresh_token(request):
     )
 
 def introduce(request):
-    return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})
+    env_path = settings.BASE_DIR / ".env"
+    
+    # get host (might include port)
+    request_host = request.get_host()       # e.g. "127.0.0.1:9001"
+    
+    # split off the port to get only hostname
+    host_only = request_host.split(":")[0]  # e.g. "127.0.0.1"
+    
+    print("host_only", host_only)           # ✅ prints "127.0.0.1"
+    
+    # If you want to save this to your env:
+    set_key(env_path, "ORIGIN_HOST", host_only)
+    load_dotenv(env_path, override=True)
+    
+    return render(
+        request,
+        'auth/first_time_installation/introduce.html',
+        context={'current_step': 1}
+    )
 
 def db_configure(request):
     if request.method=="POST":
