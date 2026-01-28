@@ -30,16 +30,22 @@ if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
 DEBUG = os.environ.get("DEBUG") == "True"
-
+CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
 if DEBUG:
     ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 else:   
     ORIGIN_HOST = os.environ.get("ORIGIN_HOST")
     print("ORIGIN_HOST",ORIGIN_HOST)
-    ALLOWED_HOSTS = [".up.railway.app",ORIGIN_HOST]
+    ALLOWED_HOSTS = [".up.railway.app"]
 
+    if ORIGIN_HOST:
+        ALLOWED_HOSTS.append(ORIGIN_HOST)
+        CSRF_TRUSTED_ORIGINS.append('https://'+ORIGIN_HOST)
+    else:
+        ALLOWED_HOSTS.append("*")
+        CSRF_TRUSTED_ORIGINS.append('https://'+"*")
+print("ALLOWED_HOSTS",ALLOWED_HOSTS)
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
 
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
