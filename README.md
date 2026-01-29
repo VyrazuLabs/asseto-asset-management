@@ -182,6 +182,8 @@ Configuration options are managed via the `.env` file. Key settings include:
 - Database credentials
 - SMTP server credentias
 - Other service configurations
+- CSRF Setup
+- Allowed-Host Setup
 
 Copy the settings from `.env.example` to `.env` and modify as needed.
 
