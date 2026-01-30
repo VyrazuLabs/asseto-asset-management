@@ -8,7 +8,7 @@ body {
 }
 #auth #auth-right {
   height: 100%;
-  background: url(../../../assets/images/4853433.png?45649b87e0b3f50bfa1372c6cdb4595f), linear-gradient(90deg, #2d499d, #3f5491);
+  background: url(../../../images/4853433.png?45649b87e0b3f50bfa1372c6cdb4595f), linear-gradient(90deg, #2d499d, #3f5491);
 }
 #auth-right {
   padding: 30px;
@@ -49,5 +49,5 @@ body {
 }
 
 body.theme-dark #auth-right {
-  background: url(../../../assets/images/4853433.png?45649b87e0b3f50bfa1372c6cdb4595f), linear-gradient(90deg, #2d499d, #3f5491);
+  background: url(../../../images/4853433.png?45649b87e0b3f50bfa1372c6cdb4595f), linear-gradient(90deg, #2d499d, #3f5491);
 }

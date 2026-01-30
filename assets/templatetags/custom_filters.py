@@ -24,9 +24,7 @@ def get_at_index(list_obj, index):
 @register.filter
 def split(value, key=' '):
     return value.split(key)
-@register.filter
-# @register.simple_tag(takes_context=True)
-@register.filter
+@register.simple_tag(takes_context=True)
 # @register.simple_tag(takes_context=True)
 def format_datetime(context,x):
     request = context['request']
@@ -41,6 +39,7 @@ def format_datetime(context,x):
         x = parse(x)
  
     formats = {
+        'DD-MM-YYYY': '%d-%m-%Y',
         'YYYY-MM-DD': '%Y-%m-%d',
         'Day Month DD, Year': '%A %B %d, %Y',   
         'Month DD, YYYY': '%B %d, %Y',
@@ -52,8 +51,11 @@ def format_datetime(context,x):
         raise ValueError("Invalid format. Choose from: " + ", ".join(formats.keys()))
  
     return x.strftime(formats[output_format])
+
 @register.simple_tag(takes_context=True)
 def dynamic_display_name(context,fullname):
+    if not fullname:
+        return "Not Available"
     request = context['request']
     format_key= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     # for id,it in NAME_FORMATS.items():
@@ -73,12 +75,19 @@ def dynamic_display_name(context,fullname):
     parts = (fullname or "").strip().split()
     first = parts[0] if len(parts) >= 1 else ""
     last = parts[-1] if len(parts) >= 2 else ""
+    middle_parts = parts[1:-1] if len(parts) > 2 else []
+
+    middle = " ".join(middle_parts)
     first_initial = first[0] if first else ""
+    middle_initial = middle_parts[0][0] if middle_parts else ""
     context = {
         "first": first,
         "last": last,
+        "middle": middle,
+        "middle_initial": middle_initial,
         "first_initial": first_initial,
     }
+    print("format_key",context)
     format_key=str(format_key)
     for it,data in NAME_FORMATS:
         if str(it)==format_key:
@@ -89,7 +98,7 @@ def dynamic_display_name(context,fullname):
         return fmt.format(**context).strip()
     except Exception:
         # fallback to standard "First Last"
-        return f"{first} {last}".strip()
+        return f"{first} {middle} {last}".strip()
     
 def audit_time_diff(audit):
     # Guard clauses if related objects are missing
@@ -116,10 +125,10 @@ def next_audit_due(audit_id):
  
     # First due date after interval
     next_due = base_date + relativedelta(days=interval_days)
- 
+    # next_due=datetime.date(next_due)
     # Grace period rule: If 30 days pass after due date → push to next interval
     days_remaining = (next_due - today).days
-    return  next_due
+    return next_due
     # else:
     #     days_remaining = (next_due - today).days
     #     return days_remaining
