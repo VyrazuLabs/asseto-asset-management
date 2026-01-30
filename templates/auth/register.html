@@ -1,6 +1,10 @@
 {% extends 'commons/first_time_installation.html' %}
 {% block title %}Register{% endblock title %}
 {% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
             {% include 'commons/progress-bar.html' with current_step=4 %}
             <h1 class="title">Sign Up</h1>
             <p class="subtitle mb-5">Input your data to register to our website.</p>
@@ -26,13 +30,6 @@
                 {% for error in u_form.full_name.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
-                <div class="form-group position-relative has-icon-left mb-3">
-                    <span class="text-danger">*</span>
-                    {{u_form.email}}
-                    <div class="form-control-icon">
-                        <i class="bi bi-envelope"></i>
-                    </div>
-                </div>
                 {% for error in u_form.email.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
@@ -40,7 +37,7 @@
                     <span class="text-danger">*</span>
                     {{u_form.username}}
                     <div class="form-control-icon">
-                        <i class="bi bi-person"></i>
+                        <i class="bi bi-envelope"></i>
                     </div>
                 </div>
                 {% for error in u_form.username.errors %}
