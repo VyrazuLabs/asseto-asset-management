@@ -137,8 +137,8 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{% if not license.start_date %}-{% else %} {{ license.start_date|date:"M d, Y" }} {% endif %}</td>
-                                        <td>{% if not license.expiry_date %}-{% else %} {{ license.expiry_date|date:"M d, Y" }} {% endif %}</td>                                          
+                                        <td>{% if not license.start_date %}-{% else %} {% format_datetime license.start_date %} {% endif %}</td>
+                                        <td>{% if not license.expiry_date %}-{% else %} {% format_datetime license.expiry_date %}  {% endif %}</td>                                          
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                                 {% if perms.authentication.view_product %}

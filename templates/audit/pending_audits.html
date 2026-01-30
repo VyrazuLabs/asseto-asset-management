@@ -49,7 +49,8 @@
                                     <td>{{ data.asset.name }}</td>
                                     <td>
                                         {% if data.last_audit_date %}
-                                            {{ data.last_audit_date.created_at.date}}
+                                            {% format_datetime data.last_audit_date.created_at.date %}
+                                            
                                         {% else %}
                                             N/A
                                         {% endif %}

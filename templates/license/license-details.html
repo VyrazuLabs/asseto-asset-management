@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -66,12 +67,12 @@
                                 <th scope="row">Start Date</th>
                                 {% if license.start_date == None %} <td>Not Provided</td> 
                                 {% else %}
-                                <td>{{license.start_date}}</td>
+                                <td>{% format_datetime license.start_date %}</td>
                                 {% endif %}
                                 <th scope="row">Expiry Date</th>
                                 {% if license.expiry_date == None %} <td>Not Provided</td> 
                                 {% else %}
-                                <td>{{license.expiry_date}}</td>
+                                <td>{% format_datetime license.expiry_date %}</td>
                                 {% endif %}
                             </tr>
                             <tr>
