@@ -136,47 +136,52 @@
 const input = document.getElementById("tag-input");
 const suggestionBox = document.getElementById("tag-suggestions");
 
-let debounceTimer;
+if (input && suggestionBox) {
+    let debounceTimer;
 
-input.addEventListener("input", function () {
-    clearTimeout(debounceTimer);
+    input.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
 
-    const query = this.value.trim();
-    let hostname = location.hostname;
-    if (!query) {
-        suggestionBox.innerHTML = "";
-        suggestionBox.style.display = "none";
-        suggestionBox.value= ""
-        return;
-    }
-
-    debounceTimer = setTimeout(() => {
-        fetch(`http://${hostname}:8000/audit/get-tags-list/?tag=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-            const tags = data.tags || [];
-
+        const query = this.value.trim();
+        if (!query) {
             suggestionBox.innerHTML = "";
-            suggestionBox.style.display = tags.length ? "block" : "none";
+            suggestionBox.style.display = "none";
+            return;
+        }
 
-            tags.forEach(tag => {
-                const li = document.createElement("li");
-                li.className = "list-group-item list-group-item-action";
-                li.textContent = tag;
-
-                li.onclick = () => {
-                    input.value = tag;
-                    input.dispatchEvent(new KeyboardEvent("keyup", { bubbles: true }));
+        debounceTimer = setTimeout(() => {
+            fetch(`/audit/get-tags-list/?tag=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    const tags = data.tags || [];
 
                     suggestionBox.innerHTML = "";
-                    suggestionBox.style.display = "none";
-                };
+                    suggestionBox.style.display = tags.length ? "block" : "none";
+                    suggestionBox.style.height="260px"
+                    suggestionBox.style.overflowY="scroll"
 
-                suggestionBox.appendChild(li);
-            });
-        });
-    }, 300); // debounce
-});
+                    tags.forEach(tag => {
+                        const li = document.createElement("li");
+                        li.className = "list-group-item list-group-item-action";
+                        li.textContent = tag;
+
+                        li.onclick = () => {
+                            input.value = tag;
+                            input.dispatchEvent(new Event("keyup"));
+                            suggestionBox.innerHTML = "";
+                            suggestionBox.style.display = "none";
+                        };
+
+                        suggestionBox.appendChild(li);
+                    });
+                });
+        }, 300);
+    });
+}
+</script>
+
+
+<script>
 
 document.getElementById("tag-input").addEventListener("keyup", function () {
 const tag = this.value.trim();
