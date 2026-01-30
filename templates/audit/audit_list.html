@@ -71,7 +71,7 @@
                                         <td>{{ audit.asset.name }}</td>
                                         <td>{{ audit.condition_label }}</td>
                                         <td>{{ audit.notes|truncatechars:30 }}</td>
-                                        <td>{{ audit.created_at }}</td>
+                                        <td>{% format_datetime audit.created_at %}</td>
                                         <td>{{ audit.id|next_audit_due }}</td>
 
                                         <td>
