@@ -1,3 +1,4 @@
+{% extends 'layouts/main-layout.html' %}
 <style>
     .pagination .page-link {
         background-color: #111 !important;
@@ -18,8 +19,8 @@
         background-color: #111 !important;
     }
 </style>
-
-{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters%}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -59,7 +60,7 @@
                             <th scope="row">Phone</th>
                             <td> {{vendor.phone}} </td>
                             <th scope="row">Contact Person</th>
-                            <td> {{vendor.contact_person}} </td>
+                            <td>{% dynamic_display_name vendors.contact_person %} </td>
                         </tr>
                         <tr>
                             <th scope="row">Designation</th>
