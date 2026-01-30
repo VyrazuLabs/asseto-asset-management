@@ -35,11 +35,14 @@ DEBUG=True
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG')
+DEBUG = config('DEBUG') or False
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = ['127.0.0.1', '.up.railway.app','*']
+else:
+    ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')] if os.environ.get('ALLOWED_HOSTS') else ['.onrender.com']
 
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com','https://2b3c17349fd6.ngrok-free.app',]
+CSRF_TRUSTED_ORIGINS = [os.environ.get('CSRF_TRUSTED_ORIGINS')] if os.environ.get('CSRF_TRUSTED_ORIGINS') else ['https://*.onrender.com']
 
 LOCALHOST_URL = 'http:127.0.0.1:8000'
 DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
@@ -87,6 +90,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # "authentication.middleware.DynamicCsrfMiddleware",
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

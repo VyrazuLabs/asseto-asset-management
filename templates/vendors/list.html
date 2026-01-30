@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% load custom_filters %}
 {% block content %}
 <div class="page-heading">
@@ -79,7 +80,7 @@
                             <tr>
                                 <td>{{forloop.counter}}</td>
                                 <td>{{vendors.name}}</td>
-                                <td>{{vendors.contact_person}}</td>
+                                <td>{% dynamic_display_name vendors.contact_person %}</td>
                                 <td>{{vendors.email}}</td>
                                 <td>{{vendors.gstin_number}}</td>
                                 <td>{{vendors.phone}}</td>

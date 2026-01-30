@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters%}
 {% block content %}
 <style>
   .flex-container {
@@ -351,7 +352,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{asset.warranty_expiry_date}}
+                                                        {% format_datetime asset.warranty_expiry_date %}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -402,7 +403,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{vendor.created_at}}
+                                                        {% format_datetime vendor.created_at %}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -445,7 +446,7 @@
                                                 </td>
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{product.created_at}}
+                                                        {% format_datetime product.created_at %}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -487,7 +488,7 @@
                                                 </td>                                
                                                 <td class="col-auto">
                                                     <p class="mb-0">
-                                                        {{location.created_at}}
+                                                        {% format_datetime location.created_at %}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -525,12 +526,12 @@
                                             </td>
                                             <td class="col-auto">
                                                 <p class="mb-0">
-                                                    {{users.full_name}}
+                                                    {% dynamic_display_name users.full_name %}
                                                 </p>
                                             </td>
                                             <td class="col-auto">
                                                 <p class="mb-0">
-                                                    {{users.created_at}}
+                                                    {% format_datetime users.created_at %}
                                                 </p>
                                             </td>
                                         </tr>
