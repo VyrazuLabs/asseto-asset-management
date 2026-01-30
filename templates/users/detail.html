@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters%}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -57,7 +58,7 @@
 
                         <tr>
                             <td><b>Full Name</b></td>
-                            <td>{{full_name}}</td>
+                            <td>{% dynamic_display_name user.full_name %}</td>
                         </tr>
 
                         <tr>
