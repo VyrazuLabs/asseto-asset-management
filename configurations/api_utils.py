@@ -28,23 +28,24 @@ def get_localization_configurations(request):
     obj=[]
     if get_localization_configurations_data is not None:
         dict = {
-            # 'id': get_localization_configurations_data.id,
             'date_format': get_localization_configurations_data.date_format,
             'time_format': get_localization_configurations_data.time_format,
             'timezone': get_localization_configurations_data.timezone,
             'currency': get_localization_configurations_data.currency,
             'name_display_format': get_localization_configurations_data.name_display_format,
-            # 'use_default_settings': get_tag_configurations_data.use_default_settings,
             'currency_value': get_val['currency'],
             'date_format_value': get_val['date_format'],
         }
         print(dict)
     else:
         dict = {
-            'id': None,
-            'prefix': None,
-            'number_suffix': None,
-            # 'use_default_settings': None,
+            'date_format': 0,
+            'time_format': 0,
+            # 'timezone': get_localization_configurations_data.timezone,
+            'currency': 6,
+            'name_display_format': 0,
+            'currency_value': "INR",
+            'date_format_value': "DD/MM/YYYY",
         }
     obj.append(dict)
     return obj

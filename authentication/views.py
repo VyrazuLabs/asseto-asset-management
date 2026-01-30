@@ -44,6 +44,9 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.conf import settings
+
+
 User = get_user_model()
 
 @api_view(["POST"])
@@ -66,6 +69,14 @@ def get_refresh_token(request):
     )
 
 def introduce(request):
+    env_path = settings.BASE_DIR / ".env"
+    request_host = request.get_host()       # e.g. "127.0.0.1:9001"
+    host_only = request_host.split(":")[0]  # e.g. "127.0.0.1"
+    print("host_only", host_only)
+    
+    # If you want to save this to your env:
+    set_key(env_path, "ORIGIN_HOST", host_only)
+    load_dotenv(env_path, override=True)
     return render(request,'auth/first_time_installation/introduce.html',context={'current_step':1})
 
 def db_configure(request):
@@ -162,7 +173,7 @@ def index(request):
     get_license_count=get_license.count()
     for it in expiring_assets:
         if not obj['date_format']:
-            it.warranty_expiry_date=it.warranty_expiry_date.date()
+            it.warranty_expiry_date=it.warranty_expiry_date
         else:
             it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
         # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
@@ -192,7 +203,7 @@ def index(request):
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
     context = {
-        'currency': obj['currency'],
+        'currency': obj['currency'] if obj['currency'] else 'INR',
         'date_format': obj['date_format'],
         'sidebar': 'index',
         'product_count': product_count,
