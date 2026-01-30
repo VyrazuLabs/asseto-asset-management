@@ -147,11 +147,11 @@ def list_localizations(request):
             if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
     else:
-        get_default_language=None
-        get_default_name_display_format=None
-        get_default_time_format=None
-        get_default_currency_format=None
-        get_default_country_format=None
+        get_default_language={'name':'English','id':0}
+        get_default_name_display_format={'name':'{first} {last}','id':0}
+        get_default_time_format={'name':'YYYY-MM-DD','id':0}
+        get_default_currency_format={'name':'INR','id':6}
+        get_default_country_format={'name':'India','id':0}
     return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'default_country':DEFAULT_COUNTRY,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format,'submenu':'localization','sidebar':'configurations'})
 
 @login_required
