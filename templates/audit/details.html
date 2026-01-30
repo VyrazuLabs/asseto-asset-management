@@ -40,7 +40,7 @@
                             </tr>
                             <tr>
                                 <th scope="row">Audited At</th>
-                                <td>{{audit.created_at}}</td>
+                                <td>{% format_datetime audit.created_at %}</td>
                                 <th scope="row">Audited By</th>
                                 <td>{{audit.audited_by}}</td>
                             </tr>

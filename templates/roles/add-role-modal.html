@@ -66,7 +66,7 @@
                                             class="col-md-3 custom-control custom-checkbox"
                                         >
                                             <input
-                                                class="form-check-input isscheck isscheck_Vendors"
+                                                class="form-check-input isscheck isscheck_Vendors vendor-main"
                                                 id="view_vendor"
                                                 name="permissions[]"
                                                 type="checkbox"
@@ -783,6 +783,29 @@
                         .forEach(childCheckbox => {
                             childCheckbox.checked = isChecked;
                         });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Master checkbox in each row
+            document.querySelectorAll('#view_vendor').forEach(master => {
+
+                master.addEventListener("change", function () {
+                    const row = this.closest("tr");
+
+                    // Find all checkboxes in the same row except the master
+                    const checkboxes = row.querySelectorAll(
+                        'input[type="checkbox"]:not([name="checkall"])'
+                    );
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
                 });
 
             });
