@@ -87,7 +87,8 @@ class UserSerializer(serializers.ModelSerializer):
                 **validated_data,
                 role=role,
                 address=address,
-                organization=self.context["request"].user.organization
+                organization=self.context["request"].user.organization,
+                is_active=True
             )
 
             if password:
