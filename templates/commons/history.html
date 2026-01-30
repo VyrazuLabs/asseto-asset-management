@@ -1,4 +1,5 @@
 {% if page_object and request.user.is_superuser %}
+{% load static %}
 {% load custom_filters %}
 <div class="col-12 col-xl-12">
     <div class="card">
@@ -45,7 +46,7 @@
                                 </td>
                                 <td class="col-auto">
                                     <p class="mb-0">
-                                        {{ history.history_date }} 
+                                        {% format_datetime history.history_date %} 
                                     </p>
                                 </td>
                             </tr>
