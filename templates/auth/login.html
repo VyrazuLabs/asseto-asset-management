@@ -2,7 +2,10 @@
 {% load static %}
 {% block title %}Login{% endblock title %}
 {% block content %}
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
             {% if not last_logins %}   
                 {% include 'commons/progress-bar.html' with current_step=5 %}
             {% endif %}
@@ -19,6 +22,7 @@
                 
                 {% csrf_token %}
                 <div class="form-group position-relative has-icon-left mb-3">
+                    <span class="text-danger">*</span>
                     {{form.email}}
                     <div class="form-control-icon">
                         <i class="bi bi-envelope"></i>
@@ -28,6 +32,7 @@
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
                 <div class="form-group position-relative has-icon-left mb-3">
+                    <span class="text-danger">*</span>
                     {{form.password}}
                     <div class="form-control-icon">
                         <i class="bi bi-shield-lock"></i>

@@ -89,14 +89,14 @@ Credentials:\
 Log in with this credential and use the below features
 
 ### Admin
-<img src="static/assets/images/006-Locations.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/006-Locations.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Admin" section.
 2. Admin consists of five sections: Locations, Departments, Product Types, Product Categories, and Roles.
 3. Each section has its own functionalities where you can perform operations such as Add/Edit/Delete/View.
 
 ### Vendors
-<img src="static/assets/images/002-Vendors.png" alt="Vendors Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/002-Vendors.png" alt="Vendors Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Vendors" section.
 2. Click the buttons as per your needs (Add/Edit/Delete/View vendors).
@@ -104,7 +104,7 @@ Log in with this credential and use the below features
 4. Searching and downloading vendor details are also available. 
 
 ### Products
-<img src="static/assets/images/003-Products.png" alt="Products Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/003-Products.png" alt="Products Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Products" section.
 2. Click the buttons as per your needs (Add/Edit/Delete/View products).
@@ -112,7 +112,7 @@ Log in with this credential and use the below features
 4. Searching and downloading product details are also available.
 
 ### Users
-<img src="static/assets/images/004-Users.png" alt="Users Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/004-Users.png" alt="Users Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Users" section.
 2. Click the buttons as per your needs (Add/Edit/Delete/View users).
@@ -120,7 +120,7 @@ Log in with this credential and use the below features
 4. Searching and downloading user details are also available. 
 
 ### Assets
-<img src="static/assets/images/005-Assigned_assets.png" alt="Assets Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/005-Assigned_assets.png" alt="Assets Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Assets" section.
 2. Click the buttons as per your needs (Add/Edit/Delete/View assets).
@@ -128,14 +128,14 @@ Log in with this credential and use the below features
 4. Assigned Assets also contain a list of all the assets assigned to different individuals with search functionalities and Reassign/Unassign features.
 
 ### Upload
-<img src="static/assets/images/012-uploads.png" alt="Upload Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/012-uploads.png" alt="Upload Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. Navigate to the "Upload" section.
 2. Upload consists of five sections: Locations, Departments, Product Types, Product Categories, and Vendors.
 3. Each section has its own functionalities where you may either upload the data or download a sample.
 
 ### Recycle Bin
-<img src="static/assets/images/013-recycle_bin.png" alt="Recycle Bin Section" style="border-radius: 15px;" width="900" height="450"/>
+<img src="static/images/013-recycle_bin.png" alt="Recycle Bin Section" style="border-radius: 15px;" width="900" height="450"/>
 
 1. The Recycle Bin contains all the previously deleted files by the admin and also has functionality to restore them, divided by category.
 
@@ -182,6 +182,8 @@ Configuration options are managed via the `.env` file. Key settings include:
 - Database credentials
 - SMTP server credentias
 - Other service configurations
+- CSRF Setup
+- Allowed-Host Setup
 
 Copy the settings from `.env.example` to `.env` and modify as needed.
 
