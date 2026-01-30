@@ -118,7 +118,7 @@
                 </div>
             {% endif %}
 
-            {% if request.user.is_superuser %}
+            {% if not request.user.is_superuser %}
                 <div class="card">
                     <div class="card-body">
                         <h6 class="my-3">
@@ -212,7 +212,7 @@
                                                 name="email_notification"
                                                 class="form-check-input"
                                                 style="cursor: pointer;"
-                                                {% if email_notification is True %} checked {% endif %}
+                                                checked
                                             >
                                         </div>
                                     </td>
@@ -240,7 +240,7 @@
                                                 name="browser_notification"
                                                 class="form-check-input"
                                                 style="cursor: pointer;"
-                                                {% if browser_notification is True %} checked {% endif %}
+                                                checked
                                             >
                                         </div>
                                     </td>
