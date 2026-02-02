@@ -22,7 +22,6 @@
                 
                 {% csrf_token %}
                 <div class="form-group position-relative has-icon-left mb-3">
-                    <span class="text-danger">*</span>
                     {{form.email}}
                     <div class="form-control-icon">
                         <i class="bi bi-envelope"></i>
@@ -32,7 +31,6 @@
                     <small class="text-danger mb-3">{{ error }}</small>
                 {% endfor %}
                 <div class="form-group position-relative has-icon-left mb-3">
-                    <span class="text-danger">*</span>
                     {{form.password}}
                     <div class="form-control-icon">
                         <i class="bi bi-shield-lock"></i>

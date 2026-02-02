@@ -291,10 +291,10 @@ def add_organization(request):
     currency=request.POST.get('currency-format')
     phone=request.POST.get('organization_phone')
     get_organization_id=request.user.organization.id
+    print("get_organization_id",get_organization_id)
     if request.method=="POST":
         if get_organization_id is not None:
-            Organization.objects.update(
-                id=get_organization_id,
+            Organization.objects.filter(id=get_organization_id).update(
                 name=name,
                 website=website,
                 email=email,    
