@@ -34,7 +34,7 @@ def location_list(request):
 @login_required
 @permission_required('authentication.add_location')
 def export_locations_csv(request):
-    header_list = ['Office Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
+    header_list = ['Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
                    'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country']
     context = {'header_list': header_list, 'rows': []}
     response = render_to_csv(context_dict=context)
@@ -60,7 +60,7 @@ def import_locations_csv(request):
         return render(request, "upload/map-location-modal.html", {
             "headers": headers,
             'fields' : [
-                'Office Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
+                'Name', 'Contact Person Name', 'Contact Person Email', 'Contact Person Phone',
                 'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country'
             ],
             'required_fields':['Office Name']
@@ -110,7 +110,8 @@ def location_render_to_mapper_modal(request):
                 organization=request.user.organization,
             )
             created_location.append(locations)
-
+            print("created_location",location_data.get("Name"))
+            print("contact_person_name",location_data.get("Contact Person Name"))
             imported_user = ImportedUser.objects.create(
                 name=location_data.get("Name"),
                 entity_type="Location",
@@ -143,7 +144,7 @@ def create_matched_data_from_csv_locations(request):
             # For example purposes:
             for it in data:
                 #Create the the user which are mapped from the csv to databsae
-                obj=ImportedUser.objects.create(entity_type="Location",office_name=it.get("office_name"),contact_person_name=it.get("contact_person_name"),contact_person_email=it.get("contact_person_email"),contact_person_phone=it.get("contact_person_phone")).first()
+                obj=ImportedUser.objects.create(entity_type="Location",office_name=it.get("name"),contact_person_name=it.get("contact_person_name"),contact_person_email=it.get("contact_person_email"),contact_person_phone=it.get("contact_person_phone")).first()
 
                 # get_user=Location.objects.filter(entity_type="Location",office_name=it.get("office_name"),contact_person_name=it.get("contact_person_name")).first()
 
