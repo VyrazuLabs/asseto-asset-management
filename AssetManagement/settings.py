@@ -272,7 +272,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=720) if not DEBUG else timedelta(minutes=720),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2) if not DEBUG else timedelta(minutes=720),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
@@ -286,7 +286,7 @@ SIMPLE_JWT = {
     "JSON_ENCODER": None,
     "JWK_URL": None,
     "LEEWAY": 0,
-
+    "TOKEN_REFRESH_SERIALIZER": "authentication.serializers.RefreshTokenSerializer",
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
