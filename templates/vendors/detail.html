@@ -70,11 +70,21 @@
                         </tr>
                         <tr>
                             <th scope="row">Address</th>
-                            <td colspan="3">{{vendor.address.address_line_one}}</td>
+                            <td >{{vendor.address.address_line_one}}</td>
+                            <th scope="row">State</th>
+                            <td >{{vendor.address.state}}</td>
                         </tr>
                         <tr>
                             <th scope="row">Description</th>
-                            <td colspan="3">{{vendor.description|urlize}}</td>
+                            <td >{{vendor.description|urlize}}</td>
+                            <th scope="row">Country</th>
+                            <td >{{vendor.address.country}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">City</th>
+                            <td >{{vendor.address.city}}</td>
+                            <th scope="row">Pincode</th>
+                            <td >{{vendor.address.pincode}}678677</td>
                         </tr>
                         </tbody>
                     </table>
