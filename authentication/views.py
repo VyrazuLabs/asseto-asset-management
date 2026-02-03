@@ -54,7 +54,6 @@ User = get_user_model()
 # @authentication_classes([])
 def get_refresh_token(request):
     user = request.user
-
     if not user.is_active:
         raise AuthenticationFailed("User is not active")
 
