@@ -769,6 +769,7 @@
             </button>
         </div>
     </form>
+</div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
@@ -889,28 +890,51 @@
             });
         });
     </script>
-</div>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+function initModuleCheckboxes() {
 
-        document.querySelectorAll('input[name="checkall"]').forEach(master => {
-            const module = master.dataset.id;
+    // Parent (module) checkbox → children
+    document.querySelectorAll('.ischeck[data-id]').forEach(parent => {
+        parent.addEventListener('change', function () {
+            const module = this.dataset.id; // Assign_Assets
+            const checked = this.checked;
 
-            const checkboxes = document.querySelectorAll(`.isscheck_${module}`);
-
-            master.addEventListener("change", function () {
-                checkboxes.forEach(cb => cb.checked = master.checked);
-            });
-
-            checkboxes.forEach(cb => {
-                cb.addEventListener("change", function () {
-                    master.checked = [...checkboxes].every(c => c.checked);
+            document
+                .querySelectorAll('.isscheck_' + module)
+                .forEach(child => {
+                    child.checked = checked;
                 });
-            });
         });
-
     });
+
+    // Children → parent sync
+    document.querySelectorAll('[class^="isscheck_"]').forEach(child => {
+        child.addEventListener('change', function () {
+            const moduleClass = [...this.classList]
+                .find(c => c.startsWith('isscheck_'));
+            const module = moduleClass.replace('isscheck_', '');
+
+            const children = document.querySelectorAll('.isscheck_' + module);
+            const parent = document.querySelector(
+                `.ischeck[data-id="${module}"]`
+            );
+
+            if (parent) {
+                parent.checked = [...children].every(cb => cb.checked);
+            }
+        });
+    });
+}
+
+// Normal page load
+document.addEventListener('DOMContentLoaded', initModuleCheckboxes);
+
+// htmx modal load
+document.body.addEventListener('htmx:afterSwap', function (e) {
+    initModuleCheckboxes();
+});
 </script>
+
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (e.detail.target.id == "add-role-modal-content" && !e.detail.xhr.response) {
