@@ -48,12 +48,13 @@ def vendor_list(request):
         Q(organization=request.user.organization)).order_by('-created_at')
     deleted_vendor_count=Vendor.deleted_objects.count()
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
-    count_array=[]
-    for it in vendors_list:
-        get_count=get_count_of_assets(request, it.id)
-        count_array.append(get_count)
+    count_array = []
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
+    for vendor in page_object:
+        count_array.append(
+            get_count_of_assets(request, vendor.id)
+        )
     context = {'sidebar': 'vendors','count_array': count_array,
                'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
                }

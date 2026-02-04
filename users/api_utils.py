@@ -86,7 +86,6 @@ def get_profile_data(request):
     for id,it in CURRENCY_CHOICES:
         if obj and obj.currency == id:
             get_currency_format=it
-    print(request.user)
     arr=[]
     dict={
         "id":user.id,
