@@ -231,7 +231,6 @@ def change_status(request, id):
     if request.method in ['PATCH', 'POST']:
         try:
             asset = Asset.objects.filter(id=id).first()
-            print("ASSET ----->",asset)
         except Asset.DoesNotExist:
             return JsonResponse({'error': 'Asset not found'}, status=404)
         try:
@@ -429,7 +428,6 @@ def reassign_asset(request, id):
 @login_required
 def slack_oauth_callback(request):
     user_id = cache.get('user_id') 
-    print("user_id",user_id)
     get_connection_data=SlackConfiguration.objects.filter(user=user_id).first()
     code = request.GET.get("code")
 
