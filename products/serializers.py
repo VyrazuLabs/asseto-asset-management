@@ -16,7 +16,6 @@ class DictionaryListField(serializers.ListField):
             # There can be some cases where custom fields will be a list of list of dictionaries
             # The following remedies it
             dictionary_copy = dictionary.copy()
-            print("custom fields:", dictionary[self.field_name])
             dictionary_copy[self.field_name] = next(iter(dictionary[self.field_name]), [])
             return dictionary_copy[self.field_name]
         return super().get_value(dictionary)
@@ -55,7 +54,6 @@ class ProductSerializer(serializers.ModelSerializer):
     
     def validate_custom_fields(self, value):
         if isinstance(value, list) and all(isinstance(item, dict) for item in value):
-            print("Passed 1st condition", value)
             return value
         elif isinstance(value, list):
             # There can be some cases where custom fields will be a list of list of dictionaries
@@ -63,14 +61,11 @@ class ProductSerializer(serializers.ModelSerializer):
             value = next(iter(value), [])
             if not all(isinstance(item, dict) for item in value):
                 raise serializers.ValidationError("Each custom field must be a dictionary")
-
-            print("Passed 2nd condition")
             return value
         raise serializers.ValidationError("Custom fields must be a list of dictionaries")
 
     def to_internal_value(self, data):
         data = data.copy()
-        print("to_internal_value",data,"\n")
         if not data.get("images"):
             data.pop("images", None)
         if data.get("custom_fields") in ["", None]:
@@ -78,7 +73,6 @@ class ProductSerializer(serializers.ModelSerializer):
         elif isinstance(data.get("custom_fields"), str):
             data["custom_fields"] = json.loads(data.get("custom_fields"))
 
-        print("to_internal_value-after",data,"\n")
         return super().to_internal_value(data)
         # custom_fields = data.get("custom_fields")
         # if isinstance(custom_fields, str):
@@ -125,31 +119,26 @@ class ProductSerializer(serializers.ModelSerializer):
         image_data = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields", [])
 
-        # 🔹 Update normal fields
         for attribute, value in validated_data.items():
             if value is not None:
                 setattr(instance, attribute, value)
         instance.save()
 
-        # 🔹 Save images
         for image in image_data:
             ProductImage.objects.create(product=instance, image=image)
 
-        # 🔹 Existing custom fields from DB
         existing_qs = CustomField.objects.filter(
             object_id=instance.id,
             entity_type="product"
         )
         existing_field_names = {cf.field_name for cf in existing_qs}
 
-        # 🔹 Incoming field names
         incoming_field_names = {
             next(iter(cf.keys()))
             for cf in custom_fields
             if isinstance(cf, dict) and cf
         }
 
-        # 🔥 Delete removed fields
         deleted_field_names = existing_field_names - incoming_field_names
         if deleted_field_names:
             CustomField.objects.filter(

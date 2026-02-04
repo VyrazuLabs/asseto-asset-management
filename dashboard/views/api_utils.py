@@ -14,7 +14,6 @@ def convert_product_to_list(request,products):
             'total_asset':Asset.objects.filter(product=product.id).count(),
             'status':product.status,
         }
-        print("pro------->",product_dict)
         get_product_image=ProductImage.objects.filter(product=product.id).first()
         if get_product_image:
             product_dict['image']=f"http://{current_host}"+get_product_image.image.url

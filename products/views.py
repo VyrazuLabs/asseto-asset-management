@@ -290,7 +290,6 @@ def status(request, id):
 @login_required
 def search(request, page):
     search_text = request.GET.get('search_text').strip()
-    print("search_text",search_text)
     if search_text:
         return render(request, 'products/products-data.html', {
             'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(

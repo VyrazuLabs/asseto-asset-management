@@ -11,7 +11,6 @@ def get_tag_configurations(request):
             'number_suffix': get_tag_configurations_data.number_suffix,
             # 'use_default_settings': get_tag_configurations_data.use_default_settings,
         }
-        print(dict)
     else:
         dict = {
             'id': None,
@@ -36,7 +35,6 @@ def get_localization_configurations(request):
             'currency_value': get_val['currency'],
             'date_format_value': get_val['date_format'],
         }
-        print(dict)
     else:
         dict = {
             'date_format': 0,

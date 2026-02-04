@@ -14,7 +14,6 @@ def license_type_list(request):
     PAGE_SIZE=10
 
     license_types=LicenseType.undeleted_objects.all().order_by("-created_at")
-    print(license_types)
     paginator=Paginator(license_types,ORPHANS,PAGE_SIZE)
     page_number=request.GET.get('page')
     page_object=paginator.get_page(page_number)
@@ -91,7 +90,6 @@ def license_type_status(request, id):
 @permission_required('authentication.delete_license_type')
 def delete_license_type(request,id):
     get_license_type=get_object_or_404(LicenseType, pk=id)
-    print(get_license_type.name)
     get_license_type.status=False
     get_license_type.soft_delete()
     messages.success(request,'License Type deleted sucessfully')

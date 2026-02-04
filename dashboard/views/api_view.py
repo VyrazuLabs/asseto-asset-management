@@ -95,7 +95,6 @@ class GlobalSearch(APIView):
                 trace_back=error_info['traceback']
             )
 
-        # print(assets,)
         # context = {
         #     'products': products,
         #     'assets': assets,
