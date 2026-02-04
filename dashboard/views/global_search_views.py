@@ -55,7 +55,6 @@ def global_search(request):
         except Exception as e:
             print(e)
 
-    print(assets,)
     context = {
         'products': products,
         'assets': assets,

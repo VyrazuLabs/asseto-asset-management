@@ -825,7 +825,6 @@ def deleted_license_types_permanently(request, id):
             request, 'Error! License Type  is used in License')
 
     except Exception as e:
-        print(e)
         messages.error(request, 'License Type can not be deleted')
 
     return redirect('recycle_bin:deleted_license_types')
@@ -846,7 +845,6 @@ def deleted_license_types_restore(request, id):
             messages.success(request, 'License Type restored successfully')
 
     except Exception as e:
-        print(e)
         messages.error(request, 'License Type can not be restored')
 
     return redirect('recycle_bin:deleted_license_types')

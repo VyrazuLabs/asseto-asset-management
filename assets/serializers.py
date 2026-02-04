@@ -15,7 +15,6 @@ class DictionaryListField(serializers.ListField):
             # There can be some cases where custom fields will be a list of list of dictionaries
             # The following remedies it
             dictionary_copy = dictionary.copy()
-            print("custom fields:", dictionary[self.field_name])
             dictionary_copy[self.field_name] = next(iter(dictionary[self.field_name]), [])
             return dictionary_copy[self.field_name]
         return super().get_value(dictionary)
@@ -47,7 +46,6 @@ class AssetSerializer(serializers.ModelSerializer):
     # Fix: Only decode, never remove or pop keys in to_internal_value
     def to_internal_value(self, data):
         # Internal value contains the list of all the items in the custom fields.
-        print("to_internal_value",data,"\n")
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
@@ -59,7 +57,6 @@ class AssetSerializer(serializers.ModelSerializer):
             data.pop("custom_fields", None)
         elif isinstance(data.get("custom_fields"), str):
             data["custom_fields"] = json.loads(data.get("custom_fields"))
-        print("to_internal_value-after",data,"\n")
         return super().to_internal_value(data)
 
     def validate_tag(self, value):
@@ -67,7 +64,6 @@ class AssetSerializer(serializers.ModelSerializer):
             return value
         if not value:
             raise serializers.ValidationError("Tag can not be empty")
-        print("true-value-tag",value)
         return value
 
     def validate_name(self, value):
@@ -83,7 +79,6 @@ class AssetSerializer(serializers.ModelSerializer):
         return value
     
     def validate_price(self, value):
-        print("value-price", value)
         if value is not None and value < 0:
             raise serializers.ValidationError("Price cannot be negative.")
         return value
@@ -92,11 +87,9 @@ class AssetSerializer(serializers.ModelSerializer):
         if value:
             today = timezone.now()
             if value > today:
-                print("value-purchase",value)
                 raise serializers.ValidationError(
                     "Purchase date must be today or less than today's date."
                 )
-            print("true-value-purchase",value)
         return value
 
     def create(self, validated_data):
@@ -104,7 +97,6 @@ class AssetSerializer(serializers.ModelSerializer):
         # custom_fields_raw = request.data.get("custom_fields", "[]")
         # custom_fields = json.loads(custom_fields_raw)
         custom_fields = validated_data.pop("custom_fields", []) or []
-        print("custom_fields",custom_fields)
         asset = Asset.objects.create(
             **validated_data,
             organization=self.context["request"].user.organization,
@@ -138,31 +130,26 @@ class AssetSerializer(serializers.ModelSerializer):
         image_data = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields", [])
 
-        # 🔹 Update normal fields
         for attribute, value in validated_data.items():
             if value is not None:
                 setattr(instance, attribute, value)
         instance.save()
 
-        # 🔹 Save images
         for image in image_data:
             AssetImage.objects.create(asset=instance, image=image)
 
-        # 🔹 Existing custom fields from DB
         existing_qs = CustomField.objects.filter(
             object_id=instance.id,
             entity_type="asset"
         )
         existing_field_names = {cf.field_name for cf in existing_qs}
 
-        # 🔹 Incoming field names
         incoming_field_names = {
             next(iter(cf.keys()))
             for cf in custom_fields
             if isinstance(cf, dict) and cf
         }
 
-        # 🔥 Delete removed fields
         deleted_field_names = existing_field_names - incoming_field_names
         if deleted_field_names:
             CustomField.objects.filter(
@@ -229,11 +216,9 @@ class AssetSerializer(serializers.ModelSerializer):
         if value:
             tomorrow = timezone.now() + timedelta(days=1)
             if value < tomorrow:
-                print("value",value)
                 raise serializers.ValidationError(
                     "Warranty expiry date must be at least tomorrow."
                 )
-            print("true-value",value)
         return value
 
 
@@ -260,7 +245,6 @@ class AssignAssetSerializer(serializers.ModelSerializer):
     )
 
     def to_internal_value(self, data):
-        print("to_internal_value",data,"\n")
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
@@ -272,7 +256,6 @@ class AssignAssetSerializer(serializers.ModelSerializer):
         return user
         
     def create(self, validated_data):
-        print(validated_data)
         asset=validated_data.pop('asset',None)
         asset_images=validated_data.pop('images',[])
         assign_asset=AssignAsset.objects.create(asset=asset,**validated_data)

@@ -54,7 +54,6 @@ class ProductDetails(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request,id):
         try:    
-            print("ID-------->",id)
             get_product=get_object_or_404(Product,pk=id)
             data=product_details(request,get_product)
             return api_response(data=data,message='Product details fetch successfully')
@@ -76,7 +75,6 @@ class UpdateProduct(APIView):
                 delete_product_images(deleted_image_ids)
             serializer=ProductSerializer(get_product,data=request.data,partial=True)
             if not serializer.is_valid():
-                print(serializer.errors)
                 return api_response(
                     status=400,error_type="Validation_error",
                     error_location="Serializer",
