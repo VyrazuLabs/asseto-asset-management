@@ -29,9 +29,7 @@ class ChangePassword(APIView):
     def post(self, request):
         # token = request.data.get("token")
         token=request.query_params.get("token")
-        print("token",token)
         new_password = request.data.get("password")
-        print("New Password:", new_password)
         if not new_password:
             return Response(
                 {"success": False, "message": "Password is required."},
@@ -96,7 +94,6 @@ class ForgotPassword(APIView):
         OpenApiParameter(name="email",type=str,description="Enter Email")])
     def post(self,request):
         email=request.query_params.get("email",None)
-        print(request.query_params.get("email"))
 
         try:
             if email is None:
@@ -126,7 +123,6 @@ class UserList(APIView):
             return api_response(status=400,error_message=str(e))
         
         except Exception as e:
-            print(e)
             return api_response(status=500,system_message=str(e))
         
 class AddUser(APIView):
@@ -274,7 +270,6 @@ class UserSearch(APIView):
                 is_active = True if status.lower() == 'active' else False
                 get_searched_user = get_searched_user.filter(is_active=is_active)
 
-            print("Rendered query: ", str(get_searched_user.query))
             data=user_data(request,get_searched_user)
             return api_response(data=data,message="Searched user fetched successfully")
         except ValueError as e:
