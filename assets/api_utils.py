@@ -62,7 +62,6 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     obj=get_currency_and_datetime_format(request.user.organization)
     format_currency=obj['currency'] if obj['currency'] else 'INR'
     format_date=obj['date_format'] if obj['date_format'] else None
-    print('format_date-----',format_date)
     # formatted_currency= format_currency.format(asset.price) if asset.price else None
     assign_info=None
     if asset.is_assigned is True:
@@ -152,7 +151,6 @@ def get_asset_id(tag_id):
 def get_asset(tag_id):
     asset=Asset.objects.filter(tag=tag_id).first()
     get_assign_asset=AssignAsset.objects.filter(asset=asset).first() if asset else None
-    print("asset",asset)
     if not asset:
         raise ValueError("Asset with this tag does not exists!")
  

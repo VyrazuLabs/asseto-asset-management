@@ -26,7 +26,6 @@ class DBConnectionMiddleware:
 
 
         if request.path in skip_paths:
-            print(request.path)
             return self.get_response(request)
         
         if not os.environ.get('EMAIL_HOST'):
@@ -60,7 +59,6 @@ class DynamicCsrfMiddleware(CsrfViewMiddleware):
     #     trusted = set(super()._get_trusted_origins(request))
     #     origin = request.META.get("HTTP_ORIGIN")
     #     origin_host= os.environ.get("ORIGIN_HOST")
-    #     print("DynamicCsrfMiddleware origin_host", origin_host)
     #     if origin :
     #         parsed = urlparse(origin)
     #         trusted.add(f"{parsed.scheme}://{parsed.netloc}")
@@ -71,14 +69,12 @@ class DynamicCsrfMiddleware(CsrfViewMiddleware):
     #     return trusted
 
     def __call__(self, request):
-        print("DynamicCsrfMiddleware __call__ called")
         self.provided_request = request
         return super().__call__(request)
 
     def __add_custom_origin_to_trusted_origins(self, trusted: list):
         origin = self.provided_request.META.get("HTTP_ORIGIN")
         origin_host= os.environ.get("ORIGIN_HOST")
-        print("DynamicCsrfMiddleware origin_host", origin_host)
         if origin :
             parsed = urlparse(origin)
             trusted.add(f"{parsed.scheme}://{parsed.netloc}")
@@ -90,15 +86,12 @@ class DynamicCsrfMiddleware(CsrfViewMiddleware):
 
     @cached_property
     def csrf_trusted_origins_hosts(self):
-        print("DynamicCsrfMiddleware csrf_trusted_origins_hosts called")
         return self.__add_custom_origin_to_trusted_origins(super().crsf_trusted_origins_hosts)
 
     @cached_property
     def allowed_origins_exact(self):
-        print("DynamicCsrfMiddleware allowed_origins_exact called")
         return self.__add_custom_origin_to_trusted_origins(super().allowed_origins_exact)
     
     @cached_property
     def allowed_origin_subdomains(self):
-        print("DynamicCsrfMiddleware allowed_origin_subdomains called")
         return self.__add_custom_origin_to_trusted_origins(super().allowed_origin_subdomains)
