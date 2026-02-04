@@ -27,8 +27,8 @@
                                 <input
                                     type="checkbox"
                                     class="align-middle checkbox_middle form-check-input"
-                                    name="checkallfield"
-                                    id="checkallfield"
+                                    name="checkall"
+                                    id="checkall"
                                 />
                             </th>
                             <th>Module</th>
@@ -792,6 +792,170 @@
         </button>
     </div>
 </form>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.ischeck').forEach(parentCheckbox => {
+
+                parentCheckbox.addEventListener('change', function () {
+                    const module = this.dataset.id; // Vendors
+                    const isChecked = this.checked;
+
+                    document
+                        .querySelectorAll('.isscheck_' + module)
+                        .forEach(childCheckbox => {
+                            childCheckbox.checked = isChecked;
+                        });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Master checkbox in each row
+            document.querySelectorAll('#view_vendor').forEach(master => {
+
+                master.addEventListener("change", function () {
+                    const row = this.closest("tr");
+
+                    // Find all checkboxes in the same row except the master
+                    const checkboxes = row.querySelectorAll(
+                        'input[type="checkbox"]:not([name="checkall"])'
+                    );
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Master checkbox in each row
+            document.querySelectorAll('input[name="checkall"]').forEach(master => {
+
+                master.addEventListener("change", function () {
+                    const row = this.closest("tr");
+
+                    // Find all checkboxes in the same row except the master
+                    const checkboxes = row.querySelectorAll(
+                        'input[type="checkbox"]:not([name="checkall"])'
+                    );
+
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.querySelectorAll('.ischeck').forEach(parentCheckbox => {
+
+                parentCheckbox.addEventListener('change', function () {
+                    const module = this.dataset.id; // Vendors
+                    const isChecked = this.checked;
+
+                    document
+                        .querySelectorAll('.isscheck_' + module)
+                        .forEach(childCheckbox => {
+                            childCheckbox.checked = isChecked;
+                        });
+                });
+
+            });
+
+        });
+    </script>
+    <script>
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+            document.querySelectorAll('.ischeck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck_Vendors').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+        document.querySelector('[name="checkall"]').addEventListener('change', function () {
+            document.querySelectorAll('.isscheck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+            document.querySelectorAll('.ischeck').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+        $(document).ready(function () {
+            $("#checkall").click(function () {
+                $("input:checkbox")
+                    .not(this)
+                    .prop("checked", this.checked);
+            });
+            $(".ischeck").click(function () {
+                var ischeck = $(this).data("id");
+                $(".isscheck_" + ischeck).prop("checked", this.checked);
+            });
+        });
+    </script>
+<script>
+function initModuleCheckboxes() {
+
+    // Parent (module) checkbox → children
+    document.querySelectorAll('.ischeck[data-id]').forEach(parent => {
+        parent.addEventListener('change', function () {
+            const module = this.dataset.id; // Assign_Assets
+            const checked = this.checked;
+
+            document
+                .querySelectorAll('.isscheck_' + module)
+                .forEach(child => {
+                    child.checked = checked;
+                });
+        });
+    });
+
+    // Children → parent sync
+    document.querySelectorAll('[class^="isscheck_"]').forEach(child => {
+        child.addEventListener('change', function () {
+            const moduleClass = [...this.classList]
+                .find(c => c.startsWith('isscheck_'));
+            const module = moduleClass.replace('isscheck_', '');
+
+            const children = document.querySelectorAll('.isscheck_' + module);
+            const parent = document.querySelector(
+                `.ischeck[data-id="${module}"]`
+            );
+
+            if (parent) {
+                parent.checked = [...children].every(cb => cb.checked);
+            }
+        });
+    });
+}
+
+// Normal page load
+document.addEventListener('DOMContentLoaded', initModuleCheckboxes);
+
+// htmx modal load
+document.body.addEventListener('htmx:afterSwap', function (e) {
+    initModuleCheckboxes();
+});
+</script>
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (e.detail.target.id == "update-role-modal-content" && !e.detail.xhr.response) {
