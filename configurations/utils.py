@@ -146,14 +146,12 @@ def get_currency_and_datetime_format(organization):
             break
         
     obj={'currency':currency_format,'date_format':date_format}
-    print('obj-----',obj)
     return obj
     # return organization.currency, organization.date_format
 
 def format_datetime(x,output_format):
     """Convert datetime object to the specified output format."""
     # x = datetime.datetime.now()
-    print(x)
     if isinstance(x, str):
         x = parse(x)
 

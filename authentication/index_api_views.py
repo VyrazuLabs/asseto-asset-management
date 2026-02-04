@@ -23,7 +23,6 @@ class AssetData(APIView):
             asset_count = all_asset_list.count()
             assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None,asset__is_assigned=True) | Q(
             asset__organization=request.user.organization,asset__is_assigned=True) ).count()
-            print(assign_assets_counts,"----assign_assets_counts---")
             data=asset_datas(expiring_assets,all_asset_list,asset_count,assign_assets_counts)
             return api_response(data=data, message="asset data for dashboard get successfully")
         except ValueError as e:
