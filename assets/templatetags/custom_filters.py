@@ -87,7 +87,6 @@ def dynamic_display_name(context,fullname):
         "middle_initial": middle_initial,
         "first_initial": first_initial,
     }
-    print("format_key",context)
     format_key=str(format_key)
     for it,data in NAME_FORMATS:
         if str(it)==format_key:
