@@ -71,7 +71,6 @@ def introduce(request):
     env_path = settings.BASE_DIR / ".env"
     request_host = request.get_host()       # e.g. "127.0.0.1:9001"
     host_only = request_host.split(":")[0]  # e.g. "127.0.0.1"
-    print("host_only", host_only)
     
     # If you want to save this to your env:
     set_key(env_path, "ORIGIN_HOST", host_only)
@@ -318,7 +317,7 @@ def activate(request, uidb64, token):
 def profile(request):
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     user = request.user
-    print(request.user)
+
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name=user.dynamic_display_name(user.full_name)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,

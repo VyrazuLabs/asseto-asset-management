@@ -40,7 +40,6 @@ class GetAssetTagList(APIView):
         try:
             tag = request.GET.get('tag')
             data = get_tag_list(tag) if tag is not None else get_tag_list("")
-            print(data,"/ntagsview")
             return api_response(data=data, message="List get Successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
@@ -57,7 +56,6 @@ class CompletedAuditList(APIView):
             thirty_days_ago = datetime.now() - timedelta(days=30)
             audit_queryset=Audit.objects.filter(created_at__gte=thirty_days_ago).order_by("-created_at")
             data=get_completed_audits(request,audit_queryset)
-            # print("-------------------------:",data)
             page=int(request.GET.get('page',"1"))
             if page is None:
                 page=1
