@@ -16,7 +16,6 @@ def send_email(user_email,notifications_title,notification_text):
         <p>{notifications_title}</p>
         <p><strong>{notification_text}</strong></p>
     """
-    print("MAIL SEND --------->")
     return send_mail(subject=subject, message=message, recipient_list=recipient_list,from_email=from_email,html_message = html_message)
 
 def notifications_call(user,entity_type,notification_title,notification_text):

@@ -214,11 +214,9 @@ def integration(request):
             'client_id':client_id,
             'client_secret':client_secret
         }
-        print(context)
     # On GET or other methods, you may render the form page or handle differently
         return render(request, "configurations/integrations.html", context=context)
 
-        print(integration_choices)
     return render(request, 'configurations/integrations.html', {'form': form,'integration_choices':integration_choices})
 
 @login_required
@@ -268,7 +266,6 @@ def save_slack_configuration(request):
         slack_config.client_id = client_id
         slack_config.client_secret = client_secret
         slack_config.save()
-        print("Slack configuration saved successfully")
         # Redirect or render success message as needed
         return redirect("configurations:integration")
     if request.method == "GET":
@@ -293,8 +290,7 @@ def add_organization(request):
     get_organization_id=request.user.organization.id
     if request.method=="POST":
         if get_organization_id is not None:
-            Organization.objects.update(
-                id=get_organization_id,
+            Organization.objects.filter(id=get_organization_id).update(
                 name=name,
                 website=website,
                 email=email,    
@@ -315,7 +311,6 @@ def add_organization(request):
         get_user_organization_id=request.user.organization.id
         if get_user_organization_id:
             get_org_data=Organization.objects.filter(id=get_user_organization_id).first()
-            print("get_org_data",get_org_data.id)
         else:
             get_org_data=None
         return render(request, 'configurations/add_organization.html', context={'org_data': get_org_data,'currency_choices':CURRENCY_CHOICES,'submenu':'organization','sidebar':'configurations'})

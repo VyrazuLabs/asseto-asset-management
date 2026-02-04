@@ -85,7 +85,6 @@ def next_audit_due(audit=None, asset=None):
 
 def next_audit_due_for_asset(asset):
     interval_days = asset.product.get_audit_interval()
-    print("interval_days",interval_days)
     if interval_days == 0:
         return None
 
@@ -118,5 +117,4 @@ def get_tag_list(tag):
     arr=[]
     for t in tags:
         arr.append(t.tag)
-    print("ARRRRRRRRRRRRRRRRRRRRRRRRR",arr)
     return arr
