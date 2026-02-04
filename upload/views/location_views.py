@@ -110,8 +110,6 @@ def location_render_to_mapper_modal(request):
                 organization=request.user.organization,
             )
             created_location.append(locations)
-            print("created_location",location_data.get("Name"))
-            print("contact_person_name",location_data.get("Contact Person Name"))
             imported_user = ImportedUser.objects.create(
                 name=location_data.get("Name"),
                 entity_type="Location",
