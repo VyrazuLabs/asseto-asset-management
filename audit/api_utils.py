@@ -58,7 +58,6 @@ def get_completed_audits(request,audit_queryset):
         'audit_image_url':audit_image_url(it,host),
         }
         obj.append(dict)
-    print("OBJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",obj)
     return obj
 
 def get_pending_audits(request):
@@ -96,7 +95,6 @@ def get_pending_audits(request):
         # )
         }
         objs.append(dict)
-    print("objjjjjjjjjjjjjjjjjjjjjj",obj)
     return objs
 
 def audit_data_by_id(request,id):
@@ -113,7 +111,6 @@ def audit_data_by_id(request,id):
         'assigned_to':audit.assigned_to,
         'audit_image_url':audit_image_url(audit),
     }
-    print("dict",dict)
     return dict
 
 def get_audit_details(request,id):
@@ -121,7 +118,6 @@ def get_audit_details(request,id):
     audit = Audit.objects.filter(id=id).first()
     images=AuditImage.objects.filter(audit=audit)
     image_list=[host+image.image.url for image in images]
-    print("IMAGE LIST",image_list)
     data = {
         "asset_tag": audit.asset.tag,
         "condition": audit.condition_label(),

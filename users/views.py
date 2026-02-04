@@ -114,7 +114,6 @@ def details(request, id):
     asset_page_object=asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
     assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
-    print(assigned_licenses.values())
     assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
     context = {
         'sidebar': 'users',
