@@ -54,7 +54,6 @@ class GetNotifications(APIView):
             # datas = external_response.json()
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
-            print("NOTIIIIIIIIIIIIIIIIIIIII",data)
             return api_response(data=paginated_data, message="List get Successfully")
             # Mark as sent
             # notifications.update(is_sent=True)
@@ -95,7 +94,6 @@ class AddAsset(APIView):
         add_asset=None
         try:
             add_asset=AssetSerializer(data=request.data,context={'request':request})
-            # print(add_asset)
             if not add_asset.is_valid():
                 return api_response(
                     status=400,error_type="Validation_error",
@@ -140,9 +138,7 @@ class UpdateAsset(APIView):
         deleted_image_ids=request.data.get('delete_image_ids',[])
         deleted_image_ids= json.loads(deleted_image_ids) if isinstance(deleted_image_ids,str) else deleted_image_ids
         if deleted_image_ids:
-            print('deleted imagessssssssssssssssss',deleted_image_ids)
             delete_images(deleted_image_ids)
-            print('deleted imagessssssssssssssssss')
         get_asset=get_object_or_404(Asset,pk=id)        
         try:
             asset_data=AssetSerializer(get_asset,data=request.data,context={'request':request},partial=True)
@@ -182,7 +178,6 @@ class SearchAsset(APIView):
 
     @extend_schema(request=SearchAssetSerializer)
     def post(self,request):
-        print("request data",request.data)
         serializer=SearchAssetSerializer(data=request.data)
         if not serializer.is_valid():
             return api_response(
@@ -206,7 +201,6 @@ class SearchAsset(APIView):
             Q(product__product_type__name__icontains=search_text)).order_by("-created_at")
             if get_asset_queryset:
                 data=convert_to_list(request,get_asset_queryset)
-                print("data",data)
                 return api_response(data=data,message="Asset found")
             else:
                 return api_response(status=200,message="Asset not found")
