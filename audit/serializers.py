@@ -23,7 +23,6 @@ class AuditSerializer(serializers.ModelSerializer):
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
     def to_internal_value(self, data):
-        print(type(data), "/////data in to_internal_value", data)
         data = data.copy()
         if (data.get("images") or "") == "":
             data.pop("images", None)
@@ -48,13 +47,11 @@ class AuditSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         images = validated_data.pop("images", [])
-        print("images",images)
         # custom_fields = self.initial_data.get("custom_fields",[])
         audit = Audit.objects.create(
             **validated_data,
             # organization=self.context["request"].user.organization,
         )
-        print("audit",validated_data,audit)
         asset_images = None
         for image in images:
             # image=convert_image(image)

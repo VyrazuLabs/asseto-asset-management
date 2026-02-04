@@ -85,8 +85,6 @@ def get_audits_by_id(request, id):
         errors={}
         comments = request.POST.get('comments', None)
         condition = request.POST.get('condition', None)
-        print(condition,"/ncondition")
-        print(comments,"/ncomments")
         if not condition:
             errors["condition"] = "Condition is required."
 
@@ -222,5 +220,4 @@ def audit_details(request, id=None):
 def get_asset_tag_list(request):
     tag = request.GET.get('tag')
     tags = get_tag_list(tag)
-    print(tags,"/ntagsview")
     return JsonResponse({"tags": tags})
