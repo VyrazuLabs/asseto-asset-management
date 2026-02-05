@@ -184,9 +184,7 @@
         </div>
     </form>
 </div>
-
 <script>
-
     function initializePasswordToggle() {
         const togglePasswordCheckbox = document.getElementById('toggle_password');
         const passwordFields = document.getElementById('password_fields');
@@ -234,7 +232,36 @@
     });
 
 </script>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
 
+function sendNotification() {
+  const title = "New User Added";
+  const options = {
+    body: "New User Added.", // 
+    icon: "/static/images/logo/favicon.png", 
+  };
+  new Notification(title, options);
+}
+</script>
+<script>
+document.body.addEventListener("userAdded", function () {
+  requestAndSendNotification();
+});
+</script>
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (e.detail.target.id == "add-user-modal-content" && !e.detail.xhr.response) {
