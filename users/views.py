@@ -163,7 +163,10 @@ def add(request):
             
             if form.instance.role:
                 form.instance.role.user_set.add(form.instance)
-            return HttpResponse('',status=204)
+            # Need to change the functionality such that when ever the toggle is enabled then only it'll run.
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "userAdded"
+            return response
 
     context = {
         'form': form,
@@ -211,8 +214,9 @@ def update(request, id):
                 all_perms.user_set.add(form.instance)
             else:
                 all_perms.user_set.remove(form.instance)
-
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "userUpdated"
+            return response
 
     context = {'user': user, 'form': form, 'address_form': address_form}
     return render(request, 'users/update-user-modal.html', context)
