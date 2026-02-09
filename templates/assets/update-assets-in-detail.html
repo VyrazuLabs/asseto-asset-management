@@ -400,6 +400,7 @@ document.getElementById("addCustomFieldBtn").onclick = function() {
     var template = document.getElementById("custom-field-template");
     container.appendChild(template.cloneNode(true));
 }
+
 // Remove a custom field row
 function removeCustomField(el) {
     el.closest(".rm-custom-field").remove();
@@ -407,6 +408,7 @@ function removeCustomField(el) {
 </script>
 
 <script>
+requestAndSendNotification()
 function requestAndSendNotification() {
   if (Notification.permission === "granted") {
     // Permission already granted, send notification directly
@@ -424,20 +426,11 @@ function sendNotification() {
   const title = "Asset Updated";
   const options = {
     body: "Asset has been updated.", // Main text
-    icon: "/static/images/logo/favicon.png", // URL of an icon to display
+    icon: "path/to/your/icon.png", // URL of an icon to display
     // Other optional properties 
   };
 
   new Notification(title, options);
 }
 </script>
-{% if messages %}
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  {% if messages|length > 0 %}
-    requestAndSendNotification();
-  {% endif %}
-});
-</script>
-{% endif %}
 {% endblock content%}
