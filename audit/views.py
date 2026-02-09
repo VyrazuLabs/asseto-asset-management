@@ -13,6 +13,7 @@ from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -68,7 +69,8 @@ def add_audit(request):
         else:
             for f in files:
                 AuditImage.objects.create(audit=audit_create, image=f)
-        return redirect('audit:completed_audits')
+        messages.success(request, 'Audit added successfully')
+        return render(request, 'audit/add_audit.html', context)
 
     elif request.method == 'GET':
         user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
