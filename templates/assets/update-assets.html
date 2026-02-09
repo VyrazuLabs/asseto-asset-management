@@ -392,12 +392,12 @@ function removeCustomField(el) {
 }
 </script>
 <script>
-requestAndSendNotification()
 function requestAndSendNotification() {
   if (Notification.permission === "granted") {
     // Permission already granted, send notification directly
     sendNotification();
-  } else if (Notification.permission !== "denied") {
+  }
+  else if (Notification.permission !== "denied") {
     // Request permission if not already denied
     Notification.requestPermission().then(permission => {
       if (permission === "granted") {
@@ -406,15 +406,25 @@ function requestAndSendNotification() {
     });
   }
 }
+
 function sendNotification() {
-  const title = "Asset Updated Post";
+  const title = "Asset Updated";
   const options = {
     body: "Asset has been updated.", // Main text
-    icon: "path/to/your/icon.png", // URL of an icon to display
+    icon: "/static/images/logo/favicon.png", // URL of an icon to display
     // Other optional properties 
   };
 
   new Notification(title, options);
 }
 </script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% if messages|length > 0 %}
+    requestAndSendNotification();
+  {% endif %}
+});
+</script>
+{% endif %}
 {% endblock content%}

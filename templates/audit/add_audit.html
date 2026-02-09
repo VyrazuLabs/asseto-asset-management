@@ -1,4 +1,5 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
@@ -235,4 +236,40 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Asset Audited";
+  const options = {
+    body: "Asset Audited.", // Main text
+    icon: "/static/images/logo/favicon.png", // URL of an icon to display
+    // Other optional properties 
+  };
+
+  new Notification(title, options);
+}
+</script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% if messages|length > 0 %}
+    requestAndSendNotification();
+  {% endif %}
+});
+</script>
+{% endif %}
 {% endblock content %}

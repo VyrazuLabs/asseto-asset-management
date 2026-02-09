@@ -142,36 +142,10 @@
                 </div>
             </div>
             <!-- Custom Fields Section -->
-<div class="card mt-3">
-    <div class="card-header">Custom Fields</div>
-    <div class="card-body" id="custom-field-container">
-        <div class="row">
-            <div class="col-5">
-                <div class="form-group">
-                    <input type="text" class="form-control"
-                           placeholder="Custom Field Name"
-                           name="custom_field_name" autocomplete="off">
-                </div>
-            </div>
-            <div class="col-5">
-                <div class="form-group">
-                    <input type="text" class="form-control"
-                           placeholder="Custom Field Value"
-                           name="custom_field_value" autocomplete="off">
-                </div>
-            </div>
-            <div class="col-auto" id="custom-field-main-btn">
-                <div class="form-group">
-                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-info">
-                        <i class="bi bi-plus-lg"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-                <!-- Hidden template for cloning -->
-                <div class="d-none">
-                    <div class="row rm-custom-field" id="custom-field-template">
+            <div class="card mt-3">
+                <div class="card-header">Custom Fields</div>
+                <div class="card-body" id="custom-field-container">
+                    <div class="row">
                         <div class="col-5">
                             <div class="form-group">
                                 <input type="text" class="form-control"
@@ -186,61 +160,35 @@
                                     name="custom_field_value" autocomplete="off">
                             </div>
                         </div>
-                        <div class="col-auto">
+                        <div class="col-auto" id="custom-field-main-btn">
                             <div class="form-group">
-                                <button type="button" onclick="removeCustomField(this)" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-dash-lg"></i>
+                                <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-info">
+                                    <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
-                        </div>   
-                    </div>
-                </div>
-            </div>
-        </div>
-            <div class="card">
-                <div class="card-header">Asset Specifications</div>
-                <div class="card-body" id="container">
-                    <div class="row">
-                        <div class="col-5">
-                            <div class="form-group">
-                                <!-- <label for="first-name-column">Specification Name</label> -->
-                                <input type="text" id="first-name-column" class="form-control"
-                                    placeholder="Specification Name" name="specifications_name" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-5">
-                            <div class="form-group">
-                                <!-- <label for="last-name-column">Specification Value</label> -->
-                                <input type="text" id="last-name-column" class="form-control"
-                                    placeholder="Specification Value" name="specifications_value" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-auto" id="mainsections">
-                            <div class="form-group">
-                                <button type="button" id="newsectionbtn" class="btn btn-sm btn-info"><i class="bi bi-plus-lg"></i></button>
-                            </div>
                         </div>
                     </div>
-
                     <div class="d-none">
-                        <div class="row rmsection" id="mainsection">
+                        <div class="row rm-custom-field" id="custom-field-template">
                             <div class="col-5">
                                 <div class="form-group">
-                                    <!-- <label for="first-name-column">Specification Name</label> -->
-                                    <input type="text" id="first-name-column" class="form-control"
-                                        placeholder="Specification Name" name="specifications_name" autocomplete="off">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Name"
+                                        name="custom_field_name" autocomplete="off">
                                 </div>
                             </div>
                             <div class="col-5">
                                 <div class="form-group">
-                                    <!-- <label for="last-name-column">Specification Value</label> -->
-                                    <input type="text" id="last-name-column" class="form-control"
-                                        placeholder="Specification Value" name="specifications_value" autocomplete="off">
+                                    <input type="text" class="form-control"
+                                        placeholder="Custom Field Value"
+                                        name="custom_field_value" autocomplete="off">
                                 </div>
                             </div>
                             <div class="col-auto">
                                 <div class="form-group">
-                                    <button type="button" onclick="remove(this)" class="btn btn-sm btn-danger"><i class="bi bi-dash-lg"></i></button>
+                                    <button type="button" onclick="removeCustomField(this)" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
                                 </div>
                             </div>   
                         </div>
@@ -275,7 +223,6 @@ function removeCustomField(el) {
 }
 </script>
 <script>
-requestAndSendNotification()
 function requestAndSendNotification() {
   if (Notification.permission === "granted") {
     // Permission already granted, send notification directly
@@ -294,11 +241,20 @@ function sendNotification() {
   const title = "Asset Added";
   const options = {
     body: "New Asset has been added.", // Main text
-    icon: "path/to/your/icon.png", // URL of an icon to display
+    icon: "/static/images/logo/favicon.png", // URL of an icon to display
     // Other optional properties 
   };
 
   new Notification(title, options);
 }
 </script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% if messages|length > 0 %}
+    requestAndSendNotification();
+  {% endif %}
+});
+</script>
+{% endif %}
 {% endblock content%}
