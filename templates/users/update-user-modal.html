@@ -158,37 +158,6 @@
             </button>
         </div>
     </form>
-</div>
-<script>
-function requestAndSendNotification() {
-  if (Notification.permission === "granted") {
-    // Permission already granted, send notification directly
-    sendNotification();
-  }
-  else if (Notification.permission !== "denied") {
-    // Request permission if not already denied
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        sendNotification();
-      }
-    });
-  }
-}
-
-function sendNotification() {
-  const title = "User Updated";
-  const options = {
-    body: "User Updated.", // 
-    icon: "/static/images/logo/favicon.png", 
-  };
-  new Notification(title, options);
-}
-</script>
-<script>
-document.body.addEventListener("userUpdated", function () {
-  requestAndSendNotification();
-});
-</script>
 <script>
 htmx.on("htmx:beforeSwap", (e) => {
     if (e.detail.target.id == "update-user-modal-content" && !e.detail.xhr.response) {
@@ -211,3 +180,4 @@ $("#inputFile").change(function () {
     filePreview(this);
 });
 </script>
+</div>
