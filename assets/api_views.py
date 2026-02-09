@@ -278,7 +278,7 @@ class UserListForAssignAsset(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         try:
-            get_users=User.undeleted_objects.filter(status=True, organization=request.user.organization).exclude(pk=request.user.id)
+            get_users=User.undeleted_objects.filter(is_active=True, organization=request.user.organization).exclude(pk=request.user.id)
             data=[{'id':user.id,'name':user.full_name} for user in get_users]
             return api_response(data=data, message="users for assign asset get successfully")
         
