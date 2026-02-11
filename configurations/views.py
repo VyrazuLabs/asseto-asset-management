@@ -236,7 +236,7 @@ def list_extensions(request):
             )
     get_extensions=Extensions.objects.get(entity_name="Slack",organization=request.user.organization)
 
-    get_api_extension=Extensions.objects.get(entity_name="API")
+    get_api_extension=Extensions.objects.get(entity_name="API", organization=request.user.organization)
     if get_extensions:
         request.session['slack'] = True
     else:
