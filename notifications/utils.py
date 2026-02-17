@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
 from authentication.models import User
+from firebase_admin import messaging
 
 # Function to send email to a user regarding operation in asset
 # Since email is optional now we have to validate whether the user has email or not
@@ -27,6 +28,7 @@ def notifications_call(user,entity_type,notification_title,notification_text):
         'browser_notification':get_user.browser_notification if get_user.browser_notification else False,
         'inapp_notification':get_user.inapp_notification if get_user.inapp_notification else False
     }
+    print(get_user_notification_types)
     if get_user_notification_types['slack_notification'] is True:
         UserNotification.objects.create(
             entity_type=2,user=get_user, notification_title=notification_title, notification_text=notification_text
@@ -41,3 +43,19 @@ def notifications_call(user,entity_type,notification_title,notification_text):
         )
     # In app to be implemented later.
     return JsonResponse({"success": True})
+
+def send_data_message(token,title,body,image_url):
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body,
+            image=image_url
+        ),
+        token=token
+    )
+    try:
+        response = messaging.send(message)
+        print('Successfully sent message:--', response)
+    except Exception as e:
+        print(f"Error sending message: {e}")
+    # return response
