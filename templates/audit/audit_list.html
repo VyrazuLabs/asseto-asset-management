@@ -140,4 +140,38 @@
         </div>
     </section>
 </div>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    sendNotification();
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Successfully Audited Asset";
+  const options = {
+    body: "Successfully Audited Asset.",
+    icon: "/static/images/logo/favicon.png",
+  };
+
+  new Notification(title, options);
+}
+</script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% for message in messages %}
+    {% if message.tags == "success" %}
+      requestAndSendNotification();
+    {% endif %}
+  {% endfor %}
+});
+</script>
+{% endif %}
 {% endblock content %}

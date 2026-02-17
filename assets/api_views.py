@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
+from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset,get_base_segment
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, AssignAssetSerializer, SearchAssetSerializer
 from authentication.models import User
@@ -38,13 +38,12 @@ class GetNotifications(APIView):
         try:
             notifications = UserNotification.objects.filter(
                 user=request.user,
-                is_seen=False,
                 notification__entity_type=0
-            )
+            ).order_by('-notification__created_at')
             # get_recent_notification=notifications.order_by('-created_at')[:1]
             data = [
                 # {"recent_notification":get_recent_notification},
-                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text}
+                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text,"is_seen": n.is_seen,"link": n.notification.link,"object_type": get_base_segment(n.notification.link) if n.notification.link else None,"created_at": n.notification.created_at,"object_id": n.notification.object_id}
                 for n in notifications
                 # "recent_notification":get_recent_notification
             ]
@@ -64,6 +63,53 @@ class GetNotifications(APIView):
             log_error_to_terminal(error_info)
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
+
+class MarkNotificationAsSeen(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='notification_id',
+                type=int,
+                required=True,
+                description="ID of the UserNotification to mark as seen"
+            )
+        ]
+    )
+    def patch(self, request):
+        try:
+            notification_id = request.GET.get("notification_id")
+
+            if not notification_id:
+                return api_response(
+                    status=400,
+                    error_message="notification_id is required"
+                )
+
+            notification = get_object_or_404(
+                UserNotification,
+                id=notification_id,
+                user=request.user
+            )
+
+            notification.is_seen = True
+            notification.save(update_fields=["is_seen"])
+
+            return api_response(
+                message="Notification marked as seen successfully"
+            )
+
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(
+                status=500,
+                error_type="server_error",
+                error_location=error_info['location'],
+                system_message=error_info["message"],
+                trace_back=error_info['traceback']
+            )
 
 
 class AssetList(APIView):

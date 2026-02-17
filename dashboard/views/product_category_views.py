@@ -107,8 +107,9 @@ def add_product_category(request):
             pc.save()
             messages.success(
                 request, 'Product Category added successfully')
-            return HttpResponse(status=204)
-
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "productCategoryAdded"
+            return response
     context = {'form': form, "modal_title": "Add Product Category"}
     return render(request, 'dashboard/product_category/product-category-modal.html', context)
 
@@ -160,7 +161,9 @@ def update_product_category(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Product Category updated successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "productCategoryUpdated"
+            return response
 
     context = {'form': form, "modal_title": "Update Product Category"}
     return render(request, 'dashboard/product_category/product-category-modal.html', context)

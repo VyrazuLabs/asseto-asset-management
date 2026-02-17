@@ -4,6 +4,7 @@ from . import views
 from . import asset_status_views
 from . import api_views
 from .api_views import GetNotifications
+from notifications import api_view as notifications_api_view
 app_name = 'assets'
 
 urlpatterns = [
@@ -55,6 +56,8 @@ api_url_patterns = [
     path('api/asset/details/assign-asset/<uuid:id>',api_views.AssignAsset.as_view(),name="assign_asset"),
     path('api/asset/details/unassign-asset/<uuid:id>',api_views.UnAssignAsset.as_view(),name="unassign_asset"),
     path('api/asset/details/user-list-for-assign-asset',api_views.UserListForAssignAsset.as_view(),name="user_list_for_assign_asset"),
-    path('api/asset/get-notifications',api_views.GetNotifications.as_view(),name="get_notifications")
+    path('api/asset/get-notifications',api_views.GetNotifications.as_view(),name="get_notifications"),
     # path('api/asset/push-notification/',api_views.get_push_notification, name='push_notification'),
+    path('api/asset/get_firebase_token/<str:token>', notifications_api_view.save_firebase_token, name='get_firebase_token'),
+    path('api/asset/mark-notification-read',api_views.MarkNotificationAsSeen.as_view(),name="mark_notification_read"),
 ]

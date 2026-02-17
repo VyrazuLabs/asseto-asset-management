@@ -42,7 +42,6 @@ def export_users_csv(request):
     response['Content-Disposition']=f'attachment; filename="sample-user-file.CSV"'
     return response
 
-
 @login_required
 @permission_required('authentication.add_user')
 def import_user_csv(request):

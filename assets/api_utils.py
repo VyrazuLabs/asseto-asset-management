@@ -12,6 +12,10 @@ from configurations.utils import dynamic_display_name
 #         "message": "Success",
 #         "user": user.username
 #     }
+def get_base_segment(path: str):
+    if not path:
+        return None
+    return next((segment for segment in path.split("/") if segment), None)
 def convert_to_list(request,queryset):
     current_host=request.get_host()
     asset_list = []
