@@ -35,7 +35,7 @@ def asset_status_list(request):
 
     # Count distinct assets per asset status
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             asset_status__in=all_asset_status_list

@@ -13,6 +13,7 @@ from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -26,7 +27,7 @@ def add_audit(request):
     assigned_to=request.POST.get('assigned-to',None)
     tag=request.POST.get('tag',None)
     get_asset=Asset.objects.filter(tag=tag).first()
-    
+    user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
     if request.method == 'POST':
         errors={}
         if not condition:
@@ -34,7 +35,6 @@ def add_audit(request):
 
         if not comments:
             errors["comments"] = "Comments cannot be empty."
-
 
         # If ANY custom errors exist → return template with errors
         if errors:
@@ -68,10 +68,12 @@ def add_audit(request):
         else:
             for f in files:
                 AuditImage.objects.create(audit=audit_create, image=f)
+        messages.success(request, 'Audit added successfully')
+        context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
+        # return render(request, 'audit/add_audit.html', context)
         return redirect('audit:completed_audits')
 
     elif request.method == 'GET':
-        user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
         context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
         return render(request, 'audit/add_audit.html', context)
 
@@ -115,7 +117,9 @@ def get_audits_by_id(request, id):
         )
         for f in files:
                 AuditImage.objects.create(audit=created_audit, image=f)
+        messages.success(request, 'Audit added successfully')
         return redirect('audit:completed_audits')
+    
 
     elif request.method == 'GET':
         if get_assigned_user is None:

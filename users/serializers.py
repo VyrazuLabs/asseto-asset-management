@@ -12,12 +12,6 @@ class ResetPasswordSerializer(serializers.Serializer):
     rewrite_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True, min_length=8)
 
-    def validate(self, attrs):
-        if attrs["current_password"] != attrs["rewrite_password"]:
-            raise serializers.ValidationError(
-                {"rewrite_password": "Passwords do not match."}
-            )
-        return attrs
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -148,7 +142,6 @@ class UserSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
 
     # Search based on user name ,email,role,department,status
     # def search(self,search_text):

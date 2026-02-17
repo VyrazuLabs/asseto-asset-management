@@ -82,6 +82,7 @@ def get_asset_filter_data(request):
             asset_user_map[assign.asset_id] = None
         if assign.user:  # avoid None users
             asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
+            print(assign.user.full_name,assign.user.profile_pic,"INFOOOOOOO")
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
