@@ -19,6 +19,12 @@ from datetime import timedelta
 import pymysql
 pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
+import firebase_admin
+from firebase_admin import credentials
+ 
+cred = credentials.Certificate("/home/vyrazu-70/Desktop/folders/Works/asetto_asset_management_app/asseto-asset-management/firebase-credentials.json")
+firebase_admin.initialize_app(cred)
+# from firebase_admin import initialize_app
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,6 +84,7 @@ INSTALLED_APPS = [
     'audit',
     'license'
 ]
+# FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True
 TRACEBACK_SHOW_LOCALS=True
 TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information

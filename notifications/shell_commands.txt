@@ -1,0 +1,1 @@
+send_data_message("ccVX3ydtS2OSZGMPHsLHty:APA91bG_cbaXIJw4tgYxGDX9Ad-uZV9NTnOPvwvKa5VNQfUF-vr9HxZq8DH9BBokjZvN6-S6-El6azrArlDJcTdqAsjj42QUJHF-6NuZSZUY5mL7ssGImrA","Testing push notification","SUCESSFULLY WORKING","https://No_image.jpg")

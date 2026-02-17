@@ -41,6 +41,36 @@
     </form>
 </div>
 <script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Product Category Added Successfully";
+  const options = {
+    body: "Product Category Added Successfully.", 
+    icon: "/static/images/logo/favicon.png", 
+  };
+  new Notification(title, options);
+}
+</script>
+<script>
+document.body.addEventListener("productCategoryAdded", function () {
+  requestAndSendNotification();
+});
+</script>
+<script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (
             (e.detail.target.id == "add-product-category-modal-content" ||  e.detail.target.id == "update-product-category-modal-content") && !e.detail.xhr.response){
