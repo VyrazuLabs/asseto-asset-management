@@ -934,7 +934,36 @@ document.body.addEventListener('htmx:afterSwap', function (e) {
     initModuleCheckboxes();
 });
 </script>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
 
+function sendNotification() {
+  const title = "New Role Added Successfully";
+  const options = {
+    body: "New Role Added Successfully.", 
+    icon: "/static/images/logo/favicon.png", 
+  };
+  new Notification(title, options);
+}
+</script>
+<script>
+document.body.addEventListener("roleAdded", function () {
+  requestAndSendNotification();
+});
+</script>
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (e.detail.target.id == "add-role-modal-content" && !e.detail.xhr.response) {

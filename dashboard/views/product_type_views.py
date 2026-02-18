@@ -97,7 +97,9 @@ def add_product_type(request):
             pt.save()
             messages.success(
                 request, 'Product Type added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "productTypeAdded"
+            return response
 
     context = {'form': form, "modal_title": "Add Product Type"}
     return render(request, 'dashboard/product_type/product-type-modal.html', context)
@@ -157,7 +159,9 @@ def update_product_type(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Product Type updated successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "productTypeUpdated"
+            return response
 
     context = {'form': form, "modal_title": "Update Product Type"}
     return render(request, 'dashboard/product_type/product-type-modal.html', context)

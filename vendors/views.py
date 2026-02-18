@@ -90,7 +90,9 @@ def add_vendor(request):
             vendor.organization = request.user.organization
             vendor.save()
             messages.success(request, 'Vendor added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "vendorAdded"
+            return response
 
     context = {'vendor_form': vendor_form, 'address_form': address_form}
     return render(request, 'vendors/add-vendor-modal.html', context=context)
@@ -147,7 +149,10 @@ def update_vendor(request, id):
                     cf.field_value = new_val
                     cf.save()
             messages.success(request, 'Vendor updated successfully')
-            return redirect(f'/vendors/details/{vendor.id}')
+            # return redirect(f'/vendors/details/{vendor.id}')
+            context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
+               'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
+            return render(request, 'vendors/update-vendor-modal.html', context=context)
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
                'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
