@@ -19,11 +19,23 @@ from datetime import timedelta
 import pymysql
 pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
+import firebase_admin
+from firebase_admin import credentials
+
+
+# from firebase_admin import initialize_app
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env', override=True)
 # os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
+print("TYPE:", type(cred_path))
+if not cred_path:
+    raise ValueError("Firebase credential path not found in environment variables")
+cred = credentials.Certificate(cred_path)
+firebase_admin.initialize_app(cred)
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -78,6 +90,7 @@ INSTALLED_APPS = [
     'audit',
     'license'
 ]
+# FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True
 TRACEBACK_SHOW_LOCALS=True
 TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
