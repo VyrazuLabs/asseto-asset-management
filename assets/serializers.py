@@ -6,6 +6,34 @@ from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework import serializers
+from notifications.models import UserNotification
+from rest_framework import serializers
+from .api_utils import get_base_segment
+
+class NotificationSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='notification.notification_title')
+    body = serializers.CharField(source='notification.notification_text')
+    link = serializers.CharField(source='notification.link')
+    created_at = serializers.DateTimeField(source='notification.created_at')
+    object_id = serializers.CharField(source='notification.object_id')
+    object_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserNotification
+        fields = [
+            'id',
+            'title',
+            'body',
+            'is_seen',
+            'link',
+            'object_type',
+            'created_at',
+            'object_id'
+        ]
+
+    def get_object_type(self, obj):
+        link = obj.notification.link
+        return get_base_segment(link) if link else None
 
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
