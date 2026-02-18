@@ -6,12 +6,27 @@ import re
 from datetime import date
 from configurations.utils import get_currency_and_datetime_format, format_datetime
 from configurations.utils import dynamic_display_name
+from django.db.models import Func, CharField
 
 # def get_push_notification_data(user):
 #     return {
 #         "message": "Success",
 #         "user": user.username
 #     }
+class BaseSegmentFunc(Func):
+    output_field = CharField()
+
+    template = """
+        CASE 
+            WHEN %(expressions)s IS NOT NULL AND %(expressions)s != ''
+            THEN SUBSTRING_INDEX(
+                    SUBSTRING_INDEX(%(expressions)s, '/', 2),
+                    '/',
+                    -1
+                 )
+            ELSE NULL
+        END
+    """
 def get_base_segment(path: str):
     if not path:
         return None
