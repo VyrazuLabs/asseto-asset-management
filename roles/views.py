@@ -70,8 +70,9 @@ def add(request):
 
                 role.permissions.add(permission)
 
-            messages.success(request, 'Role added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "roleAdded"
+            return response
 
     context = {'form': form}
     return render(request, 'roles/add-role-modal.html', context=context)
@@ -108,8 +109,9 @@ def update(request, name):
 
                 role.permissions.add(permission)
 
-            messages.success(request, 'Role updated successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "roleUpdated"
+            return response
 
     context = {
         'form': form,

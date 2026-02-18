@@ -153,5 +153,40 @@
     });
     });
 </script>
-  
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Product Added";
+  const options = {
+    body: "Product Added.", // Main text
+    icon: "/static/images/logo/favicon.png", // URL of an icon to display
+    // Other optional properties 
+  };
+
+  new Notification(title, options);
+}
+</script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% if messages|length > 0 %}
+    requestAndSendNotification();
+  {% endif %}
+});
+</script>
+{% endif %}
 {% endblock content%}
