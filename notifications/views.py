@@ -12,7 +12,12 @@ from .models import Notification
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Notification
-
+from .models import FirebaseToken
+from firebase_admin import messaging
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 def browser_notification( request):
     notifications = Notification.objects.filter(entity_type=0,user=request.user)
@@ -124,3 +129,31 @@ def search(request, page):
     page_number = page
     page_object = paginator.get_page(page_number)
     return render(request, 'notifications/notifications-data.html', {'page_object': page_object})
+# from firebase_admin.messaging import Message, Notification
+# FCMDevice.objects.send_message(Message(data=dict()))
+# # Note: You can also combine the data and notification kwarg
+# FCMDevice.objects.send_message(
+#     Message(notification=Notification(title="title", body="body", image="image_url"))
+# )
+# device = FCMDevice.objects.first()
+# device.send_message(Message(...))
+
+def send_data_message(token,title,body,image_url):
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body,
+            image=image_url
+        ),
+        token=token
+    )
+    try:
+        response = messaging.send(message)
+        print('Successfully sent message:--', response)
+    except Exception as e:
+        print(f"Error sending message: {e}")
+    # return response
+
+#This below function is to generate the token.But since token is generated from the mobile dev.. so we directly just fetch the token from the frontend.
+def firebase_initialization(request):
+    return render(request,'notifications/push_notification_initial.html')

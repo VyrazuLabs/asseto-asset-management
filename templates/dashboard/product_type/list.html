@@ -155,4 +155,34 @@
         </div>
     </section>
 </div>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "New Product Type Added";
+  const options = {
+    body: "New Product Type Added.", 
+    icon: "/static/images/logo/favicon.png", 
+  };
+  new Notification(title, options);
+}
+</script>
+<script>
+document.body.addEventListener("productTypeAdded", function () {
+  requestAndSendNotification();
+});
+</script>
 {% endblock content %}

@@ -60,6 +60,7 @@ def departments(request):
     asset_counts = (
         AssignAsset.objects
         .filter(
+            asset__is_deleted=False,
             asset__organization=request.user.organization,
             user__department__in=department_list
         )
@@ -118,7 +119,9 @@ def add_department(request):
             department.organization = request.user.organization
             department.save()
             messages.success(request, 'Department added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "departmentAdded"
+            return response
 
     context = {"form": form, "modal_title": "Add Department"}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
@@ -137,7 +140,9 @@ def update_department(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Department updated successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "departmentUpdated"
+            return response
 
     context = {"form": form, "modal_title": "Update Department"}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
