@@ -47,7 +47,7 @@ def locations(request):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(organization=request.user.organization,
                 location__in=location_list)
         .values("location")
@@ -103,7 +103,9 @@ def add_location(request):
             location.organization = request.user.organization
             location.save()
             messages.success(request, 'Location added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "locationAdded"
+            return response
 
     context = {
         'address_form': address_form,
@@ -132,7 +134,7 @@ def update_location(request, id):
                 location_form.save()
                 address_form.save()
                 messages.success(request, 'Location updated successfully')
-                return redirect(f'/admin/locations/details/{location.id}')
+                return redirect(f'/admin/locations/update/{location.id}')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
                    'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}

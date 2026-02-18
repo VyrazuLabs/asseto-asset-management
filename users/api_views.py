@@ -73,7 +73,12 @@ class ResetPassword(APIView):
         user = request.user
         current_password = serializer.validated_data["current_password"]
         new_password = serializer.validated_data["new_password"]
-
+        rewrite_password = serializer.validated_data['rewrite_password']
+        if current_password!=rewrite_password:
+            return Response(
+                {"success": False, "message": "Old passwords do not match."},
+                status=400
+            )
         if not user.check_password(current_password):
             return Response(
                 {"success": False, "message": "Current password is incorrect."},
@@ -87,6 +92,25 @@ class ResetPassword(APIView):
             {"success": True, "message": "Password changed successfully."},
             status=200
         )
+    
+# class PasswordChecker(APIView):
+#     permission_classes=[IsAuthenticated]
+#     @extend_schema(request={"multiplart/forma-data":ResetPasswordSerializer})
+#     def post(self,request):
+#         serializer=ResetPasswordSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         current_password = serializer.validated_data['current_password']
+#         rewrite_password = serializer.validated_data['rewrite_password']
+#         if current_password!=rewrite_password:
+#             return Response(
+#                 {"success": False, "message": "Passwords do not match."},
+#                 status=400
+#             )
+#         else:
+#             return Response(
+#                 {"success": True, "message": "Passwords match."},
+#                 status=200
+#             )
 
 class ForgotPassword(APIView):
     permission_classes=[AllowAny]
