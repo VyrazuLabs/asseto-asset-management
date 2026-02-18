@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset,get_base_segment
 from assets.models import Asset, AssetImage, AssetStatus
-from assets.serializers import AssetSerializer, AssignAssetSerializer, SearchAssetSerializer
+from assets.serializers import AssetSerializer,NotificationSerializer, AssignAssetSerializer, SearchAssetSerializer
 from authentication.models import User
 from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
 from common.pagination import add_pagination
@@ -20,6 +20,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
+from assets.api_utils import BaseSegmentFunc
 # from .api_utils import get_push_notification_data
 
 # @api_view(['GET'])
@@ -33,24 +34,33 @@ class GetNotifications(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
     def get(self,request):
-        # current_host=request.get_host()
-        # external_api_url = f'http://{current_host}'+'/api/asset/push-notification/'
         try:
-            notifications = UserNotification.objects.filter(
-                user=request.user,
-                notification__entity_type=0
-            ).order_by('-notification__created_at')
-            # get_recent_notification=notifications.order_by('-created_at')[:1]
-            data = [
-                # {"recent_notification":get_recent_notification},
-                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text,"is_seen": n.is_seen,"link": n.notification.link,"object_type": get_base_segment(n.notification.link) if n.notification.link else None,"created_at": n.notification.created_at,"object_id": n.notification.object_id}
-                for n in notifications
-                # "recent_notification":get_recent_notification
-            ]
-            # external_response = requests.get(external_api_url)
-            # external_response.raise_for_status()
-            # # Process the response data (assuming JSON)
-            # datas = external_response.json()
+            # notifications = UserNotification.objects.filter(
+            #     user=request.user,
+            #     notification__entity_type=0
+            # ).order_by('-notification__created_at')
+            # data = [
+            #     # {"recent_notification":get_recent_notification},
+            #     {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text,"is_seen": n.is_seen,"link": n.notification.link,"object_type": get_base_segment(n.notification.link) if n.notification.link else None,"created_at": n.notification.created_at,"object_id": n.notification.object_id}
+            #     for n in notifications
+            # ]
+            notifications= UserNotification.objects.filter(
+                    user=request.user,
+                    is_seen=False,
+                    notification__entity_type=0
+                ).annotate(
+                    object_type=BaseSegmentFunc('notification__link')
+                ).order_by('-notification__created_at')
+            data = notifications.values(
+                'id', 
+                'notification__notification_title',
+                'notification__notification_text',
+                'is_seen', 
+                'notification__link',
+                'object_type',
+                'notification__created_at', 
+                'notification__object_id'
+            )
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
             return api_response(data=paginated_data, message="List get Successfully")
