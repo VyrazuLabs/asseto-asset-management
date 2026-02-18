@@ -1,9 +1,9 @@
 import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
+from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset,get_base_segment
 from assets.models import Asset, AssetImage, AssetStatus
-from assets.serializers import AssetSerializer, AssignAssetSerializer, SearchAssetSerializer
+from assets.serializers import AssetSerializer,NotificationSerializer, AssignAssetSerializer, SearchAssetSerializer
 from authentication.models import User
 from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
 from common.pagination import add_pagination
@@ -20,6 +20,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
+from assets.api_utils import BaseSegmentFunc
+from django.db.models import F
 # from .api_utils import get_push_notification_data
 
 # @api_view(['GET'])
@@ -33,25 +35,38 @@ class GetNotifications(APIView):
     permission_classes=[IsAuthenticated]
     @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
     def get(self,request):
-        # current_host=request.get_host()
-        # external_api_url = f'http://{current_host}'+'/api/asset/push-notification/'
         try:
-            notifications = UserNotification.objects.filter(
-                user=request.user,
-                is_seen=False,
-                notification__entity_type=0
+            # notifications = UserNotification.objects.filter(
+            #     user=request.user,
+            #     notification__entity_type=0
+            # ).order_by('-notification__created_at')
+            # data = [
+            #     # {"recent_notification":get_recent_notification},
+            #     {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text,"is_seen": n.is_seen,"link": n.notification.link,"object_type": get_base_segment(n.notification.link) if n.notification.link else None,"created_at": n.notification.created_at,"object_id": n.notification.object_id}
+            #     for n in notifications
+            # ]
+            notifications= UserNotification.objects.filter(
+                    user=request.user,
+                    is_seen=False,
+                    notification__entity_type=0
+                ).annotate(
+                    object_type=BaseSegmentFunc('notification__link'),
+                    notification_title=F('notification__notification_title'),
+                    notification_text=F('notification__notification_text'),
+                    link=F('notification__link'),
+                    created_at=F('notification__created_at'),
+                    object_id=F('notification__object_id')
+                ).order_by('-notification__created_at')
+            data = notifications.values(
+                'id', 
+                'notification_title',
+                'notification_text',
+                'is_seen', 
+                'link',
+                'object_type',
+                'created_at', 
+                'object_id'
             )
-            # get_recent_notification=notifications.order_by('-created_at')[:1]
-            data = [
-                # {"recent_notification":get_recent_notification},
-                {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text}
-                for n in notifications
-                # "recent_notification":get_recent_notification
-            ]
-            # external_response = requests.get(external_api_url)
-            # external_response.raise_for_status()
-            # # Process the response data (assuming JSON)
-            # datas = external_response.json()
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
             return api_response(data=paginated_data, message="List get Successfully")
@@ -64,6 +79,53 @@ class GetNotifications(APIView):
             log_error_to_terminal(error_info)
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
+
+class MarkNotificationAsSeen(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='notification_id',
+                type=int,
+                required=True,
+                description="ID of the UserNotification to mark as seen"
+            )
+        ]
+    )
+    def patch(self, request):
+        try:
+            notification_id = request.GET.get("notification_id")
+
+            if not notification_id:
+                return api_response(
+                    status=400,
+                    error_message="notification_id is required"
+                )
+
+            notification = get_object_or_404(
+                UserNotification,
+                id=notification_id,
+                user=request.user
+            )
+
+            notification.is_seen = True
+            notification.save(update_fields=["is_seen"])
+
+            return api_response(
+                message="Notification marked as seen successfully"
+            )
+
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(
+                status=500,
+                error_type="server_error",
+                error_location=error_info['location'],
+                system_message=error_info["message"],
+                trace_back=error_info['traceback']
+            )
 
 
 class AssetList(APIView):
