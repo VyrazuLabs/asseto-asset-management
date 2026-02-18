@@ -21,6 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.models import UserNotification
 from assets.api_utils import BaseSegmentFunc
+from django.db.models import F
 # from .api_utils import get_push_notification_data
 
 # @api_view(['GET'])
@@ -49,17 +50,22 @@ class GetNotifications(APIView):
                     is_seen=False,
                     notification__entity_type=0
                 ).annotate(
-                    object_type=BaseSegmentFunc('notification__link')
+                    object_type=BaseSegmentFunc('notification__link'),
+                    notification_title=F('notification__notification_title'),
+                    notification_text=F('notification__notification_text'),
+                    link=F('notification__link'),
+                    created_at=F('notification__created_at'),
+                    object_id=F('notification__object_id')
                 ).order_by('-notification__created_at')
             data = notifications.values(
                 'id', 
-                'notification__notification_title',
-                'notification__notification_text',
+                'notification_title',
+                'notification_text',
                 'is_seen', 
-                'notification__link',
+                'link',
                 'object_type',
-                'notification__created_at', 
-                'notification__object_id'
+                'created_at', 
+                'object_id'
             )
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
