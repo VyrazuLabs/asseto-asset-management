@@ -7,14 +7,14 @@ from firebase_admin import messaging
 
 # Function to send email to a user regarding operation in asset
 # Since email is optional now we have to validate whether the user has email or not
-def send_email(user_email,notifications_title,notification_text):
-    subject = notifications_title
+def send_email(user_email,notification_title,notification_text):
+    subject = notification_title
     message = notification_text
     from_email = "sghosh@gmail.com"
     recipient_list = [user_email]
     html_message= f"""
         <h3>Hello User!</h3>
-        <p>{notifications_title}</p>
+        <p>{notification_title}</p>
         <p><strong>{notification_text}</strong></p>
     """
     return send_mail(subject=subject, message=message, recipient_list=recipient_list,from_email=from_email,html_message = html_message)
