@@ -10,7 +10,7 @@ from firebase_admin import messaging
 def send_email(user_email,notification_title,notification_text):
     subject = notification_title
     message = notification_text
-    from_email = "sghosh@gmail.com"
+    from_email = settings.EMAIL_HOST_USER
     recipient_list = [user_email]
     html_message= f"""
         <h3>Hello User!</h3>
