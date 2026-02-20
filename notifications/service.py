@@ -41,6 +41,7 @@ class NotificationService:
         if user.inapp_notification:
             token = FirebaseToken.objects.filter(user=user).first()
             if token:
+                print('Sending in-app notification to user:----', user.username,token.token)
                 send_data_message(
                     token=token.token,
                     title=title,
