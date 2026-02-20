@@ -289,7 +289,7 @@ def update_in_detail(request, id):
 
             messages.success(request, "Asset updated successfully.")
             if request.user.email_notification==True:
-                send_email(request.user.email,notifications_title='Updated asset',notification_text=f'{asset.name} is Updated.')
+                send_email(request.user.email,notification_title='Updated asset',notification_text=f'{asset.name} is Updated.')
             if request.user.slack_notification==True:
                 slack_notification(request,f"{asset.name}  updated successfully",asset.id,asset.tag)
             # return redirect('assets:update_in_detail', id=asset.id)
