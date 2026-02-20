@@ -6,3 +6,4 @@
 media
 db.sqlite3
 staticfiles
+firebase-credentials.json
