@@ -210,26 +210,26 @@ def expiring_asset(days):
 
             if not UserNotification.objects.filter(user=super_user, notification__notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.').exists():
 
-                notification = Notification.objects.create(
-                    instance_id=expiring_asset.id,
-                    notification_title='Warranty Expires',
-                    notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.',
-                    icon='bi-person-workspace',
-                    link=f'/assets/details/{expiring_asset.asset.id}',
-                    object_id=str(expiring_asset.asset.id)
-                )
-
-                UserNotification.objects.create(
-                    user=super_user,
-                    notification=notification
-                )
-                # NotificationService.send(
-                #     user=instance.previous_user,
-                #     title='Asset Deleted',
-                #     message=f'{instance.asset.name} has been deleted.',
-                #     icon='bi-gear-fill',
-                #     instance_id=instance.id
+                # notification = Notification.objects.create(
+                #     instance_id=expiring_asset.id,
+                #     notification_title='Warranty Expires',
+                #     notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.',
+                #     icon='bi-person-workspace',
+                #     link=f'/assets/details/{expiring_asset.asset.id}',
+                #     object_id=str(expiring_asset.asset.id)
                 # )
+
+                # UserNotification.objects.create(
+                #     user=super_user,
+                #     notification=notification
+                # )
+                NotificationService.send(
+                    user=expiring_asset.previous_user,
+                    title='Asset Deleted',
+                    message=f'{expiring_asset.asset.name} has been deleted.',
+                    icon='bi-gear-fill',
+                    instance_id=expiring_asset.id
+                )
 
 @receiver(connection_created)
 def conn_db(sender, connection, **kwargs):

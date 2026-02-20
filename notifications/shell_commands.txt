@@ -1,1 +1,0 @@
-send_data_message("djYLId9IRVa3mER6pbZ2Jk:APA91bG_V5nfoBpHGqiH0M0-wQOzUCm6afR5_Z9YE-ReDjnUBwSuu_jDR8sFGDsNp3rsN2lPwjPAnolh1NAKp7GMgVmDIiua6hxNTS95Wpor7OyFVuQ77KE","Testing push notification","SUCESSFULLY WORKING","https://No_image.jpg")
