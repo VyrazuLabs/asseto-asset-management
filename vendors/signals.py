@@ -59,7 +59,7 @@ def vendor_notification(sender, instance, created, **kwargs):
                 )
 
         # 🔹 Vendor Status Changed
-        if hasattr(instance, "_old_status") and instance._old_status != instance.status:
+        if hasattr(instance, "_old_status") and instance._old_status != instance.status and not instance.is_deleted:
             status_text = "Activated" if instance.status else "Deactivated"
 
             for admin in admins:
@@ -69,6 +69,18 @@ def vendor_notification(sender, instance, created, **kwargs):
                     message=f"Vendor '{instance.name}' has been {status_text}.",
                     icon="bi-toggle-on",
                     link=f"/vendors/details/{instance.id}",
+                    object_id=str(instance.id),
+                    instance_id=instance.id
+                )
+
+        if hasattr(instance,"_old_status") and instance.is_deleted:
+            for admin in admins:
+                NotificationService.send(
+                    user=admin,
+                    title="Vendor Deleted",
+                    message=f"Vendor '{instance.name}' has been Deleted.",
+                    icon="bi-toggle-on",
+                    link=f"/vendors/list",
                     object_id=str(instance.id),
                     instance_id=instance.id
                 )

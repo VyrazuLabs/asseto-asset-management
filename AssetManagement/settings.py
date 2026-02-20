@@ -30,13 +30,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env', override=True)
 # os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
-print("TYPE:", type(cred_path))
-if not cred_path:
-    raise ValueError("Firebase credential path not found in environment variables")
+# cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
+
+file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')
+cred_path = BASE_DIR / file_name
+print("Resolved Path:", cred_path)
+# If file does not exist → create empty file
+if not cred_path.exists():
+    print("Firebase credential file not found. Creating new file...")
+    cred_path.touch()
+    print("Created a new file to store the firebase credentials...")
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
-
 LOGIN_REDIRECT_URL = '/'
 
 DEBUG=True 
@@ -249,7 +254,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = False
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
