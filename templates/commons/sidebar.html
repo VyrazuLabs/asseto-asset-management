@@ -93,7 +93,7 @@
                     </li>
                 {% endif %}
                 <li class="sidebar-item {% if sidebar == 'audit' %}active{% endif %}">
-                    <a href="{% url 'audit:pending_audits' %}" class="sidebar-link">
+                    <a href="{% url 'audit:completed_audits' %}" class="sidebar-link">
                         <i><image src="{% static 'images/new_logo/hourglass.svg' %}" alt="Audit" width="20" height="20"></image></i>
                         <span>Audit</span>
                     </a>
