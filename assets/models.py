@@ -7,6 +7,7 @@ from django.db.models import Sum
 from authentication.models import User
 from simple_history.models import HistoricalRecords
 
+
 def path_and_rename(instance, filename):
     upload_to = 'asset_images/'
     ext = filename.split('.')[-1]
