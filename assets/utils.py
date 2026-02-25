@@ -16,7 +16,6 @@ from django.http import JsonResponse, HttpResponse
 from datetime import date,datetime
 from dateutil.relativedelta import relativedelta
 import requests
-from collections import defaultdict
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -177,9 +176,6 @@ def create_asset_list(request,assets_qs):
     list_of_audits=Audit.objects.all()
     list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
-    asset_conditions_map = defaultdict(list)
-    for audit in list_of_audits:
-        asset_conditions_map[audit.asset_id].append(audit.condition)
     product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
@@ -238,8 +234,7 @@ def create_asset_list(request,assets_qs):
         'deleted_asset_count':deleted_asset_count,
         'title': 'Assets',
         'is_demo':is_demo,
-        'list_of_audited_assets':list_of_audited_assets,
-        'asset_conditions_map':asset_conditions_map
+        'list_of_audited_assets':list_of_audited_assets
     }
     return context
 
