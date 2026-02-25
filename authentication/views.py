@@ -45,7 +45,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
-from .utils import generate_qr
 
 
 User = get_user_model()
@@ -249,7 +248,7 @@ def user_login(request):
                     seed_parent_category(category=True)
                 else:
                     print('seed fail for category')
-                
+
                 login(request, user)
                 # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request,  f'Welcome, {user.full_name}')
@@ -321,9 +320,8 @@ def profile(request):
 
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name=user.dynamic_display_name(user.full_name)
-    get_qr_for_2fa = generate_qr(request)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,
-               'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification,"get_qr_for_2fa":get_qr_for_2fa,"two_factor_auth":user.two_factor_auth}
+               'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification}
     return render(request, 'auth/profile.html', context=context)
 
 
