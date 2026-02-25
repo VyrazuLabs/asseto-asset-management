@@ -260,7 +260,32 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td><b>Two Factor Authentication</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="two_factor_auth"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if two_factor_auth is True %} checked {% else %} unchecked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
                             </table>
+                            {% if two_factor_auth is True %}
+                                <h5>Two Factor Authentication QR Code</h5>
+                                <img src="data:image/png;base64,{{ get_qr_for_2fa }}" 
+                                                alt="QR Code for 2FA"
+                                                class="img-fluid"
+                                                style="max-width: 200px; max-height: 200px;">
+                            {% elif two_factor_auth is False %}
+                                <img src="data:image/png;base64,{{ get_qr_for_2fa }}" 
+                                                alt="QR Code for 2FA"
+                                                class="img-fluid"
+                                                style="display: None;">
+                            {% endif %}
                         </form>
                     </div>
                 </div>
@@ -391,7 +416,6 @@
                     </div>
                 </div>
             {% endif %}
-            
         </div>
     </section>
 </div>
