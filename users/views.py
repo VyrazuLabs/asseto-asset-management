@@ -41,15 +41,13 @@ def create_user_notification_type(request):
         in_app = request.POST.get("in_app_notification") == "on"
         browser = request.POST.get("browser_notification") == "on"
         slack=request.POST.get("slack_notification") == "on"
-        two_factor_auth=request.POST.get("two_factor_auth") == "on"
         get_user=User.objects.filter(id=request.user.id).first()
         if get_user is not None:
             User.objects.filter(id=request.user.id).update(
                 email_notification=email,
                 slack_notification=slack,
                 browser_notification=browser,
-                inapp_notification=in_app,
-                two_factor_auth=two_factor_auth
+                inapp_notification=in_app
             )
 
         return JsonResponse({"success": True})
