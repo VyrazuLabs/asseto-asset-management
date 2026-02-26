@@ -21,27 +21,39 @@ pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
 import firebase_admin
 from firebase_admin import credentials
-
-
+import json
+import base64
+from cryptography.fernet import Fernet
 # from firebase_admin import initialize_app
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env', override=True)
-# os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
+# # os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# cipher_suite = Fernet(os.environ.get('FERNET_KEY'))
+# # secret_key=''
+# encrypted_bytes = cipher_suite.encrypt(str(data).encode('utf-8'))
+# print(encrypted_bytes)
+# data=cipher_suite.decrypt(encrypted_bytes).decode('utf-8')                 Decrypted Data
 # cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
-
+cipher_suite = Fernet(b'NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=')
+print("FERNET_KEY:", cipher_suite)
 file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')
 cred_path = BASE_DIR / file_name
-print("Resolved Path:", cred_path)
-# If file does not exist → create empty file
-if not cred_path.exists():
-    print("Firebase credential file not found. Creating new file...")
-    cred_path.touch()
-    print("Created a new file to store the firebase credentials...")
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred)
+firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
+
+if firebase_credentials:
+    fernet = Fernet(os.getenv("FERNET_KEY").encode())
+    decrypted = fernet.decrypt(firebase_credentials.encode())
+    print("Decrypted Firebase Credentials:", decrypted.decode())
+    cred_dict = json.loads(decrypted.decode())
+
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+
+elif cred_path.exists():
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
 LOGIN_REDIRECT_URL = '/'
 
 DEBUG=True 
