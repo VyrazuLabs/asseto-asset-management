@@ -16,6 +16,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from authentication.token import account_activation_token
 from django.contrib.auth.models import User
+from authentication.models import UserTotp
 from authentication.utils import create_db_connection
 from dashboard.forms import AddressForm
 from dashboard.models import Location, Address,ProductType,ProductCategory
@@ -45,9 +46,28 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
-
+from .utils import generate_qr
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 User = get_user_model()
+
+@login_required
+def toggle_2fa(request):
+    user = request.user
+
+    if request.method == "POST":
+        user.two_factor_auth = not user.two_factor_auth
+        user.save()
+
+    context = {
+        "two_factor_auth": user.two_factor_auth,
+        "get_qr_for_2fa": generate_qr(user),  # your QR generator
+    }
+
+    html = render_to_string("users/partials/qr_section.html", context, request=request)
+    return HttpResponse(html)
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -248,7 +268,7 @@ def user_login(request):
                     seed_parent_category(category=True)
                 else:
                     print('seed fail for category')
-
+                
                 login(request, user)
                 # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request,  f'Welcome, {user.full_name}')
@@ -320,8 +340,10 @@ def profile(request):
 
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name=user.dynamic_display_name(user.full_name)
+    get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
+    get_qr_for_2fa = generate_qr(request)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,
-               'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification}
+               'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification,"get_qr_for_2fa":get_qr_for_2fa,"two_factor_auth":user.two_factor_auth,"get_user_totp":get_user_totp}
     return render(request, 'auth/profile.html', context=context)
 
 
@@ -390,3 +412,11 @@ def organization_info_update(request):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+# def toggle_2fa(request):
+#     user = request.user
+#     if user.is_authenticated:
+#         user.two_factor_auth = not user.two_factor_auth
+#         user.save()
+#         messages.success(request, 'Two-factor authentication has been toggled.')
+#     return redirect('authentication:profile')

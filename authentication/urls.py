@@ -19,11 +19,15 @@ urlpatterns = [
     path('logout/',views.logout_view, name='logout'),
     path('profile-basic-information/update', views.profile_basic_info_update, name='profile_basic_info_update'),
     path('organization-information/update', views.organization_info_update, name='organization_info_update'),
+    path('profile/toggle-2fa', views.toggle_2fa, name='toggle_2fa'),
 ]
 
 authentication_url_patterns=[
     #api urls
-    path('api/authentication/login/', TokenObtainPairView.as_view(),name='login'),
+    path('api/authentication/login/', index_api_views.CustomTokenObtainPairView.as_view(),name='login'),
+    path('api/authentication/generate-otp/',index_api_views.GenerateTOTP.as_view(),name='generate_otp'),
+    # path('api/authentication/login/', index_api_views.CustomTokenObtainPairView.as_view(),name='login'),
+    path('api/authentication/login-otp/',index_api_views.LoginOtp.as_view(),name='login_otp'),
     path('api/authentication/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
     # path('api/authentication/token/refresh/',views.get_refresh_token,name='token_refresh'),
     path('api/authentication/logout/',TokenBlacklistView.as_view(),name='logout'),
