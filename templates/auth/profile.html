@@ -260,15 +260,41 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td><b>Two Factor Authentication</b></td>
+                                    <td>
+                                        <div class="form-check form-switch pe-3">
+                                            <input 
+                                                type="checkbox"
+                                                id="twoFactorToggle"
+                                                name="two_factor_auth"
+                                                class="form-check-input"
+                                                {% if two_factor_auth %} checked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
                             </table>
+                            <div>
+                            {% if get_user_totp.is_logged_in is True %}
+                                <h5>2FA :</h5><span>User is already logged in</span> 
+                            {% else  %}
+                                <h5 id="qrTitle">Two Factor Authentication QR Code</h5>
+                                <img id="qrImage" src="data:image/png;base64,{{ get_qr_for_2fa }}" 
+                                                alt="QR Code for 2FA"
+                                                class="img-fluid"
+                                                style="max-width: 200px; max-height: 200px;">
+                            {% endif %}
+                        </div>
                         </form>
                     </div>
                 </div>
+
             {% endif %}
             {% if assigned_assets is not None %}
                 <div class="card">
                     <div class="card-body">
-                        <h6 class="my-3">
+                        <h6 class="m-3">
                             <i class="bi bi-people-fill"></i>
                             <span>Assigned Assets</span>                       
                         </h6>                        
@@ -391,8 +417,24 @@
                     </div>
                 </div>
             {% endif %}
-            
-        </div>
     </section>
+    
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("twoFactorToggle");
+        const qrImage = document.getElementById("qrImage");
+        const qrTitle = document.getElementById("qrTitle");
+
+        toggle.addEventListener("change", function () {
+            if (this.checked) {
+                qrImage.style.display = "block";
+                qrTitle.style.display = "block";
+            } else {
+                qrImage.style.display = "none";
+                qrTitle.style.display = "none";
+            }
+        });
+    });
+</script>
 {% endblock content %}
