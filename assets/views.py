@@ -1,5 +1,5 @@
 from assets.modlues import *
-
+from .utils import get_asset_images,get_audit_images,delete_assign_asset,search_asset,add_asset,assign_asset_in_form,details_of_asset
 get_host = lambda request: request.build_absolute_uri('/')
 IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
@@ -35,8 +35,8 @@ def manage_access_for_assign_assets(user):
 
     return False
 
-@login_required
-@user_passes_test(manage_access_for_assets)
+# @login_required
+# @user_passes_test(manage_access_for_assets)
 def listed(request):
     assets_qs=filtered_asset(request)
     context=create_asset_list(request,assets_qs)
@@ -45,15 +45,7 @@ def listed(request):
 @login_required
 @permission_required('authentication.view_asset')
 def details(request, id):
-    get_audit_history=Audit.objects.filter(asset_id=id)
-    get_audit_image=AuditImage.objects.filter(audit__asset__id=id).order_by('-uploaded_at').first()
-    asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
-    assiggned_asset=AssignAsset.objects.filter(asset=asset).first()  
-    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
-    get_asset_img=AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
-    asset_barcode = generate_barcode(asset.tag)
-    context=asset_details(request,get_audit_history,get_audit_image,asset,assiggned_asset,assetSpecifications,get_asset_img,asset_barcode)
-    
+    context=details_of_asset(request,id)
     return render(request, 'assets/detail.html', context=context)
 
 @login_required
@@ -63,18 +55,7 @@ def add(request):
     if request.method == 'POST':
         form = AssetForm(request.POST, organization=request.user.organization_id)
         if form.is_valid():
-            asset = form.save(commit=False)
-            asset.organization = request.user.organization
-            available_status = AssetStatus.objects.filter(name='Available').first()
-            asset.asset_status = available_status 
-            asset.save()
-            form.save_m2m()
-            # Save images
-            for image_file in request.FILES.getlist('image'):
-                AssetImage.objects.create(asset=asset, image=image_file)
-                
-            create_custom_fileds(request,asset)
-            slack_notification(request,f"{asset.name}  added successfully",asset.id,asset.tag)
+            add_asset(request,form)
             messages.success(request, "Asset added successfully.")
             return redirect('assets:list')
     else:
@@ -87,7 +68,6 @@ def add(request):
         'image_form':image_form
     }
     return render(request, 'assets/add.html', context)
-
 
 @login_required
 @permission_required('authentication.delete_asset')
@@ -109,13 +89,8 @@ def delete(request, id):
 
 @login_required
 def search(request,page):
-        list_of_audits=Audit.objects.all()
-        list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
-        list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
-        
-        context=search_with_filters(request,list_of_audited_assets)
-
-        return render(request, 'assets/assets-data.html', context=context)
+    context=search_asset(request)
+    return render(request, 'assets/assets-data.html', context=context)
 
 @login_required
 @user_passes_test(manage_access_for_assign_assets)
@@ -135,24 +110,24 @@ def assigned_list(request):
 
     return render(request, 'assets/assigned-list.html', context=context)
 
-@login_required
-@user_passes_test(manage_access_for_assign_assets)
-def unassigned_list(request):
+# @login_required
+# @user_passes_test(manage_access_for_assign_assets)
+# def unassigned_list(request):
 
-    assign_asset_list = Asset.objects.filter(
-        organization=request.user.organization or None,is_assigned=False).order_by('-created_at')
-    paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
+#     assign_asset_list = Asset.objects.filter(
+#         organization=request.user.organization or None,is_assigned=False).order_by('-created_at')
+#     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
+#     page_number = request.GET.get('page')
+#     page_object = paginator.get_page(page_number)
 
-    context = {
-        'sidebar': 'assets',
-        'submenu': 'assigned-assets',
-        'page_object': page_object,
-        'title': 'Assigned Assets'
-    }
+#     context = {
+#         'sidebar': 'assets',
+#         'submenu': 'assigned-assets',
+#         'page_object': page_object,
+#         'title': 'Assigned Assets'
+#     }
 
-    return render(request, 'assets/unassigned-list.html', context=context)
+#     return render(request, 'assets/unassigned-list.html', context=context)
 
 
 @login_required
@@ -163,24 +138,7 @@ def assign_asset(request):
         image_form = AssetImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
             # Mark the asset as assigned and save
-            asset = form.instance.asset
-            asset.is_assigned = True
-            set_asset_status = AssetStatus.objects.filter(
-                Q(organization=request.user.organization) | Q(organization__isnull=True),
-                name='Available'
-            ).first()
-            asset.asset_status = set_asset_status
-            asset.save()
-            # form.save_m2m()
-            form.save()
-
-            # Save uploaded images related to the asset
-            for f in request.FILES.getlist('image'):
-                AssetImage.objects.create(asset=asset, image=f)
-
-            messages.success(request, 'Asset assigned to user successfully')
-            slack_notification(request,f"{asset.name}  assigned successfully to user",asset.id,asset.tag)
-            notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  assigned successfully to user",notification_title="Asset Assigned")
+            assign_asset_in_form(request,form)
             return HttpResponse(status=204)
     else:
         form = AssignedAssetForm(organization=request.user.organization)
@@ -204,7 +162,6 @@ def reassign_asset(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-
             messages.success(
                 request, 'Asset re-assigned successfully')
             return HttpResponse(status=204)
@@ -216,14 +173,7 @@ def reassign_asset(request, id):
 @permission_required('authentication.delete_assign_asset')
 def delete_assign(request, id):
     if request.method == 'POST':
-        assignAsset = get_object_or_404(
-            AssignAsset, pk=id, asset__organization=request.user.organization)
-        assignAsset.delete()
-        assignAsset.asset.is_assigned = False
-        set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
-        assignAsset.asset.asset_status=set_asset
-        assignAsset.asset.save()
-        messages.success(request, 'Asset unassigned successfully')
+        delete_assign_asset(request, id)
     return redirect('assets:assigned_list')
 
 @login_required
@@ -411,8 +361,7 @@ def assign_asset_search(request, page):
 def reassign_asset(request, id):
     assignAsset = get_object_or_404(
         AssignAsset, pk=id, asset__organization=request.user.organization)
-    form = ReassignedAssetForm(
-        request.POST or None, instance=assignAsset, organization=request.user.organization)
+    form = ReassignedAssetForm(request.POST or None, instance=assignAsset, organization=request.user.organization)
     if request.method == 'POST':
         if form.is_valid():
             client_id = form.cleaned_data['client_id']
@@ -430,7 +379,6 @@ def slack_oauth_callback(request):
     user_id = cache.get('user_id') 
     get_connection_data=SlackConfiguration.objects.filter(user=user_id).first()
     code = request.GET.get("code")
-
     slack_client_id=base64.b64decode(get_connection_data.client_id).decode() 
     slack_client_secret=base64.b64decode(get_connection_data.client_secret).decode()
     redirect_uri = os.getenv("SLACK_REDIRECT_URI")

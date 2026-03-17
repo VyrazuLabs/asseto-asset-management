@@ -3,13 +3,130 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from assets.models import Asset, AssignAsset
 from authentication.models import User
-from authentication.utils import asset_datas, location_datas, user_datas, vendor_datas
+from authentication.utils import asset_datas,user_information, location_datas, user_datas, vendor_datas, generate_totp_secret,generate_qrcode,verify_totp
 from common.API_custom_response import api_response
 from rest_framework.permissions import IsAuthenticated
 from dashboard.models import Location
 from products.models import Product
 from authentication.utils import product_datas
 from vendors.models import Vendor
+# from authentication.utils import user_information
+from authentication.serializers import LoginOTPSerializer
+from django.utils import timezone
+from rest_framework.response import Response
+from authentication.models import UserTotp,PhoneOtp
+from authentication.serializers import CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenViewBase
+from drf_spectacular.utils import extend_schema,OpenApiParameter
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+class CustomTokenObtainPairView(TokenViewBase):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class LoginOtp(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='email', type=str, description="Email"),
+            OpenApiParameter(name='otp', type=str, description="OTP"),
+        ]
+    )
+    def post(self, request):
+        try:
+            # Use request.data (NOT query_params for POST)
+            print("Request method:", request.query_params)  # Debug log
+            serializer = LoginOTPSerializer(
+                data=request.query_params,
+                context={'request': request}
+            )
+            serializer.is_valid(raise_exception=True)
+
+            email = serializer.validated_data['email']
+            entered_otp = serializer.validated_data['otp']
+
+            # Get user
+            user = User.objects.filter(email=email).first()
+            if not user:
+                return Response({
+                    'success': False,
+                    'message': 'Invalid credentials'
+                }, status=400)
+
+            # Check if TOTP enabled
+            user_totp = UserTotp.objects.filter(user_id=user.id).first()
+            if not user_totp:
+                return Response({
+                    'success': False,
+                    'message': 'TOTP not enabled'
+                }, status=400)
+
+            # Get secret (decrypt if needed)
+            secret = user_totp.secret  # decrypt here if encrypted
+
+            # Verify OTP using your function
+            is_valid = verify_totp(secret, entered_otp)
+            user_totp.is_logged_in = True
+            user_totp.status = 2
+            user_totp.save()
+            print(f"Verifying OTP: secret={secret}, entered_otp={entered_otp}, is_valid={is_valid}")  # Debug log
+            if not is_valid:
+                # Optional: increment failed attempts
+                # user_totp.failed_attempts = f'failed_attempts' + 1
+                # user_totp.save(update_fields=['failed_attempts'])
+
+                return Response({
+                    'success': False,
+                    'message': 'Invalid or expired OTP'
+                }, status=400)
+
+            # Reset failed attempts after success
+            # user_totp.failed_attempts = 0
+            # user_totp.last_verified_at = timezone.now()
+            # user_totp.save(update_fields=['failed_attempts', 'last_verified_at'])
+
+            # Generate login response
+            refresh_token = RefreshToken.for_user(user)
+            access_token = str(refresh_token.access_token)
+            # response = user_information(request, user)
+            response = {
+                "access": access_token,
+                "refresh": str(refresh_token),
+            }
+            return Response(response, status=200)
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': 'Something went wrong'
+            }, status=500)
+        
+class GenerateTOTP(APIView):
+    def post(request):
+        try:
+            user = request.user
+            user_totp = UserTotp.objects.filter(user_id=user.get('id')).first()
+            secret = generate_totp_secret()
+            if not user_totp:
+                UserTotp.objects.create(user_id=user.get('id'), secret=secret)
+            else:
+                user_totp.secret = secret
+                # user_totp.status = 0
+                user_totp.save()
+
+            qrcode = generate_qrcode(secret, user.get('username'))
+            user_logged_in=None
+            if user_totp.is_logged_in:  
+                user_logged_in= "You are already logged in using Two Factor Authentication."
+            # cache_key, response = get_cache_key_with_data(
+            #     request, USER_DATA_KEY, user.get('id'))
+
+            # remove_cache_key(cache_key)
+
+            return Response({'success': True, 'message': 'Open your authenticator app and scan this QR code to register for authenticator app login. Then use the otp to verify yourself', 'data': {'qrcode': qrcode,"user_logged_in":user_logged_in,"user_totp":user_totp}})
+
+        except Exception as e:
+            return Response({'success': False, 'message': str(e)})
 
 class AssetData(APIView):
     permission_classes=[IsAuthenticated]

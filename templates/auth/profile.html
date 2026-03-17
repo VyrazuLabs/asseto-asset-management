@@ -86,8 +86,8 @@
                         {% endif %}
                     </table>
                 </div>
+                
             </div>
-
             {% if request.user.department %}
                 <div class="card">
                     <div class="card-body">
@@ -259,16 +259,89 @@
                                             >
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> 
                             </table>
+                        </div>
                         </form>
                     </div>
                 </div>
+            </div>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="my-3">
+                        <i class="bi bi-person-fill"></i>
+                        <span>2FA Implementation</span>
+                    </h6>
+                    <table class="table table-borderless align-middle">
+                        <tr>
+                            <td><b>Two Factor Authentication</b></td>
+                            <td class="text-end">
+                                <div class="form-check form-switch">
+                                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                    <input 
+                                        type="checkbox"
+                                        id="twoFactorToggle"
+                                        name="two_factor_auth"
+                                        class="form-check-input"
+                                        style="cursor:pointer;"
+                                        {% if two_factor_auth %} checked {% endif %}
+                                    >
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    {% if get_user_totp.is_logged_in %}
+                        <div class="alert alert-success py-2">
+                            User is already logged in with 2FA.
+                        </div>
+                    {% endif %}
+                    
+                    <div id="qrContainer" class="text-center mt-4">
+                        <h5 id="qrTitle">Two Factor Authentication QR Code</h5>
+                        
+                        {% if get_user_totp.status == 1 or get_user_totp.status == 2 %}
+                            <div class="mb-3">
+                                <input 
+                                    style="display: none;"
+                                    type="text"
+                                    placeholder="Enter OTP"
+                                    id="userOtp"
+                                    class="form-control w-50 mx-auto text-center"
+                                    maxlength="6"
+                                >
+                            </div>
+                        {% endif %}
+                        <div id="img-container"></div>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap" id="qrCodeButtons">
+                            <button 
+                                type="button"
+                                id="regenerateQrBtn"
+                                class="btn btn-primary"
+                                style="max-height: 40px;"
+                            >
+                                Regenerate QR Code
+                            </button>
+                            <button 
+                                style="display: none;"
+                                type="button"
+                                id="verify2faBtn"
+                                class="btn btn-success "
+                                style="max-height: 40px;"
+                            >
+                                Verify
+                            </button>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
             {% endif %}
             {% if assigned_assets is not None %}
                 <div class="card">
                     <div class="card-body">
-                        <h6 class="my-3">
+                        <h6 class="m-3">
                             <i class="bi bi-people-fill"></i>
                             <span>Assigned Assets</span>                       
                         </h6>                        
@@ -384,15 +457,198 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 {% endif %}
                             {% endwith %}
                         {% endfor %}
                     </div>
                 </div>
             {% endif %}
-            
         </div>
     </section>
+    
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("twoFactorToggle");
+        const qrImage = document.getElementById("qrImage");
+        const qrTitle = document.getElementById("qrTitle");
+
+        toggle.addEventListener("change", function () {
+            if (this.checked) {
+                qrImage.style.display = "block";
+                qrTitle.style.display = "block";
+            } else {
+                qrImage.style.display = "none";
+                qrTitle.style.display = "none";
+            }
+        });
+    });
+</script>
+<script>
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const verifyBtn = document.getElementById("verify2faBtn");
+
+    if (verifyBtn) {
+        verifyBtn.addEventListener("click", function () {
+
+            const otpInput = document.getElementById("userOtp");
+
+            const otp = otpInput ? otpInput.value.trim() : "";
+            const email = "{{request.user.email}}"; 
+
+            if (!otp) {
+                alert("Please enter OTP");
+                return;
+            }
+            console.log("Sending OTP Verification Request:");
+            console.log("Email:", email);
+            console.log("OTP:", otp);
+            const url = `/api/authentication/login-otp/?email=${(email)}&otp=${(otp)}`;
+
+            fetch(url, {
+                method: "POST",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access) {
+                    // ✅ Store tokens (optional)
+                    console.log("Stored tokens:", data);
+                    localStorage.setItem("access_token", data.access);
+                    localStorage.setItem("refresh_token", data.refresh);
+
+                    alert("Login successful!");
+
+                    // Redirect if needed
+                    window.location.href = "/";
+                } else {
+                    alert(data.message || "Invalid OTP");
+                }
+
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong");
+            });
+
+        });
+    }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const toggle = document.getElementById("twoFactorToggle");
+
+    if (toggle) {
+
+        toggle.addEventListener("change", function () {
+
+            const isChecked = toggle.checked;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            console.log("2FA Toggle changed:", isChecked);
+
+            fetch("{% url 'users:toggle_two_factor_auth' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken
+                },
+                body: new URLSearchParams({
+                    two_factor_auth: isChecked ? "on" : ""
+                })
+            })
+            .then(response => response.json()) // change to .text() if not JSON
+            .then(data => {
+
+                console.log("Server Response:", data);
+
+                // Optional: show/hide QR section immediately
+                const qrSection = document.getElementById("qrContainer");
+
+                if (qrSection) {
+                    qrSection.style.display = isChecked ? "block" : "none";
+                }
+
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+
+        });
+
+    }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const regenerateBtn = document.getElementById("regenerateQrBtn");
+
+    if (!regenerateBtn) return;
+
+    regenerateBtn.addEventListener("click", function () {
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const qrCodeButtons = document.getElementById("qrCodeButtons")
+        regenerateBtn.disabled = true;
+        regenerateBtn.innerText = "Generating...";
+
+        fetch("{% url 'authentication:regenerate_qr' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.success) {
+                verify2faBtn.style.display = "block";
+                userOtp.style.display = "block";
+                // Remove old QR if exists
+                const existingImg = document.getElementById("dynamicQrImage");
+                if (existingImg) {
+                    existingImg.remove();
+                }
+                const imgContainer=document.getElementById("img-container")
+                // Create new image
+                const img = document.createElement("img");
+                img.id = "dynamicQrImage";
+                img.src = "data:image/png;base64," + data.qr_code;
+                img.className = "img-fluid mb-3";
+                img.style.maxWidth = "200px";
+                img.alt = "QR Code";
+
+                // Insert image ABOVE the button
+                // regenerateBtn.parentNode.insertAfter(img, regenerateBtn);
+
+                // Insert image BELOW the button
+                // regenerateBtn.parentNode.insertAfter( img,qrCodeButtons);
+                imgContainer.append(img);
+                // qrCodeButtons.style.display = "block";
+            } else {
+                alert("Failed to regenerate QR");
+            }
+
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong");
+        })
+        .finally(() => {
+            regenerateBtn.disabled = false;
+            regenerateBtn.innerText = "Regenerate QR Code";
+        });
+
+    });
+
+});
+</script>
 {% endblock content %}
