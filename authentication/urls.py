@@ -10,7 +10,7 @@ urlpatterns = [
     path('introduce/', views.introduce, name = 'introduce'),
     path('data-base-configure/',views.db_configure, name="db_configure"),
     path('smtp-email-configure/',views.smtp_email_configure,name='email_configure'),
-
+    path('verify-otp/',views.verify_otp,name='verify_otp'),
     path('', views.index, name = 'index'),
     path('login', views.user_login, name = 'login'),
     path('register', views.user_register, name = 'register'),
@@ -20,6 +20,7 @@ urlpatterns = [
     path('profile-basic-information/update', views.profile_basic_info_update, name='profile_basic_info_update'),
     path('organization-information/update', views.organization_info_update, name='organization_info_update'),
     path('profile/toggle-2fa', views.toggle_2fa, name='toggle_2fa'),
+    path('profile/regenerate-qr', views.regenerate_qr, name='regenerate_qr'),
 ]
 
 authentication_url_patterns=[
