@@ -47,7 +47,7 @@ class EditRoleTest(TestCase):
         self.assertEqual(self.role.organization.phone, '9876543210')
 
 
-    def delete_role(self):
+    def delete_role(self):        
         self.role.delete()
         organization=Organization.objects.get(id=self.role.organization.id)
         self.assertIsNotNone(organization)
