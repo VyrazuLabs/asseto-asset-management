@@ -78,7 +78,7 @@ class AssetForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
-        self.fields['product'].queryset = Product.objects.filter(organization=self._organization, status=True)
+        self.fields['product'].queryset = Product.undeleted_objects.filter(organization=self._organization, status=True)
         self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
         self.fields['location'].queryset = Location.undeleted_objects.filter(organization=self._organization, status=True)
     
