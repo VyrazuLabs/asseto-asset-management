@@ -14,7 +14,6 @@ from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .utils import get_completed_audit,get_pending_audits
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -154,7 +153,16 @@ def asset_audit_history(request,id):
 
 @login_required
 def completed_audits(request):
-    audits_page=get_completed_audit(request)
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+
+    audits = Audit.objects.filter(
+        created_at__gte=thirty_days_ago
+    ).order_by('-created_at')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(audits, 10)
+    audits_page = paginator.get_page(page)
+
     return render(request, 'audit/audit_list.html', {
         'audits': audits_page,
         'sidebar': 'audit'
@@ -162,7 +170,20 @@ def completed_audits(request):
 
 @login_required
 def pending_audits(request):
-    data_set=get_pending_audits(request)
+    asset_list = Asset.undeleted_objects.all()
+    data_set = []
+    for asset in asset_list:
+        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
+        next_due_date = next_audit_due_for_asset(asset)
+        if has_audit and next_due_date:
+            if (next_due_date > datetime.now().date()):
+                continue
+        data = {}
+        data["asset"] = asset
+        data["expected_audit_date"] = next_due_date
+        data["last_audit_date"] = has_audit
+        data_set.append(data)
+
     return render(request, 'audit/pending_audits.html', {
         'data_set': data_set,
         'sidebar': 'audit'
@@ -177,10 +198,8 @@ def get_assigned_user(request, tag=None):
 
     if not asset:
         return JsonResponse({"exists": False, "assigned_user": None}, status=200)
-    assign_record = AssignAsset.objects.select_related(
-        "user"
-    ).filter(asset_id=asset.id).first()
-    # assign_record = AssignAsset.objects.filter(asset=asset).order_by("-assigned_date").first()
+
+    assign_record = AssignAsset.objects.filter(asset=asset).order_by("-assigned_date").first()
 
     return JsonResponse({
         "exists": True,

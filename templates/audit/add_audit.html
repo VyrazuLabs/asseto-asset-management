@@ -46,7 +46,7 @@
                                 {{form.name}}
                                 <div class="input-group d-flex">
                                     {% if get_asset is not None %}
-                                        <input type="text" class="form-control w-75" name="tag" value="{{ get_asset.tag }}" disabled/>
+                                        <input type="text" class="form-control w-75" name="name" value="{{ get_asset.tag }}" disabled/>
                                     {% elif get_audit.asset is not None %}
                                         <input type="text" class="form-control w-75" name="tag" value="{{ get_audit.asset.tag }}" />
                                     {% else %}
@@ -64,11 +64,11 @@
                                 <label>Assigned To</label>
                                 <span class="text-danger">*</span>         
                                 {% if get_asset is not None and  asset_assigned_users is not None %}
-                                    <input type="text" class="form-control w-100" name="assigned_to" id="assigned-to-input" value="{{asset_assigned_users}}" disabled/>
+                                    <input type="text" class="form-control w-100" name="assigned-to" id="assigned-to-input" value="{{asset_assigned_users}}" disabled/>
                                 {% elif get_audit is not None  %}
-                                    <input type="text" class="form-control w-100" name="assigned_to" id="assigned-to-input" value="Not Assigned" disabled/>
+                                    <input type="text" class="form-control w-100" name="assigned-to" id="assigned-to-input" value="Not Assigned" disabled/>
                                 {% else %}                       
-                                    <input type="text" class="form-control w-100 " name="assigned_to" id="assigned-to-input" value="Not Assigned" disabled/>
+                                    <input type="text" class="form-control w-100 " name="assigned-to-input" id="assigned-to-input" value="Not Assigned" disabled/>
                                 {% endif %}
                                 <small id="assigned-to-msg" class="text-info"></small>
                                 <sub ></sub>
