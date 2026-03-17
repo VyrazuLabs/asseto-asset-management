@@ -152,7 +152,7 @@
                                                 {% if perms.authentication.delete_product %}
                                                     <form action="{% url 'license:delete_license' license.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
                                                         {% csrf_token %}
-                                                        <button type="submit" class="btn btn-danger btn-sm px-3"><i class="bi bi-trash3-fill"></i></button>
+                                                        <button type="submit" class="btn btn-danger btn-sm px-3"><i class="bi bi-trash3-fill" id="delete_button"></i></button>
                                                     </form>
                                                 {% endif %}
                                             </div>

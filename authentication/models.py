@@ -160,6 +160,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
 class UserTotp(models.Model):
     user_id = models.CharField(max_length=255)
     secret = models.CharField(max_length=255)
+    status = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_logged_in = models.BooleanField(default=False)
