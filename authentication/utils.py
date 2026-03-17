@@ -16,7 +16,7 @@ import random, string
 from django.utils import timezone
 import jwt
 import datetime
-from .models import PhoneOtp,UserTotp
+from .models import PhoneOtp,UserTotp,User
 from rest_framework.response import Response
 
 def generate_otl_session_id(user):
@@ -33,16 +33,28 @@ def generate_qr(request):
     try:
         user = request.user
 
-        user_totp = UserTotp.objects.filter(user_id=user.id).first()
+        user_totp = UserTotp.objects.filter(user_id=user.id).last()
         secret = generate_totp_secret()
-
+        print("Generated status:", user_totp.status if user_totp else "No existing TOTP")
         if not user_totp:
-            UserTotp.objects.create(user_id=user.id, secret=secret)
+            # secret = generate_totp_secret()
+            user_totp=UserTotp.objects.create(user_id=user.id, secret=secret)
         # else:
         #     user_totp.secret = secret
         #     user_totp.save()
-
-        qr_image = generate_qrcode(secret, user.username)
+        if user_totp.status == 1:
+            user_totp.secret = user_totp.secret
+            user_totp.status = 1
+            user_totp.save()
+        elif user_totp.status == 2:
+            user_totp.secret = user_totp.secret
+            user_totp.status = 1
+            user_totp.save()
+        elif user_totp.status == 0:
+            user_totp.secret = secret
+            user_totp.status = 1
+            user_totp.save()
+        qr_image = generate_qrcode(user_totp.secret, user.username)
 
         return qr_image  
 
@@ -85,6 +97,10 @@ def generate_totp_secret():
     return secret
 
 def generate_qrcode(secret,username):
+    # get_user=User.objects.filter(username=username).first()
+    get_totp=UserTotp.objects.filter(secret=secret).first()
+    if get_totp.status == 2:
+        secret=get_totp.secret
     totp = pyotp.totp.TOTP(secret)
     # Generating provisioning URI for the QR code
     provisioning_uri = totp.provisioning_uri(name=f"Asseto: {username}")

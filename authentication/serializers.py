@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import pyotp
 from authentication.models import PhoneOtp
-from authentication.models import User
+from authentication.models import User,UserTotp
 
 class RefreshTokenSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
@@ -18,14 +18,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         # First validate username & password
         data = super().validate(attrs)
-
+        user_totp = UserTotp.objects.filter(user_id=self.user.id).first()
         user = self.user
         two_factor_auth = user.two_factor_auth
-        if two_factor_auth:
+        if two_factor_auth or user_totp.status == 2:
             data.pop('access', None)
             data.pop('refresh', None)
             data['two_factor_auth'] = True
         if not two_factor_auth:
+            data['two_factor_auth'] = False
+        if user_totp.status == 1 or user_totp.status == 0:
             data['two_factor_auth'] = False
         return data
     
