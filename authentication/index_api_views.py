@@ -67,6 +67,7 @@ class LoginOtp(APIView):
             # Verify OTP using your function
             is_valid = verify_totp(secret, entered_otp)
             user_totp.is_logged_in = True
+            user_totp.status = 2
             user_totp.save()
             print(f"Verifying OTP: secret={secret}, entered_otp={entered_otp}, is_valid={is_valid}")  # Debug log
             if not is_valid:
@@ -79,12 +80,12 @@ class LoginOtp(APIView):
                     'message': 'Invalid or expired OTP'
                 }, status=400)
 
-            # # ✅ Reset failed attempts after success
+            # Reset failed attempts after success
             # user_totp.failed_attempts = 0
             # user_totp.last_verified_at = timezone.now()
             # user_totp.save(update_fields=['failed_attempts', 'last_verified_at'])
 
-            # ✅ Generate login response
+            # Generate login response
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
             # response = user_information(request, user)

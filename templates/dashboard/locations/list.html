@@ -15,10 +15,11 @@
         <div class="d-flex ">
             {% if perms.authentication.add_location %}
                 <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
+                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" id="add-location-button"
                         hx-get="{% url 'dashboard:add_location' %}" hx-target="#add-location-modal-content"
                         data-bs-toggle="modal" data-bs-target="#add-location-modal"
-                    >Add Location</i></button>
+                    >
+                    Add Location</i></button>
                 </div>
             {% endif %}
             <a href="{% url 'recycle_bin:deleted_locations' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
