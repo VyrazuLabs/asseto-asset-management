@@ -15,17 +15,15 @@ def path_and_rename(instance, filename):
         filename = '{}.{}'.format(uuid4().hex, ext)
     return os.path.join(upload_to, filename)
 
-
 class TimeStampModel(models.Model):
     status = models.BooleanField(default=True,null=True)
     created_at = models.DateTimeField(auto_now_add = True,null=True)
-    updated_at = models.DateTimeField(auto_now = True,null=True )  
+    updated_at = models.DateTimeField(auto_now = True,null=True )
     created_by = models.CharField(max_length=255, blank=True, null=True)
     updated_by = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         abstract = True
-        
         
 class RestoreManager(models.Manager):
     
@@ -97,7 +95,6 @@ class Organization(TimeStampModel):
     def __str__(self):
         return self.name
     
-
 class ProductType(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -120,7 +117,6 @@ class ProductCategory(TimeStampModel, SoftDeleteModel):
         if self.name is None:
             return None
         return self.name
-
 
 class Address(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

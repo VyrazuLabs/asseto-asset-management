@@ -22,6 +22,7 @@ from configurations.utils import dynamic_display_name
 from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
 from django.http import JsonResponse
+from authentication.models import UserTotp
 
 today = date.today()
 import os
@@ -56,6 +57,25 @@ def create_user_notification_type(request):
 
     return JsonResponse({"success": False, "error": "Invalid request"})
 
+# Suppose the user disables the 2FA toggle while being logged in using 2FA then the status 
+# changes to 1, So that next time the user has to again scan the QR for a new OTP.
+# Else if the -User dosen't scan for a new otp the 2FA method won't be used.
+# Similarly if the user enables the 2FA toggle while being logged in using 2FA then the status changes to 1
+def toggle_two_factor_auth(request):
+    if request.method == "POST":
+        # Convert checkbox values to booleans
+        two_factor_auth=request.POST.get("two_factor_auth") == "on"
+        get_user=User.objects.filter(id=request.user.id).first()
+        if get_user is not None:
+            User.objects.filter(id=request.user.id).update(
+                two_factor_auth=two_factor_auth
+            )
+        get_totp=UserTotp.objects.filter(user_id=get_user.id).first()
+        get_totp.status=1
+        get_totp.save()
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
 
 def manage_access(user):
     permissions_list = [
