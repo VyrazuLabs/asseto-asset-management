@@ -203,7 +203,7 @@ class UserDetails(APIView):
         except Exception as e:
             return api_response(status=500,system_message=str(e))
 
-class DeleteUser(APIView):
+class DeleteUSer(APIView):
     permission_classes=[IsAuthenticated]
     def delete(self,request,id):
         user=get_object_or_404(User,pk=id)
@@ -213,7 +213,6 @@ class DeleteUser(APIView):
         except ValueError as e:
             return api_response(status=400, system_message=str(e))
         except Exception as e:
-            print(e)
             return api_response(status=500,error_message=str(e))
         
 # class SearchUser(APIView):
