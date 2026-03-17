@@ -84,6 +84,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     browser_notification=models.BooleanField(default=False)
     slack_notification=models.BooleanField(default=False)
     inapp_notification=models.BooleanField(default=False)
+    two_factor_auth=models.BooleanField(default=False)
     password_reset_token = models.CharField(max_length=255, blank=True, null=True)
     password_reset_expires = models.DateTimeField(blank=True, null=True)
     objects = UserManager()
@@ -155,6 +156,19 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         if self.full_name:
             return self.dynamic_display_name(self.full_name)
         return ""
+
+class UserTotp(models.Model):
+    user_id = models.CharField(max_length=255)
+    secret = models.CharField(max_length=255)
+    status = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_logged_in = models.BooleanField(default=False)
+
+class PhoneOtp(models.Model):
+    user_id = models.CharField(max_length=255)
+    otp = models.CharField(max_length=255)
+    expires_at = models.DateTimeField()
 
 class SeedFlag(models.Model):
     seeded=models.BooleanField(default=False)
