@@ -22,7 +22,7 @@
         <div class="d-flex">
             {% if perms.authentication.add_asset %}
                 <div>
-                    <a href="{% url 'assets:add' %}" id="asset-add" class="btn btn-sm btn-outline-info my-3 me-2">Add Asset</a>
+                    <a href="{% url 'assets:add' %}" class="btn btn-sm btn-outline-info my-3 me-2">Add Asset</a>
                 </div>
             {% endif %}
                 <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
@@ -244,27 +244,13 @@
                                 </td>
                                 <td>{{asset.tag}}</td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        {% with asset_conditions_map|get_item:asset.id as condition_list %}
-                                            {% with condition_list|default:''|last as condition %}
-                                                {% if condition == 0 or condition == 1 %}
-                                                    <div class="d-flex" >
-                                                        <div style="width:10px;height:10px;background-color:rgb(72,255,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
-                                                    </div>
-                                                {% elif condition == 2 %}
-                                                    <div class="d-flex">
-                                                        <div style="width:10px;height:10px;background-color:rgb(255,255,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
-                                                    </div>
-                                                {% elif condition == 3 or condition == 4 %}
-                                                    <div class="d-flex">
-                                                        <div style="width:10px;height:10px;background-color:rgb(255,0,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
-                                                    </div>
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% endwith %}
-                                        {{asset.name}}
-                                    </div>
+                                    {% if asset in list_of_audited_assets %}
+                                        <div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"> 
+                                    {% endif %}
+                                    </div>{{asset.name}}</div>
+                                </td>
                                 <td>{{asset.product.product_type}}</td>
+                                
                                 <td>
                                     {{asset.product}}
                                     {% if asset.product.is_deleted %}
@@ -303,7 +289,7 @@
                                         </form>
                                     {% else %}
                                         <div class="input-group">
-                                            <button type="button"
+                                            <button type="button"  
                                                 class="btn btn-info btn-sm"
                                                 hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
                                                 hx-target="#assign-asset-modal-list-content"
@@ -352,21 +338,21 @@
                                         {% endif %}
                                         {% if perms.authentication.edit_asset %}
                                             {% if is_demo is True %}
-                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" id="update-asset" class="btn btn-info disabled pt-2 px-3" ><i class="bi bi-pencil-square"></i></a>
+                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info disabled pt-2 px-3" ><i class="bi bi-pencil-square"></i></a>
                                             {% else %}
-                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" id="update-asset" class="btn btn-info pt-2 px-3"><i class="bi bi-pencil-square"></i></a>
+                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info pt-2 px-3"><i class="bi bi-pencil-square"></i></a>
                                             {% endif %}
                                         {% endif %}
                                         {% if perms.authentication.delete_asset %}
                                             {% if is_demo is True %}
                                                 <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
                                                     {% csrf_token %}
-                                                    <button type="submit" value="Delete" id="delete-asset" class="disabled btn btn-sm btn-danger pt-2 pe-2 "><i class="bi bi-trash3-fill"></i></button>
+                                                    <button type="submit" value="Delete" class="disabled btn btn-sm btn-danger pt-2 pe-2 "><i class="bi bi-trash3-fill"></i></button>
                                                 </form>
                                             {% else %}
                                                 <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
                                                     {% csrf_token %}
-                                                    <button type="submit" value="Delete" id="delete-asset" class="btn btn-sm btn-danger pt-2 px-3"><i class="bi bi-trash3-fill"></i></button>
+                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger pt-2 px-3"><i class="bi bi-trash3-fill"></i></button>
                                                 </form>
                                             {% endif %}
                                         {% endif %}

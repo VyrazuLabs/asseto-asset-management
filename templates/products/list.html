@@ -151,11 +151,11 @@
                                                 {% endif %}
                                                 {% if perms.authentication.edit_product %}
                                                     {% if is_demo is True %}
-                                                        <a type="button" class="disabled btn btn-info" id="edit-product-btn"
+                                                        <a type="button" class="disabled btn btn-info" 
                                                             href="{% url 'products:update_product' products.id %}" 
                                                             ><i class="bi bi-pencil-square"></i></a>
                                                     {% else %}
-                                                        <a type="button" class="btn btn-info" id="edit-product-btn"
+                                                        <a type="button" class="btn btn-info" 
                                                             href="{% url 'products:update_product' products.id %}" 
                                                         ><i class="bi bi-pencil-square"></i></a>
                                                     {% endif %}
