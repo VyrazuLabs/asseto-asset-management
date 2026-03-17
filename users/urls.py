@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import *
-from .api_views import ChangePassword,UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUser,UserSearch,GetUserName,GetRoles,ForgotPassword,ResetPassword
+from .api_views import ChangePassword,UserProfile,UserList,UserDetails,AddUser,UpdateUser,DeleteUSer,UserSearch,GetUserName,GetRoles,ForgotPassword,ResetPassword
 app_name = 'users'
 
 urlpatterns = [
@@ -17,7 +17,7 @@ urlpatterns = [
     path('assigned-assets/<uuid:id>', user_assigned_assets, name='user_assigned_assets'),
     path('render-username/', render_format_based_username, name='render_format_based_username'),
     path('create-user-notification-type',create_user_notification_type,name='create_user_notification_type'),
-    path('toggle-two-factor-auth',toggle_two_factor_auth,name='toggle_two_factor_auth')
+
 ]
 
 user_api_url_patterns=[
@@ -26,7 +26,7 @@ user_api_url_patterns=[
     path('api/user/add/',AddUser.as_view(),name='add_user'),
     path('api/user/details/<uuid:id>',UserDetails.as_view(),name='user_details'),
     path('api/user/update/<uuid:id>',UpdateUser.as_view(),name='update_user'),
-    path('api/user/delete/<uuid:id>',DeleteUser.as_view(),name='delete_user'),
+    path('api/user/delete/<uuid:id>',DeleteUSer.as_view(),name='delete_user'),
     path('api/user/search/',UserSearch.as_view(),name='search_user'),
     path('api/user/profile',UserProfile.as_view(),name='user_profile'),
     path('api/user/user-name-info/<uuid:id>',GetUserName.as_view(),name='user_name_info'),
