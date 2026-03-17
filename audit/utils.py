@@ -3,43 +3,6 @@ from .constants import AUDIT_INTERVAL_VALUE
 from dateutil.relativedelta import relativedelta
 from .models import Audit
 from assets.models import Asset
-from django.core.paginator import Paginator
-
-def get_completed_audit(request):
-    thirty_days_ago = datetime.now() - timedelta(days=30)
-
-    audits = Audit.objects.filter(
-        created_at__gte=thirty_days_ago
-    ).order_by('-created_at')
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(audits, 10)
-    audits_page = paginator.get_page(page)
-    return audits_page
-
-def get_pending_audits(request):
-    asset_list = Asset.undeleted_objects.all()
-    data_set = []
-    for asset in asset_list:
-        # latest_audit = Audit.objects.filter(
-        #     asset=OuterRef("pk")
-        # ).order_by("-created_at")
-
-        # assets = Asset.objects.annotate(
-        #     last_audit_date=Subquery(latest_audit.values("created_at")[:1])
-        # )   
-        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
-        next_due_date = next_audit_due_for_asset(asset)
-        if has_audit and next_due_date:
-            if (next_due_date > datetime.now().date()):
-                continue
-        data = {}
-        data["asset"] = asset
-        data["expected_audit_date"] = next_due_date
-        data["last_audit_date"] = has_audit
-        data_set.append(data)
-
-    return data_set
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:
