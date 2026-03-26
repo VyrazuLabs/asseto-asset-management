@@ -4,9 +4,179 @@ from django.conf import settings
 from django.db import connections
 from dotenv import load_dotenv, set_key
 import os
+from users.serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from .serializers import RefreshTokenSerializer
+import pyotp
+import qrcode
+import io
+import base64
+import random, string
+from django.utils import timezone
+import jwt
+import datetime
+from .models import PhoneOtp,UserTotp,User
+from rest_framework.response import Response
+from assets.models import Asset,AssignAsset
+from datetime import datetime, timedelta
+from django.db.models import Q
+def asset_data_util(request):
+    today = datetime.now()
+    time_threshold = datetime.now() + timedelta(days=30)
+    expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(Q(
+    warranty_expiry_date__lt=today)|Q(warranty_expiry_date=None)).order_by('warranty_expiry_date')    
+    all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    asset_count = all_asset_list.count()
+    assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None,asset__is_assigned=True) | Q(
+    asset__organization=request.user.organization,asset__is_assigned=True) ).count()
+    data=asset_datas(expiring_assets,all_asset_list,asset_count,assign_assets_counts)
+    return data
 
+def totp_and_qrcode_generation(request):
+    user = request.user
+    user_totp = UserTotp.objects.filter(user_id=user.get('id')).first()
+    secret = generate_totp_secret()
+    if not user_totp:
+        UserTotp.objects.create(user_id=user.get('id'), secret=secret)
+    else:
+        user_totp.secret = secret
+        # user_totp.status = 0
+        user_totp.save()
+
+    qrcode = generate_qrcode(secret, user.get('username'))
+    user_logged_in=None
+    if user_totp.is_logged_in:  
+        user_logged_in= "You are already logged in using Two Factor Authentication."
+    return qrcode,user_logged_in,user_totp
+def handle_user_totp(request,entered_otp,user):
+    # Check if TOTP enabled
+    user_totp = UserTotp.objects.filter(user_id=user.id).first()
+    if not user_totp:
+        return Response({
+            'success': False,
+            'message': 'TOTP not enabled'
+        }, status=400)
+
+    # Get secret (decrypt if needed)
+    secret = user_totp.secret  # decrypt here if encrypted
+
+    # Verify OTP using your function
+    is_valid = verify_totp(secret, entered_otp)
+    user_totp.is_logged_in = True
+    user_totp.status = 2
+    user_totp.save()
+    return is_valid,secret
+
+def generate_otl_session_id(user):
+    length = random.randint(5, 10)
+    characters = string.ascii_letters + string.digits
+    otl_session_id = "".join(random.choice(characters) for _ in range(length))
+
+    # save otl_session_id in database
+    user.otl_session_id = otl_session_id
+    user.save()
+    return otl_session_id
+
+def generate_qr(request):
+    try:
+        user = request.user
+
+        user_totp = UserTotp.objects.filter(user_id=user.id).last()
+        secret = generate_totp_secret()
+        print("Generated status:", user_totp.status if user_totp else "No existing TOTP")
+        if not user_totp:
+            # secret = generate_totp_secret()
+            user_totp=UserTotp.objects.create(user_id=user.id, secret=secret)
+        # else:
+        #     user_totp.secret = secret
+        #     user_totp.save()
+        if user_totp.status == 1:
+            user_totp.secret = user_totp.secret
+            user_totp.status = 1
+            user_totp.save()
+        elif user_totp.status == 2:
+            user_totp.secret = user_totp.secret
+            user_totp.status = 1
+            user_totp.save()
+        elif user_totp.status == 0:
+            user_totp.secret = secret
+            user_totp.status = 1
+            user_totp.save()
+        qr_image = generate_qrcode(user_totp.secret, user.username)
+
+        return qr_image  
+
+    except Exception as e:
+        print("QR generation error:", e)
+        return None
+
+def generate_access_token(user, otl_session_id=None):
+    if otl_session_id is None:
+        otl_session_id = user.otl_session_id
+
+    access_token_payload = {
+        'token_type' : 'access',
+        'user_id': user.id,
+        'otl_session_id' : otl_session_id,
+        'exp': datetime.datetime + datetime.timedelta(days=0, minutes=15),
+        'iat': datetime.datetime
+    }
+
+    access_token = jwt.encode(access_token_payload, settings.SECRET_KEY, algorithm='HS256')
+    # PhoneOtp.objects.create(user_id=user.id, otp=access_token, expires_at=timezone.now() + datetime.timedelta(minutes=15))
+    return access_token
+
+def user_information(user):
+    response = {'success': True, 'message': 'User information'}
+    serializer_ = UserSerializer(user)
+    response['data'] = serializer_.data
+    refresh_token = RefreshToken.for_user(user)
+    otl_session_id = generate_otl_session_id(user)
+    access_token = generate_access_token(user, otl_session_id)
+    response.update({
+        'api_token': access_token,
+        'refresh_token': refresh_token
+    })
+
+    return response
+
+def generate_totp_secret():
+    secret = pyotp.random_base32()
+    return secret
+
+def generate_qrcode(secret,username):
+    # get_user=User.objects.filter(username=username).first()
+    get_totp=UserTotp.objects.filter(secret=secret).first()
+    if get_totp.status == 2:
+        secret=get_totp.secret
+    totp = pyotp.totp.TOTP(secret)
+    # Generating provisioning URI for the QR code
+    provisioning_uri = totp.provisioning_uri(name=f"Asseto: {username}")
+    # Generating QR code
+    qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=10,border=4,)
+
+    qr.add_data(provisioning_uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffered = io.BytesIO()
+
+    # saving QR into bytes object
+    img.save(buffered, format="PNG")
+    #Dont send in bytes
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    print("SECRET OF QR CODE:", secret)
+    return img_str
+
+def verify_totp(secret,entered_otp):
+    print("Verifying OTP: secret=", secret)
+    totp = pyotp.TOTP(secret)
+    user_provided_otp = entered_otp
+
+    if totp.verify(user_provided_otp):
+        return True
+    return False
 def get_tokens_for_user(user):
     if not user.is_active:
       raise AuthenticationFailed("User is not active")
