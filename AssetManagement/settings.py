@@ -45,7 +45,6 @@ firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
 if firebase_credentials:
     fernet = Fernet(os.getenv("FERNET_KEY").encode())
     decrypted = fernet.decrypt(firebase_credentials.encode())
-    print("Decrypted Firebase Credentials:", decrypted.decode())
     cred_dict = json.loads(decrypted.decode())
 
     cred = credentials.Certificate(cred_dict)
@@ -57,6 +56,14 @@ elif cred_path.exists():
 LOGIN_REDIRECT_URL = '/'
 
 DEBUG=True 
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6380/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6380/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_TIME_LIMIT = 30  # hard kill
+CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -105,14 +112,15 @@ INSTALLED_APPS = [
     'configurations',
     'drf_spectacular',
     'audit',
-    'license'
+    'license',
+    'silk'
+
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True
 TRACEBACK_SHOW_LOCALS=True
 TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
 PRINT_TRACEBACK_INFO_TO_CONSOLE=True # Set to False if not required
-
 MIDDLEWARE = [
     "authentication.middleware.DBConnectionMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -125,13 +133,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    "django_htmx.middleware.HtmxMiddleware"
+    "django_htmx.middleware.HtmxMiddleware",
+    'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = 'AssetManagement.urls'
 
 WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 
+SILKY_PYTHON_PROFILER = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -156,7 +166,8 @@ try:
                     'django.contrib.messages.context_processors.messages',
                     'configurations.context_processors.sidebar_logo',
                     'configurations.context_processors.favicon_image',
-                    'configurations.context_processors.login_page_logo'
+                    'configurations.context_processors.login_page_logo',
+                    'django.template.context_processors.request',
                 ],
             },
         },
@@ -298,7 +309,6 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
 }
 
 SIMPLE_JWT = {

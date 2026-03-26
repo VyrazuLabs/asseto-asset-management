@@ -23,6 +23,7 @@ from .models import AssetSpecification
 
 PAGE_SIZE = 10
 ORPHANS = 1
+
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
     args = [iter(iterable)] * n
@@ -48,8 +49,6 @@ def release_asset(request, asset_id):
         asset.save()
         messages.success(request, f"Asset '{asset.name}' has been released and is now Ready To Deploy.")
     return redirect('assets:list')
-
-from django.contrib.auth import get_user_model
 
 @login_required
 @permission_required('assets.change_asset', raise_exception=True)
@@ -123,7 +122,6 @@ def get_asset_filter_data(request):
         'title': 'Assets'
     }
 
-
 def filtered_asset(request):
     user_data=request.POST.get("user-data")
     product=request.POST.get("product")# gets the id of the product
@@ -134,9 +132,9 @@ def filtered_asset(request):
     location_id = request.POST.get("location")
     category_id = request.POST.get("category")
     type_id = request.POST.get("type")
-    org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
-    # filters = Q(organization=request.user.organization if request.user.organization else org)
-    filters = Q(organization=None)
+    # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
+    filters = Q(organization=request.user.organization if request.user.organization else None)
+    # filters = Q(organization=None)
     if search_text:
         filters &= (
             Q(tag__icontains=search_text) |
@@ -179,7 +177,7 @@ def filtered_asset(request):
 
 def create_asset_list(request,assets_qs):
     list_of_audits=Audit.objects.all()
-    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits if audit.asset is not None]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
     asset_conditions_map = defaultdict(list)
     for audit in list_of_audits:

@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from notifications.models import UserNotification
 from assets.api_utils import BaseSegmentFunc
 from django.db.models import F
-# from .api_utils import get_push_notification_data
+from .api_utils import get_notification_data, mark_notification_as_seen,asset_details,assign_asset_user_list
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -45,28 +45,7 @@ class GetNotifications(APIView):
             #     {"id": n.id, "title": n.notification.notification_title,"body": n.notification.notification_text,"is_seen": n.is_seen,"link": n.notification.link,"object_type": get_base_segment(n.notification.link) if n.notification.link else None,"created_at": n.notification.created_at,"object_id": n.notification.object_id}
             #     for n in notifications
             # ]
-            notifications= UserNotification.objects.filter(
-                    user=request.user,
-                    is_seen=False,
-                    notification__entity_type=0
-                ).annotate(
-                    object_type=BaseSegmentFunc('notification__link'),
-                    notification_title=F('notification__notification_title'),
-                    notification_text=F('notification__notification_text'),
-                    link=F('notification__link'),
-                    created_at=F('notification__created_at'),
-                    object_id=F('notification__object_id')
-                ).order_by('-notification__created_at')
-            data = notifications.values(
-                'id', 
-                'notification_title',
-                'notification_text',
-                'is_seen', 
-                'link',
-                'object_type',
-                'created_at', 
-                'object_id'
-            )
+            data=get_notification_data(request)
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
             return api_response(data=paginated_data, message="List get Successfully")
@@ -103,14 +82,7 @@ class MarkNotificationAsSeen(APIView):
                     error_message="notification_id is required"
                 )
 
-            notification = get_object_or_404(
-                UserNotification,
-                id=notification_id,
-                user=request.user
-            )
-
-            notification.is_seen = True
-            notification.save(update_fields=["is_seen"])
+            mark_notification_as_seen(notification_id, request)
 
             return api_response(
                 message="Notification marked as seen successfully"
@@ -126,7 +98,6 @@ class MarkNotificationAsSeen(APIView):
                 system_message=error_info["message"],
                 trace_back=error_info['traceback']
             )
-
 
 class AssetList(APIView):
     permission_classes=[IsAuthenticated]
@@ -177,11 +148,7 @@ class AssetDetails(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request,id):
         try:
-            asset=get_object_or_404(Asset,pk=id)
-            asset_images=AssetImage.objects.filter(asset=asset).all()
-            custom_fields=CustomField.objects.filter(object_id=asset.id)
-            asset_statuses=AssetStatus.objects.all()
-            data=asset_data(request,asset,asset_images,asset_statuses,custom_fields)
+            data=asset_details(id,request)
             return api_response(data=data, message="Details retrived successfully")
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
@@ -298,7 +265,7 @@ class UpdateAssetStatus(APIView):
             asset=get_object_or_404(Asset,pk=id)
             asset.asset_status=AssetStatus.objects.get(id=status_id)
             asset.save()
-            return api_response(status=200,message='Asset status updated successfully')
+            return api_response(status=200,message='Asset Status updated successfully')
         
         except Exception as e:
             error_info=get_detailed_errors_info(e)
@@ -340,8 +307,7 @@ class UserListForAssignAsset(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         try:
-            get_users=User.undeleted_objects.filter(status=True, organization=request.user.organization).exclude(pk=request.user.id)
-            data=[{'id':user.id,'name':user.full_name} for user in get_users]
+            data=assign_asset_user_list(request)
             return api_response(data=data, message="users for assign asset get successfully")
         
         except Exception as e:

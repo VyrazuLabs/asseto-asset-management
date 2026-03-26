@@ -209,9 +209,13 @@ def delete_assign_asset_list(request, id):
         set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
         asset.asset_status=set_asset
         asset.save()
-        assignAsset = get_object_or_404(
-            AssignAsset, asset=asset, asset__organization=request.user.organization)
-        assignAsset.delete()
+        # assignAsset = get_object_or_404(
+        #     AssignAsset, asset=asset, asset__organization=request.user.organization)
+        # assignAsset.delete()
+        AssignAsset.objects.filter(
+            asset=asset,
+            asset__organization=request.user.organization
+        ).delete()
     return redirect('assets:list')
 
 @login_required
@@ -238,8 +242,8 @@ def update_in_detail(request, id):
             update_existing_custom_fields(request, custom_fields)
 
             messages.success(request, "Asset updated successfully.")
-            if request.user.email_notification==True:
-                send_email(request.user.email,notification_title='Updated asset',notification_text=f'{asset.name} is Updated.')
+            # if request.user.email_notification==True:
+            #     send_email(request.user.email,notification_title='Updated asset',notification_text=f'{asset.name} is Updated.')
             if request.user.slack_notification==True:
                 slack_notification(request,f"{asset.name}  updated successfully",asset.id,asset.tag)
             # return redirect('assets:update_in_detail', id=asset.id)

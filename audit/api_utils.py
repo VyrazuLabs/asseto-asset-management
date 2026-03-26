@@ -5,7 +5,14 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from configurations.utils import get_currency_and_datetime_format, format_datetime
 from configurations.utils import dynamic_display_name
+from datetime import datetime, timedelta
 get_host = lambda request: request.build_absolute_uri('/')
+
+def get_completed_audit(request):
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    audit_queryset=Audit.objects.filter(created_at__gte=thirty_days_ago).order_by("-created_at")
+    data=get_completed_audits(request,audit_queryset)
+    return data
 
 def next_audit_due(audit_id):
     audit=Audit.objects.filter(id=audit_id).first()
