@@ -16,9 +16,14 @@ from django.http import JsonResponse, HttpResponse
 from datetime import date,datetime
 from dateutil.relativedelta import relativedelta
 import requests
+from collections import defaultdict
+from notifications.utils import notifications_call
+from .barcode import generate_barcode
+from .models import AssetSpecification
 
 PAGE_SIZE = 10
 ORPHANS = 1
+
 def grouper(iterable, n):
     # Groups iterable into chunks of size n
     args = [iter(iterable)] * n
@@ -44,8 +49,6 @@ def release_asset(request, asset_id):
         asset.save()
         messages.success(request, f"Asset '{asset.name}' has been released and is now Ready To Deploy.")
     return redirect('assets:list')
-
-from django.contrib.auth import get_user_model
 
 @login_required
 @permission_required('assets.change_asset', raise_exception=True)
@@ -119,7 +122,6 @@ def get_asset_filter_data(request):
         'title': 'Assets'
     }
 
-
 def filtered_asset(request):
     user_data=request.POST.get("user-data")
     product=request.POST.get("product")# gets the id of the product
@@ -130,8 +132,9 @@ def filtered_asset(request):
     location_id = request.POST.get("location")
     category_id = request.POST.get("category")
     type_id = request.POST.get("type")
-
-    filters = Q(organization=request.user.organization)
+    # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
+    filters = Q(organization=request.user.organization if request.user.organization else None)
+    # filters = Q(organization=None)
     if search_text:
         filters &= (
             Q(tag__icontains=search_text) |
@@ -174,8 +177,11 @@ def filtered_asset(request):
 
 def create_asset_list(request,assets_qs):
     list_of_audits=Audit.objects.all()
-    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits if audit.asset is not None]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
+    asset_conditions_map = defaultdict(list)
+    for audit in list_of_audits:
+        asset_conditions_map[audit.asset_id].append(audit.condition)
     product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
     location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
@@ -234,11 +240,76 @@ def create_asset_list(request,assets_qs):
         'deleted_asset_count':deleted_asset_count,
         'title': 'Assets',
         'is_demo':is_demo,
-        'list_of_audited_assets':list_of_audited_assets
+        'list_of_audited_assets':list_of_audited_assets,
+        'asset_conditions_map':asset_conditions_map
     }
     return context
+def assign_asset(request,id):
+    user_id = request.POST.get('user_id')
+    asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
+    selected_user = get_object_or_404(User, pk=user_id, is_active=True)
+    
+    # Create or update the AssignAsset record
+    assign_obj, created = AssignAsset.objects.update_or_create(
+        asset=asset,
+        defaults={'user': selected_user},
+    )
+    # Mark asset as assigned
+    asset.is_assigned = True
+    set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
+    asset.asset_status=set_asset
+    # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
+    asset.save()
+    
+def assign_asset_in_form(request,form):
+    asset = form.instance.asset
+    asset.is_assigned = True
+    set_asset_status = AssetStatus.objects.filter(
+        Q(organization=request.user.organization) | Q(organization__isnull=True),
+        name='Available'
+    ).first()
+    asset.asset_status = set_asset_status
+    asset.save()
+    # form.save_m2m()
+    form.save()
 
-def asset_details(request,get_audit_history,get_audit_image,asset,assiggned_asset,assetSpecifications,get_asset_img,asset_barcode):
+    # Save uploaded images related to the asset
+    for f in request.FILES.getlist('image'):
+        AssetImage.objects.create(asset=asset, image=f)
+    messages.success(request, 'Asset assigned to user successfully')
+    slack_notification(request,f"{asset.name}  assigned successfully to user",asset.id,asset.tag)
+    notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  assigned successfully to user",notification_title="Asset Assigned")
+
+def delete_assign_asset(request,id):
+    assignAsset = get_object_or_404(
+            AssignAsset, pk=id, asset__organization=request.user.organization)
+    assignAsset.delete()
+    assignAsset.asset.is_assigned = False
+    set_asset=AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Available').first()
+    assignAsset.asset.asset_status=set_asset
+    assignAsset.asset.save()
+    messages.success(request, 'Asset unassigned successfully')
+
+def get_audit_images(asset_id):
+    audit_images=AuditImage.objects.filter(audit__asset__id=asset_id).order_by('-uploaded_at').first()
+    return audit_images
+
+def get_asset_images(asset):
+    images = AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').values()
+    return images
+
+def details_of_asset(request,id):
+    get_audit_history=Audit.objects.filter(asset_id=id)
+    get_audit_image=get_audit_images(id)
+    asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
+    assigned_asset=AssignAsset.objects.filter(asset=asset).first()  
+    assetSpecifications = AssetSpecification.objects.filter(asset=asset)
+    get_asset_img=get_asset_images(asset)
+    asset_barcode = generate_barcode(asset.tag)
+    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode)
+    return context
+
+def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode):
     audit_data = []
     if get_audit_history:
         for audit in get_audit_history:
@@ -252,8 +323,8 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assiggned_asse
             }
             audit_data.append(data)
     
-    if assiggned_asset and assiggned_asset.user:
-        assigned_user=assiggned_asset.user.full_name
+    if assigned_asset and assigned_asset.user:
+        assigned_user=assigned_asset.user.full_name
     else:
         assigned_user=None
     
@@ -301,6 +372,28 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assiggned_asse
     context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image}
 
+    return context
+
+def add_asset(request,form):
+    asset = form.save(commit=False)
+    asset.organization = request.user.organization
+    available_status = AssetStatus.objects.filter(name='Available').first()
+    asset.asset_status = available_status 
+    asset.save()
+    form.save_m2m()
+    # Save images
+    for image_file in request.FILES.getlist('image'):
+        AssetImage.objects.create(asset=asset, image=image_file)
+        
+    create_custom_fileds(request,asset)
+    slack_notification(request,f"{asset.name}  added successfully",asset.id,asset.tag)
+
+def search_asset(request):
+    list_of_audits=Audit.objects.all()
+    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
+    
+    context=search_with_filters(request,list_of_audited_assets)
     return context
 
 def search_with_filters(request,list_of_audited_assets):
@@ -433,7 +526,6 @@ def create_char_data(data):
           ['Unassigned',unassigned],
         ]
     return chart_data
-
 
 def delete_asset_images(request, asset):
     try:

@@ -74,7 +74,7 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 instance_id=instance.id,
                 object_id=str(instance.id)
             )
-            continue
+            break
 
         # Activation change
         if any(f[0] == "is_active" for f in changed_fields):
@@ -93,10 +93,10 @@ def notify_user_changes(sender, instance, created, **kwargs):
             continue
 
         # General update
-        changes_text = ", ".join(
-            f"{f[0].replace('_', ' ').title()}: '{f[1]}' → '{f[2]}'"
-            for f in changed_fields
-        )
+        # changes_text = ", ".join(
+        #     # f"{f[0].replace('_', ' ').title()}: '{f[1]}' → '{f[2]}'"
+        #     for f in changed_fields
+        # )
         for f in changed_fields:
             NotificationService.send(
                 user=admin,
@@ -107,3 +107,4 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 instance_id=instance.id,
                 object_id=str(instance.id)
             )
+            break
