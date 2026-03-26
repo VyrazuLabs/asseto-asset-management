@@ -9,9 +9,11 @@ from assets.models import Asset
 from notifications.service import NotificationService
 User = get_user_model()
 
+print("ASSET SIGNALS")
 @receiver(post_save, sender=Asset)
 def asset_notification(sender, instance, created, **kwargs):
-
+    if getattr(instance, "_skip_notification", False):
+        return
     # Get organization admins
     admins = User.objects.filter(
         is_superuser=True,
@@ -19,6 +21,7 @@ def asset_notification(sender, instance, created, **kwargs):
     )
     if created:
         for admin in admins:
+            instance._skip_notification = True  # ✅ block re-entry
             NotificationService.send(
                 user=admin,
                 title="Asset Created",
@@ -115,6 +118,7 @@ def asset_notification(sender, instance, created, **kwargs):
             instance_id=instance.id,
             object_id=str(instance.id),
         )
+        print("ASSET SIGNALS")
 
 @receiver(post_save, sender=User)
 def trigger_seed_on_first_superuser(sender,instance,created,**kwargs):
