@@ -1,13 +1,67 @@
 from django.utils import timezone
 from datetime import datetime, timedelta
-from assets.models import Asset, AssetImage, AssignAsset
+from assets.models import Asset, AssetImage, AssignAsset,AssetStatus
 from dateutil.relativedelta import relativedelta
 import re
+from django.db.models import F
+from authentication.models import User
+from common.API_custom_response import api_response
+from django.shortcuts import get_object_or_404
 from datetime import date
 from configurations.utils import get_currency_and_datetime_format, format_datetime
 from configurations.utils import dynamic_display_name
 from django.db.models import Func, CharField
+from dashboard.models import CustomField
+from notifications.models import UserNotification
+# from assets.api_utils import BaseSegmentFunc
 
+def assign_asset_user_list(request):
+    get_users=User.undeleted_objects.filter(status=True, organization=request.user.organization).exclude(pk=request.user.id)
+    data=[{'id':user.id,'name':user.full_name} for user in get_users]
+    return data
+
+
+def asset_details(id,request):
+    asset=get_object_or_404(Asset,pk=id)
+    asset_images=AssetImage.objects.filter(asset=asset).all()
+    custom_fields=CustomField.objects.filter(object_id=asset.id)
+    asset_statuses=AssetStatus.objects.all()
+    data=asset_data(request,asset,asset_images,asset_statuses,custom_fields)
+    return data
+
+def mark_notification_as_seen(notification_id, request):
+    notification = get_object_or_404(
+                UserNotification,
+                id=notification_id,
+                user=request.user
+            )
+
+    notification.is_seen = True
+    notification.save(update_fields=["is_seen"])
+def get_notification_data(request):
+    notifications= UserNotification.objects.filter(
+                    user=request.user,
+                    is_seen=False,
+                    notification__entity_type=0
+                ).annotate(
+                    object_type=BaseSegmentFunc('notification__link'),
+                    notification_title=F('notification__notification_title'),
+                    notification_text=F('notification__notification_text'),
+                    link=F('notification__link'),
+                    created_at=F('notification__created_at'),
+                    object_id=F('notification__object_id')
+                ).order_by('-notification__created_at')
+    data = notifications.values(
+        'id', 
+        'notification_title',
+        'notification_text',
+        'is_seen', 
+        'link',
+        'object_type',
+        'created_at', 
+        'object_id'
+    )
+    return data
 # def get_push_notification_data(user):
 #     return {
 #         "message": "Success",
@@ -61,8 +115,8 @@ def convert_to_list(request,queryset):
             asset_dict["assigned_to_image"] = None
 
         asset_list.append(asset_dict)
-
     return asset_list
+
 # dynamic_display_name(user.full_name)
 def get_assigned_user(request,asset):
     user=request.user

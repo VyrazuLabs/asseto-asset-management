@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from assets.models import Asset, AssignAsset
 from authentication.models import User
-from authentication.utils import asset_datas,user_information, location_datas, user_datas, vendor_datas, generate_totp_secret,generate_qrcode,verify_totp
+from authentication.utils import asset_datas,user_information,asset_data_util,totp_and_qrcode_generation,handle_user_totp, location_datas, user_datas, vendor_datas, generate_totp_secret,generate_qrcode,verify_totp
 from common.API_custom_response import api_response
 from rest_framework.permissions import IsAuthenticated
 from dashboard.models import Location
@@ -53,22 +53,7 @@ class LoginOtp(APIView):
                     'message': 'Invalid credentials'
                 }, status=400)
 
-            # Check if TOTP enabled
-            user_totp = UserTotp.objects.filter(user_id=user.id).first()
-            if not user_totp:
-                return Response({
-                    'success': False,
-                    'message': 'TOTP not enabled'
-                }, status=400)
-
-            # Get secret (decrypt if needed)
-            secret = user_totp.secret  # decrypt here if encrypted
-
-            # Verify OTP using your function
-            is_valid = verify_totp(secret, entered_otp)
-            user_totp.is_logged_in = True
-            user_totp.status = 2
-            user_totp.save()
+            is_valid,secret = handle_user_totp(request,entered_otp,user)
             print(f"Verifying OTP: secret={secret}, entered_otp={entered_otp}, is_valid={is_valid}")  # Debug log
             if not is_valid:
                 # Optional: increment failed attempts
@@ -104,24 +89,7 @@ class LoginOtp(APIView):
 class GenerateTOTP(APIView):
     def post(request):
         try:
-            user = request.user
-            user_totp = UserTotp.objects.filter(user_id=user.get('id')).first()
-            secret = generate_totp_secret()
-            if not user_totp:
-                UserTotp.objects.create(user_id=user.get('id'), secret=secret)
-            else:
-                user_totp.secret = secret
-                # user_totp.status = 0
-                user_totp.save()
-
-            qrcode = generate_qrcode(secret, user.get('username'))
-            user_logged_in=None
-            if user_totp.is_logged_in:  
-                user_logged_in= "You are already logged in using Two Factor Authentication."
-            # cache_key, response = get_cache_key_with_data(
-            #     request, USER_DATA_KEY, user.get('id'))
-
-            # remove_cache_key(cache_key)
+            qrcode,user_logged_in,user_totp=totp_and_qrcode_generation(request)
 
             return Response({'success': True, 'message': 'Open your authenticator app and scan this QR code to register for authenticator app login. Then use the otp to verify yourself', 'data': {'qrcode': qrcode,"user_logged_in":user_logged_in,"user_totp":user_totp}})
 
@@ -131,16 +99,8 @@ class GenerateTOTP(APIView):
 class AssetData(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
-        today = datetime.now()
-        time_threshold = datetime.now() + timedelta(days=30)
         try:
-            expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(Q(
-                warranty_expiry_date__lt=today)|Q(warranty_expiry_date=None)).order_by('warranty_expiry_date')    
-            all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
-            asset_count = all_asset_list.count()
-            assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None,asset__is_assigned=True) | Q(
-            asset__organization=request.user.organization,asset__is_assigned=True) ).count()
-            data=asset_datas(expiring_assets,all_asset_list,asset_count,assign_assets_counts)
+            data=asset_data_util(request)
             return api_response(data=data, message="asset data for dashboard get successfully")
         except ValueError as e:
             return api_response(status=400, error_message=str(e))

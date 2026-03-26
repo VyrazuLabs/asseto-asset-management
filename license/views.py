@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponse
-
 from license.utils import get_assigned_users
 @login_required
 @permission_required('authentication.view_license')
@@ -69,7 +68,6 @@ def update_license(request,id):
         license_form=LicenseForm(instance=get_license)
     
     return render(request,'license/update-license.html',context={'form':license_form,'title':f'Update-{get_license.name}','sidebar':'license'})
-
 
 @login_required
 @permission_required('authentication.delete_license')
