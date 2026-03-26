@@ -1,16 +1,15 @@
 from django.shortcuts import render, redirect
-
 from license.models import AssignLicense
 from .forms import UserForm, UserUpdateForm, AddressForm
 from django.contrib import messages
 from django.http import HttpResponse
 from django.core.paginator import Paginator
-from authentication.models import User
+from authentication.models import User,UserTotp
 from assets.models import AssignAsset
 from dashboard.models import Address
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
-from .utils import assigned_asset_to_user, create_all_perm_role, get_all_assigned_license
+from .utils import assigned_asset_to_user,export_users_pdf_utils,get_user_detail_utils,export_users_csv_utils,search_user_utils,create_user_notification_type_utils, create_all_perm_role, get_all_assigned_license,toggle_two_factor_auth_utils
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from vendors.utils import render_to_csv, render_to_pdf
@@ -22,7 +21,6 @@ from configurations.utils import dynamic_display_name
 from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
 from django.http import JsonResponse
-from authentication.models import UserTotp
 
 today = date.today()
 import os
@@ -31,27 +29,15 @@ IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
 ORPHANS = 1
 
-
+"""Check if the current user is an admin"""
 def check_admin(user):
     return user.is_superuser
 
+"""Create a user notification type"""
 def create_user_notification_type(request):
     if request.method == "POST":
         # Convert checkbox values to booleans
-        email = request.POST.get("email_notification") == "on"
-        in_app = request.POST.get("in_app_notification") == "on"
-        browser = request.POST.get("browser_notification") == "on"
-        slack=request.POST.get("slack_notification") == "on"
-        two_factor_auth=request.POST.get("two_factor_auth") == "on"
-        get_user=User.objects.filter(id=request.user.id).first()
-        if get_user is not None:
-            User.objects.filter(id=request.user.id).update(
-                email_notification=email,
-                slack_notification=slack,
-                browser_notification=browser,
-                inapp_notification=in_app,
-                two_factor_auth=two_factor_auth
-            )
+        create_user_notification_type_utils(request)
 
         return JsonResponse({"success": True})
 
@@ -59,22 +45,14 @@ def create_user_notification_type(request):
 
 # Suppose the user disables the 2FA toggle while being logged in using 2FA then the status 
 # changes to 1, So that next time the user has to again scan the QR for a new OTP.
-# Else if the -User dosen't scan for a new otp the 2FA method won't be used.
+# Else if the User dosen't scan for a new otp the 2FA method won't be used.
 # Similarly if the user enables the 2FA toggle while being logged in using 2FA then the status changes to 1
 def toggle_two_factor_auth(request):
     if request.method == "POST":
         # Convert checkbox values to booleans
-        two_factor_auth=request.POST.get("two_factor_auth") == "on"
-        get_user=User.objects.filter(id=request.user.id).first()
-        if get_user is not None:
-            User.objects.filter(id=request.user.id).update(
-                two_factor_auth=two_factor_auth
-            )
-        get_totp=UserTotp.objects.filter(user_id=get_user.id).first()
-        get_totp.status=1
-        get_totp.save()
+        toggle_two_factor_auth_utils(request)
+        print("Toggled 2FA")
         return JsonResponse({"success": True})
-
     return JsonResponse({"success": False, "error": "Invalid request"})
 
 def manage_access(user):
@@ -91,7 +69,7 @@ def manage_access(user):
 
     return False
 
-
+"""Get the List of All the Users"""
 @login_required
 @user_passes_test(manage_access)
 def list(request):
@@ -115,28 +93,11 @@ def list(request):
     return render(request, 'users/list.html', context=context)
 
 
-
+"""Get the User Details based on the User Id"""
 @login_required
 @permission_required('authentication.view_users')
 def details(request, id):
-    user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
-    assigned_assets = AssignAsset.objects.filter(user=user)
-    history_list = User.history.all()
-    paginator = Paginator(history_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    if obj is not None:
-        format_key= None
-        for id,it in NAME_FORMATS:
-            if obj.name_display_format == id:
-                format_key=id
-    asset_paginator=Paginator(assigned_assets,10,orphans=1)
-    asset_page_number=request.GET.get('assets_page')
-    asset_page_object=asset_paginator.get_page(asset_page_number)
-    get_user_full_name=user.dynamic_display_name(user.full_name)
-    assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
-    assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
+    get_user_full_name,user,page_object,asset_page_object,assigned_licenses_object=get_user_detail_utils(request, id)
     context = {
         'sidebar': 'users',
         'full_name': get_user_full_name,
@@ -149,6 +110,7 @@ def details(request, id):
                
     return render(request, 'users/detail.html',context)
 
+"""Add a New User"""
 @login_required
 @permission_required('authentication.add_users')
 def add(request):
@@ -194,7 +156,7 @@ def add(request):
 
     return render(request, 'users/add-user-modal.html', context)
 
-
+"""Update a User based on the User Id"""
 @login_required
 @permission_required('authentication.edit_users')
 def update(request, id):
@@ -239,7 +201,7 @@ def update(request, id):
     context = {'user': user, 'form': form, 'address_form': address_form}
     return render(request, 'users/update-user-modal.html', context)
 
-
+"""Delete a User based on the User Id"""
 @login_required
 @permission_required('authentication.delete_users')
 def delete(request, id):
@@ -258,7 +220,7 @@ def delete(request, id):
 
     return redirect(request.META.get('HTTP_REFERER'))
 
-
+"""Change the Status of a User based on the User Id"""
 @user_passes_test(check_admin)
 def status(request, id):
     if request.method == "POST":
@@ -269,59 +231,10 @@ def status(request, id):
 
     return HttpResponse(status=204)
 
-
+"""Search for a User based on search text"""
 @login_required
 def search(request, page):
-    search_text = (request.GET.get('search_text') or "").strip()
-
-    if search_text:
-        users_list = (
-            User.undeleted_objects.filter(
-                Q(organization=request.user.organization),
-                Q(is_superuser=False),
-                (
-                    Q(username__icontains=search_text) |
-                    Q(full_name__icontains=search_text) |
-                    Q(phone__icontains=search_text) |
-                    Q(employee_id__icontains=search_text) |
-                    Q(department__name__icontains=search_text) |
-                    Q(role__related_name__icontains=search_text) |
-                    Q(location__office_name__icontains=search_text) |
-                    Q(address__address_line_one__icontains=search_text) |
-                    Q(address__address_line_two__icontains=search_text) |
-                    Q(address__country__icontains=search_text) |
-                    Q(address__state__icontains=search_text) |
-                    Q(address__pin_code__icontains=search_text) |
-                    Q(address__city__icontains=search_text)
-                )
-            )
-            .exclude(pk=request.user.id)
-            .order_by("-created_at")[:10]
-        )
-        page_object = users_list
-    else:
-        users_list = (
-            User.undeleted_objects.filter(
-                organization=request.user.organization, is_superuser=False
-            )
-            .exclude(pk=request.user.id)
-            .order_by("-created_at")
-        )
-        paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
-        page_object = paginator.get_page(page)
-
-    user_ids = [u.id for u in page_object]
-
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
-
-    user_asset_map_count = {}
-    for aa in assigned_assets:
-        user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
-
-    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
-
-    deleted_user_count = User.deleted_objects.count()
-
+    page_object, deleted_user_count, user_asset_map_count, user_asset_map_count_count = search_user_utils(request, page)
     return render(
         request,
         "users/users-data.html",
@@ -335,28 +248,14 @@ def search(request, page):
         },
     )
 
-
-
 @login_required
 def export_users_csv(request):
-    header_list = ['Name', 'Email', 'Phone', 'Designation', 'Department', 'Address Line One',
-                   'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Office']
-    user_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(pk=request.user.id).order_by('-created_at').values_list('full_name', 'email', 'phone', 'role__related_name',
-    'department__name', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'location__office_name')
-    context = {'header_list': header_list, 'rows': user_list}
-    response = render_to_csv(context_dict=context)
-    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.csv"'
+    response=export_users_csv_utils(request)
     return response
-
 
 @login_required
 def export_users_pdf(request):
-    users = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
-        pk=request.user.id).order_by('-created_at')
-    context = {'users': users}
-    pdf = render_to_pdf('users/users-pdf.html', context_dict=context)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.pdf"'
+    response=export_users_pdf_utils(request)
     return response
 
 @login_required
