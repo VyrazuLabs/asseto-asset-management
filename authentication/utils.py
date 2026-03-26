@@ -18,6 +18,55 @@ import jwt
 import datetime
 from .models import PhoneOtp,UserTotp,User
 from rest_framework.response import Response
+from assets.models import Asset,AssignAsset
+from datetime import datetime, timedelta
+from django.db.models import Q
+def asset_data_util(request):
+    today = datetime.now()
+    time_threshold = datetime.now() + timedelta(days=30)
+    expiring_assets = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization, warranty_expiry_date__lt=time_threshold)).exclude(Q(
+    warranty_expiry_date__lt=today)|Q(warranty_expiry_date=None)).order_by('warranty_expiry_date')    
+    all_asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
+    asset_count = all_asset_list.count()
+    assign_assets_counts = AssignAsset.objects.filter(Q(asset__organization=None,asset__is_assigned=True) | Q(
+    asset__organization=request.user.organization,asset__is_assigned=True) ).count()
+    data=asset_datas(expiring_assets,all_asset_list,asset_count,assign_assets_counts)
+    return data
+
+def totp_and_qrcode_generation(request):
+    user = request.user
+    user_totp = UserTotp.objects.filter(user_id=user.get('id')).first()
+    secret = generate_totp_secret()
+    if not user_totp:
+        UserTotp.objects.create(user_id=user.get('id'), secret=secret)
+    else:
+        user_totp.secret = secret
+        # user_totp.status = 0
+        user_totp.save()
+
+    qrcode = generate_qrcode(secret, user.get('username'))
+    user_logged_in=None
+    if user_totp.is_logged_in:  
+        user_logged_in= "You are already logged in using Two Factor Authentication."
+    return qrcode,user_logged_in,user_totp
+def handle_user_totp(request,entered_otp,user):
+    # Check if TOTP enabled
+    user_totp = UserTotp.objects.filter(user_id=user.id).first()
+    if not user_totp:
+        return Response({
+            'success': False,
+            'message': 'TOTP not enabled'
+        }, status=400)
+
+    # Get secret (decrypt if needed)
+    secret = user_totp.secret  # decrypt here if encrypted
+
+    # Verify OTP using your function
+    is_valid = verify_totp(secret, entered_otp)
+    user_totp.is_logged_in = True
+    user_totp.status = 2
+    user_totp.save()
+    return is_valid,secret
 
 def generate_otl_session_id(user):
     length = random.randint(5, 10)
