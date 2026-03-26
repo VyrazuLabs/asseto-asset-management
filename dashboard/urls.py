@@ -52,7 +52,6 @@ urlpatterns = [
     path('license-type/search/', license_type.search_license_type, name='search_license_type'),
 
     path('get-subcategories/',views.get_subcategories, name='get_subcategories'),
-     
     path('global-search/', global_search_views.global_search, name='global_search'),
 ]
 

@@ -209,3 +209,13 @@ For any inquiries or support, please contact:
 
 - Email: info@vyrazu.com
 - Project Maintainer: [Vyrazu Labs Ltd](https://vyrazu.com/)
+
+### 2FA 
+2FA can be enabled/disabled in the profile section.
+If 2FA is enabled user can scan the QR in profile section to get the OTP in their Authenticator App.
+If disabled conventional login will be used.
+
+### Notification
+Different Type of notifications can be Enabled/Disabled in the profile section.
+For using In-App notification for the mobile application we would need to also setup firebase.
+Firebase credentials file can be kept in the root folder by the name of "firebase-credentials.json" or else user can encrypt the contents of the "firebase-credentials.json" using a fernet key and store the fernet key in .env along with the encrypted data.
