@@ -11,14 +11,14 @@
                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Vendors</li>
                 </ol>
-            </nav>
+            </nav>-
         </div>
         <div class="d-flex">
             {% if perms.authentication.add_vendor %}
                 <div>
                     <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
                         hx-get="{% url 'vendors:add' %}" hx-target="#add-vendor-modal-content"
-                        data-bs-toggle="modal" data-bs-target="#add-vendor-modal">Add Vendor</button>
+                        data-bs-toggle="modal" data-bs-target="#add-vendor-modal" id="add-vendor">Add Vendor</button>
                 </div>
             {% endif %}
             <a href="{% url 'recycle_bin:deleted_vendors' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">

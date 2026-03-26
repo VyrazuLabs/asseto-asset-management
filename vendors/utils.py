@@ -3,9 +3,102 @@ from django.http import HttpResponse
 import csv
 from io import BytesIO
 from xhtml2pdf import pisa
-from assets.models import Asset
+from assets.models import Asset,AssignAsset
 from django.db.models import Q
 from vendors.models import Vendor
+from django.core.paginator import Paginator
+from dashboard.models import Address
+from django.shortcuts import get_object_or_404
+from dashboard.models import CustomField
+from datetime import date
+
+PAGE_SIZE = 10
+ORPHANS = 1
+
+
+def export_vendors_pdf_utils(request):
+    today = date.today()
+    vendors = Vendor.undeleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    context = {'vendors': vendors}
+    pdf = render_to_pdf('vendors/vendors-pdf.html', context_dict=context)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.pdf"'
+    return response
+def export_vendor_csv_utils(request):
+    today = date.today()
+    header_list = ['Vendor Name', 'Vendor Email', 'Phone', 'Contact Person Name', 'Designation', 'GSTIN Number',
+                   'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Description']
+    vendors_list = Vendor.undeleted_objects.filter(organization=request.user.organization).order_by('-created_at').values_list('name', 'email', 'phone', 'contact_person', 'designation',
+    'gstin_number', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'description')
+    context = {'header_list': header_list, 'rows': vendors_list}
+    response = render_to_csv(context_dict=context)
+    response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.csv"'
+    return response
+
+def search_utils(request,page):
+    search_text = (request.GET.get('search_text') or "").strip()
+
+    if search_text:
+        vendors_list = searched_data(request,search_text)
+        page_object = vendors_list
+    else:
+        vendors_list = Vendor.undeleted_objects.filter(
+            organization=request.user.organization
+        ).order_by("-created_at")
+
+        paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+        page_number = page
+        page_object = paginator.get_page(page_number)
+
+    count_array = []
+    for it in page_object:
+        get_count = get_count_of_assets(request, it.id)
+        count_array.append(get_count)
+
+    deleted_vendor_count = Vendor.deleted_objects.count()
+    return page_object,count_array,deleted_vendor_count
+
+def get_vendor_details(request, id):
+    vendor = get_object_or_404(
+        Vendor.undeleted_objects, pk=id, organization=request.user.organization)
+    address = Address.objects.get(id=vendor.address.id) if vendor.address else None
+    assets=Asset.undeleted_objects.filter(vendor=vendor)
+    assets_paginator=Paginator(assets,10,orphans=1)
+    assets_page_number=request.GET.get('asset_page')
+    assets_page_object=assets_paginator.get_page(assets_page_number)
+
+
+    history_list = vendor.history.all()
+    paginator = Paginator(history_list, 10, orphans=1)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    get_custom_data=[]
+    get_data=CustomField.objects.filter(object_id=vendor.id)
+    for it in get_data:
+        obj={}
+        obj['field_name']=it.field_name
+        obj['field_value']=it.field_value
+        get_custom_data.append(obj)
+    context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
+    'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
+
+def vendor_list_util(request):
+    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) |  
+        Q(organization=request.user.organization)).order_by('-created_at')
+    deleted_vendor_count=Vendor.deleted_objects.count()
+    paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+    count_array = []
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    for vendor in page_object:
+        count_array.append(
+            get_count_of_assets(request, vendor.id)
+        )
+    context = {'sidebar': 'vendors','count_array': count_array,
+               'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
+               }
+    return context
 
 def render_to_csv(context_dict={}):
     response = HttpResponse(content_type='text/csv')
@@ -104,3 +197,8 @@ def vendor_list_for_form(vendors):
         }
         list.append(vendor_dict)
     return list
+
+def get_assigned_asset_by_vendor(id):
+    get_assets=AssignAsset.undeleted_objects.filter(asset_vendor_id=id)
+    print("Asset Lists",get_assets)
+    return get_assets

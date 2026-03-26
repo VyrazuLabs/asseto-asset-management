@@ -21,30 +21,49 @@ pymysql.install_as_MySQLdb()
 from django.db.utils import OperationalError
 import firebase_admin
 from firebase_admin import credentials
-
-
+import json
+import base64
+from cryptography.fernet import Fernet
 # from firebase_admin import initialize_app
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env', override=True)
-# os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
+# # os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+# cipher_suite = Fernet(os.environ.get('FERNET_KEY'))
+# # secret_key=''
+# encrypted_bytes = cipher_suite.encrypt(str(data).encode('utf-8'))
+# print(encrypted_bytes)
+# data=cipher_suite.decrypt(encrypted_bytes).decode('utf-8')                 Decrypted Data
 # cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
-
+cipher_suite = Fernet(b'NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=')
+print("FERNET_KEY:", cipher_suite)
 file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')
 cred_path = BASE_DIR / file_name
-print("Resolved Path:", cred_path)
-# If file does not exist → create empty file
-if not cred_path.exists():
-    print("Firebase credential file not found. Creating new file...")
-    cred_path.touch()
-    print("Created a new file to store the firebase credentials...")
-cred = credentials.Certificate(cred_path)
-firebase_admin.initialize_app(cred)
+firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
+
+if firebase_credentials:
+    fernet = Fernet(os.getenv("FERNET_KEY").encode())
+    decrypted = fernet.decrypt(firebase_credentials.encode())
+    cred_dict = json.loads(decrypted.decode())
+
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
+
+elif cred_path.exists():
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
 LOGIN_REDIRECT_URL = '/'
 
 DEBUG=True 
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6380/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6380/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_TIME_LIMIT = 30  # hard kill
+CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -93,14 +112,15 @@ INSTALLED_APPS = [
     'configurations',
     'drf_spectacular',
     'audit',
-    'license'
+    'license',
+    'silk'
+
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True
 TRACEBACK_SHOW_LOCALS=True
 TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
 PRINT_TRACEBACK_INFO_TO_CONSOLE=True # Set to False if not required
-
 MIDDLEWARE = [
     "authentication.middleware.DBConnectionMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -113,13 +133,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    "django_htmx.middleware.HtmxMiddleware"
+    "django_htmx.middleware.HtmxMiddleware",
+    'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = 'AssetManagement.urls'
 
 WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 
+SILKY_PYTHON_PROFILER = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -144,7 +166,8 @@ try:
                     'django.contrib.messages.context_processors.messages',
                     'configurations.context_processors.sidebar_logo',
                     'configurations.context_processors.favicon_image',
-                    'configurations.context_processors.login_page_logo'
+                    'configurations.context_processors.login_page_logo',
+                    'django.template.context_processors.request',
                 ],
             },
         },
@@ -286,7 +309,6 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-
 }
 
 SIMPLE_JWT = {
