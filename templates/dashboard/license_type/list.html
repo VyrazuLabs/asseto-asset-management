@@ -15,7 +15,7 @@
         <div class="d-flex">
             {% if perms.authentication.add_license_type %}
                 <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
+                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" id="add-license-type-button"
                         hx-get="{% url 'dashboard:add_license_type' %}" hx-target="#add-license-type-modal-content"
                         data-bs-toggle="modal" data-bs-target="#add-license-type-modal"
                     >Add License Types</button>            
