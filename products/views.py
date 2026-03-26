@@ -13,11 +13,12 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from dashboard.models import CustomField
 from assets.models import AssetImage
-from assets.models import Asset
+from assets.models import Asset,AssignAsset
 from django.views.decorators.csrf import csrf_exempt
 from datetime import date
-from .utils import product_list,get_product_details,added_product,deleted_product
+from .utils import product_list,search_utils,get_product_details,export_product_pdf_utils,added_product,deleted_product,exports_product_csv_utils
 import os 
+from silk.profiling.profiler import silk_profile
 
 IS_DEMO = os.environ.get('IS_DEMO')
 today = date.today()
@@ -25,10 +26,8 @@ today = date.today()
 PAGE_SIZE = 10
 ORPHANS = 1
 
-
 def check_admin(user):
     return user.is_superuser
-
 
 def manage_access(user):
     permissions_list = [
@@ -37,13 +36,11 @@ def manage_access(user):
         'authentication.edit_product',
         'authentication.add_product',
     ]
-
     for permission in permissions_list:
         if user.has_perm(permission):
             return True
 
     return False
-
 
 @login_required
 @user_passes_test(manage_access)
@@ -59,6 +56,7 @@ def details_product(request, id):
 
 @login_required
 @permission_required('authentication.add_product')
+@silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
         form = AddProductsForm(
@@ -81,10 +79,17 @@ def add_product(request):
 @permission_required('authentication.delete_product')
 def delete_product(request, id):
     if request.method == 'POST':
-        deleted_product(request, id)
-        messages.success(request, 'Product deleted successfully')
-
-    return redirect(request.META.get('HTTP_REFERER'))
+        get_asset_by_product_id=Asset.objects.filter(product_id=id).first()
+        # First find if the product is already assigned to the asset or not
+        if AssignAsset.objects.filter(asset=get_asset_by_product_id).exists():
+            messages.error(
+                request, 'Error! Product is assigned to a Asset')
+            # return HttpResponse(status=400)
+        else:
+            deleted_product(request, id)
+            messages.success(request, 'Product deleted successfully')
+    return redirect('products:list')
+    # return redirect(request.META.get('HTTP_REFERER'))
 
 @csrf_exempt
 @login_required
@@ -135,7 +140,7 @@ def update_product(request, id):
 
             # Update existing custom fields
             for cf in custom_fields:
-                key = f"custom_field_{cf.id}"
+                key = f"custom_field_{cf.entity_id}"
                 new_val = request.POST.get(key, "")
                 if new_val != cf.field_value:
                     cf.field_value = new_val
@@ -197,6 +202,7 @@ def status(request, id):
 
 @login_required
 def search(request, page):
+    
     search_text = request.GET.get('search_text').strip()
     if search_text:
         return render(request, 'products/products-data.html', {
@@ -222,29 +228,16 @@ def search(request, page):
             product_images[img.product_id] = img
     return render(request, 'products/list.html', {'page_object': page_object})
 
-
 @login_required
 @permission_required('authentication.view_product')
 def export_products_csv(request):
-    header_list = ['Product Name', 'Product Category',
-                   'Product Type', 'Manufacturer', 'Description']
-    product_list = Product.undeleted_objects.filter(organization=request.user.organization).order_by(
-        '-created_at').values_list('name', 'product_category__name', 'product_type__name', 'manufacturer', 'description')
-    context = {'header_list': header_list, 'rows': product_list}
-    response = render_to_csv(context_dict=context)
-    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.csv"'
+    response=exports_product_csv_utils(request)
     return response
-
 
 @login_required
 @permission_required('authentication.view_product')
 def export_products_pdf(request):
-    products = Product.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    context = {'products': products}
-    pdf = render_to_pdf('products/products-pdf.html', context_dict=context)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.pdf"'
+    response=export_product_pdf_utils(request)
     return response
 
 def get_assigned_product_info(request, id):

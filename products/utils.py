@@ -5,9 +5,63 @@ from django.db.models import Q,Count
 from django.core.paginator import Paginator
 from products.models import Product
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render,redirect,get_object_or_404
+from vendors.utils import render_to_csv,render_to_pdf
+from datetime import date
+import os
+from django.http import HttpResponse, JsonResponse
 
 PAGE_SIZE = 10
 ORPHANS = 1
+
+def search_utils(request,page):
+    search_text = request.GET.get('search_text').strip()
+    if search_text:
+        return render(request, 'products/products-data.html', {
+            'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
+                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_sub_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
+            )).annotate(
+            total_assets=Count('asset'),
+            # available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
+            available_assets=Count('asset',filter=Q(asset__is_assigned=False) & Q(asset__organization=request.user.organization))
+        ).order_by('-created_at')
+        })
+    product_list = Product.undeleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    product_ids_in_page = [product.id for product in page_object]
+    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
+    # Map asset ID to its first image
+    product_images = {}
+    for img in images_qs:
+        if img.product_id not in product_images:
+            product_images[img.product_id] = img
+
+    return page_object
+
+def export_product_pdf_utils(request):
+    today=date.today()
+    products = Product.undeleted_objects.filter(
+        organization=request.user.organization).order_by('-created_at')
+    context = {'products': products}
+    pdf = render_to_pdf('products/products-pdf.html', context_dict=context)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.pdf"'
+    return response
+
+def exports_product_csv_utils(request):
+    today=date.today()
+    header_list = ['Product Name', 'Product Category',
+                   'Product Type', 'Manufacturer', 'Description']
+    product_list = Product.undeleted_objects.filter(organization=request.user.organization).order_by(
+        '-created_at').values_list('name', 'product_category__name', 'product_type__name', 'manufacturer', 'description')
+    context = {'header_list': header_list, 'rows': product_list}
+    response = render_to_csv(context_dict=context)
+    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.csv"'
+    return response
 
 def product_list(request):
     product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
@@ -36,7 +90,7 @@ def product_list(request):
     return context
 
 def get_product_details(request,id):
-    product = get_object_or_404(
+    product = get_object_or_404(                        
         Product.undeleted_objects, pk=id, organization=request.user.organization)
     history_list = product.history.all()
     paginator = Paginator(history_list, 10, orphans=1)
@@ -136,16 +190,16 @@ def product_search(request,search_text):
         if img.product_id not in product_images:
             product_images[img.product_id] = img
 
-def completed_audit(request):
-    thirty_days_ago = datetime.now() - timedelta(days=30)
+# def completed_audit(request):
+#     thirty_days_ago = datetime.now() - timedelta(days=30)
 
-    audits = Audit.objects.filter(
-        created_at__gte=thirty_days_ago
-    ).order_by('-created_at')
+#     audits = Audit.objects.filter(
+#         created_at__gte=thirty_days_ago
+#     ).order_by('-created_at')
 
-    page = request.GET.get('page', 1)
-    paginator = Paginator(audits, 10)
-    audits_page = paginator.get_page(page)
+#     page = request.GET.get('page', 1)
+#     paginator = Paginator(audits, 10)
+#     audits_page = paginator.get_page(page)
 
 def convert_to_list(request,products):
     current_host=request.get_host()

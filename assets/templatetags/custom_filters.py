@@ -112,7 +112,7 @@ def audit_time_diff(audit):
 @register.filter
 def next_audit_due(audit_id):
     audit=Audit.objects.filter(id=audit_id).first()
-    interval_days = audit.asset.product.get_audit_interval()
+    interval_days = audit.asset.product.get_audit_interval() if audit.asset.product is not None else None
     today=datetime.today().date()
     if not interval_days:
         return None
