@@ -272,16 +272,15 @@ def user_login(request):
                     print('seed fail for category')
                 get_user=User.objects.filter(email=email).first()
                 get_totp=UserTotp.objects.filter(user_id=get_user.id).first()
-                print("otp status",get_totp.status)
-                # get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
-                if user.two_factor_auth and get_totp.status == 1:
-                    # request.session['pre_2fa_user_id'] = str(user.id)
-                    request.session['email']=email
-                    return redirect('authentication:verify_otp')
-                if user.two_factor_auth and get_totp.status == 2:
-                    # request.session['pre_2fa_user_id'] = str(user.id)
-                    request.session['email']=email
-                    return redirect('authentication:verify_otp')
+                if get_totp:
+                    if user.two_factor_auth and get_totp.status == 1:
+                        # request.session['pre_2fa_user_id'] = str(user.id)
+                        request.session['email']=email
+                        return redirect('authentication:verify_otp')
+                    if user.two_factor_auth and get_totp.status == 2:
+                        # request.session['pre_2fa_user_id'] = str(user.id)
+                        request.session['email']=email
+                        return redirect('authentication:verify_otp')
                 login(request, user)
                 # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request,  f'Welcome, {user.full_name}')
