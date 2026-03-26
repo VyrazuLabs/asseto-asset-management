@@ -144,7 +144,6 @@ def update_location(request, id):
 
     return render(request, 'dashboard/locations/update-location.html', context=context)
 
-
 @login_required
 @permission_required('authentication.delete_location')
 def delete_location(request, id):
@@ -159,7 +158,7 @@ def delete_location(request, id):
         messages.success(request, 'Location deleted  successfully')
     return redirect('dashboard:locations')
 
-
+@login_required
 @user_passes_test(check_admin)
 def location_status(request, id):
     if request.method == "POST":
@@ -168,7 +167,6 @@ def location_status(request, id):
         location.status = False if location.status else True
         location.save()
     return HttpResponse(status=204)
-
 
 @login_required
 def search_location(request, page):

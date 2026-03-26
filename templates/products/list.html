@@ -46,7 +46,7 @@
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
                         <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
-                            hx-get="{% url 'products:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
+                            hx-get="{% url 'products:search' page|default:'1' %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                         {% if request.user.is_superuser %}
                             <button
                                 type="button"
@@ -75,7 +75,6 @@
                                 <th>Product Type</th>
                                 <th>Product Category</th>
                                 <th>Total Assets</th>
-                                
                                 <th>Status</th>
                                 {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
                                     <th>Actions</th>
@@ -127,8 +126,6 @@
                                         {% endif %} 
                                     </div>
                                 </td>
-
-                                        
                                         <td>
                                             {% if request.user.is_superuser %}
                                                 <div class="form-check form-switch">
@@ -151,11 +148,11 @@
                                                 {% endif %}
                                                 {% if perms.authentication.edit_product %}
                                                     {% if is_demo is True %}
-                                                        <a type="button" class="disabled btn btn-info" 
+                                                        <a type="button" class="disabled btn btn-info" id="edit-product-btn"
                                                             href="{% url 'products:update_product' products.id %}" 
                                                             ><i class="bi bi-pencil-square"></i></a>
                                                     {% else %}
-                                                        <a type="button" class="btn btn-info" 
+                                                        <a type="button" class="btn btn-info" id="edit-product-btn"
                                                             href="{% url 'products:update_product' products.id %}" 
                                                         ><i class="bi bi-pencil-square"></i></a>
                                                     {% endif %}
