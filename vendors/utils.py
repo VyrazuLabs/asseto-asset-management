@@ -137,7 +137,7 @@ def convert_to_list(queryset,request):
             'gstin_number':vendor.gstin_number,
             'status':vendor.status
         }
-        asset_count=Asset.objects.filter(vendor=vendor.id).count()
+        asset_count=Asset.undeleted_objects.filter(vendor=vendor.id).count()
         vendor_dict['asset_count']=asset_count
         venodr_list.append(vendor_dict)
     return venodr_list
@@ -199,6 +199,6 @@ def vendor_list_for_form(vendors):
     return list
 
 def get_assigned_asset_by_vendor(id):
-    get_assets=AssignAsset.undeleted_objects.filter(asset_vendor_id=id)
+    get_assets=Asset.undeleted_objects.filter(vendor_id=id)
     print("Asset Lists",get_assets)
     return get_assets
