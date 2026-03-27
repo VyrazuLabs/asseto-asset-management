@@ -188,8 +188,10 @@ def handle_post_save(sender, instance, created):
                 message=f"{instance} has been created.",
                 icon="bi-plus-circle",
                 link="#",
-                instance_id=instance.id,
-                object_id=str(instance.id)
+                instance_id=instance.pk if instance.pk else instance.id,
+                object_id=str(instance.pk) if instance.pk else str(instance.id)
+                # instance_id = instance.pk if instance.pk else None
+                # object_id = str(instance.pk) if instance.pk else ""
             )
         return
 
@@ -230,8 +232,8 @@ def handle_post_save(sender, instance, created):
             message=f"{instance} has been updated.",
             icon="bi-pencil-square",
             link="#",
-            instance_id=instance.id,
-            object_id=str(instance.id)
+            instance_id=instance.pk if instance.pk else instance.id,
+            object_id=str(instance.pk) if instance.pk else str(instance.id)
         )
 
 
