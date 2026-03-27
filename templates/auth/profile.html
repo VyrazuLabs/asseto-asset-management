@@ -587,16 +587,81 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 <script>
+// document.addEventListener("DOMContentLoaded", function () {
+
+//     const regenerateBtn = document.getElementById("regenerateQrBtn");
+
+//     if (!regenerateBtn) return;
+
+//     regenerateBtn.addEventListener("click", function () {
+
+//         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+//         const qrCodeButtons = document.getElementById("qrCodeButtons")
+//         regenerateBtn.disabled = true;
+//         regenerateBtn.innerText = "Generating...";
+
+//         fetch("{% url 'authentication:regenerate_qr' %}", {
+//             method: "POST",
+//             headers: {
+//                 "X-CSRFToken": csrfToken
+//             }
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+
+//             if (data.success) {
+//                 verify2faBtn.style.display = "block";
+//                 userOtp.style.display = "block";
+//                 // Remove old QR if exists
+//                 const existingImg = document.getElementById("dynamicQrImage");
+//                 if (existingImg) {
+//                     existingImg.remove();
+//                 }
+//                 const imgContainer=document.getElementById("img-container")
+//                 // Create new image
+//                 const img = document.createElement("img");
+//                 img.id = "dynamicQrImage";
+//                 img.src = "data:image/png;base64," + data.qr_code;
+//                 img.className = "img-fluid mb-3";
+//                 img.style.maxWidth = "200px";
+//                 img.alt = "QR Code";
+
+//                 // Insert image ABOVE the button
+//                 // regenerateBtn.parentNode.insertAfter(img, regenerateBtn);
+
+//                 // Insert image BELOW the button
+//                 // regenerateBtn.parentNode.insertAfter( img,qrCodeButtons);
+//                 imgContainer.append(img);
+//                 // qrCodeButtons.style.display = "block";
+//             } else {
+//                 alert("Failed to regenerate QR");
+//             }
+
+//         })
+//         .catch(error => {
+//             console.error("Error:", error);
+//             alert("Something went wrong");
+//         })
+//         .finally(() => {
+//             regenerateBtn.disabled = false;
+//             regenerateBtn.innerText = "Regenerate QR Code";
+//         });
+
+//     });
+
+// });
 document.addEventListener("DOMContentLoaded", function () {
 
     const regenerateBtn = document.getElementById("regenerateQrBtn");
+    const verify2faBtn = document.getElementById("verify2faBtn");
+    const userOtp = document.getElementById("userOtp");
 
     if (!regenerateBtn) return;
 
     regenerateBtn.addEventListener("click", function () {
 
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        const qrCodeButtons = document.getElementById("qrCodeButtons")
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
         regenerateBtn.disabled = true;
         regenerateBtn.innerText = "Generating...";
 
@@ -609,32 +674,28 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
 
+            console.log("QR API response:", data);
+
             if (data.success) {
-                verify2faBtn.style.display = "block";
-                userOtp.style.display = "block";
-                // Remove old QR if exists
+
+                if (verify2faBtn) verify2faBtn.style.display = "block";
+                if (userOtp) userOtp.style.display = "block";
+
                 const existingImg = document.getElementById("dynamicQrImage");
-                if (existingImg) {
-                    existingImg.remove();
-                }
-                const imgContainer=document.getElementById("img-container")
-                // Create new image
+                if (existingImg) existingImg.remove();
+
+                const imgContainer = document.getElementById("img-container");
+
                 const img = document.createElement("img");
                 img.id = "dynamicQrImage";
                 img.src = "data:image/png;base64," + data.qr_code;
                 img.className = "img-fluid mb-3";
                 img.style.maxWidth = "200px";
-                img.alt = "QR Code";
 
-                // Insert image ABOVE the button
-                // regenerateBtn.parentNode.insertAfter(img, regenerateBtn);
+                imgContainer.appendChild(img);
 
-                // Insert image BELOW the button
-                // regenerateBtn.parentNode.insertAfter( img,qrCodeButtons);
-                imgContainer.append(img);
-                // qrCodeButtons.style.display = "block";
             } else {
-                alert("Failed to regenerate QR");
+                alert(data.message || "Failed to regenerate QR");
             }
 
         })
