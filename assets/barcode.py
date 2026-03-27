@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from assets.api_utils import get_asset_id
 from assets.models import Asset
-from barcode import Code128
+from barcode.codex import Code128
 from barcode.writer import SVGWriter
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
