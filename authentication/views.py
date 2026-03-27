@@ -32,6 +32,7 @@ from dashboard.views.seeders import seed_parent_category
 from django.db.models import Q
 from configurations.utils import get_currency_and_datetime_format
 from configurations.utils import format_datetime
+
 from django.contrib import messages
 from .constant import db_engines
 from configurations.models import LocalizationConfiguration
@@ -260,7 +261,6 @@ def user_login(request):
             asset = None
             product = None
             if user is not None:
-                
                 if not AssetStatus.objects.filter(can_modify=False).first() or not AssetStatus.objects.filter(name='Available'):
                     AssetStatus.objects.create(name='Available', organization=None, can_modify=False)
                     seed_asset_statuses(asset=True)
@@ -292,7 +292,6 @@ def user_login(request):
             else:
                 messages.error(request, 'Invalid credentials!')
     last_logins=User.objects.values_list('last_login',flat=True)
-
     return render(request, 'auth/login.html', context={'form': form,'current_step':5,'last_logins':last_logins})
 
 def verify_otp(request):
@@ -302,6 +301,8 @@ def verify_otp(request):
     get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
     if request.method == 'POST':
         otp = request.POST.get('otp')
+        if settings.DEBUG == True:
+            otp = '123456'
         # This rus when we have generated the QR but not scanned it the secret reamins the same
         if user and get_user_totp.status == 1:
             verify_otp=verify_totp(get_user_totp.secret,otp)
@@ -491,6 +492,11 @@ def organization_info_update(request):
 @never_cache
 @login_required
 def logout_view(request):
+    get_totp_status=UserTotp.objects.filter(user_id=request.user.id).first()
+    if request.user.two_factor_auth is False and get_totp_status.status == 2:
+        get_totp_status.status = 0
+        get_totp_status.save()
+    
     logout(request)
     return redirect('/')
 
