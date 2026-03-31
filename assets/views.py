@@ -374,7 +374,6 @@ def reassign_asset(request, id):
             return redirect('configurations:list_client_credentials')
     else:
         form = ClientCredentialsForm()
-
     return render(request, 'configurations/integrations.html', {'form': form})
 
 # SLACK IN TEGRATION OAUTH CALL
