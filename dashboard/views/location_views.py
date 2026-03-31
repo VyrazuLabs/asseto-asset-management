@@ -151,6 +151,11 @@ def delete_location(request, id):
     if request.method == 'POST':
         location = get_object_or_404(
             Location.undeleted_objects, pk=id, organization=request.user.organization)
+        # Check if the deleted location is assigned to any asset, if yes then unassign the asset before deleting the location
+        assigned_assets = AssignAsset.objects.filter(asset__location=location).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Location cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the location.')
+            return redirect('dashboard:locations')
         location.status = False
         location.soft_delete()
         history_id = location.history.first().history_id

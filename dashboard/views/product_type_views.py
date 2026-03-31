@@ -38,7 +38,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
-    all_product_type_list = ProductType.objects.filter(
+    all_product_type_list = ProductType.undeleted_objects.filter(
     Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
     deleted_product_types_count=ProductType.deleted_objects.filter(can_modify=True).count()
 
@@ -127,7 +127,12 @@ def delete_product_type(request, id):
 
     if request.method == 'POST':
         product_type = get_object_or_404(
-            ProductType.undeleted_objects, pk=id, organization=None)
+            ProductType.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the product type if only the product type is not assigned to any asset
+        assigned_assets = AssignAsset.objects.filter(asset__product__product_type=product_type).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Product Type cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the product type.')
+            return redirect('dashboard:product_type_list')
         product_type.status = False
         product_type.soft_delete()
         history_id = product_type.history.first().history_id

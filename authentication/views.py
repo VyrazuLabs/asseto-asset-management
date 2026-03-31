@@ -493,10 +493,11 @@ def organization_info_update(request):
 @login_required
 def logout_view(request):
     get_totp_status=UserTotp.objects.filter(user_id=request.user.id).first()
-    if request.user.two_factor_auth is False and get_totp_status.status == 2:
+    if get_totp_status is not None and request.user.two_factor_auth is False and get_totp_status.status == 2:
         get_totp_status.status = 0
         get_totp_status.save()
-    
+    elif get_totp_status is None:
+        pass
     logout(request)
     return redirect('/')
 
