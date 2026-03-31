@@ -122,6 +122,11 @@ def delete_department(request, id):
     if request.method == 'POST':
         department = get_object_or_404(
             Department.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the department if only the department is not assigned to any user
+        assigned_assets = AssignAsset.objects.filter(user__department=department).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Department cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the department.')
+            return redirect('dashboard:departments')
         department.status = False
         department.soft_delete()
         history_id = department.history.first().history_id

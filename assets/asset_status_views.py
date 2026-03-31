@@ -143,6 +143,11 @@ def delete_asset_status(request,id):
     if request.method == 'POST':
         product_category = get_object_or_404(
         AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the asset status if only the asset status is not assigned to any asset
+        assigned_assets = Asset.objects.filter(asset_status=product_category).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Asset Status cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the asset status.')
+            return redirect('assets:asset_status_list')
         product_category.status = False
         product_category.soft_delete()
         history_id = product_category.history.first().history_id
