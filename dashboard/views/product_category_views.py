@@ -40,7 +40,7 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def product_category_list(request):
     all_product_category_list = (
-        ProductCategory.objects
+        ProductCategory.undeleted_objects
         .filter(
             Q(organization=None) |
             Q(organization=request.user.organization)
@@ -130,7 +130,6 @@ def product_category_details(request, id):
                'submenu': 'product_category', 'product_category': product_category, 'title': f'Details-{product_category.name}'}
     return render(request, 'dashboard/product_category/detail.html', context=context)
 
-
 @login_required
 @permission_required('authentication.delete_product_category')
 def delete_product_category(request, id):
@@ -138,6 +137,11 @@ def delete_product_category(request, id):
     if request.method == 'POST':
         product_category = get_object_or_404(
             ProductCategory.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the department if only the department is not assigned to any user
+        assigned_assets = AssignAsset.objects.filter(asset__product__product_sub_category=product_category).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Product Category cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the product category.')
+            return redirect('dashboard:product_category_list')
         product_category.status = False
         product_category.soft_delete()
         history_id = product_category.history.first().history_id

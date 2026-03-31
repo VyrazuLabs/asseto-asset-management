@@ -392,11 +392,14 @@ def search_asset(request):
     list_of_audits=Audit.objects.all()
     list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
-    
-    context=search_with_filters(request,list_of_audited_assets)
+    list_of_audits=Audit.objects.all()
+    asset_conditions_map = defaultdict(list)
+    for audit in list_of_audits:
+        asset_conditions_map[audit.asset_id].append(audit.condition)
+    context=search_with_filters(request,list_of_audited_assets,asset_conditions_map)
     return context
 
-def search_with_filters(request,list_of_audited_assets):
+def search_with_filters(request,list_of_audited_assets,asset_conditions_map):
     search_text = (request.GET.get('search_text') or "").strip()
     vendor_id = request.GET.get('vendor')
     status_id = request.GET.get('status')
@@ -464,7 +467,6 @@ def search_with_filters(request,list_of_audited_assets):
         )
     else:
         page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
-
     asset_user_map = {}
     get_assigned_asset_list = AssignAsset.objects.filter(
         asset_id__in=asset_ids,
@@ -480,7 +482,8 @@ def search_with_filters(request,list_of_audited_assets):
             'page_object': page_object,
             'asset_user_map': asset_user_map,
             'asset_images': asset_images,
-            'list_of_audited_assets':list_of_audited_assets
+            'list_of_audited_assets':list_of_audited_assets,
+            'asset_conditions_map':asset_conditions_map
         }
     return context
 
