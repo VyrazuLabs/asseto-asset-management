@@ -21,12 +21,26 @@
         </td>
         <td>{{asset.tag}}</td>
         <td>
-            {% if asset in list_of_audited_assets %}
-                <div class="d-flex">
-                    <div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"> 
-                </div>
-            {% endif %}
-            {{asset.name}}
+            <div class="d-flex align-items-center">
+                {% with asset_conditions_map|get_item:asset.id as condition_list %}
+                    {% with condition_list|default:''|last as condition %}
+                        {% if condition == 0 or condition == 1 %}
+                            <div class="d-flex" >
+                                <div style="width:10px;height:10px;background-color:rgb(72,255,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
+                            </div>
+                        {% elif condition == 2 %}
+                            <div class="d-flex">
+                                <div style="width:10px;height:10px;background-color:rgb(255,255,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
+                            </div>
+                        {% elif condition == 3 or condition == 4 %}
+                            <div class="d-flex">
+                                <div style="width:10px;height:10px;background-color:rgb(255,0,0);border:1px solid black;margin-top:7.5px;margin-right:10px;"></div>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}
+                {{asset.name}}
+            </div>
         </td>
         <td>{{asset.product.product_type}}</td>
         <td>
