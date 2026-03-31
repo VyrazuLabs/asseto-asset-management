@@ -93,7 +93,6 @@ class NotificationService:
         try:
             send_notification_task.delay(payload)
         except OperationalError as e:
-            # fallback (optional)
             print("????",e)
             print("⚠️ Celery broker unavailable, skipping async task")
             send_notification_task(payload)
