@@ -258,7 +258,7 @@ def handle_post_delete(sender, instance):
         icon="bi-x-circle",
         link="#",
         instance=instance,
-        object_id=str(instance.id)
+        object_id=str(instance.pk) if instance.pk else str(instance.id)
     )
 
 

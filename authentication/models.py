@@ -87,6 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     two_factor_auth=models.BooleanField(default=False)
     password_reset_token = models.CharField(max_length=255, blank=True, null=True)
     password_reset_expires = models.DateTimeField(blank=True, null=True)
+    use_expired_assets = models.BooleanField(default=False)
     objects = UserManager()
     history = HistoricalRecords()
 

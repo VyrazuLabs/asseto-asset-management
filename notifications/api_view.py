@@ -14,14 +14,14 @@ def save_firebase_token(request,token):
     user = request.user
     # token = request.data.get('token')
     # If in-app notification is enabled, block FCM token storage
-    if not user.inapp_notification:
-        return Response(
-            {
-                "success": False,
-                "error": "You need to enable in-app notification to use push notifications."
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    # if not user.inapp_notification:
+    #     return Response(
+    #         {
+    #             "success": False,
+    #             "error": "You need to enable in-app notification to use push notifications."
+    #         },
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
     if not token:
         return Response(
             {
