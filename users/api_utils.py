@@ -106,7 +106,8 @@ def get_profile_data(request):
         "organization_website":request.user.organization.website if request.user.organization.website else None,
         "organization_email":request.user.organization.email if request.user.organization.email else None,
         "organization_phone":request.user.organization.phone if request.user.organization.phone else None,
-        "organization_currency":get_currency_format if obj and obj.currency else None
+        "organization_currency":get_currency_format if obj and obj.currency else None,
+        "use_warranty_expired_assets": True if user.use_expired_assets else False
     }
     arr.append(dict)
     return arr
