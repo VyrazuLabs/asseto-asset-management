@@ -18,7 +18,7 @@ from dateutil.relativedelta import relativedelta
 import requests
 from collections import defaultdict
 from notifications.utils import notifications_call
-from .barcode import generate_barcode
+from assets.barcode import generate_barcode
 from .models import AssetSpecification
 
 PAGE_SIZE = 10

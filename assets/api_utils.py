@@ -13,7 +13,9 @@ from configurations.utils import dynamic_display_name
 from django.db.models import Func, CharField
 from dashboard.models import CustomField
 from notifications.models import UserNotification
+from notifications.views import data
 # from assets.api_utils import BaseSegmentFunc
+from django.db.models import Value, BooleanField
 
 def assign_asset_user_list(request):
     get_users=User.undeleted_objects.filter(status=True, organization=request.user.organization).exclude(pk=request.user.id)
@@ -42,6 +44,8 @@ def get_notification_data(request):
     notifications= UserNotification.objects.filter(
                     user=request.user,
                     is_seen=False,
+                    notification__isnull=False,
+                    user__isnull=False,
                     notification__entity_type=0
                 ).annotate(
                     object_type=BaseSegmentFunc('notification__link'),
@@ -49,9 +53,12 @@ def get_notification_data(request):
                     notification_text=F('notification__notification_text'),
                     link=F('notification__link'),
                     created_at=F('notification__created_at'),
-                    object_id=F('notification__object_id')
+                    object_id=F('notification__object_id'),
+        #             in_app_notifications_status=Value(
+        #     in_app_notifications_status, output_field=BooleanField()
+        # )
                 ).order_by('-notification__created_at')
-    data = notifications.values(
+    data = list(notifications.values(
         'id', 
         'notification_title',
         'notification_text',
@@ -60,7 +67,13 @@ def get_notification_data(request):
         'object_type',
         'created_at', 
         'object_id'
-    )
+    ))
+    # for item in data:
+    #     item['in_app_notifications_status'] = in_app_notifications_status
+    # # in_app_notifications_status = True if request.user.inapp_notification else False
+    # print(type(data))
+    
+    print("sdasadsadsadsadas",data)
     return data
 # def get_push_notification_data(user):
 #     return {
@@ -81,6 +94,21 @@ class BaseSegmentFunc(Func):
             ELSE NULL
         END
     """
+
+# class BaseSegmentFunc(Func):
+#     output_field = CharField()
+
+#     template = """
+#         CASE 
+#             WHEN %(expressions)s IS NOT NULL AND %(expressions)s != ''
+#             THEN SUBSTRING_INDEX(
+#                     SUBSTRING_INDEX(%(expressions)s, '/', 2),
+#                     '/',
+#                     -1
+#                  )
+#             ELSE NULL
+#         END
+#     """
 def get_base_segment(path: str):
     if not path:
         return None
@@ -130,11 +158,12 @@ def get_assigned_user(request,asset):
                 "email":assigned_asset.user.email
             }
     return assigned_user
+
 def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
     current_host=request.get_host()
     obj=get_currency_and_datetime_format(request.user.organization)
     format_currency=obj['currency'] if obj['currency'] else 'INR'
-    format_date=obj['date_format'] if obj['date_format'] else None
+    format_date=obj['date_format'] if obj['date_format'] else "YYYY-MM-DD"
     # formatted_currency= format_currency.format(asset.price) if asset.price else None
     assign_info=None
     if asset.is_assigned is True:
@@ -145,8 +174,9 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "assigned_status":asset.is_assigned,
         "name":asset.name,
         "product_id":asset.product.id,
-        "product":asset.product.name, 
-        "product_type":asset.product.product_type.name,
+        "product":asset.product.name,
+        # "product_type":asset.product.product_type.name,
+        "product_type": asset.product.product_type.name if asset.product and asset.product.product_type else None,
         "product_category":asset.product.product_sub_category.name if asset.product.product_sub_category else None,
         "serial_no":asset.serial_no if asset.serial_no else None,
         "price":format_currency+" "+str(asset.price) if asset.price else None,#asset.price if asset.price else None,
@@ -154,10 +184,13 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
         "office_location":asset.location.office_name if asset.location else None,
         "purchase_type":asset.purchase_type if asset.purchase_type else None,
         "purchase_date":format_datetime(asset.purchase_date,format_date) if asset.purchase_date else None,
-        "original_purchase_date":datetime.strptime(str(asset.purchase_date), "%Y-%m-%d").isoformat() if asset.purchase_date else None,
+        # "original_purchase_date":datetime.strptime(str(asset.purchase_date), "%Y-%m-%d").isoformat() if asset.purchase_date else None,
+        "original_purchase_date": asset.purchase_date.isoformat() if asset.purchase_date else None,
         # datetime.strptime(str(asset.warranty_expiry_date), "%Y-%m-%d").isoformat()
-        "warranty_expiry_date":format_datetime(asset.warranty_expiry_date,format_date) if asset.warranty_expiry_date else None,
-        "original_warranty_expiry_date":datetime.strptime(str(asset.warranty_expiry_date), "%Y-%m-%d").isoformat() if asset.warranty_expiry_date else None,
+        # "warranty_expiry_date":format_datetime(asset.warranty_expiry_date,format_date) if asset.warranty_expiry_date else None,
+        "warranty_expiry_date": format_datetime(asset.warranty_expiry_date, format_date) if asset.warranty_expiry_date else None,
+        # "original_warranty_expiry_date":datetime.strptime(str(asset.warranty_expiry_date), "%Y-%m-%d").isoformat() if asset.warranty_expiry_date else None,
+        "original_warranty_expiry_date": asset.warranty_expiry_date.isoformat() if asset.warranty_expiry_date else None,
         "vendor_id":asset.vendor.id if asset.vendor else None,
         "vendor":asset.vendor.name if asset.vendor else None,
         "asset_status_id":asset.asset_status.id if asset.asset_status else None,
@@ -175,7 +208,6 @@ def asset_data(request,asset,asset_images,asset_statuses,custom_fields):
             asset_images_dict={'image_id':image.id,'image_path':f"http://{current_host}"+image.image.url}
             asset_image_list.append(asset_images_dict)
     asset_data['asset_images']=asset_image_list
-
     custom_fields_list=[]
     if custom_fields:
         for custom_field in custom_fields:
