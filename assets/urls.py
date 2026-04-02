@@ -60,4 +60,5 @@ api_url_patterns = [
     # path('api/asset/push-notification/',api_views.get_push_notification, name='push_notification'),
     path('api/asset/get_firebase_token/<str:token>', notifications_api_view.save_firebase_token, name='get_firebase_token'),
     path('api/asset/mark-notification-read',api_views.MarkNotificationAsSeen.as_view(),name="mark_notification_read"),
+    path('api/asset/get-warranty-expired-assets-flag/',api_views.GetWarrantyExpiredAssetFlag.as_view(),name="get_warranty_expired_assets_flag"),
 ]

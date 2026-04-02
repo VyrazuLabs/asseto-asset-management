@@ -21,7 +21,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user_totp = UserTotp.objects.filter(user_id=self.user.id).first()
         user = self.user
         two_factor_auth = user.two_factor_auth
-        if two_factor_auth and user_totp and user_totp.status == 2:
+        # if two_factor_auth and user_totp and user_totp.status == 2:
+        if two_factor_auth:
             data.pop('access', None)
             data.pop('refresh', None)
             data['two_factor_auth'] = True

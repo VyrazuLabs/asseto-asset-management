@@ -2,7 +2,7 @@ import json
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from .api_utils import  get_completed_audits,get_pending_audits,audit_data_by_id,get_audit_details,get_completed_audit
-# from assets.barcode import generate_barcode
+from assets.barcode import generate_barcode
 from .models import Audit, AssetImage
 from assets.models import AssignAsset,Asset
 from assets.serializers import AssetSerializer
