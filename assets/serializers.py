@@ -243,7 +243,7 @@ class AssetSerializer(serializers.ModelSerializer):
                 entity_type="asset"
             ).delete()
 
-        # 🔹 Create / Update incoming fields
+        # Create / Update incoming fields
         for custom_field in custom_fields:
             if not isinstance(custom_field, dict):
                 continue
@@ -298,13 +298,16 @@ class AssetSerializer(serializers.ModelSerializer):
     #     return attrs
     
     def validate_warranty_expiry_date(self, value):
-        if value:
+        user=self.context["request"].user
+        if user.use_expired_assets is True and value:
+            return value
+        else:
             tomorrow = timezone.now() + timedelta(days=1)
             if value < tomorrow:
                 raise serializers.ValidationError(
                     "Warranty expiry date must be at least tomorrow."
                 )
-        return value
+            return value
 
 
 class SearchAssetSerializer(serializers.Serializer):

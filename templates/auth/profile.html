@@ -260,6 +260,20 @@
                                         </div>
                                     </td>
                                 </tr> 
+                                <tr>
+                                    <td><b>Use Expired Assets</b></td>
+                                    <td>
+                                        <div class="form-check form-switch">
+                                            <input 
+                                                type="checkbox"
+                                                name="use_expired_assets"
+                                                class="form-check-input"
+                                                style="cursor: pointer;"
+                                                {% if request.user.use_expired_assets is True %} checked {% else %} unchecked {% endif %}
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                         </form>
@@ -296,8 +310,7 @@
                         <div class="alert alert-success py-2">
                             User is already logged in with 2FA.
                         </div>
-                    {% endif %}
-                    
+                    {% endif %}                    
                     <div id="qrContainer" class="text-center mt-4">
                         <h5 id="qrTitle">Two Factor Authentication QR Code</h5>
                         
@@ -334,9 +347,9 @@
                             </button>
                         </div>
                     </div>
-                
                 </div>
             </div>
+            </br>
             {% endif %}
             {% if assigned_assets is not None %}
                 <div class="card">
