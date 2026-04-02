@@ -75,9 +75,16 @@ class NotificationService:
 
     @staticmethod
     def send(**kwargs):
-
+        user_obj = kwargs.get("user")
+        if hasattr(user_obj, "id"):
+            user_id = user_obj.id
+        elif hasattr(user_obj, "first"):  # QuerySet
+            user_instance = user_obj.first()
+            user_id = user_instance.id if user_instance else None
+        else:
+            user_id = user_obj  # assume it's already an ID
         payload = {
-            "user": kwargs["user"].id,
+            "user": user_id,
             # "user": kwargs["user"],
             "title": kwargs["title"],
             "message": kwargs["message"],
@@ -89,7 +96,7 @@ class NotificationService:
             "updated_by": kwargs.get("updated_by").id if kwargs.get("updated_by") else None,
         }
 
-        # 🔥 async call
+        # async call
         try:
             send_notification_task.delay(payload)
         except OperationalError as e:
