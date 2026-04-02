@@ -188,6 +188,9 @@ def search_user_utils(request,page):
     return page_object, deleted_user_count, user_asset_map_count, user_asset_map_count_count
 
 def create_user_notification_type_utils(request):
+    print("request.POST",request.POST)
+    use_expired_asset= request.POST.get("use_expired_assets")== "on"
+    print(use_expired_asset,"use_expired_asset")
     email = request.POST.get("email_notification") == "on"
     in_app = request.POST.get("in_app_notification") == "on"
     browser = request.POST.get("browser_notification") == "on"
@@ -200,7 +203,8 @@ def create_user_notification_type_utils(request):
             slack_notification=slack,
             browser_notification=browser,
             inapp_notification=in_app,
-            two_factor_auth=two_factor_auth
+            two_factor_auth=two_factor_auth,
+            use_expired_assets=use_expired_asset
         )
 
 def toggle_two_factor_auth_utils(request):

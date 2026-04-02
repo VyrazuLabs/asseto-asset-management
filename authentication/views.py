@@ -379,14 +379,16 @@ def activate(request, uidb64, token):
 def profile(request):
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     user = request.user
-
+    get_expired_asset_use_flag=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).values('use_expired_assets').first()
+    print("FLAG",get_expired_asset_use_flag)
+    # get_expired_asset_use_flag=Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization),warranty_expiry_date__lt=datetime.now(),use_expired_assets=True).count()
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name=user.dynamic_display_name(user.full_name)
     get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
     # get_qr_for_2fa = generate_qr(request)
     context = {'profile': True, 'title': 'Profile', 'full_name':get_user_full_name,
                'assigned_assets': assigned_assets,'email_notification':user.email_notification,'browser_notification':user.browser_notification,'slack_notification':user.slack_notification,'inapp_notification':user.inapp_notification,
-               "two_factor_auth":user.two_factor_auth,"get_user_totp":get_user_totp}
+               "two_factor_auth":user.two_factor_auth,"get_user_totp":get_user_totp,"get_expired_asset_use_flag":get_expired_asset_use_flag}
     return render(request, 'auth/profile.html', context=context)
 
 @login_required
