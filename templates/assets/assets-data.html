@@ -109,7 +109,7 @@
             </div>
         </td>
         <td>
-            <div class="btn-group btn-group-sm d-flex " role="group" aria-label="Basic example">
+            <!-- <div class="btn-group btn-group-sm d-flex " role="group" aria-label="Basic example">
                 {% if perms.authentication.view_asset %}
                     <a href="{% url 'assets:details' asset.id %}" class="btn btn-success pt-2"><i class="bi bi-eye-fill"></i></a>
                 {% endif %}
@@ -134,6 +134,32 @@
                     {% endif %}
                 {% endif %}
                 <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive"></i></i></a>
+            </div> -->
+            <div class="btn-group btn-group-sm d-flex " role="group" aria-label="Basic example">
+                {% if perms.authentication.view_asset %}
+                    <a href="{% url 'assets:details' asset.id %}" class="btn btn-success pt-2 px-3"><i class="bi bi-eye-fill"></i></a>
+                {% endif %}
+                {% if perms.authentication.edit_asset %}
+                    {% if is_demo is True %}
+                        <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" id="update-asset" class="btn btn-info disabled pt-2 px-3" ><i class="bi bi-pencil-square"></i></a>
+                    {% else %}
+                        <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" id="update-asset" class="btn btn-info pt-2 px-3"><i class="bi bi-pencil-square"></i></a>
+                    {% endif %}
+                {% endif %}
+                {% if perms.authentication.delete_asset %}
+                    {% if is_demo is True %}
+                        <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                            {% csrf_token %}
+                            <button type="submit" value="Delete" id="delete-asset" class="disabled btn btn-sm btn-danger pt-2 px-4 "><i class="bi bi-trash3-fill"></i></button>
+                        </form>
+                    {% else %}
+                        <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                            {% csrf_token %}
+                            <button type="submit" value="Delete" id="delete-asset" class="btn btn-sm btn-danger pt-2 px-4"><i class="bi bi-trash3-fill"></i></button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+                <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="btn btn-sm btn-primary pt-2 px-3"><i class="bi bi-archive"></i></i></a>
             </div>
         </td>
     </tr>

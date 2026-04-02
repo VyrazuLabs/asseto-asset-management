@@ -36,6 +36,7 @@ class GetNotifications(APIView):
     @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
     def get(self,request):
         try:
+            in_app_notifications_status = True if request.user.inapp_notification else False
             # notifications = UserNotification.objects.filter(
             #     user=request.user,
             #     notification__entity_type=0
@@ -48,7 +49,11 @@ class GetNotifications(APIView):
             data=get_notification_data(request)
             page = int(request.GET.get('page', 1))
             paginated_data=add_pagination(data,page=page)
-            return api_response(data=paginated_data, message="List get Successfully")
+            response_data = {
+                "in_app_notifications_status": in_app_notifications_status,
+                "notifications": paginated_data
+            }
+            return api_response(data=response_data, message="List get Successfully")
             # Mark as sent
             # notifications.update(is_sent=True)
         except ValueError as e:
@@ -317,7 +322,22 @@ class UserListForAssignAsset(APIView):
             return api_response(status=500,error_type="server_error",error_location=error_info['location'],
                 system_message=error_info["message"], trace_back=error_info['traceback'])
         
+class GetWarrantyExpiredAssetFlag(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        try:
+            user=request.user
+            data={
+                "use_warranty_expired_assets": True if user.use_expired_assets else False
+            }
+            return api_response(data=data, message="Flag get successfully")
+        
+        except Exception as e:
+            error_info=get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
 
+            return api_response(status=500,error_type="server_error",error_location=error_info['location'],
+                system_message=error_info["message"], trace_back=error_info['traceback'])
 
 
 
