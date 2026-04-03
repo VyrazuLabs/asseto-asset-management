@@ -1,6 +1,7 @@
+import structlog
 from django.apps import AppConfig
 from authentication.models import User
-from django.db.models.signals import post_save 
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from.seeders import seed_asset_statuses
 from authentication.models import SeedFlag
@@ -9,7 +10,8 @@ from assets.models import Asset
 from notifications.service import NotificationService
 User = get_user_model()
 
-print("ASSET SIGNALS")
+log = structlog.get_logger(__name__)
+log.info("asset_signals_loaded")
 @receiver(post_save, sender=Asset)
 def asset_notification(sender, instance, created, **kwargs):
     if getattr(instance, "_skip_notification", False):
@@ -118,7 +120,7 @@ def asset_notification(sender, instance, created, **kwargs):
             instance_id=instance.id,
             object_id=str(instance.id),
         )
-        print("ASSET SIGNALS")
+        log.info("asset_updated_notification_sent", asset_id=str(instance.id))
 
 @receiver(post_save, sender=User)
 def trigger_seed_on_first_superuser(sender,instance,created,**kwargs):

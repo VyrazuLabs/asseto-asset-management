@@ -127,7 +127,7 @@ class AssignedAssetForm(forms.ModelForm):
     asset = forms.ModelChoiceField(
         required=True,
         queryset=Asset.undeleted_objects.filter(is_assigned=False, status=True),
-        label='he;ll',
+        label='Asset',
         empty_label="--SELECT--",
         widget=forms.Select(
             attrs={'class': 'form-select'}
