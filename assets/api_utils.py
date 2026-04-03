@@ -1,6 +1,9 @@
+import structlog
 from django.utils import timezone
 from datetime import datetime, timedelta
 from assets.models import Asset, AssetImage, AssignAsset,AssetStatus
+
+log = structlog.get_logger(__name__)
 from dateutil.relativedelta import relativedelta
 import re
 from django.db.models import F
@@ -73,7 +76,7 @@ def get_notification_data(request):
     # # in_app_notifications_status = True if request.user.inapp_notification else False
     # print(type(data))
     
-    print("sdasadsadsadsadas",data)
+    log.debug("notification_data_fetched", count=len(data))
     return data
 # def get_push_notification_data(user):
 #     return {
@@ -114,7 +117,31 @@ def get_base_segment(path: str):
         return None
     return next((segment for segment in path.split("/") if segment), None)
 def convert_to_list(request,queryset):
+    """Convert asset queryset to list of dicts for API response, with batch-loaded images and assignments."""
     current_host=request.get_host()
+
+    # Ensure queryset uses select_related to avoid N+1 on asset fields
+    if hasattr(queryset, 'query'):
+        queryset = queryset.select_related(
+            'vendor', 'product', 'product__product_type', 'asset_status', 'location'
+        )
+
+    asset_ids = [asset.id for asset in queryset]
+
+    # Batch load first image per asset
+    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids).order_by('-uploaded_at')
+    asset_image_map = {}
+    for img in images_qs:
+        if img.asset_id not in asset_image_map:
+            asset_image_map[img.asset_id] = img
+
+    # Batch load assignments
+    assignments_qs = AssignAsset.objects.select_related('user').filter(asset_id__in=asset_ids)
+    asset_assign_map = {}
+    for assign in assignments_qs:
+        if assign.asset_id not in asset_assign_map:
+            asset_assign_map[assign.asset_id] = assign
+
     asset_list = []
     for asset in queryset:
         asset_dict = {
@@ -131,12 +158,12 @@ def convert_to_list(request,queryset):
             "asset_status": asset.asset_status.name if asset.asset_status else None,
             "asset_status_id": asset.asset_status.id if asset.asset_status else None,
         }
-        assetImage=AssetImage.objects.filter(asset=asset.id).first()
-        asset_dict["image"]=f"http://{current_host}"+assetImage.image.url if assetImage else None
-        user=request.user
+        asset_img = asset_image_map.get(asset.id)
+        asset_dict["image"]=f"http://{current_host}"+asset_img.image.url if asset_img and asset_img.image else None
+
         if asset.is_assigned:
-            assigned_asset = AssignAsset.objects.filter(asset=asset.id).select_related("user").first()
-            asset_dict["assigned_to_name"] = dynamic_display_name(request,fullname=assigned_asset.user.full_name) if assigned_asset and assigned_asset.user else None,
+            assigned_asset = asset_assign_map.get(asset.id)
+            asset_dict["assigned_to_name"] = dynamic_display_name(request,fullname=assigned_asset.user.full_name) if assigned_asset and assigned_asset.user else None
             asset_dict["assigned_to_image"] = f"http://{current_host}"+assigned_asset.user.profile_pic.url if assigned_asset and assigned_asset.user and assigned_asset.user.profile_pic else None
         else:
             asset_dict["assigned_to_name"] = None
@@ -266,7 +293,7 @@ def delete_images(deleted_image_ids):
         try:
             AssetImage.objects.filter(id=id).delete()
         except Exception as e:
-            print("exception",e)
+            log.exception("image_delete_failed", image_id=id)
 
 MM_TO_PX = 3.7795275591  # 96 dpi standard
 
