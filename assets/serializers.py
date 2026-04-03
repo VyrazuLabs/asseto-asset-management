@@ -1,13 +1,12 @@
 import json
 from rest_framework import serializers
+from django.db import transaction
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
 from dashboard.models import CustomField
 from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
-from rest_framework import serializers
 from notifications.models import UserNotification
-from rest_framework import serializers
 from .api_utils import get_base_segment
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -177,10 +176,9 @@ class AssetSerializer(serializers.ModelSerializer):
                 )
         return value
 
+    @transaction.atomic
     def create(self, validated_data):
         images = validated_data.pop("images", []) or []
-        # custom_fields_raw = request.data.get("custom_fields", "[]")
-        # custom_fields = json.loads(custom_fields_raw)
         custom_fields = validated_data.pop("custom_fields", []) or []
         asset = Asset.objects.create(
             **validated_data,
@@ -211,6 +209,7 @@ class AssetSerializer(serializers.ModelSerializer):
         return asset
 
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         image_data = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields", [])

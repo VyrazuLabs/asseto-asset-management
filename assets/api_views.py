@@ -1,28 +1,29 @@
 import json
+
 from django.shortcuts import get_object_or_404
+from django.db.models import Q, F
+from django.http import HttpResponse
+
 from rest_framework.views import APIView
-from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset,get_base_segment
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
+
 from assets.models import Asset, AssetImage, AssetStatus
-from assets.serializers import AssetSerializer,NotificationSerializer, AssignAssetSerializer, SearchAssetSerializer
+from assets.serializers import AssetSerializer, NotificationSerializer, AssignAssetSerializer, SearchAssetSerializer
+from assets.api_utils import (
+    asset_data, convert_to_list, delete_images, get_asset, get_base_segment,
+    BaseSegmentFunc, get_notification_data, mark_notification_as_seen,
+    asset_details, assign_asset_user_list,
+)
 from authentication.models import User
 from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
 from common.pagination import add_pagination
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
-from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
-from drf_spectacular.utils import extend_schema,OpenApiParameter
-from drf_spectacular.types import OpenApiTypes
-from django.db.models import Q
-from django.http import HttpResponse
-import requests
 from dashboard.models import CustomField
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from notifications.models import UserNotification
-from assets.api_utils import BaseSegmentFunc
-from django.db.models import F
-from .api_utils import get_notification_data, mark_notification_as_seen,asset_details,assign_asset_user_list
 
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
@@ -110,7 +111,9 @@ class AssetList(APIView):
         OpenApiParameter(name="page",type=int,default=1,description="page number for pagination")])
     def get(self,request):
         try:
-            asset_queryset=Asset.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
+            asset_queryset=Asset.undeleted_objects.select_related(
+                'vendor', 'product', 'product__product_type', 'location', 'asset_status', 'organization'
+            ).filter(organization=request.user.organization).order_by("-created_at")
             data=convert_to_list(request,asset_queryset)
             page=int(request.GET.get('page'))
             paginated_data=add_pagination(data,page=page)
@@ -224,15 +227,18 @@ class SearchAsset(APIView):
         if not search_text or not search_text.strip():
             return api_response(data=[], message="No Asset found")
         try:
-            get_asset_queryset=Asset.objects.filter(Q(tag__icontains=search_text) |
-            Q(name__icontains=search_text) |
-            Q(serial_no__icontains=search_text) |
-            Q(purchase_type__icontains=search_text) |
-            Q(product__name__icontains=search_text) |
-            Q(vendor__name__icontains=search_text) |
-            Q(vendor__gstin_number__icontains=search_text) |
-            Q(location__office_name__icontains=search_text) |
-            Q(product__product_type__name__icontains=search_text)).order_by("-created_at")
+            get_asset_queryset=Asset.undeleted_objects.filter(
+                Q(organization=request.user.organization),
+                Q(tag__icontains=search_text) |
+                Q(name__icontains=search_text) |
+                Q(serial_no__icontains=search_text) |
+                Q(purchase_type__icontains=search_text) |
+                Q(product__name__icontains=search_text) |
+                Q(vendor__name__icontains=search_text) |
+                Q(vendor__gstin_number__icontains=search_text) |
+                Q(location__office_name__icontains=search_text) |
+                Q(product__product_type__name__icontains=search_text)
+            ).order_by("-created_at")
             if get_asset_queryset:
                 data=convert_to_list(request,get_asset_queryset)
                 return api_response(data=data,message="Asset found")
