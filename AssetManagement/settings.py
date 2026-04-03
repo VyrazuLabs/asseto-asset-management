@@ -113,7 +113,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'audit',
     'license',
-    'silk'
+    # 'silk'
 
 ]
 # FIREBASE_APP = initialize_app()
@@ -134,14 +134,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     "django_htmx.middleware.HtmxMiddleware",
-    'silk.middleware.SilkyMiddleware'
+    # 'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = 'AssetManagement.urls'
 
 WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 
-SILKY_PYTHON_PROFILER = True
+# SILKY_PYTHON_PROFILER = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
