@@ -18,6 +18,7 @@ from dateutil.relativedelta import relativedelta
 import requests
 from collections import defaultdict
 from django.db import transaction
+from django.db.models import Sum
 from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
@@ -220,28 +221,42 @@ def create_asset_list(request,assets_qs):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
+    # Stats for summary cards
+    total_value = Asset.undeleted_objects.filter(
+        organization=request.user.organization
+    ).aggregate(total=Sum('price'))['total'] or 0
+    active_count = Asset.undeleted_objects.filter(
+        organization=request.user.organization
+    ).count()
+    assigned_count = Asset.undeleted_objects.filter(
+        organization=request.user.organization, is_assigned=True
+    ).count()
+
     context = {
         'product_category_list':product_category_list,
         'department_list':department_list,
         'location_list':location_list,
         'asset_user_map':asset_user_map,
         'product_type_list':product_type_list,
-        'asset_status_list':asset_status_list, 
+        'asset_status_list':asset_status_list,
         'user_list':user_list,
         'vendor_list':vendor_list,
         'active_user':active_users,
         'sidebar': 'assets',
         'submenu': 'list',
-        'asset_images': asset_images,  # dict {asset.id: first AssetImage instance}
+        'asset_images': asset_images,
         'page_object': page_object,
         'asset_form': asset_form,
         'assign_asset_form': assign_asset_form,
         'reassign_asset_form': reassign_asset_form,
-        'deleted_asset_count':deleted_asset_count,
+        'deleted_asset_count': deleted_asset_count,
+        'total_value': total_value,
+        'active_count': active_count,
+        'assigned_count': assigned_count,
         'title': 'Assets',
-        'is_demo':is_demo,
-        'list_of_audited_assets':list_of_audited_assets,
-        'asset_conditions_map':asset_conditions_map
+        'is_demo': is_demo,
+        'list_of_audited_assets': list_of_audited_assets,
+        'asset_conditions_map': asset_conditions_map,
     }
     return context
 def assign_asset(request,id):
