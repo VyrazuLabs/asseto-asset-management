@@ -18,7 +18,7 @@ from dashboard.models import CustomField
 from datetime import date
 from .utils import export_vendors_pdf_utils,vendor_list_util,get_vendor_details,search_utils,export_vendor_csv_utils
 import os
-from silk.profiling.profiler import silk_profile
+# from silk.profiling.profiler import silk_profile
 
 IS_DEMO = os.environ.get('IS_DEMO')
 
@@ -68,7 +68,7 @@ def delete_vendor(request, id):
 """Add a new vendor"""
 @login_required
 @permission_required('authentication.add_vendor')
-@silk_profile(name="add_vendor")
+# @silk_profile(name="add_vendor")
 def add_vendor(request):
     vendor_form = VendorForm()
     address_form = AddressForm()
@@ -99,7 +99,7 @@ def details(request, id):
 """Update the vendor based on id"""
 @login_required
 @permission_required('authentication.edit_vendor')
-@silk_profile(name="update_vendor")
+# @silk_profile(name="update_vendor")
 def update_vendor(request, id):
     vendor = get_object_or_404(
         Vendor.undeleted_objects, pk=id)
