@@ -95,7 +95,7 @@ def asset_status_details(request,id):
     asset_status = get_object_or_404(
     AssetStatus.undeleted_objects, pk=id)
 
-    history_list = AssetStatus.history.all()
+    history_list = asset_status.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
