@@ -31,14 +31,23 @@
                 {% for error in u_form.full_name.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
+
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <span class="text-danger">*</span>
+                    {{u_form.email}}
+                    <div class="form-control-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                </div>
                 {% for error in u_form.email.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
+
                 <div class="form-group position-relative has-icon-left mb-3">
                     <span class="text-danger">*</span>
                     {{u_form.username}}
                     <div class="form-control-icon">
-                        <i class="bi bi-envelope"></i>
+                        <i class="bi bi-person"></i>
                     </div>
                 </div>
                 {% for error in u_form.username.errors %}
