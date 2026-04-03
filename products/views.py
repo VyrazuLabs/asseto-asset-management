@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import date
 from .utils import product_list,search_utils,get_product_details,export_product_pdf_utils,added_product,deleted_product,exports_product_csv_utils
 import os 
-from silk.profiling.profiler import silk_profile
+# from silk.profiling.profiler import silk_profile
 
 IS_DEMO = os.environ.get('IS_DEMO')
 today = date.today()
@@ -56,7 +56,7 @@ def details_product(request, id):
 
 @login_required
 @permission_required('authentication.add_product')
-@silk_profile(name="add_products")
+# @silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
         form = AddProductsForm(
