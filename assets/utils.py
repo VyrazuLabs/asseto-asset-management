@@ -23,7 +23,7 @@ from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
 
-PAGE_SIZE = 10
+PAGE_SIZE = 25
 ORPHANS = 1
 
 def grouper(iterable, n):
@@ -38,7 +38,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from authentication.models import User
 
-PAGE_SIZE = 10
+PAGE_SIZE = 25
 ORPHANS = 1
 
 @login_required
@@ -282,7 +282,7 @@ def assign_asset_in_form(request,form):
     asset.is_assigned = True
     set_asset_status = AssetStatus.objects.filter(
         Q(organization=request.user.organization) | Q(organization__isnull=True),
-        name='Available'
+        name='Assigned'
     ).first()
     asset.asset_status = set_asset_status
     asset.save()
@@ -386,7 +386,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
 
-    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
+    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image}
 
     return context
