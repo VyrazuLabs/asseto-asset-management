@@ -1,443 +1,308 @@
 {% extends 'layouts/main-layout.html' %}
-{% block content %}
 {% load static %}
+{% block title %}Update Asset | Asseto{% endblock %}
 
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Update Asset</h3>
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/assets.css' %}">
+{% endblock css %}
 
+{% block content %}
 
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item">Assets</li>
-                    <li class="breadcrumb-item active" aria-current="page">Update Asset</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="d-flex justify-content-end align-items-center">
-            <div class="me-2">
-                <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
-            </div>
-            <div>
-                <a href="{% url 'assets:details' asset.id %}" class="btn btn-sm btn-outline-info my-3">Back to Asset Detail</a>
-            </div>
-        </div>
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="update-page-header">
+  <div>
+    <h1>Update Asset</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
+        <li class="breadcrumb-item active">Update Asset</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <a href="{% url 'assets:list' %}" class="btn-back">Back to List</a>
+    <a href="{% url 'assets:details' asset.id %}" class="btn-back">Back to Asset Detail</a>
+    <button type="submit" form="update-asset-form" class="btn-register">
+      <i class="bi bi-floppy"></i> Save Changes
+    </button>
+  </div>
+</div>
+
+<form id="update-asset-form" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
+{% csrf_token %}
+
+{# ── General Information ───────────────────────────────────────────────────── #}
+<div class="form-section">
+  <div class="section-header">
+    <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
+    <h2>General Information</h2>
+  </div>
+  <div class="section-body">
+    <div class="row g-3">
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Asset Tag</label>
+        {{ form.tag }}
+        {% for e in form.tag.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Asset Name</label>
+        {{ form.name }}
+        {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Product Category</label>
+        {{ form.product }}
+        {% for e in form.product.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Vendor</label>
+        {{ form.vendor }}
+        {% for e in form.vendor.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Office Location</label>
+        {{ form.location }}
+        {% for e in form.location.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Serial No.</label>
+        {{ form.serial_no }}
+        {% for e in form.serial_no.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-12">
+        <label class="field-label">Description &amp; Notes</label>
+        {{ form.description }}
+        {% for e in form.description.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
     </div>
-    <section class="section">
-        <form class="form row" method="POST" action="{{request.path}}" novalidate enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="card">
-                <div class="card-header">
-                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 col-12"> 
-                            <div class="form-group">
-                                <label for="city-column">Tag</label>
-                                {{form.tag}}
-                                {% for error in form.tag.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="city-column">Product</label>
-                                {{form.product}}
-                                {% for error in form.product.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="country-floating">Vendor</label>
-                                {{form.vendor}}
-                                {% for error in form.vendor.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Office Location</label>
-                                {{form.location}}
-                                {% for error in form.location.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="company-column">Asset Name</label>
-                                {{form.name}}
-                                {% for error in form.name.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Serial No.</label>
-                                {{form.serial_no}}
-                                {% for error in form.serial_no.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Price</label>
-                                {{form.price}}
-                                {% for error in form.price.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="country-floating">Purchase Type</label>
-                                {{form.purchase_type}}
-                                {% for error in form.purchase_type.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Purchase Date</label>
-                                {{form.purchase_date}}
-                                {% for error in form.purchase_date.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Warranty Expiry Date</label>
-                                {{form.warranty_expiry_date}}
-                                {% for error in form.warranty_expiry_date.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-12 col-12">
-                            <div class="form-group">
-                                <label for="email-id-column">Description</label>
-                                {{form.description}}
-                                {% for error in form.description.errors %}
-                                <small class="text-danger mb-3">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 w-100" >
-                        <label>Update/Add Images</label>
-                        {{ image_form.image }}
-                        {% for error in image_form.image.errors %}
-                            <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="row my-3 mx-0">
-                    {% for img in asset_images %}
-                        <div class="col-auto asst-prd-img-div" style="width: 150px; height: 150px;padding-bottom: 30px;" >
-                            <div class="col-auto">
-                                <img 
-                                    src="{{ img.image.url }}" 
-                                    alt="Asset Image" 
-                                    class="asst-prd-img"
-                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';"
-                                >
-                                <br>
-                                <button name="delete_image_ids" value="{{ img.id }}" class="btn delete-img-btn mb-5 mx-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-trash">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16z" />
-                                        <path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
+  </div>
+</div>
 
-                </div>
-                {% if custom_fields %}
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h6>Custom Fields</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                {% for cf in custom_fields %}
-                                     <div class="col-md-6 col-12">
-                                        <div class="form-group">
-                                            <label>{{ cf.field_name }}</label>
-                                            <input
-                                                type="text"
-                                                class="form-control"
-                                                name="custom_field_{{ cf.entity_id }}"
-                                                value="{{ cf.field_value }}"
-                                                autocomplete="off"
-                                                placeholder="{{ cf.field_value }}"
-                                            >
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-header">
-                        <h6>Add New Custom Fields</h6>
-                    </div>
-                    <div class="card-body" id="custom-field-container">
-                        <div class="row">
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <input type="text" class="form-control"
-                                        placeholder="Custom Field Name"
-                                        name="custom_field_name" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <input type="text" class="form-control"
-                                        placeholder="Custom Field Value"
-                                        name="custom_field_value" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-auto" id="custom-field-main-btn">
-                                <div class="form-group">
-                                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-info">
-                                        <i class="bi bi-plus-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="display:none">
-                        <div class="row rm-custom-field" id="custom-field-template">
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <input type="text" class="form-control"
-                                        placeholder="Custom Field Name"
-                                        name="custom_field_name" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <input type="text" class="form-control"
-                                        placeholder="Custom Field Value"
-                                        name="custom_field_value" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <button type="button" onclick="removeCustomField(this)" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-dash-lg"></i>
-                                    </button>
-                                </div>
-                            </div>   
-                        </div>
-                    </div>
-                {% endif %}
-            {% if assetSpecifications %}
-            <div class="card">
-                <div class="card-header">Asset Specifications</div>
-                <div class="card-body" id="container">
-                {% if assetSpecifications %}
-                    {% for assetSpecification in assetSpecifications %}
-                        <div class="row rmsection">
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <!-- <label for="first-name-column">Specification Name</label> -->
-                                    <input type="text" id="first-name-column" class="form-control"
-                                        placeholder="Specification Name" name="specifications_name" autocomplete="off" value="{{assetSpecification.name}}">
-                                </div>
-                            </div>
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <!-- <label for="last-name-column">Specification Value</label> -->
-                                    <input type="text" id="last-name-column" class="form-control"
-                                        placeholder="Specification Value" name="specifications_value" autocomplete="off" value="{{assetSpecification.value}}">
-                                </div>
-                            </div>
-                            {% if forloop.counter == 1 %}
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <button type="button" id="newsectionbtn" class="btn btn-sm btn-info"><i class="bi bi-plus-lg"></i></button>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <button type="button" onclick="remove(this)" class="btn btn-sm btn-danger"><i class="bi bi-dash-lg"></i></button>
-                                </div>
-                            </div>                            
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="row">
-                        <div class="col-5">
-                            <div class="form-group">
-                                <!-- <label for="first-name-column">Specification Name</label> -->
-                                <input type="text" id="first-name-column" class="form-control"
-                                    placeholder="Specification Name" name="specifications_name" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-5">
-                            <div class="form-group">
-                                <!-- <label for="last-name-column">Specification Value</label> -->
-                                <input type="text" id="last-name-column" class="form-control"
-                                    placeholder="Specification Value" name="specifications_value" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <div class="form-group">
-                                <button type="button" id="newsectionbtn" class="btn btn-sm btn-info"><i class="bi bi-plus-lg"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
+{# ── Purchase & Lifecycle Details ─────────────────────────────────────────── #}
+<div class="form-section">
+  <div class="section-header">
+    <div class="section-icon"><i class="bi bi-cash-coin"></i></div>
+    <h2>Purchase &amp; Lifecycle Details</h2>
+  </div>
+  <div class="section-body">
+    <div class="row g-3">
 
-                    <div style="display:none">
-                        <div class="row rmsection" id="mainsection">
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <!-- <label for="first-name-column">Specification Name</label> -->
-                                    <input type="text" id="first-name-column" class="form-control"
-                                        placeholder="Specification Name" name="specifications_name" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-5">
-                                <div class="form-group">
-                                    <!-- <label for="last-name-column">Specification Value</label> -->
-                                    <input type="text" id="last-name-column" class="form-control"
-                                        placeholder="Specification Value" name="specifications_value" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <div class="form-group">
-                                    <button type="button" onclick="remove(this)" class="btn btn-sm btn-danger"><i class="bi bi-dash-lg"></i></button>
-                                </div>
-                            </div>   
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </form>
-    </section>
+      <div class="col-md-4 col-12">
+        <label class="field-label">Purchase Price (₹)</label>
+        {{ form.price }}
+        {% for e in form.price.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Purchase Type</label>
+        {{ form.purchase_type }}
+        {% for e in form.purchase_type.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Purchase Date</label>
+        {{ form.purchase_date }}
+        {% for e in form.purchase_date.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
+        <label class="field-label">Warranty Expiry Date</label>
+        {{ form.warranty_expiry_date }}
+        {% for e in form.warranty_expiry_date.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{# ── Asset Media ───────────────────────────────────────────────────────────── #}
+<div class="form-section">
+  <div class="section-header">
+    <div class="section-icon"><i class="bi bi-images"></i></div>
+    <h2>Asset Media</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="update-upload-area">
+      <i class="bi bi-image-fill"></i>
+      <div class="upload-text">
+        <div class="upload-label">Upload or Update Images</div>
+        <div class="upload-hint">Recommended size: 1200×800px. Max file size: 5MB.</div>
+      </div>
+      <label for="image-upload" class="btn-choose-file">Choose File</label>
+      <span id="file-chosen-label" class="upload-hint">No file chosen</span>
+    </div>
+    <input id="image-upload" type="file" name="image" multiple class="d-none"
+           onchange="document.getElementById('file-chosen-label').textContent = this.files.length > 1 ? this.files.length + ' files chosen' : (this.files[0]?.name || 'No file chosen')">
+
+    {% if asset_images %}
+    <div class="update-image-grid mt-3">
+      {% for img in asset_images %}
+      <div class="update-image-item" id="img-item-{{ img.id }}">
+        <img src="{{ img.image.url }}"
+             alt="Asset Image"
+             onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+        <button type="button"
+                class="update-image-delete"
+                data-image-id="{{ img.id }}"
+                title="Delete image">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Custom Fields ─────────────────────────────────────────────────────────── #}
+{% if custom_fields %}
+<div class="form-section">
+  <div class="section-header">
+    <div class="section-icon"><i class="bi bi-sliders"></i></div>
+    <h2>Custom Fields</h2>
+  </div>
+  <div class="section-body">
+    <div class="row g-3" id="custom-field-container">
+      {% for cf in custom_fields %}
+      <div class="col-md-6 col-12 rm-custom-field">
+        <label class="field-label">{{ cf.field_name }}</label>
+        <input type="text" class="field-input"
+               name="custom_field_{{ cf.entity_id }}"
+               value="{{ cf.field_value }}"
+               autocomplete="off"
+               placeholder="{{ cf.field_name }}">
+      </div>
+      {% endfor %}
+    </div>
+    <div class="row g-3 mt-1" id="custom-field-new-container"></div>
+    <button type="button" id="addCustomFieldBtn" class="btn-add-row mt-3">
+      <i class="bi bi-plus-lg"></i> Add Custom Field
+    </button>
+  </div>
+</div>
+{% endif %}
+
+{# ── Asset Specifications ──────────────────────────────────────────────────── #}
+{% if assetSpecifications %}
+<div class="form-section">
+  <div class="section-header">
+    <div class="section-icon"><i class="bi bi-list-check"></i></div>
+    <h2>Asset Specifications</h2>
+  </div>
+  <div class="section-body">
+    <div id="spec-container">
+      {% for spec in assetSpecifications %}
+      <div class="spec-row rmsection">
+        <input type="text" class="field-input" placeholder="Specification Name"
+               name="specifications_name" value="{{ spec.name }}" autocomplete="off">
+        <input type="text" class="field-input" placeholder="Value"
+               name="specifications_value" value="{{ spec.value }}" autocomplete="off">
+        {% if forloop.first %}
+          <button type="button" id="newsectionbtn" class="btn-add-row" style="white-space:nowrap;">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        {% else %}
+          <button type="button" onclick="removeSpec(this)" class="btn-rm-row">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Form footer ───────────────────────────────────────────────────────────── #}
+<div class="update-form-footer">
+  <a href="{% url 'assets:details' asset.id %}" class="btn-back">Cancel</a>
+  <button type="submit" class="btn-register">
+    <i class="bi bi-check-lg"></i> Update Asset Record
+  </button>
+</div>
+
+</form>
+
+<div style="display:none">
+  <div class="rm-custom-field" id="custom-field-template">
+    <label class="field-label">Custom Field Name</label>
+    <input type="text" class="field-input" placeholder="Field Name" name="custom_field_name" autocomplete="off">
+    <label class="field-label mt-2">Custom Field Value</label>
+    <input type="text" class="field-input" placeholder="Field Value" name="custom_field_value" autocomplete="off">
+    <button type="button" onclick="removeCustomField(this)" class="btn-rm-row mt-2">
+      <i class="bi bi-dash-lg"></i>
+    </button>
+  </div>
+</div>
+
+<div style="display:none">
+  <div class="spec-row rmsection" id="spec-template">
+    <input type="text" class="field-input" placeholder="Specification Name" name="specifications_name" autocomplete="off">
+    <input type="text" class="field-input" placeholder="Value" name="specifications_value" autocomplete="off">
+    <button type="button" onclick="removeSpec(this)" class="btn-rm-row"><i class="bi bi-dash-lg"></i></button>
+  </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.delete-img-btn').forEach(button => {
-            button.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                const imageId = this.value;
-                const btn = this;
-                console.log('Deleting image with ID:', imageId);
-                if (!confirm('Are you sure you want to delete this image?')) return;
-                fetch('{% url "assets:update_in_detail" id=asset.id %}', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken'),
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ delete_image_ids: [imageId] })  // send as array
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            btn.closest('.asst-prd-img-div').remove();
-                        } else {
-                            alert('Failed to delete image.');
-                        }
-                    })
-                    .catch(() => alert('Error deleting image.'));
-            });
-        });
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                document.cookie.split(';').forEach(cookie => {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-                    }
-                });
-            }
-            return cookieValue;
-        }
+// Image delete
+document.addEventListener('DOMContentLoaded', function () {
+  function getCookie(name) {
+    let v = null;
+    document.cookie.split(';').forEach(c => {
+      c = c.trim();
+      if (c.startsWith(name + '=')) v = decodeURIComponent(c.slice(name.length + 1));
     });
-</script>
+    return v;
+  }
 
-<script>
-  document.getElementById("newsectionbtn").onclick = function() {
-    var container = document.getElementById("container");
-    var section = document.getElementById("mainsection");
-    container.appendChild(section.cloneNode(true));
-}
+  document.querySelectorAll('.update-image-delete').forEach(btn => {
+    btn.addEventListener('click', function () {
+      if (!confirm('Delete this image?')) return;
+      const id = this.dataset.imageId;
+      fetch('{% url "assets:update_in_detail" id=asset.id %}', {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delete_image_ids: [id] })
+      }).then(r => {
+        if (r.ok) document.getElementById('img-item-' + id)?.remove();
+        else alert('Failed to delete image.');
+      }).catch(() => alert('Error deleting image.'));
+    });
+  });
 
-function remove(el) {
-  var element = el;
-  element.closest(".rmsection").remove()
-}
-</script>
-
-<script>
-// Add new custom field row
-document.getElementById("addCustomFieldBtn").onclick = function() {
-    var container = document.getElementById("custom-field-container");
-    var template = document.getElementById("custom-field-template");
-    container.appendChild(template.cloneNode(true));
-}
-
-// Remove a custom field row
-function removeCustomField(el) {
-    el.closest(".rm-custom-field").remove();
-}
-</script>
-<script>
-function requestAndSendNotification() {
-  if (Notification.permission === "granted") {
-    sendNotification();
-  } else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        sendNotification();
-      }
+  // Spec add button
+  const specBtn = document.getElementById('newsectionbtn');
+  if (specBtn) {
+    specBtn.addEventListener('click', function () {
+      const tmpl = document.getElementById('spec-template');
+      document.getElementById('spec-container').appendChild(tmpl.cloneNode(true));
     });
   }
-}
 
-function sendNotification() {
-  const title = "Successfully Audited Asset";
-  const options = {
-    body: "Successfully Audited Asset.",
-    icon: "/static/images/logo/favicon.png",
-  };
-
-  new Notification(title, options);
-}
-</script>
-{% if messages %}
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  {% for message in messages %}
-    {% if message.tags == "success" %}
-      requestAndSendNotification();
-    {% endif %}
-  {% endfor %}
+  // Custom field add button
+  const cfBtn = document.getElementById('addCustomFieldBtn');
+  if (cfBtn) {
+    cfBtn.addEventListener('click', function () {
+      const tmpl = document.getElementById('custom-field-template');
+      const clone = tmpl.cloneNode(true);
+      clone.id = '';
+      document.getElementById('custom-field-new-container').appendChild(clone);
+    });
+  }
 });
+
+function removeSpec(el) { el.closest('.rmsection').remove(); }
+function removeCustomField(el) { el.closest('.rm-custom-field').remove(); }
 </script>
-{% endif %}
-{% endblock content%}
+
+{% endblock content %}
