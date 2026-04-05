@@ -1,38 +1,73 @@
 
-    <div class="modal-header bg-dark text-center">
-        <h5 class="modal-title white w-100">Assign Asset</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="assign-modal-header">
+    <div>
+        <h5 class="assign-modal-title">Assign Asset</h5>
+        <p class="assign-modal-subtitle">Update ownership for {{ asset.tag }}</p>
     </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
 
-    <form id="assign-asset-form" enctype="multipart/form-data">
-    {% csrf_token %}
-        <div class="modal-body">
-            <div class="row">
-                <div class="form-group">
-                    <label>Asset Name</label>
-                    <select disabled>
-                        <option value="{{ asset.id }}">{{ asset.name }}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-            <label>Add Asset Image(s)</label>
-            <input type="file" name="images" id="images" multiple class="form-control">
-        </div>
-        <div class="form-group">
-            <label>Assign To</label>
-            {{ form.user }}
-        </div>
+<form id="assign-asset-form" enctype="multipart/form-data">
+{% csrf_token %}
+    <div class="modal-body">
+        {# ── Asset info card ─────────────────────────────────────── #}
+        <div class="assign-asset-card">
+            <div class="assign-asset-thumb">
+                {% if asset_image and asset_image.image %}
+                    <img src="{{ asset_image.image.url }}" alt="{{ asset.name }}">
+                {% else %}
+                    <div class="assign-asset-thumb-placeholder">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="assign-asset-info">
+                <span class="assign-asset-name">{{ asset.name }}</span>
+                <span class="assign-asset-tag">TAG: {{ asset.tag }}</span>
             </div>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-info">Save</button>
+        {# ── Assignee Name ───────────────────────────────────────── #}
+        <div class="assign-form-group">
+            <label class="assign-form-label">Assignee Name</label>
+            {{ form.user }}
+            {% for error in form.user.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
         </div>
-    </form>
+
+        {# ── Issue Date ──────────────────────────────────────────── #}
+        <div class="assign-form-group">
+            <label class="assign-form-label">Issue Date</label>
+            {{ form.issue_date }}
+            {% for error in form.issue_date.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+
+        {# ── Asset Images ────────────────────────────────────────── #}
+        <div class="assign-form-group">
+            <label class="assign-form-label">Asset Images</label>
+            <input type="file" name="images" id="images" multiple class="form-control">
+        </div>
+
+        {# ── Assignment Notes ────────────────────────────────────── #}
+        <div class="assign-form-group">
+            <label class="assign-form-label">Assignment Notes</label>
+            {{ form.notes }}
+            {% for error in form.notes.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="assign-modal-footer">
+        <button type="button" class="btn-reset" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn-register">Confirm Assignment</button>
+    </div>
+</form>
 
 <script>
-    
     document.getElementById("assign-asset-form").addEventListener("submit", function(e) {
         e.preventDefault();
 
@@ -59,9 +94,4 @@
         })
         .catch(error => console.error("Error:", error));
     });
-
 </script>
-
-
-
-
