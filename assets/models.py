@@ -103,7 +103,9 @@ class AssignAsset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
-    assigned_date = models.DateField(auto_now_add=True,blank=True, null=True)
+    assigned_date = models.DateField(auto_now_add=True, blank=True, null=True)
+    issue_date = models.DateField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Assign Asset"
