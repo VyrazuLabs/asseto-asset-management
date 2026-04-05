@@ -20411,7 +20411,9 @@ body .bi::before,
 .main{
   margin-left: 300px !important;
   padding: 2rem !important;
-  height: 100vh !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow-y: auto !important;
   display: flex !important;
   flex-direction: column !important;
 }
@@ -20754,4 +20756,17 @@ body[data-theme="dark"] {
 .company-name a{
   color: #007bff;
   font-weight: 600;
+}
+
+/* ── Site footer ───────────────────────────────────────────────────────────── */
+.site-footer {
+  margin-top: auto;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* ── Search highlight ──────────────────────────────────────────────────────── */
+.highlight {
+  background-color: #435ebe;
+  color: white;
 }
