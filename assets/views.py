@@ -2,6 +2,7 @@ import json
 import os
 import base64
 import requests
+from datetime import date
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.cache import cache
@@ -9,6 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 
@@ -36,7 +38,7 @@ from .services import change_asset_status, unassign_asset_from_list, assign_asse
 
 get_host = lambda request: request.build_absolute_uri('/')
 IS_DEMO = os.environ.get('IS_DEMO')
-PAGE_SIZE = 10
+PAGE_SIZE = 25
 ORPHANS = 1
 
 def check_admin(user):
@@ -177,7 +179,10 @@ def assign_asset(request):
             assign_asset_in_form(request,form)
             return HttpResponse(status=204)
     else:
-        form = AssignedAssetForm(organization=request.user.organization)
+        form = AssignedAssetForm(
+            organization=request.user.organization,
+            initial={'issue_date': date.today()},
+        )
         image_form = AssetImageForm()
 
     context = {
@@ -328,21 +333,20 @@ def assign_assets(request, id):
         return redirect('assets:list')
 
 @login_required
+@transaction.atomic
 def assign_asset_in_asset_list(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
-    form = AssignedAssetListForm(request.POST,organization=request.user.organization)
-    image_form = AssetImageForm(request.FILES)
+    asset_image = AssetImage.objects.filter(asset=asset).order_by('-uploaded_at').first()
     if request.method == 'POST':
-        if form.is_valid() and image_form.is_valid():
+        form = AssignedAssetListForm(request.POST, organization=request.user.organization)
+        if form.is_valid():
             assign_obj = form.save(commit=False)
             assign_obj.asset = asset
             assign_obj.save()
-            form.save_m2m()
             asset.is_assigned = True
             asset.asset_status = AssetStatus.objects.filter(Q(organization=request.user.organization) | Q(organization__isnull=True), name='Assigned').first()
             asset.save()
             files = request.FILES.getlist('images')
-
             for f in files:
                 AssetImage.objects.create(asset=asset, image=f)
             messages.success(request, 'Asset assigned to user successfully')
@@ -350,9 +354,11 @@ def assign_asset_in_asset_list(request, id):
         else:
             return redirect('assets:list')
     else:
-        form = AssignedAssetListForm(organization=request.user.organization)
-        image_form = AssetImageForm()
-    context = {'form': form,'image_form':image_form,'asset':asset}
+        form = AssignedAssetListForm(
+            organization=request.user.organization,
+            initial={'issue_date': date.today()},
+        )
+    context = {'form': form, 'asset': asset, 'asset_image': asset_image}
     return render(request, 'assets/assign-asset-modal-in-list.html', context=context)
 
 @login_required
