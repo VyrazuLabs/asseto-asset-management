@@ -1,0 +1,39 @@
+/* =============================================================================
+   users.css — User-specific list page styles
+   Shared list styles are in list-common.css
+   ============================================================================= */
+
+/* ── User avatar thumbnail ───────────────────────────────────────────────── */
+.user-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--color-border);
+}
+
+/* ── Access level badge ──────────────────────────────────────────────────── */
+.access-badge {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .22rem .6rem;
+  border-radius: 5px;
+  letter-spacing: .03em;
+}
+.access-all {
+  background: #EEF2FF;
+  color: #4F46E5;
+  border: 1px solid #C7D2FE;
+}
+.access-limited {
+  background: #FFF7ED;
+  color: #EA580C;
+  border: 1px solid #FED7AA;
+}
+
+/* ── Last login muted ────────────────────────────────────────────────────── */
+.login-date {
+  font-size: .8rem;
+  color: var(--color-muted);
+}
