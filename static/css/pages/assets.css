@@ -1,29 +1,16 @@
 /* =============================================================================
-   assets.css — Styles for the Assets module (list + add/edit pages)
-   Shared across: assets/list.html, assets/add.html, assets/update.html
+   assets.css — Asset-specific styles (list + add/edit pages)
+   Shared list styles are in list-common.css
    ============================================================================= */
 
-/* ── Design tokens ────────────────────────────────────────────────────────── */
-:root {
-  --color-primary:       #4F46E5;
-  --color-primary-light: #EEF2FF;
-  --color-card:          #FFFFFF;
-  --color-border:        #E5E7EB;
-  --color-text:          #111827;
-  --color-muted:         #6B7280;
-  --card-radius:         10px;
-}
-
-/* ── Page headers ─────────────────────────────────────────────────────────── */
-.assets-page-header,
-.add-page-header {
+/* ── Backward-compatible aliases (assets templates use .assets-page-header) ── */
+.assets-page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: 1.5rem;
 }
-.assets-page-header h1,
-.add-page-header h1 {
+.assets-page-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
@@ -34,6 +21,20 @@
   font-size: .875rem;
   margin-top: .25rem;
 }
+
+/* ── Add/edit page header ────────────────────────────────────────────────── */
+.add-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.add-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 .3rem;
+}
 .add-page-header .subtitle {
   font-size: .83rem;
   color: var(--color-muted);
@@ -41,8 +42,7 @@
   line-height: 1.5;
 }
 
-/* ── Shared buttons ───────────────────────────────────────────────────────── */
-.btn-register,
+/* ── Asset-specific buttons ───────────────────────────────────────────────── */
 .btn-save-asset {
   background: var(--color-primary);
   color: #fff;
@@ -58,45 +58,10 @@
   text-decoration: none;
   cursor: pointer;
 }
-.btn-register:hover,
 .btn-save-asset:hover {
   background: #4338CA;
   color: #fff;
 }
-
-.btn-reset {
-  border: 1.5px solid var(--color-border);
-  background: #fff;
-  color: var(--color-muted);
-  border-radius: 7px;
-  padding: .4rem 1rem;
-  font-size: .85rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: .3rem;
-}
-.btn-reset:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.btn-trash {
-  background: #FEF2F2;
-  color: #DC2626;
-  border: 1.5px solid #FECACA;
-  border-radius: 7px;
-  padding: .42rem .85rem;
-  font-size: .82rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  text-decoration: none;
-}
-.btn-trash:hover { background: #DC2626; color: #fff; }
 
 .btn-assign {
   background: var(--color-primary-light);
@@ -162,106 +127,7 @@
 }
 .btn-rm-row:hover { background: #DC2626; color: #fff; }
 
-/* ── Stat cards ───────────────────────────────────────────────────────────── */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-@media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
-
-.stat-card {
-  background: var(--color-card);
-  border-radius: var(--card-radius);
-  padding: 1.1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
-  text-decoration: none;
-}
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-.stat-icon.blue   { background: #EEF2FF; color: var(--color-primary); }
-.stat-icon.green  { background: #ECFDF5; color: #059669; }
-.stat-icon.orange { background: #FFF7ED; color: #EA580C; }
-.stat-icon.red    { background: #FEF2F2; color: #DC2626; }
-.stat-label {
-  font-size: .7rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: .05em;
-}
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1.2;
-}
-
-/* ── Filter bar ───────────────────────────────────────────────────────────── */
-.filter-card {
-  background: var(--color-card);
-  border-radius: var(--card-radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
-}
-.filter-card .filter-label {
-  font-size: .65rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin-bottom: .3rem;
-}
-.filter-card input[type=search] {
-  border: 1.5px solid var(--color-border);
-  border-radius: 7px;
-  background: #fff;
-  padding: .42rem .75rem;
-  font-size: .85rem;
-  color: var(--color-text);
-  width: 100%;
-  outline: none;
-}
-.filter-card input[type=search]:focus { border-color: var(--color-primary); }
-
-.filter-select-btn {
-  border: 1.5px solid var(--color-border);
-  border-radius: 7px;
-  background: #fff;
-  padding: .42rem .75rem;
-  font-size: .85rem;
-  color: var(--color-text);
-  width: 100%;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  user-select: none;
-}
-.filter-select-btn svg { opacity: .5; }
-
-/* ── Table card ───────────────────────────────────────────────────────────── */
-.table-card {
-  background: var(--color-card);
-  border-radius: var(--card-radius);
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
-  overflow: hidden;
-}
+/* ── Assets table (alias for backward compat — shared styles in list-common.css) */
 .assets-table { width: 100%; border-collapse: collapse; }
 .assets-table thead th {
   font-size: .7rem;
@@ -319,24 +185,7 @@
 .state-good      { color: #B45309; font-size: .82rem; font-weight: 500; }
 .state-poor      { color: #DC2626; font-size: .82rem; font-weight: 500; }
 
-/* ── Status badges ────────────────────────────────────────────────────────── */
-.status-badge {
-  display: inline-block;
-  font-size: .72rem;
-  font-weight: 700;
-  padding: .28rem .7rem;
-  border-radius: 6px;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.status-allocated { background: #F3F4F6; color: #374151; border: 1.5px solid #D1D5DB; }
-.status-available { background: #ECFDF5; color: #065F46; border: 1.5px solid #A7F3D0; }
-.status-repair    { background: #FFF7ED; color: #92400E; border: 1.5px solid #FDE68A; }
-.status-lost      { background: #FEF2F2; color: #991B1B; border: 1.5px solid #FECACA; }
-.status-deploy    { background: #EFF6FF; color: #1E40AF; border: 1.5px solid #BFDBFE; }
-
-/* Inline status select */
+/* ── Asset inline status select ──────────────────────────────────────────── */
 .status-select-inline {
   border: 1.5px solid var(--color-border);
   border-radius: 6px;
@@ -379,77 +228,7 @@
 }
 .btn-assign.mt-1 { margin-top: .25rem; }
 
-/* Row action buttons */
-.row-actions { display: flex; align-items: center; gap: .4rem; }
-.action-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid var(--color-border);
-  background: #fff;
-  color: var(--color-muted);
-  font-size: .8rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all .15s;
-}
-.action-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-light);
-}
-.action-btn.danger:hover {
-  border-color: #EF4444;
-  color: #EF4444;
-  background: #FEF2F2;
-}
-
-/* ── Empty state ──────────────────────────────────────────────────────────── */
-.table-empty-state {
-  padding: 4rem 2rem;
-  text-align: center;
-  color: var(--color-muted);
-}
-.table-empty-state i { font-size: 3rem; opacity: .3; margin-bottom: 1rem; }
-.table-empty-state p { font-size: .95rem; }
-
-/* ── Pagination ───────────────────────────────────────────────────────────── */
-.pagination-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: .85rem 1rem;
-  border-top: 1px solid var(--color-border);
-  font-size: .82rem;
-  color: var(--color-muted);
-}
-.pagination-nav { display: flex; gap: .3rem; align-items: center; }
-.page-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid var(--color-border);
-  background: #fff;
-  color: var(--color-text);
-  font-size: .8rem;
-  cursor: pointer;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all .15s;
-}
-.page-btn:hover,
-.page-btn.active {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
-}
-.page-btn.disabled { opacity: .4; pointer-events: none; }
+/* (Row actions, empty state, pagination — now in list-common.css) */
 
 /* ── Form section cards (add/edit pages) ──────────────────────────────────── */
 .form-section {
@@ -715,62 +494,8 @@
 }
 .required-note .required-star { color: #EF4444; }
 
-/* ── Breadcrumb nav ───────────────────────────────────────────────────────── */
-.page-breadcrumb {
-  font-size: .78rem;
-  margin: 0 0 .35rem;
-  padding: 0;
-  background: transparent;
-}
-.page-breadcrumb .breadcrumb-link {
-  color: var(--color-muted);
-  text-decoration: none;
-}
-.page-breadcrumb .breadcrumb-item.active {
-  color: var(--color-primary);
-}
-
-/* ── Count badge (e.g. trash count) ──────────────────────────────────────── */
-.count-badge {
-  background: #DC2626;
-  color: #fff;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: .65rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ── Table utility ────────────────────────────────────────────────────────── */
-.table-index-cell {
-  color: var(--color-muted);
-  font-size: .8rem;
-  font-weight: 500;
-}
-
-/* ── Demo mode note ───────────────────────────────────────────────────────── */
-.demo-note {
-  font-size: .72rem;
-  color: var(--color-muted);
-  margin: .5rem 0 0;
-}
-
-/* ── Pagination ellipsis ──────────────────────────────────────────────────── */
-.page-ellipsis {
-  color: var(--color-muted);
-  padding: 0 .25rem;
-}
-
-/* ── Inline link (primary colour) ────────────────────────────────────────── */
-.link-primary {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-/* ── Zero-margin form (used for inline action forms in table rows) ────────── */
-.form-row-action { margin: 0; }
+/* (Breadcrumb, count-badge, table-index-cell, demo-note, pagination-ellipsis,
+   link-primary, form-row-action — now in list-common.css) */
 
 /* =============================================================================
    Detail page styles

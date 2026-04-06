@@ -74,21 +74,31 @@ def manage_access(user):
 @user_passes_test(manage_access)
 def list(request):
     users_list = User.undeleted_objects.filter(is_superuser=False).exclude(pk=request.user.id).order_by('-created_at')
-    
+
+    total_user_count = users_list.count()
+    active_user_count = users_list.filter(is_active=True).count()
+    deleted_user_count = User.deleted_objects.count()
+
     paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    # method to maop the assets with each users
-    user_asset_map=assigned_asset_to_user(page_object)
+    # method to map the assets with each users
+    user_asset_map = assigned_asset_to_user(page_object)
     assigned_assets_count = {uid: len(assets) for uid, assets in user_asset_map.items()}
+    total_assigned_assets = sum(assigned_assets_count.values())
 
     context = {
         'sidebar': 'users',
         'page_object': page_object,
         'title': 'Users',
-        'user_asset_map_count':user_asset_map,
-        'user_asset_map_count_count':assigned_assets_count,
+        'user_asset_map_count': user_asset_map,
+        'user_asset_map_count_count': assigned_assets_count,
+        'total_user_count': total_user_count,
+        'active_user_count': active_user_count,
+        'total_assigned_assets': total_assigned_assets,
+        'deleted_user_count': deleted_user_count,
+        'is_demo': IS_DEMO,
     }
     return render(request, 'users/list.html', context=context)
 
