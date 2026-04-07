@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .utils import get_completed_audit,get_pending_audits
+from .utils import get_completed_audit,get_pending_audits,get_audit_stats
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -154,19 +154,27 @@ def asset_audit_history(request,id):
 
 @login_required
 def completed_audits(request):
-    audits_page=get_completed_audit(request)
-    return render(request, 'audit/audit_list.html', {
+    audits_page = get_completed_audit(request)
+    stats = get_audit_stats(request)
+    context = {
         'audits': audits_page,
-        'sidebar': 'audit'
-    })
+        'sidebar': 'audit',
+        'tab': 'completed',
+    }
+    context.update(stats)
+    return render(request, 'audit/audit_list.html', context)
 
 @login_required
 def pending_audits(request):
-    data_set=get_pending_audits(request)
-    return render(request, 'audit/pending_audits.html', {
+    data_set = get_pending_audits(request)
+    stats = get_audit_stats(request)
+    context = {
         'data_set': data_set,
-        'sidebar': 'audit'
-    })
+        'sidebar': 'audit',
+        'tab': 'pending',
+    }
+    context.update(stats)
+    return render(request, 'audit/pending_audits.html', context)
 
 @login_required
 def get_assigned_user(request, tag=None):
