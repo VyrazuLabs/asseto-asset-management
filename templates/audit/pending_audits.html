@@ -1,82 +1,140 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
 {% load static %}
-{% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Audit</h3>
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Audit</li>
-                    <li class="breadcrumb-item active" aria-current="page">List</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-    <section class="section">   
-            <div class="card mt-3">
-                <div class="card-body" id="custom-field-container">
-                    <div class="table-responsive items-table">
-                        <div class="choice-buttons">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <a type="button" class="btn btn-outline-secondary rounded-3 active" href="{% url 'audit:pending_audits' %}" style="width: 120px;">Pending</a>
-                                    <a type="button" class="btn btn-outline-secondary rounded-3" href="{% url 'audit:completed_audits' %}" style="width: 120px;">Completed</a>
-                                </div>
-                                <a href="{% url 'audit:add_audit' %}" class="btn btn-sm btn-outline-info my-3 me-2" id="add-audit">Add Audit</a>
-                            </div>
-                            <div style="height: 40px;"></div>
-                            <div class="d-flex justify-content-between">
-                                <h3>Pending Audits</h3>
-                            </div>
-                        </div>
-                        <table class="table mt-3" id="table1">
-                            <thead>
-                                <tr>
-                                    <th>Sl No.</th>
-                                    <th>Asset Name</th>
-                                    <th>Last Audit Date</th>
-                                    <th>Expected Audit Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="search_result">
-                                {% for data in data_set %}
-                                <tr style="height: 100px;">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ data.asset.name }}</td>
-                                    <td>
-                                        {% if data.last_audit_date %}
-                                            {% format_datetime data.last_audit_date.created_at.date %}
-                                            
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ data.expected_audit_date }}</td>
 
-                                    <td> <a href="{% url 'audit:get_audits_by_id' data.asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive"></i></i></a></td>
-                                </tr>
-                                {% endfor %}
-                                {% for audit in audits %}
-                                <tr style="height: 100px;">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ audit.name }}</td>
-                                    {% if audit.expected_audit_date %}
-                                        <td>{{ audit.expected_audit_date }} days ago</td>
-                                    {% else %}
-                                        <td>N/A</td>
-                                    {% endif %}
-                                    <td> <a href="{% url 'audit:get_audits_by_id' audit.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive p-1"></i></i></a></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-    </section>
+{% block title %}Pending Audits | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/audit.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">Audit</a></li>
+        <li class="breadcrumb-item active">Pending</li>
+      </ol>
+    </nav>
+    <h1>Asset Audits</h1>
+    <p class="page-subtitle">Track and manage asset audit history and compliance.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'audit:add_audit' %}" class="btn-register">
+      <i class="bi bi-plus-lg"></i> New Audit
+    </a>
+  </div>
 </div>
+
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-clipboard2-check"></i></div>
+    <div>
+      <div class="stat-label">Total Audits</div>
+      <div class="stat-value">{{ total_audit_count }}</div>
+    </div>
+  </div>
+  <a href="{% url 'audit:completed_audits' %}" class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Completed (30d)</div>
+      <div class="stat-value">{{ completed_count }}</div>
+    </div>
+  </a>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-clock-fill"></i></div>
+    <div>
+      <div class="stat-label">Pending</div>
+      <div class="stat-value">{{ pending_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+    <div>
+      <div class="stat-label">Overdue</div>
+      <div class="stat-value">{{ pending_count }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Tab bar ──────────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="tab-pills">
+      <a href="{% url 'audit:pending_audits' %}" class="tab-pill active">Pending</a>
+      <a href="{% url 'audit:completed_audits' %}" class="tab-pill">Completed</a>
+    </div>
+  </div>
+</div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="list-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Asset Name</th>
+          <th>Last Audit Date</th>
+          <th>Expected Audit Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="search_result">
+        {% if data_set %}
+          {% for data in data_set %}
+          <tr>
+            <td class="table-index-cell">
+              {{ forloop.counter|stringformat:"02d" }}
+            </td>
+
+            <td>
+              <div class="cell-name-main">{{ data.asset.name }}</div>
+            </td>
+
+            <td>
+              <span class="login-date">
+                {% if data.last_audit_date %}
+                  {% format_datetime data.last_audit_date.created_at %}
+                {% else %}
+                  N/A
+                {% endif %}
+              </span>
+            </td>
+
+            <td>
+              <span class="login-date">{{ data.expected_audit_date|default:"N/A" }}</span>
+            </td>
+
+            <td>
+              <div class="row-actions">
+                <a href="{% url 'audit:get_audits_by_id' data.asset.id %}" class="action-btn" title="Audit history">
+                  <i class="bi bi-archive"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5">
+              <div class="table-empty-state">
+                <i class="bi bi-check-circle d-block"></i>
+                <p>No pending audits. All assets are up to date.</p>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>{# /.table-card #}
+
 {% endblock content %}
