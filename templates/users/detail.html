@@ -1,311 +1,291 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
-{% load custom_filters%}
+{% load custom_filters %}
+
+{% block title %}User Profile - {{ user.full_name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/users/users-detail.css' %}">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">User Details</h3>
-
-
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Users</li>
-                    <li class="breadcrumb-item active" aria-current="page">User Details</li>
-                </ol>
-            </nav>
-        </div>
-        <div>
-            <a href="{% url 'users:list' %}" class="btn btn-sm btn-outline-info my-3">Back to User List</a>
-        </div>
+<div class="user-detail-container">
+  {# ── Header ───────────────────────────────────────────────────────────── #}
+  <div class="detail-page-header">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb page-breadcrumb mb-2">
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'users:list' %}" class="breadcrumb-link">Users</a></li>
+          <li class="breadcrumb-item active">User Profile</li>
+        </ol>
+      </nav>
+      <h1 class="page-title mb-0">Overview</h1>
     </div>
+    <div class="header-actions">
+      {% if perms.authentication.edit_users %}
+      <button type="button" class="btn-register" hx-get="{% url 'users:update' user.id %}"
+        hx-target="#update-user-modal-content" data-bs-toggle="modal" data-bs-target="#update-user-modal">
+        <i class="bi bi-pencil-square"></i> Edit Profile
+      </button>
+      {% endif %}
+      {% if perms.authentication.delete_users %}
+      <form action="{% url 'users:status' user.id %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="{% if user.is_active %}btn-danger-solid{% else %}btn-success-solid{% endif %}"
+          onclick="return confirm('{% if user.is_active %}Suspend access for this user?{% else %}Restore access for this user?{% endif %}')">
+          <i class="bi {% if user.is_active %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
+          {% if user.is_active %}Suspend Access{% else %}Restore Access{% endif %}
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
 
-<div class="page-content">
-    <section class="row">
-        <div class="col-12 col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row gallery">
-                        <div class="col-12 mb-2 py-2 px-2 border">
-                        {% if user.profile_pic %}
-                            <img class="w-100 active" src="{{user.profile_pic.url}}"
-                            onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';">               
-                        {% else %}
-                            <img class="w-100 active" src="{% static 'images/faces/1.jpg' %}">
-                        {% endif %}
-                        </div>
-                        <h6 class="my-3">
-                            <i class="bi bi-person-badge"></i>
-                            <span>Contact Information</span>
-                        </h6>
-                        <p><i class="bi bi-telephone-fill"></i>&nbsp; <a href="tel:{{user.phone}}">{{user.phone}}</a> </p>
-                        <p><i class="bi bi-envelope-fill"></i>&nbsp; <a href="mailto:{{user.email}}">{{user.email}}</a> </p>
-                        
-                    </div>
-                </div>
+  <div class="detail-grid">
+    {# ── Sidebar (Left) ─────────────────────────────────────────────────── #}
+    <aside class="profile-sidebar">
+      <!-- Profile Card -->
+      <div class="card-profile">
+        <div class="profile-avatar-wrap">
+          {% if user.profile_pic %}
+          <img class="profile-avatar" src="{{ user.profile_pic.url }}" alt="{{ user.full_name }}"
+            onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';">
+          {% else %}
+          <img class="profile-avatar" src="{% static 'images/faces/1.jpg' %}" alt="Default Avatar">
+          {% endif %}
+        </div>
+        <h2 class="profile-name">{{ user.full_name }}</h2>
+        <span class="profile-id">ID: {{ user.employee_id|default:"N/A" }}</span>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <span class="stat-label">Status</span>
+            <span class="badge-profile-status">{% if user.is_active %}ACTIVE{% else %}INACTIVE{% endif %}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Joined</span>
+            <span class="stat-value">{{ user.date_joined|date:"M Y" }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Security Level</span>
+            <div class="text-end">
+              <span class="stat-value security-level">Tier {{ user.role.level|default:"3" }}</span>
+              <div class="small text-muted">({{ user.role.related_name|default:"Admin" }})</div>
             </div>
+          </div>
         </div>
-        <div class="col-12 col-lg-8">
+      </div>
 
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Basic Information</span>                       
-                    </h6>
-                    <table class="table table-borderless">
-
-                        <tr>
-                            <td><b>Full Name</b></td>
-                            <td>{{ user.full_name }}</td>
-                        </tr>
-
-                        <tr>
-                            <td><b>Designation</b></td>
-                            <td>{{user.role}}</td>
-                        </tr>
-
-                        <tr>
-                            <td><b>Department</b></td>
-                            <td>{{user.department.name}}</td>
-                        </tr>
-
-                        <tr>
-                            <td><b>Status</b></td>
-                            <td>
-                                {% if user.is_active %}
-                                    Active
-                                {% else %}
-                                    Inactive
-                                {% endif %}
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td><b>Address</b></td>
-                            <td>{{user.address.address_line_one}}</td>
-                        </tr>
-
-                    </table>
-                </div>
+      <!-- Contact Details Card -->
+      <div class="card-contact">
+        <span class="section-title">Contact Details</span>
+        <div class="contact-list">
+          <div class="contact-item">
+            <div class="contact-icon-circle">
+              <i class="bi bi-envelope"></i>
             </div>
+            <div class="contact-info">
+              <span class="contact-label">Email Address</span>
+              <a href="mailto:{{ user.email }}" class="contact-value">{{ user.email }}</a>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon-circle">
+              <i class="bi bi-phone"></i>
+            </div>
+            <div class="contact-info">
+              <span class="contact-label">Mobile Phone</span>
+              <span class="contact-value">{{ user.phone|default:"N/A" }}</span>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="contact-icon-circle">
+              <i class="bi bi-geo-alt"></i>
+            </div>
+            <div class="contact-info">
+              <span class="contact-label">Office Location</span>
+              <span class="contact-value">
+                {{ user.location.office_name|default:"Global HQ" }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div>
-            {% if assigned_assets %}   
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Assigned Assets</span>                       
-                        </h6>                        
-                        <div class="table-responsive">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><b>Sl No.</b></td>
-                                    <td>Asset Images</td>
-                                    <td><b>Asset Tag</b></td>
-                                    <td><b>Asset Name</b></td>
-                                    <td>Type</td>
-                                    <td>Vendor Name</td>
-                                    <td><b>Assigned Date</b></td>
-                                </tr>
-                                {% for assigned_asset in assigned_assets %}
-                                    <tr>
-                                        <td>{{assigned_assets.start_index|add:forloop.counter0}}</td>
-                                    
-                                        <td>
-                                            {% with assigned_asset.asset.images.all as images %}
-                                                <div class="asset-thumbnail">
-                                                    {% if images %}
-                                                        <img src="{{ images.0.image.url }}"
-                                                            onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
-                                                            class="img-fluid"
-                                                            style="width: 150px; height: 150px; object-fit: cover; border: none; cursor: pointer;"
-                                                            onclick="openAssetModal('carouselModal{{ assigned_asset.asset.id }}')"
-                                                            >
-                                                    {% else %}
-                                                        <img src="{% static 'images/No_Image.jpg' %}"
-                                                            style="width: 150px; height: 150px; object-fit: cover; border: none;">
-                                                    {% endif %}
-                                                </div>
-                                            {% endwith %}
-                                        </td>
-                                        <td>{{assigned_asset.asset.tag}}</td>
-                                        <td>{{assigned_asset.asset.name}}</td>
-                                        <td>{{assigned_asset.asset.product.name}}</td>
-                                        <td>{{assigned_asset.asset.vendor}}</td>
-                                        <td>{{assigned_asset.assigned_date|date:"D, M d, Y"}}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            <div class="dataTable-bottom">
-                                Showing {{ assigned_assets.start_index }} to {{ assigned_assets.end_index }} of {{ assigned_assets.paginator.count }} entries
-                            </div>
+      </div>
+    </aside>
 
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination pagination-primary justify-content-end">
+    {# ── Main Area (Right) ──────────────────────────────────────────────── #}
+    <main class="main-content">
 
-                                    <li class="page-item {% if not assigned_assets.has_previous %} disabled {% endif %}">
-                                    <a class="page-link" 
-                                        {% if assigned_assets.has_previous %}
-                                        href="?assets_page={{ assigned_assets.previous_page_number }}&page={{ page_object.number }}"
-                                        {% endif %}
-                                        tabindex="-1" aria-disabled="true">« Previous</a>
-                                    </li>
-
-                                    {% for i in assigned_assets.paginator.page_range %}
-                                    <li class="page-item {% if assigned_assets.number == i %} active {% endif %}">
-                                        <a class="page-link" href="?assets_page={{ i }}&page={{ page_object.number }}">{{ i }}</a>
-                                    </li>
-                                    {% endfor %}
-
-                                    <li class="page-item {% if not assigned_assets.has_next %} disabled {% endif %}">
-                                    <a class="page-link" 
-                                        {% if assigned_assets.has_next %}
-                                        href="?assets_page={{ assigned_assets.next_page_number }}&page={{ page_object.number }}"
-                                        {% endif %}
-                                    >Next »</a>
-                                    </li>
-
-                                </ul>
-                            </nav>
-                        </div>
-                        {% for assigned_asset in assigned_assets %}
-                            {% with assigned_asset.asset.images.all as images %}
-                                {% if images %}
-                                    <div class="modal fade" id="carouselModal{{ assigned_asset.asset.id }}" tabindex="-1" aria-labelledby="carouselModalLabel{{ assigned_asset.asset.id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                            <div class="modal-content">
-
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="carouselModalLabel{{ assigned_asset.asset.id }}">Asset Images</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body p-0">
-                                                    <div id="carousel{{ assigned_asset.asset.id }}" class="carousel slide" data-bs-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            {% for image in images %}
-                                                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                                                    <img class="d-block w-100"
-                                                                        onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
-                                                                        src="{{ image.image.url }}"
-                                                                        alt="Asset Image"
-                                                                        style="object-fit: contain; max-height: 600px;">
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-
-                                                        {% if images|length > 1 %}
-                                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="prev">
-                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                            </button>
-                                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="next">
-                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                            </button>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                {% endif %}
-                            {% endwith %}
-                        {% endfor %}
+      {% if assigned_assets %}
+      <!-- Current Asset Assignments -->
+      <div class="content-card">
+        <div class="card-header-flex border-bottom-0 pb-3">
+          <div>
+            <h3 class="card-header-title">Current Asset Assignments</h3>
+            <p class="text-muted mb-0 small">Inventory items currently registered to this profile.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="list-table mb-0">
+            <thead>
+              <tr>
+                <th width="35%">Asset</th>
+                <th width="20%">Asset Tag</th>
+                <th width="20%">Status</th>
+                <th width="25%">Assigned Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assigned_asset in assigned_assets %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="asset-thumb">
+                      {% if assigned_asset.asset.images.first %}
+                      <img src="{{ assigned_asset.asset.images.first.image.url }}"
+                        alt="{{ assigned_asset.asset.name }}">
+                      {% else %}
+                      <div class="asset-thumb-placeholder">
+                        <i class="bi bi-laptop"></i>
+                      </div>
+                      {% endif %}
                     </div>
-                </div>
-            {% endif %}
-        </div>
-        <div>
-            {% if assigned_licenses %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Assigned Licenses</span>
-                        </h6>
-                        <div class="table-responsive">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><b>Sl No.</b></td>
-                                    <td><b>License Name</b></td>
-                                    <td>Type</td>
-                                    <td>License Key</td>
-                                    <td>Vendor Name</td>
-                                    <td><b>Assigned Date</b></td>
-                                </tr>
-                                {% for assigned_license in assigned_licenses %}
-                                <tr>
-                                    <td>{{assigned_licenses.start_index|add:forloop.counter0}}</td>
-                                    <td>{{assigned_license.license.name}}</td>
-                                    <td>{{assigned_license.license.license_type.name}}</td>
-                                    <td>{{assigned_license.license.key}}</td>
-                                    <td>{{assigned_license.license.vendor.name}}</td>
-                                    <td>{{assigned_license.assigned_date|date:"D, M d, Y"}}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                            <div class="dataTable-bottom">
-                                Showing {{ assigned_licenses.start_index }} to {{ assigned_licenses.end_index }} of {{assigned_licenses.paginator.count }} entries
-                            </div>
-            
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination pagination-primary justify-content-end">
-            
-                                    <li class="page-item {% if not assigned_licenses.has_previous %} disabled {% endif %}">
-                                        <a class="page-link" {% if assigned_licenses.has_previous %}
-                                            href="?assets_page={{ assigned_licenses.previous_page_number }}&page={{ page_object.number }}"
-                                            {% endif %} tabindex="-1" aria-disabled="true">« Previous</a>
-                                    </li>
-            
-                                    {% for i in assigned_licenses.paginator.page_range %}
-                                    <li class="page-item {% if assigned_licenses.number == i %} active {% endif %}">
-                                        <a class="page-link" href="?assets_page={{ i }}&page={{ page_object.number }}">{{ i }}</a>
-                                    </li>
-                                    {% endfor %}
-
-                                    <li class="page-item {% if not assigned_licenses.has_next %} disabled {% endif %}">
-                                        <a class="page-link" {% if assigned_licenses.has_next %}
-                                            href="?assets_page={{ assigned_licenses.next_page_number }}&page={{ page_object.number }}"
-                                            {% endif %}>Next »</a>
-                                    </li>
-            
-                                </ul>
-                            </nav>
-                        </div>
+                    <div>
+                      <div class="cell-name-main">{{ assigned_asset.asset.name }}</div>
+                      <div class="cell-name-sub">{{ assigned_asset.asset.product.name }}</div>
                     </div>
-                </div>
-            {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <span class="asset-tag-code">{{ assigned_asset.asset.tag }}</span>
+                </td>
+                <td>
+                  <span class="badge bg-light-success text-success fw-bold" style="font-size: 0.65rem;">IN USE</span>
+                </td>
+                <td>
+                  <div class="date-stacked">
+                    {{ assigned_asset.assigned_date|date:"d M" }}<br>
+                    <span class="text-muted fw-normal">{{ assigned_asset.assigned_date|date:"Y" }}</span>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        {% include 'commons/history.html'  %}
-    </section>
+        {% include 'commons/list-pagination.html' with item_label="assets" page_object=assigned_assets page_param="assets_page" %}
+      </div>
+      {% endif %}
+
+      {% if assigned_licenses %}
+      <!-- Assigned Licenses -->
+      <div class="content-card">
+        <div class="card-header-flex">
+          <h3 class="card-header-title">Assigned Licenses</h3>
+          <span class="badge bg-primary rounded-pill">{{ assigned_licenses.paginator.count }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="list-table mb-0">
+            <thead>
+              <tr>
+                <th>License Name</th>
+                <th>Type</th>
+                <th>License Key</th>
+                <th>Assigned Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assigned_license in assigned_licenses %}
+              <tr>
+                <td>
+                  <div class="cell-name-main">{{ assigned_license.license.name }}</div>
+                </td>
+                <td>{{ assigned_license.license.license_type.name }}</td>
+                <td><code>{{ assigned_license.license.key }}</code></td>
+                <td><span class="text-muted">{{ assigned_license.assigned_date|date:"d M, Y" }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Activity Log (History) -->
+      {% if page_object %}
+      <div class="content-card">
+        <div class="card-header-flex border-bottom-0 pb-3">
+          <h3 class="card-header-title">Activity Log</h3>
+          <a href="#" class="btn-reset text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">VIEW ALL HISTORY</a>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th width="35%">Action Type</th>
+                <th width="20%">Resource</th>
+                <th width="25%">Timestamp</th>
+                <th width="20%" class="text-end">Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for history in page_object %}
+              <tr class="activity-row">
+                <td class="activity-cell">
+                  <div class="activity-type-wrap">
+                    <div class="activity-circle {% if history.history_type == '+' %}circle-success{% elif history.history_type == '-' %}circle-danger{% else %}circle-primary{% endif %}">
+                      <i class="bi {% if history.history_type == '+' %}bi-plus-circle{% elif history.history_type == '-' %}bi-trash{% else %}bi-arrow-repeat{% endif %}"></i>
+                    </div>
+                    <div>
+                      <span class="activity-title-main">
+                        {% if history.history_type == "+" %}Account Created{% elif history.history_type == "^" %}Record Restored{% elif history.history_type == "-" %}Account Deleted{% else %}Profile Updated{% endif %}
+                      </span>
+                      <span class="activity-subtitle">by {{ history.history_user.full_name|default:"System" }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="activity-cell">
+                  <span class="activity-resource">#{{ history.employee_id|default:history.username|default:"SYSTEM"|truncatechars:12 }}</span>
+                </td>
+                <td class="activity-cell">
+                  <div class="activity-time-stacked">
+                    <div>{{ history.history_date|date:"d M," }}</div>
+                    <span>{{ history.history_date|date:"h:i A" }}</span>
+                  </div>
+                </td>
+                <td class="activity-cell activity-result-cell">
+                  <span class="activity-result-text {% if history.history_type == '+' %}text-success{% else %}text-primary{% endif %}">
+                    {% if history.history_type == '+' %}Verified{% else %}Success{% endif %}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        {% if page_object.paginator.num_pages > 1 %}
+        <div class="border-top p-3">
+          {% include 'commons/list-pagination.html' with item_label="history" page_object=page_object page_param="history_page" %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </main>
+  </div>
 </div>
-<script>
-    function openAssetModal(modalId) {
-        const modalEl = document.getElementById(modalId);
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
-    }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Fix: When multiple modals are in DOM, make sure `modal-open` class remains
-        $(document).on('hidden.bs.modal', '.modal', function () {
-            if ($('.modal.show').length > 0) {
-                $('body').addClass('modal-open');
-            }
-        });
+{# ── Modals ───────────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="update-user-modal" tabindex="-1" aria-labelledby="updateUserLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div id="update-user-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
 
-        // Optional: z-index stacking fix for multiple modals
-        $(document).on('show.bs.modal', '.modal', function () {
-            let zIndex = 1050 + (10 * $('.modal:visible').length);
-            $(this).css('z-index', zIndex);
-            setTimeout(function () {
-                $('.modal-backdrop:not(.modal-stack)').first().css('z-index', zIndex - 1).addClass('modal-stack');
-            }, 0);
-        });
-    });
-</script>
 {% endblock content %}

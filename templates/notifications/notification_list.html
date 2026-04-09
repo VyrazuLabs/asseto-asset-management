@@ -9,12 +9,34 @@
         width: 100%;
         display: block;
     }
-    
+
+    .notification-list-item .dropdown-item {
+        position: relative;
+    }
+
+    .notification-list-item .notification-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .notification-list-item .unread-dot {
+        width: 10px;
+        height: 10px;
+        min-width: 10px;
+        background: #435ebe !important;
+        border-radius: 50%;
+        flex-shrink: 0;
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
 </style>
 
 {% for user_notification in notifications %}
-    <li>
-        <div class="dropdown-item d-flex p-2 alert alert-dismissible show fade xyz" style="cursor: pointer;">
+    <li class="notification-list-item">
+        <div class="dropdown-item d-flex p-2 alert alert-dismissible show fade xyz" style="cursor: pointer; position: relative;">
 
             <i class="bi {{user_notification.notification.icon}} fs-3 ps-2 pe-4"></i>
             <div 
@@ -27,10 +49,10 @@
                     hx-trigger="click"
                 {% endif %}
             >
-                <div class="d-flex flex-start gap-2" style="flex-direction: column;">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <strong class="fs-6">{{user_notification.notification.notification_title}}</strong>
-                        {% if not user_notification.is_seen %}<div class="unread-dot"></div>{% endif %}
+                <div class="d-flex flex-start gap-2 w-100" style="flex-direction: column;">
+                    <div class="notification-title-row">
+                        <strong class="fs-6 mb-0">{{user_notification.notification.notification_title}}</strong>
+                        {% if not user_notification.is_seen %}<span class="unread-dot"></span>{% endif %}
                     </div>
 
                     <small>{{ user_notification.notification.created_at|date:"F j, Y, g:i A" }}</small>

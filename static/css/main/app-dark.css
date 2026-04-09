@@ -176,13 +176,7 @@ body.theme-dark .h1 {
 }
 body.theme-dark h1,
 body.theme-dark .h1 {
-  font-size: calc(1.375rem + 1.5vw);
-}
-@media (min-width: 1200px) {
-  body.theme-dark h1,
-  body.theme-dark .h1 {
-    font-size: 2.5rem;
-  }
+  font-size: 1.75rem;
 }
 body.theme-dark h2,
 body.theme-dark .h2 {
@@ -8008,12 +8002,23 @@ body[data-theme="dark"] {
   display: inline-block !important;
   width: 10px !important;
   height: 10px !important;
-  margin-right: 8px !important;
+  min-width: 10px !important;
+  margin: 0 !important;
   border-radius: 50% !important;
   background-color: #435ebe !important;
   font-weight: bold !important;
   box-shadow: 0 0 2px #435ebe !important;
   vertical-align: middle !important;
+}
+
+.notification-dropdown .notification-list-item .dropdown-item {
+  position: relative;
+}
+
+.notification-dropdown .notification-list-item .unread-dot {
+  position: absolute !important;
+  top: 0.75rem !important;
+  right: 0.75rem !important;
 }
 
 .notification-dropdown {
