@@ -78,32 +78,15 @@ def generate_otl_session_id(user):
     user.save()
     return otl_session_id
 
-def generate_qr(request):
+def generate_qr(request,user_totp):
     try:
-        user = request.user
-
-        user_totp = UserTotp.objects.filter(user_id=user.id).last()
         secret = generate_totp_secret()
-        print("Generated status:", user_totp.status if user_totp else "No existing TOTP")
-        if not user_totp:
-            # secret = generate_totp_secret()
-            user_totp=UserTotp.objects.create(user_id=user.id, secret=secret)
-        # else:
-        #     user_totp.secret = secret
-        #     user_totp.save()
-        if user_totp.status == 1:
-            user_totp.secret = user_totp.secret
-            user_totp.status = 1
-            user_totp.save()
-        elif user_totp.status == 2:
-            user_totp.secret = user_totp.secret
-            user_totp.status = 1
-            user_totp.save()
-        elif user_totp.status == 0:
-            user_totp.secret = secret
-            user_totp.status = 1
-            user_totp.save()
-        qr_image = generate_qrcode(user_totp.secret, user.username)
+
+        user_totp.secret = secret
+        user_totp.status = 1
+        user_totp.save()
+
+        qr_image = generate_qrcode(user_totp.secret, request.user.username)
 
         return qr_image  
 
