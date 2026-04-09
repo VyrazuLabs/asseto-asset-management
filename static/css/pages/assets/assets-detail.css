@@ -286,15 +286,15 @@
 
 /* ── Barcode block ────────────────────────────────────────────────────────── */
 .detail-barcode-wrap {
-  background: #F9FAFB;
-  border: 1.5px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
+  background: transparent;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  padding: .75rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.detail-barcode-wrap svg { width: 100%; height: auto; }
+.detail-barcode-wrap svg { width: 100%; height: auto; max-width: 100%; }
 .detail-barcode-tag-label {
   font-family: monospace;
   font-size: .85rem;
@@ -319,7 +319,7 @@
 }
 .btn-download-label:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 
-body.theme-dark .detail-barcode-wrap { background: #fff; padding: 1.5rem; }
+body.theme-dark .detail-barcode-wrap { background: transparent; padding: .75rem; border-radius: 4px; border: 1px solid #374151; }
 
 /* ── Activity log ─────────────────────────────────────────────────────────── */
 .activity-log-list {
@@ -365,7 +365,6 @@ body.theme-dark .detail-audit-table thead th { background: #16162a; }
 body.theme-dark .detail-specs-table tbody td,
 body.theme-dark .detail-audit-table tbody td { border-color: var(--color-border); }
 body.theme-dark .detail-main-image-wrap { background: #2a2a3d; border-color: var(--color-border); }
-body.theme-dark .detail-barcode-wrap { background: #f5f5f5; }
 body.theme-dark .detail-thumb-more { background: #2a2a3d; }
 body.theme-dark .audit-thumb-empty { background: #2a2a3d; }
 body.theme-dark .activity-log-item { border-color: var(--color-border); }
