@@ -1,0 +1,60 @@
+/* =============================================================================
+   assets-list.css — Styles specific to the Assets List page
+   Relies on: list-common.css, assets-common.css
+   ============================================================================= */
+
+/* ── Asset-specific table overrides ──────────────────────────────────────── */
+.assets-table { width: 100%; border-collapse: collapse; }
+.assets-table thead th {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: .75rem 1rem;
+  background: #FAFBFC;
+  border-bottom: 1.5px solid var(--color-border);
+  white-space: nowrap;
+}
+.assets-table tbody tr {
+  border-bottom: 1px solid #F3F4F6;
+  transition: background .15s;
+}
+.assets-table tbody tr:last-child { border-bottom: none; }
+.assets-table tbody tr:hover { background: #FAFBFF; }
+.assets-table td {
+  padding: .85rem 1rem;
+  vertical-align: middle;
+  font-size: .925rem;
+  color: var(--color-text);
+}
+
+/* ── Asset inline status select ──────────────────────────────────────────── */
+.status-select-inline {
+  border: 1.5px solid var(--color-border);
+  border-radius: 6px;
+  padding: .3rem .6rem;
+  font-size: .85rem;
+  font-weight: 600;
+  background: #F9FAFB;
+  color: var(--color-text);
+  cursor: pointer;
+  min-width: 130px;
+}
+.status-select-inline:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE OVERRIDES
+   ───────────────────────────────────────────────────────────────────────────── */
+body.theme-dark .assets-table thead th { background: #16162a; border-color: var(--color-border); }
+body.theme-dark .assets-table tbody tr { border-color: var(--color-border); }
+body.theme-dark .assets-table tbody tr:hover { background: #22223a; }
+
+body.theme-dark .status-select-inline {
+  background: #151521;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
