@@ -176,13 +176,7 @@ body.theme-dark .h1 {
 }
 body.theme-dark h1,
 body.theme-dark .h1 {
-  font-size: calc(1.375rem + 1.5vw);
-}
-@media (min-width: 1200px) {
-  body.theme-dark h1,
-  body.theme-dark .h1 {
-    font-size: 2.5rem;
-  }
+  font-size: 1.75rem;
 }
 body.theme-dark h2,
 body.theme-dark .h2 {
