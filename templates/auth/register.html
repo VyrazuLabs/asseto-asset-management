@@ -12,8 +12,6 @@
   
 
             <form action="" method="post" novalidate>
-                
-
                 {% if messages %}
                     {% for message in messages %}
                     <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
@@ -25,20 +23,45 @@
                     <span class="text-danger">*</span>
                     {{u_form.full_name}}
                     <div class="form-control-icon">
-                        <i class="bi bi-person"></i>
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-person"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in u_form.full_name.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
+
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <span class="text-danger">*</span>
+                    {{u_form.email}}
+                    <div class="form-control-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                </div>
                 {% for error in u_form.email.errors %}
                     <div class="text-danger mb-3">{{ error }}</div>
                 {% endfor %}
+
                 <div class="form-group position-relative has-icon-left mb-3">
                     <span class="text-danger">*</span>
                     {{u_form.username}}
                     <div class="form-control-icon">
-                        <i class="bi bi-envelope"></i>
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-person-square"></i>
+                        </div>
+                    </div>
+                </div>
+                {% for error in u_form.username.errors %}
+                    <div class="text-danger mb-3">{{ error }}</div>
+                {% endfor %}
+                <div class="form-group position-relative has-icon-left mb-3">
+                    <span class="text-danger">*</span>
+                    {{u_form.email}}
+                    <div class="form-control-icon">
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-person"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in u_form.username.errors %}
@@ -48,7 +71,9 @@
                     <span class="text-danger">*</span>
                     {{u_form.phone}}
                     <div class="form-control-icon">
-                        <i class="bi bi-phone"></i>
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-phone"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in u_form.phone.errors %}
@@ -58,7 +83,9 @@
                     <span class="text-danger">*</span>
                     {{u_form.password1}}
                     <div class="form-control-icon">
-                        <i class="bi bi-shield-lock"></i> 
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in u_form.password1.errors %}
@@ -69,7 +96,9 @@
                     <span class="text-danger">*</span>
                     {{u_form.password2}}
                     <div class="form-control-icon">
-                        <i class="bi bi-shield-lock"></i> 
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in u_form.password2.errors %}
@@ -79,7 +108,9 @@
                     <span class="text-danger">*</span>
                     {{o_form.name}}
                     <div class="form-control-icon">
-                        <i class="bi bi-building"></i>
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-building"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in o_form.name.errors %}
@@ -89,7 +120,9 @@
                     <span class="text-danger">*</span>
                     {{o_form.website}}
                     <div class="form-control-icon">
-                        <i class="bi bi-globe"></i>
+                        <div id="input-content" style="padding-top: 20px;">
+                            <i class="bi bi-globe"></i>
+                        </div>
                     </div>
                 </div>
                 {% for error in o_form.website.errors %}

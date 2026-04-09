@@ -1,11 +1,38 @@
 import json
 from rest_framework import serializers
+from django.db import transaction
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
 from dashboard.models import CustomField
 from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
-from rest_framework import serializers
+from notifications.models import UserNotification
+from .api_utils import get_base_segment
+
+class NotificationSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(source='notification.notification_title')
+    body = serializers.CharField(source='notification.notification_text')
+    link = serializers.CharField(source='notification.link')
+    created_at = serializers.DateTimeField(source='notification.created_at')
+    object_id = serializers.CharField(source='notification.object_id')
+    object_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserNotification
+        fields = [
+            'id',
+            'title',
+            'body',
+            'is_seen',
+            'link',
+            'object_type',
+            'created_at',
+            'object_id'
+        ]
+
+    def get_object_type(self, obj):
+        link = obj.notification.link
+        return get_base_segment(link) if link else None
 
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
@@ -44,20 +71,77 @@ class AssetSerializer(serializers.ModelSerializer):
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
-    def to_internal_value(self, data):
-        # Internal value contains the list of all the items in the custom fields.
-        data = data.copy()
-        if (data.get("images") or "") == "":
-            data.pop("images", None)
+    # def to_internal_value(self, data):
+    #     # Internal value contains the list of all the items in the custom fields.
+    #     data = data.copy()
+    #     if (data.get("images") or "") == "":
+    #         data.pop("images", None)
 
+    #     for field in ["purchase_date", "warranty_expiry_date"]:
+    #         if data.get(field) == "":
+    #             data[field] = None
+    #     if data.get("custom_fields") in ["", None]:
+    #         data.pop("custom_fields", None)
+    #     elif isinstance(data.get("custom_fields"), str):
+    #         data["custom_fields"] = json.loads(data.get("custom_fields"))
+    #     return super().to_internal_value(data)
+    def to_internal_value(self, data):
+        # Create a new mutable dictionary
+        mutable_data = {}
+        
+        # Handle different input types
+        if hasattr(data, 'getlist'):  # Django QueryDict (from request.POST/request.FILES)
+            # Copy regular fields
+            for key in data.keys():
+                if key != 'images':
+                    value = data.get(key)
+                    if value not in ["", None]:
+                        mutable_data[key] = value
+                    else:
+                        mutable_data[key] = None
+            
+            # Handle images with getlist() to get all files
+            if 'images' in data:
+                images = data.getlist('images')
+                # Filter out empty strings but keep file objects
+                filtered_images = [img for img in images if img not in ["", None]]
+                if filtered_images:
+                    mutable_data['images'] = filtered_images
+        else:
+            # Regular dictionary
+            for key, value in data.items():
+                if key == 'images':
+                    # Handle images list
+                    if isinstance(value, (list, tuple)):
+                        filtered_images = [img for img in value if img not in ["", None]]
+                        if filtered_images:
+                            mutable_data[key] = filtered_images
+                    elif value not in ["", None]:
+                        mutable_data[key] = value
+                elif isinstance(value, (str, int, float, bool, list, dict)):
+                    mutable_data[key] = value
+                elif hasattr(value, 'read'):  # File-like object
+                    mutable_data[key] = value
+                elif value is None:
+                    mutable_data[key] = None
+                # Skip other complex types
+        
+        # Handle date fields
         for field in ["purchase_date", "warranty_expiry_date"]:
-            if data.get(field) == "":
-                data[field] = None
-        if data.get("custom_fields") in ["", None]:
-            data.pop("custom_fields", None)
-        elif isinstance(data.get("custom_fields"), str):
-            data["custom_fields"] = json.loads(data.get("custom_fields"))
-        return super().to_internal_value(data)
+            if field in mutable_data and mutable_data[field] == "":
+                mutable_data[field] = None
+        
+        # Handle custom_fields
+        if "custom_fields" in mutable_data:
+            if mutable_data["custom_fields"] in ["", None]:
+                mutable_data.pop("custom_fields", None)
+            elif isinstance(mutable_data["custom_fields"], str):
+                try:
+                    mutable_data["custom_fields"] = json.loads(mutable_data["custom_fields"])
+                except json.JSONDecodeError:
+                    mutable_data["custom_fields"] = []
+        
+        return super().to_internal_value(mutable_data)
 
     def validate_tag(self, value):
         if self.partial and value in (None, ""):
@@ -92,10 +176,9 @@ class AssetSerializer(serializers.ModelSerializer):
                 )
         return value
 
+    @transaction.atomic
     def create(self, validated_data):
         images = validated_data.pop("images", []) or []
-        # custom_fields_raw = request.data.get("custom_fields", "[]")
-        # custom_fields = json.loads(custom_fields_raw)
         custom_fields = validated_data.pop("custom_fields", []) or []
         asset = Asset.objects.create(
             **validated_data,
@@ -126,6 +209,7 @@ class AssetSerializer(serializers.ModelSerializer):
         return asset
 
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         image_data = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields", [])
@@ -158,7 +242,7 @@ class AssetSerializer(serializers.ModelSerializer):
                 entity_type="asset"
             ).delete()
 
-        # 🔹 Create / Update incoming fields
+        # Create / Update incoming fields
         for custom_field in custom_fields:
             if not isinstance(custom_field, dict):
                 continue
@@ -213,13 +297,16 @@ class AssetSerializer(serializers.ModelSerializer):
     #     return attrs
     
     def validate_warranty_expiry_date(self, value):
-        if value:
+        user=self.context["request"].user
+        if user.use_expired_assets is True and value:
+            return value
+        else:
             tomorrow = timezone.now() + timedelta(days=1)
             if value < tomorrow:
                 raise serializers.ValidationError(
                     "Warranty expiry date must be at least tomorrow."
                 )
-        return value
+            return value
 
 
 class SearchAssetSerializer(serializers.Serializer):
@@ -244,12 +331,39 @@ class AssignAssetSerializer(serializers.ModelSerializer):
         default=list,
     )
 
+    # def to_internal_value(self, data):
+    #     data = data.copy()
+    #     if (data.get("images") or "") == "":
+    #         data.pop("images", None)
+    #     return super().to_internal_value(data)
+    # def to_internal_value(self, data):
+    #     # Convert QueryDict → regular dict (no deepcopy of file objects)
+    #     data = dict(data)
+    #     if (data.get("images") or "") == "":
+    #         data.pop("images", None)
+    #     return super().to_internal_value(data)
     def to_internal_value(self, data):
-        data = data.copy()
-        if (data.get("images") or "") == "":
-            data.pop("images", None)
-        return super().to_internal_value(data)
-    
+        mutable_data = {}
+
+        # Handle QueryDict safely
+        if hasattr(data, "getlist"):
+            for key in data.keys():
+                values = data.getlist(key)
+
+                if key == "images":
+                    mutable_data[key] = [v for v in values if v not in ["", None]]
+                else:
+                    # Take first value if single field
+                    mutable_data[key] = values[0] if values else None
+        else:
+            mutable_data = data.copy()
+
+        # Remove empty images
+        if mutable_data.get("images") in ["", None, []]:
+            mutable_data.pop("images", None)
+
+        return super().to_internal_value(mutable_data)
+
     def validate_user(self,user):
         if not user:
             raise serializers.ValidationError("User must needed")

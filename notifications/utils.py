@@ -3,17 +3,18 @@ from django.http import HttpResponse, JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
 from authentication.models import User
+from firebase_admin import messaging
 
 # Function to send email to a user regarding operation in asset
 # Since email is optional now we have to validate whether the user has email or not
-def send_email(user_email,notifications_title,notification_text):
-    subject = notifications_title
+def send_email(user_email,notification_title,notification_text):
+    subject = notification_title
     message = notification_text
-    from_email = "sghosh@gmail.com"
+    from_email = settings.EMAIL_HOST_USER
     recipient_list = [user_email]
     html_message= f"""
         <h3>Hello User!</h3>
-        <p>{notifications_title}</p>
+        <p>{notification_title}</p>
         <p><strong>{notification_text}</strong></p>
     """
     return send_mail(subject=subject, message=message, recipient_list=recipient_list,from_email=from_email,html_message = html_message)
@@ -27,6 +28,7 @@ def notifications_call(user,entity_type,notification_title,notification_text):
         'browser_notification':get_user.browser_notification if get_user.browser_notification else False,
         'inapp_notification':get_user.inapp_notification if get_user.inapp_notification else False
     }
+    print(get_user_notification_types)
     if get_user_notification_types['slack_notification'] is True:
         UserNotification.objects.create(
             entity_type=2,user=get_user, notification_title=notification_title, notification_text=notification_text
@@ -41,3 +43,19 @@ def notifications_call(user,entity_type,notification_title,notification_text):
         )
     # In app to be implemented later.
     return JsonResponse({"success": True})
+
+def send_data_message(token,title,body,image_url):
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body,
+            image=image_url
+        ),
+        token=token
+    )
+    try:
+        response = messaging.send(message)
+        print('Successfully sent message:--', response)
+    except Exception as e:
+        print(f"Error sending message: {e}")
+    # return response
