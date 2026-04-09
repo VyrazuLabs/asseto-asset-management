@@ -13,6 +13,8 @@ from django.db.models import OuterRef, Subquery
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .utils import get_completed_audit,get_pending_audits,get_audit_stats
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -26,7 +28,7 @@ def add_audit(request):
     assigned_to=request.POST.get('assigned-to',None)
     tag=request.POST.get('tag',None)
     get_asset=Asset.objects.filter(tag=tag).first()
-    
+    user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
     if request.method == 'POST':
         errors={}
         if not condition:
@@ -34,7 +36,6 @@ def add_audit(request):
 
         if not comments:
             errors["comments"] = "Comments cannot be empty."
-
 
         # If ANY custom errors exist → return template with errors
         if errors:
@@ -68,10 +69,12 @@ def add_audit(request):
         else:
             for f in files:
                 AuditImage.objects.create(audit=audit_create, image=f)
+        messages.success(request, 'Audit added successfully')
+        context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
+        # return render(request, 'audit/add_audit.html', context)
         return redirect('audit:completed_audits')
 
     elif request.method == 'GET':
-        user_list = [assign for assign in User.undeleted_objects.all() if assign is not None]
         context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
         return render(request, 'audit/add_audit.html', context)
 
@@ -115,7 +118,9 @@ def get_audits_by_id(request, id):
         )
         for f in files:
                 AuditImage.objects.create(audit=created_audit, image=f)
+        messages.success(request, 'Audit added successfully')
         return redirect('audit:completed_audits')
+    
 
     elif request.method == 'GET':
         if get_assigned_user is None:
@@ -149,41 +154,27 @@ def asset_audit_history(request,id):
 
 @login_required
 def completed_audits(request):
-    thirty_days_ago = datetime.now() - timedelta(days=30)
-
-    audits = Audit.objects.filter(
-        created_at__gte=thirty_days_ago
-    ).order_by('-created_at')
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(audits, 10)
-    audits_page = paginator.get_page(page)
-
-    return render(request, 'audit/audit_list.html', {
+    audits_page = get_completed_audit(request)
+    stats = get_audit_stats(request)
+    context = {
         'audits': audits_page,
-        'sidebar': 'audit'
-    })
+        'sidebar': 'audit',
+        'tab': 'completed',
+    }
+    context.update(stats)
+    return render(request, 'audit/audit_list.html', context)
 
 @login_required
 def pending_audits(request):
-    asset_list = Asset.undeleted_objects.all()
-    data_set = []
-    for asset in asset_list:
-        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
-        next_due_date = next_audit_due_for_asset(asset)
-        if has_audit and next_due_date:
-            if (next_due_date > datetime.now().date()):
-                continue
-        data = {}
-        data["asset"] = asset
-        data["expected_audit_date"] = next_due_date
-        data["last_audit_date"] = has_audit
-        data_set.append(data)
-
-    return render(request, 'audit/pending_audits.html', {
+    data_set = get_pending_audits(request)
+    stats = get_audit_stats(request)
+    context = {
         'data_set': data_set,
-        'sidebar': 'audit'
-    })
+        'sidebar': 'audit',
+        'tab': 'pending',
+    }
+    context.update(stats)
+    return render(request, 'audit/pending_audits.html', context)
 
 @login_required
 def get_assigned_user(request, tag=None):
@@ -194,8 +185,10 @@ def get_assigned_user(request, tag=None):
 
     if not asset:
         return JsonResponse({"exists": False, "assigned_user": None}, status=200)
-
-    assign_record = AssignAsset.objects.filter(asset=asset).order_by("-assigned_date").first()
+    assign_record = AssignAsset.objects.select_related(
+        "user"
+    ).filter(asset_id=asset.id).first()
+    # assign_record = AssignAsset.objects.filter(asset=asset).order_by("-assigned_date").first()
 
     return JsonResponse({
         "exists": True,

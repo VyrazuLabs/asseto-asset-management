@@ -3,6 +3,68 @@ from .constants import AUDIT_INTERVAL_VALUE
 from dateutil.relativedelta import relativedelta
 from .models import Audit
 from assets.models import Asset
+from django.core.paginator import Paginator
+
+def get_audit_stats(request):
+    """Return stat card counts for the audit list pages."""
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    completed_count = Audit.objects.filter(created_at__gte=thirty_days_ago).count()
+    total_audit_count = Audit.objects.count()
+
+    # Pending: assets whose next audit is overdue or never audited
+    asset_list = Asset.undeleted_objects.all()
+    pending_count = 0
+    for asset in asset_list:
+        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
+        next_due = next_audit_due_for_asset(asset)
+        if has_audit and next_due:
+            if next_due <= datetime.now().date():
+                pending_count += 1
+        elif not has_audit:
+            pending_count += 1
+
+    return {
+        'total_audit_count': total_audit_count,
+        'completed_count': completed_count,
+        'pending_count': pending_count,
+    }
+
+
+def get_completed_audit(request):
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+
+    audits = Audit.objects.filter(
+        created_at__gte=thirty_days_ago
+    ).order_by('-created_at')
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(audits, 10)
+    audits_page = paginator.get_page(page)
+    return audits_page
+
+def get_pending_audits(request):
+    asset_list = Asset.undeleted_objects.all()
+    data_set = []
+    for asset in asset_list:
+        # latest_audit = Audit.objects.filter(
+        #     asset=OuterRef("pk")
+        # ).order_by("-created_at")
+
+        # assets = Asset.objects.annotate(
+        #     last_audit_date=Subquery(latest_audit.values("created_at")[:1])
+        # )   
+        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
+        next_due_date = next_audit_due_for_asset(asset)
+        if has_audit and next_due_date:
+            if (next_due_date > datetime.now().date()):
+                continue
+        data = {}
+        data["asset"] = asset
+        data["expected_audit_date"] = next_due_date
+        data["last_audit_date"] = has_audit
+        data_set.append(data)
+
+    return data_set
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:

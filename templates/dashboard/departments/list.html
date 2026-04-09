@@ -16,7 +16,7 @@
         <div class="d-flex ">
             {% if perms.authentication.add_department %}
                 <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-sm btn-outline-info my-3 me-2" 
+                    <button type="button" id="add-modal" class="btn btn-sm btn-outline-info my-3 me-2" 
                         hx-get="{% url 'dashboard:add_department' %}" hx-target="#add-department-modal-content"
                         data-bs-toggle="modal" data-bs-target="#add-department-modal"
                     >Add Department</i></button>
@@ -116,12 +116,12 @@
                                         {% endif %}
                                         {% if perms.authentication.edit_department %}
                                             {% if is_demo is True %}
-                                                <button type="button" class="disabled btn btn-info" 
+                                                <button type="button" class="disabled btn btn-info" id="add-department"
                                                 hx-get="{% url 'dashboard:update_department' department.id %}" hx-target="#update-department-modal-content"
                                                 data-bs-toggle="modal" data-bs-target="#update-department-modal"
                                             ><i class="bi bi-pencil-square"></i></button>
                                             {% else %}
-                                                <button type="button" class="btn btn-info" 
+                                                <button type="button" class="btn btn-info" id="add-department"
                                                     hx-get="{% url 'dashboard:update_department' department.id %}" hx-target="#update-department-modal-content"
                                                     data-bs-toggle="modal" data-bs-target="#update-department-modal"
                                                 ><i class="bi bi-pencil-square"></i></button>
@@ -157,4 +157,34 @@
         </div>
     </section>
 </div>
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    // Permission already granted, send notification directly
+    sendNotification();
+  }
+  else if (Notification.permission !== "denied") {
+    // Request permission if not already denied
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "New Department Added";
+  const options = {
+    body: "New Department Added.", 
+    icon: "/static/images/logo/favicon.png", 
+  };
+  new Notification(title, options);
+}
+</script>
+<script>
+document.body.addEventListener("departmentAdded", function () {
+  requestAndSendNotification();
+});
+</script>
 {% endblock content%}

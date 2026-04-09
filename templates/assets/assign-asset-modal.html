@@ -1,49 +1,76 @@
-<div class="modal-header bg-dark text-center">
-    <h5 class="modal-title white w-100" id="myModalLabel160">Reassign Asset</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"
-        aria-label="Close">
-    </button>
+<div class="assign-modal-header">
+    <div>
+        <h5 class="assign-modal-title">Assign Asset</h5>
+        <p class="assign-modal-subtitle">Assign an asset to a user</p>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <form hx-post='{{request.path}}' novalidate>
     {% csrf_token %}
-    <div class="modal-body">
+    <div class="modal-body p-4">
         <div class="row">
-            <div class="form-group">
-                <label>Asset Name</label>
-                {{form.asset}}
-                {% for error in form.asset.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
-            </div>
-            <div class="col-md-6 col-12">
-                <div class="form-group">
-                    <label for="company-column">Add Asset Image</label>
-                    {{image_form.image}}
-                    {% for error in image_form.image.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+            <div class="col-md-12">
+                {# ── Asset selector ──────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Asset Name</label>
+                    {{ form.asset }}
+                    {% for error in form.asset.errors %}
+                        <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
-                <div class="form-group rounded ml-2" id="imagePreview"></div>                    
             </div>
-            <div class="form-group">
-                <label>Assign To</label>
-                {{form.user}}
-                {% for error in form.user.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
-                {% endfor %}
+
+            <div class="col-md-12">
+                {# ── Assignee Name ───────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Assignee Name</label>
+                    {{ form.user }}
+                    {% for error in form.user.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                {# ── Issue Date ──────────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Issue Date</label>
+                    {{ form.issue_date }}
+                    {% for error in form.issue_date.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                {# ── Asset Images ────────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Asset Images</label>
+                    {{ image_form.image }}
+                    {% for error in image_form.image.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                {# ── Assignment Notes ────────────────────────────────────── #}
+                <div class="assign-form-group mb-0">
+                    <label class="assign-form-label">Assignment Notes</label>
+                    {{ form.notes }}
+                    {% for error in form.notes.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-light-secondary"
-            data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">Close</span>
-        </button>
-        <button type="submit" class="btn btn-sm btn-info ml-1" 
+
+    <div class="assign-modal-footer">
+        <button type="button" class="btn-reset" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn-register"
             onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;">
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">Save</span>
+            Confirm Assignment
         </button>
     </div>
 </form>

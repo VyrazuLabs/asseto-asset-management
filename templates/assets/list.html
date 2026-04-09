@@ -1,434 +1,469 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
 {% load static %}
+
+{% block title %}Asset Inventory | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+{% endblock css %}
+
 {% block content %}
-<style>
-    #asset-search{
-        width: 100%;
-    }
-</style>
-<div class="page-heading">
-    {% csrf_token %}
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Assets</h3>
-            <nav aria-label="breadcrumb " class="d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Assets</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="d-flex">
-            {% if perms.authentication.add_asset %}
-                <div>
-                    <a href="{% url 'assets:add' %}" class="btn btn-sm btn-outline-info my-3 me-2">Add Asset</a>
-                </div>
-            {% endif %}
-                <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-trash" style="margin-bottom: 2px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                </svg>Trash</a>
-        </div>
-    </div>
-    <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <div class="filter">
-                    <div>
-                        <form id="asset-filter-form"
-                            hx-get="{% url 'assets:search' page_object.number %}"
-                            hx-target="#search_result"
-                            hx-trigger="change, keyup changed delay:500ms from:input">
 
-                            <div class="row g-3"> 
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'"
-                                        hx-get="{% url 'assets:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-status">
-                                        <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                            Select Status
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                        {% for status in asset_status_list %}
-                                        <li>
-                                        <a href="#" class="dropdown-item"
-                                            onclick="event.preventDefault(); 
-                                                    this.closest('form').querySelector('[name=status]').value='{{ status.id }}'; 
-                                                    this.closest('.dropdown-asset-status').querySelector('button').innerText='{{ status.name }}';
-                                                    htmx.trigger(this.closest('form'),'change');">
-                                            {{ status.name }}
-                                        </a>
-                                        </li>
-                                        {% endfor %}
-                                        </ul>
-                                        <input type="hidden" name="status">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-vendors">
-                                        <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                            Select Vendor
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            {% for vendor in vendor_list %}
-                                            <li>
-                                            <a href="#" class="dropdown-item"
-                                                onclick="event.preventDefault(); 
-                                                        this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}'; 
-                                                        this.closest('.dropdown-asset-vendors').querySelector('button').innerText='{{ vendor.name }}';
-                                                        htmx.trigger(this.closest('form'),'change');">
-                                                {{ vendor.name }}
-                                            </a>
-                                            </li>
-                                            {% endfor %}
-                                        </ul>
-                                        <input type="hidden" name="vendor">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-product-type">
-                                        <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                            Select Product Type
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            {% for type in product_type_list %}
-                                            <li>
-                                            <a href="#" class="dropdown-item"
-                                                onclick="event.preventDefault(); 
-                                                        this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
-                                                        this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
-                                                        htmx.trigger(this.closest('form'),'change');">
-                                                {{ type.name }}
-                                            </a>
-                                            </li>
-                                            {% endfor %}
-                                        </ul>
-                                        <input type="hidden" name="type">
-                                    </div>
-                                </div>
-
-                                <!-- Second Row -->
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-users">
-                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        Select User
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {% for user in user_list %}
-                                        <li>
-                                        <a href="#" class="dropdown-item"
-                                            onclick="event.preventDefault(); 
-                                                    this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
-                                                    this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
-                                                    htmx.trigger(this.closest('form'),'change');">
-                                            {{ user.full_name }}
-                                        </a>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <input type="hidden" name="user">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-product-category">
-                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        Select Category
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {% for category in product_category_list %}
-                                        <li>
-                                        <a href="#" class="dropdown-item"
-                                            onclick="event.preventDefault(); 
-                                                    this.closest('form').querySelector('[name=category]').value='{{ category.id }}';
-                                                    this.closest('.dropdown-asset-product-category').querySelector('button').innerText='{{ category.name }}';
-                                                    htmx.trigger(this.closest('form'),'change');">
-                                            {{ category.name }}
-                                        </a>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <input type="hidden" name="category">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-location">
-                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        Select Location
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {% for location in location_list %}
-                                        <li>
-                                        <a href="#" class="dropdown-item"
-                                            onclick="event.preventDefault(); 
-                                                    this.closest('form').querySelector('[name=location]').value='{{ location.id }}'; 
-                                                    this.closest('.dropdown-asset-location').querySelector('button').innerText='{{ location.office_name }}';
-                                                    htmx.trigger(this.closest('form'),'change');">
-                                            {{ location.office_name }}
-                                        </a>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <input type="hidden" name="location">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-6 col-lg-3">
-                                    <div class="dropdown-asset-department">
-                                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                        Select Department
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {% for department in department_list %}
-                                        <li>
-                                        <a href="#" class="dropdown-item"
-                                            onclick="event.preventDefault(); 
-                                                    this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
-                                                    this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
-                                                    htmx.trigger(this.closest('form'),'change');">
-                                            {{ department.name }}
-                                        </a>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <input type="hidden" name="department">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    </br>
-                    <div class="d-flex justify-content-end h-75">
-                        <a href="{% url 'assets:list' %}" class="btn btn-info">Reset</a>
-                    </div>
-                    <div>
-                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
-                    </div>
-                </div>
-                </br>
-                <div class="table-responsive items-table">
-                    <table class="table" id="table1">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Image</th>
-                                <th>Asset Tag</th>
-                                <th>Asset Name</th>
-                                <th>Product Type</th>
-                                <th>Product</th>
-                                <th>Vendor</th>
-                                <th>Current State</th>
-                                <th>Status</th>
-                                {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
-                                    <th>Actions</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        {% if page_object %}
-                        <tbody id="search_result">
-                            {% for asset in page_object %}
-                            <tr style="height: 100px;">
-                                <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>
-                                    {% with img=asset_images|get_item:asset.id %}
-                                        {% if img %}
-                                            <img src="{{ img.image.url }}" alt="{{ asset.name }}"
-                                                style="max-width:100px; max-height:100px;"
-                                                onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';">
-                                        {% else %}
-                                            <img src="{% static 'images/No_Image.jpg' %}"
-                                                alt="No image"
-                                                style="max-width:100px; max-height:100px;">
-                                        {% endif %}
-                                    {% endwith %}
-                                </td>
-                                <td>{{asset.tag}}</td>
-                                <td>
-                                    {% if asset in list_of_audited_assets %}
-                                        <div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"> 
-                                    {% endif %}
-                                    </div>{{asset.name}}</div>
-                                </td>
-                                <td>{{asset.product.product_type}}</td>
-                                
-                                <td>
-                                    {{asset.product}}
-                                    {% if asset.product.is_deleted %}
-                                    <i class="bi bi-exclamation-triangle text-warning" title="Product is deleted, please update or restore."></i>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{asset.vendor}} 
-                                    {% if asset.vendor.is_deleted %}
-                                    <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted, please update or restore."></i>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if asset.is_assigned %}
-                                            <div class="d-flex pb-1">
-                                                {% with map=asset_user_map|get_item:asset.id %}
-                                                    {% if map.image %}
-                                                        <sup class="d-flex pe-1">
-                                                            <img src="{{ map.image.url }}"
-                                                                onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';"
-                                                                class="rounded-circle mb-1"
-                                                                style="width: 20px; height: 20px;" 
-                                                            />
-                                                        </sup>
-                                                    {% endif %}
-                                                    {% with parts=map.full_name|split%}
-                                                        {% for part in parts %}
-                                                            <sup class="pt-2 pe-1">{{ part }}</sup>
-                                                        {% endfor %}
-                                                    {% endwith %}
-                                                {% endwith %}
-                                            </div>
-                                        <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
-                                                {% csrf_token %}
-                                                <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
-                                        </form>
-                                    {% else %}
-                                        <div class="input-group">
-                                            <button type="button"  
-                                                class="btn btn-info btn-sm"
-                                                hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
-                                                hx-target="#assign-asset-modal-list-content"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#assign-asset-list-modal">
-                                                Assign
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </td>
-                                {{active_users}}
-                                <td>
-                                    <div class="d-flex justify-content-between gap-2" style="width: 193px;">
-                                        {% if not asset.is_assigned %}
-                                        <select class="status-select form-select" data-asset-id="{{ asset.id }}">
-                                
-                                            <!-- current status -->
-                                            <option value="{{ asset.asset_status.name }}" selected>
-                                                {{ asset.asset_status.name }}
-                                            </option>
-                                
-                                            {% for value, label in asset_form.fields.status.choices %}
-                                            {% if value != asset.asset_status.name %}
-                                            <option value="{{ value }}">{{ label }}</option>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </select>
-                                        {% else %}
-                                        <select class="form-select" disabled>
-                                            <option selected>Assigned</option>
-                                        </select>
-                                        {% endif %}
-                                    </div>                                
-                                    <!-- <div style="display:none;" class="release-button-container" id="release-btn-container-{{ asset.id }}">
-                                        <div class="input-group">
-                                            <button type="button" class="btn btn-warning release-asset-btn" data-asset-id="{{ asset.id }}">
-                                                Release
-                                            </button>
-                                        </div>
-                                    </div> -->
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm d-flex " role="group" aria-label="Basic example">
-                                        {% if perms.authentication.view_asset %}
-                                            <a href="{% url 'assets:details' asset.id %}" class="btn btn-success pt-2"><i class="bi bi-eye-fill"></i></a>
-                                        {% endif %}
-                                        {% if perms.authentication.edit_asset %}
-                                            {% if is_demo is True %}
-                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info disabled pt-2" ><i class="bi bi-pencil-square"></i></a>
-                                            {% else %}
-                                                <a href="{% url 'assets:update_in_detail' asset.id %}" type="button" class="btn btn-info pt-2"><i class="bi bi-pencil-square"></i></a>
-                                            {% endif %}
-                                        {% endif %}
-                                        {% if perms.authentication.delete_asset %}
-                                            {% if is_demo is True %}
-                                                <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                    {% csrf_token %}
-                                                    <button type="submit" value="Delete" class="disabled btn btn-sm btn-danger pt-2 pe-2"><i class="bi bi-trash3-fill"></i></button>
-                                                </form>
-                                            {% else %}
-                                                <form action="{% url 'assets:delete' asset.id %}" class="" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                    {% csrf_token %}
-                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger pt-2 px-3"><i class="bi bi-trash3-fill"></i></button>
-                                                </form>
-                                            {% endif %}
-                                        {% endif %}
-                                        <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="btn btn-sm btn-primary pt-2"><i class="bi bi-archive"></i></i></a>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
-                        <div class="alert alert-info" role="alert">
-                            No record available!
-                        </div>
-                        {% endif %}
-                    </table>
-                </div>
-                {% include 'commons/pagination.html' %}
-            </div>
-            <div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this">
-                    </div>data-asset-id
-                </div>
-            </div>
-        </div>
-    </section>
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="assets-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Assets</li>
+      </ol>
+    </nav>
+    <h1>Asset Inventory</h1>
+    <p class="page-subtitle">Manage and track your organization's high-value physical assets.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn-trash" title="Recycle Bin">
+      <i class="bi bi-trash3"></i> Trash
+      {% if deleted_asset_count %}<span class="count-badge">{{ deleted_asset_count }}</span>{% endif %}
+    </a>
+    {% if perms.authentication.add_asset %}
+      <a href="{% url 'assets:add' %}" class="btn-register">
+        <i class="bi bi-plus-lg"></i> Register New Asset
+      </a>
+    {% endif %}
+  </div>
 </div>
 
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <a href="{% url 'assets:list' %}" class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
+    <div>
+      <div class="stat-label">Total Value</div>
+      <div class="stat-value">{{ total_value|floatformat:0 }}</div>
+    </div>
+  </a>
+  <a href="{% url 'assets:list' %}" class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Active Units</div>
+      <div class="stat-value">{{ active_count }}</div>
+    </div>
+  </a>
+  <a href="{% url 'assets:list' %}?status=assigned" class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-tools"></i></div>
+    <div>
+      <div class="stat-label">In Service</div>
+      <div class="stat-value">{{ assigned_count }}</div>
+    </div>
+  </a>
+  <a href="{% url 'recycle_bin:deleted_assets' %}" class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
+    <div>
+      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-value">{{ deleted_asset_count }}</div>
+    </div>
+  </a>
+</div>
+
+{# ── Filter bar ───────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  {% csrf_token %}
+  <form id="asset-filter-form"
+        hx-get="{% url 'assets:search' page_object.number %}"
+        hx-target="#search_result"
+        hx-trigger="change, keyup changed delay:400ms from:input">
+    <div class="row g-2 align-items-end">
+
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="filter-label">Search Asset</div>
+        <input name="search_text" type="search"
+          autocomplete="off" placeholder="Tag or Name…"
+          hx-get="{% url 'assets:search' page_object.number %}"
+          hx-trigger="keyup changed delay:400ms, search"
+          hx-target="#search_result"
+          aria-label="Search assets">
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Status</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
+            All Status
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-filter-form','change');">All Status</a></li>
+            {% for status in asset_status_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=status]').value='{{ status.id }}';document.getElementById('status-btn').childNodes[0].textContent='{{ status.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ status.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="status">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Vendor</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
+            All Vendors
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors ';htmx.trigger('#asset-filter-form','change');">All Vendors</a></li>
+            {% for vendor in vendor_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=vendor]').value='{{ vendor.id }}';document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ vendor.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="vendor">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Product Type</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
+            All Types
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
+            {% for type in product_type_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ type.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="type">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Category</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="category-btn" aria-label="Filter by category">
+            All Categories
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=category]').value='';document.getElementById('category-btn').childNodes[0].textContent='All Categories ';htmx.trigger('#asset-filter-form','change');">All Categories</a></li>
+            {% for category in product_category_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=category]').value='{{ category.id }}';document.getElementById('category-btn').childNodes[0].textContent='{{ category.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ category.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="category">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Location</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn" aria-label="Filter by location">
+            All Locations
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=location]').value='';document.getElementById('location-btn').childNodes[0].textContent='All Locations ';htmx.trigger('#asset-filter-form','change');">All Locations</a></li>
+            {% for loc in location_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=location]').value='{{ loc.id }}';document.getElementById('location-btn').childNodes[0].textContent='{{ loc.office_name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ loc.office_name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="location">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Department</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn" aria-label="Filter by department">
+            All Dept
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=department]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All Dept</a></li>
+            {% for dept in department_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=department]').value='{{ dept.id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ dept.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ dept.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="department">
+        </div>
+      </div>
+
+      <div class="col-auto">
+        <a href="{% url 'assets:list' %}" class="btn-reset" title="Reset all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
+
+    </div>
+  </form>
+  {% if is_demo is True %}
+    <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
+  {% endif %}
+</div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="assets-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Image</th>
+          <th>Asset Tag</th>
+          <th>Asset Name</th>
+          <th>Product Type</th>
+          <th>Vendor</th>
+          <th>Assigned To</th>
+          <th>Status</th>
+          {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
+            <th>Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+
+      {% if page_object %}
+      <tbody id="search_result">
+        {% for asset in page_object %}
+        <tr>
+          <td class="table-index-cell">
+            {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+          </td>
+
+          <td>
+            {% with img=asset_images|get_item:asset.id %}
+              <img class="asset-thumb"
+                src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                alt="{{ asset.name }}"
+                width="52" height="52"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            {% endwith %}
+          </td>
+
+          <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
+
+          <td>
+            {% with asset_conditions_map|get_item:asset.id as condition_list %}
+              {% with condition_list|default:''|last as condition %}
+                <div class="asset-name-main">{{ asset.name }}</div>
+                <div class="asset-name-sub">
+                  {% if asset.product %}{{ asset.product.name }}{% endif %}
+                  {% if condition == 0 or condition == 1 %}
+                    &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+                  {% elif condition == 2 %}
+                    &nbsp;·&nbsp;<span class="state-good">● Good</span>
+                  {% elif condition == 3 or condition == 4 %}
+                    &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+                  {% endif %}
+                </div>
+              {% endwith %}
+            {% endwith %}
+          </td>
+
+          <td>{{ asset.product.product_type }}</td>
+
+          <td>
+            {{ asset.vendor }}
+            {% if asset.vendor.is_deleted %}
+              <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if asset.is_assigned %}
+              {% with map=asset_user_map|get_item:asset.id %}
+                <div class="assignee-chip mb-1">
+                  {% if map.image %}
+                    <img src="{{ map.image.url }}"
+                      onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
+                      alt="{{ map.full_name }}" width="22" height="22">
+                  {% else %}
+                    <span class="assignee-initials">
+                      {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
+                    </span>
+                  {% endif %}
+                  <span>{{ map.full_name|default:"Unknown User" }}</span>
+                </div>
+              {% endwith %}
+              <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
+                    class="form-row-action"
+                    onsubmit="return confirm('Unassign this asset?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-unassign">Unassign</button>
+              </form>
+            {% else %}
+              <span class="unassigned-label">Unassigned</span>
+              <button type="button" class="btn-assign mt-1"
+                hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+                hx-target="#assign-asset-modal-list-content"
+                data-bs-toggle="modal"
+                data-bs-target="#assign-asset-list-modal"
+                aria-label="Assign {{ asset.name }}">
+                + Assign
+              </button>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if not asset.is_assigned %}
+              <select class="status-select status-select-inline" data-asset-id="{{ asset.id }}"
+                      aria-label="Status for {{ asset.name }}">
+                <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
+                {% for value, label in asset_form.fields.status.choices %}
+                  {% if value != asset.asset_status.name %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            {% else %}
+              <span class="status-badge status-allocated">Allocated</span>
+            {% endif %}
+          </td>
+
+          {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
+          <td>
+            <div class="row-actions">
+              {% if perms.authentication.view_asset %}
+                <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View {{ asset.name }}">
+                  <i class="bi bi-eye"></i>
+                </a>
+              {% endif %}
+              {% if perms.authentication.edit_asset %}
+                <a href="{% url 'assets:update_in_detail' asset.id %}"
+                  class="action-btn {% if is_demo %}disabled{% endif %}"
+                  title="Edit {{ asset.name }}">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              {% endif %}
+              {% if perms.authentication.delete_asset %}
+                <form action="{% url 'assets:delete' asset.id %}" method="post" class="form-row-action"
+                      onsubmit="return confirm('Delete {{ asset.name }}? It can be restored from Recycle Bin.')">
+                  {% csrf_token %}
+                  <button type="submit"
+                    class="action-btn danger {% if is_demo %}disabled{% endif %}"
+                    title="Delete {{ asset.name }}"
+                    {% if is_demo %}disabled{% endif %}>
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </form>
+              {% endif %}
+              <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="action-btn" title="Audit history">
+                <i class="bi bi-archive"></i>
+              </a>
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="10">
+            <div class="table-empty-state">
+              <i class="bi bi-inbox d-block"></i>
+              <p>No assets found.<br>
+                <a href="{% url 'assets:add' %}" class="link-primary">Register your first asset</a>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  {# ── Pagination ─────────────────────────────────────────────────────────── #}
+  <div class="pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+      of <strong>{{ page_object.paginator.count }}</strong> assets
+    </span>
+    <div class="pagination-nav">
+      {% if page_object.has_previous %}
+        <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">‹</span>
+      {% endif %}
+
+      {% for num in page_object.paginator.page_range %}
+        {% if page_object.number == num %}
+          <span class="page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_object.has_next %}
+        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">›</span>
+      {% endif %}
+    </div>
+  </div>
+</div>{# /.table-card #}
+
+{# ── Assign modal ─────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="assign-asset-list-modal" tabindex="-1" aria-labelledby="assignAssetLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="assign-asset-modal-list-content" hx-target="this"></div>
+  </div>
+</div>
 
 <script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-</script>
-<script>
-    console.log("Document loaded, setting up status change handlers.");
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('.status-select').forEach(function (select) {
+  }
+  return cookieValue;
+}
 
-            select.addEventListener('change', function () {
-
-                const assetId = this.dataset.assetId;   // UUID with dashes
-                const statusValue = this.value;
-                const currentSelect = this;
-
-                fetch(`/assets/change-status/${assetId}/`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken"),
-                    },
-                    body: JSON.stringify({ status: statusValue })
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error("Status update failed");
-                        return response.json();
-                    })
-                    .catch(error => {
-                        alert(error.message);
-                        location.reload();  // rollback UI on error
-                    });
-            });
-
-        });
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('.status-select').forEach(function (select) {
+    select.addEventListener('change', function () {
+      const assetId = this.dataset.assetId;
+      const statusValue = this.value;
+      fetch(`/assets/change-status/${assetId}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+        body: JSON.stringify({ status: statusValue })
+      })
+      .then(response => { if (!response.ok) throw new Error("Status update failed"); })
+      .catch(error => { alert(error.message); location.reload(); });
     });
+  });
+});
 </script>
 
 {% endblock %}

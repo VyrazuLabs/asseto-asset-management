@@ -4,7 +4,20 @@ from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
 from django.core.paginator import Paginator
 from configurations.utils import dynamic_display_name
+from authentication.models import User,UserTotp
+from assets.models import AssignAsset
+from django.db.models import Q
+from datetime import date
+from configurations.models import LocalizationConfiguration
+from vendors.utils import render_to_csv, render_to_pdf
+from django.http import HttpResponse
+from configurations.constants import NAME_FORMATS
+from django.shortcuts import get_object_or_404
+from license.models import AssignLicense
 
+
+PAGE_SIZE = 10  
+ORPHANS = 1
 
 PERMISSION_LIST = [
     # products
@@ -80,6 +93,131 @@ PERMISSION_LIST = [
     'add_upload'
 ]
 
+def get_user_detail_utils(request, id):
+    user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
+    assigned_assets = AssignAsset.objects.filter(user=user)
+    # Filter history specifically for this user
+    history_list = user.history.all().order_by('-history_date')
+    history_paginator = Paginator(history_list, 5, orphans=1)
+    history_page_number = request.GET.get('history_page')
+    history_page_object = history_paginator.get_page(history_page_number)
+    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    if obj is not None:
+        format_key= None
+        for id,it in NAME_FORMATS:
+            if obj.name_display_format == id:
+                format_key=id
+    asset_paginator = Paginator(assigned_assets, 10, orphans=1)
+    asset_page_number = request.GET.get('assets_page')
+    asset_page_object = asset_paginator.get_page(asset_page_number)
+    get_user_full_name=user.dynamic_display_name(user.full_name)
+    assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
+    assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
+    return get_user_full_name, user, history_page_object, asset_page_object, assigned_licenses_object
+    
+
+def export_users_pdf_utils(request):
+    today = date.today()
+
+    users = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
+        pk=request.user.id).order_by('-created_at')
+    context = {'users': users}
+    pdf = render_to_pdf('users/users-pdf.html', context_dict=context)
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.pdf"'
+    return response
+
+def export_users_csv_utils(request):
+    today = date.today()
+    header_list = ['Name', 'Email', 'Phone', 'Designation', 'Department', 'Address Line One',
+                   'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Office']
+    user_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(pk=request.user.id).order_by('-created_at').values_list('full_name', 'email', 'phone', 'role__related_name',
+    'department__name', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'location__office_name')
+    context = {'header_list': header_list, 'rows': user_list}
+    response = render_to_csv(context_dict=context)
+    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.csv"'
+
+def search_user_utils(request,page):
+    search_text = (request.GET.get('search_text') or "").strip()
+    if search_text:
+        users_list = (
+            User.undeleted_objects.filter(
+                Q(organization=request.user.organization),
+                Q(is_superuser=False),
+                (
+                    Q(username__icontains=search_text) |
+                    Q(full_name__icontains=search_text) |
+                    Q(phone__icontains=search_text) |
+                    Q(employee_id__icontains=search_text) |
+                    Q(department__name__icontains=search_text) |
+                    Q(role__related_name__icontains=search_text) |
+                    Q(location__office_name__icontains=search_text) |
+                    Q(address__address_line_one__icontains=search_text) |
+                    Q(address__address_line_two__icontains=search_text) |
+                    Q(address__country__icontains=search_text) |
+                    Q(address__state__icontains=search_text) |
+                    Q(address__pin_code__icontains=search_text) |
+                    Q(address__city__icontains=search_text)
+                )
+            )
+            .exclude(pk=request.user.id)
+            .order_by("-created_at")[:10]
+        )
+        page_object = users_list
+    else:
+        users_list = (
+            User.undeleted_objects.filter(
+                organization=request.user.organization, is_superuser=False
+            )
+            .exclude(pk=request.user.id)
+            .order_by("-created_at")
+        )
+        paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
+        page_object = paginator.get_page(page)
+
+    user_ids = [u.id for u in page_object]
+
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+
+    user_asset_map_count = {}
+    for aa in assigned_assets:
+        user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
+
+    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
+
+    deleted_user_count = User.deleted_objects.count()
+    return page_object, deleted_user_count, user_asset_map_count, user_asset_map_count_count
+
+def create_user_notification_type_utils(request):
+    print("request.POST",request.POST)
+    use_expired_asset= request.POST.get("use_expired_assets")== "on"
+    print(use_expired_asset,"use_expired_asset")
+    email = request.POST.get("email_notification") == "on"
+    in_app = request.POST.get("in_app_notification") == "on"
+    browser = request.POST.get("browser_notification") == "on"
+    slack=request.POST.get("slack_notification") == "on"
+    two_factor_auth=request.POST.get("two_factor_auth") == "on"
+    get_user=User.objects.filter(id=request.user.id).first()
+    if get_user is not None:
+        User.objects.filter(id=request.user.id).update(
+            email_notification=email,
+            slack_notification=slack,
+            browser_notification=browser,
+            inapp_notification=in_app,
+            two_factor_auth=two_factor_auth,
+            use_expired_assets=use_expired_asset
+        )
+
+def toggle_two_factor_auth_utils(request):
+    two_factor_auth=request.POST.get("two_factor_auth") == "on"
+    get_user=User.objects.filter(id=request.user.id).first()
+    if get_user is not None:
+        User.objects.filter(id=request.user.id).update(
+            two_factor_auth=two_factor_auth
+        )
+    get_totp=UserTotp.objects.filter(user_id=get_user.id).first()
+    get_totp.status=1
+    get_totp.save()
 
 def create_all_perm_role():
 

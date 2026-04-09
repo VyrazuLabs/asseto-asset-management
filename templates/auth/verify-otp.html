@@ -1,0 +1,248 @@
+<style>
+.otp-box {
+    width: 45px;
+    height: 50px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.otp-container {
+    max-width: 400px;
+    width: 100%;
+}
+</style>
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" href={% static 'css/main/app.css' %}> 
+    <link rel="stylesheet" href={% static 'css/pages/auth.css' %}> 
+    <link rel="shortcut icon" href={% static 'images/logo/Logo.svg' %} type="image/x-icon"> 
+    <link rel="shortcut icon" href={% static 'images/logo/Logo.png' %} type="image/png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="auth">
+        <div class="row h-100">
+            <div class=" d-flex flex-col justify-content-center">
+                <div id="auth-left w-50 pt-2 ps-2" >
+                    {% if updated_login_page_logo %}
+                        <div class="auth-logo p-5 mt-3 ms-3">
+                            <a href="/"><img src="/media{{ updated_login_page_logo }}" alt="Logo" style="max-width: 43%;  height: auto;padding-left: 10px;"></a>
+                        </div>
+                    {% else %}
+                        <div class="auth-logo p-5 mt-3 ms-3">
+                            <a href="/"><img src="{% static 'images/asseto-logo.svg' %}" alt="Logo" style="max-width: 43%;  height: auto;"></a>
+                        </div>
+                    {% endif %}
+                        <div class="container min-vh-100 margin-left">
+                            <div class="d-flex justify-content-center align-items-center mt-4 pt-5">
+                                <div class="card shadow-lg p-4 otp-container">
+
+                                    <div class="text-center mb-3">
+                                        <h2>Verify OTP</h2>
+                                        <p class="text-muted">Enter the 6-digit code from your authenticator app</p>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center gap-2 mb-3 otp-inputs">
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                        <input type="text" maxlength="1" class="otp-box form-control text-center" />
+                                    </div>
+
+                                    <form id="otpForm" method="POST" action="{% url 'authentication:verify_otp' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="email" value="{{ email }}">
+                                        <input type="hidden" name="otp" id="userOtp">
+
+                                        <button type="submit" id="verify2faBtn" class="btn btn-primary w-100 mb-2">
+                                            Verify
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div id="auth-right" class="d-flex justify-content-center align-items-center flex-column">
+                        <img src="{% static 'images/new_logo/illustration.svg' %}" alt="" class="img-login display-flex justify-content-center " width="50%" >
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+{% endblock content %}
+</body>
+<script>
+document.body.addEventListener('htmx:afterSwap', function (evt) {
+
+    if (evt.detail.target.id === "modalContainer") {
+        const modalElement = document.getElementById('verifyOtpModal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const inputs = document.querySelectorAll(".otp-box");
+    const hiddenInput = document.getElementById("userOtp");
+
+    inputs.forEach((input, index) => {
+
+        input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+            if (e.target.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+
+            updateHiddenOtp();
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+    });
+
+    function updateHiddenOtp() {
+        let otp = "";
+        inputs.forEach(input => otp += input.value);
+        hiddenInput.value = otp;
+    }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const verifyBtn = document.getElementById("verify2faBtn");
+
+    if (verifyBtn) {
+        verifyBtn.addEventListener("click", function () {
+
+            const otpInput = document.getElementById("userOtp");
+
+            const otp = otpInput ? otpInput.value.trim() : "";
+            const email = "{{ email }}"
+
+            if (!otp) {
+                alert("Please enter OTP");
+                return;
+            }
+            console.log("Sending OTP Verification Request:");
+            console.log("Email:", email);
+            console.log("OTP:", otp);
+            const url = `/api/authentication/login-otp/?email=${(email)}&otp=${(otp)}`;
+
+            fetch(url, {
+                method: "POST",
+                credentials: "same-origin"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access) {
+                    // ✅ Store tokens (optional)
+                    console.log("Stored tokens:", data);
+                    localStorage.setItem("access_token", data.access);
+                    localStorage.setItem("refresh_token", data.refresh);
+
+                    alert("Login successful!");
+
+                    // Redirect if needed
+                    window.location.href = "/";
+                } else {
+                    alert(data.message || "Invalid OTP");
+                }
+
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong");
+            });
+
+        });
+    }
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const regenerateBtn = document.getElementById("regenerateQrBtn");
+
+    if (!regenerateBtn) return;
+
+    regenerateBtn.addEventListener("click", function () {
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        regenerateBtn.disabled = true;
+        regenerateBtn.innerText = "Generating...";
+
+        fetch("{% url 'authentication:regenerate_qr' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.success) {
+
+                // Remove old QR if exists
+                const existingImg = document.getElementById("dynamicQrImage");
+                if (existingImg) {
+                    existingImg.remove();
+                }
+
+                // Create new image
+                const img = document.createElement("img");
+                img.id = "dynamicQrImage";
+                img.src = "data:image/png;base64," + data.qr_code;
+                img.className = "img-fluid mb-3";
+                img.style.maxWidth = "200px";
+                img.alt = "QR Code";
+
+                // Insert image ABOVE the button
+                regenerateBtn.parentNode.insertBefore(img, regenerateBtn);
+
+            } else {
+                alert("Failed to regenerate QR");
+            }
+
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong");
+        })
+        .finally(() => {
+            regenerateBtn.disabled = false;
+            regenerateBtn.innerText = "Regenerate QR Code";
+        });
+
+    });
+
+});
+</script>
