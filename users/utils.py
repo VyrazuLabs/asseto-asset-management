@@ -96,23 +96,24 @@ PERMISSION_LIST = [
 def get_user_detail_utils(request, id):
     user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
     assigned_assets = AssignAsset.objects.filter(user=user)
-    history_list = User.history.all()
-    paginator = Paginator(history_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
+    # Filter history specifically for this user
+    history_list = user.history.all().order_by('-history_date')
+    history_paginator = Paginator(history_list, 5, orphans=1)
+    history_page_number = request.GET.get('history_page')
+    history_page_object = history_paginator.get_page(history_page_number)
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     if obj is not None:
         format_key= None
         for id,it in NAME_FORMATS:
             if obj.name_display_format == id:
                 format_key=id
-    asset_paginator=Paginator(assigned_assets,10,orphans=1)
-    asset_page_number=request.GET.get('assets_page')
-    asset_page_object=asset_paginator.get_page(asset_page_number)
+    asset_paginator = Paginator(assigned_assets, 10, orphans=1)
+    asset_page_number = request.GET.get('assets_page')
+    asset_page_object = asset_paginator.get_page(asset_page_number)
     get_user_full_name=user.dynamic_display_name(user.full_name)
     assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
     assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
-    return get_user_full_name,user,page_object,asset_page_object,assigned_licenses_object
+    return get_user_full_name, user, history_page_object, asset_page_object, assigned_licenses_object
     
 
 def export_users_pdf_utils(request):
