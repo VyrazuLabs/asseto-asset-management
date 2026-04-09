@@ -5,7 +5,7 @@ from django.utils import timezone
 from audit.models import Audit, AuditImage
 from configurations.models import TagConfiguration
 from configurations.utils import dynamic_display_name, format_datetime, generate_asset_tag, get_currency_and_datetime_format
-from .models import Asset,AssignAsset,AssetImage,AssetStatus,Location,Vendor
+from .models import Asset,AssignAsset,AssetImage,AssetStatus,AssetStatusChoice,Location,Vendor
 from dashboard.models import CustomField, Department,ProductType,ProductCategory
 from .forms import AssetForm, AssignedAssetForm,ReassignedAssetForm
 from django.core.paginator import Paginator
@@ -17,11 +17,13 @@ from datetime import date,datetime
 from dateutil.relativedelta import relativedelta
 import requests
 from collections import defaultdict
+from django.db import transaction
+from django.db.models import Sum
 from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
 
-PAGE_SIZE = 10
+PAGE_SIZE = 25
 ORPHANS = 1
 
 def grouper(iterable, n):
@@ -36,7 +38,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from authentication.models import User
 
-PAGE_SIZE = 10
+PAGE_SIZE = 25
 ORPHANS = 1
 
 @login_required
@@ -44,8 +46,7 @@ ORPHANS = 1
 def release_asset(request, asset_id):
     if request.method == 'POST':
         asset = get_object_or_404(Asset, pk=asset_id)
-        # Assumes status 3 means "Ready To Deploy"
-        asset.status = 3
+        asset.status = AssetStatusChoice.READY_TO_DEPLOY
         asset.save()
         messages.success(request, f"Asset '{asset.name}' has been released and is now Ready To Deploy.")
     return redirect('assets:list')
@@ -62,7 +63,7 @@ def assign_asset(request, asset_id):
         asset.assigned_user = selected_user
         get_assigned_asset=AssignAsset.objects.filter(asset=asset).first()
         if get_assigned_asset is not None:
-            asset.status = 0  # Example: 0 for "Assigned"
+            asset.status = AssetStatusChoice.ASSIGNED
         asset.save()
         messages.success(request, f"Asset '{asset.name}' assigned to {selected_user.get_full_name() or selected_user.username}.")
     return redirect('assets:list')
@@ -77,15 +78,14 @@ def get_asset_filter_data(request):
     product_type_list=ProductType.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
     asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(
         organization=request.user.organization)).order_by('-created_at')
-    deleted_asset_count=Asset.deleted_objects.count()
-    get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+    deleted_asset_count=Asset.deleted_objects.filter(organization=request.user.organization).count()
+    get_assigned_asset_list=AssignAsset.objects.select_related('user').filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
     asset_user_map = {}
     for assign in get_assigned_asset_list:
         if assign.asset_id not in asset_user_map:
             asset_user_map[assign.asset_id] = None
-        if assign.user:  # avoid None users
+        if assign.user:
             asset_user_map[assign.asset_id]={"full_name":assign.user.full_name,"image":assign.user.profile_pic}
-            print(assign.user.full_name,assign.user.profile_pic,"INFOOOOOOO")
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -176,22 +176,23 @@ def filtered_asset(request):
     return assets_qs
 
 def create_asset_list(request,assets_qs):
-    list_of_audits=Audit.objects.all()
-    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits if audit.asset is not None]
+    list_of_audits=Audit.objects.select_related('asset').filter(asset__isnull=False)
+    list_of_assigned_audits=[audit.asset_id for audit in list_of_audits]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
     asset_conditions_map = defaultdict(list)
     for audit in list_of_audits:
         asset_conditions_map[audit.asset_id].append(audit.condition)
-    product_category_list=ProductCategory.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
-    department_list=Department.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
-    location_list=Location.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization))
-    user_list=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization),is_active=True).order_by('-created_at')
-    vendor_list=Vendor.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
-    asset_status_list=AssetStatus.objects.filter(Q(organization=None) | Q(organization=request.user.organization))
-    product_type_list=ProductType.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
-    asset_list = Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).order_by('-created_at')
-    deleted_asset_count=Asset.deleted_objects.count()
-    get_assigned_asset_list=AssignAsset.objects.filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
+    org_filter = Q(organization=None) | Q(organization=request.user.organization)
+    product_category_list=ProductCategory.undeleted_objects.filter(org_filter)
+    department_list=Department.undeleted_objects.filter(org_filter)
+    location_list=Location.undeleted_objects.filter(org_filter)
+    user_list=User.objects.filter(org_filter,is_active=True).order_by('-created_at')
+    vendor_list=Vendor.objects.filter(org_filter).order_by('-created_at')
+    asset_status_list=AssetStatus.objects.filter(org_filter)
+    product_type_list=ProductType.objects.filter(org_filter).order_by('-created_at')
+    asset_list = Asset.undeleted_objects.filter(org_filter).order_by('-created_at')
+    deleted_asset_count=Asset.deleted_objects.filter(organization=request.user.organization).count()
+    get_assigned_asset_list=AssignAsset.objects.select_related('user').filter(Q(asset__in=asset_list) & Q(asset__organization=None) | Q(asset__organization=request.user.organization)).order_by('-assigned_date')
     asset_user_map = {}
     for assign in get_assigned_asset_list:
         if assign.asset_id not in asset_user_map:
@@ -220,28 +221,42 @@ def create_asset_list(request,assets_qs):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
+    # Stats for summary cards
+    total_value = Asset.undeleted_objects.filter(
+        organization=request.user.organization
+    ).aggregate(total=Sum('price'))['total'] or 0
+    active_count = Asset.undeleted_objects.filter(
+        organization=request.user.organization
+    ).count()
+    assigned_count = Asset.undeleted_objects.filter(
+        organization=request.user.organization, is_assigned=True
+    ).count()
+
     context = {
         'product_category_list':product_category_list,
         'department_list':department_list,
         'location_list':location_list,
         'asset_user_map':asset_user_map,
         'product_type_list':product_type_list,
-        'asset_status_list':asset_status_list, 
+        'asset_status_list':asset_status_list,
         'user_list':user_list,
         'vendor_list':vendor_list,
         'active_user':active_users,
         'sidebar': 'assets',
         'submenu': 'list',
-        'asset_images': asset_images,  # dict {asset.id: first AssetImage instance}
+        'asset_images': asset_images,
         'page_object': page_object,
         'asset_form': asset_form,
         'assign_asset_form': assign_asset_form,
         'reassign_asset_form': reassign_asset_form,
-        'deleted_asset_count':deleted_asset_count,
+        'deleted_asset_count': deleted_asset_count,
+        'total_value': total_value,
+        'active_count': active_count,
+        'assigned_count': assigned_count,
         'title': 'Assets',
-        'is_demo':is_demo,
-        'list_of_audited_assets':list_of_audited_assets,
-        'asset_conditions_map':asset_conditions_map
+        'is_demo': is_demo,
+        'list_of_audited_assets': list_of_audited_assets,
+        'asset_conditions_map': asset_conditions_map,
     }
     return context
 def assign_asset(request,id):
@@ -261,12 +276,13 @@ def assign_asset(request,id):
     # asset.status = 0  # 0 = 'Assigned' by your STATUS_CHOICES
     asset.save()
     
+@transaction.atomic
 def assign_asset_in_form(request,form):
     asset = form.instance.asset
     asset.is_assigned = True
     set_asset_status = AssetStatus.objects.filter(
         Q(organization=request.user.organization) | Q(organization__isnull=True),
-        name='Available'
+        name='Assigned'
     ).first()
     asset.asset_status = set_asset_status
     asset.save()
@@ -280,6 +296,7 @@ def assign_asset_in_form(request,form):
     slack_notification(request,f"{asset.name}  assigned successfully to user",asset.id,asset.tag)
     notifications_call(user=request.user,entity_type=2,notification_text=f"{asset.name}  assigned successfully to user",notification_title="Asset Assigned")
 
+@transaction.atomic
 def delete_assign_asset(request,id):
     assignAsset = get_object_or_404(
             AssignAsset, pk=id, asset__organization=request.user.organization)
@@ -369,11 +386,12 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
 
-    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
+    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image}
 
     return context
 
+@transaction.atomic
 def add_asset(request,form):
     asset = form.save(commit=False)
     asset.organization = request.user.organization
@@ -389,10 +407,9 @@ def add_asset(request,form):
     slack_notification(request,f"{asset.name}  added successfully",asset.id,asset.tag)
 
 def search_asset(request):
-    list_of_audits=Audit.objects.all()
-    list_of_assigned_audits=[audit.asset.id for audit in list_of_audits ]
+    list_of_audits=Audit.objects.select_related('asset').filter(asset__isnull=False)
+    list_of_assigned_audits=[audit.asset_id for audit in list_of_audits]
     list_of_audited_assets=Asset.objects.filter(id__in=list_of_assigned_audits)
-    list_of_audits=Audit.objects.all()
     asset_conditions_map = defaultdict(list)
     for audit in list_of_audits:
         asset_conditions_map[audit.asset_id].append(audit.condition)
@@ -468,7 +485,7 @@ def search_with_filters(request,list_of_audited_assets,asset_conditions_map):
     else:
         page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
     asset_user_map = {}
-    get_assigned_asset_list = AssignAsset.objects.filter(
+    get_assigned_asset_list = AssignAsset.objects.select_related('user').filter(
         asset_id__in=asset_ids,
         asset__organization=request.user.organization
     ).order_by('-assigned_date')

@@ -23,6 +23,11 @@ class AssetSpecification(TimeStampModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     value = models.CharField(max_length=255, blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Asset Specification"
+        verbose_name_plural = "Asset Specifications"
+        ordering = ["-created_at"]
+
 class AssetStatus(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -30,21 +35,28 @@ class AssetStatus(TimeStampModel, SoftDeleteModel):
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
-    def __str__(self): 
+    class Meta:
+        verbose_name = "Asset Status"
+        verbose_name_plural = "Asset Statuses"
+        ordering = ["-created_at"]
+
+    def __str__(self):
         return self.name
 
+
+class AssetStatusChoice(models.IntegerChoices):
+    ASSIGNED = 0, "Assigned"
+    AVAILABLE = 1, "Available"
+    REPAIR_REQUIRED = 2, "Repair Required"
+    LOST_STOLEN = 3, "Lost/Stolen"
+    BROKEN = 4, "Broken"
+    READY_TO_DEPLOY = 5, "Ready To Deploy"
+    OUT_FOR_REPAIR = 6, "Out for Repair"
+
+
 class Asset(TimeStampModel, SoftDeleteModel):
-    STATUS_CHOICES = [
-        (0, 'Assigned'),
-        (1, 'Available'),
-        (2, 'Repair Required'),
-        (3, 'Lost/Stolen'),
-        (4, 'Broken'),
-        (5, 'Ready To Deploy'),
-        (6, 'Out for Repair')
-    ]
-    status = models.IntegerField(choices=STATUS_CHOICES, default=1)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    status = models.IntegerField(choices=AssetStatusChoice.choices, default=AssetStatusChoice.AVAILABLE)
     tag = models.CharField(max_length=255, blank=False, null=True, unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
@@ -61,8 +73,13 @@ class Asset(TimeStampModel, SoftDeleteModel):
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
 
+    class Meta:
+        verbose_name = "Asset"
+        verbose_name_plural = "Assets"
+        ordering = ["-created_at"]
+
     def get_status(self):
-        return dict(self.STATUS_CHOICES).get(self.status, 'Unknown')
+        return AssetStatusChoice(self.status).label
 
     def __str__(self):
         return self.name
@@ -71,6 +88,12 @@ class AssetImage(models.Model):
     asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Asset Image"
+        verbose_name_plural = "Asset Images"
+        ordering = ["-uploaded_at"]
+
     def __str__(self):
         if self.image and hasattr(self.image, "url"):
             return str(self.image.url)
@@ -79,5 +102,12 @@ class AssetImage(models.Model):
 class AssignAsset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)                          
-    assigned_date = models.DateField(auto_now_add=True,blank=True, null=True)
+    user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
+    assigned_date = models.DateField(auto_now_add=True, blank=True, null=True)
+    issue_date = models.DateField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Assign Asset"
+        verbose_name_plural = "Assign Assets"
+        ordering = ["-assigned_date"]

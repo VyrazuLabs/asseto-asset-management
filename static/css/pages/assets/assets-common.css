@@ -1,0 +1,223 @@
+/* =============================================================================
+   assets-common.css — Shared asset-specific components
+   Used by: list, detail, add, edit pages
+   ============================================================================= */
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+  --color-primary:       #4F46E5;
+  --color-primary-light: #EEF2FF;
+  --color-card:          #FFFFFF;
+  --color-border:        #E5E7EB;
+  --color-text:          #111827;
+  --color-muted:         #6B7280;
+  --card-radius:         10px;
+}
+
+/* ── Asset-specific buttons ───────────────────────────────────────────────── */
+.btn-save-asset {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: .55rem 1.2rem;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-save-asset:hover {
+  background: #4338CA;
+  color: #fff;
+}
+
+.btn-assign {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 6px;
+  padding: .3rem .8rem;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-assign:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.btn-unassign {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FECACA;
+  border-radius: 6px;
+  padding: .25rem .65rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-unassign:hover { background: #DC2626; color: #fff; }
+
+.btn-add-row {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 6px;
+  padding: .3rem .75rem;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+}
+.btn-add-row:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.btn-rm-row {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FECACA;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  flex-shrink: 0;
+}
+.btn-rm-row:hover { background: #DC2626; color: #fff; }
+
+/* ── Asset appearance ─────────────────────────────────────────────────────── */
+.asset-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-border);
+}
+
+.asset-tag-pill {
+  display: inline-block;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: .82rem;
+  font-weight: 700;
+  padding: .25rem .6rem;
+  border-radius: 20px;
+  letter-spacing: .02em;
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.asset-name-main { font-weight: 600; color: var(--color-text); }
+.asset-name-sub  { font-size: .8rem; color: var(--color-muted); margin-top: .1rem; }
+
+/* ── Condition indicators ─────────────────────────────────────────────────── */
+.state-excellent { color: #059669; font-size: .85rem; font-weight: 500; }
+.state-good      { color: #B45309; font-size: .85rem; font-weight: 500; }
+.state-poor      { color: #DC2626; font-size: .85rem; font-weight: 500; }
+
+/* ── Status badges ────────────────────────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: .28rem .7rem;
+  border-radius: 6px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.status-allocated { background: #F3F4F6; color: #374151; border: 1.5px solid #D1D5DB; }
+.status-available { background: #ECFDF5; color: #065F46; border: 1.5px solid #A7F3D0; }
+.status-repair    { background: #FFF7ED; color: #92400E; border: 1.5px solid #FDE68A; }
+.status-lost      { background: #FEF2F2; color: #991B1B; border: 1.5px solid #FECACA; }
+.status-deploy    { background: #EFF6FF; color: #1E40AF; border: 1.5px solid #BFDBFE; }
+
+/* ── Assignee chip ────────────────────────────────────────────────────────── */
+.assignee-chip { display: flex; align-items: center; gap: .4rem; }
+.assignee-chip img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.assignee-chip span { font-size: .85rem; font-weight: 500; }
+.assignee-initials {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: .6rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.unassigned-label {
+  display: block;
+  font-size: .82rem;
+  color: var(--color-muted);
+  font-style: italic;
+  margin-bottom: .2rem;
+}
+
+/* ── Backward-compatible Aliases (headers used in modals/etc) ─────────────── */
+.assets-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.assets-page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 .3rem;
+}
+.assets-page-header .page-subtitle {
+  color: var(--color-muted);
+  font-size: .925rem;
+  margin-top: .25rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE OVERRIDES
+   ───────────────────────────────────────────────────────────────────────────── */
+body.theme-dark {
+  --color-primary-light: #2a2650;
+  --color-card:          #1e1e2d;
+  --color-border:        #2e2e42;
+  --color-text:          #e0e0f0;
+  --color-muted:         #8b8ba4;
+}
+
+body.theme-dark .btn-unassign { background: #3a1c1c; border-color: #5c2020; }
+body.theme-dark .btn-assign { background: var(--color-primary-light); border-color: #3d3780; }
+body.theme-dark .btn-add-row { background: var(--color-primary-light); border-color: #3d3780; }
+body.theme-dark .btn-rm-row { background: #3a1c1c; border-color: #5c2020; }
+
+body.theme-dark .asset-tag-pill { background: var(--color-primary-light); }
+
+body.theme-dark .assets-page-header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 .3rem;
+}
+body.theme-dark .assets-page-header .page-subtitle {
+  margin-top: .25rem;
+}
+
+body.theme-dark .status-allocated { background: #2a2a3d; color: #b0b0c8; border-color: #3e3e55; }
+body.theme-dark .status-available { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
+body.theme-dark .status-repair    { background: #302515; color: #fbbf24; border-color: #4a3515; }
+body.theme-dark .status-lost      { background: #301515; color: #fca5a5; border-color: #5c2020; }
+body.theme-dark .status-deploy    { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
