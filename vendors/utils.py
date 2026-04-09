@@ -11,6 +11,7 @@ from dashboard.models import Address
 from django.shortcuts import get_object_or_404
 from dashboard.models import CustomField
 from datetime import date
+import os
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -84,9 +85,12 @@ def get_vendor_details(request, id):
     'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
 
 def vendor_list_util(request):
-    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) |  
+    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) |
         Q(organization=request.user.organization)).order_by('-created_at')
     deleted_vendor_count=Vendor.deleted_objects.count()
+    total_vendor_count = vendors_list.count()
+    active_vendor_count = vendors_list.filter(status=True).count()
+    inactive_vendor_count = vendors_list.filter(status=False).count()
     paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
     count_array = []
     page_number = request.GET.get('page')
@@ -95,9 +99,18 @@ def vendor_list_util(request):
         count_array.append(
             get_count_of_assets(request, vendor.id)
         )
-    context = {'sidebar': 'vendors','count_array': count_array,
-               'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
-               }
+    is_demo = os.environ.get('IS_DEMO')
+    context = {
+        'sidebar': 'vendors',
+        'count_array': count_array,
+        'page_object': page_object,
+        'deleted_vendor_count': deleted_vendor_count,
+        'total_vendor_count': total_vendor_count,
+        'active_vendor_count': active_vendor_count,
+        'inactive_vendor_count': inactive_vendor_count,
+        'is_demo': is_demo,
+        'title': 'Vendors',
+    }
     return context
 
 def render_to_csv(context_dict={}):
