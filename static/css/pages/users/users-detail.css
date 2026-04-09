@@ -310,151 +310,133 @@ body.theme-dark .list-table thead th {
   color: #94a3b8;
 }
 
-/* ── Activity Table Styling (Refined for Ledger-Style) ─────────────────────── */
-.activity-table {
+/* ── Activity Table Styling (Air-Tight Ledger Style) ─────────────────────── */
+.user-detail-container .activity-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-bottom: 0;
+  border: none !important;
+  margin-top: 1rem;
 }
 
-.activity-table thead th {
+.user-detail-container .activity-table thead th {
   background: #f8fbff !important;
-  padding: 1rem 1.75rem;
-  font-size: 0.725rem;
-  font-weight: 800;
-  color: #5e718d;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border-bottom: 1px solid #eef2f8;
+  padding: 1.25rem 1.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  color: #5e718d !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.12em !important;
+  border-bottom: 2px solid #edf2f9 !important;
   text-align: left;
 }
 
-body.theme-dark .activity-table thead th {
-  background: rgba(255,255,255,0.03) !important;
-  color: #94a3b8;
-  border-bottom-color: #2d2d3f;
+body.theme-dark .user-detail-container .activity-table thead th {
+  background: rgba(255,255,255,0.04) !important;
+  border-bottom-color: #2d2d3f !important;
+  color: #94a3b8 !important;
 }
 
-.activity-row {
-  border-bottom: 1px solid #f1f5f9;
-  transition: all 0.2s ease;
+.user-detail-container .activity-row {
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: background 0.2s ease;
 }
 
-.activity-row:last-child {
-  border-bottom: none;
+.user-detail-container .activity-row:hover {
+  background: #fbfcfe !important;
 }
 
-.activity-row:hover {
-  background: #fbfcfe;
+body.theme-dark .user-detail-container .activity-row {
+  border-bottom-color: #2d2d3f !important;
 }
 
-body.theme-dark .activity-row:hover {
-  background: rgba(255,255,255,0.02);
-}
-
-.activity-cell {
-  padding: 1.5rem 1.75rem;
-  vertical-align: middle;
+.user-detail-container .activity-cell {
+  padding: 1.75rem 1.75rem !important;
+  vertical-align: middle !important;
+  border: none !important;
 }
 
 .activity-type-wrap {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1.25rem !important;
 }
 
 .activity-circle {
-  width: 42px; height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  flex-shrink: 0;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.15rem !important;
+  flex-shrink: 0 !important;
 }
 
-.circle-success { background: #ecfdf5; color: #10b981; }
-.circle-danger  { background: #fff1f2; color: #f43f5e; }
-.circle-primary { background: #eff6ff; color: #3b82f6; }
-.circle-warning { background: #fffbeb; color: #f59e0b; }
-.circle-gray    { background: #f8fafc; color: #64748b; }
-
-body.theme-dark .activity-circle { opacity: 0.9; }
+.circle-success { background: #ecfdf5 !important; color: #10b981 !important; }
+.circle-danger  { background: #fff1f2 !important; color: #f43f5e !important; }
+.circle-primary { background: #eff6ff !important; color: #3b82f6 !important; }
+.circle-warning { background: #fffbeb !important; color: #f59e0b !important; }
+.circle-gray    { background: #f8fafc !important; color: #64748b !important; }
 
 .activity-title-main {
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: #1e293b;
-  display: block;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  color: #1e293b !important;
+  display: block !important;
+  margin-bottom: 2px;
 }
 
-body.theme-dark .activity-title-main { color: #f1f5f9; }
-
 .activity-subtitle {
-  font-size: 0.8rem;
-  color: #64748b;
-  font-weight: 500;
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
 }
 
 .activity-resource {
-  font-family: 'Inter', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.85rem;
-  color: #475569;
-  background: transparent;
-  padding: 0;
-  line-height: 1.5;
-  font-weight: 500;
+  font-family: inherit !important;
+  font-size: 0.9rem !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
 }
-
-body.theme-dark .activity-resource { color: #94a3b8; }
 
 .activity-time-stacked {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #334155;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.2rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
 }
 
-body.theme-dark .activity-time-stacked { color: #94a3b8; }
+.activity-time-stacked span {
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
 
-.activity-time-stacked span { color: #5e718d; }
-
-.activity-result-cell { text-align: right; }
+.activity-result-cell {
+  text-align: right !important;
+}
 
 .activity-result-text {
-  font-weight: 800;
-  font-size: 0.95rem;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  letter-spacing: -0.01em;
 }
 
-/* ── Status Badges (Detail Context) ───────────────────────────────────────── */
-.badge-status {
-  padding: 0.35rem 0.8rem;
-  border-radius: 50px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.badge-active { background: #dcfce7; color: #15803d; }
-.badge-inactive { background: #fee2e2; color: #b91c1c; }
-
-/* ── Page Header Actions (Solid Styles) ──────────────────────────────────── */
+/* ── Page Header Actions (Absolute Right) ────────────────────────────────── */
 .detail-page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 2rem;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 2.25rem !important;
+  width: 100% !important;
 }
 
 .header-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-/* Pagination Sync */
-.detail-grid .pagination {
-  margin-top: 1rem;
+  display: flex !important;
+  gap: 1rem !important;
+  align-items: center !important;
 }
