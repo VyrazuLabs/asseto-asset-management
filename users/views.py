@@ -73,7 +73,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = User.undeleted_objects.filter(is_superuser=False).exclude(pk=request.user.id).order_by('-created_at')
+    users_list = User.undeleted_objects.filter(is_superuser=False, organization = request.user.organization).exclude(pk=request.user.id).order_by('-created_at')
 
     total_user_count = users_list.count()
     active_user_count = users_list.filter(is_active=True).count()
