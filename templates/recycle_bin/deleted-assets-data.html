@@ -1,33 +1,68 @@
+{% load custom_filters %}
+{% load static %}
 {% if page_object %}
     {% for asset in page_object %}
     <tr>
-        <td>
-            {% if page_object.start_index %}
-                {{page_object.start_index|add:forloop.counter0}}
-            {% else %}
-                {{forloop.counter}}
-            {% endif %}
-        </td>
-        <td>{{asset.name}}</td>
-        <td>{{asset.serial_no}}</td>
-        <td>{{asset.product.product_type}}</td>
-        <td>{{asset.product}}</td>
-        <td>{{asset.vendor}}</td>
-        <td>{{asset.updated_at}}</td>
-        <td>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                <form action="{% url 'recycle_bin:deleted_asset_restore' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to restore this?')">  
-                    {% csrf_token %}
-                    <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
-                </form>
-                <form action="{% url 'recycle_bin:deleted_asset_permanently' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this permanently?')">  
-                    {% csrf_token %}
-                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                </form>
-            </div>
-        </td>   
+      <td class="trash-index">
+        {% if page_object.start_index %}
+          {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+        {% else %}
+          {{ forloop.counter|stringformat:"02d" }}
+        {% endif %}
+      </td>
+
+      <td>
+        <div class="trash-asset-name">
+          <span class="trash-asset-icon">
+            <i class="bi bi-laptop"></i>
+          </span>
+          {{ asset.name }}
+        </div>
+      </td>
+
+      <td class="trash-serial">{{ asset.serial_no|default:"—" }}</td>
+
+      <td>
+        {% if asset.product and asset.product.product_type %}
+          <span class="trash-type-badge">{{ asset.product.product_type }}</span>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+
+      <td>{{ asset.vendor|default:"—" }}</td>
+
+      <td class="trash-date">{{ asset.updated_at|date:"M d, Y" }}</td>
+
+      <td>
+        <div class="trash-actions">
+          <form action="{% url 'recycle_bin:deleted_asset_restore' asset.id %}" method="post"
+                class="d-inline"
+                onsubmit="return confirm('Restore {{ asset.name }}? It will be moved back to your asset list.')">
+            {% csrf_token %}
+            <button type="submit" class="trash-action-btn restore" title="Restore {{ asset.name }}">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </form>
+          <form action="{% url 'recycle_bin:deleted_asset_permanently' asset.id %}" method="post"
+                class="d-inline"
+                onsubmit="return confirm('Permanently delete {{ asset.name }}? This action cannot be undone.')">
+            {% csrf_token %}
+            <button type="submit" class="trash-action-btn delete" title="Permanently delete {{ asset.name }}">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </form>
+        </div>
+      </td>
     </tr>
     {% endfor %}
 {% else %}
-    <td colspan="8" class="text-center"> No record found related to your search keyword</td>
+    <tr>
+      <td colspan="7">
+        <div class="trash-empty-state">
+          <i class="bi bi-inbox d-block"></i>
+          <p>No assets found matching your search.</p>
+        </div>
+      </td>
+    </tr>
 {% endif %}
