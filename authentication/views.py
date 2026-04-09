@@ -399,7 +399,7 @@ def regenerate_qr(request):
     user_totp = UserTotp.objects.filter(user_id=user.id).first()
 
     if not user_totp or user_totp.status == 0:
-        UserTotp.objects.create(user_id=user.id, secret=secret, status=0)
+        user_totp = UserTotp.objects.create(user_id=user.id, secret=secret, status=0)
 
     # if user_totp.status == 2:
     #     # UserTotp.objects.filter(user_id=user.id).update(secret=secret, status=1)
