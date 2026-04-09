@@ -1,315 +1,401 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
-{% load custom_filters %}
 {% load static %}
-{% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Asset Details</h3>
 
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Assets</li>
-                    <li class="breadcrumb-item active" aria-current="page">Asset Details</li>
-                </ol>
-            </nav>
+{% block title %}{{ asset.tag }} — Asset Details | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="detail-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb mb-2">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
+        <li class="breadcrumb-item active">Asset Details</li>
+      </ol>
+    </nav>
+    <h1 class="page-title">Asset Details</h1>
+    <p class="page-subtitle">Detailed overview and history for <strong class="detail-tag-inline">{{ asset.tag }}</strong></p>
+  </div>
+  <div class="header-actions">
+    <a href="{% url 'assets:list' %}" class="btn-reset">
+      <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn-register ms-2">
+      <i class="bi bi-pencil-square"></i> Update Asset
+    </a>
+  </div>
+</div>
+
+{# ── Two-column layout ────────────────────────────────────────────────────── #}
+<div class="detail-layout">
+
+  {# ── Left / main column ──────────────────────────────────────────────────── #}
+  <div class="detail-main">
+
+    {# Asset Information card #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-cpu"></i></div>
+          <h2>Asset Information</h2>
         </div>
-        <div class="d-flex justify-content-end align-items-center">
-            <div class="me-2">
-                <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Asset List</a>
-            </div>
-            {% if is_demo is not None %}
-                <div>
-                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
-                </div>
-            {% else %}
-                <div>
-                    <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn btn-sm btn-outline-info my-3">Update Asset</a>
-                </div>
-            {% endif %}
+        {% if asset.is_assigned %}
+          <span class="detail-status-badge badge-in-use">IN USE</span>
+        {% elif asset.asset_status %}
+          <span class="detail-status-badge badge-available">{{ asset.asset_status.name }}</span>
+        {% endif %}
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-fields-grid">
+
+          <div class="detail-field">
+            <span class="detail-field-label">Asset Tag</span>
+            <span class="detail-field-value"><span class="asset-tag-pill">{{ asset.tag }}</span></span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Asset Name</span>
+            <span class="detail-field-value fw-semibold">{{ asset.name|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Product</span>
+            <span class="detail-field-value">{{ asset.product|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Serial No.</span>
+            <span class="detail-field-value detail-mono">{{ asset.serial_no|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Purchase Price</span>
+            <span class="detail-field-value detail-price">
+              {% if asset.price %}
+                {% if get_currency %}{{ get_currency }} {% endif %}{{ asset.price }}
+              {% else %}—{% endif %}
+            </span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Warranty Expiry</span>
+            <span class="detail-field-value">
+              {% if asset.warranty_expiry_date %}
+                <span class="detail-warranty-ok"><i class="bi bi-shield-check"></i> {{ asset.warranty_expiry_date }}</span>
+              {% else %}—{% endif %}
+            </span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">End of Life</span>
+            <span class="detail-field-value">{{ eol_date|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Assigned To</span>
+            <span class="detail-field-value">
+              {% if assigned_user %}
+                <span class="detail-assignee-chip">
+                  <span class="detail-assignee-avatar">{{ assigned_user|slice:":2"|upper }}</span>
+                  <span>{{ assigned_user }}</span>
+                </span>
+              {% else %}<span class="text-muted">Unassigned</span>{% endif %}
+            </span>
+          </div>
+
+          {% if assigned_asset %}
+          <div class="detail-field">
+            <span class="detail-field-label">Issue Date</span>
+            <span class="detail-field-value">{{ assigned_asset.issue_date|default:"—" }}</span>
+          </div>
+          {% endif %}
+
+          <div class="detail-field">
+            <span class="detail-field-label">Location</span>
+            <span class="detail-field-value">{{ asset.location.office_name|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Vendor</span>
+            <span class="detail-field-value">{{ asset.vendor|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Purchase Date</span>
+            <span class="detail-field-value">{{ asset.purchase_date|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Product Type</span>
+            <span class="detail-field-value">{{ asset.product.product_type|default:"—" }}</span>
+          </div>
+
         </div>
+
+        {% if asset.description %}
+        <div class="detail-description-block">
+          <span class="detail-field-label">Asset Description &amp; Notes</span>
+          <p class="detail-description-text">{{ asset.description|urlize }}</p>
+        </div>
+        {% endif %}
+
+        {% if assigned_asset.notes %}
+        <div class="detail-description-block">
+          <span class="detail-field-label">Assignment Notes</span>
+          <p class="detail-description-text">{{ assigned_asset.notes|urlize }}</p>
+        </div>
+        {% endif %}
+      </div>
     </div>
 
-    <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="my-3">
-                    <i class="bi bi-pc-display"></i>
-                    <span>Asset Information</span>                       
-                </h6>
-                <div class="table-responsive">
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Asset Tag</th>
-                                <td>{{asset.tag}}</td>
-                                <th scope="row">Asset Name</th>
-                                <td>{{asset.name}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Product</th>
-                                <td>{{asset.product}}</td>
-                                <th scope="row">Product Type</th>
-                                <td>{{asset.product.product_type}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Product Category</th>
-                                <td>{{asset.product.product_category.parent}}</td>
-                                <th scope="row">Serial No.</th>
-                                <td>{{asset.serial_no}}</td>
-                            </tr>
-                            
-                            <tr>
-                                <th scope="row">Price</th>
-                                {% if asset.price == None %} <td>Not Available</td> 
-                                {% else %}
-                                    {% if get_currency is not None %}
-                                    <td>{{get_currency}} {{asset.price}}</td>
-                                    {% else %}
-                                    <td>{{asset.price}}</td>
-                                    {% endif %}
-                                {% endif %}
-                                <th scope="row">Office Location</th>
-                                <td>{{asset.location.address.address_line_one}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Purchase Date</th>
-                                {% if asset.purchase_date == None %} <td>Not Available</td> 
-                                {% else %} <td>{{ asset.purchase_date }}</td>
-                                {% endif %}
-                                <th scope="row">Warranty Expiry Date</th>
-                                {% if asset.warranty_expiry_date == None %} <td>Not Available</td> 
-                                {% else %}
-                                <td>{{  asset.warranty_expiry_date }}</td>
-                                {% endif %}
-                            </tr>
-                            <tr>
-                                <th scope="row">End of Life</th>
-                                <td>{{eol_date}}</td>
-                                <th scope="row">Vendor</th>
-                                <td>{{asset.vendor}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Status</th>
-                                <td>{{asset.asset_status.name}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Description</th>
-                                <td colspan="3">{{asset.description|urlize}}</td>
-                            </tr>
-
-                            </tbody>
-                    </table>
-                    {% if get_asset_img %}
-                        <p ><b>Asset Images</b></p>
-                        <div class="d-flex gap-2">
-                            {% for it in get_asset_img %}
-                                {% if it.image %}
-                                    <div >
-                                        <img
-                                        src="{% get_media_prefix %}{{ it.image }}" 
-                                        alt="Asset Image {{ forloop.counter }}"
-                                        style="cursor: pointer; width: 150px;"
-                                        class="clickable-image"
-                                        data-image-src="{% get_media_prefix %}{{ it.image }}"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#imageModal{{ forloop.counter }}"
-                                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';"
-                                        >
-                                    </div>
-                                {% elif not it.image.url %}
-                                    <div >
-                                        <img src="{% static 'images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
-                                    </div>
-                                {% endif %}
-                                <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- large modal for better image display -->
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body text-center">
-                                        <img id="modalImage{{ forloop.counter }}" src="{% get_media_prefix %}{{ it.image }}"  alt="Image Preview" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';" style="max-width: 100%; max-height: 80vh;">
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% if get_custom_data %}
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h6>Custom Fields</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                {% for cf in get_custom_data %}
-                                     <table class="table table-borderless">
-                                        <tbody>
-                                            <tr>
-                                                <th>{{ cf.field_name }}</th>
-                                                <td>{{ cf.field_value }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table> 
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                <h5 class="pt-5">BARCODE</h5>
-                <div class="d-flex barcode-div">
-                    <div class="asset-barcode">
-                        {{asset_barcode|safe}}
-                    </div>
-                    <div class="barcode-dowload-btn ps-3" style="margin-top: 50px;">
-                        <button
-                            id="download-btn"
-                            type="button"
-                            class="btn btn-secondary rounded"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        ><i class="bi bi-download"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+    {# Custom Fields #}
+    {% if get_custom_data %}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-sliders"></i></div>
+          <h2>Custom Fields</h2>
         </div>
-        {% if assetSpecifications %}
-            <div class="card">
-                <div class="card-body">
-                    <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#specifications" aria-expanded="true" aria-controls="collapseOne">
-                                Asset Specifications
-                            </button>
-                        </h2>
-                        <div id="specifications" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Specification Name</th>
-                                                <th>Specification Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% if assetSpecifications %}
-                                                {% for assetSpecification in assetSpecifications %}
-                                            <tr>
-                                                <th scope="row">
-                                                    {{assetSpecification.name}}
-                                                </th>
-                                                <td>
-                                                    {{assetSpecification.value}}
-                                                </td>
-                                            </tr>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-        <div class="card mt-3">
-            <div class="card-header  mb-4">
-                <h5>Audit History</h5>
-            </div>
-            <div class="card-body" id="custom-field-container">
-                <div class="table-responsive items-table">
-                        <table class="table" id="table1">
-                            <thead>
-                                <tr>
-                                    <th>Sl No.</th>
-                                    <th>Image</th>
-                                    <th>Condition</th>
-                                    <th>Notes</th>
-                                    <th>Time</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            {% for audit in get_audit_history %}
-                            <tbody id="search_result">
-                                <tr style="height: 100px;">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{% if audit.audit_image %}
-                                            <img src="{{ audit.id|audit_image_url}}" height="100" width="100" />
-                                        {% else %}
-                                            <img src="{% static 'images/No_Image.jpg' %}" style="max-width:100px; max-height:100px;">
-                                        {% endif %}
-                                        </td>
-                                    <td>{{ audit.condition_label }}</td>
-                                    <td>{{ audit.notes|truncatechars:30  }}</td>                                       
-                                    <td>{{ audit.created_at }}</td>
-                                    <td> 
-                                        <div> 
-                                            <a href="{% url 'audit:details' audit.id %}" class="btn btn-sm btn-success pt-2"><i class="bi bi-eye-fill p-1"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            {% endfor %}
-                        </table>
-                    {% if not get_audit_history %}
-                        <p colspan="6">No audit history found</p>
-                    {% endif %}
-                </div>
-            </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-fields-grid">
+          {% for cf in get_custom_data %}
+          <div class="detail-field">
+            <span class="detail-field-label">{{ cf.field_name }}</span>
+            <span class="detail-field-value">{{ cf.field_value }}</span>
+          </div>
+          {% endfor %}
         </div>
-        {% include 'commons/history.html' %}
-    </section>
-</div>
-<script>
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('hidden.bs.modal', () => {
-    window.location.reload();
-  });
-});
-</script>
-<script>
-function requestAndSendNotification() {
-  if (Notification.permission === "granted") {
-    sendNotification();
-  } else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        sendNotification();
-      }
-    });
-  }
-}
-
-function sendNotification() {
-  const title = "Successfully Updated Asset";
-  const options = {
-    body: "Successfully Updated Asset.",
-    icon: "/static/images/logo/favicon.png",
-  };
-
-  new Notification(title, options);
-}
-</script>
-{% if messages %}
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  {% for message in messages %}
-    {% if message.tags == "success" %}
-      requestAndSendNotification();
+      </div>
+    </div>
     {% endif %}
-  {% endfor %}
-});
-</script>
-{% endif %}
-{% endblock content%}
+
+    {# Specifications #}
+    {% if assetSpecifications %}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-list-check"></i></div>
+          <h2>Asset Specifications</h2>
+        </div>
+      </div>
+      <div class="detail-card-body p-0">
+        <table class="detail-specs-table">
+          <thead>
+            <tr><th>Specification</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            {% for spec in assetSpecifications %}
+            <tr><td>{{ spec.name }}</td><td>{{ spec.value }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Audit History #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-clipboard-check"></i></div>
+          <h2>Audit History</h2>
+        </div>
+        {% if get_audit_history %}
+          <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="detail-view-all">View All Records</a>
+        {% endif %}
+      </div>
+      <div class="detail-card-body p-0">
+        {% if get_audit_history %}
+        <table class="detail-audit-table">
+          <thead>
+            <tr>
+              <th>Sl No.</th>
+              <th>Proof</th>
+              <th>Condition</th>
+              <th>Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for audit in get_audit_history %}
+            <tr>
+              <td class="table-index-cell">{{ forloop.counter|stringformat:"02d" }}</td>
+              <td>
+                {% if audit.audit_image %}
+                  <img src="{{ audit.id|audit_image_url }}" class="audit-thumb" alt="Audit proof">
+                {% else %}
+                  <div class="audit-thumb-empty"><i class="bi bi-image"></i></div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="audit-condition-badge audit-{{ audit.condition_label|lower|cut:' ' }}">
+                  ● {{ audit.condition_label }}
+                </span>
+              </td>
+              <td class="audit-date-cell">{{ audit.created_at }}</td>
+              <td>
+                <a href="{% url 'audit:details' audit.id %}" class="action-btn" title="View audit details">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="detail-empty-state">
+          <i class="bi bi-clipboard-x"></i>
+          <p>No audit records found</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>{# /detail-main #}
+
+  {# ── Right / sidebar column ──────────────────────────────────────────────── #}
+  <div class="detail-sidebar">
+
+    {# Asset Images #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-images"></i></div>
+          <h2>Asset Images</h2>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        {% if get_asset_img %}
+          {% with first=get_asset_img|first %}
+            <div class="detail-main-image-wrap">
+              <img src="{% get_media_prefix %}{{ first.image }}"
+                   class="detail-main-image"
+                   alt="{{ asset.name }}"
+                   data-bs-toggle="modal" data-bs-target="#imageModal1"
+                   onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            </div>
+          {% endwith %}
+          {% if arr_size > 1 %}
+          <div class="detail-thumb-row">
+            {% for it in get_asset_img %}{% if forloop.counter > 1 %}
+              {% if forloop.counter <= 3 %}
+                <img src="{% get_media_prefix %}{{ it.image }}"
+                     class="detail-thumb"
+                     alt="Image {{ forloop.counter }}"
+                     data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}"
+                     onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% elif forloop.counter == 4 %}
+                <div class="detail-thumb detail-thumb-more"
+                     data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}">
+                  +{{ arr_size|add:"-3" }} More
+                </div>
+              {% endif %}
+            {% endif %}{% endfor %}
+          </div>
+          {% endif %}
+        {% else %}
+          <div class="detail-main-image-wrap">
+            <img src="{% static 'images/No_Image.jpg' %}" class="detail-main-image" alt="No image available">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Asset Identification — Barcode #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-upc-scan"></i></div>
+          <h2>Asset Identification</h2>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-barcode-wrap">{{ asset_barcode|safe }}</div>
+        <div class="detail-barcode-tag-label">{{ asset.tag }}</div>
+        <div class="text-center mt-3">
+          <button id="download-btn" type="button" class="btn-download-label">
+            <i class="bi bi-download"></i> Download Label (PNG)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {# Activity Log #}
+    {% if page_object %}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-clock-history"></i></div>
+          <h2>Activity Log</h2>
+        </div>
+      </div>
+      <div class="detail-card-body p-0">
+        <ul class="activity-log-list">
+          {% for h in page_object %}
+          <li class="activity-log-item">
+            <div class="activity-dot
+              {% if h.history_type == '+' %}dot-create
+              {% elif h.history_type == '-' %}dot-delete
+              {% else %}dot-update{% endif %}">
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">
+                {% if h.history_type == '+' %}
+                  Asset created in system
+                {% elif h.history_type == '-' %}
+                  Asset deleted
+                {% elif h.is_assigned != h.prev_record.is_assigned %}
+                  {% if h.is_assigned %}Asset assigned to user{% else %}Asset unassigned{% endif %}
+                {% else %}
+                  Asset updated
+                {% endif %}
+              </div>
+              <div class="activity-meta">
+                {{ h.history_date }}
+                {% if h.history_user %}&nbsp;· by {{ h.history_user.full_name|default:h.history_user }}{% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>{# /detail-sidebar #}
+
+</div>{# /detail-layout #}
+
+{# ── Image modals ──────────────────────────────────────────────────────────── #}
+{% for it in get_asset_img %}
+  {% if it.image %}
+  <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Image {{ forloop.counter }} of {{ arr_size }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img src="{% get_media_prefix %}{{ it.image }}"
+               alt="Asset Image {{ forloop.counter }}"
+               class="detail-modal-image"
+               onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endfor %}
+
+{% endblock content %}

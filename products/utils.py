@@ -80,12 +80,20 @@ def product_list(request):
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
+    total_product_count = product_list.count()
+    active_product_count = product_list.filter(status=True).count()
+    with_assets_count = product_list.filter(total_assets__gt=0).count()
+    is_demo = os.environ.get('IS_DEMO')
     context = {
         'sidebar': 'products',
         'product_images': product_images,
         'page_object': page_object,
-        'deleted_product_count':deleted_product_count,
-        'title': 'Products'
+        'deleted_product_count': deleted_product_count,
+        'total_product_count': total_product_count,
+        'active_product_count': active_product_count,
+        'with_assets_count': with_assets_count,
+        'is_demo': is_demo,
+        'title': 'Products',
     }
     return context
 

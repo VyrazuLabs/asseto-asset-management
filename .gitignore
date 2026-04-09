@@ -27,3 +27,13 @@ agents.md
 .windsurfrules
 .cursorignore
 .knowledge-base
+
+# macOS System Files
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes

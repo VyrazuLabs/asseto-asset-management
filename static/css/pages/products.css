@@ -1,0 +1,8 @@
+/* =============================================================================
+   products.css — Product-specific list page styles
+   Shared list styles are in list-common.css
+   ============================================================================= */
+
+/* ── Product name cell ───────────────────────────────────────────────────── */
+.product-name-main { font-weight: 600; color: var(--color-text); }
+.product-name-sub  { font-size: .75rem; color: var(--color-muted); margin-top: .1rem; }
