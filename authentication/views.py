@@ -398,33 +398,18 @@ def regenerate_qr(request):
     secret = generate_totp_secret()
     user_totp = UserTotp.objects.filter(user_id=user.id).first()
 
-    if not user_totp or user_totp.status == 0:
+    if not user_totp:
         user_totp = UserTotp.objects.create(user_id=user.id, secret=secret, status=0)
 
-    # if user_totp.status == 2:
-    #     # UserTotp.objects.filter(user_id=user.id).update(secret=secret, status=1)
-    #     user_totp.secret = secret
-    #     user_totp.status = 1
-    #     user_totp.save()
-    #     print("User with status 2, secret updated and status set to 1 for regeneration. SECRET updated to:", secret)
-    # Regenerate only if allowed
     if user_totp.status in [0, 1, 2]:
-        qr_code_base64 = generate_qr(request)
-        # user_totp.status = 1
-        # user_totp.secret = secret
-        user_totp.save()
+        qr_code_base64 = generate_qr(request, user_totp)
 
         return JsonResponse({
             "success": True,
             "qr_code": qr_code_base64,
             "status": user_totp.status
         })
-    # if user_totp.status == 2:
-    #     #When status is 2,Then we will allow regeneration of QR which means generate new secret for the TOTP
-    #     # secret = generate_totp_secret()
-    #     user_totp.status = 1
-    #     user_totp.save()
-    #     qr_code_base64 = generate_qr(request)
+
     return JsonResponse({
         "success": False,
         "message": "QR regeneration not allowed.",
