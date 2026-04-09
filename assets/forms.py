@@ -127,7 +127,7 @@ class AssignedAssetForm(forms.ModelForm):
     asset = forms.ModelChoiceField(
         required=True,
         queryset=Asset.undeleted_objects.filter(is_assigned=False, status=True),
-        label='he;ll',
+        label='Asset',
         empty_label="--SELECT--",
         widget=forms.Select(
             attrs={'class': 'form-select'}
@@ -142,39 +142,60 @@ class AssignedAssetForm(forms.ModelForm):
         ))
     
     image = MultipleFileField(label='Select files', required=False)
-    
+
+    issue_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={'class': 'form-control', 'type': 'date'}
+        ))
+
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={'class': 'form-control', 'rows': 3,
+                   'placeholder': 'Additional details or condition reporting...'}
+        ))
+
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['asset'].queryset = Asset.undeleted_objects.filter(is_assigned=False, status=True, organization=self._organization)
         self.fields['user'].queryset = User.undeleted_objects.filter(is_active=True, organization=self._organization).exclude(is_superuser=True)
-        
-    
+
     class Meta:
             model = AssignAsset
-            fields = ['asset', 'user']
+            fields = ['asset', 'user', 'issue_date', 'notes']
 
 class AssignedAssetListForm(forms.ModelForm):
     user = forms.ModelChoiceField(
         required=True,
-        # queryset=User.undeleted_objects.filter(is_active=True).exclude(is_superuser=True),
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(
             attrs={'class': 'form-select'}
         ))
-    
-    # image = MultipleFileField(label='Select files', required=False)
+
+    issue_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={'class': 'form-control', 'type': 'date'}
+        ))
+
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={'class': 'form-control', 'rows': 3,
+                   'placeholder': 'Additional details or condition reporting...'}
+        ))
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)
         self.fields['user'].queryset = User.undeleted_objects.filter(is_active=True, organization=self._organization).exclude(is_superuser=True)
-        
-    
+
     class Meta:
             model = AssignAsset
-            fields = ['user']
+            fields = ['user', 'issue_date', 'notes']
 
 
 class ReassignedAssetForm(forms.ModelForm):

@@ -5,6 +5,31 @@ from .models import Audit
 from assets.models import Asset
 from django.core.paginator import Paginator
 
+def get_audit_stats(request):
+    """Return stat card counts for the audit list pages."""
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    completed_count = Audit.objects.filter(created_at__gte=thirty_days_ago).count()
+    total_audit_count = Audit.objects.count()
+
+    # Pending: assets whose next audit is overdue or never audited
+    asset_list = Asset.undeleted_objects.all()
+    pending_count = 0
+    for asset in asset_list:
+        has_audit = Audit.objects.filter(asset=asset).order_by('-created_at').first()
+        next_due = next_audit_due_for_asset(asset)
+        if has_audit and next_due:
+            if next_due <= datetime.now().date():
+                pending_count += 1
+        elif not has_audit:
+            pending_count += 1
+
+    return {
+        'total_audit_count': total_audit_count,
+        'completed_count': completed_count,
+        'pending_count': pending_count,
+    }
+
+
 def get_completed_audit(request):
     thirty_days_ago = datetime.now() - timedelta(days=30)
 
