@@ -208,8 +208,14 @@ body.theme-dark .list-page-header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
   flex-shrink: 0;
+  padding-top: 2px;
+}
+.stat-icon i.bi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
 }
 .stat-icon.blue   { background: #EEF2FF; color: var(--color-primary); }
 .stat-icon.green  { background: #ECFDF5; color: #059669; }
