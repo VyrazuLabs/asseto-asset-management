@@ -1,0 +1,35 @@
+<div class="table-responsive">
+    <table class="table premium-table">
+        <thead>
+            <tr>
+                <th style="width: 60px;"></th>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in latest_users_list %}
+            <tr>
+                <td>
+                    <div class="metric-icon-box metric-gray" style="width: 38px; height: 38px; border-radius: 8px; font-size: 1rem; margin: 0;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                </td>
+                <td class="fw-bold">{{ user.full_name }}</td>
+                <td class="text-muted">{{ user.role|default:"User" }}</td>
+                <td class="text-muted">{{ user.formatted_date }}</td>
+                <td style="width: 40px; text-align: right;">
+                    <a href="{% url 'users:details' user.id %}" class="row-link-icon">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No recent users found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
