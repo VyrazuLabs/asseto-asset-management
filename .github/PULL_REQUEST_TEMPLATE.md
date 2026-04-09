@@ -19,21 +19,21 @@ Describe your changes clearly and concisely
 ## Type of Change
 <!-- Select one -->
 - [ ] Bug Fix
-- [ ] New Feature
-- [ ] Enhancement / Improvement
+- [x] New Feature
+- [x] Enhancement / Improvement
 - [ ] Documentation Update
-- [ ] Refactor / Code Cleanup
+- [x] Refactor / Code Cleanup
 
 ## Related Issue
 If this PR addresses a specific issue, link it here
 - Closes # (issue number)
 
 ## Checklist
-- [ ] I have read the **Code of Conduct** and followed it in this PR
-- [ ] My code follows the project style and conventions
+- [x] I have read the **Code of Conduct** and followed it in this PR
+- [x] My code follows the project style and conventions
 - [ ] I have added unit tests where applicable
-- [ ] All new and existing tests pass
-- [ ] I have updated documentation if necessary
+- [x] All new and existing tests pass
+- [x] I have updated documentation if necessary
 
 ## Screenshots / Recordings (Optional)
 If applicable, include screenshots or recordings demonstrating the changes
