@@ -11,58 +11,37 @@ from django.db import connection
 from assets.models import Asset
 from notifications.utils import notifications_call,send_email
 from assets.utils import slack_notification
+from notifications.service import NotificationService
 # User Notification
-
-
+# Implement this with the service to maintain a clean code.
+print("IN NOTIFICATION SIGNALS")
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def userNotification(sender, instance, created,  **kwargs):
-    if instance.previous_role != instance.role:
-        # notification = Notification.objects.create(
-        #     instance_id=instance.id,
-        #     notification_title='New User' if created else 'Updated User',
-        #     notification_text=f'{instance.full_name} has been added to your team ({instance.role})',
-        #     icon='bi-person-fill',
-        # )
+def user_notification(sender, instance, created, **kwargs):
+    if created:
+        NotificationService.send(
+            user=instance,
+            title='New User',
+            message=f'{instance.full_name} has been added to your team ({instance.role})',
+            icon='bi-person-fill',
+            instance_id=instance.id,
+            object_id=str(instance.id)
+        )
 
-        # users = User.objects.filter(
-        #     role=instance.role, organization=instance.organization).exclude(pk=instance.id)
-        # for user in users:
-        #     UserNotification.objects.create(
-        #         user=user,
-        #         notification=notification
-        #     )
-        notifications_call(user=instance,
-                           entity_type=2,
-                           notification_title='New User' if created else 'Updated User',
-                           notification_text=f'{instance.full_name} has been added to your team ({instance.role})'
-                        )
-        # send_email(instance.user.email,notifications_title='Updated asset',notification_text=f'{asset.name} is Updated.')
-
-    if instance.previous_role is not None and instance.previous_role != instance.role and not created:
-        notifications_call(user=instance,
-                            entity_type=2,
-                            notification_title='Updated User',
-                            notification_text=f'{instance.full_name} has been removed from your team ({instance.previous_role})',
-                            icon='bi-person-fill',
-                        )
-
-        # users = User.objects.filter(
-        #     role=instance.previous_role, organization=instance.organization)
-        # for user in users:
-        #     UserNotification.objects.create(
-        #         user=user,
-        #         notification=notification
-        #     )
-
+    elif instance.previous_role != instance.role:
+        NotificationService.send(
+            user=instance,
+            title='Role Updated',
+            message=f'{instance.full_name} role changed to {instance.role}',
+            icon='bi-person-fill',
+            instance_id=instance.id,
+            object_id=str(instance.id)
+        )
 
 @receiver(post_init, sender=settings.AUTH_USER_MODEL)
 def remember_state_user(sender, instance, **kwargs):
-
     instance.previous_role = instance.role
 
-
 # Asset Notification
-
 
 @receiver(pre_save, sender=Asset)
 def save_old_status(sender, instance, **kwargs):
@@ -88,7 +67,8 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
                 icon="bi-gear-fill",
                 link=f"/assets/list",  # Update to actual admin URL
                 is_superuser=True,
-                updated_by=instance.updated_by
+                updated_by=instance.updated_by,
+                object_id=str(instance.id) if instance else None
             )
             admins = User.objects.filter(is_superuser=True)
             for admin in admins:
@@ -109,51 +89,135 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             #             instance.id,
             #             instance.tag
             #         )
-
-@receiver(post_save, sender=AssignAsset)
-def asset_notification(sender, instance, created,  **kwargs):
-    if instance.previous_user != instance.user:
-        # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
-        notifications_call(user=instance.user,
-            entity_type=2,
-            notification_title='Assigned asset',
-            notification_text=f'{instance.asset.name} is assigned to you.'
+@receiver(post_save, sender=Asset)
+def notify_admin_on_asset_created(sender, instance, created, **kwargs):
+    if created:
+        notification = Notification.objects.create(
+            notification_title="Asset Created",
+            notification_text=f"A new asset '{instance}' has been created.",
+            icon="bi-plus-circle-fill",
+            link="/assets/list",
+            is_superuser=True,
+            updated_by=instance.updated_by,
+            object_id=str(instance.id)
         )
 
-        # UserNotification.objects.create(
-        #     user=instance.user,
-        #     notification=notification
-        # )
+        admins = User.objects.filter(is_superuser=True)
 
-    if instance.previous_user != instance.user and not created:
-        # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
-        notifications_call(user=instance.user,
-            instance_id=instance.id,
-            notification_title='Assigned asset',
-            notification_text=f'{instance.asset.name} is unassigned from you.',
-        )
+        for admin in admins:
+            UserNotification.objects.create(
+                user=admin,
+                notification=notification
+            )
+
+@receiver(post_save, sender=Asset)
+def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
+    if not created and hasattr(instance, '_old_status'):
+        
+        old_status = instance._old_status
+        new_status = instance.asset_status
+
+        # Only notify if status did NOT change
+        if old_status == new_status:
+            notification = Notification.objects.create(
+                notification_title="Asset Updated",
+                notification_text=f"Asset '{instance}' has been updated.",
+                icon="bi-pencil-square",
+                link="/assets/list",
+                is_superuser=True,
+                updated_by=instance.updated_by,
+                object_id=str(instance.id)
+            )
+
+            admins = User.objects.filter(is_superuser=True)
+            print("hre")
+            for admin in admins:
+                UserNotification.objects.create(
+                    user=admin,
+                    notification=notification
+                )
+
+
+# @receiver(post_save, sender=AssignAsset)
+# def asset_notification(sender, instance, created,  **kwargs):
+#     if instance.previous_user != instance.user:
+#         # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+#         NotificationService.send(
+#             user=instance.user,
+#             title='Assigned Asset',
+#             message=f'{instance.asset.name} is assigned to you.',
+#             icon='bi-laptop',
+#             link=f'/assets/details/{instance.asset.id}',
+#             instance_id=instance.id,
+#             object_id=str(instance.asset.id)
+#         )
+
+#         # UserNotification.objects.create(
+#         #     user=instance.user,
+#         #     notification=notification
+#         # )
+
+#     if instance.previous_user != instance.user and not created:
+#         # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
+#         NotificationService.send(
+#             user=instance.user,
+#             title='Assigned Asset',
+#             message=f'{instance.asset.name} is assigned to you.',
+#             icon='bi-laptop',
+#             link=f'/assets/details/{instance.asset.id}',
+#             instance_id=instance.id,
+#             object_id=str(instance.asset.id)
+#         )
+
+
 
         # UserNotification.objects.create(
         #     user=instance.previous_user,
         #     notification=notification
         # )
+@receiver(post_save, sender=AssignAsset)
+def asset_notifications(sender, instance, created, **kwargs):
 
+    admins = User.objects.filter(is_superuser=True)
+
+    if created:
+        for admin in admins:
+            NotificationService.send(
+                user=admin,
+                title="Asset Created",
+                message=f"{instance} created"
+            )
+        return
+
+    # status change
+    if hasattr(instance, "_old_status"):
+        if instance._old_status != instance.asset_status:
+            for admin in admins:
+                NotificationService.send(
+                    user=admin,
+                    title="Status Changed",
+                    message=f"{instance} status changed"
+                )
+            return
+
+    # general update
+    for admin in admins:
+        NotificationService.send(
+            user=admin,
+            title="Asset Updated",
+            message=f"{instance} updated"
+        )
 
 @receiver(post_delete, sender=AssignAsset)
 def asset_delete_notification(sender, instance, *args,  **kwargs):
     # send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
-    notification = Notification.objects.create(
-        instance_id=instance.id,
-        notification_title='Asset Deleted',
-        notification_text=f'{instance.asset.name} has been deleted.',
-        icon='bi-gear-fill',
-    )
-
-    UserNotification.objects.create(
-        user=instance.previous_user,
-        notification=notification
-    )
-
+        NotificationService.send(
+            user=instance.previous_user,
+            title='Asset Deleted',
+            message=f'{instance.asset.name} has been deleted.',
+            icon='bi-gear-fill',
+            instance_id=instance.id
+        )
 
 @receiver(post_init, sender=AssignAsset)
 def remember_state_asset(sender, instance, **kwargs):
@@ -178,17 +242,25 @@ def expiring_asset(days):
 
             if not UserNotification.objects.filter(user=super_user, notification__notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.').exists():
 
-                notification = Notification.objects.create(
-                    instance_id=expiring_asset.id,
-                    notification_title='Warranty Expires',
-                    notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.',
-                    icon='bi-person-workspace',
-                    link=f'/assets/details/{expiring_asset.asset.id}'
-                )
+                # notification = Notification.objects.create(
+                #     instance_id=expiring_asset.id,
+                #     notification_title='Warranty Expires',
+                #     notification_text=f'{expiringAssetManagement_asset.asset.name} warranty expires in {days} days.',
+                #     icon='bi-person-workspace',
+                #     link=f'/assets/details/{expiring_asset.asset.id}',
+                #     object_id=str(expiring_asset.asset.id)
+                # )
 
-                UserNotification.objects.create(
-                    user=super_user,
-                    notification=notification
+                # UserNotification.objects.create(
+                #     user=super_user,
+                #     notification=notification
+                # )
+                NotificationService.send(
+                    user=expiring_asset.previous_user,
+                    title='Asset Deleted',
+                    message=f'{expiring_asset.asset.name} has been deleted.',
+                    icon='bi-gear-fill',
+                    instance_id=expiring_asset.id
                 )
 
 @receiver(connection_created)

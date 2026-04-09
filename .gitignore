@@ -6,3 +6,34 @@
 media
 db.sqlite3
 staticfiles
+firebase-credentials.json
+
+# AI assistant config files — keep local only, never push to GitHub
+CLAUDE.md
+.agents
+.agents/
+**/.agents
+**/.agents/
+agents.md
+.claude
+.claude/
+
+# Tool-agnostic AI rules folder
+.ai-rules/
+.ai-rules
+
+# Tool-specific AI config files
+.cursorrules
+.windsurfrules
+.cursorignore
+.knowledge-base
+
+# macOS System Files
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes

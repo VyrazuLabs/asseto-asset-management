@@ -35,7 +35,7 @@ def asset_status_list(request):
 
     # Count distinct assets per asset status
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(
             organization=request.user.organization,
             asset_status__in=all_asset_status_list
@@ -95,7 +95,7 @@ def asset_status_details(request,id):
     asset_status = get_object_or_404(
     AssetStatus.undeleted_objects, pk=id)
 
-    history_list = AssetStatus.history.all()
+    history_list = asset_status.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
@@ -143,6 +143,11 @@ def delete_asset_status(request,id):
     if request.method == 'POST':
         product_category = get_object_or_404(
         AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the asset status if only the asset status is not assigned to any asset
+        assigned_assets = Asset.objects.filter(asset_status=product_category).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Asset Status cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the asset status.')
+            return redirect('assets:asset_status_list')
         product_category.status = False
         product_category.soft_delete()
         history_id = product_category.history.first().history_id

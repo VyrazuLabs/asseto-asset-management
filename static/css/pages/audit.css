@@ -1,0 +1,318 @@
+/* =============================================================================
+   audit.css — Styles for the Audit module (add / update audit pages)
+   ============================================================================= */
+
+/* ── Design tokens (mirrors assets.css) ──────────────────────────────────── */
+:root {
+  --color-primary:       #4F46E5;
+  --color-primary-light: #EEF2FF;
+  --color-card:          #FFFFFF;
+  --color-border:        #E5E7EB;
+  --color-text:          #111827;
+  --color-muted:         #6B7280;
+  --card-radius:         10px;
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.audit-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.audit-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 .3rem;
+}
+.page-breadcrumb {
+  font-size: .78rem;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+.page-breadcrumb .breadcrumb-link {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+.page-breadcrumb .breadcrumb-item.active { color: var(--color-primary); }
+
+/* ── Back button ──────────────────────────────────────────────────────────── */
+.btn-back {
+  background: #fff;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  padding: .5rem 1.1rem;
+  font-size: .875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-top: .4rem;
+}
+.btn-back:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+/* ── Two-column layout ────────────────────────────────────────────────────── */
+.audit-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 900px) { .audit-layout { grid-template-columns: 1fr; } }
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.audit-card {
+  background: var(--color-card);
+  border-radius: var(--card-radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+.audit-card-header {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .85rem 1.25rem;
+  border-bottom: 1.5px solid var(--color-border);
+}
+.audit-card-header h2 {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+.audit-card-body { padding: 1.25rem; }
+
+/* ── Section icon ─────────────────────────────────────────────────────────── */
+.section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+/* ── Field labels & inputs ────────────────────────────────────────────────── */
+.field-label {
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: .35rem;
+  display: block;
+}
+.required-star { color: #EF4444; margin-left: .1rem; }
+
+.field-input {
+  width: 100%;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  padding: .5rem .8rem;
+  font-size: .875rem;
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s;
+}
+.field-input:focus { border-color: var(--color-primary); }
+.field-input:disabled { background: #F9FAFB; color: var(--color-muted); cursor: not-allowed; }
+
+.field-textarea {
+  width: 100%;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  padding: .65rem .8rem;
+  font-size: .875rem;
+  color: var(--color-text);
+  background: #fff;
+  outline: none;
+  resize: vertical;
+  min-height: 140px;
+  transition: border-color .15s;
+}
+.field-textarea:focus { border-color: var(--color-primary); }
+
+.field-error { font-size: .72rem; color: #EF4444; margin-top: .25rem; display: block; }
+.field-hint  { font-size: .72rem; color: var(--color-primary); margin-top: .2rem; display: block; }
+
+/* ── Condition buttons ────────────────────────────────────────────────────── */
+.condition-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: .4rem;
+}
+.condition-btn {
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: .45rem 1.15rem;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.condition-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.condition-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* ── Audit autocomplete suggestions ──────────────────────────────────────── */
+.audit-suggestions {
+  position: absolute;
+  z-index: 100;
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  list-style: none;
+  margin: .25rem 0 0;
+  padding: .25rem 0;
+  max-height: 220px;
+  overflow-y: auto;
+  width: 100%;
+  display: none;
+}
+.audit-suggestion-item {
+  padding: .5rem .85rem;
+  font-size: .875rem;
+  cursor: pointer;
+  color: var(--color-text);
+}
+.audit-suggestion-item:hover { background: var(--color-primary-light); color: var(--color-primary); }
+
+/* ── Upload area ──────────────────────────────────────────────────────────── */
+.audit-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border: 2px dashed var(--color-border);
+  border-radius: 10px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  min-height: 160px;
+}
+.audit-upload-area:hover,
+.audit-upload-area.dragover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+.audit-upload-area .bi-cloud-arrow-up {
+  font-size: 2.25rem;
+  color: var(--color-primary);
+}
+.upload-label { font-size: .875rem; font-weight: 600; color: var(--color-text); }
+.upload-hint  { font-size: .75rem; color: var(--color-muted); }
+
+.audit-file-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .25rem;
+}
+.audit-file-chosen {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* ── Save / Discard buttons ───────────────────────────────────────────────── */
+.btn-save-audit {
+  width: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: .7rem 1rem;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  transition: background .15s;
+  margin-bottom: .85rem;
+}
+.btn-save-audit:hover { background: #4338CA; }
+
+.btn-discard-audit {
+  display: block;
+  text-align: center;
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  padding: .5rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: background .15s;
+}
+.btn-discard-audit:hover { background: #F3F4F6; color: var(--color-text); }
+
+.audit-compliance-note {
+  font-size: .75rem;
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* =============================================================================
+   DARK MODE OVERRIDES
+   ============================================================================= */
+body.theme-dark {
+  --color-primary-light: #2a2650;
+  --color-card:          #1e1e2d;
+  --color-border:        #2e2e42;
+  --color-text:          #e0e0f0;
+  --color-muted:         #8b8ba4;
+}
+
+body.theme-dark .btn-back {
+  background: #2a2a3d;
+  color: var(--color-text);
+}
+body.theme-dark .field-input,
+body.theme-dark .field-textarea {
+  background: #151521;
+  color: var(--color-text);
+}
+body.theme-dark .field-input:disabled {
+  background: #1a1a2e;
+}
+body.theme-dark .condition-btn {
+  background: #2a2a3d;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+body.theme-dark .audit-suggestions {
+  background: #1e1e2d;
+}
+body.theme-dark .btn-discard-audit:hover {
+  background: #2a2a3d;
+}

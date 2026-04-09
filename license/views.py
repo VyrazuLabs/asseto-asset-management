@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib import messages
 from django.db.models import Q
-
+from django.http import HttpResponse
 from license.utils import get_assigned_users
 @login_required
 @permission_required('authentication.view_license')
@@ -32,8 +32,11 @@ def add_license(request):
         license_form=LicenseForm(request.POST)
         if license_form.is_valid():
             license_form.save()
-            messages.success(request, "License add sucessfully")
+            messages.success(request, "License added sucessfully")
             return redirect('license:license_list')
+            # response = HttpResponse(status=204)
+            # response["HX-Trigger"] = "licenseAdded"
+            # return response
     else:
         license_form=LicenseForm()
     
@@ -59,13 +62,12 @@ def update_license(request,id):
         license_form=LicenseForm(request.POST,instance=get_license)
         if license_form.is_valid():
             license_form.save()
-            messages.success(request, "License update sucessfully")
-            return redirect('license:license_list')
+            messages.success(request, "License updated sucessfully")
+            return redirect('license:update_license' , id=id)
     else:
         license_form=LicenseForm(instance=get_license)
     
     return render(request,'license/update-license.html',context={'form':license_form,'title':f'Update-{get_license.name}','sidebar':'license'})
-
 
 @login_required
 @permission_required('authentication.delete_license')

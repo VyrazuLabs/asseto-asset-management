@@ -12,11 +12,11 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset
 import os
+from dashboard.utils import get_department_list
 
 IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
 ORPHANS = 1
-
 
 def check_admin(user):
     return user.is_superuser
@@ -39,39 +39,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def departments(request):
-    department_list = (
-        Department.undeleted_objects
-        .filter(organization=request.user.organization)
-    )
-    
-    deleted_department_count = (
-        Department.deleted_objects
-        .filter(organization=request.user.organization)
-        .count()
-    )
-
-    paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-
-    department_form = DepartmentForm()
-
-    # Count distinct assets per department
-    asset_counts = (
-        AssignAsset.objects
-        .filter(
-            asset__organization=request.user.organization,
-            user__department__in=department_list
-        )
-        .values("user__department")
-        .annotate(asset_count=Count("asset", distinct=True))   # ✅ unique assets
-    )
-
-    # Map: {department_id: asset_count}
-    department_asset_count = {
-        item["user__department"]: item["asset_count"]
-        for item in asset_counts
-    }
+    page_object, department_form, department_asset_count,deleted_department_count=get_department_list(request)
     # is_demo=IS_DEMO
     # if is_demo:
     #     is_demo=True
@@ -118,7 +86,9 @@ def add_department(request):
             department.organization = request.user.organization
             department.save()
             messages.success(request, 'Department added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "departmentAdded"
+            return response
 
     context = {"form": form, "modal_title": "Add Department"}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
@@ -137,7 +107,9 @@ def update_department(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Department updated successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "departmentUpdated"
+            return response
 
     context = {"form": form, "modal_title": "Update Department"}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
@@ -150,6 +122,11 @@ def delete_department(request, id):
     if request.method == 'POST':
         department = get_object_or_404(
             Department.undeleted_objects, pk=id, organization=request.user.organization)
+        # Delete the department if only the department is not assigned to any user
+        assigned_assets = AssignAsset.objects.filter(user__department=department).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Department cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the department.')
+            return redirect('dashboard:departments')
         department.status = False
         department.soft_delete()
         history_id = department.history.first().history_id
@@ -168,8 +145,6 @@ def department_status(request, id):
         department.status = False if department.status else True
         department.save()
     return HttpResponse(status=204)
-
-
 
 @login_required
 def search_department(request, page):

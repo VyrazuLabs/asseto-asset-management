@@ -2,142 +2,203 @@
 {% load custom_filters %}
 {% load static %}
 
+{% block title %}Completed Audits | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/audit.css' %}">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Audit</h3>
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item">Audit</li>
-                    <li class="breadcrumb-item active" aria-current="page">List</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
 
-    <section class="section">   
-        <div class="card mt-3">
-            <div class="card-body" id="custom-field-container">
-                <div class="table-responsive items-table">
-
-                    <!-- Header Buttons -->
-                    <div class="choice-buttons">
-                        <div class="d-flex justify-content-between">
-                            <div class="d-flex justify-content-start gap-2 h-50">
-                                <a class="btn btn-outline-secondary rounded-3" href="{% url 'audit:pending_audits' %}" style="width: 120px;">Pending</a>
-                                <a class="btn btn-outline-secondary rounded-3 active" href="{% url 'audit:completed_audits' %}" style="width: 120px;">Completed</a>
-                            </div>
-                            <a href="{% url 'audit:add_audit' %}" class="btn btn-sm btn-outline-info my-3 me-2">Add Audit</a>
-                        </div>
-
-                        <div style="height: 40px;"></div>
-                        <div class="d-flex justify-content-between">
-                            <h3>Completed Audits</h3>
-                        </div>
-                    </div>
-
-                    <table class="table mt-3" id="table1">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Image</th>
-                                <th>Asset Name</th>
-                                <th>Condition</th>
-                                <th class="ps-5">Notes</th>
-                                <th>Time</th>
-                                <th>Next Audit Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="search_result">
-                            {% if audits %}
-                                {% for audit in audits %}
-                                    <tr style="height: 100px;">
-                                        <td>{{ forloop.counter0|add:audits.start_index }}</td>
-
-                                        <td>
-                                            {% with image_url=audit|audit_image_url %}
-                                                {% if image_url %}
-                                                    <img src="{{ image_url }}" height="100" width="100">
-                                                {% else %}
-                                                    <img src="{% static 'images/No_Image.jpg' %}" height="100" width="100">
-                                                {% endif %}
-                                            {% endwith %}
-                                        </td>
-
-                                        <td>{{ audit.asset.name }}</td>
-                                        <td>{{ audit.condition_label }}</td>
-                                        <td>{{ audit.notes|truncatechars:30 }}</td>
-                                        <td>{% format_datetime audit.created_at %}</td>
-                                        <td>{{ audit.id|next_audit_due }}</td>
-
-                                        <td>
-                                            <div class="d-flex gap-0">
-                                                <a href="{% url 'audit:details' audit.id %}" class="btn btn-sm btn-success pt-2">
-                                                    <i class="bi bi-eye-fill p-1"></i>
-                                                </a>
-                                                <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="btn btn-sm btn-primary pt-2">
-                                                    <i class="bi bi-archive p-1"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="8" class="text-center">No audit history found</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-
-                    <!-- Pagination Section -->
-                    {% if audits.has_other_pages %}
-                        <nav aria-label="Page navigation" class="d-flex justify-content-end mt-3">
-                            <ul class="pagination justify-content-center">
-
-                                {% if audits.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ audits.previous_page_number }}">Previous</a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <span class="page-link">Previous</span>
-                                    </li>
-                                {% endif %}
-
-                                {% for num in audits.paginator.page_range %}
-                                    {% if audits.number == num %}
-                                        <li class="page-item active">
-                                            <span class="page-link">{{ num }}</span>
-                                        </li>
-                                    {% else %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% if audits.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ audits.next_page_number }}">Next</a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled">
-                                        <span class="page-link">Next</span>
-                                    </li>
-                                {% endif %}
-
-                            </ul>
-                        </nav>
-                    {% endif %}
-
-                </div>
-            </div>
-        </div>
-    </section>
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">Audit</a></li>
+        <li class="breadcrumb-item active">Completed</li>
+      </ol>
+    </nav>
+    <h1>Asset Audits</h1>
+    <p class="page-subtitle">Track and manage asset audit history and compliance.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'audit:add_audit' %}" class="btn-register">
+      <i class="bi bi-plus-lg"></i> New Audit
+    </a>
+  </div>
 </div>
+
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-clipboard2-check"></i></div>
+    <div>
+      <div class="stat-label">Total Audits</div>
+      <div class="stat-value">{{ total_audit_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Completed (30d)</div>
+      <div class="stat-value">{{ completed_count }}</div>
+    </div>
+  </div>
+  <a href="{% url 'audit:pending_audits' %}" class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-clock-fill"></i></div>
+    <div>
+      <div class="stat-label">Pending</div>
+      <div class="stat-value">{{ pending_count }}</div>
+    </div>
+  </a>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+    <div>
+      <div class="stat-label">Overdue</div>
+      <div class="stat-value">{{ pending_count }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Tab bar ──────────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="tab-pills">
+      <a href="{% url 'audit:pending_audits' %}" class="tab-pill">Pending</a>
+      <a href="{% url 'audit:completed_audits' %}" class="tab-pill active">Completed</a>
+    </div>
+  </div>
+</div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="list-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Image</th>
+          <th>Asset Name</th>
+          <th>Condition</th>
+          <th>Notes</th>
+          <th>Time</th>
+          <th>Next Audit Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody id="search_result">
+        {% if audits %}
+          {% for audit in audits %}
+          <tr>
+            <td class="table-index-cell">
+              {{ forloop.counter0|add:audits.start_index|stringformat:"02d" }}
+            </td>
+
+            <td>
+              {% with image_url=audit|audit_image_url %}
+                <img class="list-thumb"
+                  src="{% if image_url %}{{ image_url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                  alt="{{ audit.asset.name }}"
+                  width="52" height="52"
+                  onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% endwith %}
+            </td>
+
+            <td>
+              <div class="cell-name-main">{{ audit.asset.name }}</div>
+            </td>
+
+            <td>
+              <span class="status-badge
+                {% if audit.condition_label == 'Excellent' %}status-active
+                {% elif audit.condition_label == 'Good' %}status-deploy
+                {% elif audit.condition_label == 'Fair' %}status-repair
+                {% else %}status-inactive{% endif %}">
+                {{ audit.condition_label }}
+              </span>
+            </td>
+
+            <td>
+              <span class="cell-name-sub">{{ audit.notes|truncatechars:30 }}</span>
+            </td>
+
+            <td>
+              <span class="login-date">{% format_datetime audit.created_at %}</span>
+            </td>
+
+            <td>
+              <span class="login-date">{{ audit.id|next_audit_due }}</span>
+            </td>
+
+            <td>
+              <div class="row-actions">
+                <a href="{% url 'audit:details' audit.id %}" class="action-btn" title="View details">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="action-btn" title="Audit history">
+                  <i class="bi bi-archive"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8">
+              <div class="table-empty-state">
+                <i class="bi bi-clipboard2-check d-block"></i>
+                <p>No completed audits found.<br>
+                  <a href="{% url 'audit:add_audit' %}" class="link-primary">Start a new audit</a>
+                </p>
+              </div>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if audits %}
+    {% include 'commons/list-pagination.html' with page_object=audits item_label="audits" %}
+  {% endif %}
+</div>{# /.table-card #}
+
+<script>
+function requestAndSendNotification() {
+  if (Notification.permission === "granted") {
+    sendNotification();
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendNotification();
+      }
+    });
+  }
+}
+
+function sendNotification() {
+  const title = "Successfully Audited Asset";
+  const options = {
+    body: "Successfully Audited Asset.",
+    icon: "/static/images/logo/favicon.png",
+  };
+  new Notification(title, options);
+}
+</script>
+{% if messages %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% for message in messages %}
+    {% if message.tags == "success" %}
+      requestAndSendNotification();
+    {% endif %}
+  {% endfor %}
+});
+</script>
+{% endif %}
+
 {% endblock content %}
