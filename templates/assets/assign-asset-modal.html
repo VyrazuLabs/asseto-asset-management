@@ -7,50 +7,62 @@
 </div>
 <form hx-post='{{request.path}}' novalidate>
     {% csrf_token %}
-    <div class="modal-body">
-        {# ── Asset selector ──────────────────────────────────────── #}
-        <div class="assign-form-group">
-            <label class="assign-form-label">Asset Name</label>
-            {{ form.asset }}
-            {% for error in form.asset.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-        </div>
+    <div class="modal-body p-4">
+        <div class="row">
+            <div class="col-md-12">
+                {# ── Asset selector ──────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Asset Name</label>
+                    {{ form.asset }}
+                    {% for error in form.asset.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
 
-        {# ── Assignee Name ───────────────────────────────────────── #}
-        <div class="assign-form-group">
-            <label class="assign-form-label">Assignee Name</label>
-            {{ form.user }}
-            {% for error in form.user.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-        </div>
+            <div class="col-md-12">
+                {# ── Assignee Name ───────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Assignee Name</label>
+                    {{ form.user }}
+                    {% for error in form.user.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
 
-        {# ── Issue Date ──────────────────────────────────────────── #}
-        <div class="assign-form-group">
-            <label class="assign-form-label">Issue Date</label>
-            {{ form.issue_date }}
-            {% for error in form.issue_date.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-        </div>
+            <div class="col-md-12">
+                {# ── Issue Date ──────────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Issue Date</label>
+                    {{ form.issue_date }}
+                    {% for error in form.issue_date.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
 
-        {# ── Asset Images ────────────────────────────────────────── #}
-        <div class="assign-form-group">
-            <label class="assign-form-label">Asset Images</label>
-            {{ image_form.image }}
-            {% for error in image_form.image.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
-        </div>
+            <div class="col-md-12">
+                {# ── Asset Images ────────────────────────────────────────── #}
+                <div class="assign-form-group">
+                    <label class="assign-form-label">Asset Images</label>
+                    {{ image_form.image }}
+                    {% for error in image_form.image.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
 
-        {# ── Assignment Notes ────────────────────────────────────── #}
-        <div class="assign-form-group">
-            <label class="assign-form-label">Assignment Notes</label>
-            {{ form.notes }}
-            {% for error in form.notes.errors %}
-                <small class="text-danger">{{ error }}</small>
-            {% endfor %}
+            <div class="col-md-12">
+                {# ── Assignment Notes ────────────────────────────────────── #}
+                <div class="assign-form-group mb-0">
+                    <label class="assign-form-label">Assignment Notes</label>
+                    {{ form.notes }}
+                    {% for error in form.notes.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
