@@ -1,0 +1,374 @@
+/* =============================================================================
+   assets-detail.css — Styles specific to the Asset Detail page
+   Relies on: assets-common.css
+   ============================================================================= */
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.detail-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.detail-page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 .3rem;
+}
+.detail-tag-inline {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.btn-back {
+  background: #fff;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+  border-radius: 8px;
+  padding: .5rem 1.1rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-back:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+/* ── Two-column layout ────────────────────────────────────────────────────── */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 1024px) {
+  .detail-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Generic detail card ──────────────────────────────────────────────────── */
+.detail-card {
+  background: var(--color-card);
+  border-radius: var(--card-radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+.detail-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1.25rem;
+  border-bottom: 1.5px solid var(--color-border);
+}
+.detail-card-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+.detail-card-body { padding: 1.25rem; }
+.detail-card-body.p-0 { padding: 0; }
+.detail-view-all {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.detail-view-all:hover { text-decoration: underline; }
+
+/* ── Status badges (Unique to detail) ─────────────────────────────────────── */
+.detail-status-badge {
+  display: inline-block;
+  font-size: .82rem;
+  font-weight: 700;
+  padding: .28rem .75rem;
+  border-radius: 20px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.badge-in-use  { background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #BFDBFE; }
+.badge-available { background: #ECFDF5; color: #065F46; border: 1.5px solid #A7F3D0; }
+
+/* ── Field grid ───────────────────────────────────────────────────────────── */
+.detail-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 1.5rem;
+}
+@media (max-width: 600px) { .detail-fields-grid { grid-template-columns: 1fr; } }
+
+.detail-field { display: flex; flex-direction: column; gap: .25rem; }
+.detail-field-label {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.detail-field-value {
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+.detail-mono { font-family: monospace; letter-spacing: .02em; }
+.detail-price { font-size: 1.05rem; font-weight: 700; color: var(--color-primary); }
+.detail-warranty-ok { color: #059669; font-weight: 600; }
+.detail-warranty-ok .bi { margin-right: .2rem; }
+
+/* ── Assignee chip (detail page) ──────────────────────────────────────────── */
+.detail-assignee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--color-primary-light);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 20px;
+  padding: .2rem .65rem .2rem .25rem;
+}
+.detail-assignee-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.detail-assignee-chip span:last-child { font-size: .8rem; font-weight: 600; color: var(--color-primary); }
+
+/* ── Description block ────────────────────────────────────────────────────── */
+.detail-description-block {
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.detail-description-text {
+  font-size: .95rem;
+  color: var(--color-text);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Specs table ──────────────────────────────────────────────────────────── */
+.detail-specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+}
+.detail-specs-table thead th {
+  background: #FAFBFC;
+  border-bottom: 1.5px solid var(--color-border);
+  padding: .6rem 1.25rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.detail-specs-table tbody td {
+  padding: .7rem 1.25rem;
+  border-bottom: 1px solid #F3F4F6;
+  color: var(--color-text);
+}
+.detail-specs-table tbody tr:last-child td { border-bottom: none; }
+
+/* ── Audit table ──────────────────────────────────────────────────────────── */
+.detail-audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+}
+.detail-audit-table thead th {
+  background: #FAFBFC;
+  border-bottom: 1.5px solid var(--color-border);
+  padding: .6rem 1.25rem;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  white-space: nowrap;
+}
+.detail-audit-table tbody td {
+  padding: .85rem 1.25rem;
+  border-bottom: 1px solid #F3F4F6;
+  vertical-align: middle;
+}
+.detail-audit-table tbody tr:last-child td { border-bottom: none; }
+.audit-thumb {
+  width: 48px; height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-border);
+}
+.audit-thumb-empty {
+  width: 48px; height: 48px;
+  border-radius: 6px;
+  background: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  font-size: 1.1rem;
+}
+.audit-condition-badge {
+  font-size: .85rem;
+  font-weight: 600;
+}
+.audit-excellent { color: #059669; }
+.audit-good      { color: #B45309; }
+.audit-needsrepair { color: #DC2626; }
+
+/* ── Detail empty state ───────────────────────────────────────────────────── */
+.detail-empty-state {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--color-muted);
+}
+.detail-empty-state i  { font-size: 2.5rem; opacity: .3; display: block; margin-bottom: .75rem; }
+.detail-empty-state p  { font-size: .875rem; margin: 0; }
+
+/* ── Asset images (sidebar) ───────────────────────────────────────────────── */
+.detail-main-image-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #F9FAFB;
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+}
+.detail-main-image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+}
+.detail-thumb-row {
+  display: flex;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+.detail-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.detail-thumb:hover { border-color: var(--color-primary); }
+.detail-thumb-more {
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  background: #F3F4F6;
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.detail-thumb-more:hover { background: var(--color-primary-light); color: var(--color-primary); border-color: var(--color-primary); }
+
+/* ── Barcode block ────────────────────────────────────────────────────────── */
+.detail-barcode-wrap {
+  background: transparent;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  padding: .75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-barcode-wrap svg { width: 100%; height: auto; max-width: 100%; }
+.detail-barcode-tag-label {
+  font-family: monospace;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-align: center;
+  color: var(--color-text);
+  margin-top: .6rem;
+}
+.btn-download-label {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1.5px solid #C7D2FE;
+  border-radius: 7px;
+  padding: .45rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+.btn-download-label:hover { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+body.theme-dark .detail-barcode-wrap { background: transparent; padding: .75rem; border-radius: 4px; border: 1px solid #374151; }
+
+/* ── Activity log ─────────────────────────────────────────────────────────── */
+.activity-log-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.activity-log-item {
+  display: flex;
+  gap: .85rem;
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid #F3F4F6;
+  align-items: flex-start;
+}
+.activity-log-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: .35rem;
+}
+.dot-create { background: #059669; }
+.dot-update { background: #4F46E5; }
+.dot-delete { background: #DC2626; }
+.activity-title {
+  font-size: .925rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: .15rem;
+}
+.activity-meta {
+  font-size: .82rem;
+  color: var(--color-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE OVERRIDES
+   ───────────────────────────────────────────────────────────────────────────── */
+body.theme-dark .btn-back { background: #2a2a3d; color: var(--color-text); }
+body.theme-dark .detail-specs-table thead th,
+body.theme-dark .detail-audit-table thead th { background: #16162a; }
+body.theme-dark .detail-specs-table tbody td,
+body.theme-dark .detail-audit-table tbody td { border-color: var(--color-border); }
+body.theme-dark .detail-main-image-wrap { background: #2a2a3d; border-color: var(--color-border); }
+body.theme-dark .detail-thumb-more { background: #2a2a3d; }
+body.theme-dark .audit-thumb-empty { background: #2a2a3d; }
+body.theme-dark .activity-log-item { border-color: var(--color-border); }
+
+body.theme-dark .badge-in-use  { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
+body.theme-dark .badge-available { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
+body.theme-dark .detail-assignee-chip { background: var(--color-primary-light); border-color: #3d3780; }

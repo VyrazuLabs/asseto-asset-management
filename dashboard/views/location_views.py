@@ -47,7 +47,7 @@ def locations(request):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
     asset_counts = (
-        Asset.objects
+        Asset.undeleted_objects
         .filter(organization=request.user.organization,
                 location__in=location_list)
         .values("location")
@@ -103,7 +103,9 @@ def add_location(request):
             location.organization = request.user.organization
             location.save()
             messages.success(request, 'Location added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "locationAdded"
+            return response
 
     context = {
         'address_form': address_form,
@@ -132,7 +134,7 @@ def update_location(request, id):
                 location_form.save()
                 address_form.save()
                 messages.success(request, 'Location updated successfully')
-                return redirect(f'/admin/locations/details/{location.id}')
+                return redirect(f'/admin/locations/update/{location.id}')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
                    'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}
@@ -142,7 +144,6 @@ def update_location(request, id):
 
     return render(request, 'dashboard/locations/update-location.html', context=context)
 
-
 @login_required
 @permission_required('authentication.delete_location')
 def delete_location(request, id):
@@ -150,6 +151,11 @@ def delete_location(request, id):
     if request.method == 'POST':
         location = get_object_or_404(
             Location.undeleted_objects, pk=id, organization=request.user.organization)
+        # Check if the deleted location is assigned to any asset, if yes then unassign the asset before deleting the location
+        assigned_assets = AssignAsset.objects.filter(asset__location=location).first()
+        if assigned_assets is not None:
+            messages.error(request, 'Location cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the location.')
+            return redirect('dashboard:locations')
         location.status = False
         location.soft_delete()
         history_id = location.history.first().history_id
@@ -157,7 +163,7 @@ def delete_location(request, id):
         messages.success(request, 'Location deleted  successfully')
     return redirect('dashboard:locations')
 
-
+@login_required
 @user_passes_test(check_admin)
 def location_status(request, id):
     if request.method == "POST":
@@ -166,7 +172,6 @@ def location_status(request, id):
         location.status = False if location.status else True
         location.save()
     return HttpResponse(status=204)
-
 
 @login_required
 def search_location(request, page):

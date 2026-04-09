@@ -13,7 +13,8 @@ from common.API_custom_response import api_response,format_validation_errors
 from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
 from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
 from users.utils import user_data
-from .api_utils import convert_product_to_list,convert_asset_to_list
+from .api_utils import search_utils
+
 class GlobalSearch(APIView):
     permission_classes=[IsAuthenticated]
     parser_classes=[FormParser,JSONParser]
@@ -33,47 +34,8 @@ class GlobalSearch(APIView):
             return api_response(data={}, message="No Data found")
 
         try:
-            org_filter = Q(organization=request.user.organization) | Q(organization=None)
-
-            response_data = {
-                "products": [],
-                "assets": [],
-                "users": []
-            }
-
-            # -------- Products --------
-            products = Product.undeleted_objects.filter(
-                org_filter & Q(name__icontains=search_text)
-            ).annotate(
-                total_assets=Count('asset'),
-                available_assets=Count('asset', filter=Q(asset__is_assigned=False))
-            ).order_by('-created_at')[:10]
-
-            if products.exists():
-                response_data["products"] = convert_product_to_list(request, products)
-
-            # -------- Assets --------
-            assets = Asset.undeleted_objects.filter(
-                org_filter & (
-                    Q(tag__icontains=search_text) |
-                    Q(name__icontains=search_text)
-                )
-            ).order_by('-created_at')[:10]
-
-            if assets.exists():
-                response_data["assets"] = convert_asset_to_list(request, assets)
-
-            # -------- Users (Superuser only) --------
-            if request.user.is_superuser:
-                users = User.undeleted_objects.filter(
-                    org_filter &
-                    Q(is_superuser=False) &
-                    Q(full_name__icontains=search_text)
-                ).exclude(pk=request.user.id).order_by('-created_at')[:10]
-
-                if users.exists():
-                    response_data["users"] = user_data(request, users)
-
+            response_data = search_utils(request,search_text)
+            print("Searched Noiw")
             # -------- Final Response --------
             if not any(response_data.values()):
                 return api_response(data=response_data, message="Data not found")

@@ -73,7 +73,12 @@ class ResetPassword(APIView):
         user = request.user
         current_password = serializer.validated_data["current_password"]
         new_password = serializer.validated_data["new_password"]
-
+        rewrite_password = serializer.validated_data['rewrite_password']
+        if current_password!=rewrite_password:
+            return Response(
+                {"success": False, "message": "Old passwords do not match."},
+                status=400
+            )
         if not user.check_password(current_password):
             return Response(
                 {"success": False, "message": "Current password is incorrect."},
@@ -87,6 +92,25 @@ class ResetPassword(APIView):
             {"success": True, "message": "Password changed successfully."},
             status=200
         )
+    
+# class PasswordChecker(APIView):
+#     permission_classes=[IsAuthenticated]
+#     @extend_schema(request={"multiplart/forma-data":ResetPasswordSerializer})
+#     def post(self,request):
+#         serializer=ResetPasswordSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         current_password = serializer.validated_data['current_password']
+#         rewrite_password = serializer.validated_data['rewrite_password']
+#         if current_password!=rewrite_password:
+#             return Response(
+#                 {"success": False, "message": "Passwords do not match."},
+#                 status=400
+#             )
+#         else:
+#             return Response(
+#                 {"success": True, "message": "Passwords match."},
+#                 status=200
+#             )
 
 class ForgotPassword(APIView):
     permission_classes=[AllowAny]
@@ -179,7 +203,7 @@ class UserDetails(APIView):
         except Exception as e:
             return api_response(status=500,system_message=str(e))
 
-class DeleteUSer(APIView):
+class DeleteUser(APIView):
     permission_classes=[IsAuthenticated]
     def delete(self,request,id):
         user=get_object_or_404(User,pk=id)
@@ -189,6 +213,7 @@ class DeleteUSer(APIView):
         except ValueError as e:
             return api_response(status=400, system_message=str(e))
         except Exception as e:
+            print(e)
             return api_response(status=500,error_message=str(e))
         
 # class SearchUser(APIView):
