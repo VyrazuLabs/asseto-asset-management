@@ -135,6 +135,10 @@
       </tbody>
     </table>
   </div>
+
+  {% if data_set %}
+    {% include 'commons/list-pagination.html' with page_object=data_set item_label="pending audits" %}
+  {% endif %}
 </div>{# /.table-card #}
 
 {% endblock content %}
