@@ -13,10 +13,12 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from dashboard.models import CustomField
 from assets.models import AssetImage
-from assets.models import Asset
+from assets.models import Asset,AssignAsset
 from django.views.decorators.csrf import csrf_exempt
 from datetime import date
+from .utils import product_list,search_utils,get_product_details,export_product_pdf_utils,added_product,deleted_product,exports_product_csv_utils
 import os 
+# from silk.profiling.profiler import silk_profile
 
 IS_DEMO = os.environ.get('IS_DEMO')
 today = date.today()
@@ -24,10 +26,8 @@ today = date.today()
 PAGE_SIZE = 10
 ORPHANS = 1
 
-
 def check_admin(user):
     return user.is_superuser
-
 
 def manage_access(user):
     permissions_list = [
@@ -36,124 +36,35 @@ def manage_access(user):
         'authentication.edit_product',
         'authentication.add_product',
     ]
-
     for permission in permissions_list:
         if user.has_perm(permission):
             return True
 
     return False
 
-
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
-            organization=request.user.organization)).annotate(
-            total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=True) and Q(asset__organization=request.user.organization)),
-        ).order_by('-created_at')
-    deleted_product_count=Product.deleted_objects.count()
-    paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    product_ids_in_page = [product.id for product in page_object]
-    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('-uploaded_at')
-    # Map asset ID to its first image
-    product_images = {}
-    for img in images_qs:
-        if img.product_id not in product_images:
-            product_images[img.product_id] = img
-    context = {
-        'sidebar': 'products',
-        'product_images': product_images,
-        'page_object': page_object,
-        'deleted_product_count':deleted_product_count,
-        'title': 'Products'
-    }
-
+    context=product_list(request)
     return render(request, 'products/list.html', context=context)
-
 
 @login_required
 @permission_required('authentication.view_product')
 def details_product(request, id):
-
-    product = get_object_or_404(
-        Product.undeleted_objects, pk=id, organization=request.user.organization)
-    history_list = product.history.all()
-    paginator = Paginator(history_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    get_product_img=ProductImage.objects.filter(product=product).order_by('-uploaded_at').values()
-    img_array=[]
-    for it in get_product_img:
-        img_array.append(it)
-    get_custom_data=[]
-    get_data=CustomField.objects.filter(object_id=product.id)
-    for it in get_data:
-        obj={}
-        obj['field_name']=it.field_name
-        obj['field_value']=it.field_value
-        get_custom_data.append(obj)
-
-    context = {
-        'sidebar': 'products',
-        'product': product,
-        'img_array':img_array,
-        'title': f'Details-{product.name}',
-        'page_object': page_object,
-        'get_custom_data': get_custom_data
-    }
-
+    context=get_product_details(request,id)
     return render(request, 'products/detail.html', context=context)
-
 
 @login_required
 @permission_required('authentication.add_product')
+# @silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
         form = AddProductsForm(
             request.POST, request.FILES, organization=request.user.organization)
         image_form=ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
-            product = form.save(commit=False)
-            product.audit_interval = form.cleaned_data.get('audit_interval') or 0
-            product.organization = request.user.organization
-            product.save()
-            form.save_m2m()
-            files=request.FILES
-            for f in files.getlist('image'): # 'image' is the name of your file input
-                ProductImage.objects.create(product=product, image=f)
-            names = request.POST.getlist('custom_field_name')
-            values = request.POST.getlist('custom_field_value')
-            for key, value in request.POST.items():
-                    if key.startswith("customfield_") and value.strip() != "":
-                        field_id = key.replace("customfield_", "")
-                        try:
-                            cf = CustomField.objects.get(pk=field_id, entity_type='asset', organization=request.user.organization)
-                            CustomField.objects.create(
-                                name=cf.name,
-                                object_id=product.id,
-                                field_type=cf.field_type,
-                                field_name=cf.field_name,
-                                field_value=value,
-                                entity_type='product',
-                                organization=request.user.organization
-                            )
-                        except CustomField.DoesNotExist:
-                            pass
-
-            for name, val in zip(names, values):
-                if name.strip() and val.strip():
-                    CustomField.objects.create(
-                        name=name.strip(),
-                        object_id=product.id,
-                        field_type='text',  # Defaulting new ones as text unless field type select is added
-                        field_name=name.strip(),
-                        field_value=val.strip(),
-                        entity_type='product',
-                        organization=request.user.organization
-                    )
+            added_product(request,form)
+            print("Product added successfully")
             messages.success(request, 'Product added successfully')
             return redirect('products:list')
     else:
@@ -168,15 +79,17 @@ def add_product(request):
 @permission_required('authentication.delete_product')
 def delete_product(request, id):
     if request.method == 'POST':
-        product = get_object_or_404(
-            Product.undeleted_objects, pk=id, organization=request.user.organization)
-        product.status = False
-        product.soft_delete()
-        history_id = product.history.first().history_id
-        product.history.filter(pk=history_id).update(history_type='-')
-        messages.success(request, 'Product deleted successfully')
-
-    return redirect(request.META.get('HTTP_REFERER'))
+        get_asset_by_product_id=Asset.objects.filter(product_id=id).first()
+        # First find if the product is already assigned to the asset or not
+        if AssignAsset.objects.filter(asset=get_asset_by_product_id).exists():
+            messages.error(
+                request, 'Error! Product is assigned to a Asset')
+            # return HttpResponse(status=400)
+        else:
+            deleted_product(request, id)
+            messages.success(request, 'Product deleted successfully')
+    return redirect('products:list')
+    # return redirect(request.META.get('HTTP_REFERER'))
 
 @csrf_exempt
 @login_required
@@ -227,7 +140,7 @@ def update_product(request, id):
 
             # Update existing custom fields
             for cf in custom_fields:
-                key = f"custom_field_{cf.id}"
+                key = f"custom_field_{cf.entity_id}"
                 new_val = request.POST.get(key, "")
                 if new_val != cf.field_value:
                     cf.field_value = new_val
@@ -289,6 +202,7 @@ def status(request, id):
 
 @login_required
 def search(request, page):
+    
     search_text = request.GET.get('search_text').strip()
     if search_text:
         return render(request, 'products/products-data.html', {
@@ -314,29 +228,16 @@ def search(request, page):
             product_images[img.product_id] = img
     return render(request, 'products/list.html', {'page_object': page_object})
 
-
 @login_required
 @permission_required('authentication.view_product')
 def export_products_csv(request):
-    header_list = ['Product Name', 'Product Category',
-                   'Product Type', 'Manufacturer', 'Description']
-    product_list = Product.undeleted_objects.filter(organization=request.user.organization).order_by(
-        '-created_at').values_list('name', 'product_category__name', 'product_type__name', 'manufacturer', 'description')
-    context = {'header_list': header_list, 'rows': product_list}
-    response = render_to_csv(context_dict=context)
-    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.csv"'
+    response=exports_product_csv_utils(request)
     return response
-
 
 @login_required
 @permission_required('authentication.view_product')
 def export_products_pdf(request):
-    products = Product.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    context = {'products': products}
-    pdf = render_to_pdf('products/products-pdf.html', context_dict=context)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="export-products-{today}.pdf"'
+    response=export_product_pdf_utils(request)
     return response
 
 def get_assigned_product_info(request, id):

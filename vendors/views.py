@@ -16,8 +16,10 @@ from assets.models import Asset
 from vendors.utils import get_count_of_assets
 from dashboard.models import CustomField
 from datetime import date
-today = date.today()
+from .utils import export_vendors_pdf_utils,vendor_list_util,get_vendor_details,search_utils,export_vendor_csv_utils
 import os
+# from silk.profiling.profiler import silk_profile
+
 IS_DEMO = os.environ.get('IS_DEMO')
 
 PAGE_SIZE = 10
@@ -41,26 +43,15 @@ def manage_access(user):
             return True
 
     return False
+
+"""Get the list of all the vendors"""
 @login_required
 @user_passes_test(manage_access)
 def vendor_list(request):
-    vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) |  
-        Q(organization=request.user.organization)).order_by('-created_at')
-    deleted_vendor_count=Vendor.deleted_objects.count()
-    paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
-    count_array = []
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    for vendor in page_object:
-        count_array.append(
-            get_count_of_assets(request, vendor.id)
-        )
-    context = {'sidebar': 'vendors','count_array': count_array,
-               'page_object': page_object, 'deleted_vendor_count':deleted_vendor_count,'title': 'Vendors',
-               }
+    context = vendor_list_util(request)
     return render(request, 'vendors/list.html', context=context)
 
-
+"""Delete the vendor based on id"""
 @login_required
 @permission_required('authentication.delete_vendor')
 def delete_vendor(request, id):
@@ -74,9 +65,10 @@ def delete_vendor(request, id):
         messages.success(request, 'Vendor deleted  successfully')
     return redirect('vendors:list')
 
-
+"""Add a new vendor"""
 @login_required
 @permission_required('authentication.add_vendor')
+# @silk_profile(name="add_vendor")
 def add_vendor(request):
     vendor_form = VendorForm()
     address_form = AddressForm()
@@ -90,45 +82,27 @@ def add_vendor(request):
             vendor.organization = request.user.organization
             vendor.save()
             messages.success(request, 'Vendor added successfully')
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "vendorAdded"
+            return response
 
     context = {'vendor_form': vendor_form, 'address_form': address_form}
     return render(request, 'vendors/add-vendor-modal.html', context=context)
 
-
+"""Get the details of the vendor based on id"""
 @login_required
 @permission_required('authentication.view_vendor')
 def details(request, id):
-    vendor = get_object_or_404(
-        Vendor.undeleted_objects, pk=id, organization=request.user.organization)
-    address = Address.objects.get(id=vendor.address.id) if vendor.address else None
-    assets=Asset.undeleted_objects.filter(vendor=vendor)
-    assets_paginator=Paginator(assets,10,orphans=1)
-    assets_page_number=request.GET.get('asset_page')
-    assets_page_object=assets_paginator.get_page(assets_page_number)
-
-
-    history_list = vendor.history.all()
-    paginator = Paginator(history_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    get_custom_data=[]
-    get_data=CustomField.objects.filter(object_id=vendor.id)
-    for it in get_data:
-        obj={}
-        obj['field_name']=it.field_name
-        obj['field_value']=it.field_value
-        get_custom_data.append(obj)
-    context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
-    'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
+    context = get_vendor_details(request, id)
     return render(request, 'vendors/detail.html', context=context)
 
-
+"""Update the vendor based on id"""
 @login_required
 @permission_required('authentication.edit_vendor')
+# @silk_profile(name="update_vendor")
 def update_vendor(request, id):
     vendor = get_object_or_404(
-        Vendor.undeleted_objects, pk=id, organization=request.user.organization)
+        Vendor.undeleted_objects, pk=id)
     address = Address.objects.get(id=vendor.address.id)
     vendor_form = VendorForm(instance=vendor)
     address_form = AddressForm(instance=address)
@@ -147,35 +121,18 @@ def update_vendor(request, id):
                     cf.field_value = new_val
                     cf.save()
             messages.success(request, 'Vendor updated successfully')
-            return redirect(f'/vendors/details/{vendor.id}')
+            # return redirect(f'/vendors/details/{vendor.id}')
+            context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
+               'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
+            return render(request, 'vendors/update-vendor-modal.html', context=context)
     context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
                'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
     return render(request, 'vendors/update-vendor-modal.html', context=context)
 
-
+"""Search the vendors based on search text"""
 @login_required
 def search(request, page):
-    search_text = (request.GET.get('search_text') or "").strip()
-
-    if search_text:
-        vendors_list = searched_data(request,search_text)
-        page_object = vendors_list
-    else:
-        vendors_list = Vendor.undeleted_objects.filter(
-            organization=request.user.organization
-        ).order_by("-created_at")
-
-        paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
-        page_number = page
-        page_object = paginator.get_page(page_number)
-
-    count_array = []
-    for it in page_object:
-        get_count = get_count_of_assets(request, it.id)
-        count_array.append(get_count)
-
-    deleted_vendor_count = Vendor.deleted_objects.count()
-
+    page_object, count_array, deleted_vendor_count = search_utils(request, page)
     return render(
         request,
         "vendors/vendors-data.html",
@@ -188,7 +145,7 @@ def search(request, page):
         },
     )
 
-
+"""Change the status of the vendor based on id"""
 @user_passes_test(check_admin)
 def status(request, id):
     if request.method == "POST":
@@ -198,27 +155,16 @@ def status(request, id):
         vendor.save()
     return HttpResponse(status=204)
 
-
+"""Export Vendors from Database in a CSV File"""
 @login_required
 @permission_required('authentication.view_vendor')
 def export_vendors_csv(request):
-    header_list = ['Vendor Name', 'Vendor Email', 'Phone', 'Contact Person Name', 'Designation', 'GSTIN Number',
-                   'Address Line One', 'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Description']
-    vendors_list = Vendor.undeleted_objects.filter(organization=request.user.organization).order_by('-created_at').values_list('name', 'email', 'phone', 'contact_person', 'designation',
-    'gstin_number', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'description')
-    context = {'header_list': header_list, 'rows': vendors_list}
-    response = render_to_csv(context_dict=context)
-    response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.csv"'
+    response=export_vendor_csv_utils(request)
     return response
 
-
+"""Export Vendors from Database in a PDF File"""
 @login_required
 @permission_required('authentication.view_vendor')
 def export_vendors_pdf(request):
-    vendors = Vendor.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    context = {'vendors': vendors}
-    pdf = render_to_pdf('vendors/vendors-pdf.html', context_dict=context)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.pdf"'
+    response=export_vendors_pdf_utils(request)
     return response

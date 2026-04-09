@@ -1,0 +1,40 @@
+/* =============================================================================
+   common/base.css — Design tokens + global dark mode overrides
+   Loaded by main-layout.html on every page.
+   ============================================================================= */
+
+:root {
+  --color-primary:       #4F46E5;
+  --color-primary-light: #EEF2FF;
+  --color-card:          #FFFFFF;
+  --color-border:        #E5E7EB;
+  --color-text:          #111827;
+  --color-muted:         #6B7280;
+  --card-radius:         10px;
+}
+
+/* =============================================================================
+   DARK MODE — token overrides
+   ============================================================================= */
+body.theme-dark {
+  --color-primary-light: #2a2650;
+  --color-card:          #1e1e2d;
+  --color-border:        #2e2e42;
+  --color-text:          #e0e0f0;
+  --color-muted:         #8b8ba4;
+}
+
+/* Bootstrap global overrides in dark mode */
+body.theme-dark .modal-content {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+body.theme-dark .modal-body  { color: var(--color-text); }
+body.theme-dark .text-muted  { color: var(--color-muted) !important; }
+body.theme-dark .btn-close   { filter: invert(1) grayscale(100%) brightness(200%); }
+body.theme-dark .form-control,
+body.theme-dark .form-select {
+  background: #151521;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}

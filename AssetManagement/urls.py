@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.staticfiles.views import serve
+from django.urls import re_path
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
@@ -77,9 +79,16 @@ urlpatterns = [
 ]
 
 urlpatterns=urlpatterns+api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns
-
+urlpatterns += [
+    re_path(
+        r'^firebase-messaging-sw\.js$',
+        serve,
+        {'path': 'firebase-messaging-sw.js'}
+    ),
+]
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+	# urlpatterns +=[path('silk/', include('silk.urls', namespace='silk'))]
 
 # Error Handlers
 handler403 = 'error_handlers.views.handle_403'
