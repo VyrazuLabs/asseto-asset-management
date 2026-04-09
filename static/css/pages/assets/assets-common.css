@@ -208,6 +208,14 @@ body.theme-dark .btn-rm-row { background: #3a1c1c; border-color: #5c2020; }
 
 body.theme-dark .asset-tag-pill { background: var(--color-primary-light); }
 
+body.theme-dark .assets-page-header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 .3rem;
+}
+body.theme-dark .assets-page-header .page-subtitle {
+  margin-top: .25rem;
+}
+
 body.theme-dark .status-allocated { background: #2a2a3d; color: #b0b0c8; border-color: #3e3e55; }
 body.theme-dark .status-available { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
 body.theme-dark .status-repair    { background: #302515; color: #fbbf24; border-color: #4a3515; }
