@@ -234,9 +234,9 @@ def list_extensions(request):
                 status=0,  # Inactive by default
                 validity=0,
             )
-    get_extensions=Extensions.objects.get(entity_name="Slack",organization=request.user.organization)
+    get_extensions=Extensions.objects.filter(entity_name="Slack",organization=request.user.organization).first()
 
-    get_api_extension=Extensions.objects.get(entity_name="API", organization=request.user.organization)
+    get_api_extension=Extensions.objects.filter(entity_name="API", organization=request.user.organization).first()
     if get_extensions:
         request.session['slack'] = True
     else:
