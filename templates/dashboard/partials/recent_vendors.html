@@ -1,0 +1,35 @@
+<div class="table-responsive">
+    <table class="table premium-table">
+        <thead>
+            <tr>
+                <th style="width: 60px;"></th>
+                <th>Vendor Name</th>
+                <th>Contact</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendor in latest_vendor_list %}
+            <tr>
+                <td>
+                    <div class="metric-icon-box metric-blue" style="width: 38px; height: 38px; border-radius: 8px; font-size: 1rem; margin: 0;">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                </td>
+                <td class="fw-bold">{{ vendor.name }}</td>
+                <td class="text-muted">{{ vendor.contact_person|default:"---" }}</td>
+                <td class="text-muted">{{ vendor.formatted_date }}</td>
+                <td style="width: 40px; text-align: right;">
+                    <a href="{% url 'vendors:details' vendor.id %}" class="row-link-icon">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No recent vendors found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

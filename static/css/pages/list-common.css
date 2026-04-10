@@ -106,19 +106,21 @@ body.theme-dark .list-page-header h1 {
 .btn-trash {
   background: #FEF2F2;
   color: #DC2626;
-  border: 1.5px solid #FECACA;
-  border-radius: 8px;
-  padding: 0 1.1rem;
-  height: 40px;
-  font-size: .85rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .5rem;
-  text-decoration: none;
-  line-height: 1;
-  box-sizing: border-box;
+  border: 1.5px solid #FECACA !important;
+  border-radius: 8px !important;
+  padding: 0 1rem !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  font-size: .8rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .4rem !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
 }
 .btn-trash:hover { background: #DC2626; color: #fff; }
 
