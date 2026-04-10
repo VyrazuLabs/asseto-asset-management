@@ -1,0 +1,256 @@
+/* =============================================================================
+   dashboard.css — Modern Dashboard Design
+   ============================================================================= */
+
+:root {
+    --dash-card-bg: #FFFFFF;
+    --dash-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    --dash-card-radius: 16px;
+    
+    --metric-blue: #4F46E5;
+    --metric-blue-soft: #EFF6FF;
+    --metric-cyan: #0EA5E9;
+    --metric-cyan-soft: #F0F9FF;
+    --metric-orange: #F59E0B;
+    --metric-orange-soft: #FFF7ED;
+    --metric-gray: #64748B;
+    --metric-gray-soft: #F8FAFC;
+    --metric-green: #10B981;
+    --metric-green-soft: #ECFDF5;
+    --metric-purple: #8B5CF6;
+    --metric-purple-soft: #F5F3FF;
+    --metric-teal: #14B8A6;
+    --metric-teal-soft: #F0FDFA;
+    --metric-rose: #F43F5E;
+    --metric-rose-soft: #FFF1F2;
+    
+    --text-main: #1E293B;
+    --text-muted: #64748B;
+}
+
+/* ── Stats Row ───────────────────────────────────────────────────────────── */
+.dashboard-stats-row {
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: var(--dash-card-bg);
+    border-radius: var(--dash-card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--dash-card-shadow);
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.metric-icon-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.25rem;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+    line-height: 0; /* Ensures icon is perfectly centered */
+}
+
+.metric-content {
+    flex-grow: 1;
+}
+
+.metric-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+/* Colors */
+.metric-blue { background-color: var(--metric-blue-soft); color: var(--metric-blue); }
+.metric-cyan { background-color: var(--metric-cyan-soft); color: var(--metric-cyan); }
+.metric-orange { background-color: var(--metric-orange-soft); color: var(--metric-orange); }
+.metric-gray { background-color: var(--metric-gray-soft); color: var(--metric-gray); }
+.metric-green { background-color: var(--metric-green-soft); color: var(--metric-green); }
+.metric-purple { background-color: var(--metric-purple-soft); color: var(--metric-purple); }
+.metric-teal { background-color: var(--metric-teal-soft); color: var(--metric-teal); }
+.metric-rose { background-color: var(--metric-rose-soft); color: var(--metric-rose); }
+
+/* ── Charts Grid ─────────────────────────────────────────────────────────── */
+.chart-container-card {
+    background: var(--dash-card-bg);
+    border-radius: var(--dash-card-radius);
+    padding: 1.75rem;
+    box-shadow: var(--dash-card-shadow);
+    height: 100%;
+    border: none;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-header-line {
+    width: 4px;
+    height: 20px;
+    background: var(--metric-blue);
+    border-radius: 2px;
+    margin-right: 10px;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ── Table Sections ──────────────────────────────────────────────────────── */
+.table-container-card {
+    background: var(--dash-card-bg);
+    border-radius: var(--dash-card-radius);
+    padding: 1.75rem;
+    box-shadow: var(--dash-card-shadow);
+    height: 100%;
+}
+
+.premium-table {
+    margin-top: 1rem;
+}
+
+.premium-table thead th {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 1rem 0;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.premium-table tbody td {
+    padding: 1.1rem 0;
+    font-size: 0.88rem;
+    color: var(--text-main);
+    border-bottom: 1px solid #F8FAFC;
+    vertical-align: middle;
+}
+
+.row-link-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.premium-table tr:hover .row-link-icon {
+    background: var(--metric-blue-soft);
+    color: var(--metric-blue);
+}
+
+.premium-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.status-badge-premium {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-active-p { background: #DBEAFE; color: #1E40AF; }
+.status-pending-p { background: #FFEDD5; color: #9A3412; }
+
+/* ── Tabbed Section ──────────────────────────────────────────────────────── */
+.tab-nav-premium {
+    background: #F1F5F9;
+    padding: 4px;
+    border-radius: 10px;
+    display: inline-flex;
+    gap: 4px;
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.tab-link-premium {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+}
+
+.tab-link-premium.active {
+    background: #FFFFFF;
+    color: var(--metric-blue);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ─- Dark Mode Overrides ─────────────────────────────────────────────────── */
+body.theme-dark {
+    --dash-card-bg: #1E1E2D;
+    --dash-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    
+    --dash-card-border: 1px solid #2D2D44;
+    
+    --metric-blue-soft: #2D2D44;
+    --metric-cyan-soft: #1E2D3D;
+    --metric-orange-soft: #2D261E;
+    --metric-gray-soft: #1E1E2D;
+    --metric-green-soft: #1B2E26;
+    --metric-purple-soft: #261E2E;
+    --metric-teal-soft: #1E2E2D;
+    --metric-rose-soft: #2E1E22;
+    
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+}
+
+body.theme-dark .metric-card,
+body.theme-dark .chart-container-card,
+body.theme-dark .table-container-card {
+    border: var(--dash-card-border);
+}
+
+body.theme-dark .tab-nav-premium {
+    background: #2D2D44;
+}
+
+body.theme-dark .tab-link-premium.active {
+    background: #1E1E2D;
+    color: #818CF8;
+}
+
+body.theme-dark .premium-table thead th { border-bottom-color: #2D2D44; }
+body.theme-dark .premium-table tbody td { border-bottom-color: #2D2D44; }

@@ -1,690 +1,349 @@
 {% extends 'layouts/main-layout.html' %}
 {% include 'notifications/push_notification_initial.html' %}
 {% load static %}
-{% load custom_filters%}
+{% load custom_filters %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/dashboard.css' %}" />
+{% endblock css %}
+
 {% block content %}
-<style>
-  .flex-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(16px, 5vw, 164px);
-    flex-wrap: wrap;
-  }
-  @media (max-width: 800px) {
-    .flex-container {
-      flex-direction: column;
-      gap: 14px;
-    }
-    .flex-container > div {
-      width: 100vw !important;
-      max-width: 98vw;
-    }
-    .abc {
-      height: 48vw !important;
-      min-height: 200px;
-      max-width: 600px;
-    }
-  }
-
-
-    .abc {
-        width: 100%;
-        border-radius: 10px;
-        background: var(--background);
-    }
-
-    /* Mobile */
-    @media (max-width: 576px) {
-        .abc {
-            height: 280px;
-            width: 100%;
-        }
-    }
-
-    /* Tablets */
-    @media (min-width: 577px) and (max-width: 768px) {
-        .abc {
-            height: 300px;
-            width: 100%;
-        }
-    }
-
-    /* Large Tablets */
-    @media (min-width: 769px) and (max-width: 1024px) {
-        .abc {
-            height: 500px;
-            width: 100%;
-        }
-    }
-
-    /* Laptop */
-    @media (min-width: 1025px) and (max-width: 1440px) {
-        .abc {
-            height: 500px;
-            width: 100%;
-        }
-    }
-
-    /* Desktops */
-    @media (min-width: 1441px) {
-        .abc {
-            height: 600px;
-            width: 100%;
-        }
-    }
-
-</style>
 <div class="page-heading">
     <h3>Dashboard</h3>
 </div>
+
 <div class="page-content">
-    <section class="row">
-        <div class="col-12 col-lg-12">
-            <div class="row">
-            {% if perms.authentication.view_asset or perms.authentication.add_asset or perms.authentication.edit_asset or perms.authentication.delete_asset %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'assets:list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon green ">
-                                       <i class="bi bi-pc-display me-2 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Assets</h6>
-                                    {% if asset_count %}
-                                        <h6 class="font-extrabold mb-0">{{asset_count}}</h6>
-                                    {% else %}
-                                        <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
+    <!-- ── Top Stats Row ─────────────────────────────────────────────────── -->
+    <div class="row dashboard-stats-row">
+        <!-- Row 1 -->
+        <!-- Total Assets -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-green">
+                    <i class="bi bi-laptop"></i>
                 </div>
-            {% endif %}
-            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'assets:assigned_list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon purple">
-                                        <i class="bi bi-person-workspace me-2 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Assigned Assets</h6>
-
-                                      {% if assign_assets_counts %}
-                                          <h6 class="font-extrabold mb-0">{{assign_assets_counts}}</h6>
-                                      {% else %}
-                                          <h6 class="font-extrabold mb-0">0</h6>
-                                      {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>    
-                    </div>
+                <div class="metric-content">
+                    <div class="metric-label">Assets</div>
+                    <div class="metric-value">{{ asset_count }}</div>
                 </div>
-            {% endif %}
-            {% if perms.license.view_license or perms.license.add_license or perms.license.edit_license or perms.license.delete_license %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'license:license_list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon blue">
-                                        <img src="{% static 'images/license-logo.svg' %}" alt="License Image" style="max-width:25px; max-height:25px;">
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">License</h6>
-                                    {% if license_count %}
-                                        <h6 class="font-extrabold mb-0">{{license_count}}</h6>
-                                    {% else %}
-                                        <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'vendors:list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon red">
-                                        <i class="bi bi-person-badge ms-1 me-3 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Vendors</h6>
-                                    {% if vendor_count %}
-                                        <h6 class="font-extrabold mb-0">{{vendor_count}}</h6>
-                                    {% else %}
-                                        <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if perms.authentication.view_location or perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'dashboard:locations' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon blue">
-                                        <i class="bi bi-geo-alt-fill ms-1 me-3 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Locations</h6>
-                                    {% if location_count %}
-                                       <h6 class="font-extrabold mb-0">{{location_count}}</h6>
-                                    {% else %}
-                                       <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if perms.authentication.view_product or perms.authentication.add_product or perms.authentication.edit_product or perms.authentication.delete_product %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'products:list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon green">
-                                        <i class="bi bi-display ms-1 me-3 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Products</h6>
-                                    {% if product_count %}
-                                       <h6 class="font-extrabold mb-0">{{product_count}}</h6>
-                                    {% else %}
-                                       <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if request.user.is_superuser %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <a href="{% url 'users:list' %}">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon red">
-                                        <i class="bi bi-people-fill ms-1 me-3 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-
-                                    <h6 class="text-muted font-semibold">Users</h6>
-                                       {% if users_count %}
-                                    <h6 class="font-extrabold mb-0">{{users_count}}</h6>
-                                       {% else %}
-                                    <h6 class="font-extrabold mb-0">0</h6>
-                                       {% endif %}
-
-                                </div>
-                            </div>
-                        </div>
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            {% if perms.authentication.view_asset or perms.authentication.add_asset or perms.authentication.edit_asset or perms.authentication.delete_asset %}
-                <div class="col-6 col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body px-3 py-4-5">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="stats-icon purple">
-                                        <i class="bi bi-currency-exchange ms-1 me-3 mb-3"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-8">
-                                    <h6 class="text-muted font-semibold">Total Asset Cost</h6>
-                                    {% if all_asset_cost and currency %}
-                                       <h6 class="font-extrabold mb-0">{{currency}} {{all_asset_cost}} </h6>
-                                    {% elif all_asset_cost %}
-                                        <h6 class="font-extrabold mb-0">{{all_asset_cost}} {{request.user.organization.currency|default_if_none:""}}</h6>
-                                    {% else %}
-                                       <h6 class="font-extrabold mb-0">0</h6>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-            </div>
-            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
-                <div class="page-heading">    
-                    <h3>Asset Graphs</h3>
-                </div>
-                </br>
-                <div class="container-fluid">
-                    <div class="row gx-3">
-                        <div class="col-12 col-md-6 mb-3">
-                            <div class="abc" id="donutchart"></div>
-                        </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <div class="abc" id="donutchartt"></div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            
-            <br>
-            <br>
-
-            {% if perms.authentication.add_assign_asset or perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset %}
-            <div class="row">
-                <div class="page-heading">
-                    <h3>Upcoming Warranty Expiries</h3>
-                </div>
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Assets</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    {% if expiring_assets %}
-                                    <thead>
-                                        <tr>
-                                            <th>Sl No.</th>
-                                            <th>Name</th>
-                                            <th>Current State</th>
-                                            <th>Warranty Expiry Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for asset  in expiring_assets %}
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                    {{asset.name}} 
-                                                    </p>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {% if asset.is_assigned %}
-                                                            In Use
-                                                        {% else %}
-                                                            In Store
-                                                        {% endif %}
-                                                    </p>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {% format_datetime asset.warranty_expiry_date %}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                    {% else %}
-                                        <p>No records found</p>
-                                    {% endif %}
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            <div class="row">
-                <div class="page-heading">
-                    <h3>Recently Added</h3>
-                </div>
-                {% if perms.authentication.view_vendor or perms.authentication.add_vendor or perms.authentication.edit_vendor or perms.authentication.delete_vendor %}
-                <div class="col-12 col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Vendors</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Sl No.</th>
-                                            <th>Name</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for vendor in latest_vendor_list %}
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {{vendor.name}}
-                                                    </p>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {% format_datetime vendor.created_at %}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                         {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% if perms.authentication.view_product or perms.authentication.add_product or perms.authentication.edit_product or perms.authentication.delete_product %}
-                <div class="col-12 col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Products</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Sl No.</th>
-                                            <th>Name</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for product in latest_product_list %}
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                    {{product.name}}
-                                                    </p>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {% format_datetime product.created_at %}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% if perms.authentication.view_location or perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location %}
-                <div class="col-12 col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Locations</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Sl No.</th>
-                                            <th>Address</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for location in all_location_list %}
-                                            <tr>
-                                                <td class="col-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
-                                                    </div>
-                                                </td>
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {{location.address.address_line_one}}
-                                                </td>                                
-                                                <td class="col-auto">
-                                                    <p class="mb-0">
-                                                        {% format_datetime location.created_at %}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% if request.user.is_superuser %}
-                <div class="col-12 col-xl-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Users</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-lg">
-                                    <thead>
-                                        <tr>
-                                            <th>Sl No.</th>
-                                            <th>Name</th>
-                                            <th>Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for users in latest_users_list %}
-                                        <tr>
-                                            <td class="col-3">
-                                                <div class="d-flex align-items-center">
-                                                    <p class="font-bold ms-3 mb-0">{{forloop.counter}}</p>
-                                                </div>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">
-                                                    {% dynamic_display_name users.full_name %}
-                                                </p>
-                                            </td>
-                                            <td class="col-auto">
-                                                <p class="mb-0">
-                                                    {% format_datetime users.created_at %}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
             </div>
         </div>
-    </section>
+        <!-- Assigned Assets -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-blue">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Assigned Assets</div>
+                    <div class="metric-value">{{ assign_assets_counts }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Licenses -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-cyan">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">License</div>
+                    <div class="metric-value">{{ license_count }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Vendors -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-rose">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Vendors</div>
+                    <div class="metric-value">{{ vendor_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <!-- Locations -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-teal">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Locations</div>
+                    <div class="metric-value">{{ location_count }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Products -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-green">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Products</div>
+                    <div class="metric-value">{{ product_count }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Users -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-rose">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Users</div>
+                    <div class="metric-value">{{ users_count }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Total Asset Cost -->
+        <div class="col-6 col-md-3 mb-4">
+            <div class="metric-card">
+                <div class="metric-icon-box metric-purple">
+                    <i class="bi bi-currency-exchange"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-label">Total Asset Cost</div>
+                    <div class="metric-value" style="font-size: 1.1rem;">{{ currency }} {{ all_asset_cost }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Middle Row: Charts ────────────────────────────────────────────── -->
+    <div class="row mb-4">
+        <!-- Asset Status Chart -->
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="chart-container-card">
+                <div class="chart-header">
+                    <div class="chart-header-line"></div>
+                    <h5 class="chart-title">Assets Status</h5>
+                </div>
+                <div id="assetsStatusChart" style="min-height: 300px;"></div>
+            </div>
+        </div>
+        <!-- Assets Utilization Chart -->
+        <div class="col-12 col-lg-6 mb-4">
+            <div class="chart-container-card">
+                <div class="chart-header">
+                    <div class="chart-header-line" style="background: var(--metric-cyan);"></div>
+                    <h5 class="chart-title">Assets Utilization</h5>
+                </div>
+                <div id="assetsUtilizationChart" style="min-height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Bottom Row: Tables & Tabs ─────────────────────────────────────── -->
+    <div class="row">
+        <!-- Upcoming Expiries -->
+        <div class="col-12 col-xl-5 mb-4">
+            <div class="table-container-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="chart-title m-0">Upcoming Expiries</h5>
+                    <div class="dropdown">
+                        <i class="bi bi-three-dots-vertical text-muted cursor-pointer" data-bs-toggle="dropdown"></i>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'assets:list' %}">View All Assets</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table premium-table">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asset in expiring_assets|slice:":4" %}
+                            <tr>
+                                <td class="fw-bold">{{ asset.name|truncatechars:15 }}</td>
+                                <td class="text-muted">{{ asset.warranty_expiry_date }}</td>
+                                <td>
+                                    <span class="status-badge-premium status-active-p">
+                                        {% if asset.is_assigned %}ACTIVE{% else %}STORE{% endif %}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'assets:details' asset.id %}" class="row-link-icon">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">No upcoming expiries</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="#" class="btn btn-link text-decoration-none fw-bold" style="font-size: 0.75rem; color: var(--metric-blue);">VIEW ALL WARRANTIES</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recently Added (Tabs) -->
+        <div class="col-12 col-xl-7 mb-4">
+            <div class="table-container-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="chart-title m-0">Recently Added</h5>
+                    <div class="tab-nav-premium" id="recentTabs">
+                        <button class="tab-link-premium active" 
+                                hx-get="{% url 'authentication:recent_vendors_partial' %}" 
+                                hx-target="#recentContent"
+                                onclick="setActiveTab(this)">Vendors</button>
+                        <button class="tab-link-premium" 
+                                hx-get="{% url 'authentication:recent_products_partial' %}" 
+                                hx-target="#recentContent"
+                                onclick="setActiveTab(this)">Products</button>
+                        <button class="tab-link-premium" 
+                                hx-get="{% url 'authentication:recent_locations_partial' %}" 
+                                hx-target="#recentContent"
+                                onclick="setActiveTab(this)">Locations</button>
+                        <button class="tab-link-premium" 
+                                hx-get="{% url 'authentication:recent_users_partial' %}" 
+                                hx-target="#recentContent"
+                                onclick="setActiveTab(this)">Users</button>
+                    </div>
+                </div>
+                <div id="recentContent">
+                    <!-- Default content: Vendors -->
+                    {% include 'dashboard/partials/recent_vendors.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-  // Get the theme from localStorage
-  google.charts.load("current", {packages:["corechart"]});
 
-  function drawChart(chartData) {
-    var data = google.visualization.arrayToDataTable(chartData);
-    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
-    console.log(labelColor)
-//      --background: #fff;
-//   --text-color: #222;
-    var options = {
-        title: 'Assets Status',
-        pieHole: 0.4,
-        titleTextStyle: {
-            color: labelColor,
-        },
-        legend: {
-            textStyle: { color: labelColor } // Sets legend label color
-        },
-        pieSliceTextStyle: {
-            color: labelColor,
-        },
-        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-        backgroundColor: 'transparent',  // transparent to allow corners to show
-        chartArea: { backgroundColor: 'transparent' }
-    };
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    function setActiveTab(btn) {
+        document.querySelectorAll('.tab-link-premium').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
 
-    var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
-    chart.draw(data, options);
-  }
+    // Chart shared config
+    const isDark = document.body.classList.contains('theme-dark');
+    const labelColor = isDark ? '#94A3B8' : '#64748B';
 
-  // Fetch data from the API endpoint and draw the chart
-  function loadAndDrawChart() {
+    // ── Asset Status Chart ──────────────────────────────────────────────────
     fetch("{% url 'assets:pie_chart_status' %}")
-      .then(response => response.json())
-      .then(json => {
-        console.log(Array.isArray(json.chart_data));
-        console.log("data",json.chart_data);
-        // The API should return { chart_data: [...] }
-        google.charts.setOnLoadCallback(() => drawChart(json.chart_data));
-      }).then(() => {
-        console.log("chart drawn")
-        console.log("redraw chart");
+    .then(r => r.json())
+    .then(data => {
+        // Transform Google Chart Data [['Status', 'Count'], ['Ready', 9], ...] to Apex format
+        // Data structure: [["Status", "Count"], ["Available", 9], ["Allocated", 0]]
+        const labels = data.chart_data.slice(1).map(item => item[0]);
+        const series = data.chart_data.slice(1).map(item => item[1]);
+        const total = series.reduce((a, b) => a + b, 0);
 
-            const el = document.getElementById('donutchart');
-            console.log({el});
+        const options = {
+            series: series,
+            chart: { type: 'donut', height: 350 },
+            labels: labels,
+            colors: ['#4F46E5', '#6366F1', '#818CF8', '#94A3B8', '#CBD5E1'],
+            stroke: { show: false },
+            dataLabels: { enabled: false },
+            legend: {
+                position: 'right',
+                offsetY: 0,
+                height: 230,
+                labels: { colors: labelColor }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '75%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'TOTAL',
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                color: labelColor,
+                                formatter: function() { return total; }
+                            },
+                            value: {
+                                show: true,
+                                fontSize: '24px',
+                                fontWeight: 700,
+                                color: isDark ? '#E2E8F0' : '#1E293B',
+                                offsetY: 5
+                            }
+                        }
+                    }
+                }
+            },
+            theme: { mode: isDark ? 'dark' : 'light' }
+        };
 
-            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
-            const g = el.querySelectorAll('text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
-            console.log({r});
-      })
-  }
+        const chart = new ApexCharts(document.querySelector("#assetsStatusChart"), options);
+        chart.render();
+    });
 
-  // Wait until Google Charts is loaded, then fetch chart data
-  google.charts.setOnLoadCallback(loadAndDrawChart);
-</script>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-  google.charts.load("current", {packages:["corechart"]});
+    // ── Asset Utilization Chart ────────────────────────────────────────────
+    // Using simple stats from context for this one
+    const assignedCount = {{ assign_assets_counts }};
+    const totalCount = {{ asset_count }};
+    const utilization = totalCount > 0 ? Math.round((assignedCount / totalCount) * 100) : 0;
 
-//   function drawChartt(chartData) {
-//     var data = google.visualization.arrayToDataTable(chartData);
-
-//     var options = {
-//     title: 'Assets by Assigned Status',
-//     pieHole: 0.4,
-//     titleTextStyle: {
-//         color: 'white',
-//     },
-//     legend: {
-//         textStyle: { color: 'white' } // Sets legend label color
-//     },
-//     pieSliceTextStyle: {
-//         color: 'white',
-//     },
-//     colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-//     titleTextStyle: {
-//             color: 'white',
-//           },
-//     backgroundColor: 'transparent',  
-//     chartArea: { backgroundColor: 'transparent' }
-//     };
-
-
-//     var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
-//     chart.draw(data, options);
-//   }
-function drawChartt(chartData) {
-    var data = google.visualization.arrayToDataTable(chartData);
-
-    // Get the computed CSS variable value for --text-color
-    // const labelColor = getComputedStyle(document.documentElement)
-    //                      .getPropertyValue('--text-color').trim() || 'pink';
-
-    const labelColor = localStorage.getItem('theme') === 'theme-dark' ? '#fff' : '#222';
-    console.log(labelColor)
-    var options = {
-        title: 'Assets by Assigned Status',
-        pieHole: 0.4,
-        titleTextStyle: { color: labelColor },
-        legend: { textStyle: { color: "red" } },
-        pieSliceTextStyle: { color: labelColor },
-        colors: ['#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8'],
-        backgroundColor: 'transparent',
-        chartArea: { backgroundColor: 'transparent' }
+    const utilOptions = {
+        series: [utilization],
+        chart: { type: 'radialBar', height: 350 },
+        plotOptions: {
+            radialBar: {
+                startAngle: -135,
+                endAngle: 135,
+                hollow: { size: '70%', },
+                track: {
+                    background: isDark ? '#2D2D44' : '#F1F5F9',
+                    strokeWidth: '97%',
+                },
+                dataLabels: {
+                    name: {
+                        show: true,
+                        color: labelColor,
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        offsetY: 20,
+                        label: 'UTILIZATION'
+                    },
+                    value: {
+                        offsetY: -10,
+                        fontSize: '32px',
+                        fontWeight: 700,
+                        color: isDark ? '#E2E8F0' : '#1E293B',
+                        formatter: function(val) { return val + "%"; }
+                    }
+                }
+            }
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'dark',
+                type: 'horizontal',
+                gradientToColors: ['#0EA5E9'],
+                stops: [0, 100]
+            }
+        },
+        labels: ['UTILIZATION'],
     };
 
-    var chart = new google.visualization.PieChart(document.getElementById('donutchartt'));
-    chart.draw(data, options);
-}
-
-  // Fetch data from the API endpoint and draw the chart
-  function loadAndDrawChartt() {
-    fetch('assets/piechart_status_data')
-      .then(response => response.json())
-      .then(json => {
-        console.log(Array.isArray(json.chart_data));
-        console.log("data",json.chart_data);
-        // The API should return { chart_data: [...] }
-        google.charts.setOnLoadCallback(() => drawChartt(json.chart_data));
-      }).then(() => {
-        console.log("chart drawn")
-        console.log("redraw chart");
-
-            const el = document.getElementById('donutchartt');
-            console.log({el});
-
-            const r = el.querySelectorAll('g > text').forEach(t => t.setAttribute('fill', 'var(--text-color)'));
-            console.log({r});
-      })
-  }
-
-
-
-  // Wait until Google Charts is loaded, then fetch chart data
-  google.charts.setOnLoadCallback(loadAndDrawChartt);
+    const utilChart = new ApexCharts(document.querySelector("#assetsUtilizationChart"), utilOptions);
+    utilChart.render();
 </script>
-
 {% endblock content %}
