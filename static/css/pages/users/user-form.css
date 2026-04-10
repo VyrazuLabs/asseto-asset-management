@@ -1,0 +1,284 @@
+/* =============================================================================
+   user-form.css — Premium styles for the Add User modal
+   ============================================================================= */
+
+.modal-premium {
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.modal-premium .modal-header {
+    padding: 1.25rem 1.5rem 0.75rem;
+    background: transparent;
+}
+
+.modal-premium .modal-title {
+    color: #3B44B1;
+    font-size: 1.15rem;
+}
+
+.modal-premium .modal-subtitle {
+    color: #64748B;
+    font-size: 0.82rem;
+}
+
+.modal-premium .modal-body {
+    padding: 0.75rem 1.5rem 1.25rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+}
+
+.section-header:first-of-type {
+    margin-top: 0;
+}
+
+.icon-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #E0E7FF;
+    color: #4F46E5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #1E293B;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.premium-input-group {
+    margin-bottom: 0.6rem;
+}
+
+.premium-input-group label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+    color: #475569;
+    font-size: 0.82rem;
+}
+
+.modal-premium .form-control, 
+.modal-premium .form-select {
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    color: #1E293B;
+    transition: all 0.2s ease;
+}
+
+.modal-premium .form-control:focus, 
+.modal-premium .form-select:focus {
+    background-color: #FFFFFF;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.modal-premium .modal-footer {
+    padding: 1rem 1.5rem;
+    background-color: #F1F5F9;
+    border-top: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-discard {
+    background: transparent;
+    border: 1.5px solid #CBD5E1;
+    color: #64748B;
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: 0.55rem 1.5rem;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+
+.btn-discard:hover {
+    color: #1E293B;
+    border-color: #94A3B8;
+    background-color: #F8FAFC;
+}
+
+.btn-save-user {
+    background-color: #3751FF;
+    color: white;
+    border: none;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.75rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    box-shadow: 0 4px 12px rgba(55, 81, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.btn-save-user:hover {
+    background-color: #2C41D6;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(55, 81, 255, 0.3);
+}
+.premium-input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.premium-input-with-icon i {
+    position: absolute;
+    left: 14px;
+    color: #94A3B8;
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.premium-input-with-icon .form-control,
+.premium-input-with-icon .form-select {
+    padding-left: 42px !important;
+}
+
+/* Specific fix for File Inputs to prevent icon overlap with the native button */
+.premium-input-with-icon input[type="file"].form-control {
+    padding-left: 12px !important; /* Reset padding group because we move the button instead */
+    line-height: 1.5;
+}
+
+.modal-premium input[type="file"]::file-selector-button {
+    margin-left: 32px; /* Make room for the absolute positioned icon */
+    background-color: #EEF2FF;
+    border: 1px solid #E0E7FF;
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    margin-right: 0.5rem;
+    color: #4F46E5;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-premium input[type="file"]::file-selector-button:hover {
+    background-color: #E0E7FF;
+}
+
+body.theme-dark .modal-premium input[type="file"]::file-selector-button {
+    background-color: #2D2D44;
+    border-color: #3D3D56;
+    color: #818CF8;
+}
+
+body.theme-dark .modal-premium input[type="file"]::file-selector-button:hover {
+    background-color: #3D3D56;
+}
+
+/* Dark mode support */
+body.theme-dark .modal-premium {
+    background-color: #1E1E2D;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+body.theme-dark .modal-premium .modal-header,
+body.theme-dark .modal-premium .modal-body {
+    background-color: #1E1E2D;
+}
+
+body.theme-dark .modal-premium .modal-title {
+    color: #818CF8;
+}
+
+body.theme-dark .modal-premium .modal-subtitle {
+    color: #94A3B8;
+}
+
+body.theme-dark .modal-premium .modal-footer {
+    background-color: #151521;
+    padding: 1rem 1.5rem; /* override app-dark.css reduction */
+}
+
+body.theme-dark .section-title {
+    color: #E2E8F0;
+}
+
+body.theme-dark .premium-input-group label {
+    color: #94A3B8;
+}
+
+body.theme-dark .icon-box {
+    background-color: #2D2D44;
+    color: #818CF8;
+}
+
+body.theme-dark .modal-premium .form-control,
+body.theme-dark .modal-premium .form-select {
+    background-color: #151521;
+    border-color: #2D2D44;
+    color: #E2E8F0;
+}
+
+body.theme-dark .modal-premium .form-control:focus,
+body.theme-dark .modal-premium .form-select:focus {
+    background-color: #1A1A2E;
+    border-color: #4F46E5;
+}
+
+body.theme-dark .modal-premium ::placeholder {
+    color: #4B5563;
+}
+
+body.theme-dark .btn-discard {
+    color: #94A3B8;
+    border-color: #3D3D56;
+}
+
+body.theme-dark .btn-discard:hover {
+    color: #E2E8F0;
+    border-color: #64748B;
+    background-color: #2D2D44;
+}
+
+body.theme-dark .btn-discard,
+body.theme-dark .btn-save-user {
+    font-size: 0.88rem !important;
+}
+
+/* ── Fix: app-dark.css shrinks ALL <i> and <svg> inside .modal .modal-header
+   to 12px. Override that for our premium modal so icons render at full size. ── */
+body.theme-dark .modal .modal-premium .modal-header i,
+body.theme-dark .modal .modal-premium .modal-body i,
+body.theme-dark .modal .modal-premium .modal-header svg,
+body.theme-dark .modal .modal-premium .modal-body svg {
+    font-size: inherit;
+    height: 1em !important;
+    width: 1em !important;
+}
+
+/* Section header icon-box icons */
+body.theme-dark .modal-premium .icon-box i {
+    font-size: 0.85rem;
+    height: auto;
+    width: auto;
+}
+
+/* Field icons inside premium-input-with-icon */
+body.theme-dark .modal-premium .premium-input-with-icon i {
+    font-size: 1.1rem;
+    height: 1em !important;
+    width: 1em !important;
+    color: #64748B;
+}
