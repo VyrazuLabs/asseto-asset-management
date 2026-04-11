@@ -9,7 +9,7 @@ staticfiles
 firebase-credentials.json
 
 # AI assistant config files — keep local only, never push to GitHub
-CLAUDE.md
+INSTRUCTIONS.md
 .agents
 .agents/
 **/.agents
