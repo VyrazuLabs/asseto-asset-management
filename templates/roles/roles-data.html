@@ -1,53 +1,84 @@
 {% if page_object %}
-    {% for role in page_object %}
-    <tr>
-        <td>
-            {% if page_object.start_index %}
-                {{page_object.start_index|add:forloop.counter0}}
-            {% else %}
-                {{forloop.counter}}
-            {% endif %}
-        </td>
-        <td>{{role.related_name}}</td>
-        <td>
-            <div class="badges" style="display:grid; grid-template-columns: auto auto auto auto; gap: 5px; ">
-                {% for permission in role.permissions.all %}
-                    {% if 'add' in permission.name %}
-                        <span class="badge bg-primary">{{permission.name}}</span>
-                    {% elif 'view' in permission.name %}
-                        <span class="badge bg-success">{{permission.name}}</span>
-                    {% elif 'edit' in permission.name %}   
-                        <span class="badge bg-info">{{permission.name}}</span>
-                    {% elif 'delete' in permission.name %}   
-                        <span class="badge bg-danger">{{permission.name}}</span>
-                    {% else %}
-                        <span class="badge bg-warning">{{permission.name}}</span>
-                    {% endif %}
-                {% endfor %}
-            </div>     
-        </td>
-        <td>
+{% for role in page_object %}
+<tr>
+
+    <!-- INDEX -->
+    <td class="table-index-cell">
+        {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+    </td>
+
+    <!-- ROLE NAME -->
+    <td>
+        <div class="cell-name-main">
+            {{ role.related_name }}
+        </div>
+    </td>
+
+    <!-- PERMISSIONS -->
+    <td>
+        <div class="role-permissions-grid">
+            {% for permission in role.permissions.all %}
+                {% if 'add' in permission.codename %}
+                    <span class="permission-tag add">Add</span>
+                {% elif 'view' in permission.codename %}
+                    <span class="permission-tag view">View</span>
+                {% elif 'change' in permission.codename or 'edit' in permission.codename %}   
+                    <span class="permission-tag edit">Edit</span>
+                {% elif 'delete' in permission.codename %}   
+                    <span class="permission-tag delete">Delete</span>
+                {% else %}
+                    <span class="permission-tag other">{{ permission.name|truncatechars:10 }}</span>
+                {% endif %}
+            {% empty %}
+                <span class="text-muted small">No permissions</span>
+            {% endfor %}
+        </div>
+    </td>
+
+    <!-- STATUS -->
+    <td>
+        <div class="status-toggle">
             <div class="form-check form-switch">
-                <input 
-                    class="form-check-input"
-                    hx-post="{% url 'roles:status' role.name %}" 
-                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                    type="checkbox" {% if role.status %} checked {% endif %}
-                    style="cursor: pointer;"
-                >
-            </div>  
-        </td>
-        <td>
-            <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                <button class="btn btn-info" hx-get="{% url 'roles:update' role.name %}" hx-target="#update-role-modal-content" data-bs-toggle="modal" data-bs-target="#update-role-modal"><i class="bi bi-pencil-square"></i></a></button>
-                <form action="{% url 'roles:delete' role.name %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                    {% csrf_token %}
-                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                </form>
+                <input class="form-check-input" hx-post="{% url 'roles:status' role.name %}"
+                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' type="checkbox" {% if role.status %}checked{% endif %}>
             </div>
-        </td>
-    </tr>
-    {% endfor %}
+        </div>
+    </td>
+
+    <!-- ACTIONS -->
+    <td>
+        <div class="row-actions">
+
+            {% if perms.authentication.change_role %}
+            <button class="action-btn" hx-get="{% url 'roles:update' role.name %}"
+                hx-target="#update-role-modal-content" data-bs-toggle="modal"
+                data-bs-target="#update-role-modal">
+                <i class="bi bi-pencil"></i>
+            </button>
+            {% endif %}
+
+            {% if perms.authentication.delete_role %}
+            <form method="post" action="{% url 'roles:delete' role.name %}"
+                class="form-row-action"
+                onsubmit="return confirm('Are you sure you want to delete this role?')">
+                {% csrf_token %}
+                <button class="action-btn danger">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            </form>
+            {% endif %}
+
+        </div>
+    </td>
+
+</tr>
+{% endfor %}
 {% else %}
-    <td colspan="8" class="text-center"> No record found related to your search keyword</td>
+<tr>
+    <td colspan="5">
+        <div class="table-empty-state text-center">
+            <p>No roles found.</p>
+        </div>
+    </td>
+</tr>
 {% endif %}

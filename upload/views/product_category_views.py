@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from dashboard.models import ProductCategory
 from django.core.paginator import Paginator
-from upload.utils import render_to_csv, csv_file_upload
+from upload.utils import render_to_csv, csv_file_upload, get_product_category_upload_list
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from ..utils import function_to_get_matching_objects_product_category
@@ -17,19 +17,22 @@ from django.core.files.storage import default_storage
 @login_required
 @permission_required('authentication.add_product_category')
 def product_category_list(request):
-
-    product_category_list = ImportedUser.objects.filter(entity_type="ProductCategory",
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(product_category_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
+    page_object, stats = get_product_category_upload_list(request)
     context = {
         'sidebar': 'upload',
         'submenu': 'product_categories',
         'page_object': page_object,
         'title': 'Upload - Product Categories',
+        **stats
     }
     return render(request, 'upload/product_category_list.html', context=context)
+
+@login_required
+def search_product_category_upload(request, page):
+    page_object, _ = get_product_category_upload_list(request, page_number=page)
+    return render(request, 'upload/product-category-upload-data.html', {
+        'page_object': page_object,
+    })
 
 
 @login_required

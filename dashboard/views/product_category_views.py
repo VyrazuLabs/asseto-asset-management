@@ -12,6 +12,7 @@ from django.db.models import Q,Count
 from django.http import JsonResponse
 from assets.models import AssignAsset,Asset
 import os
+from dashboard.utils import get_product_category_list
 
 IS_DEMO = os.environ.get('IS_DEMO')
 PAGE_SIZE = 10
@@ -39,55 +40,19 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def product_category_list(request):
-    all_product_category_list = (
-        ProductCategory.undeleted_objects
-        .filter(
-            Q(organization=None) |
-            Q(organization=request.user.organization)
-        )
-        .exclude(name='Root')
-        .order_by('-created_at')
-    )
+    page_number = request.GET.get('page', 1)
+    page_object, product_category_asset_count, stats = get_product_category_list(request, page_number)
 
-    deleted_product_categories_count = (
-        ProductCategory.objects
-        .filter(Q(organization=None) | Q(organization=request.user.organization))
-        .count()
-    )
-
-    paginator = Paginator(all_product_category_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-
-    # Count distinct assets per product category
-    asset_counts = (
-        Asset.undeleted_objects
-        .filter(
-            organization=request.user.organization,
-            product__product_sub_category__in=all_product_category_list
-        )
-        .values("product__product_sub_category")
-        .annotate(asset_count=Count("id", distinct=True))   # ✅ distinct asset count
-    )
-
-    # Map: {product_category_id: asset_count}
-    product_category_asset_count = {
-        item["product__product_sub_category"]: item["asset_count"]
-        for item in asset_counts
-    }
-    # is_demo=IS_DEMO
-    # if is_demo==True:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
     context = {
         'sidebar': 'admin',
         'submenu': 'product_category',
         'page_object': page_object,
-        'deleted_product_categories_count': deleted_product_categories_count,
         'product_category_asset_count': product_category_asset_count,
+        'total_categories': stats['total_categories'],
+        'active_categories': stats['active_categories'],
+        'inactive_categories': stats['inactive_categories'],
+        'deleted_product_categories_count': stats['deleted_categories_count'],
         'title': 'Product Categories',
-        # 'is_demo':is_demo
     }
     return render(request, 'dashboard/product_category/list.html', context=context)
 
@@ -185,19 +150,13 @@ def product_category_status(request, id):
 
 @login_required
 def search_product_category(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'dashboard/product_category/product-categories-data.html', {
-            'page_object': ProductCategory.undeleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
-        })
+    page_object, product_category_asset_count, stats = get_product_category_list(request, page)
 
-    product_categories = ProductCategory.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(product_categories, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/product_category/product-categories-data.html', {'page_object': page_object})
-
+    return render(request, 'dashboard/product_category/product-categories-data.html', {
+        'page_object': page_object,
+        'product_category_asset_count': product_category_asset_count,
+        'total_categories': stats['total_categories'],
+    })
 
 def get_subcategories(request):
     category_id = request.GET.get('category_id')
