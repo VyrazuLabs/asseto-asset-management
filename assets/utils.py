@@ -18,7 +18,7 @@ from dateutil.relativedelta import relativedelta
 import requests
 from collections import defaultdict
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
@@ -749,3 +749,75 @@ def get_host(request):
 #     number_str = str(next_num).zfill(size)
 
 #     return f"{prefix}{number_str}"
+
+
+def get_asset_status_list_utils(request, page_number=None):
+    """
+    Returns:
+        page_object,
+        asset_status_asset_count (dict),
+        stats (dict)
+    """
+
+    search_text = request.GET.get('search_text', '').strip()
+    status = request.GET.get('status', '')
+
+    # BASE QUERY
+    base_query = AssetStatus.undeleted_objects.filter(
+        Q(organization=None) | Q(organization=request.user.organization)
+    )
+
+    # STATS
+    total_statuses = base_query.count()
+    active_statuses = base_query.filter(status=True).count()
+    inactive_statuses = base_query.filter(status=False).count()
+    deleted_statuses_count = AssetStatus.deleted_objects.filter(
+        Q(organization=None, can_modify=True) |
+        Q(organization=request.user.organization, can_modify=True)
+    ).count()
+
+    # SEARCH FILTER
+    if search_text:
+        base_query = base_query.filter(name__icontains=search_text)
+
+    # STATUS FILTER
+    if status == 'active':
+        base_query = base_query.filter(status=True)
+    elif status == 'inactive':
+        base_query = base_query.filter(status=False)
+
+    # ORDERING
+    status_list = base_query.order_by('-created_at')
+
+    # PAGINATION
+    paginator = Paginator(status_list, 10, orphans=1)  # Using consistent PAGE_SIZE
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    # ASSET COUNT
+    status_ids = list(page_object.object_list.values_list('id', flat=True))
+
+    asset_counts = (
+        Asset.undeleted_objects
+        .filter(
+            organization=request.user.organization,
+            asset_status_id__in=status_ids
+        )
+        .values("asset_status")
+        .annotate(asset_count=Count("id", distinct=True))
+    )
+
+    asset_status_asset_count = {
+        item["asset_status"]: item["asset_count"]
+        for item in asset_counts
+    }
+
+    stats = {
+        'total_statuses': total_statuses,
+        'active_statuses': active_statuses,
+        'inactive_statuses': inactive_statuses,
+        'deleted_statuses_count': deleted_statuses_count,
+    }
+
+    return page_object, asset_status_asset_count, stats

@@ -1,0 +1,27 @@
+{% load custom_filters %}
+{% if page_object %}
+{% for ptype in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ ptype.name }}</div>
+  </td>
+  <td class="text-end pe-4">
+     <div class="cell-name-sub">{{ ptype.created_at|date:"M d, Y" }}</div>
+  </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+  <td colspan="3">
+    <div class="table-empty-state">
+      <i class="bi bi-box d-block"></i>
+      <p>No product type upload records found.<br>
+        <span class="text-muted small">Try adjusting your search criteria.</span>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endif %}

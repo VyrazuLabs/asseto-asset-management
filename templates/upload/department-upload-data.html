@@ -1,0 +1,36 @@
+{% load custom_filters %}
+{% if page_object %}
+{% for dept in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ dept.name }}</div>
+  </td>
+  <td>
+    <div class="cell-name-main">{% dynamic_display_name dept.contact_person_name %}</div>
+    {% if dept.contact_person_email %}
+    <div class="cell-name-sub">{{ dept.contact_person_email }}</div>
+    {% endif %}
+    {% if dept.contact_person_phone %}
+    <div class="cell-name-sub"><i class="bi bi-telephone small pe-1"></i>{{ dept.contact_person_phone }}</div>
+    {% endif %}
+  </td>
+  <td class="text-end pe-4">
+     <div class="cell-name-sub">{{ dept.created_at|date:"M d, Y" }}</div>
+  </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+  <td colspan="4">
+    <div class="table-empty-state">
+      <i class="bi bi-people d-block"></i>
+      <p>No department upload records found.<br>
+        <span class="text-muted small">Try adjusting your search criteria.</span>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endif %}

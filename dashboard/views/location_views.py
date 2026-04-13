@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q,Count
 from assets.models import AssignAsset,Asset
+from dashboard.utils import get_location_list
 import os
 
 IS_DEMO = os.environ.get('IS_DEMO')
@@ -40,33 +41,15 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def locations(request):
-    location_list = Location.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    deleted_location_count=Location.deleted_objects.count()
-    paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    asset_counts = (
-        Asset.undeleted_objects
-        .filter(organization=request.user.organization,
-                location__in=location_list)
-        .values("location")
-        .annotate(asset_count=Count("id"))
-    )
-    # is_demo=IS_DEMO
-    # if is_demo:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
-    location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
+    page_object, location_asset_count, stats = get_location_list(request)
+    
     context = {
         'sidebar': 'admin',
         'submenu': 'location',
         'page_object': page_object,
-        'deleted_location_count':deleted_location_count,
-        'location_asset_count':location_asset_count,
+        'location_asset_count': location_asset_count,
         'title': 'Locations',
-        # 'is_demo':is_demo
+        **stats
     }
 
     return render(request, 'dashboard/locations/list.html', context=context)
@@ -175,30 +158,10 @@ def location_status(request, id):
 
 @login_required
 def search_location(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'dashboard/locations/locations-data.html', {
-            'page_object': Location.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                office_name__icontains=search_text) | Q(contact_person_name__icontains=search_text) | Q(contact_person_email__icontains=search_text) | Q(contact_person_phone__icontains=search_text)
-                | Q(address__address_line_one__icontains=search_text) | Q(address__address_line_two__icontains=search_text) | Q(address__country__icontains=search_text) | Q(address__state__icontains=search_text)
-                | Q(address__city__icontains=search_text) | Q(address__pin_code__icontains=search_text)
-            )).order_by('-created_at')[:10]
-        })
-
-    location_list = Location.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    asset_counts = (
-        Asset.objects
-        .filter(organization=request.user.organization,
-                location__in=location_list)
-        .values("location")
-        .annotate(asset_count=Count("id"))
-    )
-    location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
+    page_object, location_asset_count, stats = get_location_list(request, page_number=page)
+    
     return render(request, 'dashboard/locations/locations-data.html', 
                   {'page_object': page_object,
-                   'location_asset_count':location_asset_count
+                   'location_asset_count': location_asset_count,
+                   **stats
                    })

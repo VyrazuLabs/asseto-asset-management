@@ -251,7 +251,11 @@
 
         const options = {
             series: series,
-            chart: { type: 'donut', height: 350 },
+            chart: { 
+                type: 'donut', 
+                height: 350,
+                background: 'transparent'
+            },
             labels: labels,
             colors: ['#4F46E5', '#6366F1', '#818CF8', '#94A3B8', '#CBD5E1'],
             stroke: { show: false },
@@ -302,7 +306,11 @@
 
     const utilOptions = {
         series: [utilization],
-        chart: { type: 'radialBar', height: 350 },
+        chart: { 
+            type: 'radialBar', 
+            height: 350,
+            background: 'transparent'
+        },
         plotOptions: {
             radialBar: {
                 startAngle: -135,
@@ -341,6 +349,7 @@
             }
         },
         labels: ['UTILIZATION'],
+        theme: { mode: isDark ? 'dark' : 'light' }
     };
 
     const utilChart = new ApexCharts(document.querySelector("#assetsUtilizationChart"), utilOptions);

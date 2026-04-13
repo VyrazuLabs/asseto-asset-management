@@ -7,7 +7,7 @@ from AssetManagement import settings
 from vendors.models import Vendor
 from dashboard.models import Address
 from django.core.paginator import Paginator
-from upload.utils import render_to_csv, csv_file_upload
+from upload.utils import render_to_csv, csv_file_upload, get_vendor_upload_list
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
@@ -22,19 +22,23 @@ import csv
 @login_required
 @permission_required('authentication.add_vendor')
 def vendor_list(request):
-    vendors_list = ImportedUser.objects.filter(entity_type="Vendor",
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(vendors_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)    
+    page_object, stats = get_vendor_upload_list(request)
     context = {
         'sidebar': 'upload',
         'submenu': 'vendors',
         'page_object': page_object,
         'title': 'Upload - Vendors',
+        **stats
     }
 
     return render(request, 'upload/vendor_list.html', context=context)
+
+@login_required
+def search_vendor_upload(request, page):
+    page_object, _ = get_vendor_upload_list(request, page_number=page)
+    return render(request, 'upload/vendor-upload-data.html', {
+        'page_object': page_object,
+    })
 
 
 @login_required

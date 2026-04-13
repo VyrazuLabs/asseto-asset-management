@@ -1,0 +1,37 @@
+{% load custom_filters %}
+{% if page_object %}
+{% for u in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ u.full_name }}</div>
+    <div class="cell-name-sub">{{ u.username }}</div>
+  </td>
+  <td>
+    <div class="cell-name-main">{{ u.email }}</div>
+    {% if u.phone %}
+    <div class="cell-name-sub"><i class="bi bi-telephone small pe-1"></i>{{ u.phone }}</div>
+    {% endif %}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ u.department.name|default:"-" }}</div>
+  </td>
+  <td class="text-end pe-4">
+     <div class="cell-name-sub">{{ u.created_at|date:"M d, Y" }}</div>
+  </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+  <td colspan="5">
+    <div class="table-empty-state">
+      <i class="bi bi-person d-block"></i>
+      <p>No user upload records found.<br>
+        <span class="text-muted small">Try adjusting your search criteria.</span>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endif %}
