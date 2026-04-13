@@ -1,106 +1,175 @@
-{% extends 'layouts/main-layout.html' %} {% block content %}
-<div class="page-heading">
-    <div class="page-title">
-        <h3>Departments</h3>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="/">Dashboard</a>
-                </li>
-                <li class="breadcrumb-item">Upload</li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    Departments
-                </li>
-            </ol>
-        </nav>
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters %}
 
+{% block title %}Department Upload History | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item">Upload</li>
+        <li class="breadcrumb-item active">Departments</li>
+      </ol>
+    </nav>
+    <h1>Department Upload History</h1>
+    <p class="page-subtitle">View and manage history of imported department records.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'upload:export_departments_csv' %}" class="btn-trash" title="Download Sample CSV">
+      <i class="bi bi-download"></i> Sample File
+    </a>
+    <button type="button" class="btn-register" id="upload-modal-btn"
+      hx-get="{% url 'upload:import_departments_csv' %}"
+      hx-target="#upload-departments-modal-content" data-bs-toggle="modal" data-bs-target="#upload-departments-modal">
+      <i class="bi bi-upload"></i> Upload CSV
+    </button>
+  </div>
+</div>
+
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-cloud-upload"></i></div>
+    <div>
+      <div class="stat-label">Total Uploaded</div>
+      <div class="stat-value">{{ total_uploads }}</div>
     </div>
-    <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <!-- upload Modal -->
-                <div class="modal fade text-left" id="upload-departments-modal" tabindex="-1" role="dialog"
-                    aria-labelledby="myModalLabel160" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div id="upload-departments-modal-content" class="modal-content" hx-target="this"></div>
-                    </div>
-                </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-calendar-check"></i></div>
+    <div>
+      <div class="stat-label">Uploaded Today</div>
+      <div class="stat-value">{{ today_uploads }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-people"></i></div>
+    <div>
+      <div class="stat-label">Unique Departments</div>
+      <div class="stat-value">{{ unique_departments }}</div>
+    </div>
+  </div>
+</div>
 
-                <div class="modal fade text-left" id="mapping-departments-modal" tabindex="-1" role="dialog"
-                    aria-labelledby="mappingModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                        <div id="mapping-departments-modal-content" class="modal-content" hx-target="this">
-                        </div>
-                    </div>
-                </div>
+{# ── Filter bar ───────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  {% csrf_token %}
+  <form id="department-filter-form" hx-get="{% url 'upload:search_department_upload' page_object.number %}"
+    hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-8 col-lg">
+        <div class="filter-label">Search Uploads</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="Department name, contact person..."
+          hx-get="{% url 'upload:search_department_upload' page_object.number %}"
+          hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result" aria-label="Search uploads">
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'upload:department_list' %}" class="btn-reset" title="Reset all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
 
-                <div class="d-flex justify-content-end my-2 gap-2">
-                    <a
-                        type="button"
-                        class="btn btn-secondary rounded"
-                        class="btn-space"
-                        href="{% url 'upload:export_departments_csv' %}"
-                        ><i class="bi bi-download"></i> Sample File
-                    </a>
-                    <button
-                        type="button"
-                        class="btn btn-secondary rounded"
-                        hx-get="{% url 'upload:import_departments_csv' %}"
-                        hx-target="#upload-departments-modal-content"
-                        data-bs-target="#upload-departments-modal"
-                        data-bs-toggle="modal"
-                    >
-                    <i class="bi bi-upload"></i> Upload
-                    </button>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover" id="table1">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Department Name</th>
-                                <th>Contact Person Name</th>
-                                <th>Contact Person Email</th>
-                                <th>Contact Person Phone</th>
-                            </tr>
-                        </thead>
-                        {% if page_object %}
-                        <tbody>
-                        {% for department in page_object %}
-                            <tr>
-                                <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>{{department.name}}</td>
-                                <td>{{department.contact_person_name}}</td>
-                                <td>{{department.contact_person_email}}</td>
-                                <td>{{department.contact_person_phone}}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        {% else %}
-                        <div class="alert alert-info" role="alert">
-                            No record available!
-                        </div>
-                    {% endif %}
-                    </table>
-                </div>
-                {% include 'commons/pagination.html' %}
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card">
+  <!-- upload modal -->
+  <div class="modal fade" id="upload-departments-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div id="upload-departments-modal-content" class="modal-content" hx-target="this"></div>
+    </div>
+  </div>
+  <!-- mapping modal -->
+  <div class="modal fade" id="mapping-departments-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div id="mapping-departments-modal-content" class="modal-content" hx-target="this"></div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="list-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Department Name</th>
+          <th>Contact Person</th>
+          <th class="text-end pe-4">Upload Date</th>
+        </tr>
+      </thead>
+      {% if page_object %}
+      <tbody id="search_result">
+        {% include 'upload/department-upload-data.html' %}
+      </tbody>
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="4">
+            <div class="table-empty-state">
+              <i class="bi bi-cloud-upload d-block"></i>
+              <p>No department upload history found.<br>
+                <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
+                  hx-get="{% url 'upload:import_departments_csv' %}" hx-target="#upload-departments-modal-content"
+                  data-bs-toggle="modal" data-bs-target="#upload-departments-modal">Upload your first CSV</button>
+              </p>
             </div>
-        </div>
-    </section>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  {# ── Pagination ─────────────────────────────────────────────────────────── #}
+  <div class="pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+      of <strong>{{ page_object.paginator.count|default:0 }}</strong> records
+    </span>
+    <div class="pagination-nav">
+      {% if page_object.has_previous %}
+      <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}"
+        class="page-btn">‹</a>
+      {% else %}
+      <span class="page-btn disabled">‹</span>
+      {% endif %}
+
+      {% for num in page_object.paginator.page_range %}
+      {% if page_object.number == num %}
+      <span class="page-btn active">{{ num }}</span>
+      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+      <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}" class="page-btn">{{ num }}</a>
+      {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+      <span class="page-ellipsis">…</span>
+      {% endif %}
+      {% endfor %}
+
+      {% if page_object.has_next %}
+      <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}"
+        class="page-btn">›</a>
+      {% else %}
+      <span class="page-btn disabled">›</span>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
 <script>
 htmx.on("htmx:afterSwap", (e) => {
-    console.log("HTMX afterSwap triggered for target:", e.target.id);
     if (e.target.id === "mapping-departments-modal-content") {
         const uploadModalEl = document.getElementById("upload-departments-modal");
         const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
-        if (uploadModal) {
-            console.log("Hiding upload modal");
-            uploadModal.hide();
-        } else {
-            console.warn("Upload modal instance not found");
-        }
+        if (uploadModal) uploadModal.hide();
+        
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
@@ -111,4 +180,5 @@ htmx.on("htmx:afterSwap", (e) => {
     }
 });
 </script>
-{% endblock content%}
+
+{% endblock content %}

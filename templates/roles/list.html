@@ -1,118 +1,217 @@
 {% extends 'layouts/main-layout.html' %}
-{% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3>Roles</h3>
-            <nav aria-label="breadcrumb"class="d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Roles</li>
-                </ol>
-            </nav>
-        </div>
-                <!-- Add Modal -->
-            <div>
-                {% if perms.authentication.add_role %}
-                <button type="button" class="btn btn-sm btn-outline-info my-3" 
-                    hx-get="{% url 'roles:add' %}" hx-target="#add-role-modal-content"
-                    data-bs-toggle="modal" data-bs-target="#add-role-modal">Add role</button>
-                {% endif %}
+{% load static %}
+{% load custom_filters %}
 
-                <div class="modal fade text-left" id="add-role-modal" tabindex="-1" role="dialog"
-                    aria-labelledby="myModalLabel160" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                        <div id="add-role-modal-content" class="modal-content" hx-target="this"></div>
-                    </div>
-                </div>
-            </div>
+{% block title %}Role Management | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<style>
+    .role-permissions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 400px;
+    }
+    .permission-tag {
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .permission-tag.add { background: rgba(67, 94, 204, 0.1); color: #435ebe; border: 1px solid rgba(67, 94, 204, 0.2); }
+    .permission-tag.view { background: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.2); }
+    .permission-tag.edit { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; border: 1px solid rgba(13, 202, 240, 0.2); }
+    .permission-tag.delete { background: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); }
+    .permission-tag.other { background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.2); }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="list-page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                <li class="breadcrumb-item active">Roles</li>
+            </ol>
+        </nav>
+        <h1>Role Management</h1>
+        <p class="page-subtitle">Define and manage user roles and their associated permissions.</p>
     </div>
 
-    <section class="section">
-        <!-- update modal -->
-        <div class="modal fade text-left" id="update-role-modal" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel160" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div id="update-role-modal-content" class="modal-content" hx-target="this"></div>
-            </div>
-        </div>
-
-
-        <div class="card">
-            <div class="card-body">
-                {% if page_object %}
-                    <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input' autocomplete="off" placeholder='Search here...'
-                            hx-get="{% url 'roles:search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
-                    </div>
-                {% endif %}
-                <div class="table-responsive">
-                    <table class="table table-hover" id="table1">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Role</th>
-                                <th>Permission</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        {% if page_object %}
-                        <tbody id="search_result">
-                            {% for role in page_object %}
-                            <tr>
-                                <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>{{role.related_name}}</td>
-                                <td>
-                                    <div class="badges" style="display:grid; grid-template-columns: auto auto auto auto; gap: 5px; ">
-                                        {% for permission in role.permissions.all %}
-                                            {% if 'add' in permission.name %}
-                                                <span class="badge bg-primary">{{permission.name}}</span>
-                                            {% elif 'view' in permission.name %}
-                                                <span class="badge bg-success">{{permission.name}}</span>
-                                            {% elif 'edit' in permission.name %}   
-                                                <span class="badge bg-info">{{permission.name}}</span>
-                                            {% elif 'delete' in permission.name %}   
-                                                <span class="badge bg-danger">{{permission.name}}</span>
-                                            {% else %}
-                                                <span class="badge bg-warning">{{permission.name}}</span>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>     
-                                </td>
-                                <td>
-                                    <div class="form-check form-switch">
-                                        <input 
-                                            class="form-check-input"
-                                            hx-post="{% url 'roles:status' role.name %}" 
-                                            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                            type="checkbox" {% if role.status %} checked {% endif %}
-                                            style="cursor: pointer;"
-                                        >
-                                    </div>  
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                        <button class="btn btn-info" hx-get="{% url 'roles:update' role.name %}" hx-target="#update-role-modal-content" data-bs-toggle="modal" data-bs-target="#update-role-modal"><i class="bi bi-pencil-square"></i></a></button>
-                                        <form action="{% url 'roles:delete' role.name %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                            {% csrf_token %}
-                                            <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
-                        <div class="alert alert-info" role="alert">
-                            No record available!
-                        </div>
-                        {% endif %}
-                    </table>
-                </div>
-                {% include 'commons/pagination.html' %}
-            </div>
-        </div>
-    </section>
+    <div class="d-flex align-items-center gap-2 mt-1">
+        {% if perms.authentication.add_role %}
+        <button type="button" class="btn-register" hx-get="{% url 'roles:add' %}"
+            hx-target="#add-role-modal-content" data-bs-toggle="modal"
+            data-bs-target="#add-role-modal">
+            <i class="bi bi-plus-lg"></i> Add Role
+        </button>
+        {% endif %}
+    </div>
 </div>
-{% endblock content%}
+
+<!-- STATS -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-shield-lock"></i></div>
+        <div>
+            <div class="stat-label">Total Roles</div>
+            <div class="stat-value">{{ total_roles }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+        <div>
+            <div class="stat-label">Active</div>
+            <div class="stat-value">{{ active_roles }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
+        <div>
+            <div class="stat-label">Inactive</div>
+            <div class="stat-value">{{ inactive_roles }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
+        <div>
+            <div class="stat-label">Deleted</div>
+            <div class="stat-value">{{ deleted_roles_count }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-card">
+    {% csrf_token %}
+    <form id="role-filter-form" hx-get="{% url 'roles:search' page_object.number %}"
+        hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+
+        <div class="row g-2 align-items-end">
+
+            <div class="col-12 col-md-6 col-lg">
+                <div class="filter-label">Search Role</div>
+                <input name="search_text" type="search" placeholder="Search role name..."
+                    hx-get="{% url 'roles:search' page_object.number %}"
+                    hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result">
+            </div>
+
+            <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
+                <div class="filter-label">Status</div>
+                <div class="dropdown">
+                    <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
+                        All Status
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" class="dropdown-item"
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#role-filter-form','change');">All
+                                Status</a></li>
+                        <li><a href="#" class="dropdown-item"
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#role-filter-form','change');">Active</a>
+                        </li>
+                        <li><a href="#" class="dropdown-item"
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#role-filter-form','change');">Inactive</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" name="status">
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <a href="{% url 'roles:list' %}" class="btn-reset">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<!-- TABLE -->
+<div class="table-card">
+
+    <!-- MODALS -->
+    <div class="modal fade" id="add-role-modal">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div id="add-role-modal-content" class="modal-content"></div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="update-role-modal">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div id="update-role-modal-content" class="modal-content"></div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="list-table">
+            <thead>
+                <tr>
+                    <th>Sl No.</th>
+                    <th>Role Name</th>
+                    <th>Permissions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody id="search_result">
+                {% include 'roles/roles-data.html' %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-wrap">
+        <span>
+            Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+            of <strong>{{ page_object.paginator.count|default:0 }}</strong> roles
+        </span>
+
+        <div class="pagination-nav">
+            {% if page_object.has_previous %}
+            <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">‹</a>
+            {% else %}
+            <span class="page-btn disabled">‹</span>
+            {% endif %}
+
+            {% for num in page_object.paginator.page_range %}
+            {% if page_object.number == num %}
+            <span class="page-btn active">{{ num }}</span>
+            {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+            <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">{{ num }}</a>
+            {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+            <span class="page-ellipsis">…</span>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_object.has_next %}
+            <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">›</a>
+            {% else %}
+            <span class="page-btn disabled">›</span>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.body.addEventListener("roleAdded", function () {
+        location.reload();
+    });
+    document.body.addEventListener("roleUpdated", function () {
+        location.reload();
+    });
+</script>
+
+{% endblock %}

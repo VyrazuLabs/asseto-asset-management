@@ -1,0 +1,1308 @@
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x7b73d9ccf0d0>
+2026-04-09 18:19:51 [info     ] asset_signals_loaded
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x74758a52a380>
+2026-04-09 18:19:52 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.OperationalError: (1054, "Unknown column 'assets_assignasset.issue_date' in 'field list'")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.10/threading.py", line 953, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/core/management/commands/runserver.py", line 137, in inner_run
+    self.check_migrations()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/core/management/base.py", line 587, in check_migrations
+    executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/migrations/executor.py", line 18, in __init__
+    self.loader = MigrationLoader(self.connection)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/migrations/loader.py", line 58, in __init__
+    self.build_graph()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/migrations/loader.py", line 235, in build_graph
+    self.applied_migrations = recorder.applied_migrations()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/migrations/recorder.py", line 89, in applied_migrations
+    if self.has_table():
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/migrations/recorder.py", line 63, in has_table
+    with self.connection.cursor() as cursor:
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/utils/asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/base/base.py", line 320, in cursor
+    return self._cursor()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/base/base.py", line 296, in _cursor
+    self.ensure_connection()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/utils/asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/base/base.py", line 279, in ensure_connection
+    self.connect()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/utils/asyncio.py", line 26, in inner
+    return func(*args, **kwargs)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/base/base.py", line 259, in connect
+    connection_created.send(sender=self.__class__, connection=self)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+  File "/home/vyrazu-44/Desktop/asset-management/notifications/signals.py", line 271, in conn_db
+    expiring_asset(15)
+  File "/home/vyrazu-44/Desktop/asset-management/notifications/signals.py", line 238, in expiring_asset
+    for expiring_asset in expiring_assets:
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/models/query.py", line 386, in __iter__
+    self._fetch_all()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/models/query.py", line 1954, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/models/query.py", line 93, in __iter__
+    results = compiler.execute_sql(
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/models/sql/compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/backends/mysql/base.py", line 76, in execute
+    return self.cursor.execute(query, args)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/cursors.py", line 153, in execute
+    result = self._query(query)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/cursors.py", line 322, in _query
+    conn.query(q)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 825, in _read_query_result
+    result.read()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/connections.py", line 775, in _read_packet
+    packet.raise_for_error()
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/protocol.py", line 219, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/pymysql/err.py", line 150, in raise_mysql_exception
+    raise errorclass(errno, errval)
+django.db.utils.OperationalError: (1054, "Unknown column 'assets_assignasset.issue_date' in 'field list'")
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x7f2b3b4fe380>
+2026-04-09 18:24:21 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+[09/Apr/2026 18:24:24] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 09, 2026 - 18:24:23
+Django version 5.2.8, using settings 'AssetManagement.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x74bd78dee380>
+2026-04-09 18:24:26 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+[09/Apr/2026 18:24:29] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 09, 2026 - 18:24:27
+Django version 5.2.8, using settings 'AssetManagement.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x7c1ec5cfe380>
+2026-04-09 18:24:34 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 09, 2026 - 18:24:34
+Django version 5.2.8, using settings 'AssetManagement.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x7b860e2ea380>
+2026-04-09 18:24:39 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+[09/Apr/2026 18:24:44] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:24:49] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:24:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:24:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:19] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:39] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:44] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:49] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 09, 2026 - 18:24:40
+Django version 5.2.8, using settings 'AssetManagement.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x73f01cc56380>
+2026-04-09 18:25:50 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+[09/Apr/2026 18:25:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:25:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:19] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:24] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/license/views.py changed, reloading.
+IN NOTIFICATION SIGNALS
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 09, 2026 - 18:25:51
+Django version 5.2.8, using settings 'AssetManagement.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/simple_history/__init__.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+FERNET_KEY: <cryptography.fernet.Fernet object at 0x730fae9e6380>
+2026-04-09 18:26:30 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+[09/Apr/2026 18:26:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:39] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:44] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:49] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:26:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:19] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:39] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:44] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:49] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:27:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:19] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:33] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:35] "GET /license/list/ HTTP/1.1" 200 66274
+[09/Apr/2026 18:28:35] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:28:35] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+[09/Apr/2026 18:28:35] "GET /static/css/pages/list-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:28:35] "GET /static/css/pages/assets/assets-common.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:28:35] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:28:35] "GET /static/css/pages/assets/assets-list.css HTTP/1.1" 304 0
+[09/Apr/2026 18:28:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:35] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:28:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:45] "GET /license/add/ HTTP/1.1" 200 46632
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:28:45] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:28:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:45] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:28:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:53] "GET /license/update/6 HTTP/1.1" 200 46950
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:28:53] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:28:53] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:53] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:28:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:57] "GET /assets/list HTTP/1.1" 200 174593
+[09/Apr/2026 18:28:57] "GET /static/css/pages/assets/assets-form.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:28:57] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg
+Not Found: /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:28:57] "GET /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png
+[09/Apr/2026 18:28:57] "GET /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg
+[09/Apr/2026 18:28:57] "GET /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/b8f84545534643c29ab669827578cbd0.svg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/b8f84545534643c29ab669827578cbd0.svg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/edaed73b6d35456a80142a686b695118.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/edaed73b6d35456a80142a686b695118.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:28:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:28:57] "GET /notifications/data HTTP/1.1" 200 7838
+Not Found: /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png
+[09/Apr/2026 18:28:57] "GET /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png HTTP/1.1" 404 23702
+Not Found: /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg
+[09/Apr/2026 18:28:57] "GET /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:28:57] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg
+Not Found: /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:28:57] "GET /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/8110b8dc6b654733859998d76009044c.jpg
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/8110b8dc6b654733859998d76009044c.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:28:57] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png
+[09/Apr/2026 18:28:57] "GET /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:28:57] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg
+[09/Apr/2026 18:28:57] "GET /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:29:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:29:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:48] "GET /license/list/ HTTP/1.1" 200 66274
+[09/Apr/2026 18:30:48] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:30:48] "GET /static/css/pages/list-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:30:48] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+[09/Apr/2026 18:30:48] "GET /static/css/pages/assets/assets-common.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:30:48] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:30:48] "GET /static/css/pages/assets/assets-list.css HTTP/1.1" 304 0
+[09/Apr/2026 18:30:49] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:49] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:30:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:54] "GET /vendors/list HTTP/1.1" 200 65688
+[09/Apr/2026 18:30:54] "GET /static/css/pages/vendors.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:30:54] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:30:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:54] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:30:57] "GET /products/list HTTP/1.1" 200 70842
+[09/Apr/2026 18:30:57] "GET /static/css/pages/products.css HTTP/1.1" 200 611
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:30:57] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/product/593607a45d134b1191452e74d0aeff3d.jpg
+[09/Apr/2026 18:30:57] "GET /media/product/593607a45d134b1191452e74d0aeff3d.jpg HTTP/1.1" 404 23682
+Not Found: /media/product/4ba12679101b4d9fb5fe785862cdba66.jpg
+Not Found: /media/product/6685b12c4e8f42cbb7c5ea7a6b8d70d9.jpg
+[09/Apr/2026 18:30:57] "GET /media/product/4ba12679101b4d9fb5fe785862cdba66.jpg HTTP/1.1" 404 23682
+Not Found: /media/product/221273be65ce486bb7b386ccd3ca59ed.jpg
+[09/Apr/2026 18:30:57] "GET /media/product/6685b12c4e8f42cbb7c5ea7a6b8d70d9.jpg HTTP/1.1" 404 23682
+[09/Apr/2026 18:30:57] "GET /media/product/221273be65ce486bb7b386ccd3ca59ed.jpg HTTP/1.1" 404 23682
+Not Found: /media/product/fcf6354a3feb40bfb01d8be175fb62c8.svg
+[09/Apr/2026 18:30:57] "GET /media/product/fcf6354a3feb40bfb01d8be175fb62c8.svg HTTP/1.1" 404 23682
+Not Found: /media/product/a3cdb859769b4779a93dace88ba1bdc5.svg
+[09/Apr/2026 18:30:57] "GET /media/product/a3cdb859769b4779a93dace88ba1bdc5.svg HTTP/1.1" 404 23682
+Not Found: /media/product/b6555ffeccd8450fa453cdae5043ad48.jpg
+[09/Apr/2026 18:30:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:57] "GET /media/product/b6555ffeccd8450fa453cdae5043ad48.jpg HTTP/1.1" 404 23682
+[09/Apr/2026 18:30:57] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:30:58] "GET /users/list HTTP/1.1" 200 72965
+[09/Apr/2026 18:30:58] "GET /static/css/pages/users.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:30:58] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:30:58] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:30:58] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:30:58] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg
+[09/Apr/2026 18:30:58] "GET /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:30:58,667] - Broken pipe from ('127.0.0.1', 38736)
+[09/Apr/2026 18:30:58] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:30:58] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:00] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:00] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:00] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:16] "GET /users/list HTTP/1.1" 200 72965
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:16] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:31:16] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:31:16] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:16] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg
+[09/Apr/2026 18:31:16] "GET /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:16] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:20] "GET /assets/list HTTP/1.1" 200 174593
+[09/Apr/2026 18:31:20] "GET /static/css/pages/assets/assets-form.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:20] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png
+[09/Apr/2026 18:31:20] "GET /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg
+Not Found: /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:20] "GET /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/b8f84545534643c29ab669827578cbd0.svg
+Not Found: /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg
+Not Found: /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg
+[09/Apr/2026 18:31:20] "GET /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:20] "GET /media/asset_images/b8f84545534643c29ab669827578cbd0.svg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:20] "GET /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/edaed73b6d35456a80142a686b695118.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/edaed73b6d35456a80142a686b695118.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:20] "GET /notifications/count HTTP/1.1" 200 190
+Not Found: /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg
+[09/Apr/2026 18:31:20] "GET /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png
+[09/Apr/2026 18:31:20] "GET /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:20] "GET /notifications/data HTTP/1.1" 200 7838
+Not Found: /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg
+Not Found: /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:20] "GET /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:31:20] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/8110b8dc6b654733859998d76009044c.jpg
+[09/Apr/2026 18:31:20] "GET /media/asset_images/8110b8dc6b654733859998d76009044c.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:31:20] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png
+[09/Apr/2026 18:31:20] "GET /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg
+[09/Apr/2026 18:31:21] "GET /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg
+[09/Apr/2026 18:31:21] "GET /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:31:21] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg
+[09/Apr/2026 18:31:21] "GET /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:22] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:22] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:22] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:22] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:26] "GET /license/details/6 HTTP/1.1" 200 42716
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:26] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:26] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:26] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:31] "GET /license/update/6 HTTP/1.1" 200 46950
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:31] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:31] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:31] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:35] "GET /assets/list HTTP/1.1" 200 174593
+Not Found: /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:35] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg
+Not Found: /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png
+[09/Apr/2026 18:31:35] "GET /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:35] "GET /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/b8f84545534643c29ab669827578cbd0.svg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/b8f84545534643c29ab669827578cbd0.svg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/edaed73b6d35456a80142a686b695118.jpg
+[09/Apr/2026 18:31:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:35] "GET /media/asset_images/edaed73b6d35456a80142a686b695118.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg
+[09/Apr/2026 18:31:35] "GET /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg
+[09/Apr/2026 18:31:35] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:35] "GET /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png
+[09/Apr/2026 18:31:35] "GET /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png HTTP/1.1" 404 23702
+Not Found: /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg
+Not Found: /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg
+[09/Apr/2026 18:31:35] "GET /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:31:35] "GET /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:31:35] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/8110b8dc6b654733859998d76009044c.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/8110b8dc6b654733859998d76009044c.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:31:35] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png
+[09/Apr/2026 18:31:35] "GET /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png HTTP/1.1" 404 23702
+Not Found: /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg
+Not Found: /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:35] "GET /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:31:35] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg
+[09/Apr/2026 18:31:35] "GET /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:36] "GET /assets/details/6e6f4bd2-84e1-4842-ad35-b41ab657f21a HTTP/1.1" 200 52699
+[09/Apr/2026 18:31:36] "GET /static/css/pages/assets/assets-detail.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:31:36] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg
+[09/Apr/2026 18:31:36] "GET /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:31:36] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:36] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:31:41] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:46] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:51] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:31:56] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:01] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:06] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:11] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:26] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:30] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:32:30] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:32:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:30] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:32:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:32:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:14] "GET /license/list/ HTTP/1.1" 200 66274
+[09/Apr/2026 18:33:14] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/pages/simple-datatables.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/shared/iconly.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/js/htmx.min.js HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/asseto-logo.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/pages/list-common.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:33:14] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:33:14] "GET /static/js/app.js HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/dash.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/pages/assets/assets-list.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/css/pages/assets/assets-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/vendor_new.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/hourglass.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/asset.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/product_new.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:14] "GET /static/images/new_logo/user.svg HTTP/1.1" 304 0
+[09/Apr/2026 18:33:15] "GET /static/images/logo/Logo.png HTTP/1.1" 304 0
+[09/Apr/2026 18:33:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:15] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:33:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:23] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:33:23] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:33:23] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:23] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:33:27] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:33:27] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:33:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:27] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:33:32] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:47] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:52] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:33:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:02] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:17] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:22] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:32] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:41] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:41] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:42] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:45] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:45] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:46] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:46] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:48] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:50] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/dashboard/utils.py:21: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'dashboard.models.Department'> QuerySet.
+  paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
+[09/Apr/2026 18:34:51] "GET /admin/departments/list HTTP/1.1" 200 59220
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:51] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:51] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:51] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:53] "GET /admin/product-types/list HTTP/1.1" 200 79157
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:53] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:53] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:53] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:54] "GET /admin/license-type/list/ HTTP/1.1" 200 62385
+[09/Apr/2026 18:34:54] "GET /notifications/count HTTP/1.1" 200 190
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:54] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:54] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:54] "GET /admin/product-categories/list HTTP/1.1" 200 68541
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:54] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:55] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:55] "GET /assets/asset_status_list HTTP/1.1" 200 88546
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:56] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:56] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:56] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:34:58] "GET /configurations/upload-logo/ HTTP/1.1" 200 43145
+[09/Apr/2026 18:34:58] "GET /static/images/logo/Logo.svg HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:34:58] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:34:58] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:34:58] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:03] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:03] "GET /configurations/list-tag-configuration/ HTTP/1.1" 200 43083
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:03] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:03] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:03] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:06] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:07] "GET /configurations/list-localization/ HTTP/1.1" 200 45313
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:07] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:07] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:11] "GET /configurations/add-organization/ HTTP/1.1" 200 44029
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:11] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:11] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:11] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:17] "GET /upload/vendors/ HTTP/1.1" 200 48626
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:17] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:17] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:17] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:18] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:22] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:26] "GET /upload/locations/ HTTP/1.1" 200 48802
+[09/Apr/2026 18:35:26] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:35:26] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:26] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:26] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:26] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:29] "GET /upload/departments/ HTTP/1.1" 200 44366
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:29] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:29] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:36] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:39] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:40] "GET /upload/product-types/ HTTP/1.1" 200 44040
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:40] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:40] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:42] "GET /upload/product-categories/ HTTP/1.1" 200 44144
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:42] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:42] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:44] "GET /upload/users/ HTTP/1.1" 200 44071
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:35:44] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:35:44] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:44] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:35:49] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:54] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:35:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:05] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:06] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:06] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:06] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:09] "GET /license/list/ HTTP/1.1" 200 66274
+[09/Apr/2026 18:36:09] "GET /static/css/pages/list-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:36:09] "GET /static/css/pages/assets/assets-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:36:09] "GET /static/css/pages/assets/assets-list.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:09] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:09] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:14] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:15] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:15] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:17] "GET /admin/locations/add HTTP/1.1" 200 5318
+[09/Apr/2026 18:36:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:21] "GET /license/list/ HTTP/1.1" 200 66274
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:21] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:22] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:27] "GET /license/add/ HTTP/1.1" 200 46632
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:27] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:27] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:31] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:34] "GET /license/details/6 HTTP/1.1" 200 42716
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:34] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:34] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:36:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:47] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:51] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:59] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:36:59] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:36:59] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:36:59] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:07] "GET /admin/locations/details/f5e5afc6-b5e2-4cc2-b84e-09b1b496fb7f HTTP/1.1" 200 44902
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:07] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:07] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:13] "GET /admin/departments/list HTTP/1.1" 200 59220
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:13] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:13] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:13] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:16] "GET /assets/list HTTP/1.1" 200 174593
+[09/Apr/2026 18:37:16] "GET /static/css/pages/assets/assets-form.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:16] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg
+Not Found: /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg
+Not Found: /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/ada5f39f332444ed8545564527f947b3.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/asset_images/8a5704d4f1ec407c872660fdb6a204f4.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/asset_images/ba04a2faaaa24e84bab972fcb7e98f04.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg
+Not Found: /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png
+[09/Apr/2026 18:37:16] "GET /media/asset_images/bcc4ef88be46488388940b04bcaeed37.png HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/asset_images/f649cb412de84c38bae8d6be4d85519a.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /static/images/No_Image.jpg HTTP/1.1" 304 0
+Not Found: /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/081ac2ed4b0740e59d6595ac5d972cdd.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /notifications/count HTTP/1.1" 200 190
+Not Found: /media/asset_images/b8f84545534643c29ab669827578cbd0.svg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/b8f84545534643c29ab669827578cbd0.svg HTTP/1.1" 404 23702
+Not Found: /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg
+[09/Apr/2026 18:37:16] "GET /media/profile/7a61dea5-9cc8-4582-9ba7-8d6ed195ad15.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:16] "GET /notifications/data HTTP/1.1" 200 7838
+Not Found: /media/asset_images/edaed73b6d35456a80142a686b695118.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/edaed73b6d35456a80142a686b695118.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/628eb1bfb04d42b7a9600b5cc4d6ee00.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png
+[09/Apr/2026 18:37:16] "GET /media/asset_images/5b0484a3e1d64aa1a50338fef3c2445d.png HTTP/1.1" 404 23702
+Not Found: /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg
+[09/Apr/2026 18:37:16] "GET /media/profile/c0cc657d-d5e7-4576-b598-15cd51fe634e.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/a1adb5be540440d2b774fd658e73d7ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/193dfbd068e041c88e863ab8373d318b.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+[09/Apr/2026 18:37:16] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/ca668553116045cfadcd7ac7ce9e5999.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg
+Not Found: /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/30e528514df5488ca8aae66865ebb62e.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/asset_images/da7012f8ac3f4b6a92a5431aec1bf9ae.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/8110b8dc6b654733859998d76009044c.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/8110b8dc6b654733859998d76009044c.jpg HTTP/1.1" 404 23702
+Not Found: /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/5f6927346ffc4b1897d2a5dc438a6178.png HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg
+Not Found: /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg
+[09/Apr/2026 18:37:16] "GET /static/images/faces/1.jpg HTTP/1.1" 304 0
+[09/Apr/2026 18:37:16] "GET /media/asset_images/32258e2642e04a9aa65232f61acb61c1.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:16] "GET /media/asset_images/0be1ab1e32b24a4f9b7244159b13caa0.jpg HTTP/1.1" 404 23702
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:37:16] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg
+[09/Apr/2026 18:37:16] "GET /media/asset_images/64ade96baf5e4cbd9a1feb10b9df8c40.jpg HTTP/1.1" 404 23702
+[09/Apr/2026 18:37:20] "GET /assets/add HTTP/1.1" 200 55143
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:20] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:20] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:40] "GET /notifications/count HTTP/1.1" 200 190
+/home/vyrazu-44/Desktop/asset-management/env/lib/python3.10/site-packages/django/db/models/fields/__init__.py:1671: RuntimeWarning: DateTimeField Audit.created_at received a naive datetime (2026-03-10 18:37:40.684449) while time zone support is active.
+  warnings.warn(
+[09/Apr/2026 18:37:40] "GET /audit/pending-audits/ HTTP/1.1" 200 71440
+[09/Apr/2026 18:37:40] "GET /static/css/pages/audit.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:40] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:41] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:42] "GET /audit/add-audit/ HTTP/1.1" 200 47495
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:42] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:42] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:46] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:47] "GET /users/list HTTP/1.1" 200 72965
+[09/Apr/2026 18:37:47] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:37:47] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+[09/Apr/2026 18:37:47] "GET /static/css/pages/users.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:37:47] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg
+[09/Apr/2026 18:37:47] "GET /media/profile/ba08579b-e947-4c88-bd45-8b19ca930e32.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg
+[09/Apr/2026 18:37:47] "GET /media/profile/d985f4ca-74dc-42e2-97bc-665741491581.jpg HTTP/1.1" 404 23698
+Not Found: /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg
+Not Found: /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg
+[09/Apr/2026 18:37:47] "GET /media/profile/fa2e7def-966b-414c-b7d5-61d1475ed739.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:47] "GET /media/profile/73cbb134-4135-4c85-9268-cbcde28a4efa.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:37:47] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:47] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:37:48] "GET /users/add HTTP/1.1" 200 11918
+[09/Apr/2026 18:37:52] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:37:53] "GET /users/add HTTP/1.1" 200 11918
+[09/Apr/2026 18:37:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:02] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:16] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:38:16] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:38:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:16] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:38:18] "GET /admin/locations/details/f5e5afc6-b5e2-4cc2-b84e-09b1b496fb7f HTTP/1.1" 200 44902
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:38:18] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:38:18] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:18] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:38:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:23] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:26] "GET /admin/locations/details/02e19bf3-bd12-4d1b-9d2c-e1da1d768ce7 HTTP/1.1" 200 46082
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:38:26] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:38:26] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:26] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:38:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:38:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:39:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:14] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:15] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:15] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:24] "GET /admin/locations/details/f5e5afc6-b5e2-4cc2-b84e-09b1b496fb7f HTTP/1.1" 200 44902
+[09/Apr/2026 18:40:24] "GET /static/css/main/app.css HTTP/1.1" 304 0
+[09/Apr/2026 18:40:24] "GET /static/css/main/app-dark.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:24] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:24] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:26] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:26] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:26] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:26] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:31] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:33] "GET /license/list/ HTTP/1.1" 200 66274
+[09/Apr/2026 18:40:33] "GET /static/css/pages/list-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:40:33] "GET /static/css/pages/assets/assets-common.css HTTP/1.1" 304 0
+[09/Apr/2026 18:40:33] "GET /static/css/pages/assets/assets-list.css HTTP/1.1" 304 0
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:33] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:33] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:33] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:37] "GET /license/details/6 HTTP/1.1" 200 42716
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:37] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:37] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:44] "GET /assets/asset_status_list HTTP/1.1" 200 88546
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:44] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:45] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:47] "GET /roles/list HTTP/1.1" 200 90303
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:40:47] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:40:47] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:47] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:40:52] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:40:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:02] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:02] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:41:02] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:41:02] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:02] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:41:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:17] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:22] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:32] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:41:32] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:41:32] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:32] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:41:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:42] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:47] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:52] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:41:57] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:02] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:07] "GET /admin/locations/list?page=2 HTTP/1.1" 200 55137
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:07] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:07] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:07] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:09] "GET /admin/locations/list?page=1 HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:09] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:09] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:09] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:12] "GET /admin/departments/list HTTP/1.1" 200 59220
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:12] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:12] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:12] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:14] "GET /admin/product-types/list HTTP/1.1" 200 79157
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:14] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:14] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:14] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:16] "GET /roles/list HTTP/1.1" 200 90303
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:16] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:16] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:23] "GET /configurations/upload-logo/ HTTP/1.1" 200 43145
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:23] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:23] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:23] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:24] "GET /configurations/list-tag-configuration/ HTTP/1.1" 200 43083
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:24] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:24] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:24] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:27] "GET /upload/vendors/ HTTP/1.1" 200 48626
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:27] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:27] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:27] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:28] "GET /upload/vendors/ HTTP/1.1" 200 48626
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:28] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:28] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:28] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:29] "GET /upload/locations/ HTTP/1.1" 200 48802
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:29] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:29] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:29] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:33] "GET /upload/product-categories/ HTTP/1.1" 200 44144
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:33] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:33] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:33] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:35] "GET /upload/product-types/ HTTP/1.1" 200 44040
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:35] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:35] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:36] "GET /upload/departments/ HTTP/1.1" 200 44366
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:36] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:36] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:36] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:37] "GET /upload/locations/ HTTP/1.1" 200 48802
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:37] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:37] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:37] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:40] "GET /admin/locations/list HTTP/1.1" 200 79666
+Not Found: /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg
+[09/Apr/2026 18:42:40] "GET /media/profile/b62b5019-ee7a-43ea-81d3-13e02dbd7d00.jpg HTTP/1.1" 404 23698
+[09/Apr/2026 18:42:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:40] "GET /notifications/data HTTP/1.1" 200 7838
+[09/Apr/2026 18:42:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:42:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:43:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:44:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:45:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:46:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:47:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:48:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:49:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:50:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:51:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:52:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:53:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:54:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:15] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:20] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:25] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:30] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:35] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:45] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:50] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:55:55] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:00] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:05] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:16] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:22] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:28] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:34] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:40] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:46] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:52] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:56:58] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:57:04] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:57:10] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:57:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:57:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:58:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:58:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:59:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 18:59:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:00:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:00:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:01:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:01:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:02:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:02:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:03:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:03:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:04:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:04:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:05:21] "GET /notifications/count HTTP/1.1" 200 190
+[09/Apr/2026 19:05:21] "GET /notifications/count HTTP/1.1" 200 190
