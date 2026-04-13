@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from dashboard.models import ProductType
 from django.core.paginator import Paginator
-from upload.utils import render_to_csv, csv_file_upload
+from upload.utils import render_to_csv, csv_file_upload, get_product_type_upload_list
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from ..utils import function_to_get_matching_objects_product_types
@@ -18,20 +18,23 @@ from django.core.files.storage import default_storage
 @login_required
 @permission_required('authentication.add_product_type')
 def product_type_list(request):
-
-    product_type_list = ImportedUser.objects.filter(entity_type="ProductType",
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(product_type_list, 10, orphans=1)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
+    page_object, stats = get_product_type_upload_list(request)
 
     context = {
         'sidebar': 'upload',
         'submenu': 'product_types',
         'page_object': page_object,
-        'title': 'Upload - Product Types'
+        'title': 'Upload - Product Types',
+        **stats
     }
     return render(request, 'upload/product_type_list.html', context=context)
+
+@login_required
+def search_product_type_upload(request, page):
+    page_object, _ = get_product_type_upload_list(request, page_number=page)
+    return render(request, 'upload/product-type-upload-data.html', {
+        'page_object': page_object,
+    })
 
 
 @login_required
