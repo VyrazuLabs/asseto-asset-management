@@ -57,28 +57,28 @@
     <div class="stat-icon blue"><i class="bi bi-building"></i></div>
     <div>
       <div class="stat-label">Total Locations</div>
-      <div class="stat-value">{{ total_locations }}</div>
+      <div class="stat-value" id="total-count">{{ total_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
       <div class="stat-label">Active</div>
-      <div class="stat-value">{{ active_locations }}</div>
+      <div class="stat-value" id="active-count">{{ active_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
     <div>
       <div class="stat-label">Inactive</div>
-      <div class="stat-value">{{ inactive_locations }}</div>
+      <div class="stat-value" id="inactive-count">{{ inactive_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
       <div class="stat-label">Deleted</div>
-      <div class="stat-value">{{ deleted_location_count }}</div>
+      <div class="stat-value" id="deleted-count">{{ deleted_location_count }}</div>
     </div>
   </div>
 </div>
@@ -86,15 +86,15 @@
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
   {% csrf_token %}
-  <form id="location-filter-form" hx-get="{% url 'dashboard:search_location' page_object.number %}"
-    hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+  <form id="location-filter-form" hx-get="{% url 'dashboard:search_location' 1 %}"
+    hx-target="#location-list-container" hx-trigger="change from:input">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-6 col-lg">
         <div class="filter-label">Search Location</div>
         <input name="search_text" type="search" autocomplete="off" placeholder="Name, city, contact..."
-          hx-get="{% url 'dashboard:search_location' page_object.number %}"
-          hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result" aria-label="Search locations">
+          hx-get="{% url 'dashboard:search_location' 1 %}"
+          hx-trigger="keyup changed delay:200ms, input changed delay:200ms" hx-target="#location-list-container" aria-label="Search locations">
       </div>
 
       <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
@@ -135,7 +135,7 @@
 </div>
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
-<div class="table-card">
+<div class="table-card" id="location-list-container">
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
@@ -263,7 +263,7 @@
   </div>
 
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
-  <div class="pagination-wrap">
+  <div class="pagination-wrap" id="location-pagination">
     <span>
       Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
       of <strong>{{ page_object.paginator.count|default:0 }}</strong> locations
@@ -279,12 +279,13 @@
       {% for num in page_object.paginator.page_range %}
       {% if page_object.number == num %}
       <span class="page-btn active">{{ num }}</span>
-      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-      <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">{{ num }}</a>
-      {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-      <span class="page-ellipsis">…</span>
-      {% endif %}
-      {% endfor %}
+      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} <a
+        href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+        class="page-btn">{{ num }}</a>
+        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+        <span class="page-ellipsis">…</span>
+        {% endif %}
+        {% endfor %}
 
         {% if page_object.has_next %}
         <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"

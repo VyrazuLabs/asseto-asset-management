@@ -252,3 +252,64 @@ def get_product_category_list(request, page_number=None):
     }
 
     return page_object, product_category_asset_count, stats
+# ---------------- LOCATION LIST ---------------- #
+def get_location_list(request, page_number=None):
+    from dashboard.models import Location
+    
+    search_text = (request.GET.get('search_text') or "").strip()
+    status_filter = request.GET.get('status')
+    
+    filters = Q(organization=request.user.organization)
+    
+    if search_text:
+        filters &= (
+            Q(office_name__icontains=search_text) |
+            Q(contact_person_name__icontains=search_text) |
+            Q(contact_person_email__icontains=search_text) |
+            Q(contact_person_phone__icontains=search_text) |
+            Q(address__address_line_one__icontains=search_text) |
+            Q(address__address_line_two__icontains=search_text) |
+            Q(address__country__icontains=search_text) |
+            Q(address__state__icontains=search_text) |
+            Q(address__city__icontains=search_text) |
+            Q(address__pin_code__icontains=search_text)
+        )
+    
+    if status_filter:
+        if status_filter == 'active':
+            filters &= Q(status=True)
+        elif status_filter == 'inactive':
+            filters &= Q(status=False)
+
+    base_query = Location.undeleted_objects.filter(filters)
+    location_list = base_query.order_by('-created_at')
+    
+    deleted_location_count = Location.deleted_objects.filter(organization=request.user.organization).count()
+    
+    paginator = Paginator(location_list, PAGE_SIZE, orphans=ORPHANS)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    asset_counts = (
+        Asset.undeleted_objects
+        .filter(organization=request.user.organization,
+                location__in=location_list)
+        .values("location")
+        .annotate(asset_count=Count("id"))
+    )
+    location_asset_count = {item["location"]: item["asset_count"] for item in asset_counts}
+    
+    # Stats for summary cards
+    total_locations = Location.undeleted_objects.filter(organization=request.user.organization).count()
+    active_locations = Location.undeleted_objects.filter(organization=request.user.organization, status=True).count()
+    inactive_locations = Location.undeleted_objects.filter(organization=request.user.organization, status=False).count()
+
+    stats = {
+        'total_locations': total_locations,
+        'active_locations': active_locations,
+        'inactive_locations': inactive_locations,
+        'deleted_location_count': deleted_location_count,
+    }
+
+    return page_object, location_asset_count, stats
