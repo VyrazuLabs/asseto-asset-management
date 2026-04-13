@@ -1,98 +1,166 @@
 {% load custom_filters %}
-{% if page_object %}
-{% for location in page_object %}
-<tr>
-  <td class="table-index-cell">
-    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-  </td>
+<div class="table-responsive">
+  <table class="list-table" id="table1">
+    <thead>
+      <tr>
+        <th>Sl No.</th>
+        <th>Office Name</th>
+        <th>Total Assets</th>
+        <th>Contact Person</th>
+        <th>State / City</th>
+        <th>Zip Code</th>
+        <th>Status</th>
+        {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
+        <th>Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
 
-  <td>
-    <div class="cell-name-main">{{ location.office_name }}</div>
-    <div class="cell-name-sub">{{ location.address.address_line_one }}</div>
-  </td>
+    {% if page_object %}
+    <tbody id="search_result">
+      {% for location in page_object %}
+      <tr>
+        <td class="table-index-cell">
+          {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+        </td>
 
-  <td>
-    {% with asset_count=location_asset_count|get_item:location.id %}
-    {% if not asset_count %}
-    <span class="count-pill zero">0</span>
+        <td>
+          <div class="cell-name-main">{{ location.office_name }}</div>
+          <div class="cell-name-sub">{{ location.address.address_line_one }}</div>
+        </td>
+
+        <td>
+          {% with asset_count=location_asset_count|get_item:location.id %}
+          {% if not asset_count %}
+          <span class="count-pill zero">0</span>
+          {% else %}
+          <form method="post" action="{% url 'assets:list' %}" class="d-inline">
+            {% csrf_token %}
+            <input type="hidden" name="location" value="{{ location.id }}">
+            <button type="submit" class="count-pill">
+              {{ asset_count }}
+            </button>
+          </form>
+          {% endif %}
+          {% endwith %}
+        </td>
+
+        <td>
+          <div class="cell-name-main">{{ location.contact_person_name }}</div>
+          <div class="cell-name-sub">{{ location.contact_person_email }}</div>
+        </td>
+
+        <td>
+          {{ location.address.state }} / {{ location.address.city }}
+        </td>
+
+        <td>{{ location.address.pin_code }}</td>
+
+        <td>
+          {% if request.user.is_superuser %}
+          <div class="status-toggle">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch"
+                hx-post="{% url 'dashboard:location_status' location.id %}"
+                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' {% if location.status %}checked{% endif %}>
+            </div>
+          </div>
+          {% else %}
+          {% if location.status %}
+          <span class="status-badge status-active">Active</span>
+          {% else %}
+          <span class="status-badge status-inactive">Inactive</span>
+          {% endif %}
+          {% endif %}
+        </td>
+
+        {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
+        <td>
+          <div class="row-actions">
+            {% if perms.authentication.view_location %}
+            <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="View Details">
+              <i class="bi bi-eye"></i>
+            </a>
+            {% endif %}
+            {% if perms.authentication.edit_location %}
+            <a href="{% url 'dashboard:update_location' location.id %}"
+              class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Location">
+              <i class="bi bi-pencil"></i>
+            </a>
+            {% endif %}
+            {% if perms.authentication.delete_location %}
+            <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
+              onsubmit="return confirm('Are you sure you want to delete this location?')">
+              {% csrf_token %}
+              <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}"
+                title="Delete Location" {% if is_demo %}disabled{% endif %}>
+                <i class="bi bi-trash3"></i>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
     {% else %}
-    <form method="post" action="{% url 'assets:list' %}" class="d-inline">
-      {% csrf_token %}
-      <input type="hidden" name="location" value="{{ location.id }}">
-      <button type="submit" class="count-pill">
-        {{ asset_count }}
-      </button>
-    </form>
+    <tbody>
+      <tr>
+        <td colspan="8">
+          <div class="table-empty-state">
+            <i class="bi bi-building d-block"></i>
+            <p>No locations found related to your search.<br>
+              {% if perms.authentication.add_location %}
+              <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
+                hx-get="{% url 'dashboard:add_location' %}" hx-target="#add-location-modal-content"
+                data-bs-toggle="modal" data-bs-target="#add-location-modal">Register a new location</button>
+              {% endif %}
+            </p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
     {% endif %}
-    {% endwith %}
-  </td>
+  </table>
+</div>
 
-  <td>
-    <div class="cell-name-main">{{ location.contact_person_name }}</div>
-    <div class="cell-name-sub">{{ location.contact_person_email }}</div>
-  </td>
-
-  <td>
-    {{ location.address.state }} / {{ location.address.city }}
-  </td>
-
-  <td>{{ location.address.pin_code }}</td>
-
-  <td>
-    {% if request.user.is_superuser %}
-    <div class="status-toggle">
-      <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch"
-          hx-post="{% url 'dashboard:location_status' location.id %}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' {%
-          if location.status %}checked{% endif %}>
-      </div>
-    </div>
+{# ── Pagination ─────────────────────────────────────────────────────────── #}
+<div class="pagination-wrap">
+  <span>
+    Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+    of <strong>{{ page_object.paginator.count|default:0 }}</strong> locations
+  </span>
+  <div class="pagination-nav">
+    {% if page_object.has_previous %}
+    <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+      class="page-btn">‹</a>
     {% else %}
-    {% if location.status %}
-    <span class="status-badge status-active">Active</span>
-    {% else %}
-    <span class="status-badge status-inactive">Inactive</span>
+    <span class="page-btn disabled">‹</span>
     {% endif %}
-    {% endif %}
-  </td>
 
-  {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location
-  %}
-  <td>
-    <div class="row-actions">
-      {% if perms.authentication.view_location %}
-      <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="View Details">
-        <i class="bi bi-eye"></i>
-      </a>
+    {% for num in page_object.paginator.page_range %}
+    {% if page_object.number == num %}
+    <span class="page-btn active">{{ num }}</span>
+    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} 
+      <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+      class="page-btn">{{ num }}</a>
+      {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+      <span class="page-ellipsis">…</span>
       {% endif %}
-      {% if perms.authentication.edit_location %}
-      <a href="{% url 'dashboard:update_location' location.id %}" class="action-btn {% if is_demo %}disabled{% endif %}"
-        title="Edit Location">
-        <i class="bi bi-pencil"></i>
-      </a>
+      {% endfor %}
+
+      {% if page_object.has_next %}
+      <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+        class="page-btn">›</a>
+      {% else %}
+      <span class="page-btn disabled">›</span>
       {% endif %}
-      {% if perms.authentication.delete_location %}
-      <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
-        onsubmit="return confirm('Are you sure you want to delete this location?')">
-        {% csrf_token %}
-        <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}" title="Delete Location" {%
-          if is_demo %}disabled{% endif %}>
-          <i class="bi bi-trash3"></i>
-        </button>
-      </form>
-      {% endif %}
-    </div>
-  </td>
-  {% endif %}
-</tr>
-{% endfor %}
-{% else %}
-<tr>
-  <td colspan="8">
-    <div class="table-empty-state">
-      <i class="bi bi-building d-block"></i>
-      <p>No locations found related to your filters.</p>
-    </div>
-  </td>
-</tr>
-{% endif %}
+  </div>
+</div>
+
+{# ── OOB Swaps for Stats ────────────────────────────────────────────────── #}
+<div id="total-count" hx-swap-oob="innerHTML">{{ total_locations }}</div>
+<div id="active-count" hx-swap-oob="innerHTML">{{ active_locations }}</div>
+<div id="inactive-count" hx-swap-oob="innerHTML">{{ inactive_locations }}</div>
+<div id="deleted-count" hx-swap-oob="innerHTML">{{ deleted_location_count }}</div>
