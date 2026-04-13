@@ -1,190 +1,310 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 {% load custom_filters %}
+
+{% block title %}Department Management | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between align-items-center">
-        <div class="page-title">
-            <h3 class="page-name">Departments</h3>
-            <nav aria-label="breadcrumb" class="d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Departments</li>
-                </ol>
-            </nav>
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Departments</li>
+      </ol>
+    </nav>
+    <h1>Department Management</h1>
+    <p class="page-subtitle">Organize and manage your organization's internal departments and contact units.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'recycle_bin:deleted_departments' %}" class="btn-trash" title="Recycle Bin">
+      <i class="bi bi-trash3"></i> Trash
+      {% if deleted_department_count %}<span class="count-badge">{{ deleted_department_count }}</span>{% endif %}
+    </a>
+    {% if perms.authentication.add_department %}
+    <button type="button" class="btn-register" id="add-modal" hx-get="{% url 'dashboard:add_department' %}"
+      hx-target="#add-department-modal-content" data-bs-toggle="modal" data-bs-target="#add-department-modal">
+      <i class="bi bi-plus-lg"></i> Add Department
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+    <div>
+      <div class="stat-label">Total Departments</div>
+      <div class="stat-value" id="total-department-count">{{ total_departments }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Active</div>
+      <div class="stat-value" id="active-department-count">{{ active_departments }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Inactive</div>
+      <div class="stat-value" id="inactive-department-count">{{ inactive_departments }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
+    <div>
+      <div class="stat-label">Deleted</div>
+      <div class="stat-value" id="deleted-department-count">{{ deleted_department_count }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Filter bar ───────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  {% csrf_token %}
+  <form id="department-filter-form" hx-get="{% url 'dashboard:search_department' 1 %}"
+    hx-target="#department-list-container" hx-trigger="change from:input">
+    <div class="row g-2 align-items-end">
+
+      <div class="col-12 col-md-6 col-lg">
+        <div class="filter-label">Search Department</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="Name, person, email..."
+          hx-get="{% url 'dashboard:search_department' 1 %}"
+          hx-trigger="keyup changed delay:200ms, input changed delay:200ms" hx-target="#department-list-container" aria-label="Search departments">
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
+        <div class="filter-label">Status</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
+            All Status
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#department-filter-form','change');">All
+                Status</a></li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#department-filter-form','change');">Active</a>
+            </li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#department-filter-form','change');">Inactive</a>
+            </li>
+          </ul>
+          <input type="hidden" name="status">
         </div>
-        <div class="d-flex ">
-            {% if perms.authentication.add_department %}
-                <div class="d-flex justify-content-end">
-                    <button type="button" id="add-modal" class="btn btn-sm btn-outline-info my-3 me-2" 
-                        hx-get="{% url 'dashboard:add_department' %}" hx-target="#add-department-modal-content"
-                        data-bs-toggle="modal" data-bs-target="#add-department-modal"
-                    >Add Department</i></button>
-                </div>
-            {% endif %}
-            <a href="{% url 'recycle_bin:deleted_departments' %}" class="btn btn-sm btn-outline-info my-3 trash-btn d-flex align-items-center position-relative">
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-trash" style="margin-bottom: 2px;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-            </svg>Trash</a>
-        </div>
+      </div>
+
+      <div class="col-auto">
+        <a href="{% url 'dashboard:departments' %}" class="btn-reset" title="Reset all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
 
     </div>
-    <section class="section">
-        <!-- add modal -->
-        <div class="modal fade text-left" id="add-department-modal" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel160" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div id="add-department-modal-content" class="modal-content" hx-target="this"></div>
-            </div>
-        </div>
-        <!-- update modal -->
-       <div class="modal fade text-left" id="update-department-modal" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel160" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div id="update-department-modal-content" class="modal-content" hx-target="this"></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                {% if page_object %}
-                    <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
-                            hx-get="{% url 'dashboard:search_department' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
-                    </div>
-                    <div>
-                        {% if is_demo is True %}<sub>*Demo feature are disabled: Update,Delete</sub>{% endif %}
-                    </div>
-                {% endif %}
-                <div class="table-responsive">
-                    <table class="table table-hover" id="table1">
-                        <thead>
-                            <tr>
-                                <th>Sl No.</th>
-                                <th>Department Name</th>
-                                <th>Total Asset</th>
-                                <th>Contact Person Name</th>
-                                <th>Contact Person Email</th>
-                                <th>Contact Person Phone</th>
-                                <th>Status</th>
-                                {% if perms.authentication.edit_department or perms.authentication.delete_department %}
-                                    <th>Actions</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        {% if page_object %}
-                        <tbody id="search_result">
-                            {% for department in page_object %}
-                            <tr>
-                                <td>{{page_object.start_index|add:forloop.counter0}}</td>
-                                <td>{{department.name}}</td>
-                                <td>
-                                    {% if not department_asset_count|get_item:department.id  %}
-                                        0
-                                    {% else %}
-                                        <form method="post" action="{% url 'assets:list' %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="department" value="{{ department.id }}">
-                                            <button type="submit" 
-                                                    class="btn btn-sm text-white"
-                                                    style="background-color: rgb(67, 94, 204); border: none; border-radius: 7px; cursor: pointer; padding-right: 7px;">
-                                                {{ department_asset_count|get_item:department.id }}
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                </td>
-                                <td>{% dynamic_display_name department.contact_person_name %}</td>
-                                <td>{{department.contact_person_email}}</td>
-                                <td>{{department.contact_person_phone}}</td>
-                                <td>
-                                    {% if request.user.is_superuser %}
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                class="form-check-input"
-                                                hx-post="{% url 'dashboard:department_status' department.id %}" 
-                                                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                                                type="checkbox" {% if department.status %} checked {% endif %}
-                                                style="cursor: pointer;"
-                                            >
-                                        </div>  
-                                    {% else %}
-                                        {% if department.status %} Active {% else %} Inactive {% endif %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                        {% if request.user.is_superuser %}
-                                            <a href="{% url 'dashboard:department_details' department.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                                        {% endif %}
-                                        {% if perms.authentication.edit_department %}
-                                            {% if is_demo is True %}
-                                                <button type="button" class="disabled btn btn-info" id="add-department"
-                                                hx-get="{% url 'dashboard:update_department' department.id %}" hx-target="#update-department-modal-content"
-                                                data-bs-toggle="modal" data-bs-target="#update-department-modal"
-                                            ><i class="bi bi-pencil-square"></i></button>
-                                            {% else %}
-                                                <button type="button" class="btn btn-info" id="add-department"
-                                                    hx-get="{% url 'dashboard:update_department' department.id %}" hx-target="#update-department-modal-content"
-                                                    data-bs-toggle="modal" data-bs-target="#update-department-modal"
-                                                ><i class="bi bi-pencil-square"></i></button>
-                                            {% endif %}
-                                        {% endif %}
-                                        {% if perms.authentication.delete_department %}
-                                            {% if is_demo is True %}
-                                                <form action="{% url 'dashboard:delete_department' department.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                    {% csrf_token %}
-                                                    <button type="submit" value="Delete" class="btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
-                                                </form>
-                                            {% else %}
-                                                <form action="{% url 'dashboard:delete_department' department.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
-                                                    {% csrf_token %}
-                                                    <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
-                                                </form>
-                                            {% endif %}
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
-                        <div class="alert alert-info" role="alert">
-                            No record available!
-                        </div>
-                        {% endif %}
-                    </table>
-                </div>
-                {% include 'commons/pagination.html' %}
-            </div>
-        </div>
-    </section>
+  </form>
+  {% if is_demo is True %}
+  <p class="demo-note">* Demo mode: some features are disabled.</p>
+  {% endif %}
 </div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card" id="department-list-container">
+  <!-- add modal -->
+  <div class="modal fade" id="add-department-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div id="add-department-modal-content" class="modal-content" hx-target="this"></div>
+    </div>
+  </div>
+  <!-- update modal -->
+  <div class="modal fade" id="update-department-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div id="update-department-modal-content" class="modal-content" hx-target="this"></div>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="list-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Department Name</th>
+          <th>Total Asset</th>
+          <th>Contact Person</th>
+          <th>Status</th>
+          {% if perms.authentication.edit_department or perms.authentication.delete_department or request.user.is_superuser %}
+          <th>Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      {% if page_object %}
+      <tbody id="search_result">
+        {% for department in page_object %}
+        <tr>
+          <td class="table-index-cell">
+            {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+          </td>
+          <td>
+            <div class="cell-name-main">{{ department.name }}</div>
+          </td>
+          <td>
+            {% with asset_count=department_asset_count|get_item:department.id %}
+            {% if not asset_count %}
+            <span class="count-pill zero">0</span>
+            {% else %}
+            <form method="post" action="{% url 'assets:list' %}" class="d-inline">
+              {% csrf_token %}
+              <input type="hidden" name="department" value="{{ department.id }}">
+              <button type="submit" class="count-pill">
+                {{ asset_count }}
+              </button>
+            </form>
+            {% endif %}
+            {% endwith %}
+          </td>
+          <td>
+            <div class="cell-name-main">{% dynamic_display_name department.contact_person_name %}</div>
+            <div class="cell-name-sub">{{ department.contact_person_email }}</div>
+            {% if department.contact_person_phone %}
+            <div class="cell-name-sub"><i class="bi bi-telephone small pe-1"></i>{{ department.contact_person_phone }}</div>
+            {% endif %}
+          </td>
+          <td>
+            {% if request.user.is_superuser %}
+            <div class="status-toggle">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                  hx-post="{% url 'dashboard:department_status' department.id %}"
+                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' {% if department.status %}checked{% endif %}>
+              </div>
+            </div>
+            {% else %}
+            {% if department.status %}
+            <span class="status-badge status-active">Active</span>
+            {% else %}
+            <span class="status-badge status-inactive">Inactive</span>
+            {% endif %}
+            {% endif %}
+          </td>
+          <td>
+            <div class="row-actions">
+              {% if request.user.is_superuser %}
+              <a href="{% url 'dashboard:department_details' department.id %}" class="action-btn" title="View Details">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% endif %}
+              {% if perms.authentication.edit_department %}
+              <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Department"
+                hx-get="{% url 'dashboard:update_department' department.id %}"
+                hx-target="#update-department-modal-content" data-bs-toggle="modal"
+                data-bs-target="#update-department-modal" {% if is_demo %}disabled{% endif %}>
+                <i class="bi bi-pencil"></i>
+              </button>
+              {% endif %}
+              {% if perms.authentication.delete_department %}
+              <form action="{% url 'dashboard:delete_department' department.id %}" method="post" class="form-row-action"
+                onsubmit="return confirm('Are you sure you want to delete this department?')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}"
+                  title="Delete Department" {% if is_demo %}disabled{% endif %}>
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="6">
+            <div class="table-empty-state">
+              <i class="bi bi-people d-block"></i>
+              <p>No departments found.<br>
+                {% if perms.authentication.add_department %}
+                <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
+                  hx-get="{% url 'dashboard:add_department' %}" hx-target="#add-department-modal-content"
+                  data-bs-toggle="modal" data-bs-target="#add-department-modal">Create your first department</button>
+                {% endif %}
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  {# ── Pagination ─────────────────────────────────────────────────────────── #}
+  <div class="pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+      of <strong>{{ page_object.paginator.count|default:0 }}</strong> departments
+    </span>
+    <div class="pagination-nav">
+      {% if page_object.has_previous %}
+      <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+        class="page-btn">‹</a>
+      {% else %}
+      <span class="page-btn disabled">‹</span>
+      {% endif %}
+
+      {% for num in page_object.paginator.page_range %}
+      {% if page_object.number == num %}
+      <span class="page-btn active">{{ num }}</span>
+      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+      <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">{{ num }}</a>
+      {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+      <span class="page-ellipsis">…</span>
+      {% endif %}
+      {% endfor %}
+
+      {% if page_object.has_next %}
+      <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+        class="page-btn">›</a>
+      {% else %}
+      <span class="page-btn disabled">›</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 <script>
-function requestAndSendNotification() {
-  if (Notification.permission === "granted") {
-    // Permission already granted, send notification directly
-    sendNotification();
+  function requestAndSendNotification() {
+    if (Notification.permission === "granted") {
+      sendNotification();
+    } else if (Notification.permission !== "denied") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") sendNotification();
+      });
+    }
   }
-  else if (Notification.permission !== "denied") {
-    // Request permission if not already denied
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        sendNotification();
-      }
+  function sendNotification() {
+    new Notification("New Department Added", {
+      body: "A new department has been successfully created.",
+      icon: "{% static 'images/logo/favicon.png' %}",
     });
   }
-}
+  document.body.addEventListener("departmentAdded", function () {
+    requestAndSendNotification();
+    location.reload();
+  });
+  document.body.addEventListener("departmentUpdated", function () {
+    location.reload();
+  });
+</script>
 
-function sendNotification() {
-  const title = "New Department Added";
-  const options = {
-    body: "New Department Added.", 
-    icon: "/static/images/logo/favicon.png", 
-  };
-  new Notification(title, options);
-}
-</script>
-<script>
-document.body.addEventListener("departmentAdded", function () {
-  requestAndSendNotification();
-});
-</script>
-{% endblock content%}
+{% endblock content %}

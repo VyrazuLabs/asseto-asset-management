@@ -241,6 +241,7 @@ body.theme-dark .metric-card,
 body.theme-dark .chart-container-card,
 body.theme-dark .table-container-card {
     border: var(--dash-card-border);
+    box-shadow: none;
 }
 
 body.theme-dark .tab-nav-premium {
