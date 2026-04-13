@@ -1,0 +1,45 @@
+{% load custom_filters %}
+{% if page_object %}
+{% for location in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ location.name }}</div>
+  </td>
+  <td>
+    <div class="cell-name-main">{% dynamic_display_name location.contact_person_name %}</div>
+    {% if location.contact_person_email %}
+    <div class="cell-name-sub">{{ location.contact_person_email }}</div>
+    {% endif %}
+    {% if location.contact_person_phone %}
+    <div class="cell-name-sub"><i class="bi bi-telephone small pe-1"></i>{{ location.contact_person_phone }}</div>
+    {% endif %}
+  </td>
+  <td>
+     <div class="cell-name-sub">
+       {% if location.address %}
+         {{ location.address.city }}{% if location.address.state %}, {{ location.address.state }}{% endif %}
+       {% else %}
+         -
+       {% endif %}
+     </div>
+  </td>
+  <td class="text-end pe-4">
+     <div class="cell-name-sub">{{ location.created_at|date:"M d, Y" }}</div>
+  </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+  <td colspan="5">
+    <div class="table-empty-state">
+      <i class="bi bi-geo-alt d-block"></i>
+      <p>No location upload records found.<br>
+        <span class="text-muted small">Try adjusting your search criteria.</span>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endif %}
