@@ -142,8 +142,9 @@ def department_status(request, id):
 
 @login_required
 def search_department(request, page):
-    page_object, _, department_asset_count, _ = get_department_list(request, page_number=page)
+    page_object, _, department_asset_count, stats = get_department_list(request, page_number=page)
     return render(request, 'dashboard/departments/departments-data.html', {
         'page_object': page_object,
-        'department_asset_count': department_asset_count
+        'department_asset_count': department_asset_count,
+        **stats
     })
