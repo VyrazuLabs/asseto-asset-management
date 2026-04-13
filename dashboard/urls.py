@@ -46,10 +46,10 @@ urlpatterns = [
     path('license-type/list/',license_type.license_type_list,name='license_type_list'),
     path('license-type/add/',license_type.license_type_add,name='add_license_type'),
     path('license-types/details/<int:id>', license_type.license_type_details, name='license_type_details'),
-    path('license-type/add/<int:id>',license_type.update_license_type,name='update_license_type'),
+    path('license-type/update/<int:id>',license_type.update_license_type,name='update_license_type'),
     path('license-type/status/<int:id>',license_type.license_type_status,name='license_type_status'),
     path('license-type/delete/<int:id>',license_type.delete_license_type,name='delete_license_type'),
-    path('license-type/search/', license_type.search_license_type, name='search_license_type'),
+    path('license-type/search/<str:page>', license_type.search_license_type, name='search_license_type'),
 
     path('get-subcategories/',views.get_subcategories, name='get_subcategories'),
     path('global-search/', global_search_views.global_search, name='global_search'),
