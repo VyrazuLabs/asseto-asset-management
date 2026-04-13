@@ -39,22 +39,16 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def departments(request):
-    page_object, department_form, department_asset_count,deleted_department_count=get_department_list(request)
-    # is_demo=IS_DEMO
-    # if is_demo:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
+    page_object, department_form, department_asset_count, stats = get_department_list(request)
 
     context = {
         'sidebar': 'admin',
         'submenu': 'department',
         'page_object': page_object,
         'department_form': department_form,
-        'deleted_department_count': deleted_department_count,
         'department_asset_count': department_asset_count,
-        # 'is_demo':is_demo,
-        'title': 'Departments'
+        'title': 'Departments',
+        **stats
     }
     return render(request, 'dashboard/departments/list.html', context=context)
 
@@ -148,31 +142,9 @@ def department_status(request, id):
 
 @login_required
 def search_department(request, page):
-    search_text = request.GET.get('search_text')
-    if search_text:
-        return render(request, 'dashboard/departments/departments-data.html', {
-            'page_object': Department.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(contact_person_name__icontains=search_text) | Q(contact_person_email__icontains=search_text) | Q(contact_person_phone__icontains=search_text)
-            )).order_by('-created_at')[:10]
-        })
-
-    department_list = Department.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(department_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    asset_counts = (
-        AssignAsset.objects
-        .filter(
-            asset__organization=request.user.organization,
-            user__department__in=department_list
-        )
-        .values("user__department")
-        .annotate(asset_count=Count("asset", distinct=True))
-    )
-    department_asset_count = {
-        item["user__department"]: item["asset_count"]
-        for item in asset_counts
-    }
-    return render(request, 'dashboard/departments/departments-data.html', {'page_object': page_object,
-                'department_asset_count': department_asset_count})
+    page_object, _, department_asset_count, stats = get_department_list(request, page_number=page)
+    return render(request, 'dashboard/departments/departments-data.html', {
+        'page_object': page_object,
+        'department_asset_count': department_asset_count,
+        **stats
+    })

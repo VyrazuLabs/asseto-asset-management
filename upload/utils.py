@@ -1,5 +1,7 @@
 from django.template.loader import get_template
 from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
+from django.db.models import Q
+from django.core.paginator import Paginator
 import csv
 from io import BytesIO
 from xhtml2pdf import pisa
@@ -9,13 +11,11 @@ import pandas as pd
 from django.contrib import messages
 import os
 from datetime import date
+from django.utils import timezone
 from .models import File,ImportedUser
 import json
 from vendors.models import Vendor
 from dashboard.models import Department,Location,ProductCategory,ProductType
-
-today = date.today()
-
 
 def render_to_csv(context_dict={}):
     response = HttpResponse(content_type='text/csv')
@@ -244,3 +244,203 @@ def function_to_get_matching_objects_product_types(arr):
         obj['designation']=""
         array.append(obj)
     return array
+
+def get_vendor_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="Vendor", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique vendors by email
+    unique_vendors = base_query.values('email').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(
+            Q(name__icontains=search_text) |
+            Q(email__icontains=search_text) |
+            Q(contact_person_name__icontains=search_text) |
+            Q(phone__icontains=search_text) |
+            Q(gstin_number__icontains=search_text)
+        )
+        
+    vendor_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(vendor_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_vendors': unique_vendors,
+    }
+    
+    return page_object, stats
+
+def get_department_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="Department", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique departments by name
+    unique_departments = base_query.values('name').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(
+            Q(name__icontains=search_text) |
+            Q(contact_person_name__icontains=search_text) |
+            Q(contact_person_email__icontains=search_text)
+        )
+        
+    department_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(department_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_departments': unique_departments,
+    }
+    
+    return page_object, stats
+
+def get_product_type_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="ProductType", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique types by name
+    unique_types = base_query.values('name').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(Q(name__icontains=search_text))
+        
+    product_type_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(product_type_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_types': unique_types,
+    }
+    
+    return page_object, stats
+
+def get_product_category_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="ProductCategory", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique categories by name
+    unique_categories = base_query.values('name').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(Q(name__icontains=search_text))
+        
+    category_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(category_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_categories': unique_categories,
+    }
+    
+    return page_object, stats
+
+def get_user_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="User", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique users by email
+    unique_users = base_query.values('email').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(
+            Q(full_name__icontains=search_text) |
+            Q(email__icontains=search_text) |
+            Q(username__icontains=search_text) |
+            Q(phone__icontains=search_text)
+        )
+        
+    user_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(user_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_users': unique_users,
+    }
+    
+    return page_object, stats
+
+def get_location_upload_list(request, page_number=None):
+    search_text = request.GET.get('search_text', '')
+    
+    base_query = ImportedUser.objects.filter(entity_type="Location", organization=request.user.organization)
+    
+    # Summary stats
+    total_uploads = base_query.count()
+    today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
+    # Unique locations by name
+    unique_locations = base_query.values('name').distinct().count()
+    
+    # Filtering
+    if search_text:
+        base_query = base_query.filter(
+            Q(name__icontains=search_text) |
+            Q(contact_person_name__icontains=search_text) |
+            Q(contact_person_email__icontains=search_text) |
+            Q(contact_person_phone__icontains=search_text)
+        )
+        
+    location_list = base_query.order_by('-created_at')
+    
+    paginator = Paginator(location_list, 10, orphans=1)
+    if not page_number:
+        page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+    
+    stats = {
+        'total_uploads': total_uploads,
+        'today_uploads': today_uploads,
+        'unique_locations': unique_locations,
+    }
+    
+    return page_object, stats
