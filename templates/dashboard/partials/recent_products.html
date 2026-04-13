@@ -1,0 +1,35 @@
+<div class="table-responsive">
+    <table class="table premium-table">
+        <thead>
+            <tr>
+                <th style="width: 60px;"></th>
+                <th>Product Name</th>
+                <th>Model</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in latest_product_list %}
+            <tr>
+                <td>
+                    <div class="metric-icon-box metric-cyan" style="width: 38px; height: 38px; border-radius: 8px; font-size: 1rem; margin: 0;">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                </td>
+                <td class="fw-bold">{{ product.name }}</td>
+                <td class="text-muted">{{ product.model_no|default:"---" }}</td>
+                <td class="text-muted">{{ product.formatted_date }}</td>
+                <td style="width: 40px; text-align: right;">
+                    <a href="{% url 'products:details_product' product.id %}" class="row-link-icon">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No recent products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
