@@ -188,7 +188,7 @@ def index(request):
         is_superuser=True).order_by('created_at').reverse()[0:5]
     users_count = users_list.count()
     obj=get_currency_and_datetime_format(request.user.organization)
- 
+
     get_license=License.undeleted_objects.all()
     get_license_count=get_license.count()
     for it in expiring_assets:
@@ -208,7 +208,7 @@ def index(request):
         else:
             it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
         # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
- 
+
     for it in all_location_list:
         if not obj['date_format']:
             it.created_at=it.created_at.date
@@ -244,43 +244,6 @@ def index(request):
     }
  
     return render(request, 'index.html', context=context)
-
-@login_required
-def recent_vendors_partial(request):
-    latest_vendor_list = Vendor.undeleted_objects.filter(Q(organization=None) | Q(
-        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
-    obj = get_currency_and_datetime_format(request.user.organization)
-    for it in latest_vendor_list:
-        it.formatted_date = format_datetime(x=it.created_at, output_format=obj['date_format']) if obj['date_format'] else it.created_at.date()
-    return render(request, 'dashboard/partials/recent_vendors.html', {'latest_vendor_list': latest_vendor_list})
-
-@login_required
-def recent_products_partial(request):
-    latest_product_list = Product.undeleted_objects.filter(Q(organization=None) | Q(
-        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
-    obj = get_currency_and_datetime_format(request.user.organization)
-    for it in latest_product_list:
-        it.formatted_date = format_datetime(x=it.created_at, output_format=obj['date_format']) if obj['date_format'] else it.created_at.date()
-    return render(request, 'dashboard/partials/recent_products.html', {'latest_product_list': latest_product_list})
-
-@login_required
-def recent_locations_partial(request):
-    all_location_list = Location.undeleted_objects.filter(Q(organization=None) | Q(
-        organization=request.user.organization)).order_by('created_at').reverse()[0:5]
-    obj = get_currency_and_datetime_format(request.user.organization)
-    for it in all_location_list:
-        it.formatted_date = format_datetime(x=it.created_at, output_format=obj['date_format']) if obj['date_format'] else it.created_at.date()
-    return render(request, 'dashboard/partials/recent_locations.html', {'all_location_list': all_location_list})
-
-@login_required
-def recent_users_partial(request):
-    latest_users_list = User.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization)).exclude(
-        is_superuser=True).order_by('created_at').reverse()[0:5]
-    obj = get_currency_and_datetime_format(request.user.organization)
-    for it in latest_users_list:
-        it.formatted_date = format_datetime(x=it.created_at, output_format=obj['date_format']) if obj['date_format'] else it.created_at.date()
-    return render(request, 'dashboard/partials/recent_users.html', {'latest_users_list': latest_users_list})
-
 
 
 @unauthenticated_user

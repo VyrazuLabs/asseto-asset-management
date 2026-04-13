@@ -11,6 +11,7 @@ from .forms import RoleForm
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from .utils import get_roles_list_utils
 from django.db.models import Q
 
 PAGE_SIZE = 10
@@ -24,16 +25,18 @@ def check_admin(user):
 @login_required
 @user_passes_test(check_admin)
 def list(request):
-    roles_list = Role.objects.filter(
-        organization=request.user.organization).order_by('created_at')
-    page_number = request.GET.get('page')
-    paginator = Paginator(roles_list, PAGE_SIZE, orphans=ORPHANS)
-    page_object = paginator.get_page(page_number)
+    page_number = request.GET.get('page', 1)
+    page_object, role_user_count, stats = get_roles_list_utils(request, page_number)
 
     context = {
         'sidebar': 'admin',
         'submenu': 'roles',
         'page_object': page_object,
+        'role_user_count': role_user_count,
+        'total_roles': stats['total_roles'],
+        'active_roles': stats['active_roles'],
+        'inactive_roles': stats['inactive_roles'],
+        'deleted_roles_count': stats['deleted_roles_count'],
         'title': 'Roles'
     }
     return render(request, 'roles/list.html', context=context)
@@ -147,15 +150,10 @@ def status(request, name):
 
 @login_required
 def search(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'roles/roles-data.html', {
-            'page_object': Role.objects.filter(Q(organization=request.user.organization) & Q(related_name__icontains=search_text)).order_by('created_at')[:10]
-        })
+    page_object, role_user_count, stats = get_roles_list_utils(request, page)
 
-    role_list = Role.objects.filter(
-        organization=request.user.organization).order_by('created_at')
-    paginator = Paginator(role_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'roles/roles-data.html', {'page_object': page_object})
+    return render(request, 'roles/roles-data.html', {
+        'page_object': page_object,
+        'role_user_count': role_user_count,
+        'total_roles': stats['total_roles'],
+    })

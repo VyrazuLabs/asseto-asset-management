@@ -21,12 +21,6 @@ urlpatterns = [
     path('organization-information/update', views.organization_info_update, name='organization_info_update'),
     path('profile/toggle-2fa', views.toggle_2fa, name='toggle_2fa'),
     path('profile/regenerate-qr', views.regenerate_qr, name='regenerate_qr'),
-    
-    # Dashboard Partials
-    path('dashboard/recent-vendors', views.recent_vendors_partial, name='recent_vendors_partial'),
-    path('dashboard/recent-products', views.recent_products_partial, name='recent_products_partial'),
-    path('dashboard/recent-locations', views.recent_locations_partial, name='recent_locations_partial'),
-    path('dashboard/recent-users', views.recent_users_partial, name='recent_users_partial'),
 ]
 
 authentication_url_patterns=[
