@@ -42,28 +42,28 @@
     <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
     <div>
       <div class="stat-label">Total Departments</div>
-      <div class="stat-value">{{ total_departments }}</div>
+      <div class="stat-value" id="total-department-count">{{ total_departments }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
       <div class="stat-label">Active</div>
-      <div class="stat-value">{{ active_departments }}</div>
+      <div class="stat-value" id="active-department-count">{{ active_departments }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
     <div>
       <div class="stat-label">Inactive</div>
-      <div class="stat-value">{{ inactive_departments }}</div>
+      <div class="stat-value" id="inactive-department-count">{{ inactive_departments }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
       <div class="stat-label">Deleted</div>
-      <div class="stat-value">{{ deleted_department_count }}</div>
+      <div class="stat-value" id="deleted-department-count">{{ deleted_department_count }}</div>
     </div>
   </div>
 </div>
@@ -71,15 +71,15 @@
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
   {% csrf_token %}
-  <form id="department-filter-form" hx-get="{% url 'dashboard:search_department' page_object.number %}"
-    hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+  <form id="department-filter-form" hx-get="{% url 'dashboard:search_department' 1 %}"
+    hx-target="#department-list-container" hx-trigger="change from:input">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-6 col-lg">
         <div class="filter-label">Search Department</div>
         <input name="search_text" type="search" autocomplete="off" placeholder="Name, person, email..."
-          hx-get="{% url 'dashboard:search_department' page_object.number %}"
-          hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result" aria-label="Search departments">
+          hx-get="{% url 'dashboard:search_department' 1 %}"
+          hx-trigger="keyup changed delay:200ms, input changed delay:200ms" hx-target="#department-list-container" aria-label="Search departments">
       </div>
 
       <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
@@ -120,7 +120,7 @@
 </div>
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
-<div class="table-card">
+<div class="table-card" id="department-list-container">
   <!-- add modal -->
   <div class="modal fade" id="add-department-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
