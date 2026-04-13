@@ -1,16 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from dashboard.forms import ProductTypeForm
 from django.contrib import messages
 from dashboard.models import ProductType
 from django.core.paginator import Paginator
-from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import permission_required, user_passes_test, login_required
 from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.db.models import Q,Count
-from assets.models import AssignAsset,Asset
-import os 
+from django.db.models import Q, Count
+from assets.models import AssignAsset, Asset
+from dashboard.utils import get_product_type_list
+import os
 
 IS_DEMO = os.environ.get('IS_DEMO')
 
@@ -28,86 +26,57 @@ def manage_access(user):
         'authentication.edit_product_type',
         'authentication.add_product_type',
     ]
+    return any(user.has_perm(permission) for permission in permissions_list)
 
-    for permission in permissions_list:
-        if user.has_perm(permission):
-            return True
 
-    return False
-
+# ✅ UPDATED LIST VIEW (USING UTILS)
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
-    all_product_type_list = ProductType.undeleted_objects.filter(
-    Q(organization=request.user.organization)|Q(organization=None)).order_by('-created_at')
-    deleted_product_types_count=ProductType.deleted_objects.filter(can_modify=True).count()
-
-
-    paginator = Paginator(all_product_type_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    product_type = ProductTypeForm(organization=request.user.organization)
-
-    asset_counts = (
-        Asset.undeleted_objects
-        .filter(
-            organization=request.user.organization,
-            product__product_type__in=all_product_type_list
-        )
-        .values("product__product_type")
-        .annotate(asset_count=Count("id", distinct=True)) 
-    )
-    user_product_type_asset_count = {
-        item["product__product_type"]: item["asset_count"]
-        for item in asset_counts
-    }
-    # is_demo=IS_DEMO
-    # if is_demo:
-    #     is_demo=True
-    # else:
-    #     is_demo=False
+    page_object, product_type_form, product_type_asset_count, stats = get_product_type_list(request)
 
     context = {
         'sidebar': 'admin',
         'submenu': 'product_type',
-        'product_type': product_type,
         'page_object': page_object,
-        'deleted_product_types_count':deleted_product_types_count,
-        'user_product_type_asset_count':user_product_type_asset_count,
-        # 'is_demo':is_demo,
-        'title': 'Product Types'
+        'product_type': product_type_form,
+        'product_type_asset_count': product_type_asset_count,
+        'title': 'Product Types',
+        **stats
     }
 
-    return render(request, 'dashboard/product_type/list.html', context=context)
+    return render(request, 'dashboard/product_type/list.html', context)
 
 
+# ✅ ADD
 @login_required
 @permission_required('authentication.add_product_type')
 def add_product_type(request):
-
     form = ProductTypeForm(organization=request.user.organization)
 
     if request.method == "POST":
-        form = ProductTypeForm(
-            request.POST, organization=request.user.organization)
+        form = ProductTypeForm(request.POST, organization=request.user.organization)
 
         if form.is_valid():
             pt = form.save(commit=False)
             pt.organization = request.user.organization
             pt.save()
-            messages.success(
-                request, 'Product Type added successfully')
+            messages.success(request, 'Product Type added successfully')
+
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "productTypeAdded"
             return response
 
-    context = {'form': form, "modal_title": "Add Product Type"}
-    return render(request, 'dashboard/product_type/product-type-modal.html', context)
+    return render(request, 'dashboard/product_type/product-type-modal.html', {
+        'form': form,
+        "modal_title": "Add Product Type"
+    })
 
+
+# ✅ DETAILS
 @login_required
 @user_passes_test(check_admin)
 def product_type_details(request, id):
-
     product_type = get_object_or_404(ProductType, pk=id)
 
     history_list = product_type.history.all()
@@ -115,74 +84,103 @@ def product_type_details(request, id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'product_type', 'product_type': product_type, 'title': f'Details-{ product_type.name}'}
-    
-    return render(request, 'dashboard/product_type/detail.html',context=context)
+    context = {
+        'sidebar': 'admin',
+        'submenu': 'product_type',
+        'product_type': product_type,
+        'page_object': page_object,
+        'title': f'Details-{product_type.name}'
+    }
+
+    return render(request, 'dashboard/product_type/detail.html', context)
 
 
+# ✅ DELETE
 @login_required
 @permission_required('authentication.delete_product_type')
 def delete_product_type(request, id):
-
     if request.method == 'POST':
         product_type = get_object_or_404(
-            ProductType.undeleted_objects, pk=id, organization=request.user.organization)
-        # Delete the product type if only the product type is not assigned to any asset
-        assigned_assets = AssignAsset.objects.filter(asset__product__product_type=product_type).first()
-        if assigned_assets is not None:
-            messages.error(request, 'Product Type cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the product type.')
+            ProductType.undeleted_objects,
+            pk=id,
+            organization=request.user.organization
+        )
+
+        assigned_assets = AssignAsset.objects.filter(
+            asset__product__product_type=product_type
+        ).first()
+
+        if assigned_assets:
+            messages.error(
+                request,
+                'Product Type cannot be deleted as it is assigned to an asset.'
+            )
             return redirect('dashboard:product_type_list')
+
         product_type.status = False
         product_type.soft_delete()
+
         history_id = product_type.history.first().history_id
         product_type.history.filter(pk=history_id).update(history_type='-')
+
         messages.success(request, 'Product Type deleted successfully')
+
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+# ✅ STATUS TOGGLE
+@login_required
 @user_passes_test(check_admin)
 def product_type_status(request, id):
     if request.method == "POST":
         product_type = get_object_or_404(
-            ProductType.undeleted_objects, pk=id, organization=request.user.organization)
-        product_type.status = False if product_type.status else True
+            ProductType.undeleted_objects,
+            pk=id,
+            organization=request.user.organization
+        )
+        product_type.status = not product_type.status
         product_type.save()
+
     return HttpResponse(status=204)
 
 
+# ✅ UPDATE
 @login_required
 @permission_required('authentication.edit_product_type')
 def update_product_type(request, id):
-
     product_type = get_object_or_404(
-        ProductType.undeleted_objects, pk=id, organization=request.user.organization)
-    form = ProductTypeForm(request.POST or None, instance=product_type,
-                           organization=request.user.organization,pk=product_type.id)
+        ProductType.undeleted_objects,
+        pk=id,
+        organization=request.user.organization
+    )
 
-    if request.method == "POST":
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Product Type updated successfully')
-            response = HttpResponse(status=204)
-            response["HX-Trigger"] = "productTypeUpdated"
-            return response
+    form = ProductTypeForm(
+        request.POST or None,
+        instance=product_type,
+        organization=request.user.organization,
+        pk=product_type.id
+    )
 
-    context = {'form': form, "modal_title": "Update Product Type"}
-    return render(request, 'dashboard/product_type/product-type-modal.html', context)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, 'Product Type updated successfully')
+
+        response = HttpResponse(status=204)
+        response["HX-Trigger"] = "productTypeUpdated"
+        return response
+
+    return render(request, 'dashboard/product_type/product-type-modal.html', {
+        'form': form,
+        "modal_title": "Update Product Type"
+    })
 
 
+# ✅ UPDATED SEARCH (USING UTILS)
 @login_required
 def search_product_type(request, page):
-    search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'dashboard/product_type/product-types-data.html', {
-            'page_object': ProductType.undeleted_objects.filter(Q(organization=request.user.organization) & Q(name__icontains=search_text)).order_by('-created_at')[:10]
-        })
+    page_object, _, product_type_asset_count, _ = get_product_type_list(request, page_number=page)
 
-    product_type_list = ProductType.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(product_type_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(request, 'dashboard/product_type/product-types-data.html', {'page_object': page_object})
+    return render(request, 'dashboard/product_type/product-types-data.html', {
+        'page_object': page_object,
+        'product_type_asset_count': product_type_asset_count
+    })
