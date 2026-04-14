@@ -29,15 +29,7 @@ def split(value, key=' '):
 def format_datetime(context,x):
     request = context['request']
     obj=get_currency_and_datetime_format(request.user.organization)
-    if obj and obj['date_format']:
-        output_format=obj['date_format']
-    else:
-        output_format='DD-MM-YYYY'
     """Convert datetime object to the specified output format."""
-    # x = datetime.datetime.now()
-    if isinstance(x, str):
-        x = parse(x)
- 
     formats = {
         'DD-MM-YYYY': '%d-%m-%Y',
         'YYYY-MM-DD': '%Y-%m-%d',
@@ -46,7 +38,12 @@ def format_datetime(context,x):
         'DD/MM/YYYY': '%d/%m/%Y',
         'MM/DD/YYYY': '%m/%d/%Y'
     }
- 
+    output_format = obj.get('date_format') if obj else None
+    if output_format not in formats:
+        output_format = 'DD-MM-YYYY'
+
+    if isinstance(x, str):
+        x = parse(x)
     if output_format not in formats:
         raise ValueError("Invalid format. Choose from: " + ", ".join(formats.keys()))
  
