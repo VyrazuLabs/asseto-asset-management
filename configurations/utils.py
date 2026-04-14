@@ -150,22 +150,26 @@ def get_currency_and_datetime_format(organization):
     # return organization.currency, organization.date_format
 
 def format_datetime(x,output_format):
+    # request = context['request']
+    # obj=get_currency_and_datetime_format(request.user.organization)
     """Convert datetime object to the specified output format."""
-    # x = datetime.datetime.now()
-    if isinstance(x, str):
-        x = parse(x)
-
     formats = {
+        'DD-MM-YYYY': '%d-%m-%Y',
         'YYYY-MM-DD': '%Y-%m-%d',
-        'Day Month DD, Year': '%A %B %d, %Y',
+        'Day Month DD, Year': '%A %B %d, %Y',   
         'Month DD, YYYY': '%B %d, %Y',
         'DD/MM/YYYY': '%d/%m/%Y',
         'MM/DD/YYYY': '%m/%d/%Y'
     }
+    # output_format = obj.get('date_format') if obj else None
+    if output_format not in formats:
+        output_format = 'DD-MM-YYYY'
 
+    if isinstance(x, str):
+        x = parse(x)
     if output_format not in formats:
         raise ValueError("Invalid format. Choose from: " + ", ".join(formats.keys()))
-
+ 
     return x.strftime(formats[output_format])
     
 def dynamic_display_name(request,fullname):
