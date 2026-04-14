@@ -15,8 +15,7 @@ from drf_spectacular.types import OpenApiTypes
 from assets.models import Asset, AssetImage, AssetStatus
 from assets.serializers import AssetSerializer, NotificationSerializer, AssignAssetSerializer, SearchAssetSerializer
 from assets.api_utils import (
-    asset_data, convert_to_list, delete_images, get_asset, get_base_segment,
-    BaseSegmentFunc, get_notification_data, mark_notification_as_seen,
+    asset_data, convert_to_list, delete_images, get_asset, get_base_segment, get_notification_data, mark_notification_as_seen,
     asset_details, assign_asset_user_list,
 )
 from authentication.models import User
