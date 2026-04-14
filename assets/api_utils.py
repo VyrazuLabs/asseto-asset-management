@@ -43,6 +43,14 @@ def mark_notification_as_seen(notification_id, request):
 
     notification.is_seen = True
     notification.save(update_fields=["is_seen"])
+
+def extract_object_type(link):
+    if link:
+        parts = link.split('/')
+        if len(parts) > 1:
+            return parts[1]
+    return None
+
 def get_notification_data(request):
     notifications= UserNotification.objects.filter(
                     user=request.user,
@@ -51,7 +59,7 @@ def get_notification_data(request):
                     user__isnull=False,
                     notification__entity_type=0
                 ).annotate(
-                    object_type=BaseSegmentFunc('notification__link'),
+                    # object_type=BaseSegmentFunc('notification__link'),
                     notification_title=F('notification__notification_title'),
                     notification_text=F('notification__notification_text'),
                     link=F('notification__link'),
@@ -67,7 +75,7 @@ def get_notification_data(request):
         'notification_text',
         'is_seen', 
         'link',
-        'object_type',
+        # 'object_type',
         'created_at', 
         'object_id'
     ))
@@ -75,28 +83,10 @@ def get_notification_data(request):
     #     item['in_app_notifications_status'] = in_app_notifications_status
     # # in_app_notifications_status = True if request.user.inapp_notification else False
     # print(type(data))
-    
+    for item in data:
+        item['object_type'] = extract_object_type(item['link'])
     log.debug("notification_data_fetched", count=len(data))
     return data
-# def get_push_notification_data(user):
-#     return {
-#         "message": "Success",
-#         "user": user.username
-#     }
-class BaseSegmentFunc(Func):
-    output_field = CharField()
-
-    template = """
-        CASE 
-            WHEN %(expressions)s IS NOT NULL AND %(expressions)s != ''
-            THEN SUBSTRING_INDEX(
-                    SUBSTRING_INDEX(%(expressions)s, '/', 2),
-                    '/',
-                    -1
-                 )
-            ELSE NULL
-        END
-    """
 
 # class BaseSegmentFunc(Func):
 #     output_field = CharField()
