@@ -7,6 +7,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.1">
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <style>
     /* Pagination overrides for this page */
     .pagination .page-link {
@@ -53,41 +54,41 @@
             {# Row 1 #}
             <div class="info-item">
                 <span class="label">Phone</span>
-                <span class="value">{{ vendor.phone|default:"N/A" }}</span>
+                <span class="value">{{ vendor.phone|default:"-" }}</span>
             </div>
             <div class="info-item">
                 <span class="label">Email</span>
-                <span class="value">{{ vendor.email|default:"N/A" }}</span>
+                <span class="value">{{ vendor.email|default:"-" }}</span>
             </div>
 
             {# Row 2 #}
             <div class="info-item">
                 <span class="label">Designation</span>
-                <span class="value">{{ vendor.designation|default:"N/A" }}</span>
+                <span class="value">{{ vendor.designation|default:"-" }}</span>
             </div>
             <div class="info-item">
                 <span class="label">Contact Person</span>
-                <span class="value">{% if vendor.contact_person %}{{ vendor.contact_person }}{% else %}N/A{% endif %}</span>
+                <span class="value">{% if vendor.contact_person %}{{ vendor.contact_person }}{% else %}-{% endif %}</span>
             </div>
 
             {# Row 3 #}
             <div class="info-item">
                 <span class="label">Address</span>
-                <span class="value">{{ vendor.address.address_line_one|default:"N/A" }}</span>
+                <span class="value">{{ vendor.address.address_line_one|default:"-" }}</span>
             </div>
             <div class="info-item">
                 <span class="label">GSTIN Number</span>
-                <span class="value">{{ vendor.gstin_number|default:"N/A" }}</span>
+                <span class="value">{{ vendor.gstin_number|default:"-" }}</span>
             </div>
 
             {# Row 4 #}
             <div class="info-item">
                 <span class="label">State</span>
-                <span class="value">{{ vendor.address.state|default:"N/A" }}</span>
+                <span class="value">{{ vendor.address.state|default:"-" }}</span>
             </div>
             <div class="info-item">
                 <span class="label">Country</span>
-                <span class="value">{{ vendor.address.country|default:"N/A" }}</span>
+                <span class="value">{{ vendor.address.country|default:"-" }}</span>
             </div>
 
             {# Description - Full Width #}
@@ -99,11 +100,11 @@
             {# Row 5 #}
             <div class="info-item">
                 <span class="label">City</span>
-                <span class="value">{{ vendor.address.city|default:"N/A" }}</span>
+                <span class="value">{{ vendor.address.city|default:"-" }}</span>
             </div>
             <div class="info-item">
                 <span class="label">Pincode</span>
-                <span class="value">{{ vendor.address.pin_code|default:"N/A" }}</span>
+                <span class="value">{{ vendor.address.pin_code|default:"-" }}</span>
             </div>
         </div>
     </div>
@@ -144,26 +145,102 @@
             <h2>Asset List</h2>
         </div>
         <div class="table-responsive">
-            <table class="list-table">
+            <table class="assets-table list-table">
                 <thead>
                     <tr>
                         <th>Sl No.</th>
-                        <th>Asset Serial Number</th>
+                        <th>Image</th>
+                        <th>Asset Tag</th>
                         <th>Asset Name</th>
+                        <th>Product Type</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for asset in assets_page_object %}
                     <tr>
                         <td class="table-index-cell">
-                            {{ assets_page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+                            {% if assets_page_object.start_index %}
+                              {{ assets_page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+                            {% else %}
+                              {{ forloop.counter|stringformat:"02d" }}
+                            {% endif %}
                         </td>
-                        <td>{{ asset.serial_no|default:"######" }}</td>
-                        <td><div class="cell-name-main">{{ asset.name|default:"Unnamed Asset" }}</div></td>
+
+                        <td>
+                            {% with img=asset_images|get_item:asset.id %}
+                              <img class="asset-thumb"
+                                src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ asset.name }}"
+                                width="52" height="52"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                        </td>
+
+                        <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
+
+                        <td>
+                            {% with asset_conditions_map|get_item:asset.id as condition_list %}
+                              {% with condition_list|default:''|last as condition %}
+                                <div class="asset-name-main">{{ asset.name }}</div>
+                                <div class="asset-name-sub">
+                                  {% if asset.product %}{{ asset.product.name }}{% endif %}
+                                  {% if condition == 0 or condition == 1 %}
+                                    &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+                                  {% elif condition == 2 %}
+                                    &nbsp;·&nbsp;<span class="state-good">● Good</span>
+                                  {% elif condition == 3 or condition == 4 %}
+                                    &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+                                  {% endif %}
+                                </div>
+                              {% endwith %}
+                            {% endwith %}
+                        </td>
+
+                        <td>{{ asset.product.product_type }}</td>
+
+                        <td>
+                            {% if asset.is_assigned %}
+                              {% with map=asset_user_map|get_item:asset.id %}
+                                <div class="assignee-chip mb-1">
+                                  {% if map.image %}
+                                    <img src="{{ map.image.url }}"
+                                      onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
+                                      alt="{{ map.full_name }}" width="22" height="22">
+                                  {% else %}
+                                    <span class="assignee-initials">
+                                      {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
+                                    </span>
+                                  {% endif %}
+                                  <span>{{ map.full_name|default:"Unknown User" }}</span>
+                                </div>
+                              {% endwith %}
+                            {% else %}
+                              <span class="unassigned-label">Unassigned</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if not asset.is_assigned %}
+                              <span class="status-badge" style="background:var(--color-bg-secondary); color:var(--color-text);">{{ asset.asset_status.name }}</span>
+                            {% else %}
+                              <span class="status-badge status-allocated">Allocated</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="row-actions">
+                                <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View details">
+                                  <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="3"><div class="text-center py-4 text-muted">No assets assigned to this vendor.</div></td>
+                        <td colspan="8"><div class="text-center py-4 text-muted">No assets assigned to this vendor.</div></td>
                     </tr>
                     {% endfor %}
                 </tbody>

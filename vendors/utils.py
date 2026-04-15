@@ -81,8 +81,30 @@ def get_vendor_details(request, id):
         obj['field_name']=it.field_name
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
+    from assets.models import AssetImage, AssignAsset
+    from audit.models import Audit
+    from collections import defaultdict
+    asset_ids = [a.id for a in assets_page_object]
+    
+    asset_images = {}
+    for img in AssetImage.objects.filter(asset__organization=request.user.organization, asset_id__in=asset_ids).order_by('-uploaded_at'):
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+
+    asset_user_map = {}
+    for assign in AssignAsset.objects.select_related('user').filter(asset_id__in=asset_ids).order_by('-assigned_date'):
+        if assign.asset_id not in asset_user_map:
+            asset_user_map[assign.asset_id] = None
+        if assign.user:
+            asset_user_map[assign.asset_id] = {"full_name": assign.user.full_name, "image": assign.user.profile_pic}
+
+    asset_conditions_map = defaultdict(list)
+    for audit in Audit.objects.filter(asset_id__in=asset_ids):
+        asset_conditions_map[audit.asset_id].append(audit.condition)
+
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
-    'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
+    'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data,
+    'asset_images': asset_images, 'asset_user_map': asset_user_map, 'asset_conditions_map': asset_conditions_map}
     return context
 
 def vendor_list_util(request):

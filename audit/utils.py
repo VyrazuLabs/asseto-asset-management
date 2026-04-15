@@ -39,7 +39,30 @@ def get_completed_audit(request):
 
     page = request.GET.get('page', 1)
     paginator = Paginator(audits, 10)
-    audits_page = paginator.get_page(page)
+    from assets.models import AssetImage, AssignAsset
+    from collections import defaultdict
+    asset_ids = [audit.asset.id for audit in audits_page if audit.asset]
+    
+    asset_images = {}
+    for img in AssetImage.objects.filter(asset__organization=request.user.organization, asset_id__in=asset_ids).order_by('-uploaded_at'):
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+
+    asset_user_map = {}
+    for assign in AssignAsset.objects.select_related('user').filter(asset_id__in=asset_ids).order_by('-assigned_date'):
+        if assign.asset_id not in asset_user_map:
+            asset_user_map[assign.asset_id] = None
+        if assign.user:
+            asset_user_map[assign.asset_id] = {"full_name": assign.user.full_name, "image": assign.user.profile_pic}
+
+    asset_conditions_map = defaultdict(list)
+    for a in Audit.objects.filter(asset_id__in=asset_ids).order_by('created_at'):
+        asset_conditions_map[a.asset_id].append(a.condition)
+
+    audits_page.asset_images = asset_images
+    audits_page.asset_user_map = asset_user_map
+    audits_page.asset_conditions_map = asset_conditions_map
+
     return audits_page
 
 def get_pending_audits(request):
@@ -64,7 +87,33 @@ def get_pending_audits(request):
         data["last_audit_date"] = has_audit
         data_set.append(data)
 
-    return data_set
+    from assets.models import AssetImage, AssignAsset
+    from collections import defaultdict
+    
+    asset_ids = [data['asset'].id for data in data_set if data.get('asset')]
+    
+    asset_images = {}
+    for img in AssetImage.objects.filter(asset__organization=request.user.organization, asset_id__in=asset_ids).order_by('-uploaded_at'):
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+
+    asset_user_map = {}
+    for assign in AssignAsset.objects.select_related('user').filter(asset_id__in=asset_ids).order_by('-assigned_date'):
+        if assign.asset_id not in asset_user_map:
+            asset_user_map[assign.asset_id] = None
+        if assign.user:
+            asset_user_map[assign.asset_id] = {"full_name": assign.user.full_name, "image": assign.user.profile_pic}
+
+    asset_conditions_map = defaultdict(list)
+    for a in Audit.objects.filter(asset_id__in=asset_ids).order_by('created_at'):
+        asset_conditions_map[a.asset_id].append(a.condition)
+
+    return {
+        'data_set': data_set,
+        'asset_images': asset_images,
+        'asset_user_map': asset_user_map,
+        'asset_conditions_map': asset_conditions_map
+    }
 
 def get_time_difference(asset_creation_time, audit_interval_days):
     if asset_creation_time.tzinfo is not None and asset_creation_time.tzinfo.utcoffset(asset_creation_time) is not None:
