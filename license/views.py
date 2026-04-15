@@ -69,7 +69,7 @@ def license_details(request,id):
     page_number = request.GET.get('page')
     page_object = paginator.get_page(page_number)
 
-    context={'license':license,'pag_object':page_object,'title':f'Detail-{license.name}','sidebar':'license'}
+    context={'license':license,'page_object':page_object,'title':f'Detail-{license.name}','sidebar':'license'}
     return render(request,'license/license-details.html',context=context)
 
 @login_required

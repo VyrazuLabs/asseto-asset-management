@@ -1,0 +1,215 @@
+/* =============================================================================
+   add-license.css — Styles for the redesigned "Add License" page
+   ============================================================================= */
+
+.add-license-container {
+    width: 100%;
+    padding: 0 1rem 3rem;
+}
+
+/* ── Breadcrumb & Header ─────────────────────────────────────────────────── */
+.breadcrumb-wrap {
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6B7280;
+}
+
+.breadcrumb-custom .separator {
+    font-size: 0.6rem;
+    opacity: 0.5;
+}
+
+.breadcrumb-custom a {
+    color: #6B7280;
+    text-decoration: none;
+}
+
+.breadcrumb-custom a:hover {
+    color: #2563EB;
+}
+
+.breadcrumb-custom .active {
+    color: #2563EB;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+}
+
+/* ── Form Card ───────────────────────────────────────────────────────────── */
+.form-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2.5rem;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+/* ── Labels & Inputs ─────────────────────────────────────────────────────── */
+.form-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #4B5563;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.6rem;
+}
+
+.form-group label .required {
+    color: #EF4444;
+    margin-left: 2px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    background: #F9FAFB;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    color: #111827;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    background: #FFFFFF;
+    border-color: #2563EB;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.form-group .text-danger.small {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.4rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #F3F4F6;
+}
+
+.btn-cancel {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #6B7280;
+    text-decoration: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    color: #111827;
+    background-color: #F3F4F6;
+}
+
+.btn-save {
+    background: #1D4ED8;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2.5rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background: #1E40AF;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Dark Mode ───────────────────────────────────────────────────────────── */
+body.theme-dark .form-card {
+    background: #1E1E2D;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .page-title {
+    color: #F9FAFB;
+}
+
+body.theme-dark .form-group label {
+    color: #9CA3AF;
+}
+
+body.theme-dark .form-group input,
+body.theme-dark .form-group textarea,
+body.theme-dark .form-group select {
+    background: #151521;
+    border-color: #2E2E42;
+    color: #F9FAFB;
+}
+
+body.theme-dark .form-group input:focus,
+body.theme-dark .form-group textarea:focus,
+body.theme-dark .form-group select:focus {
+    background: #1A1A27;
+    border-color: #3B82F6;
+}
+
+body.theme-dark .form-actions {
+    border-color: #2E2E42;
+}
+
+body.theme-dark .btn-cancel {
+    color: #9CA3AF;
+}
+
+body.theme-dark .btn-cancel:hover {
+    background-color: #2E2E42;
+    color: #F9FAFB;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 850px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .form-card {
+        padding: 1.5rem;
+    }
+}

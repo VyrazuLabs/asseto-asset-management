@@ -1,61 +1,105 @@
-{% if page_object and request.user.is_superuser %}
+{% if request.user.is_staff or request.user.is_superuser %}
 {% load static %}
 {% load custom_filters %}
-<div class="col-12 col-xl-12">
-    <div class="card">
-        <div class="card-header">
-            <h4>Activity Log</h4>
+<div class="timeline-card">
+    <div class="timeline-header">
+        <div class="timeline-header-left">
+            <i class="bi bi-clock-history"></i>
+            <h3>Activity Log</h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-lg">
-                    <thead>
-                        <tr>
-                            <th>Sl No.</th>
-                            <th>Description</th>
-                            <th>Datetime</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            {% for history in page_object %}
-                            <tr>
-                                <td class="col-3">
-                                    <div class="d-flex align-items-center">
-                                        <p class="font-bold ms-3 mb-0">{{page_object.start_index|add:forloop.counter0}}</p>
-                                    </div>
-                                </td>
-                                <td class="col-auto">
-                                    <p class="mb-0">
-                                        {% if history.history_type == "+" %}
-                                            Inserted
-                                        {% elif history.history_type == "^" %}
-                                            Restored
-                                        {% elif history.history_type == "-" %}
-                                            Deleted
-                                        {% else %}
-                                            {% if history.status != history.prev_record.status %}
-                                                {% if history.status %} Enabled {% else %} Disabled {% endif %}
-                                            {% elif history.is_assigned != history.prev_record.is_assigned %}
-                                                {% if history.is_assigned %} Assigned {% else %} Unassigned {% endif %}
-                                            {% else %}
-                                                Updated
-                                            {% endif %}
-                                        {% endif %}
-                                        by {{history.history_user.full_name}}                                                                                    
-                                    </p>
-                                </td>
-                                <td class="col-auto">
-                                    <p class="mb-0">
-                                        {% format_datetime history.history_date %} 
-                                    </p>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                    </tbody>
-                </table>
-                {% include 'commons/pagination.html' %}
+        <a href="#" class="view-all-link">View All History</a>
+    </div>
+    <div class="timeline-body">
+        {% for history in page_object %}
+        <div class="timeline-item">
+            {# Dynamic Icon and Color logic #}
+            {% if history.history_type == "+" %}
+                <div class="timeline-icon bg-blue">
+                    <i class="bi bi-plus-circle"></i>
+                </div>
+            {% elif history.history_type == "-" %}
+                <div class="timeline-icon bg-orange">
+                    <i class="bi bi-trash"></i>
+                </div>
+            {% elif history.history_type == "^" %}
+                <div class="timeline-icon bg-green">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </div>
+            {% else %}
+                {# Check for specific status changes if applicable #}
+                {% if history.prev_record and history.status != history.prev_record.status %}
+                    <div class="timeline-icon bg-green">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                {% else %}
+                    <div class="timeline-icon bg-blue">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="timeline-content">
+                <div class="timeline-content-header">
+                    <h4 class="timeline-title">
+                        {% if history.history_type == "+" %}
+                            Record Created
+                        {% elif history.history_type == "-" %}
+                            Record Deleted
+                        {% elif history.history_type == "^" %}
+                            Record Restored
+                        {% else %}
+                            {% if history.prev_record and history.status != history.prev_record.status %}
+                                Status Changed
+                            {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
+                                Assignment Changed
+                            {% else %}
+                                Information Updated
+                            {% endif %}
+                        {% endif %}
+                    </h4>
+                    <span class="timeline-time">
+                        {% format_datetime history.history_date %}
+                    </span>
+                </div>
+                
+                <p class="timeline-desc">
+                    {% if history.history_type == "+" %}
+                        The record was successfully created and added to the system.
+                    {% elif history.history_type == "-" %}
+                        The record was removed and moved to the recycle bin.
+                    {% elif history.history_type == "^" %}
+                        The record was restored from the recycle bin.
+                    {% else %}
+                        {% if history.prev_record and history.status != history.prev_record.status %}
+                            Status was {% if history.status %}Enabled{% else %}Disabled{% endif %} by the administrator.
+                        {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
+                             Record was {% if history.is_assigned %}Assigned{% else %}Unassigned{% endif %}.
+                        {% else %}
+                            Information was updated with new details.
+                        {% endif %}
+                    {% endif %}
+                </p>
+
+                <div class="timeline-footer">
+                    <div class="timeline-avatar">
+                        {{ history.history_user.full_name|slice:":1"|upper|default:"?" }}
+                    </div>
+                    <span class="timeline-user">{{ history.history_user.full_name|default:"System" }}</span>
+                    <span class="timeline-role">{{ history.history_user.role.related_name|default:"Administrator" }}</span>
+                </div>
             </div>
         </div>
+        {% empty %}
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+            <p>No activity log found for this record.</p>
+        </div>
+        {% endfor %}
     </div>
+    {% if page_object.has_other_pages %}
+    <div class="px-4 pb-3">
+        {% include 'commons/pagination.html' %}
+    </div>
+    {% endif %}
 </div>
 {% endif %}
