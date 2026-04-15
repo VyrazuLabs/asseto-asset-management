@@ -1,0 +1,316 @@
+/* =============================================================================
+   audit-details.css — Styles for the redesigned "Audit Details" page
+   ============================================================================= */
+
+:root {
+    --color-primary: #1D4ED8;
+    --color-primary-light: #EFF6FF;
+    --color-bg: #F9FAFB;
+    --color-card: #FFFFFF;
+    --color-border: #E5E7EB;
+    --color-text: #111827;
+    --color-muted: #6B7280;
+    --color-success: #10B981;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.audit-details-container {
+    width: 100%;
+    padding: 0 1rem 3rem;
+}
+
+/* ── Breadcrumb & Header ─────────────────────────────────────────────────── */
+.breadcrumb-wrap {
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+}
+
+.breadcrumb-custom .separator {
+    font-size: 0.6rem;
+    opacity: 0.5;
+}
+
+.breadcrumb-custom a {
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-custom a:hover {
+    color: var(--color-primary);
+}
+
+.breadcrumb-custom .active {
+    color: var(--color-primary);
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.header-row h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.btn-back-premium {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    background: #DBEAFE;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-back-premium:hover {
+    background: #BFDBFE;
+    transform: translateY(-1px);
+}
+
+/* ── Main Layout Grid ────────────────────────────────────────────────────── */
+.audit-details-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .audit-details-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Info Card ───────────────────────────────────────────────────────────── */
+.detail-card {
+    background: var(--color-card);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-header-custom {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-header-custom i {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+}
+
+.card-header-custom h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.info-grid {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 2rem;
+}
+
+.info-item .label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+}
+
+.info-item .value {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+/* Badge for Interval */
+.badge-interval {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.85rem;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Condition Indicator */
+.condition-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.excellent {
+    background-color: var(--color-success);
+}
+
+.status-dot.good {
+    background-color: #3B82F6;
+}
+
+.status-dot.fair {
+    background-color: #F59E0B;
+}
+
+.status-dot.poor {
+    background-color: #EF4444;
+}
+
+/* ── Notes Section ───────────────────────────────────────────────────────── */
+.notes-section {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.notes-section .label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.notes-box {
+    background: #F3F4F6;
+    border-radius: 8px;
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    color: #374151;
+    line-height: 1.6;
+    border-left: 4px solid var(--color-border);
+}
+
+/* ── Audit Images ────────────────────────────────────────────────────────── */
+.image-gallery {
+    padding: 1.5rem;
+}
+
+.image-container {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 4/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.image-container:hover {
+    transform: scale(1.02);
+}
+
+.image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Dark Mode ───────────────────────────────────────────────────────────── */
+body.theme-dark {
+    --color-bg: #111827;
+    --color-card: #1F2937;
+    --color-border: #374151;
+    --color-text: #F9FAFB;
+    --color-muted: #9CA3AF;
+    --color-primary-light: rgba(29, 78, 216, 0.15);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body.theme-dark .header-row h1 {
+    font-size: 2rem !important;
+}
+
+body.theme-dark .card-header-custom h2 {
+    font-size: 1.125rem !important;
+}
+
+body.theme-dark .notes-box {
+    background: #111827;
+    color: #D1D5DB;
+    border-color: #374151;
+}
+
+body.theme-dark .btn-back-premium {
+    background: #1D4ED8;
+    color: #FFFFFF;
+}
+
+body.theme-dark .btn-back-premium:hover {
+    background: #1E40AF;
+    color: white !important;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+.font-bold {
+    font-weight: 700;
+}
+
+.text-primary {
+    color: var(--color-primary);
+}
+
+@media (max-width: 640px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

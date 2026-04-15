@@ -82,12 +82,10 @@ def add_vendor(request):
             vendor.organization = request.user.organization
             vendor.save()
             messages.success(request, 'Vendor added successfully')
-            response = HttpResponse(status=204)
-            response["HX-Trigger"] = "vendorAdded"
-            return response
+            return redirect('vendors:list')
 
     context = {'vendor_form': vendor_form, 'address_form': address_form}
-    return render(request, 'vendors/add-vendor-modal.html', context=context)
+    return render(request, 'vendors/add.html', context=context)
 
 """Get the details of the vendor based on id"""
 @login_required
@@ -101,33 +99,28 @@ def details(request, id):
 @permission_required('authentication.edit_vendor')
 # @silk_profile(name="update_vendor")
 def update_vendor(request, id):
-    vendor = get_object_or_404(
-        Vendor.undeleted_objects, pk=id)
-    address = Address.objects.get(id=vendor.address.id)
+    vendor = get_object_or_404(Vendor.undeleted_objects, pk=id)
+    address = vendor.address
     vendor_form = VendorForm(instance=vendor)
     address_form = AddressForm(instance=address)
-    custom_fields = CustomField.objects.filter(entity_type='asset', object_id=vendor.id, organization=request.user.organization)
+    
     if request.method == "POST":
         vendor_form = VendorForm(request.POST, instance=vendor)
         address_form = AddressForm(request.POST, instance=address)
         if vendor_form.is_valid() and address_form.is_valid():
             vendor_form.save()
             address_form.save()
-            custom_fields = CustomField.objects.filter(entity_type='asset', object_id=vendor.id, organization=request.user.organization)
-            for cf in custom_fields:
-                key = f"custom_field_{cf.entity_id}"
-                new_val = request.POST.get(key, "")
-                if new_val != cf.field_value:
-                    cf.field_value = new_val
-                    cf.save()
             messages.success(request, 'Vendor updated successfully')
-            # return redirect(f'/vendors/details/{vendor.id}')
-            context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
-               'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
-            return render(request, 'vendors/update-vendor-modal.html', context=context)
-    context = {'sidebar': 'vendors', 'vendor_form': vendor_form,
-               'address_form': address_form, 'vendor': vendor, 'title': f'Update-{vendor.name}','custom_fields': custom_fields}
-    return render(request, 'vendors/update-vendor-modal.html', context=context)
+            return redirect('vendors:list')
+
+    context = {
+        'sidebar': 'vendors',
+        'vendor_form': vendor_form,
+        'address_form': address_form,
+        'vendor': vendor,
+        'title': f'Update-{vendor.name}'
+    }
+    return render(request, 'vendors/edit.html', context=context)
 
 """Search the vendors based on search text"""
 @login_required

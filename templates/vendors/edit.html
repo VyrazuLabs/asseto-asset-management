@@ -1,0 +1,154 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Update Vendor - {{ vendor.name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/add-vendor.css' %}?v=1.1">
+{% endblock css %}
+
+{% block content %}
+<div class="add-vendor-container">
+    {# ── Breadcrumbs ───────────────────────────────────────────────────────── #}
+    <div class="breadcrumb-wrap">
+        <div class="breadcrumb-custom">
+            <span>Vendors</span>
+            <span class="separator"><i class="bi bi-chevron-right"></i></span>
+            <span class="active">Update Vendor</span>
+        </div>
+    </div>
+
+    {# ── Page Header ────────────────────────────────────────────────────────── #}
+    <h1 class="page-title">Update Vendor: {{ vendor.name }}</h1>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-grid">
+                {# Vendor Name #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.name.id_for_label }}">Vendor <span class="required">*</span></label>
+                    {{ vendor_form.name }}
+                    {% if vendor_form.name.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Email #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.email.id_for_label }}">Email</label>
+                    {{ vendor_form.email }}
+                    {% if vendor_form.email.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Phone #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.phone.id_for_label }}">Phone</label>
+                    {{ vendor_form.phone }}
+                    {% if vendor_form.phone.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Contact Person #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.contact_person.id_for_label }}">Contact Person</label>
+                    {{ vendor_form.contact_person }}
+                    {% if vendor_form.contact_person.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.contact_person.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Designation #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.designation.id_for_label }}">Designation</label>
+                    {{ vendor_form.designation }}
+                    {% if vendor_form.designation.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.designation.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# GSTIN Number #}
+                <div class="form-group">
+                    <label for="{{ vendor_form.gstin_number.id_for_label }}">GSTIN Number</label>
+                    {{ vendor_form.gstin_number }}
+                    {% if vendor_form.gstin_number.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.gstin_number.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Address Line 1 #}
+                <div class="form-group full-width">
+                    <label for="{{ address_form.address_line_one.id_for_label }}">Address Line 1</label>
+                    {{ address_form.address_line_one }}
+                    {% if address_form.address_line_one.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.address_line_one.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Address Line 2 #}
+                <div class="form-group full-width">
+                    <label for="{{ address_form.address_line_two.id_for_label }}">Address Line 2</label>
+                    {{ address_form.address_line_two }}
+                    {% if address_form.address_line_two.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.address_line_two.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Country #}
+                <div class="form-group">
+                    <label for="{{ address_form.country.id_for_label }}">Country</label>
+                    {{ address_form.country }}
+                    {% if address_form.country.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.country.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# State #}
+                <div class="form-group">
+                    <label for="{{ address_form.state.id_for_label }}">State</label>
+                    {{ address_form.state }}
+                    {% if address_form.state.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.state.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# City #}
+                <div class="form-group">
+                    <label for="{{ address_form.city.id_for_label }}">City</label>
+                    {{ address_form.city }}
+                    {% if address_form.city.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.city.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Zip Code #}
+                <div class="form-group">
+                    <label for="{{ address_form.pin_code.id_for_label }}">Zip Code</label>
+                    {{ address_form.pin_code }}
+                    {% if address_form.pin_code.errors %}
+                    <div class="text-danger small mt-1">{{ address_form.pin_code.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {# Description #}
+                <div class="form-group full-width">
+                    <label for="{{ vendor_form.description.id_for_label }}">Description</label>
+                    {{ vendor_form.description }}
+                    {% if vendor_form.description.errors %}
+                    <div class="text-danger small mt-1">{{ vendor_form.description.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'vendors:list' %}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">Update Vendor</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

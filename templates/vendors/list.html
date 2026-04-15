@@ -29,11 +29,9 @@
       {% if deleted_vendor_count %}<span class="count-badge">{{ deleted_vendor_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_vendor %}
-      <button type="button" class="btn-register"
-        hx-get="{% url 'vendors:add' %}" hx-target="#add-vendor-modal-content"
-        data-bs-toggle="modal" data-bs-target="#add-vendor-modal">
+      <a href="{% url 'vendors:add' %}" class="btn-register">
         <i class="bi bi-plus-lg"></i> Add Vendor
-      </button>
+      </a>
     {% endif %}
   </div>
 </div>
@@ -207,8 +205,7 @@
             <div class="table-empty-state">
               <i class="bi bi-building d-block"></i>
               <p>No vendors found.<br>
-                <a href="#" class="link-primary" hx-get="{% url 'vendors:add' %}" hx-target="#add-vendor-modal-content"
-                  data-bs-toggle="modal" data-bs-target="#add-vendor-modal">Add your first vendor</a>
+                <a href="{% url 'vendors:add' %}" class="link-primary">Add your first vendor</a>
               </p>
             </div>
           </td>
