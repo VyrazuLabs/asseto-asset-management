@@ -259,7 +259,7 @@ def get_asset_by_users(id):
 def assigned_asset_to_user(page_object):
     user_ids = [u.id for u in page_object]
 
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids,asset__is_deleted=False).select_related("asset")
 
     user_asset_map = {}
     for aa in assigned_assets:

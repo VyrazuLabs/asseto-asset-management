@@ -51,7 +51,7 @@ class LoginOtp(APIView):
                 return Response({
                     'success': False,
                     'message': 'Invalid credentials'
-                }, status=400)
+                }, status=401)
 
             is_valid,secret = handle_user_totp(request,entered_otp,user)
             print(f"Verifying OTP: secret={secret}, entered_otp={entered_otp}, is_valid={is_valid}")  # Debug log

@@ -83,6 +83,7 @@ def get_vendor_details(request, id):
         get_custom_data.append(obj)
     context = {'sidebar': 'vendors', 'vendor': vendor, 'page_object': page_object,
     'address': address, 'title': f'Details-{vendor.name}','assets_page_object':assets_page_object,'get_custom_data':get_custom_data}
+    return context
 
 def vendor_list_util(request):
     vendors_list = Vendor.undeleted_objects.filter(Q(organization=None) |

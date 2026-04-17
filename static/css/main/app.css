@@ -20442,6 +20442,14 @@ body .bi::before,
   font-weight: bold;
 }
 
+.page-title h3{
+  color: #111827;
+}
+
+body.theme-dark .page-title h3{
+  color: white;
+}
+
 .page-title-headings {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 from django import template
 from dateutil.parser import parse
+from rsa import key
 from configurations.utils import get_currency_and_datetime_format
 from datetime import datetime
 from configurations.models import LocalizationConfiguration
@@ -12,6 +13,11 @@ register = template.Library()
  
 @register.filter
 def get_item(dictionary, key):
+    print("DICTIONARY",dictionary,"KEY",key )
+    print("TYPE",type(dictionary))
+    print("TYPE OF KEY",type(key))
+    if not isinstance(dictionary, dict):
+        return None
     return dictionary.get(key)
  
 @register.filter

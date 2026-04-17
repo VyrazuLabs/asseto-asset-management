@@ -26,12 +26,28 @@
   color: var(--color-text);
   margin: 0 0 .3rem;
 }
+
+.audit-page-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
 .page-breadcrumb {
   font-size: .78rem;
-  margin: 0;
+  margin-bottom: 0.35rem;
   padding: 0;
   background: transparent;
 }
+
+body.theme-dark .page-breadcrumb {
+  font-size: .78rem;
+  margin-bottom: 0.35rem;
+  padding: 0;
+  background: transparent;
+}
+
 .page-breadcrumb .breadcrumb-link {
   color: var(--color-muted);
   text-decoration: none;
@@ -82,7 +98,14 @@
   border-bottom: 1.5px solid var(--color-border);
 }
 .audit-card-header h2 {
-  font-size: .95rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+body.theme-dark h2{
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;

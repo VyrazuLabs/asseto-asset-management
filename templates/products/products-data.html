@@ -13,6 +13,7 @@
 
       <td>
         {% with img=product_images|get_item:products.id %}
+          {{img}}
           <img class="list-thumb"
             src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
             alt="{{ products.name }}"
