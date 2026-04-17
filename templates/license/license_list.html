@@ -276,8 +276,7 @@
       {% for num in page_object.paginator.page_range %}
       {% if page_object.number == num %}
       <span class="page-btn active" aria-current="page">{{ num }}</span>
-      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <=
-        page_object.number|add:"2" %} <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
         {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
         <span class="page-ellipsis">…</span>
         {% endif %}

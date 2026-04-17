@@ -166,13 +166,13 @@ def completed_audits(request):
 
 @login_required
 def pending_audits(request):
-    data_set = get_pending_audits(request)
+    pending_data = get_pending_audits(request)
     stats = get_audit_stats(request)
     context = {
-        'data_set': data_set,
         'sidebar': 'audit',
         'tab': 'pending',
     }
+    context.update(pending_data)
     context.update(stats)
     return render(request, 'audit/pending_audits.html', context)
 

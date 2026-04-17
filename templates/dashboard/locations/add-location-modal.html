@@ -1,123 +1,309 @@
 <div class="modal-content">
-    <div class="modal-header bg-dark text-center">
-        <h5 class="modal-title white w-100" id="myModalLabel160">Add Location
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-            aria-label="Close">
+    <div class="modal-header-custom">
+        <h5 class="modal-title"><i class="bi bi-building"></i> Add Location</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
     <form hx-post="{{request.path}}" novalidate>
         {% csrf_token %}
-        <div class="modal-body">
-            <div class="row">
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Office Name</label>
-                        <span class="text-danger">*</span>
-                        {{location_form.office_name}}
-                        {% for error in location_form.office_name.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+        <div class="modal-body-custom">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>OFFICE NAME <span class="required">*</span></label>
+                    {{location_form.office_name}}
+                    {% for error in location_form.office_name.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Contact Person Name</label>
-                        {{location_form.contact_person_name}}
-                        {% for error in location_form.contact_person_name.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>CONTACT PERSON NAME</label>
+                    {{location_form.contact_person_name}}
+                    {% for error in location_form.contact_person_name.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Contact Person Email</label>
-                        {{location_form.contact_person_email}}
-                        {% for error in location_form.contact_person_email.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>CONTACT PERSON EMAIL</label>
+                    {{location_form.contact_person_email}}
+                    {% for error in location_form.contact_person_email.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Contact Person Phone</label>
-                        {{location_form.contact_person_phone}}
-                        {% for error in location_form.contact_person_phone.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>CONTACT PERSON PHONE</label>
+                    {{location_form.contact_person_phone}}
+                    {% for error in location_form.contact_person_phone.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Address Line 1</label>
-                        {{address_form.address_line_one}}
-                        {% for error in address_form.address_line_one.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group full-width">
+                    <label>ADDRESS LINE 1</label>
+                    {{address_form.address_line_one}}
+                    {% for error in address_form.address_line_one.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Address Line 2</label>
-                        {{address_form.address_line_two}}
-                        {% for error in address_form.address_line_two.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group full-width">
+                    <label>ADDRESS LINE 2</label>
+                    {{address_form.address_line_two}}
+                    {% for error in address_form.address_line_two.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Country</label>
-                        {{address_form.country}}
-                        {% for error in address_form.country.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>COUNTRY</label>
+                    {{address_form.country}}
+                    {% for error in address_form.country.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>State</label>
-                        {{address_form.state}}
-                        {% for error in address_form.state.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>STATE</label>
+                    {{address_form.state}}
+                    {% for error in address_form.state.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>City</label>
-                        {{address_form.city}}
-                        {% for error in address_form.city.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>CITY</label>
+                    {{address_form.city}}
+                    {% for error in address_form.city.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
-                <div class="col-md-6 col-12">
-                    <div class="form-group">
-                        <label>Zip Code</label>
-                        {{address_form.pin_code}}
-                        {% for error in address_form.pin_code.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
-                        {% endfor %}
-                    </div>
+                <div class="form-group">
+                    <label>ZIP CODE</label>
+                    {{address_form.pin_code}}
+                    {% for error in address_form.pin_code.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-light-secondary"
-                data-bs-dismiss="modal">
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Close</span>
+        <div class="modal-footer-custom">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> Cancel
             </button>
-            <button type="submit" class="btn btn-info ml-1"
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
-            >
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Save</span>
+            <button type="submit" class="btn-save">
+                <i class="bi bi-check-lg"></i> Save
             </button>
         </div>
     </form>
 </div>
+
+<style>
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    background: var(--color-card);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header-custom .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.modal-header-custom .modal-title i {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.modal-body-custom {
+    padding: 1.25rem;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+.modal-body-custom .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1rem;
+}
+
+.modal-body-custom .form-group.full-width {
+    grid-column: span 2;
+}
+
+.modal-body-custom .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.modal-body-custom .form-group label .required {
+    color: #EF4444;
+    margin-left: 0.15rem;
+}
+
+.modal-body-custom .form-group input,
+.modal-body-custom .form-group select,
+.modal-body-custom .form-group textarea {
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+.modal-body-custom .form-group input:focus,
+.modal-body-custom .form-group select:focus,
+.modal-body-custom .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-card);
+}
+
+.modal-body-custom .text-danger {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.modal-footer-custom .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer-custom .btn-cancel:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+}
+
+.modal-footer-custom .btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 1rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer-custom .btn-save:hover {
+    background: #4338CA;
+}
+
+/* Dark Mode */
+body.theme-dark .modal-content {
+    background: #1E1E2D;
+}
+
+body.theme-dark .modal-header-custom {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .modal-header-custom .modal-title {
+    color: #F9FAFB;
+}
+
+body.theme-dark .btn-close-modal {
+    color: #9CA3AF;
+}
+
+body.theme-dark .btn-close-modal:hover {
+    background: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-body-custom .form-group input,
+body.theme-dark .modal-body-custom .form-group select,
+body.theme-dark .modal-body-custom .form-group textarea {
+    background: #161625;
+    border-color: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-footer-custom {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel {
+    background: #1E1E2D;
+    border-color: #2D2D3F;
+    color: #9CA3AF;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel:hover {
+    border-color: #F9FAFB;
+    color: #F9FAFB;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .modal-body-custom .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-body-custom .form-group.full-width {
+        grid-column: span 1;
+    }
+}
+</style>
+
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (

@@ -73,7 +73,7 @@ def add_product(request):
 
     context = {'form': form,
                'image_form': image_form,}
-    return render(request, 'products/add-product-modal.html', context)
+    return render(request, 'products/add.html', context)
 
 @login_required
 @permission_required('authentication.delete_product')
@@ -110,12 +110,18 @@ def update_product(request, id):
     if request.method=="DELETE":
         try:
             data = json.loads(request.body)
-            delete_ids = data.get('delete_image_ids', [])
-            if delete_ids:
-                ProductImage.objects.filter(id__in=delete_ids, product=product).delete()
+            delete_image_ids = data.get('delete_image_ids', [])
+            delete_custom_field_ids = data.get('delete_custom_field_ids', [])
+            
+            if delete_image_ids:
+                ProductImage.objects.filter(id__in=delete_image_ids, product=product).delete()
                 return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
-            else:
-                return JsonResponse({'success': False, 'message': 'No image IDs provided.'}, status=400)
+            
+            if delete_custom_field_ids:
+                CustomField.objects.filter(entity_id__in=delete_custom_field_ids, object_id=product.id, organization=request.user.organization).delete()
+                return JsonResponse({'success': True, 'message': 'Custom fields deleted successfully.'})
+
+            return JsonResponse({'success': False, 'message': 'No IDs provided for deletion.'}, status=400)
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
         
@@ -188,7 +194,7 @@ def update_product(request, id):
             return redirect(f"/products/details/{product.id}")
 
     context = {'form': form, 'title': f'Edit - {product.name}','product': product,'product_images': img_array,'img_form':img_form,'custom_fields': custom_fields,}
-    return render(request, 'products/update-product-modal.html', context)
+    return render(request, 'products/edit.html', context)
 
 
 @user_passes_test(check_admin)

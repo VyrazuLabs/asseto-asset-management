@@ -1,0 +1,172 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Update Vendor - {{ vendor.name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-vendor.css' %}?v=1.3">
+{% endblock css %}
+
+{% block content %}
+<div class="add-vendor-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'vendors:list' %}" class="breadcrumb-link">Vendors</a>
+                    </li>
+                    <li class="breadcrumb-item active">Update Vendor</li>
+                </ol>
+            </nav>
+            <h1>Update Vendor: {{ vendor.name }}</h1>
+            <p class="subtitle">Update the vendor details below to modify the vendor partner information.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'vendors:list' %}" class="btn-back-listing">
+                <i class="bi bi-arrow-left"></i> Back to Listing
+            </a>
+            <button type="submit" form="vendor-form" class="btn-save-asset">
+                <i class="bi bi-floppy2"></i> Update
+            </button>
+        </div>
+    </div>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="vendor-form" novalidate>
+            {% csrf_token %}
+
+            {# ── Section 1: Vendor Identity ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-person-vcard-fill"></i> <span>Vendor Identity</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ vendor_form.name.id_for_label }}">VENDOR NAME <span
+                                class="required">*</span></label>
+                        {{ vendor_form.name }}
+                        {% if vendor_form.name.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ vendor_form.gstin_number.id_for_label }}">GSTIN NUMBER</label>
+                        {{ vendor_form.gstin_number }}
+                        {% if vendor_form.gstin_number.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.gstin_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2: Contact Information ────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-person-lines-fill"></i> <span>Contact Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ vendor_form.contact_person.id_for_label }}">CONTACT PERSON</label>
+                        {{ vendor_form.contact_person }}
+                        {% if vendor_form.contact_person.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.contact_person.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ vendor_form.designation.id_for_label }}">DESIGNATION</label>
+                        {{ vendor_form.designation }}
+                        {% if vendor_form.designation.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.designation.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ vendor_form.email.id_for_label }}">EMAIL</label>
+                        {{ vendor_form.email }}
+                        {% if vendor_form.email.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ vendor_form.phone.id_for_label }}">PHONE</label>
+                        {{ vendor_form.phone }}
+                        {% if vendor_form.phone.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3: Registered Address ─────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-geo-alt-fill"></i> <span>Registered Address</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ address_form.address_line_one.id_for_label }}">ADDRESS LINE 1</label>
+                        {{ address_form.address_line_one }}
+                        {% if address_form.address_line_one.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.address_line_one.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="{{ address_form.address_line_two.id_for_label }}">ADDRESS LINE 2</label>
+                        {{ address_form.address_line_two }}
+                        {% if address_form.address_line_two.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.address_line_two.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ address_form.city.id_for_label }}">CITY</label>
+                        {{ address_form.city }}
+                        {% if address_form.city.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ address_form.state.id_for_label }}">STATE</label>
+                        {{ address_form.state }}
+                        {% if address_form.state.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.state.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ address_form.country.id_for_label }}">COUNTRY</label>
+                        {{ address_form.country }}
+                        {% if address_form.country.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.country.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ address_form.pin_code.id_for_label }}">ZIP CODE</label>
+                        {{ address_form.pin_code }}
+                        {% if address_form.pin_code.errors %}
+                        <div class="text-danger small mt-1">{{ address_form.pin_code.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Additional Details ─────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-file-earmark-text-fill"></i> <span>Additional Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ vendor_form.description.id_for_label }}">DESCRIPTION</label>
+                        {{ vendor_form.description }}
+                        {% if vendor_form.description.errors %}
+                        <div class="text-danger small mt-1">{{ vendor_form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

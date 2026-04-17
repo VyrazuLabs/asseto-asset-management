@@ -104,8 +104,6 @@ class UserForm(forms.ModelForm):
         phone = self.cleaned_data['phone']
         if not phone.isdigit():
             raise forms.ValidationError("Phone number must contain only digits")
-        elif not len(phone)==10:
-            raise forms.ValidationError("Phone number does not have 10 digits")
         return phone
     class Meta:
         model = User
@@ -188,8 +186,6 @@ class UserUpdateForm(UserChangeForm):
         phone = self.cleaned_data['phone']
         if not phone.isdigit():
             raise forms.ValidationError("Phone number must contain only digits")
-        elif len(phone)>10: 
-            raise forms.ValidationError("Phone number can not be more than 10 digits")
         return phone
 
     def clean_full_name(self):

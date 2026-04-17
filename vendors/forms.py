@@ -36,8 +36,6 @@ class VendorForm(forms.ModelForm):
         if phone:
             if not phone.isdigit():
                 raise forms.ValidationError("Phone number must contain only digits")
-            elif not len(phone)==10: 
-                raise forms.ValidationError("Phone number does not have 10 digits")
         return phone
             
 

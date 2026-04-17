@@ -220,10 +220,14 @@
               </a>
               {% endif %}
               {% if perms.authentication.edit_location %}
-              <a href="{% url 'dashboard:update_location' location.id %}"
-                class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Location">
+              <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Location"
+                hx-get="{% url 'dashboard:update_location' location.id %}?modal=1&_={{ forloop.counter }}"
+                hx-target="#edit-location-modal-content"
+                hx-cache="false"
+                data-bs-toggle="modal" data-bs-target="#edit-location-modal"
+                {% if is_demo %}disabled{% endif %}>
                 <i class="bi bi-pencil"></i>
-              </a>
+              </button>
               {% endif %}
               {% if perms.authentication.delete_location %}
               <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
@@ -301,6 +305,13 @@
 <div class="modal fade" id="add-location-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div id="add-location-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
+
+{# ── Edit modal ───────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="edit-location-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div id="edit-location-modal-content" class="modal-content" hx-target="this"></div>
   </div>
 </div>
 
