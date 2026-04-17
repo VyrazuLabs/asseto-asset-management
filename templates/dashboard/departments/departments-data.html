@@ -73,9 +73,9 @@
             {% endif %}
             {% if perms.authentication.edit_department %}
             <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Department"
-              hx-get="{% url 'dashboard:update_department' department.id %}"
-              hx-target="#update-department-modal-content" data-bs-toggle="modal"
-              data-bs-target="#update-department-modal" {% if is_demo %}disabled{% endif %}>
+              hx-get="{% url 'dashboard:update_department' department.id %}?modal=1&_={{ forloop.counter }}"
+              hx-target="#update-department-modal-content" hx-cache="false"
+              data-bs-toggle="modal" data-bs-target="#update-department-modal" {% if is_demo %}disabled{% endif %}>
               <i class="bi bi-pencil"></i>
             </button>
             {% endif %}
@@ -101,11 +101,10 @@
           <div class="table-empty-state">
             <i class="bi bi-people d-block"></i>
             <p>No departments found related to your search.<br>
-              {% if perms.authentication.add_department %}
-              <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
-                hx-get="{% url 'dashboard:add_department' %}" hx-target="#add-department-modal-content"
-                data-bs-toggle="modal" data-bs-target="#add-department-modal">Create your first department</button>
-              {% endif %}
+{% if perms.authentication.add_department %}
+                <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
+                  onclick="openDepartmentModal()">Create your first department</button>
+                {% endif %}
             </p>
           </div>
         </td>

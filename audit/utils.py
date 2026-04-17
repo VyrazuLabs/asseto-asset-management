@@ -39,9 +39,11 @@ def get_completed_audit(request):
 
     page = request.GET.get('page', 1)
     paginator = Paginator(audits, 10)
+    audits_page = paginator.get_page(page)
+    
     from assets.models import AssetImage, AssignAsset
     from collections import defaultdict
-    asset_ids = [audit.asset.id for audit in audits_page if audit.asset]
+    asset_ids = [audit.asset.id for audit in audits if audit.asset]
     
     asset_images = {}
     for img in AssetImage.objects.filter(asset__organization=request.user.organization, asset_id__in=asset_ids).order_by('-uploaded_at'):

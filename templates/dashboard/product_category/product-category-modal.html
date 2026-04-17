@@ -1,53 +1,232 @@
 <div class="modal-content">
-    <div class="modal-header bg-dark">
-        <h5 class="modal-title white w-100 text-center" id="myModalLabel160">{{modal_title}}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-            aria-label="Close">
+    <div class="modal-header-custom">
+        <h5 class="modal-title"><i class="bi bi-folder2-open"></i> {{modal_title}}</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
-    <form hx-post='{{request.path}}' novalidate>
+    <form hx-post="{{request.path}}" novalidate>
         {% csrf_token %}
-        <div class="modal-body">
+        <div class="modal-body-custom">
             <div class="form-group">
-                <label>Category Name</label>
-                {{form.name}} 
+                <label>CATEGORY NAME <span class="required">*</span></label>
+                {{form.name}}
                 {% for error in form.name.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+                <small class="text-danger">{{ error }}</small>
                 {% endfor %}
             </div>
             <div class="form-group">
-                <label>Parent Name</label>
-                <span class="text-danger">*</span>
-                {{form.parent}} 
+                <label>PARENT CATEGORY</label>
+                {{form.parent}}
                 {% for error in form.parent.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+                <small class="text-danger">{{ error }}</small>
                 {% endfor %}
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-light-secondary"
-                data-bs-dismiss="modal">
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Close</span>
+        <div class="modal-footer-custom">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> Cancel
             </button>
-            <button type="submit" class="btn btn-sm btn-info ml-1"
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
-            >
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Save</span>
+            <button type="submit" class="btn-save">
+                <i class="bi bi-check-lg"></i> {% if 'Add' in modal_title %}Save{% else %}Update{% endif %}
             </button>
         </div>
     </form>
 </div>
+
+<style>
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    background: var(--color-card);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header-custom .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.modal-header-custom .modal-title i {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+.modal-body-custom {
+    padding: 1.25rem;
+}
+
+.modal-body-custom .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.modal-body-custom .form-group label .required {
+    color: #EF4444;
+    margin-left: 0.15rem;
+}
+
+.modal-body-custom .form-group input,
+.modal-body-custom .form-group select,
+.modal-body-custom .form-group textarea {
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+.modal-body-custom .form-group input:focus,
+.modal-body-custom .form-group select:focus,
+.modal-body-custom .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-card);
+}
+
+.modal-body-custom .text-danger {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.modal-footer-custom .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer-custom .btn-cancel:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+}
+
+.modal-footer-custom .btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 1rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-footer-custom .btn-save:hover {
+    background: #4338CA;
+}
+
+body.theme-dark .modal-content {
+    background: #1E1E2D;
+}
+
+body.theme-dark .modal-header-custom {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .modal-header-custom .modal-title {
+    color: #F9FAFB;
+}
+
+body.theme-dark .btn-close-modal {
+    color: #9CA3AF;
+}
+
+body.theme-dark .btn-close-modal:hover {
+    background: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-body-custom .form-group input,
+body.theme-dark .modal-body-custom .form-group select,
+body.theme-dark .modal-body-custom .form-group textarea {
+    background: #161625;
+    border-color: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-footer-custom {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel {
+    background: #1E1E2D;
+    border-color: #2D2D3F;
+    color: #9CA3AF;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel:hover {
+    border-color: #F9FAFB;
+    color: #F9FAFB;
+}
+</style>
 <script>
 function requestAndSendNotification() {
   if (Notification.permission === "granted") {
-    // Permission already granted, send notification directly
     sendNotification();
   }
   else if (Notification.permission !== "denied") {
-    // Request permission if not already denied
     Notification.requestPermission().then(permission => {
       if (permission === "granted") {
         sendNotification();
@@ -64,8 +243,7 @@ function sendNotification() {
   };
   new Notification(title, options);
 }
-</script>
-<script>
+
 document.body.addEventListener("productCategoryAdded", function () {
   requestAndSendNotification();
 });
@@ -77,4 +255,12 @@ document.body.addEventListener("productCategoryAdded", function () {
                 location.reload();
         }
     });
+</script>
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const form = this;
+    const submitBtn = form.querySelector('.btn-save');
+    submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Saving...';
+    submitBtn.disabled = true;
+});
 </script>

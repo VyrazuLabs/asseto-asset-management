@@ -4,106 +4,121 @@
 {% block title %}Add New License | Asseto{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/pages/add-license.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-license.css' %}?v=1.2">
 {% endblock css %}
 
 {% block content %}
 <div class="add-license-container">
-    {# ── Breadcrumbs ───────────────────────────────────────────────────────── #}
-    <div class="breadcrumb-wrap">
-        <div class="breadcrumb-custom">
-            <a href="/">Dashboard</a>
-            <span class="separator"><i class="bi bi-chevron-right"></i></span>
-            <a href="{% url 'license:license_list' %}">Licenses</a>
-            <span class="separator"><i class="bi bi-chevron-right"></i></span>
-            <span class="active">Add New License</span>
-        </div>
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'license:license_list' %}" class="breadcrumb-link">Licenses</a></li>
+            <li class="breadcrumb-item active">Add License</li>
+          </ol>
+        </nav>
+        <h1>Add New License</h1>
+        <p class="subtitle">Create a new license in the system. Fill in the details below to add a new license.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'license:license_list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <button type="submit" form="license-form" class="btn-save-asset">
+          <i class="bi bi-floppy2"></i> Save
+        </button>
+      </div>
     </div>
-
-    {# ── Page Header ────────────────────────────────────────────────────────── #}
-    <h1 class="page-title">Add New License</h1>
 
     {# ── Form Card ─────────────────────────────────────────────────────────── #}
     <div class="form-card">
-        <form method="post" novalidate>
+        <form method="post" id="license-form" novalidate>
             {% csrf_token %}
-            <div class="form-grid">
-                {# License Name #}
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">License Name <span class="required">*</span></label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                    <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
-                    {% endif %}
-                </div>
 
-                {# License Type #}
-                <div class="form-group">
-                    <label for="{{ form.license_type.id_for_label }}">License Type <span class="required">*</span></label>
-                    {{ form.license_type }}
-                    {% if form.license_type.errors %}
-                    <div class="text-danger small mt-1">{{ form.license_type.errors.0 }}</div>
-                    {% endif %}
+            {# ── Section 1: Basic Information ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-key"></i> <span>Basic Information</span>
                 </div>
-
-                {# Seats #}
-                <div class="form-group">
-                    <label for="{{ form.seats.id_for_label }}">Seats <span class="required">*</span></label>
-                    {{ form.seats }}
-                    {% if form.seats.errors %}
-                    <div class="text-danger small mt-1">{{ form.seats.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Key #}
-                <div class="form-group">
-                    <label for="{{ form.key.id_for_label }}">License Key</label>
-                    {{ form.key }}
-                    {% if form.key.errors %}
-                    <div class="text-danger small mt-1">{{ form.key.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Vendor #}
-                <div class="form-group">
-                    <label for="{{ form.vendor.id_for_label }}">Vendor</label>
-                    {{ form.vendor }}
-                    {% if form.vendor.errors %}
-                    <div class="text-danger small mt-1">{{ form.vendor.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Start Date #}
-                <div class="form-group">
-                    <label for="{{ form.start_date.id_for_label }}">Start Date</label>
-                    {{ form.start_date }}
-                    {% if form.start_date.errors %}
-                    <div class="text-danger small mt-1">{{ form.start_date.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Expiry Date #}
-                <div class="form-group">
-                    <label for="{{ form.expiry_date.id_for_label }}">Expiry Date</label>
-                    {{ form.expiry_date }}
-                    {% if form.expiry_date.errors %}
-                    <div class="text-danger small mt-1">{{ form.expiry_date.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Description (Notes) #}
-                <div class="form-group full-width">
-                    <label for="{{ form.notes.id_for_label }}">Description / Notes</label>
-                    {{ form.notes }}
-                    {% if form.notes.errors %}
-                    <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>
-                    {% endif %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">LICENSE NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.license_type.id_for_label }}">LICENSE TYPE <span class="required">*</span></label>
+                        {{ form.license_type }}
+                        {% if form.license_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.license_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.seats.id_for_label }}">SEATS <span class="required">*</span></label>
+                        {{ form.seats }}
+                        {% if form.seats.errors %}
+                        <div class="text-danger small mt-1">{{ form.seats.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.vendor.id_for_label }}">VENDOR</label>
+                        {{ form.vendor }}
+                        {% if form.vendor.errors %}
+                        <div class="text-danger small mt-1">{{ form.vendor.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            <div class="form-actions">
-                <a href="{% url 'license:license_list' %}" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-save">Save License</button>
+            {# ── Section 2: License Details ─────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-info-circle"></i> <span>License Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.key.id_for_label }}">LICENSE KEY</label>
+                        {{ form.key }}
+                        {% if form.key.errors %}
+                        <div class="text-danger small mt-1">{{ form.key.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.start_date.id_for_label }}">START DATE</label>
+                        {{ form.start_date }}
+                        {% if form.start_date.errors %}
+                        <div class="text-danger small mt-1">{{ form.start_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.expiry_date.id_for_label }}">EXPIRY DATE</label>
+                        {{ form.expiry_date }}
+                        {% if form.expiry_date.errors %}
+                        <div class="text-danger small mt-1">{{ form.expiry_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3: Additional Details ──────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-file-earmark-text"></i> <span>Additional Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ form.notes.id_for_label }}">DESCRIPTION / NOTES</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                        <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </form>
     </div>
