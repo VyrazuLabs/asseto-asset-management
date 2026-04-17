@@ -18,89 +18,103 @@
         <!-- Row 1 -->
         <!-- Total Assets -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-green">
-                    <i class="bi bi-laptop"></i>
+            <a href="{% url 'assets:list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-green">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Assets</div>
+                        <div class="metric-value">{{ asset_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Assets</div>
-                    <div class="metric-value">{{ asset_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Assigned Assets -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-blue">
-                    <i class="bi bi-person-workspace"></i>
+            <a href="{% url 'assets:assigned_list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-blue">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Assigned Assets</div>
+                        <div class="metric-value">{{ assign_assets_counts }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Assigned Assets</div>
-                    <div class="metric-value">{{ assign_assets_counts }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Licenses -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-cyan">
-                    <i class="bi bi-key-fill"></i>
+            <a href="{% url 'license:license_list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-cyan">
+                        <i class="bi bi-key-fill"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">License</div>
+                        <div class="metric-value">{{ license_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">License</div>
-                    <div class="metric-value">{{ license_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Vendors -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-rose">
-                    <i class="bi bi-shop"></i>
+            <a href="{% url 'vendors:list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-rose">
+                        <i class="bi bi-shop"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Vendors</div>
+                        <div class="metric-value">{{ vendor_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Vendors</div>
-                    <div class="metric-value">{{ vendor_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
 
         <!-- Row 2 -->
         <!-- Locations -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-teal">
-                    <i class="bi bi-geo-alt-fill"></i>
+            <a href="{% url 'dashboard:locations' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-teal">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Locations</div>
+                        <div class="metric-value">{{ location_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Locations</div>
-                    <div class="metric-value">{{ location_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Products -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-green">
-                    <i class="bi bi-box-seam"></i>
+            <a href="{% url 'products:list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-green">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Products</div>
+                        <div class="metric-value">{{ product_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Products</div>
-                    <div class="metric-value">{{ product_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Users -->
         <div class="col-6 col-md-3 mb-4">
-            <div class="metric-card">
-                <div class="metric-icon-box metric-rose">
-                    <i class="bi bi-people-fill"></i>
+            <a href="{% url 'users:list' %}">
+                <div class="metric-card">
+                    <div class="metric-icon-box metric-rose">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-label">Users</div>
+                        <div class="metric-value">{{ users_count }}</div>
+                    </div>
                 </div>
-                <div class="metric-content">
-                    <div class="metric-label">Users</div>
-                    <div class="metric-value">{{ users_count }}</div>
-                </div>
-            </div>
+            </a>
         </div>
         <!-- Total Asset Cost -->
         <div class="col-6 col-md-3 mb-4">

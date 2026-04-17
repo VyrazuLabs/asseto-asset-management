@@ -28,8 +28,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 col-12">
-                            <label for="id_prefix">Tag Prefix</label>
+                        <div class="col-md-6 col-12 d-flex">
+                            <label for="id_prefix">Tag Prefixx</label>
                             {{ form.prefix }}
                             <div>{% for error in form.prefix.errors %}
                                 <p><small class="text-danger">{{ error }}</small></p>
@@ -37,7 +37,7 @@
                             {% endfor %}
                         </div>
 
-                        <div class="col-md-6 col-12">
+                        <div class="col-md-6 col-12 w-100 p-2">
                             <label for="id_number_suffix">Tag Suffix</label>
                             {{ form.number_suffix }}
                             <div>{% for error in form.number_suffix.errors %}

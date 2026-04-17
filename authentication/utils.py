@@ -149,11 +149,11 @@ def generate_qrcode(secret,username):
     img.save(buffered, format="PNG")
     #Dont send in bytes
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-    print("SECRET OF QR CODE:", secret)
+    # print("SECRET OF QR CODE:", secret)
     return img_str
 
 def verify_totp(secret,entered_otp):
-    print("Verifying OTP: secret=", secret)
+    # print("Verifying OTP: secret=", secret)
     totp = pyotp.TOTP(secret)
     user_provided_otp = entered_otp
 

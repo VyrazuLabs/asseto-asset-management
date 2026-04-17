@@ -32,8 +32,8 @@
                 {# ── Assignee Name ───────────────────────────────────────── #}
                 <div class="assign-form-group">
                     <label class="assign-form-label">Assignee Name</label>
-                    <div class="position-relative">
-                        <i class="bi bi-person"></i>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- <i class="bi bi-person input-icon"></i> -->
                         {{ form.user }}
                     </div>
                     {% for error in form.user.errors %}

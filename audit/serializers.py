@@ -54,7 +54,7 @@ class AuditSerializer(serializers.ModelSerializer):
         )
         asset_images = None
         for image in images:
-            # image=convert_image(image)
+            image=convert_image(image)
             AuditImage.objects.create(image=image, audit=audit)
         return audit
 

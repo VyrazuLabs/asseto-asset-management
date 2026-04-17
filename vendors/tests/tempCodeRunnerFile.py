@@ -21,7 +21,6 @@ def login(self):
         )
         # driver.get("http://10.0.0.117:9000/login")
         vendors_url = "http://10.0.0.117:9000/vendors/list"
-        print("logged in")
         self.driver.get(vendors_url)
         time.sleep(5)
         driver.quit()

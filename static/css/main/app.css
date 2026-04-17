@@ -568,7 +568,7 @@ h1,
   margin-bottom: 0.5rem;
   font-weight: 700;
   line-height: 1.2;
-  color: #25396f;
+  color: black;
 }
 
 h1,
@@ -20440,6 +20440,14 @@ body .bi::before,
 .page-heading h3,
 .page-heading .h3 {
   font-weight: bold;
+}
+
+.page-title h3{
+  color: #111827;
+}
+
+body.theme-dark .page-title h3{
+  color: white;
 }
 
 .page-title-headings {
