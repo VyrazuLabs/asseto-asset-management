@@ -1,9 +1,9 @@
 /* =============================================================================
-   license-details.css — Styles for the redesigned "License Details" page
+   department-details.css — Styles for the redesigned "Department Details" page
    Relies on: list-common.css (for --color-primary, --color-text, etc.)
    ============================================================================= */
 
-.license-details-container {
+.department-details-container {
     width: 100%;
     padding: 0 0 3rem 0;
 }
@@ -151,62 +151,8 @@
     line-height: 1.5;
 }
 
-.info-item .value a {
-    color: var(--color-primary);
-    text-decoration: none;
-}
-
 .info-item.full-width {
     grid-column: span 2;
-}
-
-/* ── Status Badges ─────────────────────────────────────────────────────────── */
-.status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.status-badge.status-deploy {
-    background: rgba(59, 130, 246, 0.1);
-    color: #3B82F6;
-}
-
-.status-badge.status-active {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10B981;
-}
-
-.status-badge.status-inactive {
-    background: rgba(107, 114, 128, 0.1);
-    color: #6B7280;
-}
-
-.asset-tag-pill {
-    display: inline-block;
-    background: var(--color-primary-light);
-    color: var(--color-primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.text-muted {
-    color: var(--color-muted);
-}
-
-/* ── Notes Box ──────────────────────────────────────────────────────────── */
-.notes-box {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    padding: 1rem;
-    font-size: 0.925rem;
-    color: var(--color-text);
-    line-height: 1.5;
 }
 
 /* ── Dark Mode ───────────────────────────────────────────────────────────── */
@@ -253,6 +199,7 @@ body.theme-dark .card-header-custom i {
 
 body.theme-dark .card-header-custom h2 {
     color: var(--color-text);
+    font-size: 1.05rem;
 }
 
 body.theme-dark .info-item .label {
@@ -263,33 +210,7 @@ body.theme-dark .info-item .value {
     color: #F9FAFB;
 }
 
-body.theme-dark .status-badge.status-deploy {
-    background: rgba(99, 102, 241, 0.2);
-    color: #818CF8;
-}
-
-body.theme-dark .status-badge.status-active {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34D399;
-}
-
-body.theme-dark .status-badge.status-inactive {
-    background: rgba(107, 114, 128, 0.2);
-    color: #9CA3AF;
-}
-
-body.theme-dark .asset-tag-pill {
-    background: rgba(99, 102, 241, 0.2);
-    color: #818CF8;
-}
-
-body.theme-dark .notes-box {
-    background: #161625;
-    border-color: #2D2D3F;
-    color: #F9FAFB;
-}
-
-/* ── Activity Log Timeline ────────────────────────────────────────────────── */
+/* ── Timeline Styles (for history) ───────────────────────────────────────── */
 .timeline-card {
     background: var(--color-card);
     border-radius: 12px;
@@ -487,6 +408,7 @@ body.theme-dark .timeline-header-left i {
 
 body.theme-dark .timeline-header-left h3 {
     color: var(--color-text);
+    font-size: 1.05rem;
 }
 
 body.theme-dark .timeline-body::before {

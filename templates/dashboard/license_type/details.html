@@ -1,40 +1,92 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}License Type Details - {{ license_type.name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/department-details.css' %}">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">License Type Details</h3>
-
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Product Types</li>
-                    <li class="breadcrumb-item active" aria-current="page">License Type Details</li>
-                </ol>
-            </nav>
-
-        </div>
-        <div>
-            <a href="{% url 'dashboard:license_type_list' %}" class="btn btn-sm btn-outline-info my-3">Back to License Type List</a>
-        </div>
+<div class="license-type-details-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:license_type_list' %}" class="breadcrumb-link">License Types</a></li>
+            <li class="breadcrumb-item active">License Type Details</li>
+          </ol>
+        </nav>
+        <h1>{{ license_type.name }}</h1>
+        <p class="page-subtitle">View and manage license type details and associated licenses.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'dashboard:license_type_list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        {% if perms.authentication.edit_license_type %}
+        <button type="button" class="btn-save-asset" onclick="openEditLicenseTypeModal('{% url 'dashboard:update_license_type' license_type.id %}')" {% if is_demo %}disabled{% endif %}>
+          <i class="bi bi-pencil"></i> Update License Type
+        </button>
+        {% endif %}
+      </div>
     </div>
-    <section class="section">
 
-        <div class="card">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-borderless">
-                        <tbody>
-                        <tr>
-                            <th scope="row">License Type Name</th>
-                            <td>{{license_type.name}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+    {# ── License Type Information Card ───────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-journal-check"></i>
+            <h2><span>License Type Information</span></h2>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">License Type Name</span>
+                <span class="value">{{ license_type.name|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Status</span>
+                <span class="value">
+                    {% if license_type.status %}
+                    <span class="status-badge status-active">Active</span>
+                    {% else %}
+                    <span class="status-badge status-inactive">Inactive</span>
+                    {% endif %}
+                </span>
             </div>
         </div>
+    </div>
+
+    {# ── History Section ───────────────────────────────────────────────────── #}
+    <div class="mt-4">
         {% include 'commons/history.html' %}
-    </section>
+    </div>
 </div>
-{% endblock content%}
+
+{# ── Edit modal ───────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="update-license-type-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div id="update-license-type-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
+
+<script>
+function openEditLicenseTypeModal(url) {
+    var modalEl = document.getElementById('update-license-type-modal');
+    if (!modalEl) return;
+    
+    htmx.ajax('GET', url, {
+        target: '#update-license-type-modal-content'
+    }).then(function() {
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+}
+
+document.body.addEventListener("licenseTypeUpdated", function () {
+    location.reload();
+});
+</script>
+{% endblock content %}

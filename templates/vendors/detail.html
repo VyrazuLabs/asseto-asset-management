@@ -5,7 +5,7 @@
 {% block title %}Vendor Details - {{ vendor.name }} | Asseto{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.1">
+<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.2">
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <style>
@@ -25,30 +25,34 @@
 
 {% block content %}
 <div class="vendor-details-container">
-    {# ── Breadcrumbs ───────────────────────────────────────────────────────── #}
-    <div class="breadcrumb-wrap">
-        <div class="breadcrumb-custom">
-            <a href="/">Dashboard</a>
-            <span class="separator"><i class="bi bi-chevron-right"></i></span>
-            <a href="{% url 'vendors:list' %}">Vendors</a>
-            <span class="separator"><i class="bi bi-chevron-right"></i></span>
-            <span class="active">{{ vendor.name }}</span>
-        </div>
-    </div>
-
-    {# ── Header Row ────────────────────────────────────────────────────────── #}
-    <div class="header-row">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'vendors:list' %}" class="breadcrumb-link">Vendors</a></li>
+            <li class="breadcrumb-item active">{{ vendor.name }}</li>
+          </ol>
+        </nav>
         <h1>{{ vendor.name }}</h1>
+        <p class="page-subtitle">View and manage vendor details and associated assets.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
         <a href="{% url 'vendors:list' %}" class="btn-back">
-            <i class="bi bi-arrow-left me-2"></i> Back to Vendor List
+          <i class="bi bi-arrow-left"></i> Back to Listing
         </a>
+        <a href="{% url 'vendors:update_vendor' vendor.id %}" class="btn-update">
+          <i class="bi bi-pencil"></i> Update Vendor
+        </a>
+      </div>
     </div>
 
     {# ── Vendor Information Card ───────────────────────────────────────────── #}
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-person-badge"></i>
-            <h2>Vendor Information</h2>
+            <h2><span>Vendor Information</span></h2>
         </div>
         <div class="info-grid">
             {# Row 1 #}
@@ -114,7 +118,7 @@
     <div class="table-card mb-4">
         <div class="card-header-custom">
             <i class="bi bi-list-stars"></i>
-            <h2>Custom Fields</h2>
+            <h2><span>Custom Fields</span></h2>
         </div>
         <div class="table-responsive">
             <table class="list-table">
@@ -142,7 +146,7 @@
     <div class="table-card mb-4">
         <div class="card-header-custom">
             <i class="bi bi-box-seam"></i>
-            <h2>Asset List</h2>
+            <h2><span>Asset List</span></h2>
         </div>
         <div class="table-responsive">
             <table class="assets-table list-table">

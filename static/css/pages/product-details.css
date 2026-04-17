@@ -1,64 +1,44 @@
 /* =============================================================================
    product-details.css — Redesigned "Product Details" page
+   Relies on: list-common.css (for --color-primary, --color-text, etc.)
    ============================================================================= */
 
 :root {
-    --pd-primary: #1D4ED8;
-    --pd-primary-hover: #1E40AF;
-    --pd-bg-light: #F9FAFB;
-    --pd-card-bg: #FFFFFF;
-    --pd-border: #E5E7EB;
-    --pd-text-main: #111827;
-    --pd-text-muted: #6B7280;
+    --pd-primary: var(--color-primary);
+    --pd-primary-hover: #4338CA;
+    --pd-bg-light: transparent;
+    --pd-card-bg: var(--color-card);
+    --pd-border: var(--color-border);
+    --pd-text-main: var(--color-text);
+    --pd-text-muted: var(--color-muted);
     --pd-success: #10B981;
 }
 
 .product-details-container {
     width: 100%;
-    padding: 0 1rem 3rem;
-    background: var(--pd-bg-light);
-    min-height: 100vh;
+    padding: 0 0 3rem 0;
 }
 
 /* ── Breadcrumb & Header ─────────────────────────────────────────────────── */
-.pd-breadcrumb-wrap {
-    margin-bottom: 0.5rem;
+.list-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
-
-.pd-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--pd-text-muted);
+.list-page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.3rem;
 }
-
-.pd-breadcrumb .pd-id {
-    color: var(--pd-text-muted);
-    font-weight: 500;
-}
-
-.pd-breadcrumb .pd-id::before {
-    content: "•";
-    margin: 0 0.5rem;
-}
-
-.pd-header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.pd-header-row h1 {
-    font-size: 1.75rem;
-    /* Reduced from 2rem */
-    font-weight: 800;
-    color: var(--pd-text-main);
-    margin: 0;
+.list-page-header .page-subtitle {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  max-width: 520px;
+  line-height: 1.5;
 }
 
 .pd-header-actions {
@@ -69,34 +49,91 @@
 .btn-pd-secondary {
     display: inline-flex;
     align-items: center;
-    padding: 0.6rem 1.25rem;
-    background: #DBEAFE;
-    border: none;
+    padding: 0 1rem;
+    height: 34px;
+    background: #fff;
+    border: 1.5px solid var(--color-border);
     border-radius: 8px;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--pd-primary);
+    color: var(--color-text);
     text-decoration: none;
+    gap: 0.4rem;
     transition: all 0.2s ease;
+}
+
+.btn-pd-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .btn-pd-primary {
     display: inline-flex;
     align-items: center;
-    padding: 0.6rem 1.25rem;
-    background: var(--pd-primary);
+    padding: 0 1rem;
+    height: 34px;
+    background: var(--color-primary);
     border: none;
     border-radius: 8px;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #FFFFFF;
     text-decoration: none;
+    gap: 0.4rem;
     transition: all 0.2s ease;
 }
 
 .btn-pd-primary:hover {
-    background: var(--pd-primary-hover);
+    background: #4338CA;
     color: white;
+}
+
+.btn-save-asset {
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    padding: 0 1rem;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    text-decoration: none;
+    line-height: 1;
+    box-sizing: border-box;
+}
+.btn-save-asset:hover {
+    background: #4338CA;
+    color: #fff;
+}
+
+.btn-back-listing {
+    background: #fff;
+    color: var(--color-text);
+    border: 1.5px solid var(--color-border);
+    border-radius: 8px;
+    padding: 0 1rem;
+    height: 34px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1;
+    box-sizing: border-box;
+}
+.btn-back-listing:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 /* ── Layout Grid ─────────────────────────────────────────────────────────── */
@@ -111,13 +148,13 @@
 .pd-card {
     background: var(--pd-card-bg);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1.25rem;
     overflow: hidden;
 }
 
 .pd-card-header {
-    padding: 1.25rem 1.5rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--pd-border);
     display: flex;
     align-items: center;
@@ -127,17 +164,30 @@
 .pd-card-title {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 1.125rem;
+    gap: 0.65rem;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: var(--pd-primary);
-    /* Changed to primary to match Light Mode Screenshot */
+    color: var(--pd-text-main);
     margin: 0;
 }
 
 .pd-card-title i {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    background: var(--color-primary-light);
     color: var(--pd-primary);
-    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.pd-card-title span {
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
 }
 
 .pd-badge {
@@ -326,9 +376,9 @@
 }
 
 .pd-history-wrap .timeline-header-left h3 {
-    font-size: 1.125rem !important;
+    font-size: 1.05rem;
     font-weight: 700;
-    color: var(--pd-primary);
+    color: var(--pd-text-main);
     margin: 0;
 }
 
@@ -496,23 +546,25 @@ body.theme-dark .pd-history-wrap .timeline-icon.bg-gray {
 
 /* ── Dark Mode ───────────────────────────────────────────────────────────── */
 body.theme-dark {
-    --pd-bg-light: #0B0E14;
-    --pd-card-bg: #151921;
-    --pd-border: #2D3748;
+    --pd-bg-light: transparent;
+    --pd-card-bg: #1E1E2D;
+    --pd-border: #2D2D3F;
     --pd-text-main: #F9FAFB;
-    --pd-text-muted: #A0AEC0;
+    --pd-text-muted: #9CA3AF;
 }
 
-body.theme-dark .pd-header-row h1 {
-    color: #FFFFFF !important;
-    font-size: 1.75rem !important;
-    /* Matches light mode scale */
+body.theme-dark .list-page-header h1 {
+    color: var(--color-text);
 }
 
 body.theme-dark .pd-card-title {
-    color: white !important;
-    /* Light blue for dark mode to match the theme's blue in light mode */
-    font-size: 1.125rem !important;
+    color: var(--color-text);
+    font-size: 1.05rem;
+}
+
+body.theme-dark .pd-card-title i {
+    background: #1E1E2D;
+    color: var(--color-primary);
 }
 
 body.theme-dark .pd-badge {
@@ -521,45 +573,42 @@ body.theme-dark .pd-badge {
 }
 
 body.theme-dark .pd-card {
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    background: var(--pd-card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 body.theme-dark .pd-card-header {
-    border-color: #2D3748;
+    border-color: var(--pd-border);
 }
 
 body.theme-dark .pd-custom-box,
 body.theme-dark .pd-add-photo {
-    background: #1A202C;
-    border-color: #2D3748;
+    background: #161625;
+    border-color: var(--pd-border);
 }
 
 body.theme-dark .pd-main-image {
-    background: #1A202C;
-    border-color: #2D3748;
+    background: #161625;
+    border-color: var(--pd-border);
 }
 
-body.theme-dark .btn-pd-secondary {
-    background: #151521;
-    border: 1px solid #2D3748;
-    color: #60A5FA;
+body.theme-dark .btn-back-listing {
+    background: #1E1E2D;
+    border-color: #2D2D3F;
+    color: var(--color-text);
+}
+body.theme-dark .btn-back-listing:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
-body.theme-dark .btn-pd-secondary:hover {
-    background: #1A1A27;
-    border-color: #60A5FA;
-    color: #FFFFFF;
+body.theme-dark .btn-save-asset {
+    background: var(--color-primary);
+    color: #fff;
 }
-
-body.theme-dark .btn-pd-primary {
-    background: #2563EB;
-    color: #FFFFFF;
-}
-
-body.theme-dark .btn-pd-primary:hover {
-    background: #1D4ED8;
-    color: white !important;
-    box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+body.theme-dark .btn-save-asset:hover {
+    background: #4338CA;
+    color: #fff;
 }
 
 /* More Timeline Dark Mode Refinements */
@@ -568,13 +617,12 @@ body.theme-dark .pd-history-wrap .timeline-card {
 }
 
 body.theme-dark .pd-history-wrap .timeline-header-left h3 {
-    color: white !important;
+    color: var(--color-text);
+    font-size: 1.05rem;
 }
 
 body.theme-dark .pd-history-wrap .timeline-title {
-    color: #60A5FA !important;
-    /* Blue headers in activity log to match light mode's blue headers */
-    font-size: 1rem !important;
+    color: var(--color-primary);
 }
 
 body.theme-dark .pd-history-wrap .timeline-desc {

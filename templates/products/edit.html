@@ -4,15 +4,15 @@
 {% block title %}Update Product - {{ product.name }} | Asseto{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.1">
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.2">
 <style>
-    /* Additional styles for image preview and custom fields */
     .product-img-card {
         position: relative;
         display: inline-block;
         margin-right: 1rem;
         margin-bottom: 1rem;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--color-border);
         border-radius: 8px;
         padding: 4px;
         background: white;
@@ -49,177 +49,169 @@
         background: #dc2626;
     }
 
-    .custom-field-row {
-        margin-bottom: 1rem;
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #e5e7eb;
-    }
-
-    body.theme-dark .custom-field-row {
-        background: #151521;
-        border-color: #2e2e42;
-    }
-
     body.theme-dark .product-img-card {
-        background: #1e1e2d;
-        border-color: #2e2e42;
+        background: #1E1E2D;
+        border-color: #2D2D3F;
     }
 </style>
 {% endblock css %}
 
 {% block content %}
 <div class="add-product-container">
-    {# ── Breadcrumbs ───────────────────────────────────────────────────────── #}
-    <div class="breadcrumb-wrap">
-        <div class="breadcrumb-custom">
-            <a href="{% url 'products:list' %}" style="text-decoration: none; color: inherit;">Products</a>
-            <span class="separator"><i class="bi bi-chevron-right"></i></span>
-            <span class="active">Update Product</span>
-        </div>
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="breadcrumb-link">Products</a></li>
+            <li class="breadcrumb-item active">Update Product</li>
+          </ol>
+        </nav>
+        <h1>Update Product: {{ product.name }}</h1>
+        <p class="subtitle">Update the product details below to modify the product information.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'products:list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <button type="submit" form="product-form" class="btn-save-asset">
+          <i class="bi bi-floppy2"></i> Update
+        </button>
+      </div>
     </div>
-
-    {# ── Page Header ────────────────────────────────────────────────────────── #}
-    <h1 class="page-title">Update Product: {{ product.name }}</h1>
 
     {# ── Form Card ─────────────────────────────────────────────────────────── #}
     <div class="form-card">
-        <form method="post" novalidate enctype="multipart/form-data">
+        <form method="post" id="product-form" novalidate enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="form-grid">
-                {# Product Name #}
-                <div class="form-group">
-                    <label for="{{ form.name.id_for_label }}">Product Name <span class="required">*</span></label>
-                    {{ form.name }}
-                    {% if form.name.errors %}
-                    <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
-                    {% endif %}
+
+            {# ── Section 1: Basic Information ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-box-seam"></i> <span>Basic Information</span>
                 </div>
-
-                {# Product Type #}
-                <div class="form-group">
-                    <label for="{{ form.product_type.id_for_label }}">Product Type <span
-                            class="required">*</span></label>
-                    {{ form.product_type }}
-                    {% if form.product_type.errors %}
-                    <div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Product Category #}
-                <div class="form-group">
-                    <label for="{{ form.product_category.id_for_label }}">Product Category <span
-                            class="required">*</span></label>
-                    {{ form.product_category }}
-                    {% if form.product_category.errors %}
-                    <div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Product Sub Category #}
-                <div class="form-group">
-                    <label for="{{ form.product_sub_category.id_for_label }}">Product Sub Category</label>
-                    {{ form.product_sub_category }}
-                    {% if form.product_sub_category.errors %}
-                    <div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Manufacturer #}
-                <div class="form-group">
-                    <label for="{{ form.manufacturer.id_for_label }}">Manufacturer</label>
-                    {{ form.manufacturer }}
-                    {% if form.manufacturer.errors %}
-                    <div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Model #}
-                <div class="form-group">
-                    <label for="{{ form.model.id_for_label }}">Model</label>
-                    {{ form.model }}
-                    {% if form.model.errors %}
-                    <div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Product EOL #}
-                <div class="form-group">
-                    <label for="{{ form.eol.id_for_label }}">Product EOL</label>
-                    {{ form.eol }}
-                    {% if form.eol.errors %}
-                    <div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Audit Interval #}
-                <div class="form-group">
-                    <label for="{{ form.audit_interval.id_for_label }}">Audit Interval</label>
-                    {{ form.audit_interval }}
-                    {% if form.audit_interval.errors %}
-                    <div class="text-danger small mt-1">{{ form.audit_interval.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Description #}
-                <div class="form-group full-width">
-                    <label for="{{ form.description.id_for_label }}">Description</label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                    <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                {# Images Section #}
-                <div class="form-group full-width">
-                    <label>Product Images</label>
-
-                    {# Existing Images #}
-                    <div class="mb-3" id="existing-images">
-                        {% for img in product_images %}
-                        <div class="product-img-card" id="img-card-{{ img.id }}">
-                            <img src="{% get_media_prefix %}{{ img.image }}" alt="Product Image"
-                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
-                            <button type="button" class="delete-img-btn" data-img-id="{{ img.id }}"
-                                title="Delete image">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-                        {% endfor %}
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">PRODUCT NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
                     </div>
-
-                    {# New Image Upload #}
-                    <label for="{{ img_form.image.id_for_label }}"
-                        style="font-size: 0.7rem; color: var(--color-text-muted);">Add More Images</label>
-                    {{ img_form.image }}
-                    <div id="imagePreview" class="mt-2 text-center" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="{{ form.product_type.id_for_label }}">PRODUCT TYPE <span class="required">*</span></label>
+                        {{ form.product_type }}
+                        {% if form.product_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_category.id_for_label }}">PRODUCT CATEGORY <span class="required">*</span></label>
+                        {{ form.product_category }}
+                        {% if form.product_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_sub_category.id_for_label }}">PRODUCT SUB CATEGORY</label>
+                        {{ form.product_sub_category }}
+                        {% if form.product_sub_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            {# ── Custom Fields Section ─────────────────────────────────────────── #}
-            <div class="mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 style="font-size: 1.125rem; font-weight: 700; color: #1D4ED8; margin: 0;">Custom Fields</h3>
+            {# ── Section 2: Product Details ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-info-circle"></i> <span>Product Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.manufacturer.id_for_label }}">MANUFACTURER</label>
+                        {{ form.manufacturer }}
+                        {% if form.manufacturer.errors %}
+                        <div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.model.id_for_label }}">MODEL</label>
+                        {{ form.model }}
+                        {% if form.model.errors %}
+                        <div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.eol.id_for_label }}">PRODUCT EOL</label>
+                        {{ form.eol }}
+                        {% if form.eol.errors %}
+                        <div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.audit_interval.id_for_label }}">AUDIT INTERVAL</label>
+                        {{ form.audit_interval }}
+                        {% if form.audit_interval.errors %}
+                        <div class="text-danger small mt-1">{{ form.audit_interval.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3: Description & Image ──────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-file-earmark-text"></i> <span>Description & Image</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ form.description.id_for_label }}">DESCRIPTION</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group full-width">
+                        <label>PRODUCT IMAGES</label>
+                        <div class="mb-3" id="existing-images">
+                            {% for img in product_images %}
+                            <div class="product-img-card" id="img-card-{{ img.id }}">
+                                <img src="{% get_media_prefix %}{{ img.image }}" alt="Product Image" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <button type="button" class="delete-img-btn" data-img-id="{{ img.id }}" title="Delete image">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <label for="{{ img_form.image.id_for_label }}" style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">ADD MORE IMAGES</label>
+                        {{ img_form.image }}
+                        <div id="imagePreview" class="mt-2 text-center" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-list-stars"></i> <span>Custom Fields</span>
+                </div>
+                <div class="mb-3">
                     <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
                         <i class="bi bi-plus-lg me-1"></i> Add New Field
                     </button>
                 </div>
-
                 <div id="custom-field-container">
-                    {# Existing Custom Fields #}
                     {% for cf in custom_fields %}
                     <div class="row custom-field-row">
                         <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <label style="font-size: 0.65rem; color: #6B7280;">FIELD NAME</label>
-                            <input type="text" class="form-control" name="existing_custom_field_name_{{ cf.id }}"
-                                value="{{ cf.field_name }}" readonly
-                                style="background: transparent; border: none; font-weight: 600;">
+                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">FIELD NAME</label>
+                            <input type="text" class="form-control" name="existing_custom_field_name_{{ cf.id }}" value="{{ cf.field_name }}" readonly style="background: transparent; border: none; font-weight: 600;">
                         </div>
                         <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <label style="font-size: 0.65rem; color: #6B7280;">FIELD VALUE</label>
-                            <input type="text" class="form-control" name="custom_field_{{ cf.entity_id }}"
-                                value="{{ cf.field_value }}">
+                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">FIELD VALUE</label>
+                            <input type="text" class="form-control" name="custom_field_{{ cf.entity_id }}" value="{{ cf.field_value }}">
                         </div>
                         <div class="col-md-2 col-12 d-flex align-items-end">
                             <button type="button" class="btn btn-sm btn-outline-danger w-100 delete-cf-btn" data-cf-id="{{ cf.entity_id }}" title="Delete field">
@@ -228,8 +220,6 @@
                         </div>
                     </div>
                     {% endfor %}
-
-                    {# Placeholder for new custom fields #}
                 </div>
             </div>
 
@@ -243,18 +233,12 @@
                         <input type="text" class="form-control" placeholder="New Field Value" name="custom_field_value">
                     </div>
                     <div class="col-md-2 col-12">
-                        <button type="button" class="btn btn-outline-danger w-100 h-100"
-                            onclick="removeCustomField(this)">
+                        <button type="button" class="btn btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
                 </div>
             </template>
-
-            <div class="form-actions">
-                <a href="{% url 'products:list' %}" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-save">Update Product</button>
-            </div>
         </form>
     </div>
 </div>

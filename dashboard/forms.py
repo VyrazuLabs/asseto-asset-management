@@ -111,16 +111,16 @@ class ProductTypeForm(forms.ModelForm):
 class DepartmentForm(forms.ModelForm):
 
     name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Department Name'}
+        attrs={'autocomplete': 'off', 'placeholder': 'Department Name'}
     ))
     contact_person_name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Contact Person Name'}
+        attrs={'autocomplete': 'off', 'placeholder': 'Contact Person Name'}
     ))
     contact_person_email = forms.EmailField(required=True, widget=forms.EmailInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Contact Person Email'}
+        attrs={'autocomplete': 'off', 'placeholder': 'Contact Person Email'}
     ))
     contact_person_phone = forms.IntegerField(required=True, widget=forms.NumberInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Contact Person Phone'}
+        attrs={'autocomplete': 'off', 'placeholder': 'Contact Person Phone'}
     ))
 
     def clean_contact_person_name(self):
