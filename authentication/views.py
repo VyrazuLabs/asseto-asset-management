@@ -417,7 +417,7 @@ def profile(request):
     obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
     user = request.user
     get_expired_asset_use_flag=User.objects.filter(Q(organization=None) | Q(organization=request.user.organization)).values('use_expired_assets').first()
-    print("FLAG",get_expired_asset_use_flag)
+    # print("FLAG",get_expired_asset_use_flag)
     # get_expired_asset_use_flag=Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization),warranty_expiry_date__lt=datetime.now(),use_expired_assets=True).count()
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name=user.dynamic_display_name(user.full_name)

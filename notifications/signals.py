@@ -14,7 +14,7 @@ from assets.utils import slack_notification
 from notifications.service import NotificationService
 # User Notification
 # Implement this with the service to maintain a clean code.
-print("IN NOTIFICATION SIGNALS")
+# print("IN NOTIFICATION SIGNALS")
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def user_notification(sender, instance, created, **kwargs):
     if created:
@@ -130,7 +130,7 @@ def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
             )
 
             admins = User.objects.filter(is_superuser=True)
-            print("hre")
+            # print("hre")
             for admin in admins:
                 UserNotification.objects.create(
                     user=admin,

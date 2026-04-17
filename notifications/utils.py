@@ -28,7 +28,7 @@ def notifications_call(user,entity_type,notification_title,notification_text):
         'browser_notification':get_user.browser_notification if get_user.browser_notification else False,
         'inapp_notification':get_user.inapp_notification if get_user.inapp_notification else False
     }
-    print(get_user_notification_types)
+    # print(get_user_notification_types)
     if get_user_notification_types['slack_notification'] is True:
         UserNotification.objects.create(
             entity_type=2,user=get_user, notification_title=notification_title, notification_text=notification_text
@@ -55,7 +55,7 @@ def send_data_message(token,title,body,image_url):
     )
     try:
         response = messaging.send(message)
-        print('Successfully sent message:--', response)
+        # print('Successfully sent message:--', response)
     except Exception as e:
         print(f"Error sending message: {e}")
     # return response

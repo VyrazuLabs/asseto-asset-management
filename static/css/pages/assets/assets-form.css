@@ -61,6 +61,13 @@
   color: var(--color-text);
   margin: 0;
 }
+
+body.theme-dark .section-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
 .section-body { padding: 1.25rem; }
 
 /* ── Form field labels & inputs ───────────────────────────────────────────── */
@@ -131,17 +138,35 @@
 .section-body textarea {
   width: 100%;
   border: 1.5px solid var(--color-border) !important;
-  border-radius: 7px !important;
-  padding: .5rem .8rem !important;
-  font-size: 0.925rem !important;
-  color: var(--color-text) !important;
-  background: #fff !important;
+  border-radius: 7px ;
+  padding: .5rem .8rem;
+  font-size: 0.925rem ;
+  color: black !important;
+  background-color: #fff !important;
+  /* background: #151521; */
   outline: none !important;
   box-shadow: none !important;
 }
+
 .section-body select:focus,
 .section-body input:focus,
 .section-body textarea:focus { border-color: var(--color-primary) !important; }
+
+body.theme-dark .section-body select,
+.section-body input[type=text],
+.section-body input[type=number],
+.section-body input[type=date],
+.section-body textarea {
+  width: 100%;
+  border: 1.5px solid var(--color-border) !important;
+  border-radius: 7px;
+  padding: .5rem .8rem;
+  font-size: 0.925rem;
+  color: black;
+  background-color: #fff;
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 /* ── Sidebar sections ─────────────────────────────────────────────────────── */
 .sidebar-section {
@@ -422,9 +447,23 @@
   text-transform: uppercase;
   letter-spacing: .08em;
   margin-bottom: .75rem;
+  padding-left: 2rem;
 }
 
+
 .modal-body .form-control,
+.modal-body .form-select {
+  border-radius: 12px !important;
+  padding: .85rem 1.1rem !important;
+  padding-left: 2rem;
+  border: 1.5px solid #E2E8F0 !important;
+  font-size: .95rem !important;
+  font-weight: 500 !important;
+  color: #0F172A;
+  background:white;
+}
+
+body.theme-dark .modal-body .form-control,
 .modal-body .form-select {
   border-radius: 12px !important;
   padding: .85rem 1.1rem !important;
@@ -432,8 +471,9 @@
   font-size: .95rem !important;
   font-weight: 500 !important;
   color: #0F172A;
-  background: #fff;
+  background:white;
 }
+
 .modal-body .form-control:focus,
 .modal-body .form-select:focus {
   border-color: #4F46E5 !important;
@@ -441,9 +481,11 @@
 }
 
 .assign-form-group i {
+    display: flex;
+    justify-content: space-around;
     position: absolute;
     left: 16px;
-    top: 42px; /* Adjusted based on label height */
+    top: 16px; /* Adjusted based on label height */
     font-size: 1.2rem;
     color: #4F46E5;
     z-index: 5;
@@ -503,6 +545,18 @@
   height: auto !important;
   color: #fff !important;
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2) !important;
+}
+
+.input-icon {
+    position: relative;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.assign-form-group input {
+    padding-left: 35px; /* creates space between icon and placeholder */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

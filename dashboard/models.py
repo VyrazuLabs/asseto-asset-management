@@ -4,6 +4,7 @@ import os
 from uuid import uuid4
 from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
+from configurations.constants import CURRENCY_CHOICES
 
 
 def path_and_rename(instance, filename):
@@ -91,6 +92,10 @@ class Organization(TimeStampModel):
     date_format = models.CharField(max_length=255, blank=True, null=True)
     logo = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     history = HistoricalRecords()
+
+    def get_currency_display_value(self):
+        currency_dict = dict(CURRENCY_CHOICES)
+        return currency_dict.get(int(self.currency), None)
 
     def __str__(self):
         return self.name

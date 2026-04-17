@@ -155,8 +155,6 @@ class UserTest(LiveServerTestCase):
         password.send_keys("password123")
         organization.send_keys("Test Organization")
 
-        print("✅ User Created")
-
         submit = self.driver.find_element(By.XPATH, "//button[@type='submit']")
         submit.click()
 
@@ -182,7 +180,6 @@ class UserTest(LiveServerTestCase):
 
         time.sleep(2)
 
-        print("✅ User Updated")
 
         self.assertIn("Updated User", self.driver.page_source)
 
@@ -202,5 +199,3 @@ class UserTest(LiveServerTestCase):
         delete_button.click()
 
         time.sleep(2)
-
-        print("🗑 User Deleted")

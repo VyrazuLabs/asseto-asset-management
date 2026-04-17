@@ -149,7 +149,7 @@ def send_data_message(token,title,body,image_url):
     )
     try:
         response = messaging.send(message)
-        print('Successfully sent message:--', response)
+        # print('Successfully sent message:--', response)
     except Exception as e:
         print(f"Error sending message: {e}")
     # return response

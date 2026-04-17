@@ -5,7 +5,7 @@
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3 class="page-name">Licnese Details</h3>
+            <h3 class="page-name">License Details</h3>
 
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
@@ -49,6 +49,11 @@
                             <tr>
                                 <th scope="row">License Type</th>
                                 <td>{{license.license_type.name}}</td>
+                                <th scope="row">Expiry Date</th>
+                                {% if license.expiry_date == None %} <td>Not Provided</td> 
+                                {% else %}
+                                <td>{% format_datetime license.expiry_date %}</td>
+                                {% endif %}
                             </tr>
                             
                             <tr>
@@ -68,11 +73,6 @@
                                 {% if license.start_date == None %} <td>Not Provided</td> 
                                 {% else %}
                                 <td>{% format_datetime license.start_date %}</td>
-                                {% endif %}
-                                <th scope="row">Expiry Date</th>
-                                {% if license.expiry_date == None %} <td>Not Provided</td> 
-                                {% else %}
-                                <td>{% format_datetime license.expiry_date %}</td>
                                 {% endif %}
                             </tr>
                             <tr>

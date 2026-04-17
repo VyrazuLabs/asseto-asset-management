@@ -8,7 +8,7 @@ from .utils import send_data_message
 @shared_task(bind=True, autoretry_for=(Exception,), retry_backoff=True, max_retries=3,acks_late=True)
 # @shared_task(bind=True)
 def send_notification_task(self, payload):
-    print("🔥 TASK STARTED:", payload)
+    # print("🔥 TASK STARTED:", payload)
     user = payload["user"]
     title = payload["title"]
     message = payload["message"]

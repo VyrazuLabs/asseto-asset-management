@@ -255,3 +255,11 @@ body.theme-dark .tab-link-premium.active {
 
 body.theme-dark .premium-table thead th { border-bottom-color: #2D2D44; }
 body.theme-dark .premium-table tbody td { border-bottom-color: #2D2D44; }
+
+.page-heading h3{
+    color: black;
+}
+
+body.theme-dark .page-heading h3{
+    color: white;
+}

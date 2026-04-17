@@ -64,7 +64,7 @@ def add_product(request):
         image_form=ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
             added_product(request,form)
-            print("Product added successfully")
+            # print("Product added successfully")
             messages.success(request, 'Product added successfully')
             return redirect('products:list')
     else:
@@ -202,18 +202,7 @@ def status(request, id):
 
 @login_required
 def search(request, page):
-    
     search_text = request.GET.get('search_text').strip()
-    if search_text:
-        return render(request, 'products/products-data.html', {
-            'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_sub_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
-            )).annotate(
-            total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
-        ).order_by('-created_at')
-        })
-
     product_list = Product.undeleted_objects.filter(
         organization=request.user.organization).order_by('-created_at')
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
@@ -226,7 +215,17 @@ def search(request, page):
     for img in images_qs:
         if img.product_id not in product_images:
             product_images[img.product_id] = img
-    return render(request, 'products/list.html', {'page_object': page_object})
+    if search_text:
+        return render(request, 'products/products-data.html', {
+            'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
+                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_sub_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
+            )).annotate(
+            total_assets=Count('asset'),
+            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
+        ).order_by('-created_at'),
+        'product_images': product_images
+        })
+    return render("assets:list")
 
 @login_required
 @permission_required('authentication.view_product')

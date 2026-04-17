@@ -167,9 +167,8 @@ body.theme-dark .h3,
 body.theme-dark h2,
 body.theme-dark .h2,
 body.theme-dark h1,
-body.theme-dark .h1 {
+/* body.theme-dark .h1 {
   margin-top: 0;
-  margin-bottom: 0.5rem;
   font-weight: 700;
   line-height: 1.2;
   color: #fff;
@@ -177,8 +176,8 @@ body.theme-dark .h1 {
 body.theme-dark h1,
 body.theme-dark .h1 {
   font-size: 1.75rem;
-}
-body.theme-dark h2,
+} */
+/* body.theme-dark h2,
 body.theme-dark .h2 {
   font-size: calc(1.325rem + 0.9vw);
 }
@@ -187,10 +186,15 @@ body.theme-dark .h2 {
   body.theme-dark .h2 {
     font-size: 2rem;
   }
-}
+} */
 body.theme-dark h3,
 body.theme-dark .h3 {
-  font-size: calc(1.3rem + 0.6vw);
+  /* font-size: calc(1.3rem + 0.6vw); */
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: white;
 }
 @media (min-width: 1200px) {
   body.theme-dark h3,
@@ -218,7 +222,7 @@ body.theme-dark .h6 {
 }
 body.theme-dark p {
   margin-top: 0;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
 }
 body.theme-dark abbr[title],
 body.theme-dark abbr[data-bs-original-title] {
@@ -233,22 +237,22 @@ body.theme-dark address {
   font-style: normal;
   line-height: inherit;
 }
-body.theme-dark ol,
-body.theme-dark ul {
+/* body.theme-dark ol,
+ body.theme-dark ul {
   padding-left: 2rem;
-}
-body.theme-dark ol,
+} */
+/* body.theme-dark ol,
 body.theme-dark ul,
 body.theme-dark dl {
   margin-top: 0;
   margin-bottom: 1rem;
-}
-body.theme-dark ol ol,
+} */
+/* body.theme-dark ol ol,
 body.theme-dark ul ul,
 body.theme-dark ol ul,
 body.theme-dark ul ol {
   margin-bottom: 0;
-}
+} */
 body.theme-dark dt {
   font-weight: 700;
 }
@@ -369,9 +373,9 @@ body.theme-dark th {
   border-style: solid;
   border-width: 0;
 }
-body.theme-dark label {
+/* body.theme-dark label {
   display: inline-block;
-}
+} */
 body.theme-dark button {
   border-radius: 0;
 }
@@ -4642,13 +4646,13 @@ body.theme-dark .accordion-flush .accordion-item:last-child {
 body.theme-dark .accordion-flush .accordion-item .accordion-button {
   border-radius: 0;
 }
-body.theme-dark .breadcrumb {
+/* body.theme-dark .breadcrumb {
   display: flex;
   flex-wrap: wrap;
   padding: 0 0;
   margin-bottom: 1rem;
   list-style: none;
-}
+} */
 body.theme-dark .breadcrumb-item + .breadcrumb-item {
   padding-left: 0.5rem;
 }
@@ -7855,6 +7859,7 @@ body.theme-dark .page-heading {
 body.theme-dark .page-heading h3,
 body.theme-dark .page-heading .h3 {
   font-weight: bold;
+  color: white;
 }
 body.theme-dark .page-title-headings {
   display: flex;

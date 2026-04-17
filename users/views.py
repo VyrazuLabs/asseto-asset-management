@@ -51,7 +51,6 @@ def toggle_two_factor_auth(request):
     if request.method == "POST":
         # Convert checkbox values to booleans
         toggle_two_factor_auth_utils(request)
-        print("Toggled 2FA")
         return JsonResponse({"success": True})
     return JsonResponse({"success": False, "error": "Invalid request"})
 
