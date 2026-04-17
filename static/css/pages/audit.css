@@ -26,12 +26,28 @@
   color: var(--color-text);
   margin: 0 0 .3rem;
 }
+
+.audit-page-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
 .page-breadcrumb {
   font-size: .78rem;
-  margin: 0;
+  margin-bottom: 0.35rem;
   padding: 0;
   background: transparent;
 }
+
+body.theme-dark .page-breadcrumb {
+  font-size: .78rem;
+  margin-bottom: 0.35rem;
+  padding: 0;
+  background: transparent;
+}
+
 .page-breadcrumb .breadcrumb-link {
   color: var(--color-muted);
   text-decoration: none;
@@ -82,7 +98,14 @@
   border-bottom: 1.5px solid var(--color-border);
 }
 .audit-card-header h2 {
-  font-size: .95rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+body.theme-dark h2{
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
@@ -165,12 +188,39 @@
   cursor: pointer;
   transition: all .15s;
 }
+
+body.theme-dark .condition-btn {
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: .45rem 1.15rem;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+
 .condition-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
   background: var(--color-primary-light);
 }
+
+body.theme-dark .condition-btn:hover {
+  border-color: var(--color-primary);
+  border-radius: 5px;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
 .condition-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+body.theme-dark .condition-btn.active {
   background: var(--color-primary);
   color: #fff;
   border-color: var(--color-primary);
@@ -221,6 +271,8 @@
   background: var(--color-primary-light);
 }
 .audit-upload-area .bi-cloud-arrow-up {
+  margin-right: 20px;
+  margin-bottom: 10px;
   font-size: 2.25rem;
   color: var(--color-primary);
 }
@@ -259,6 +311,25 @@
   margin-bottom: .85rem;
 }
 .btn-save-audit:hover { background: #4338CA; }
+
+body.theme-dark .btn-save-audit {
+  width: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: .7rem 1rem;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  transition: background .15s;
+  margin-bottom: .85rem;
+}
+body.theme-dark .btn-save-audit:hover { background: #4338CA; }
 
 .btn-discard-audit {
   display: block;

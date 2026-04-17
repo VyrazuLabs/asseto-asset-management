@@ -229,11 +229,25 @@ body.theme-dark .contact-icon {
 }
 
 .card-header-title {
-  font-size: 1.1rem;
+  font-size: 1.01rem;
   font-weight: 800;
   color: var(--color-text);
   margin: 0;
 }
+
+body.theme-dark .card-header-title {
+  font-size: 1.01rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+}
+/* 
+body.theme-dark .card-header-title{
+  font-size: 1.01rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+} */
 
 .card-action-link {
   font-size: 0.75rem;
@@ -383,6 +397,14 @@ body.theme-dark .user-detail-container .activity-row {
   font-weight: 800 !important;
   font-size: 1.05rem !important;
   color: #1e293b !important;
+  display: block !important;
+  margin-bottom: 2px;
+}
+
+body.theme-dark .activity-title-main {
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  color: white !important;
   display: block !important;
   margin-bottom: 2px;
 }

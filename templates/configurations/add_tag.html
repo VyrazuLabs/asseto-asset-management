@@ -38,8 +38,8 @@
                             </div>
                         {% endif %}
                         <div class="row">
-                            <div class="col-md-6 col-12">
-                                <label for="id_prefix">Tag Prefix</label>
+                            <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
+                                <label for="id_prefix" class="mt-1">Tag Prefix</label>
                                 {{ form.prefix }}
                                 {% for error in form.prefix.errors %}
                                     <small class="text-danger">{{ error }}</small>
@@ -51,8 +51,8 @@
                 <div class="card w-50">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-6 col-12 w-100">
-                                <label for="id_number_suffix">Tag Suffix</label>
+                            <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
+                                <label for="id_number_suffix" class="mt-1">Tag Suffix</label>
                                 {{ form.number_suffix }}
                                 {% for error in form.number_suffix.errors %}
                                     <small class="text-danger">{{ error }}</small>
