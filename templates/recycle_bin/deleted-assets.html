@@ -23,7 +23,7 @@
     <p class="page-subtitle">Review and manage recently removed organization assets.</p>
   </div>
   <div>
-    <a href="{% url 'assets:list' %}" class="btn-back-assets">
+    <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">
       <i class="bi bi-arrow-left"></i> Back to Assets
     </a>
   </div>
@@ -50,12 +50,12 @@
                hx-target="#search_result"
                aria-label="Search deleted assets">
       </div>
-      <button class="trash-icon-btn" title="Filter" type="button">
+      <!-- <button class="trash-icon-btn" title="Filter" type="button">
         <i class="bi bi-funnel"></i>
       </button>
       <button class="trash-icon-btn" title="Export" type="button">
         <i class="bi bi-download"></i>
-      </button>
+      </button> -->
     </div>
     {% endif %}
   </div>

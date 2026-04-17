@@ -388,9 +388,10 @@
         </div>
         <div class="modal-body text-center">
           <img src="{% get_media_prefix %}{{ it.image }}"
-               alt="Asset Image {{ forloop.counter }}"
-               class="detail-modal-image"
-               onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              alt="Asset Image {{ forloop.counter }}"
+              class="detail-modal-image"
+              style="max-height:35vh; object-fit:contain;"
+              onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
         </div>
       </div>
     </div>

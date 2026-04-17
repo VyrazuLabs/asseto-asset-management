@@ -37,7 +37,7 @@ load_dotenv(BASE_DIR / '.env', override=True)
 # data=cipher_suite.decrypt(encrypted_bytes).decode('utf-8')                 Decrypted Data
 # cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
 cipher_suite = Fernet(b'NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=')
-print("FERNET_KEY:", cipher_suite)
+# print("FERNET_KEY:", cipher_suite)
 file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')
 cred_path = BASE_DIR / file_name
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")

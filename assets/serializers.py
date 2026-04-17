@@ -71,77 +71,82 @@ class AssetSerializer(serializers.ModelSerializer):
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
+    def to_internal_value(self, data):
+        mutable_data = {}
+        # Handle QueryDict (multipart/form-data)
+        if hasattr(data, "getlist"):
+            for key in data.keys():
+                if key == "images":
+                    continue
+
+                value = data.get(key)
+                if value not in ["", None]:
+                    mutable_data[key] = value
+
+            # Handle images
+            images = data.getlist("images")
+            images = [img for img in images if img not in ["", None]]
+            if images:
+                mutable_data["images"] = images
+
+        else:
+            for key, value in data.items():
+                if key == "images":
+                    if isinstance(value, (list, tuple)):
+                        images = [img for img in value if img not in ["", None]]
+                        if images:
+                            mutable_data["images"] = images
+                    elif value not in ["", None]:
+                        mutable_data["images"] = value
+                elif value not in ["", None]:
+                    mutable_data[key] = value
+
+        # Normalize date fields
+        for field in ["purchase_date", "warranty_expiry_date"]:
+            if mutable_data.get(field) == "":
+                mutable_data[field] = None
+
+        # Handle custom_fields safely
+        custom_fields = mutable_data.get("custom_fields")
+
+        if custom_fields in ["", None]:
+            mutable_data.pop("custom_fields", None)
+
+        elif isinstance(custom_fields, str):
+            try:
+                mutable_data["custom_fields"] = json.loads(custom_fields)
+            except json.JSONDecodeError:
+                raise serializers.ValidationError({
+                    "custom_fields": "Invalid JSON format"
+                })
+
+        return super().to_internal_value(mutable_data)
+    
     # def to_internal_value(self, data):
-    #     # Internal value contains the list of all the items in the custom fields.
-    #     data = data.copy()
-    #     if (data.get("images") or "") == "":
+    # # Convert QueryDict safely → plain dict
+    #     if hasattr(data, "lists"):
+    #         data = {k: v[0] if len(v) == 1 else v for k, v in data.lists()}
+    #     else:
+    #         data = dict(data)
+
+    #     # Remove empty images field
+    #     if not data.get("images"):
     #         data.pop("images", None)
 
-    #     for field in ["purchase_date", "warranty_expiry_date"]:
-    #         if data.get(field) == "":
-    #             data[field] = None
-    #     if data.get("custom_fields") in ["", None]:
+    #     # Handle custom_fields safely
+    #     custom_fields = data.get("custom_fields")
+
+    #     if not custom_fields:
     #         data.pop("custom_fields", None)
-    #     elif isinstance(data.get("custom_fields"), str):
-    #         data["custom_fields"] = json.loads(data.get("custom_fields"))
+    #     elif isinstance(custom_fields, str):
+    #         try:
+    #             data["custom_fields"] = json.loads(custom_fields)
+    #         except json.JSONDecodeError:
+    #             raise serializers.ValidationError({
+    #                 "custom_fields": "Invalid JSON format"
+    #             })
+
     #     return super().to_internal_value(data)
-    def to_internal_value(self, data):
-        # Create a new mutable dictionary
-        mutable_data = {}
-        
-        # Handle different input types
-        if hasattr(data, 'getlist'):  # Django QueryDict (from request.POST/request.FILES)
-            # Copy regular fields
-            for key in data.keys():
-                if key != 'images':
-                    value = data.get(key)
-                    if value not in ["", None]:
-                        mutable_data[key] = value
-                    else:
-                        mutable_data[key] = None
-            
-            # Handle images with getlist() to get all files
-            if 'images' in data:
-                images = data.getlist('images')
-                # Filter out empty strings but keep file objects
-                filtered_images = [img for img in images if img not in ["", None]]
-                if filtered_images:
-                    mutable_data['images'] = filtered_images
-        else:
-            # Regular dictionary
-            for key, value in data.items():
-                if key == 'images':
-                    # Handle images list
-                    if isinstance(value, (list, tuple)):
-                        filtered_images = [img for img in value if img not in ["", None]]
-                        if filtered_images:
-                            mutable_data[key] = filtered_images
-                    elif value not in ["", None]:
-                        mutable_data[key] = value
-                elif isinstance(value, (str, int, float, bool, list, dict)):
-                    mutable_data[key] = value
-                elif hasattr(value, 'read'):  # File-like object
-                    mutable_data[key] = value
-                elif value is None:
-                    mutable_data[key] = None
-                # Skip other complex types
-        
-        # Handle date fields
-        for field in ["purchase_date", "warranty_expiry_date"]:
-            if field in mutable_data and mutable_data[field] == "":
-                mutable_data[field] = None
-        
-        # Handle custom_fields
-        if "custom_fields" in mutable_data:
-            if mutable_data["custom_fields"] in ["", None]:
-                mutable_data.pop("custom_fields", None)
-            elif isinstance(mutable_data["custom_fields"], str):
-                try:
-                    mutable_data["custom_fields"] = json.loads(mutable_data["custom_fields"])
-                except json.JSONDecodeError:
-                    mutable_data["custom_fields"] = []
-        
-        return super().to_internal_value(mutable_data)
 
     def validate_tag(self, value):
         if self.partial and value in (None, ""):
@@ -212,70 +217,141 @@ class AssetSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         image_data = validated_data.pop("images", [])
-        custom_fields = validated_data.pop("custom_fields", [])
+        # custom_fields = validated_data.pop("custom_fields", None)
 
+        # for attribute, value in validated_data.items():
+        #     if value is not None:
+        #         setattr(instance, attribute, value)
+        # instance.save()
+
+        # for image in image_data:
+        #     AssetImage.objects.create(asset=instance, image=image)
+
+        # existing_qs = CustomField.objects.filter(
+        #     object_id=instance.id,
+        #     entity_type="asset"
+        # )
+        # existing_field_names = {cf.field_name for cf in existing_qs}
+
+        # incoming_field_names = {
+        #     next(iter(cf.keys()))
+        #     for cf in custom_fields
+        #     if isinstance(cf, dict) and cf
+        # }
+
+        # deleted_field_names = existing_field_names - incoming_field_names
+        # if deleted_field_names:
+        #     CustomField.objects.filter(
+        #         object_id=instance.id,
+        #         field_name__in=deleted_field_names,
+        #         entity_type="asset"
+        #     ).delete()
+
+        # # Create / Update incoming fields
+        # for custom_field in custom_fields:
+        #     if not isinstance(custom_field, dict):
+        #         continue
+
+        #     field_name = next(iter(custom_field.keys()), None)
+        #     field_value = custom_field.get(field_name)
+
+        #     if not field_name:
+        #         continue
+
+        #     qs = CustomField.objects.filter(
+        #         object_id=instance.id,
+        #         field_name=field_name,
+        #         entity_type="asset"
+        #     )
+
+        #     if field_value is None:
+        #         qs.delete()
+        #     elif qs.exists():
+        #         qs.update(
+        #             field_value=field_value,
+        #             field_type="text",
+        #             name=field_name
+        #         )
+        #     else:
+        #         CustomField.objects.create(
+        #             object_id=instance.id,
+        #             field_name=field_name,
+        #             field_value=field_value,
+        #             entity_type="asset",
+        #             field_type="text",
+        #             name=field_name
+        #         )
+
+        # return instance
+        custom_fields = validated_data.pop("custom_fields", None)
+
+    # Update normal fields
         for attribute, value in validated_data.items():
             if value is not None:
                 setattr(instance, attribute, value)
         instance.save()
 
+        # Handle images
         for image in image_data:
             AssetImage.objects.create(asset=instance, image=image)
 
-        existing_qs = CustomField.objects.filter(
-            object_id=instance.id,
-            entity_type="asset"
-        )
-        existing_field_names = {cf.field_name for cf in existing_qs}
+        # 🚀 ONLY RUN IF USER SENT custom_fields
+        if custom_fields is not None:
 
-        incoming_field_names = {
-            next(iter(cf.keys()))
-            for cf in custom_fields
-            if isinstance(cf, dict) and cf
-        }
-
-        deleted_field_names = existing_field_names - incoming_field_names
-        if deleted_field_names:
-            CustomField.objects.filter(
+            existing_qs = CustomField.objects.filter(
                 object_id=instance.id,
-                field_name__in=deleted_field_names,
-                entity_type="asset"
-            ).delete()
-
-        # Create / Update incoming fields
-        for custom_field in custom_fields:
-            if not isinstance(custom_field, dict):
-                continue
-
-            field_name = next(iter(custom_field.keys()), None)
-            field_value = custom_field.get(field_name)
-
-            if not field_name:
-                continue
-
-            qs = CustomField.objects.filter(
-                object_id=instance.id,
-                field_name=field_name,
                 entity_type="asset"
             )
+            existing_field_names = {cf.field_name for cf in existing_qs}
 
-            if field_value is None:
-                qs.delete()
-            elif qs.exists():
-                qs.update(
-                    field_value=field_value,
-                    field_type="text",
-                    name=field_name
-                )
-            else:
-                CustomField.objects.create(
+            incoming_field_names = {
+                next(iter(cf.keys()))
+                for cf in custom_fields
+                if isinstance(cf, dict) and cf
+            }
+
+            deleted_field_names = existing_field_names - incoming_field_names
+
+            if deleted_field_names:
+                CustomField.objects.filter(
+                    object_id=instance.id,
+                    field_name__in=deleted_field_names,
+                    entity_type="asset"
+                ).delete()
+
+            for custom_field in custom_fields:
+                if not isinstance(custom_field, dict):
+                    continue
+
+                field_name = next(iter(custom_field.keys()), None)
+                field_value = custom_field.get(field_name)
+
+                if not field_name:
+                    continue
+
+                qs = CustomField.objects.filter(
                     object_id=instance.id,
                     field_name=field_name,
-                    field_value=field_value,
-                    entity_type="asset",
-                    field_type="text",
-                    name=field_name
+                    entity_type="asset"
                 )
+
+                if field_value is None:
+                    qs.delete()
+                elif qs.exists():
+                    qs.update(
+                        field_value=field_value,
+                        field_type="text",
+                        name=field_name
+                    )
+                else:
+                    CustomField.objects.create(
+                        object_id=instance.id,
+                        field_name=field_name,
+                        field_value=field_value,
+                        entity_type="asset",
+                        field_type="text",
+                        name=field_name
+                    )
 
         return instance
     

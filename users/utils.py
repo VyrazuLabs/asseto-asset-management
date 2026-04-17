@@ -189,9 +189,7 @@ def search_user_utils(request,page):
     return page_object, deleted_user_count, user_asset_map_count, user_asset_map_count_count
 
 def create_user_notification_type_utils(request):
-    print("request.POST",request.POST)
     use_expired_asset= request.POST.get("use_expired_assets")== "on"
-    print(use_expired_asset,"use_expired_asset")
     email = request.POST.get("email_notification") == "on"
     in_app = request.POST.get("in_app_notification") == "on"
     browser = request.POST.get("browser_notification") == "on"
@@ -259,7 +257,7 @@ def get_asset_by_users(id):
 def assigned_asset_to_user(page_object):
     user_ids = [u.id for u in page_object]
 
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids,asset__is_deleted=False).select_related("asset")
 
     user_asset_map = {}
     for aa in assigned_assets:
