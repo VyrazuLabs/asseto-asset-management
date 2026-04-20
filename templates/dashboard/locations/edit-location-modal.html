@@ -1,6 +1,6 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-diagram-3"></i> {{modal_title}}</h5>
+        <h5 class="modal-title"><i class="bi bi-building"></i> Edit Location</h5>
         <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -10,30 +10,72 @@
         <div class="modal-body-custom">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>DEPARTMENT NAME <span class="required">*</span></label>
-                    {{form.name}}
-                    {% for error in form.name.errors %}
+                    <label>OFFICE NAME <span class="required">*</span></label>
+                    {{location_form.office_name}}
+                    {% for error in location_form.office_name.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON NAME <span class="required">*</span></label>
-                    {{form.contact_person_name}}
-                    {% for error in form.contact_person_name.errors %}
+                    <label>CONTACT PERSON NAME</label>
+                    {{location_form.contact_person_name}}
+                    {% for error in location_form.contact_person_name.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON EMAIL <span class="required">*</span></label>
-                    {{form.contact_person_email}}
-                    {% for error in form.contact_person_email.errors %}
+                    <label>CONTACT PERSON EMAIL</label>
+                    {{location_form.contact_person_email}}
+                    {% for error in location_form.contact_person_email.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON PHONE <span class="required">*</span></label>
-                    {{form.contact_person_phone}}
-                    {% for error in form.contact_person_phone.errors %}
+                    <label>CONTACT PERSON PHONE</label>
+                    {{location_form.contact_person_phone}}
+                    {% for error in location_form.contact_person_phone.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group full-width">
+                    <label>ADDRESS LINE 1</label>
+                    {{address_form.address_line_one}}
+                    {% for error in address_form.address_line_one.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group full-width">
+                    <label>ADDRESS LINE 2</label>
+                    {{address_form.address_line_two}}
+                    {% for error in address_form.address_line_two.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>COUNTRY</label>
+                    {{address_form.country}}
+                    {% for error in address_form.country.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>STATE</label>
+                    {{address_form.state}}
+                    {% for error in address_form.state.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>CITY</label>
+                    {{address_form.city}}
+                    {% for error in address_form.city.errors %}
+                    <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label>ZIP CODE</label>
+                    {{address_form.pin_code}}
+                    {% for error in address_form.pin_code.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
@@ -44,7 +86,7 @@
                 <i class="bi bi-x-lg"></i> Cancel
             </button>
             <button type="submit" class="btn-save">
-                <i class="bi bi-check-lg"></i> {% if modal_title == 'Edit Department' %}Update{% else %}Save{% endif %}
+                <i class="bi bi-check-lg"></i> Update
             </button>
         </div>
     </form>
@@ -110,6 +152,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem 1rem;
+}
+
+.modal-body-custom .form-group.full-width {
+    grid-column: span 2;
 }
 
 .modal-body-custom .form-group label {
@@ -251,42 +297,18 @@ body.theme-dark .modal-footer-custom .btn-cancel:hover {
     .modal-body-custom .form-grid {
         grid-template-columns: 1fr;
     }
+    
+    .modal-body-custom .form-group.full-width {
+        grid-column: span 1;
+    }
 }
 </style>
 
 <script>
-function requestAndSendNotification() {
-  if (Notification.permission === "granted") {
-    sendNotification();
-  }
-  else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        sendNotification();
-      }
-    });
-  }
-}
-
-function sendNotification() {
-  const title = "Department Updated Successfully";
-  const options = {
-    body: "Department Updated Successfully.", 
-    icon: "/static/images/logo/favicon.png", 
-  };
-  new Notification(title, options);
-}
-</script>
-<script>
-document.body.addEventListener("departmentUpdated", function () {
-  requestAndSendNotification();
-});
-</script>
-<script>
     htmx.on("htmx:beforeSwap", (e) => {
         if (
-            (e.detail.target.id == "add-department-modal-content" || e.detail.target.id == "update-department-modal-content") && !e.detail.xhr.response){
-                location.reload();
+            e.detail.target.id == "edit-location-modal-content" && !e.detail.xhr.response){
+            location.reload();
         }
     });
 </script>

@@ -1,81 +1,78 @@
 {% load custom_filters %}
 {% if page_object %}
-    {% for vendors in page_object %}
-        <tr>
-          <td class="table-index-cell">
-            {% if page_object.start_index %}
-              {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-            {% else %}
-              {{ forloop.counter|stringformat:"02d" }}
-            {% endif %}
-          </td>
-          <td>
-            <div class="cell-name-main">{{ vendors.name }}</div>
-          </td>
-          <td>{{ vendors.contact_person }}</td>
-          <td>{{ vendors.email }}</td>
-          <td>{{ vendors.gstin_number }}</td>
-          <td>{{ vendors.phone }}</td>
-          <td>
-            {% if request.user.is_superuser %}
-              <div class="form-check form-switch status-toggle">
-                <input
-                  class="form-check-input"
-                  hx-post="{% url 'vendors:status' vendors.id %}"
-                  hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                  type="checkbox" {% if vendors.status %} checked {% endif %}>
-              </div>
-            {% else %}
-              {% if vendors.status %}
-                <span class="status-badge status-active">Active</span>
-              {% else %}
-                <span class="status-badge status-inactive">Inactive</span>
-              {% endif %}
-            {% endif %}
-          </td>
-          <td>
-            {% with count=count_array|get_at_index:forloop.counter0 %}
-              {% if count %}
-                <span class="count-pill">{{ count }}</span>
-              {% else %}
-                <span class="count-pill zero">0</span>
-              {% endif %}
-            {% endwith %}
-          </td>
-          {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
-          <td>
-            <div class="row-actions">
-              {% if perms.authentication.view_vendor %}
-                <a href="{% url 'vendors:details' vendors.id %}" class="action-btn" title="View {{ vendors.name }}">
-                  <i class="bi bi-eye"></i>
-                </a>
-              {% endif %}
-              {% if perms.authentication.edit_vendor %}
-                <a href="{% url 'vendors:update_vendor' vendors.id %}" class="action-btn" title="Edit {{ vendors.name }}">
-                  <i class="bi bi-pencil"></i>
-                </a>
-              {% endif %}
-              {% if perms.authentication.delete_vendor %}
-                <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('Delete {{ vendors.name }}? It can be restored from Recycle Bin.')">
-                  {% csrf_token %}
-                  <button type="submit" class="action-btn danger" title="Delete {{ vendors.name }}">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </form>
-              {% endif %}
-            </div>
-          </td>
-          {% endif %}
-        </tr>
-    {% endfor %}
+{% for vendors in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {% if page_object.start_index %}
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+    {% else %}
+    {{ forloop.counter|stringformat:"02d" }}
+    {% endif %}
+  </td>
+  <td>
+    <div class="cell-name-main">{{ vendors.name }}</div>
+  </td>
+  <td>{{ vendors.contact_person }}</td>
+  <td>{{ vendors.email }}</td>
+  <td>{{ vendors.gstin_number }}</td>
+  <td>{{ vendors.phone }}</td>
+  <td>
+    {% if request.user.is_superuser %}
+    <div class="form-check form-switch status-toggle">
+      <input class="form-check-input" hx-post="{% url 'vendors:status' vendors.id %}"
+        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' type="checkbox" {% if vendors.status %} checked {% endif %}>
+    </div>
+    {% else %}
+    {% if vendors.status %}
+    <span class="status-badge status-active">Active</span>
+    {% else %}
+    <span class="status-badge status-inactive">Inactive</span>
+    {% endif %}
+    {% endif %}
+  </td>
+  <td>
+    {% with count=count_array|get_at_index:forloop.counter0 %}
+    {% if count %}
+    <span class="count-pill">{{ count }}</span>
+    {% else %}
+    <span class="count-pill zero">0</span>
+    {% endif %}
+    {% endwith %}
+  </td>
+  {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
+  <td>
+    <div class="row-actions">
+      {% if perms.authentication.view_vendor %}
+      <a href="{% url 'vendors:details' vendors.id %}" class="action-btn" title="View {{ vendors.name }}">
+        <i class="bi bi-eye"></i>
+      </a>
+      {% endif %}
+      {% if perms.authentication.edit_vendor %}
+      <a href="{% url 'vendors:update_vendor' vendors.id %}" class="action-btn" title="Edit {{ vendors.name }}">
+        <i class="bi bi-pencil"></i>
+      </a>
+      {% endif %}
+      {% if perms.authentication.delete_vendor %}
+      <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" class="form-row-action"
+        onsubmit="return confirm('Delete {{ vendors.name }}? It can be restored from Recycle Bin.')">
+        {% csrf_token %}
+        <button type="submit" class="action-btn danger" title="Delete {{ vendors.name }}">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </td>
+  {% endif %}
+</tr>
+{% endfor %}
 {% else %}
-    <tr>
-      <td colspan="9">
-        <div class="table-empty-state">
-          <i class="bi bi-search d-block"></i>
-          <p>No vendors found matching your search.</p>
-        </div>
-      </td>
-    </tr>
+<tr>
+  <td colspan="9">
+    <div class="table-empty-state">
+      <i class="bi bi-search d-block"></i>
+      <p>No vendors found matching your search.</p>
+    </div>
+  </td>
+</tr>
 {% endif %}

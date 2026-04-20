@@ -117,13 +117,19 @@ def update_location(request, id):
                 location_form.save()
                 address_form.save()
                 messages.success(request, 'Location updated successfully')
+                if request.htmx:
+                    return HttpResponse(status=200, headers={'HX-Refresh': 'true'})
                 return redirect(f'/admin/locations/update/{location.id}')
 
         context = {'sidebar': 'admin', 'submenu': 'location', 'location_form': location_form,
-                   'address_form': address_form, 'location': location, 'title': f'Update-{location. office_name}'}
+                   'address_form': address_form, 'location': location, 'title': f'Update-{location.office_name}'}
 
     else:
         return redirect('/admin/locations/list')
+
+    # Only return modal template for HTMX requests
+    if request.headers.get('HX-Request', 'false').lower() == 'true':
+        return render(request, 'dashboard/locations/edit-location-modal.html', context=context)
 
     return render(request, 'dashboard/locations/update-location.html', context=context)
 

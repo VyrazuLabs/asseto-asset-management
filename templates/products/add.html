@@ -1,0 +1,257 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Add New Product | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.2">
+<style>
+    #imagePreview img {
+        margin-top: 10px;
+        border: 2px solid var(--color-border);
+        padding: 4px;
+        background: white;
+    }
+    body.theme-dark #imagePreview img {
+        background: #1E1E2D;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="add-product-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="breadcrumb-link">Products</a></li>
+            <li class="breadcrumb-item active">Add Product</li>
+          </ol>
+        </nav>
+        <h1>Add New Product</h1>
+        <p class="subtitle">Create a new product in the system. Fill in the details below to add a new product to the inventory.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'products:list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <button type="submit" form="product-form" class="btn-save-asset">
+          <i class="bi bi-floppy2"></i> Save
+        </button>
+      </div>
+    </div>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="product-form" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {# ── Section 1: Basic Information ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-box-seam"></i> <span>Basic Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">PRODUCT NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_type.id_for_label }}">PRODUCT TYPE <span class="required">*</span></label>
+                        {{ form.product_type }}
+                        {% if form.product_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_category.id_for_label }}">PRODUCT CATEGORY <span class="required">*</span></label>
+                        {{ form.product_category }}
+                        {% if form.product_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_sub_category.id_for_label }}">PRODUCT SUB CATEGORY</label>
+                        {{ form.product_sub_category }}
+                        {% if form.product_sub_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2: Product Details ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-info-circle"></i> <span>Product Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.manufacturer.id_for_label }}">MANUFACTURER</label>
+                        {{ form.manufacturer }}
+                        {% if form.manufacturer.errors %}
+                        <div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.model.id_for_label }}">MODEL</label>
+                        {{ form.model }}
+                        {% if form.model.errors %}
+                        <div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.eol.id_for_label }}">PRODUCT EOL</label>
+                        {{ form.eol }}
+                        {% if form.eol.errors %}
+                        <div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>AUDIT INTERVAL</label>
+                        <select class="form-control" name="audit_interval">
+                            <option value="1">Yearly</option>
+                            <option value="2">Half Yearly</option>
+                            <option value="3">Quarterly</option>
+                            <option value="4">Bi-Monthly</option>
+                            <option value="4">Monthly</option>
+                            <option value="5">Not Applicable</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3: Description & Image ──────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-file-earmark-text"></i> <span>Description & Image</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ form.description.id_for_label }}">DESCRIPTION</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ image_form.image.id_for_label }}">PRODUCT IMAGE</label>
+                        {{ image_form.image }}
+                        <div id="imagePreview"></div>
+                        {% if image_form.image.errors %}
+                        <div class="text-danger small mt-1">{{ image_form.image.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-list-stars"></i> <span>Custom Fields</span>
+                </div>
+                <div class="mb-3">
+                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i> Add Field
+                    </button>
+                </div>
+                <div id="custom-field-container">
+                    <div class="row custom-field-row">
+                        <div class="col-md-5 col-12 mb-2 mb-md-0">
+                            <input type="text" class="form-control" placeholder="Field Name" name="custom_field_name">
+                        </div>
+                        <div class="col-md-5 col-12 mb-2 mb-md-0">
+                            <input type="text" class="form-control" placeholder="Field Value" name="custom_field_value">
+                        </div>
+                        <div class="col-md-2 col-12">
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Template for additional custom fields (hidden) #}
+            <template id="custom-field-template">
+                <div class="row custom-field-row mt-3 rm-custom-field">
+                    <div class="col-md-5 col-12 mb-2 mb-md-0">
+                        <input type="text" class="form-control" placeholder="Field Name" name="custom_field_name">
+                    </div>
+                    <div class="col-md-5 col-12 mb-2 mb-md-0">
+                        <input type="text" class="form-control" placeholder="Field Value" name="custom_field_value">
+                    </div>
+                    <div class="col-md-2 col-12">
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Trigger on product category change to fetch subcategories
+        $('#id_product_category').on('change', function () {
+            const categoryId = $(this).val();
+            const $subCatSelect = $('#id_product_sub_category');
+
+            if (!categoryId) {
+                $subCatSelect.prop('disabled', true).html('<option value="">--SELECT--</option>');
+                return;
+            }
+
+            $subCatSelect.prop('disabled', false).html('<option value="">Loading...</option>');
+
+            fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">--SELECT--</option>';
+                    data.forEach(function (item) {
+                        options += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    $subCatSelect.html(options);
+                })
+                .catch(() => {
+                    $subCatSelect.html('<option value="">Error loading</option>');
+                });
+        });
+
+        // Add new custom field row
+        $("#addCustomFieldBtn").on('click', function () {
+            const template = document.getElementById("custom-field-template");
+            const clone = template.content.cloneNode(true);
+            $("#custom-field-container").append(clone);
+        });
+
+        // Image Preview
+        $("#id_image").on('change', function () {
+            const input = this;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#imagePreview").html('<img src="' + e.target.result + '" class="rounded" width="100" height="80"/>');
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $("#imagePreview").html('');
+            }
+        });
+    });
+
+    // Remove a custom field row
+    function removeCustomField(el) {
+        $(el).closest(".custom-field-row").remove();
+    }
+</script>
+{% endblock content %}

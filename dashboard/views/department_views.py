@@ -105,7 +105,7 @@ def update_department(request, id):
             response["HX-Trigger"] = "departmentUpdated"
             return response
 
-    context = {"form": form, "modal_title": "Update Department"}
+    context = {"form": form, "modal_title": "Edit Department"}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
 
 

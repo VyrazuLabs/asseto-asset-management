@@ -1,0 +1,425 @@
+:root {
+    --pd-card-bg: #ffffff;
+    --pd-input-bg: #f3f6f9;
+    --pd-input-border: #e4e6ef;
+    --pd-text-main: #3f4254;
+    --pd-text-muted: #7e8299;
+    --pd-primary: #2d5cf0;
+    --pd-primary-hover: #1b47d1;
+    --pd-primary-light: rgba(45, 92, 240, 0.08);
+    --pd-border-radius: 16px;
+    --pd-success: #50cd89;
+    --pd-body-bg: #f5f8fa;
+}
+
+body.theme-dark {
+    --pd-card-bg: #1e1e2d;
+    --pd-input-bg: #1b1b28;
+    --pd-input-border: #323248;
+    --pd-text-main: #cdcdde;
+    --pd-text-muted: #92929f;
+    --pd-primary: #2d5cf0;
+    --pd-primary-hover: #1b47d1;
+    --pd-primary-light: rgba(45, 92, 240, 0.15);
+    --pd-body-bg: #151521;
+}
+
+.profile-details-container {
+    padding: 0 0 3rem 0;
+    width: 100%;
+}
+
+.pd-page-header {
+    margin-bottom: 2rem;
+}
+
+.pd-page-title {
+    font-size: 1.75rem !important;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin-bottom: 0.3rem;
+}
+
+.pd-page-subtitle {
+    font-size: 0.9rem;
+    color: var(--pd-text-muted);
+    max-width: 700px;
+}
+
+.pd-card {
+    background: var(--pd-card-bg);
+    border-radius: var(--pd-border-radius);
+    padding: 2.5rem;
+    box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.02);
+    border: 1px solid var(--pd-input-border);
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+/* Profile Sidebar Card */
+.pd-profile-sidebar {
+    text-align: center;
+}
+
+.pd-avatar-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 1.5rem;
+}
+
+.pd-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px; /* Square with slight rounding as in image */
+}
+
+.pd-avatar-edit {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 34px;
+    height: 34px;
+    background: var(--pd-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    border: 2px solid var(--pd-card-bg);
+}
+
+.pd-profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin-bottom: 0.25rem;
+}
+
+.pd-profile-role {
+    font-size: 0.95rem;
+    color: var(--pd-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.pd-profile-username {
+    font-size: 0.85rem;
+    color: var(--pd-text-muted);
+}
+
+/* Content Sections */
+.pd-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.pd-section-title h3 {
+    font-size: 1.25rem !important;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin: 0;
+}
+
+.pd-btn-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--pd-primary);
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0;
+    transition: all 0.2s;
+}
+
+.pd-btn-edit:hover {
+    color: var(--pd-primary-hover);
+    text-decoration: underline;
+}
+
+body.theme-dark .pd-btn-edit {
+    color: #818CF8;
+}
+
+body.theme-dark .pd-btn-edit:hover {
+    color: #A5B4FC;
+}
+
+/* Basic Info Grid */
+.pd-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.pd-info-item {
+    margin-bottom: 0.5rem;
+}
+
+.pd-info-item.full-width {
+    grid-column: span 2;
+}
+
+.pd-info-label {
+    display: block;
+    font-size: 0.75rem !important;
+    font-weight: 700;
+    color: var(--pd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.pd-info-value-box {
+    background: var(--pd-input-bg);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: var(--pd-text-main);
+    font-weight: 500;
+    border: 1px solid var(--pd-input-border);
+}
+
+/* Contact Info (In Sidebar) */
+.pd-contact-info {
+    margin-top: 2rem;
+    text-align: left;
+}
+
+.pd-contact-section-title {
+    font-size: 1.25rem !important;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin: 0;
+}
+
+.pd-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.pd-contact-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--pd-primary-light);
+    color: var(--pd-primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.pd-contact-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.pd-contact-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--pd-text-muted);
+    text-transform: uppercase;
+}
+
+.pd-contact-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pd-text-main);
+}
+
+/* Notification Settings Card */
+.pd-notif-card {
+    background: #f8fafc; /* Subtle light blue as in image */
+    border: none;
+    border-radius: var(--pd-border-radius);
+    padding: 2rem;
+}
+
+body.theme-dark .pd-notif-card {
+    background: rgba(45, 92, 240, 0.05);
+}
+
+.pd-notif-header {
+    margin-bottom: 1.5rem;
+}
+
+.pd-notif-header h3 {
+    font-size: 1.35rem !important;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin-bottom: 0.35rem;
+}
+
+.pd-notif-header p {
+    color: var(--pd-text-muted);
+    font-size: 0.95rem;
+}
+
+.pd-notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pd-notif-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--pd-card-bg);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--pd-input-border);
+}
+
+.pd-notif-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pd-notif-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--pd-primary-light);
+    color: var(--pd-primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.pd-notif-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.pd-notif-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--pd-text-main);
+}
+
+.pd-notif-desc {
+    font-size: 0.85rem;
+    color: var(--pd-text-muted);
+}
+
+/* 2FA Section */
+.pd-2fa-card {
+    border-left: 4px solid var(--pd-primary);
+}
+
+.pd-2fa-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.pd-2fa-icon {
+    width: 60px;
+    min-width: 60px;
+    height: 60px;
+    background: var(--pd-primary-light);
+    color: var(--pd-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.pd-2fa-text {
+    flex: 1;
+}
+
+.pd-2fa-title {
+    font-size: 1.35rem !important;
+    font-weight: 700;
+    color: var(--pd-text-main);
+    margin-bottom: 0.5rem;
+}
+
+.pd-2fa-desc {
+    color: var(--pd-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.pd-2fa-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: var(--pd-input-bg);
+    padding: 1.25rem;
+    border-radius: 12px;
+    min-width: 280px;
+}
+
+.pd-2fa-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.pd-2fa-status-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--pd-text-main);
+}
+
+.pd-btn-qr {
+    width: 100%;
+    background: var(--pd-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.2s;
+}
+
+.pd-btn-qr:hover {
+    background: var(--pd-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Form Switches (Better than default) */
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+    cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--pd-primary);
+    border-color: var(--pd-primary);
+}
+
+@media (max-width: 991px) {
+    .pd-info-grid {
+        grid-template-columns: 1fr;
+    }
+    .pd-2fa-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .pd-2fa-actions {
+        width: 100%;
+    }
+}
