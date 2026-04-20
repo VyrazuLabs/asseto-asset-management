@@ -1,728 +1,379 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/profile-details.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <h3>Profile</h3>
-</div>
-<div class="page-content">
-    <section class="row">
-        <div class="col-12 col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row gallery">
-                        <div class="col-12 mb-2">
-                        {% if user.profile_pic %}
-                            <img class="w-50 active" src="{{request.user.profile_pic.url}}">               
-                        {% else %}
-                            <img class="w-50 active" src="{% static 'images/faces/1.jpg' %}">
-                        {% endif %}
+<div class="profile-details-container">
+    <div class="pd-page-header">
+        <h1 class="pd-page-title">My Profile</h1>
+        <p class="pd-page-subtitle">Manage your profile information, notification preferences, and account security.</p>
+    </div>
+
+    <div class="row">
+        <!-- Profile Sidebar Column -->
+        <div class="col-lg-4">
+            <div class="pd-card pd-profile-sidebar">
+                <div class="pd-avatar-wrapper">
+                    {% if request.user.profile_pic %}
+                    <img class="pd-avatar-img" src="{{request.user.profile_pic.url}}" alt="Avatar"
+                        onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';">
+                    {% else %}
+                    <img class="pd-avatar-img" src="{% static 'images/No_Image.jpg' %}" alt="Default Avatar">
+                    {% endif %}
+                    <div class="pd-avatar-edit" onclick="document.getElementById('update-basic-btn').click()">
+                        <i class="bi bi-pencil-fill"></i>
+                    </div>
+                </div>
+                <h2 class="pd-profile-name">{{request.user.reverse_full_name}}</h2>
+                <p class="pd-profile-role">
+                    {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
+                </p>
+                <p class="pd-profile-username">{{request.user.username}}</p>
+
+                <div class="pd-contact-info">
+                    <div class="pd-contact-section-title mb-4">Contact Information</div>
+
+                    <div class="pd-contact-item">
+                        <div class="pd-contact-icon">
+                            <i class="bi bi-envelope-at"></i>
                         </div>
-                        <h6 class="my-3">
-                            <i class="bi bi-person-badge"></i>
-                            <span>Contact Information</span>
-                        </h6>
-                        <p><i class="bi bi-telephone-fill"></i>&nbsp; {{request.user.phone}}</p>
-                        <p><i class="bi bi-envelope-fill"></i>&nbsp; {{request.user.email}}</p>
+                        <div class="pd-contact-details">
+                            <span class="pd-contact-label">Email</span>
+                            <span class="pd-contact-value text-break">{{request.user.email}}</span>
+                        </div>
+                    </div>
+
+                    <div class="pd-contact-item">
+                        <div class="pd-contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div class="pd-contact-details">
+                            <span class="pd-contact-label">Phone</span>
+                            <span class="pd-contact-value">{{request.user.phone|default:"N/A"}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- update basic details modal -->
-        <div class="modal fade text-left" id="update-basic-modal" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel160" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div id="update-basic-modal-content" class="modal-content" hx-target="this"></div>
-            </div>
-        </div>
-        <!-- update organization details modal -->
-        <div class="modal fade text-left" id="update-organization-modal" tabindex="-1" role="dialog"
-            aria-labelledby="myModalLabel160" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div id="update-organization-modal-content" class="modal-content" hx-target="this"></div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-8">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-person-fill"></i>
-                        <span>Basic Information</span>          
-                        <button type="button" class="btn float-end" data-bs-toggle="modal" 
-                            hx-get="{% url 'authentication:profile_basic_info_update' %}" hx-target="#update-basic-modal-content"
-                            data-bs-toggle="modal" data-bs-target="#update-basic-modal"
-                        ><i class="bi bi-pencil-fill"></i> </button>             
-                    </h6>
-                    <table class="table table-borderless">
 
-                        <tr>
-                            <td><b>Full Name</b></td>
-                            <td>{{full_name}}</td>
-                        </tr>
-
-                        {% if request.user.username %}
-                            <tr>
-                                <td><b>Email</b></td>
-                                <td>{{request.user.username}}</td>
-                            </tr>
-                        {% endif %}
-
-                        {% if request.user.is_superuser %}
-                            <tr>
-                                <td><b>Designation</b></td>
-                                <td>Administrator</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td><b>Designation</b></td>
-                                <td>{{request.user.role}}</td>
-                            </tr>
-                        {% endif %}
-
-                        {% if request.user.address %}
-                            <tr>
-                                <td><b>Address</b></td>
-                                <td>{{request.user.address}}</td>
-                            </tr>
-                        {% endif %}
-                    </table>
+        <!-- Main Content Column -->
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="pd-card">
+                <div class="pd-section-title">
+                    <h3>Basic Information</h3>
+                    <button type="button" class="pd-btn-edit" id="update-basic-btn"
+                        hx-get="{% url 'authentication:profile_basic_info_update' %}"
+                        hx-target="#update-basic-modal-content" data-bs-toggle="modal"
+                        data-bs-target="#update-basic-modal">
+                        <i class="bi bi-pencil-square"></i> Edit Changes
+                    </button>
                 </div>
-                
-            </div>
-            {% if request.user.department %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-person-video3"></i>
-                            <span>Department Information</span>          
-                        </h6>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><b>Department</b></td>
-                                <td>{{request.user.department}}</td>
-                            </tr>
-            
-                            <tr>
-                                <td><b>Contact Person Name</b></td>
-                                <td>{{request.user.department.contact_person_name}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Person Number</b></td>
-                                <td>{{request.user.department.contact_person_phone}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Person Email</b></td>
-                                <td>{{request.user.department.contact_person_email}}</td>
-                            </tr>   
-                        </table>
+
+                <div class="pd-info-grid">
+                    <div class="pd-info-item">
+                        <span class="pd-info-label">Full Name</span>
+                        <div class="pd-info-value-box">{{request.user.full_name|default:"--"}}</div>
                     </div>
-                </div>
-            {% endif %}
-
-            {% if not request.user.is_superuser %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-building"></i>
-                            <span>Organization Information</span>
-                            <button type="button" class="btn float-end" 
-                                hx-get="{% url 'authentication:organization_info_update' %}" hx-target="#update-organization-modal-content"
-                                data-bs-toggle="modal" data-bs-target="#update-organization-modal"
-                            > <i class="bi bi-pencil-fill"></i> </button>             
-                        </h6>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><b>Organization Name</b></td>
-                                <td>{{request.user.organization.name}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Organization Website</b></td>
-                                <td>{{request.user.organization.website|urlize}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Organization Email</b></td>
-                                <td>{{request.user.organization.email}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Organization Phone</b></td>
-                                <td>{{request.user.organization.phone}}</td>
-                            </tr>
-    
-                            <tr>
-                                <td><b>Organization Currency</b></td>
-                                <td>{{request.user.organization.currency}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            {% endif %}
-
-            {% if not request.user.is_superuser %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-building"></i>
-                            <span>Company Information</span>
-                        </h6>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><b>Company Name</b></td>
-                                <td>{{request.user.location.office_name}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Company Address</b></td>
-                                <td>{{request.user.location.address}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Person Name</b></td>
-                                <td>{{request.user.location.contact_person_name}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Person Number</b></td>
-                                <td>{{request.user.location.contact_person_phone}}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Person Email</b></td>
-                                <td>{{request.user.location.contact_person_email}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            {% endif %}
-            {% if request.user.is_superuser %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="my-3">
-                            <i class="bi bi-gear-wide"></i>
-                            <span>Notification Settings</span>
-                        </h6>
-                        <form 
-                            hx-post="{% url 'users:create_user_notification_type' %}" 
-                            hx-trigger="change" 
-                            hx-include="this" 
-                            hx-swap="none"
-                        >
-                            {% csrf_token %}
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><b>Email Notification</b></td>
-                                    <td>
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                type="checkbox"
-                                                name="email_notification"
-                                                class="form-check-input"
-                                                style="cursor: pointer;"
-                                                {% if email_notification is True %} checked {% else %} unchecked {% endif %}
-                                            >
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><b>In-App Notification</b></td>
-                                    <td>
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                type="checkbox"
-                                                name="in_app_notification"
-                                                class="form-check-input"
-                                                style="cursor: pointer;"
-                                                {% if inapp_notification is True %} checked {% else %} unchecked {% endif %}
-                                            >
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><b>Browser Notification</b></td>
-                                    <td>
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                type="checkbox"
-                                                name="browser_notification"
-                                                class="form-check-input"
-                                                style="cursor: pointer;"
-                                                {% if browser_notification is True %} checked {% else %} unchecked {% endif %}
-                                            >
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><b>Slack Notification</b></td>
-                                    <td>
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                type="checkbox"
-                                                name="slack_notification"
-                                                class="form-check-input"
-                                                style="cursor: pointer;"
-                                                {% if slack_notification is True %} checked {% else %} unchecked {% endif %}
-                                                disabled
-                                            >
-                                        </div>
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td><b>Use Expired Assets</b></td>
-                                    <td>
-                                        <div class="form-check form-switch">
-                                            <input 
-                                                type="checkbox"
-                                                name="use_expired_assets"
-                                                class="form-check-input"
-                                                style="cursor: pointer;"
-                                                {% if request.user.use_expired_assets is True %} checked {% else %} unchecked {% endif %}
-                                            >
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
+                    <div class="pd-info-item">
+                        <span class="pd-info-label">Designation</span>
+                        <div class="pd-info-value-box">
+                            {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role|default:"--"}} {% endif %}
                         </div>
-                        </form>
                     </div>
+                    <div class="pd-info-item full-width">
+                        <span class="pd-info-label">Email Address</span>
+                        <div class="pd-info-value-box">{{request.user.email}}</div>
+                    </div>
+                    {% if request.user.department %}
+                    <div class="pd-info-item">
+                        <span class="pd-info-label">Department</span>
+                        <div class="pd-info-value-box">{{request.user.department}}</div>
+                    </div>
+                    <div class="pd-info-item">
+                        <span class="pd-info-label">Contact Person</span>
+                        <div class="pd-info-value-box">{{request.user.department.contact_person_name}}</div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
-            {% if request.user.is_superuser %}
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h6 class="my-3">
-                        <i class="bi bi-person-fill"></i>
-                        <span>2FA Implementation</span>
-                    </h6>
-                    <table class="table table-borderless align-middle">
-                        <tr>
-                            <td><b>Two Factor Authentication</b></td>
-                            <td class="text-end">
-                                <div class="form-check form-switch">
-                                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                                    <input 
-                                        type="checkbox"
-                                        id="twoFactorToggle"
-                                        name="two_factor_auth"
-                                        class="form-check-input"
-                                        style="cursor:pointer;"
-                                        {% if two_factor_auth %} checked {% endif %}
-                                    >
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    {% if get_user_totp.is_logged_in %}
-                        <div class="alert alert-success py-2">
-                            User is already logged in with 2FA.
-                        </div>
-                    {% endif %}                    
-                    <div id="qrContainer" class="text-center mt-4">
-                        <h5 id="qrTitle">Two Factor Authentication QR Code</h5>
-                        
-                        {% if get_user_totp.status == 1 or get_user_totp.status == 2 %}
-                            <div class="mb-3">
-                                <input 
-                                    style="display: none;"
-                                    type="text"
-                                    placeholder="Enter OTP"
-                                    id="userOtp"
-                                    class="form-control w-50 mx-auto text-center"
-                                    maxlength="6"
-                                >
+
+            <!-- Notification Settings Card -->
+            <div class="pd-notif-card">
+                <div class="pd-notif-header">
+                    <h3>Notification Settings</h3>
+                    <p>Configure how you want to be alerted about system changes.</p>
+                </div>
+
+                <form hx-post="{% url 'users:create_user_notification_type' %}" hx-trigger="change" hx-include="this"
+                    hx-swap="none" class="pd-notif-list">
+                    {% csrf_token %}
+                    <!-- Email Notifications -->
+                    <div class="pd-notif-item">
+                        <div class="pd-notif-info">
+                            <div class="pd-notif-icon">
+                                <i class="bi bi-envelope-check"></i>
                             </div>
-                        {% endif %}
-                        <div id="img-container"></div>
-                        <div class="d-flex justify-content-center gap-2 flex-wrap" id="qrCodeButtons">
-                            <button 
-                                type="button"
-                                id="regenerateQrBtn"
-                                class="btn btn-primary"
-                                style="max-height: 40px;"
-                            >
-                                Regenerate QR Code
-                            </button>
-                            <button 
-                                style="display: none;"
-                                type="button"
-                                id="verify2faBtn"
-                                class="btn btn-success "
-                                style="max-height: 40px;"
-                            >
-                                Verify
-                            </button>
+                            <div class="pd-notif-text">
+                                <span class="pd-notif-title">Email Notifications</span>
+                                <span class="pd-notif-desc">Daily digest and critical alerts</span>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="email_notification" {% if email_notification is True %} checked {% endif %}>
                         </div>
                     </div>
+
+                    <!-- In-App Notifications -->
+                    <div class="pd-notif-item">
+                        <div class="pd-notif-info">
+                            <div class="pd-notif-icon">
+                                <i class="bi bi-bell"></i>
+                            </div>
+                            <div class="pd-notif-text">
+                                <span class="pd-notif-title">In-App Notifications</span>
+                                <span class="pd-notif-desc">Real-time alerts within the portal</span>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="in_app_notification" {% if inapp_notification is True %} checked {% endif %}>
+                        </div>
+                    </div>
+
+                    <!-- Browser Notifications -->
+                    <div class="pd-notif-item">
+                        <div class="pd-notif-info">
+                            <div class="pd-notif-icon">
+                                <i class="bi bi-window"></i>
+                            </div>
+                            <div class="pd-notif-text">
+                                <span class="pd-notif-title">Browser Notifications</span>
+                                <span class="pd-notif-desc">Desktop push notifications</span>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="browser_notification" {% if browser_notification is True %} checked {% endif %}>
+                        </div>
+                    </div>
+
+                    <!-- Slack Integration -->
+                    <div class="pd-notif-item">
+                        <div class="pd-notif-info">
+                            <div class="pd-notif-icon">
+                                <i class="bi bi-slack"></i>
+                            </div>
+                            <div class="pd-notif-text">
+                                <span class="pd-notif-title">Slack Integration</span>
+                                <span class="pd-notif-desc">Send alerts to connected workspaces</span>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="slack_notification" {% if slack_notification is True %} checked {% endif %} disabled
+                                title="Integration coming soon">
+                        </div>
+                    </div>
+
+                    <!-- Expired Assets -->
+                    <div class="pd-notif-item">
+                        <div class="pd-notif-info">
+                            <div class="pd-notif-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="pd-notif-text">
+                                <span class="pd-notif-title">Expired Assets</span>
+                                <span class="pd-notif-desc">Weekly summary of deprecated items</span>
+                            </div>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="use_expired_assets" {% if request.user.use_expired_assets is True %} checked {% endif %}>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2FA Section - Bottom Full Width -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="pd-card pd-2fa-card">
+                <div class="pd-2fa-content">
+                    <div class="pd-2fa-icon">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    <div class="pd-2fa-text">
+                        <h3 class="pd-2fa-title">2FA Implementation</h3>
+                        <p class="pd-2fa-desc">Two-factor authentication adds an additional layer of security to your
+                            account by requiring more than just a password to log in. We recommend using a hardware key
+                            or a trusted authenticator app.</p>
+                    </div>
+                    <div class="pd-2fa-actions shadow-sm">
+                        <div class="pd-2fa-status">
+                            <span class="pd-2fa-status-label">Active Status</span>
+                            <div class="form-check form-switch p-0 m-0">
+                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                <input class="form-check-input" type="checkbox" id="twoFactorToggle"
+                                    name="two_factor_auth" {% if two_factor_auth %} checked {% endif %}>
+                            </div>
+                        </div>
+                        <button type="button" id="regenerateQrBtn" class="pd-btn-qr mt-3">
+                            <i class="bi bi-qr-code"></i> Regenerate QR Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code Container (Hidden by default based on JS) -->
+                <div id="qrContainer" class="text-center mt-4 {% if not two_factor_auth %}d-none{% endif %}">
+                    <hr class="my-4 opacity-25">
+                    <h5 class="mb-3">Scan this QR Code in your Authenticator App</h5>
+
+                    <div id="otpInputContainer" class="mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">
+                        <input type="text" placeholder="Enter 6-digit OTP to verify" id="userOtp"
+                            class="form-control w-25 mx-auto text-center font-monospace" maxlength="6">
+                    </div>
+                    <button type="button" id="verify2faBtn" class="btn btn-success px-4 mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">Verify & Enable</button>
+
+                    <div id="img-container"></div>
                 </div>
             </div>
-            </br>
-            {% endif %}
-            {% if assigned_assets is not None %}
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="m-3">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Assigned Assets</span>                       
-                        </h6>                        
-                        <div class="table-responsive">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><b>Sl No.</b></td>
-                                    <td>Asset Images</td>
-                                    <td><b>Asset Tag</b></td>
-                                    <td><b>Asset Name</b></td>
-                                    <td>Type</td>
-                                    <td>Vendor Name</td>
-                                    <td><b>Assigned Date</b></td>
-                                </tr>
-                                {% for assigned_asset in assigned_assets %}
-                                    <tr>
-                                        <td>{{assigned_assets.start_index|add:forloop.counter0}}</td>
-                                    
-                                        <td>
-                                            {% with assigned_asset.asset.images.all as images %}
-                                                <div class="asset-thumbnail">
-                                                    {% if images %}
-                                                        <img src="{{ images.0.image.url }}"
-                                                            onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
-                                                            class="img-fluid"
-                                                            style="width: 150px; height: 150px; object-fit: cover; border: none; cursor: pointer;"
-                                                            onclick="openAssetModal('carouselModal{{ assigned_asset.asset.id }}')"
-                                                            >
-                                                    {% else %}
-                                                        <img src="{% static 'images/No_Image.jpg' %}"
-                                                            style="width: 150px; height: 150px; object-fit: cover; border: none;">
-                                                    {% endif %}
-                                                </div>
-                                            {% endwith %}
-                                        </td>
-                                        <td>{{assigned_asset.asset.tag}}</td>
-                                        <td>{{assigned_asset.asset.name}}</td>
-                                        <td>{{assigned_asset.asset.product.name}}</td>
-                                        <td>{{assigned_asset.asset.vendor}}</td>
-                                        <td>{{assigned_asset.assigned_date|date:"D, M d, Y"}}</td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            <div class="dataTable-bottom">
-                                Showing {{ assigned_assets.start_index }} to {{ assigned_assets.end_index }} of {{ assigned_assets.paginator.count }} entries
-                            </div>
-
-                            <nav aria-label="Page navigation example">
-                                <ul class="pagination pagination-primary justify-content-end">
-
-                                    <li class="page-item {% if not assigned_assets.has_previous %} disabled {% endif %}">
-                                    <a class="page-link" 
-                                        {% if assigned_assets.has_previous %}
-                                        href="?assets_page={{ assigned_assets.previous_page_number }}&page={{ page_object.number }}"
-                                        {% endif %}
-                                        tabindex="-1" aria-disabled="true">« Previous</a>
-                                    </li>
-
-                                    {% for i in assigned_assets.paginator.page_range %}
-                                    <li class="page-item {% if assigned_assets.number == i %} active {% endif %}">
-                                        <a class="page-link" href="?assets_page={{ i }}&page={{ page_object.number }}">{{ i }}</a>
-                                    </li>
-                                    {% endfor %}
-
-                                    <li class="page-item {% if not assigned_assets.has_next %} disabled {% endif %}">
-                                    <a class="page-link" 
-                                        {% if assigned_assets.has_next %}
-                                        href="?assets_page={{ assigned_assets.next_page_number }}&page={{ page_object.number }}"
-                                        {% endif %}
-                                    >Next »</a>
-                                    </li>
-
-                                </ul>
-                            </nav>
-                        </div>
-                        {% for assigned_asset in assigned_assets %}
-                            {% with assigned_asset.asset.images.all as images %}
-                                {% if images %}
-                                    <div class="modal fade" id="carouselModal{{ assigned_asset.asset.id }}" tabindex="-1" aria-labelledby="carouselModalLabel{{ assigned_asset.asset.id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                                            <div class="modal-content">
-
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="carouselModalLabel{{ assigned_asset.asset.id }}">Asset Images</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-
-                                                <div class="modal-body p-0">
-                                                    <div id="carousel{{ assigned_asset.asset.id }}" class="carousel slide" data-bs-ride="carousel">
-                                                        <div class="carousel-inner">
-                                                            {% for image in images %}
-                                                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                                                    <img class="d-block w-100"
-                                                                        onerror="this.onerror=null; this.src='{% static 'images/No_Image.jpg' %}';"
-                                                                        src="{{ image.image.url }}"
-                                                                        alt="Asset Image"
-                                                                        style="object-fit: contain; max-height: 600px;">
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-
-                                                        {% if images|length > 1 %}
-                                                            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="prev">
-                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                            </button>
-                                                            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ assigned_asset.asset.id }}" data-bs-slide="next">
-                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                            </button>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endwith %}
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
         </div>
-    </section>
-    
+    </div>
 </div>
+
+<!-- Modals -->
+<div class="modal fade" id="update-basic-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div id="update-basic-modal-content" class="modal-content" hx-target="this"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="update-organization-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div id="update-organization-modal-content" hx-target="this">
+            <!-- Content loaded via HTMX -->
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const toggle = document.getElementById("twoFactorToggle");
-        const qrImage = document.getElementById("qrImage");
-        const qrTitle = document.getElementById("qrTitle");
+        const regenerateBtn = document.getElementById("regenerateQrBtn");
+        const verify2faBtn = document.getElementById("verify2faBtn");
+        const userOtp = document.getElementById("userOtp");
+        const qrSection = document.getElementById("qrContainer");
 
-        toggle.addEventListener("change", function () {
-            if (this.checked) {
-                qrImage.style.display = "block";
-                qrTitle.style.display = "block";
-            } else {
-                qrImage.style.display = "none";
-                qrTitle.style.display = "none";
-            }
-        });
-    });
-</script>
-<script>
+        // 2FA Toggle Update
+        if (toggle) {
+            toggle.addEventListener("change", function () {
+                const isChecked = toggle.checked;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const verifyBtn = document.getElementById("verify2faBtn");
-
-    if (verifyBtn) {
-        verifyBtn.addEventListener("click", function () {
-
-            const otpInput = document.getElementById("userOtp");
-
-            const otp = otpInput ? otpInput.value.trim() : "";
-            const email = "{{request.user.email}}"; 
-
-            if (!otp) {
-                alert("Please enter OTP");
-                return;
-            }
-            console.log("Sending OTP Verification Request:");
-            console.log("Email:", email);
-            console.log("OTP:", otp);
-            const url = `/api/authentication/login-otp/?email=${(email)}&otp=${(otp)}`;
-
-            fetch(url, {
-                method: "POST",
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access) {
-                    // ✅ Store tokens (optional)
-                    console.log("Stored tokens:", data);
-                    localStorage.setItem("access_token", data.access);
-                    localStorage.setItem("refresh_token", data.refresh);
-
-                    alert("Login successful!");
-
-                    // Redirect if needed
-                    window.location.href = "/";
-                } else {
-                    alert(data.message || "Invalid OTP");
-                }
-
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Something went wrong");
-            });
-
-        });
-    }
-
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const toggle = document.getElementById("twoFactorToggle");
-
-    if (toggle) {
-
-        toggle.addEventListener("change", function () {
-
-            const isChecked = toggle.checked;
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            console.log("2FA Toggle changed:", isChecked);
-
-            fetch("{% url 'users:toggle_two_factor_auth' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": csrfToken
-                },
-                body: new URLSearchParams({
-                    two_factor_auth: isChecked ? "on" : ""
+                fetch("{% url 'users:toggle_two_factor_auth' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: new URLSearchParams({
+                        two_factor_auth: isChecked ? "on" : ""
+                    })
                 })
-            })
-            .then(response => response.json()) // change to .text() if not JSON
-            .then(data => {
+                    .then(response => response.json())
+                    .then(data => {
+                        if (qrSection) {
+                            if (isChecked) {
+                                qrSection.classList.remove("d-none");
+                            } else {
+                                qrSection.classList.add("d-none");
+                            }
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        }
 
-                console.log("Server Response:", data);
+        // Regenerate QR
+        if (regenerateBtn) {
+            regenerateBtn.addEventListener("click", function () {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                regenerateBtn.disabled = true;
+                regenerateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
 
-                // Optional: show/hide QR section immediately
-                const qrSection = document.getElementById("qrContainer");
+                fetch("{% url 'authentication:regenerate_qr' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (qrSection) qrSection.classList.remove("d-none");
+                            if (verify2faBtn) verify2faBtn.classList.remove("d-none");
+                            if (userOtp) userOtp.classList.remove("d-none");
+                            const otpContainer = document.getElementById("otpInputContainer");
+                            if (otpContainer) otpContainer.classList.remove("d-none");
 
-                if (qrSection) {
-                    qrSection.style.display = isChecked ? "block" : "none";
+                            const existingImg = document.getElementById("dynamicQrImage");
+                            if (existingImg) existingImg.remove();
+
+                            const imgContainer = document.getElementById("img-container");
+                            const img = document.createElement("img");
+                            img.id = "dynamicQrImage";
+                            img.src = "data:image/png;base64," + data.qr_code;
+                            img.className = "img-fluid mt-3";
+                            img.style.maxWidth = "200px";
+                            imgContainer.appendChild(img);
+                        } else {
+                            alert(data.message || "Failed to regenerate QR");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Something went wrong");
+                    })
+                    .finally(() => {
+                        regenerateBtn.disabled = false;
+                        regenerateBtn.innerHTML = '<i class="bi bi-qr-code"></i> Regenerate QR Code';
+                    });
+            });
+        }
+
+        // Verify 2FA
+        if (verify2faBtn) {
+            verify2faBtn.addEventListener("click", function () {
+                const otp = userOtp ? userOtp.value.trim() : "";
+                const email = "{{request.user.email}}";
+
+                if (!otp) {
+                    alert("Please enter OTP");
+                    return;
                 }
 
-            })
-            .catch(error => {
-                console.error("Error:", error);
+                fetch(`/api/authentication/login-otp/?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`, {
+                    method: "POST",
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.access) {
+                            alert("Verification successful!");
+                            window.location.reload();
+                        } else {
+                            alert(data.message || "Invalid OTP");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Something went wrong");
+                    });
             });
-
-        });
-
-    }
-
-});
-</script>
-<script>
-// document.addEventListener("DOMContentLoaded", function () {
-
-//     const regenerateBtn = document.getElementById("regenerateQrBtn");
-
-//     if (!regenerateBtn) return;
-
-//     regenerateBtn.addEventListener("click", function () {
-
-//         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-//         const qrCodeButtons = document.getElementById("qrCodeButtons")
-//         regenerateBtn.disabled = true;
-//         regenerateBtn.innerText = "Generating...";
-
-//         fetch("{% url 'authentication:regenerate_qr' %}", {
-//             method: "POST",
-//             headers: {
-//                 "X-CSRFToken": csrfToken
-//             }
-//         })
-//         .then(response => response.json())
-//         .then(data => {
-
-//             if (data.success) {
-//                 verify2faBtn.style.display = "block";
-//                 userOtp.style.display = "block";
-//                 // Remove old QR if exists
-//                 const existingImg = document.getElementById("dynamicQrImage");
-//                 if (existingImg) {
-//                     existingImg.remove();
-//                 }
-//                 const imgContainer=document.getElementById("img-container")
-//                 // Create new image
-//                 const img = document.createElement("img");
-//                 img.id = "dynamicQrImage";
-//                 img.src = "data:image/png;base64," + data.qr_code;
-//                 img.className = "img-fluid mb-3";
-//                 img.style.maxWidth = "200px";
-//                 img.alt = "QR Code";
-
-//                 // Insert image ABOVE the button
-//                 // regenerateBtn.parentNode.insertAfter(img, regenerateBtn);
-
-//                 // Insert image BELOW the button
-//                 // regenerateBtn.parentNode.insertAfter( img,qrCodeButtons);
-//                 imgContainer.append(img);
-//                 // qrCodeButtons.style.display = "block";
-//             } else {
-//                 alert("Failed to regenerate QR");
-//             }
-
-//         })
-//         .catch(error => {
-//             console.error("Error:", error);
-//             alert("Something went wrong");
-//         })
-//         .finally(() => {
-//             regenerateBtn.disabled = false;
-//             regenerateBtn.innerText = "Regenerate QR Code";
-//         });
-
-//     });
-
-// });
-document.addEventListener("DOMContentLoaded", function () {
-
-    const regenerateBtn = document.getElementById("regenerateQrBtn");
-    const verify2faBtn = document.getElementById("verify2faBtn");
-    const userOtp = document.getElementById("userOtp");
-
-    if (!regenerateBtn) return;
-
-    regenerateBtn.addEventListener("click", function () {
-
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-
-        regenerateBtn.disabled = true;
-        regenerateBtn.innerText = "Generating...";
-
-        fetch("{% url 'authentication:regenerate_qr' %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            console.log("QR API response:", data);
-
-            if (data.success) {
-
-                if (verify2faBtn) verify2faBtn.style.display = "block";
-                if (userOtp) userOtp.style.display = "block";
-
-                const existingImg = document.getElementById("dynamicQrImage");
-                if (existingImg) existingImg.remove();
-
-                const imgContainer = document.getElementById("img-container");
-
-                const img = document.createElement("img");
-                img.id = "dynamicQrImage";
-                img.src = "data:image/png;base64," + data.qr_code;
-                img.className = "img-fluid mb-3";
-                img.style.maxWidth = "200px";
-
-                imgContainer.appendChild(img);
-
-            } else {
-                alert(data.message || "Failed to regenerate QR");
-            }
-
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Something went wrong");
-        })
-        .finally(() => {
-            regenerateBtn.disabled = false;
-            regenerateBtn.innerText = "Regenerate QR Code";
-        });
-
+        }
     });
-
-});
 </script>
 {% endblock content %}
