@@ -3258,15 +3258,17 @@ function setTheme(theme) {
   document.body.className = document.body.className.replace(THEME_REGEX, "");
   console.log("change theme to ", theme);
   document.body.classList.add(theme);
-  toggler.checked = theme == "theme-dark";
+  if (toggler) toggler.checked = theme == "theme-dark";
 
   if (!dontPersist) {
     localStorage.setItem(THEME_KEY, theme);
   }
 }
-toggler.addEventListener("input", function (e) {
-  setTheme(e.target.checked ? "theme-dark" : "theme-light");
-});
+if (toggler) {
+  toggler.addEventListener("input", function (e) {
+    setTheme(e.target.checked ? "theme-dark" : "theme-light");
+  });
+}
 document.addEventListener("DOMContentLoaded", function () {
   console.log("Dark Loaded"); //If the user manually set a theme, we'll load that
 

@@ -1,0 +1,364 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Update Product - {{ product.name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.2">
+<style>
+    .product-img-card {
+        position: relative;
+        display: inline-block;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 4px;
+        background: white;
+    }
+
+    .product-img-card img {
+        width: 100px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .delete-img-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .delete-img-btn:hover {
+        transform: scale(1.1);
+        background: #dc2626;
+    }
+
+    body.theme-dark .product-img-card {
+        background: #1E1E2D;
+        border-color: #2D2D3F;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="add-product-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="breadcrumb-link">Products</a></li>
+            <li class="breadcrumb-item active">Update Product</li>
+          </ol>
+        </nav>
+        <h1>Update Product: {{ product.name }}</h1>
+        <p class="subtitle">Update the product details below to modify the product information.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'products:list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <button type="submit" form="product-form" class="btn-save-asset">
+          <i class="bi bi-floppy2"></i> Update
+        </button>
+      </div>
+    </div>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="product-form" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {# ── Section 1: Basic Information ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-box-seam"></i> <span>Basic Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">PRODUCT NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_type.id_for_label }}">PRODUCT TYPE <span class="required">*</span></label>
+                        {{ form.product_type }}
+                        {% if form.product_type.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_category.id_for_label }}">PRODUCT CATEGORY <span class="required">*</span></label>
+                        {{ form.product_category }}
+                        {% if form.product_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.product_sub_category.id_for_label }}">PRODUCT SUB CATEGORY</label>
+                        {{ form.product_sub_category }}
+                        {% if form.product_sub_category.errors %}
+                        <div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2: Product Details ────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-info-circle"></i> <span>Product Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.manufacturer.id_for_label }}">MANUFACTURER</label>
+                        {{ form.manufacturer }}
+                        {% if form.manufacturer.errors %}
+                        <div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.model.id_for_label }}">MODEL</label>
+                        {{ form.model }}
+                        {% if form.model.errors %}
+                        <div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.eol.id_for_label }}">PRODUCT EOL</label>
+                        {{ form.eol }}
+                        {% if form.eol.errors %}
+                        <div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.audit_interval.id_for_label }}">AUDIT INTERVAL</label>
+                        {{ form.audit_interval }}
+                        {% if form.audit_interval.errors %}
+                        <div class="text-danger small mt-1">{{ form.audit_interval.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3: Description & Image ──────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-file-earmark-text"></i> <span>Description & Image</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="{{ form.description.id_for_label }}">DESCRIPTION</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group full-width">
+                        <label>PRODUCT IMAGES</label>
+                        <div class="mb-3" id="existing-images">
+                            {% for img in product_images %}
+                            <div class="product-img-card" id="img-card-{{ img.id }}">
+                                <img src="{% get_media_prefix %}{{ img.image }}" alt="Product Image" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <button type="button" class="delete-img-btn" data-img-id="{{ img.id }}" title="Delete image">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <label for="{{ img_form.image.id_for_label }}" style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">ADD MORE IMAGES</label>
+                        {{ img_form.image }}
+                        <div id="imagePreview" class="mt-2 text-center" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-list-stars"></i> <span>Custom Fields</span>
+                </div>
+                <div class="mb-3">
+                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-lg me-1"></i> Add New Field
+                    </button>
+                </div>
+                <div id="custom-field-container">
+                    {% for cf in custom_fields %}
+                    <div class="row custom-field-row">
+                        <div class="col-md-5 col-12 mb-2 mb-md-0">
+                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">FIELD NAME</label>
+                            <input type="text" class="form-control" name="existing_custom_field_name_{{ cf.id }}" value="{{ cf.field_name }}" readonly style="background: transparent; border: none; font-weight: 600;">
+                        </div>
+                        <div class="col-md-5 col-12 mb-2 mb-md-0">
+                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">FIELD VALUE</label>
+                            <input type="text" class="form-control" name="custom_field_{{ cf.entity_id }}" value="{{ cf.field_value }}">
+                        </div>
+                        <div class="col-md-2 col-12 d-flex align-items-end">
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100 delete-cf-btn" data-cf-id="{{ cf.entity_id }}" title="Delete field">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Template for new custom fields #}
+            <template id="custom-field-template">
+                <div class="row custom-field-row mt-3 rm-custom-field">
+                    <div class="col-md-5 col-12 mb-2 mb-md-0">
+                        <input type="text" class="form-control" placeholder="New Field Name" name="custom_field_name">
+                    </div>
+                    <div class="col-md-5 col-12 mb-2 mb-md-0">
+                        <input type="text" class="form-control" placeholder="New Field Value" name="custom_field_value">
+                    </div>
+                    <div class="col-md-2 col-12">
+                        <button type="button" class="btn btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // CSRF Token helper
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Image Delete via AJAX
+        $('.delete-img-btn').on('click', function () {
+            const imgId = $(this).data('img-id');
+            const $card = $(`#img-card-${imgId}`);
+
+            if (!confirm('Are you sure you want to delete this image?')) return;
+
+            fetch('{% url "products:update_product" id=product.id %}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ delete_image_ids: [imgId] })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        $card.fadeOut(300, function () { $(this).remove(); });
+                    } else {
+                        alert('Error deleting image.');
+                    }
+                })
+                .catch(() => alert('Network error.'));
+        });
+
+        // Custom Field Delete via AJAX
+        $('.delete-cf-btn').on('click', function () {
+            const cfId = $(this).data('cf-id');
+            const $row = $(this).closest('.custom-field-row');
+
+            if (!confirm('Are you sure you want to delete this custom field?')) return;
+
+            fetch('{% url "products:update_product" id=product.id %}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ delete_custom_field_ids: [cfId] })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        $row.fadeOut(300, function () { $(this).remove(); });
+                    } else {
+                        alert('Error deleting custom field.');
+                    }
+                })
+                .catch(() => alert('Network error.'));
+        });
+
+        // Subcategory cascade
+        $('#id_product_category').on('change', function () {
+            const categoryId = $(this).val();
+            const $subCatSelect = $('#id_product_sub_category');
+
+            if (!categoryId) {
+                $subCatSelect.html('<option value="">--SELECT--</option>');
+                return;
+            }
+
+            $subCatSelect.html('<option value="">Loading...</option>');
+            fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    let options = '<option value="">--SELECT--</option>';
+                    data.forEach(item => {
+                        options += `<option value="${item.id}">${item.name}</option>`;
+                    });
+                    $subCatSelect.html(options);
+                })
+                .catch(() => $subCatSelect.html('<option value="">Error loading</option>'));
+        });
+
+        // Add New Custom Field
+        $("#addCustomFieldBtn").on('click', function () {
+            const template = document.getElementById("custom-field-template");
+            const clone = template.content.cloneNode(true);
+            $("#custom-field-container").append(clone);
+        });
+
+        // Image Preview for New Uploads
+        $("#id_image").on('change', function () {
+            const input = this;
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#imagePreview").html('<img src="' + e.target.result + '" class="rounded" width="100" height="80" style="border: 2px solid #e5e7eb; padding: 4px; background: white;"/>').fadeIn();
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $("#imagePreview").hide();
+            }
+        });
+    });
+
+    function removeCustomField(el) {
+        $(el).closest(".custom-field-row").remove();
+    }
+</script>
+{% endblock content %}

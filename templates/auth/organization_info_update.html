@@ -1,80 +1,298 @@
 {% load static %}
 <div class="modal-content">
-    <div class="modal-header bg-dark text-center">
-        <h5 class="modal-title white w-100" id="myModalLabel160">Update Organization</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
-            aria-label="Close">
+    <div class="modal-header-custom">
+        <h5 class="modal-title"><i class="bi bi-building"></i> Update Organization</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
     <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
         {% csrf_token %}
-        <div class="modal-body">
+        <div class="modal-body-custom">
             <div class="row">
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="first-name-column">Company Name</label>
+                        <label>COMPANY NAME</label>
                         {{organization_form.name}}
                         {% for error in organization_form.name.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+                        <small class="text-danger">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="last-name-column">Company Email</label>
+                        <label>COMPANY EMAIL</label>
                         {{organization_form.email}}
                         {% for error in organization_form.email.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+                        <small class="text-danger">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="company-column">Company Phone</label>
+                        <label>COMPANY PHONE</label>
                         {{organization_form.phone}}
                         {% for error in organization_form.phone.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+                        <small class="text-danger">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="company-column">Company Website</label>
+                        <label>COMPANY WEBSITE</label>
                         {{organization_form.website}}
                         {% for error in organization_form.website.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+                        <small class="text-danger">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label for="company-column">Company Currency</label>
+                        <label>COMPANY CURRENCY</label>
                         {{organization_form.currency}}
                         {% for error in organization_form.currency.errors %}
-                        <small class="text-danger mb-3">{{ error }}</small>
+                        <small class="text-danger">{{ error }}</small>
                         {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-light-secondary"
-                data-bs-dismiss="modal">
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Close</span>
+        <div class="modal-footer-custom">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> Cancel
             </button>
-            <button type="submit" class="btn btn-sm btn-info ml-1" 
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"> 
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Save</span>
+            <button type="submit" class="btn-save"> 
+                <span class="save-text"><i class="bi bi-check-lg"></i> Save</span>
+                <span class="loading-spinner d-none">
+                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Saving...
+                </span>
             </button>
         </div>
     </form>
-<script>
-htmx.on("htmx:beforeSwap", (e) => {
-    if (e.detail.target.id == "update-organization-modal-content" && !e.detail.xhr.response) {
-        location.reload()
-    }
-})
-</script>
 </div>
+
+<style>
+/* Premium Modal Styling */
+.modal-content {
+    border: none;
+    border-radius: 20px;
+    background-color: var(--pd-card, #FFFFFF) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    border: 1px solid var(--pd-border, #E5E7EB);
+}
+
+.modal-header-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-card);
+}
+
+.modal-header-custom .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--pd-text, #111827);
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.modal-header-custom .modal-title i {
+    color: var(--pd-primary, #4F46E5);
+    background: rgba(79, 70, 229, 0.1);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1.2rem;
+}
+
+.btn-close-modal {
+    background: var(--pd-bg, #F3F4F6);
+    border: none;
+    color: var(--pd-muted, #6B7280);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-close-modal:hover {
+    background: #FEE2E2;
+    color: #EF4444;
+    transform: rotate(90deg);
+}
+
+.modal-body-custom {
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-body-custom .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.modal-body-custom .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--pd-muted, #6B7280);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.modal-body-custom .form-group input,
+.modal-body-custom .form-group select,
+.modal-body-custom .form-group textarea {
+    width: 100%;
+    background: var(--pd-bg, #F9FAFB);
+    border: 1px solid var(--pd-border, #E5E7EB);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--pd-text, #111827);
+    transition: all 0.2s;
+}
+
+.modal-body-custom .form-group input:focus {
+    outline: none;
+    border-color: var(--pd-primary, #4F46E5);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--pd-border, #E5E7EB);
+    background-color: var(--pd-bg, #F9FAFB);
+}
+
+.btn-cancel {
+    padding: 0.75rem 1.5rem;
+    background: #fff;
+    border: 1px solid var(--pd-border, #E5E7EB);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pd-muted, #6B7280);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #F9FAFB;
+    border-color: var(--pd-muted, #6B7280);
+    color: var(--pd-text, #111827);
+}
+
+.btn-save {
+    padding: 0.75rem 2rem;
+    background: var(--pd-primary, #4F46E5);
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+
+.btn-save:hover {
+    background: #4338CA;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+body.theme-dark .modal-content {
+    background-color: #1E1E2D !important;
+}
+
+body.theme-dark .modal-header-custom,
+body.theme-dark .modal-footer-custom {
+    background-color: #1E1E2D !important;
+    border-color: #2D2D3F !important;
+}
+
+body.theme-dark .modal-header-custom {
+    border-bottom: 1px solid #2D2D3F !important;
+}
+
+body.theme-dark .modal-header-custom .modal-title {
+    color: #F9FAFB !important;
+}
+
+body.theme-dark .btn-close-modal {
+    background: #2D2D3F;
+    color: #9CA3AF;
+}
+
+body.theme-dark .btn-close-modal:hover {
+    background: #4B5563;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-body-custom .form-group input,
+body.theme-dark .modal-body-custom .form-group select,
+body.theme-dark .modal-body-custom .form-group textarea {
+    background: #161625;
+    border-color: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel {
+    background: #1E1E2D;
+    border-color: #2D2D3F;
+    color: #9CA3AF;
+}
+
+body.theme-dark .modal-footer-custom .btn-cancel:hover {
+    border-color: #F9FAFB;
+    color: #F9FAFB;
+}
+</style>
+
+<script>
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    const btn = evt.detail.elt.querySelector('.btn-save');
+    if (btn) {
+        btn.disabled = true;
+        btn.querySelector('.save-text').classList.add('d-none');
+        btn.querySelector('.loading-spinner').classList.remove('d-none');
+    }
+});
+
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const target = evt.detail.target;
+    if (target && target.id === "update-organization-modal-content") {
+        if (evt.detail.xhr.status === 204 || (evt.detail.xhr.status === 200 && !evt.detail.xhr.responseText.trim())) {
+            location.reload();
+        } else {
+            // Re-enable button if there are validation errors
+            const btn = target.querySelector('.btn-save');
+            if (btn) {
+                btn.disabled = false;
+                btn.querySelector('.save-text').classList.remove('d-none');
+                btn.querySelector('.loading-spinner').classList.add('d-none');
+            }
+        }
+    }
+});
+</script>

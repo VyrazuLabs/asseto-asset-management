@@ -129,19 +129,30 @@ class UserPasswordResetForm(SetPasswordForm):
 
 class UserUpdateForm(forms.ModelForm):
 
-    full_name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Full name', 'autofocus': True}))
+    full_name = forms.CharField(required=False, widget=forms.TextInput(
+        attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Full Name', 'autofocus': True}))
     email = forms.EmailField(max_length=30, widget=forms.EmailInput(
         attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Email'}))
 
-    phone = forms.IntegerField(required=True, widget=forms.NumberInput(
+    phone = forms.CharField(required=False, widget=forms.TextInput(
         attrs={'autocomplete': 'off', 'class': 'form-control', 'placeholder': 'Phone'}))
 
-    profile_pic = forms.ImageField(
-        required=False,
-        widget=forms.FileInput(
-            attrs={'class': 'form-control', 'id': 'inputFile'}
-        ))
+    role = forms.ModelChoiceField(queryset=None, required=False, widget=forms.Select(
+        attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.initial['full_name'] = self.instance.full_name or ''
+            self.initial['phone'] = self.instance.phone or ''
+            
+            # Filter roles by organization
+            if self.instance.organization:
+                from roles.models import Role
+                self.fields['role'].queryset = Role.objects.filter(organization=self.instance.organization)
+            else:
+                from roles.models import Role
+                self.fields['role'].queryset = Role.objects.all()
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -149,11 +160,11 @@ class UserUpdateForm(forms.ModelForm):
 
     def clean_full_name(self):
         full_name = self.cleaned_data.get('full_name')
-        return full_name.title()
+        return full_name.title() if full_name else ''
 
     class Meta:
         model = User
-        fields = ['full_name', 'email', 'phone', 'profile_pic']
+        fields = ['full_name', 'email', 'phone', 'role', 'profile_pic']
 
 
 class OrganizationUpdateForm(forms.ModelForm):

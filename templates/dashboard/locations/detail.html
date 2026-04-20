@@ -1,73 +1,98 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Location Details - {{ location.office_name }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/location-details.css' %}?v=1.1">
+{% endblock css %}
+
 {% block content %}
-<div class="page-heading">
-    <div class="d-flex justify-content-between">
-        <div class="page-title">
-            <h3 class="page-name">Location Details</h3>
+<div class="location-details-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:locations' %}" class="breadcrumb-link">Locations</a></li>
+            <li class="breadcrumb-item active">Location Details</li>
+          </ol>
+        </nav>
+        <h1>{{ location.office_name }}</h1>
+        <p class="page-subtitle">View and manage location details and associated assets.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'dashboard:locations' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <a href="{% url 'dashboard:update_location' location.id %}?modal=1" class="btn-save-asset" data-bs-toggle="modal" data-bs-target="#edit-location-modal">
+          <i class="bi bi-pencil"></i> Update Location
+        </a>
+      </div>
+    </div>
 
-
-            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Locations</li>
-                    <li class="breadcrumb-item active" aria-current="page">Location Details</li>
-                </ol>
-            </nav>
-
+    {# ── Location Information Card ───────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-geo-alt-fill"></i>
+            <h2><span>Location Information</span></h2>
         </div>
-        <div>
-            <a href="{% url 'dashboard:locations' %}" class="btn btn-sm btn-outline-info my-3">Back to Location List</a>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Office Name</span>
+                <span class="value">{{ location.office_name|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Contact Person Name</span>
+                <span class="value">{{ location.contact_person_name|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Contact Person Email</span>
+                <span class="value">{{ location.contact_person_email|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Contact Person Phone</span>
+                <span class="value">{{ location.contact_person_phone|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Country</span>
+                <span class="value">{{ location.address.country|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">State</span>
+                <span class="value">{{ location.address.state|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">City</span>
+                <span class="value">{{ location.address.city|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Zip Code</span>
+                <span class="value">{{ location.address.pin_code|default:"-" }}</span>
+            </div>
+            <div class="info-item full-width">
+                <span class="label">Address Line 1</span>
+                <span class="value">{{ location.address.address_line_one|default:"-" }}</span>
+            </div>
+            <div class="info-item full-width">
+                <span class="label">Address Line 2</span>
+                <span class="value">{{ location.address.address_line_two|default:"-" }}</span>
+            </div>
         </div>
     </div>
 
-    <section class="section">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="my-3">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    <span>Location Information</span>                       
-                </h6>
-                <div class="table-responsive">
-                    <table class="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <th scope="row">Office Name</th>
-                                <td>{{location.office_name}}</td>
-                                <th scope="row">Contact Person Name</th>
-                                <td>{{location.contact_person_name}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Contact Person Email</th>
-                                <td>{{location.contact_person_email}}</td>
-                                <th scope="row">Contact Person Number</th>
-                                <td>{{location.contact_person_phone}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Country</th>
-                                <td>{{location.address.country}}</td>
-                                <th scope="row">State</th>
-                                <td>{{location.address.state}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">City</th>
-                                <td>{{location.address.city}}</td>
-                                <th scope="row">Zip Code</th>
-                                <td>{{location.address.pin_code}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Address Line 1</th>
-                                <td colspan="3">{{location.address.address_line_one}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Address Line 2</th>
-                                <td colspan="3">{{location.address.address_line_two}}</td>
-                            </tr>
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    {# ── History Section ───────────────────────────────────────────────────── #}
+    <div class="mt-4">
         {% include 'commons/history.html' %}
-    </section>
+    </div>
 </div>
-{% endblock content%}
+
+{# ── Edit modal ───────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="edit-location-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div id="edit-location-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
+{% endblock content %}

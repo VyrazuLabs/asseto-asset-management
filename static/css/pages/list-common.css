@@ -574,6 +574,9 @@ body.theme-dark .filter-card input[type=search]::placeholder {
 body.theme-dark .page-breadcrumb {
   margin-bottom: 0.35rem;
 }
+body.theme-dark .page-breadcrumb .breadcrumb-item.active {
+  color: var(--color-primary);
+}
 body.theme-dark .list-page-header h1 {
   margin: 0 0 .3rem;
 }
