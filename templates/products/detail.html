@@ -50,41 +50,57 @@
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Type</span>
-                        <span class="pd-value">{{ product.product_type|default:"N/A" }}</span>
+                        <span class="pd-value">{{ product.product_type|default:"-" }}</span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Category</span>
-                        <span class="pd-value">{{ product.product_sub_category.parent.name|default:"N/A" }}</span>
+                        <span class="pd-value">
+                            {% if product.product_sub_category %}
+                                {% if product.product_sub_category.parent and product.product_sub_category.parent.name != 'Root' %}
+                                    {{ product.product_sub_category.parent.name }}
+                                {% else %}
+                                    {{ product.product_sub_category.name }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Sub Category</span>
-                        <span class="pd-value">{{ product.product_sub_category.name|default:"N/A" }}</span>
+                        <span class="pd-value">
+                            {% if product.product_sub_category and product.product_sub_category.parent and product.product_sub_category.parent.name != 'Root' %}
+                                {{ product.product_sub_category.name }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Manufacturer</span>
-                        <span class="pd-value">{{ product.manufacturer|default:"N/A" }}</span>
+                        <span class="pd-value">{{ product.manufacturer|default:"-" }}</span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Model Name</span>
-                        <span class="pd-value">{{ product.model|default:"N/A" }}</span>
+                        <span class="pd-value">{{ product.model|default:"-" }}</span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Product EOL</span>
                         <span class="pd-value">
-                            {% if product.eol %}{{ product.eol }} Months{% else %}Not Provided{% endif %}
+                            {% if product.eol %}{{ product.eol }} Months{% else %}-{% endif %}
                         </span>
                     </div>
                     <div class="pd-info-item">
                         <span class="pd-label">Audit Interval</span>
                         <span class="pd-value">
-                            {% if product.get_audit_duration %}{{ product.get_audit_duration }}{% else %}Not Applicable{% endif %}
+                            {% if product.get_audit_duration %}{{ product.get_audit_duration }}{% else %}-{% endif %}
                         </span>
                     </div>
                     
                     <div class="pd-info-item full-width">
                         <span class="pd-label">Description</span>
                         <div class="pd-description-box">
-                            {{ product.description|default:"No description available."|urlize }}
+                            {{ product.description|default:"-"|urlize }}
                         </div>
                     </div>
                 </div>
@@ -160,7 +176,7 @@
                              data-bs-toggle="modal" 
                              data-bs-target="#productImageCarousel" 
                              data-bs-slide-to="{{ forloop.counter0 }}">
-                            +{{ img_array|add:"-3" }} More
+                            +{{ arr_size|add:"-3" }} More
                         </div>
                         {% endif %}
                         {% endfor %}

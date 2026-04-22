@@ -112,10 +112,18 @@ def update_product(request, id):
             data = json.loads(request.body)
             delete_image_ids = data.get('delete_image_ids', [])
             delete_custom_field_ids = data.get('delete_custom_field_ids', [])
+            delete_main_picture = data.get('delete_main_picture', False)
             
             if delete_image_ids:
                 ProductImage.objects.filter(id__in=delete_image_ids, product=product).delete()
                 return JsonResponse({'success': True, 'message': 'Images deleted successfully.'})
+            
+            if delete_main_picture:
+                if product.product_picture:
+                    product.product_picture.delete()
+                    product.product_picture = None
+                    product.save()
+                return JsonResponse({'success': True, 'message': 'Main picture deleted successfully.'})
             
             if delete_custom_field_ids:
                 CustomField.objects.filter(entity_id__in=delete_custom_field_ids, object_id=product.id, organization=request.user.organization).delete()
