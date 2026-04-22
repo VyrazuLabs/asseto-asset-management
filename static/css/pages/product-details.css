@@ -290,6 +290,32 @@
     object-fit: cover;
 }
 
+.pd-thumbnail-more {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px dashed var(--color-border);
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    transition: all 0.2s ease;
+}
+
+.pd-thumbnail-more:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+body.theme-dark .pd-thumbnail-more {
+    background: #2a2a3d;
+}
+
 .pd-add-photo {
     aspect-ratio: 1;
     border-radius: 6px;

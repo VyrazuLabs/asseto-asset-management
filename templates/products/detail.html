@@ -128,7 +128,14 @@
                 <div class="pd-visuals-container">
                     <div class="pd-main-image">
                         {% if img_array %}
-                            <img id="pdMainImg" src="{% get_media_prefix %}{{ img_array.0.image }}" alt="Primary View" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            <img id="pdMainImg" 
+                                 src="{% get_media_prefix %}{{ img_array.0.image }}" 
+                                 alt="Primary View" 
+                                 {% if img_array|length > 1 %}
+                                 data-bs-toggle="modal" data-bs-target="#productImageCarousel" data-bs-slide-to="0"
+                                 style="cursor:pointer"
+                                 {% endif %}
+                                 onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
                         {% else %}
                             <div class="no-image-available">
                                 <i class="bi bi-image"></i>
@@ -137,12 +144,25 @@
                         {% endif %}
                     </div>
                     
-                    {% if img_array %}
+                    {% if img_array|length > 1 %}
                     <div class="pd-thumbnails-grid">
                         {% for it in img_array %}
-                        <div class="pd-thumbnail {% if forloop.first %}active{% endif %}" onclick="switchPdImage(this, '{% get_media_prefix %}{{ it.image }}')">
+                        {% if forloop.counter > 1 and forloop.counter <= 3 %}
+                        <div class="pd-thumbnail" 
+                             data-bs-toggle="modal" 
+                             data-bs-target="#productImageCarousel" 
+                             data-bs-slide-to="{{ forloop.counter0 }}"
+                             style="cursor:pointer">
                             <img src="{% get_media_prefix %}{{ it.image }}" alt="Thumbnail {{ forloop.counter }}" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
                         </div>
+                        {% elif forloop.counter == 4 %}
+                        <div class="pd-thumbnail pd-thumbnail-more" 
+                             data-bs-toggle="modal" 
+                             data-bs-target="#productImageCarousel" 
+                             data-bs-slide-to="{{ forloop.counter0 }}">
+                            +{{ img_array|add:"-3" }} More
+                        </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -156,6 +176,40 @@
         {% include 'commons/history.html' %}
     </div>
 </div>
+
+{# ── Image Carousel Modal ────────────────────────────────────────────────────── #}
+{% if img_array and img_array|length > 1 %}
+<div class="modal fade" id="productImageCarousel" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Image <span id="productImageCounter">1</span> of {{ img_array|length }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="productCarouselMain" class="carousel slide" data-bs-ride="false">
+          <div class="carousel-inner">
+            {% for it in img_array %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{% get_media_prefix %}{{ it.image }}"
+                     class="detail-modal-image"
+                     alt="Product Image {{ forloop.counter }}"
+                     onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#productCarouselMain" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#productCarouselMain" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <script>
     function switchPdImage(thumb, src) {
@@ -195,5 +249,17 @@
         {% endif %}
     });
     {% endif %}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var carouselEl = document.getElementById('productCarouselMain');
+        if (carouselEl) {
+            var counterEl = document.getElementById('productImageCounter');
+            carouselEl.addEventListener('slide.bs.carousel', function(e) {
+                if (counterEl) {
+                    counterEl.textContent = e.to + 1;
+                }
+            });
+        }
+    });
 </script>
 {% endblock content %}
