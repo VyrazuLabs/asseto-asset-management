@@ -64,7 +64,18 @@ body.theme-dark .form-select {
   display: none;
 }
 
+
 body.theme-dark .carousel-control-prev-icon,
 body.theme-dark .carousel-control-next-icon {
   background-color: rgba(80, 80, 80, 0.8);
 }
+
+.bi {
+    width: 1rem;
+    height: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
