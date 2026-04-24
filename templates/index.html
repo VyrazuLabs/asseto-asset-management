@@ -244,129 +244,199 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+    // Global chart references
+    let statusChart = null;
+    let utilizationChart = null;
+
     function setActiveTab(btn) {
         document.querySelectorAll('.tab-link-premium').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Chart shared config
-    const isDark = document.body.classList.contains('theme-dark');
-    const labelColor = isDark ? '#94A3B8' : '#64748B';
+    function getThemeConfig() {
+        const isDark = document.body.classList.contains('theme-dark') || 
+                       document.body.classList.contains('dark') || 
+                       localStorage.getItem('theme') === 'theme-dark';
+        return {
+            isDark: isDark,
+            labelColor: isDark ? '#CBD5E1' : '#64748B',
+            valueColor: isDark ? '#FFFFFF' : '#1E293B',
+            trackColor: isDark ? '#2D2D44' : '#F1F5F9',
+            mode: isDark ? 'dark' : 'light'
+        };
+    }
 
-    // ── Asset Status Chart ──────────────────────────────────────────────────
-    fetch("{% url 'assets:pie_chart_status' %}")
-    .then(r => r.json())
-    .then(data => {
-        // Transform Google Chart Data [['Status', 'Count'], ['Ready', 9], ...] to Apex format
-        // Data structure: [["Status", "Count"], ["Available", 9], ["Allocated", 0]]
-        const labels = data.chart_data.slice(1).map(item => item[0]);
-        const series = data.chart_data.slice(1).map(item => item[1]);
-        const total = series.reduce((a, b) => a + b, 0);
-
-        const options = {
-            series: series,
-            chart: { 
-                type: 'donut', 
-                height: 350,
-                background: 'transparent'
-            },
-            labels: labels,
-            colors: ['#4F46E5', '#6366F1', '#818CF8', '#94A3B8', '#CBD5E1'],
-            stroke: { show: false },
-            dataLabels: { enabled: false },
-            legend: {
-                position: 'right',
-                offsetY: 0,
-                height: 230,
-                labels: { colors: labelColor }
-            },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '75%',
-                        labels: {
-                            show: true,
-                            total: {
-                                show: true,
-                                label: 'TOTAL',
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                color: labelColor,
-                                formatter: function() { return total; }
-                            },
-                            value: {
-                                show: true,
-                                fontSize: '24px',
-                                fontWeight: 700,
-                                color: isDark ? '#E2E8F0' : '#1E293B',
-                                offsetY: 5
+    function updateChartsTheme() {
+        const config = getThemeConfig();
+        
+        if (statusChart) {
+            statusChart.updateOptions({
+                theme: { mode: config.mode },
+                legend: { labels: { colors: config.labelColor } },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                total: { color: config.labelColor },
+                                value: { color: config.valueColor }
                             }
                         }
                     }
                 }
-            },
-            theme: { mode: isDark ? 'dark' : 'light' }
-        };
+            });
+        }
 
-        const chart = new ApexCharts(document.querySelector("#assetsStatusChart"), options);
-        chart.render();
-    });
-
-    // ── Asset Utilization Chart ────────────────────────────────────────────
-    // Using simple stats from context for this one
-    const assignedCount = {{ assign_assets_counts }};
-    const totalCount = {{ asset_count }};
-    const utilization = totalCount > 0 ? Math.round((assignedCount / totalCount) * 100) : 0;
-
-    const utilOptions = {
-        series: [utilization],
-        chart: { 
-            type: 'radialBar', 
-            height: 350,
-            background: 'transparent'
-        },
-        plotOptions: {
-            radialBar: {
-                startAngle: -135,
-                endAngle: 135,
-                hollow: { size: '70%', },
-                track: {
-                    background: isDark ? '#2D2D44' : '#F1F5F9',
-                    strokeWidth: '97%',
-                },
-                dataLabels: {
-                    name: {
-                        show: true,
-                        color: labelColor,
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        offsetY: 20,
-                        label: 'UTILIZATION'
-                    },
-                    value: {
-                        offsetY: -10,
-                        fontSize: '32px',
-                        fontWeight: 700,
-                        color: isDark ? '#E2E8F0' : '#1E293B',
-                        formatter: function(val) { return val + "%"; }
+        if (utilizationChart) {
+            utilizationChart.updateOptions({
+                theme: { mode: config.mode },
+                plotOptions: {
+                    radialBar: {
+                        track: { background: config.trackColor },
+                        dataLabels: {
+                            name: { color: config.labelColor },
+                            value: { color: config.valueColor }
+                        }
                     }
                 }
-            }
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'dark',
-                type: 'horizontal',
-                gradientToColors: ['#0EA5E9'],
-                stops: [0, 100]
-            }
-        },
-        labels: ['UTILIZATION'],
-        theme: { mode: isDark ? 'dark' : 'light' }
-    };
+            });
+        }
+    }
 
-    const utilChart = new ApexCharts(document.querySelector("#assetsUtilizationChart"), utilOptions);
-    utilChart.render();
+    // ── Asset Status Chart ──────────────────────────────────────────────────
+    function initStatusChart() {
+        const config = getThemeConfig();
+        fetch("{% url 'assets:pie_chart_status' %}")
+        .then(r => r.json())
+        .then(data => {
+            const labels = data.chart_data.slice(1).map(item => item[0]);
+            const series = data.chart_data.slice(1).map(item => item[1]);
+            const total = series.reduce((a, b) => a + b, 0);
+
+            const options = {
+                series: series,
+                chart: { 
+                    type: 'donut', 
+                    height: 350,
+                    background: 'transparent'
+                },
+                labels: labels,
+                colors: ['#4F46E5', '#6366F1', '#818CF8', '#94A3B8', '#CBD5E1'],
+                stroke: { show: false },
+                dataLabels: { enabled: false },
+                legend: {
+                    position: 'right',
+                    offsetY: 0,
+                    height: 230,
+                    labels: { colors: config.labelColor }
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '75%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'TOTAL',
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    color: config.labelColor,
+                                    formatter: function() { return total; }
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '24px',
+                                    fontWeight: 700,
+                                    color: config.valueColor,
+                                    offsetY: 5
+                                }
+                            }
+                        }
+                    }
+                },
+                theme: { mode: config.mode }
+            };
+
+            if (statusChart) statusChart.destroy();
+            statusChart = new ApexCharts(document.querySelector("#assetsStatusChart"), options);
+            statusChart.render();
+        });
+    }
+
+    // ── Asset Utilization Chart ────────────────────────────────────────────
+    function initUtilizationChart() {
+        const config = getThemeConfig();
+        const assignedCount = {{ assign_assets_counts|default:0 }};
+        const totalCount = {{ asset_count|default:0 }};
+        const utilization = totalCount > 0 ? Math.round((assignedCount / totalCount) * 100) : 0;
+
+        const utilOptions = {
+            series: [utilization],
+            chart: { 
+                type: 'radialBar', 
+                height: 350,
+                background: 'transparent'
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -135,
+                    endAngle: 135,
+                    hollow: { size: '70%', },
+                    track: {
+                        background: config.trackColor,
+                        strokeWidth: '97%',
+                    },
+                    dataLabels: {
+                        name: {
+                            show: true,
+                            color: config.labelColor,
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            offsetY: 20,
+                            label: 'UTILIZATION'
+                        },
+                        value: {
+                            offsetY: -10,
+                            fontSize: '32px',
+                            fontWeight: 700,
+                            color: config.valueColor,
+                            formatter: function(val) { return val + "%"; }
+                        }
+                    }
+                }
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'dark',
+                    type: 'horizontal',
+                    gradientToColors: ['#0EA5E9'],
+                    stops: [0, 100]
+                }
+            },
+            labels: ['UTILIZATION'],
+            theme: { mode: config.mode }
+        };
+
+        if (utilizationChart) utilizationChart.destroy();
+        utilizationChart = new ApexCharts(document.querySelector("#assetsUtilizationChart"), utilOptions);
+        utilizationChart.render();
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+        initStatusChart();
+        initUtilizationChart();
+        
+        // Watch for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    updateChartsTheme();
+                }
+            });
+        });
+        observer.observe(document.body, { attributes: true });
+    });
 </script>
 {% endblock content %}

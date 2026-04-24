@@ -72,7 +72,7 @@
 <div class="filter-card">
   {% csrf_token %}
   <form id="department-filter-form" hx-get="{% url 'dashboard:search_department' 1 %}"
-    hx-target="#department-list-container" hx-trigger="change from:input">
+    hx-target="#department-list-container" hx-trigger="change">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-6 col-lg">
@@ -120,7 +120,6 @@
 </div>
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
-<div class="table-card" id="department-list-container">
   <div class="modal fade" id="add-department-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div id="add-department-modal-content" class="modal-content" hx-target="this"></div>
@@ -132,6 +131,8 @@
     <div id="update-department-modal-content" class="modal-content" hx-target="this"></div>
   </div>
 </div>
+
+<div class="table-card" id="department-list-container">
 
 
 
