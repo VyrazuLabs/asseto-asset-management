@@ -1,7 +1,8 @@
 {% extends 'layouts/main-layout.html' %}
 {% load custom_filters %}
 {% load static %}
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% block title %}{{ asset.tag }} — Asset Details | Asseto{% endblock %}
 
 {% block css %}
@@ -281,7 +282,12 @@
               <img src="{% get_media_prefix %}{{ first.image }}"
                    class="detail-main-image"
                    alt="{{ asset.name }}"
-                   data-bs-toggle="modal" data-bs-target="#imageModal1"
+                   {% if arr_size > 1 %}
+                   data-bs-toggle="modal" data-bs-target="#imageCarouselModal"
+                   data-bs-slide-to="0"
+                   {% else %}
+                   data-bs-toggle="modal" data-bs-target="#imageModalSingle"
+                   {% endif %}
                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
             </div>
           {% endwith %}
@@ -292,13 +298,18 @@
                 <img src="{% get_media_prefix %}{{ it.image }}"
                      class="detail-thumb"
                      alt="Image {{ forloop.counter }}"
-                     data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}"
+                     data-bs-toggle="modal"
+                     data-bs-target="#imageCarouselModal"
+                     data-bs-slide-to="{{ forloop.counter|add:'-1' }}"
                      onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
               {% elif forloop.counter == 4 %}
-                <div class="detail-thumb detail-thumb-more"
-                     data-bs-toggle="modal" data-bs-target="#imageModal{{ forloop.counter }}">
+                <button type="button"
+                        class="detail-thumb detail-thumb-more"
+                        data-bs-toggle="modal"
+                        data-bs-target="#imageCarouselModal"
+                        data-bs-slide-to="{{ forloop.counter|add:'-1' }}">
                   +{{ arr_size|add:"-3" }} More
-                </div>
+                </button>
               {% endif %}
             {% endif %}{% endfor %}
           </div>
@@ -377,26 +388,131 @@
 </div>{# /detail-layout #}
 
 {# ── Image modals ──────────────────────────────────────────────────────────── #}
+{% if arr_size == 1 %}
 {% for it in get_asset_img %}
   {% if it.image %}
-  <div class="modal fade" id="imageModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="imageModalSingle" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Image {{ forloop.counter }} of {{ arr_size }}</h5>
+          <h5 class="modal-title">Image 1 of {{ arr_size }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body text-center">
           <img src="{% get_media_prefix %}{{ it.image }}"
-              alt="Asset Image {{ forloop.counter }}"
-              class="detail-modal-image"
-              style="max-height:35vh; object-fit:contain;"
-              onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+               alt="Asset Image"
+               class="detail-modal-image"
+               onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
         </div>
       </div>
     </div>
   </div>
   {% endif %}
 {% endfor %}
+{% endif %}
 
+{# ──── Image Modal For Remaining Images ────────────────────────────────────────────────────── #}
+<!-- arr_size|add:"-3"  is thew starting index or the index that will open first. But we can view all the images if we want to -->
+<!-- {% if arr_size > 3 %}
+<div class="modal fade" id="imageCarouselModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Image {{ forloop.counter }} of {{ arr_size }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="carouselExampleControls" class="carousel{{ forloop.counter }} slide" data-bs-ride="carousel">
+          
+          <div class="carousel-inner">
+            {% for it in get_asset_img %}
+              {% if it.image %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{% get_media_prefix %}{{ it.image }}"
+                     class="d-block w-100 detail-modal-image"
+                     style="max-height:70vh; object-fit:contain;"
+                     onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <button class="carousel-control-prev" type="button"
+                  data-bs-target="#carouselExampleControls"
+                  data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+
+          <button class="carousel-control-next" type="button"
+                  data-bs-target="#carouselExampleControls"
+                  data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} -->
+{% if arr_size > 1 %}
+<div class="modal fade" id="imageCarouselModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Image <span id="carouselImageCounter">1</span> of {{ arr_size }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="carouselMain" class="carousel slide" data-bs-ride="false">
+          <div class="carousel-inner">
+            {% for it in get_asset_img %}
+              {% if it.image %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{% get_media_prefix %}{{ it.image }}"
+                       class="detail-modal-image"
+                       onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <!-- Prev -->
+          <button class="carousel-control-prev" type="button"
+                  data-bs-target="#carouselMain"
+                  data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+
+          <!-- Next -->
+          <button class="carousel-control-next" type="button"
+                  data-bs-target="#carouselMain"
+                  data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var carouselEl = document.getElementById('carouselMain');
+  if (carouselEl) {
+    var counterEl = document.getElementById('carouselImageCounter');
+    var totalImages = {{ arr_size }};
+    
+    carouselEl.addEventListener('slide.bs.carousel', function(e) {
+      if (counterEl) {
+        var currentIndex = e.to + 1;
+        counterEl.textContent = currentIndex;
+      }
+    });
+  }
+});
+</script>
 {% endblock content %}
+

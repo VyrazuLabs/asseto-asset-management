@@ -116,10 +116,12 @@ def get_product_details(request,id):
         obj['field_value']=it.field_value
         get_custom_data.append(obj)
 
+    arr_size = len(img_array)
     context = {
         'sidebar': 'products',
         'product': product,
         'img_array':img_array,
+        'arr_size': arr_size,
         'title': f'Details-{product.name}',
         'page_object': page_object,
         'get_custom_data': get_custom_data
