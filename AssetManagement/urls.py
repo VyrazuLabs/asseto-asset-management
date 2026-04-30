@@ -32,6 +32,7 @@ from products.urls import product_api_urlpattrens
 from dashboard.urls import dashboard_api_urlpatterns
 from audit.urls import audit_api_url_patterns
 from configurations.urls import configuration_api_url_patterns
+from gate_pass.urls import gate_pass_api_url_patterns
 
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -52,6 +53,7 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
 	path('configurations/',include('configurations.urls',namespace='configurations')),
+	path('gate-pass/', include('gate_pass.urls', namespace='gate_pass')),
 
     # django smart select urls
     path('chaining/', include('smart_selects.urls')),
@@ -78,7 +80,7 @@ urlpatterns = [
 	
 ]
 
-urlpatterns=urlpatterns+api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns
+urlpatterns=urlpatterns+api_url_patterns+user_api_url_patterns+authentication_url_patterns+vendor_api_urlpatterns+product_api_urlpattrens+dashboard_api_urlpatterns+audit_api_url_patterns+configuration_api_url_patterns+gate_pass_api_url_patterns
 urlpatterns += [
     re_path(
         r'^firebase-messaging-sw\.js$',

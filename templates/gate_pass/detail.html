@@ -1,0 +1,402 @@
+{% extends 'layouts/main-layout.html' %} 
+{% load static %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
+
+{% endblock css %}
+
+{% block content %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Asseto GatePass - Administrative View</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#ffb77e",
+              "surface-bright": "#f7f9ff",
+              "secondary-fixed-dim": "#a4c9ff",
+              tertiary: "#773e00",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-fixed": "#001551",
+              "on-primary-fixed-variant": "#203e9e",
+              "inverse-primary": "#b7c4ff",
+              "on-surface-variant": "#444652",
+              "tertiary-fixed": "#ffdcc3",
+              "surface-container-highest": "#dee3eb",
+              "on-secondary-fixed-variant": "#004883",
+              "surface-container-low": "#eff4fc",
+              "on-secondary-fixed": "#001c39",
+              "inverse-on-surface": "#ecf1f9",
+              "on-secondary-container": "#00447e",
+              "on-primary-container": "#dde1ff",
+              "surface-tint": "#3c57b7",
+              "surface-container": "#e9eef6",
+              outline: "#757684",
+              "on-surface": "#161c22",
+              "secondary-container": "#7ab3ff",
+              "on-background": "#161c22",
+              "on-tertiary-fixed-variant": "#6e3900",
+              "on-tertiary-container": "#ffdcc3",
+              "primary-fixed-dim": "#b7c4ff",
+              "on-error": "#ffffff",
+              "on-primary": "#ffffff",
+              secondary: "#1960a6",
+              "surface-variant": "#dee3eb",
+              "surface-dim": "#d5dae2",
+              background: "#f7f9ff",
+              "on-tertiary-fixed": "#2f1500",
+              "secondary-fixed": "#d4e3ff",
+              "outline-variant": "#c5c5d4",
+              "inverse-surface": "#2b3137",
+              primary: "#2845a4",
+              "on-secondary": "#ffffff",
+              error: "#ba1a1a",
+              "tertiary-container": "#9a5200",
+              "primary-fixed": "#dce1ff",
+              "surface-container-high": "#e3e8f0",
+              surface: "#f7f9ff",
+              "on-error-container": "#93000a",
+              "primary-container": "#435ebe",
+            },
+            fontFamily: {
+              headline: ["Inter"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface antialiased">
+    <div
+      class=" py-3 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div class="">
+        <p
+          class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-1"
+        >
+          Authorization Details
+        </p>
+        <h1
+          class="text-2xl md:text-3xl font-bold text-on-surface tracking-tight"
+        >
+          Gate Pass #{{ items.id|truncatechars:20 }}
+        </h1>
+        <div class="flex items-center gap-2 mt-2">
+          {% if items.status == 1 or item.status == 0 %}
+            <span
+              class="px-3 py-1 bg-success-container/30 text-success text-xs font-bold rounded-full bg-green-100 text-green-700"
+              >ACTIVE AUTHORIZATION</span>
+            <!-- <span class="text-on-surface-variant text-xs">• Issued 2 hours ago</span> -->
+          {% endif %}
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <a href="{% url 'gate_pass:print_doc' items.id  %}">
+          <button type="submit" class="btn-register">
+            <i class="bi bi-floppy2"></i> Print Document
+          </button>
+        </a>
+        {% if items.status == 1 %}
+          <a href="{% url 'gate_pass:authorise' items.id items.status %}">
+              <button type="button" class="btn-trash">
+                  <i class="bi bi-x-circle"></i> Revoke Authorisation
+              </button>
+          </a>
+        {% else %}
+          <a href="{% url 'gate_pass:authorise' items.id items.status %}">
+              <button type="button" class="bg-success text-on-primary rounded-3 p-1">
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="check_circle"
+                    style="font-variation-settings: &quot;FILL&quot; 1"
+                    >check_circle</span
+                  >
+                  <span class="text-sm font-bold tracking-tight"
+                    >Approve Authorisation</span> 
+              </button>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+      <!-- Bento Grid Layout -->
+      <!-- New LayOut -->
+    <div class="lg:col-span-8   rounded-[0.7rem] shadow-sm relative overflow-hidden">
+        {# General Information #}
+        <div class="form-section">
+          <div class="section-header">
+            <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
+            <h2>Asset Specifications</h2>
+          </div>
+          <div class="section-body">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="field-label">Asset Name
+                <p class="stat-value">{{ items.asset.name }}</p>
+              </div>
+
+              <div class="col-md-6">
+                <label class="field-label">Asset Tag/ Serial<span class="required">*</span></label>
+                <p class="stat-value">{{ items.asset.tag }}</p>
+              </div>
+
+              <div class="col-md-6">
+                <label class="field-label">Category</label>
+                <p class="stat-value">{% if items.asset.product.product_sub_category %}{{ items.asset.product.product_sub_category }}{% else %} UnCategorised{% endif %}</p>
+              </div>
+
+              <div class="col-md-6">
+                <label class="field-label">Declared Value
+                <p class="stat-value">{% if items.asset.price %}{{ currency }} {{ items.asset.price }}{% else %}Not Declared{% endif %}</p>
+              </div>
+              <br/>
+              <div class="mt-4">
+                <div class="bg-secondary-fixed/30 rounded-lg p-6 flex items-start gap-4 mt-4">
+                  <div class="p-3 bg-secondary-fixed rounded-full text-secondary">
+                    <span class="material-symbols-outlined" data-icon="analytics"
+                      >analytics</span
+                    >
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-bold text-sm text-on-secondary-fixed">
+                      Infrastructure Impact Check
+                    </h4>
+                    <p class="page-subtitle">
+                      Check if this asset movement affects connected dependencies
+                      or active service level agreements.
+                    </p>
+                    <button type="submit" class="btn-save-asset mt-1">
+                      Check for Impact
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Asset Details Card -->
+      <div class="detail-card">
+        <div class="detail-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div class="section-icon"><span
+              class="material-symbols-outlined text-primary"
+              data-icon="swap_horiz"
+              >swap_horiz</span>
+            </div>
+            <h3 class="font-bold text-sm text-on-secondary-fixed">Movement Context</h3>
+          </div>
+        </div>
+        <div class="detail-card-body p-5">
+          <table class="detail-specs-table">
+            <tbody>
+              <div class="space-y-6">
+                <div class="flex justify-between items-start">
+                  <label class="field-label">Movement Type</label>
+                  <span
+                    class="px-2 py-0.5 bg-primary-container/20 text-primary text-[0.9rem] font-bold rounded"
+                    >{% if items.movement_type == 0 %}Inward{% else %}Outward{% endif %}</span
+                  >
+                </div>
+                <div class="flex justify-between items-start">
+                 <label class="field-label">Expected Return</label>
+                  <span class="text-sm font-semibold">{{ items.expected_return_date }}</span>
+                </div>
+                <div class="pt-4 border-t border-surface-container">
+                  <label class="field-label">Destination Vendor</label
+                  >
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden"
+                    >
+                      <img
+                        alt="Vendor Logo"
+                        data-alt="Minimalist geometric logo icon for a technology repair company with sharp clean lines in corporate blue"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF_G-px5T8aNiqvolUGAY-O9g0V17djKkLjdzc2uihQ0bT2I99EMs7hSTEtgFZcRs85soB5aGXMEEuHugqeEqWbRX0WAOnV6kUJ2KbXOX0jwn3deOt9fNkSghSD5hGFsOQw94Fk2bDz0LqXgk37Duzmcn0Pb4lby2hKD7Wh7qSiShkgqb2po1yX4gOgiIje5RAl4YTNKyGtfK2jjrFdr1h--vaxsB40RSUORpQsZLTuKvbkh8eueJwXFiRWiHUdmNhlA8UWZc1pUU"
+                      />
+                    </div>
+                    <div>
+                      <p class="text-sm font-bold">{{ items.destination_vendor }}</p>
+                      <p class="text-[0.9rem] font-bold">
+                        {{ items.destination_vendor.address.address_line_one }}, {{ items.destination_vendor.address.address_line_two }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Movement Sidebar Info -->
+      <div class="detail-card">
+        <div class="detail-card-header">
+          <div class="d-flex justify-content-around gap-5 items-end">
+            <div>
+              <h3 class="font-bold text-sm text-on-secondary-fixed">
+                Infrastructure Impact Check
+              </h3>
+            </div>
+            <div
+              class="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg justify-content-between"
+            >
+              <span
+                class="material-symbols-outlined text-sm"
+                data-icon="check_circle"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >check_circle</span
+              >
+              <span class="text-sm font-bold tracking-tight"
+                >Low Risk - Continuity Secured</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="detail-card-body p-5">
+          <table class="detail-specs-table">
+            <tbody>
+              <div class="stats-grid">
+                <a  class="stat-card">
+                  <div>
+                    <div class="stat-icon blue"><span
+                      class="material-symbols-outlined text-primary"
+                      data-icon="backup"
+                      >backup</span>
+                    </div>
+                    <div>
+                      <div class="stat-label">Redundancy Check</div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-[0.7rem] text-on-surface-variant">Checking for backup assets in the current facility area...</p>
+                    <p class="text-[0.7rem] text-on-surface-variant">2 Standby Units Found For The Time Being...</p>
+                  </div>
+                </a>
+                <a  class="stat-card">
+                  <div>
+                    <div class="stat-icon blue"><span
+                      class="material-symbols-outlined text-primary"
+                      data-icon="backup"
+                      >backup</span>
+                    </div>
+                    <div>
+                      <div class="stat-label">Production Impact</div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-[0.7rem] text-on-surface-variant">Production Impact</p>
+                    <p class="text-[0.7rem] text-on-surface-variant">Analyzing scheduled workflows for the laser cutter...</p>
+                  </div>
+                </a>
+                <a  class="stat-card">
+                  <div>
+                    <div class="stat-icon blue"><span
+                      class="material-symbols-outlined text-primary"
+                      data-icon="backup"
+                      >backup</span>
+                    </div>
+                    <div>
+                      <div class="stat-label">Security Audit</div>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-[0.7rem] text-on-surface-variant">Production Impact</p>
+                    <p class="text-[0.7rem] text-on-surface-variant">Verifying exit protocols and personnel clearance...</p>
+                  </div>
+                  <!--  -->
+                </a>
+              </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
+        <!-- Infrastructure Impact Check - Bento Wide -->
+      <!-- <div class="table-card">
+        <div class="detail-card-header">
+          <h3 class="font-bold text-sm text-on-secondary-fixed">
+            Audit Trail &amp; Timeline
+          </h3>
+          <button class="text-xs font-bold text-primary hover:underline">
+            Download Log
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="assets-table" id="table1">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Actor</th>
+                <th>Location</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><p class="w-2 h-2 rounded-full bg-green-500"></p>Pass Generated</td>
+                <td>System Automated</td>
+                <td>Server Hub A</td>
+                <td>14 Oct, 09:30:12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
+      <br/>
+      <br/>
+      <!-- Footer Details Table Style -->
+      <div
+        class="lg:col-span-12 bg-white rounded-[0.7rem] overflow-hidden shadow-sm"
+      >
+    </div>
+
+  </body>
+</html>
+{% endblock %}

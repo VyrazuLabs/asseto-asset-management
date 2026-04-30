@@ -106,7 +106,12 @@
                     </a>
                 </li>
                 {% endif %}
-
+                <li class="sidebar-item {% if sidebar == 'gate-pass' %}active{% endif %}">
+                    <a href="{% url 'gate-pass:list' %}" class="sidebar-link">
+                        <i><image src="{% static 'images/gate-pass-logo.svg' %}" alt="Gate" width="40" height="30"></image></i>
+                        <span>Gate Pass</span>
+                    </a>
+                </li>
                 {% if perms.authentication.edit_license or perms.authentication.delete_license or perms.authentication.add_license %}
                 <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
                     <a href="{% url 'license:license_list' %}" class="sidebar-link">

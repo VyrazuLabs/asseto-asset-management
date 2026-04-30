@@ -1,0 +1,73 @@
+<thead>
+    <tr>
+    <th>Pass #</th>
+    <th>Asset</th>
+    <th>Raised By</th>
+    <th>Authorised By</th>
+    <th>To Vendor</th>
+    <th>Type</th>
+    <th>Status</th>
+    <th>Actions</th>
+    </tr>
+</thead>
+<tbody id="search_result">
+    {% for item in filters %}
+    <tr>
+        <td class="table-index-cell">
+            <span class="asset-tag-pill">{{ item.id }}</span>
+        </td>
+        <td class="d-flex gap-3 align-items-center mt-4">
+        <span
+            class="material-symbols-outlined text-slate-500 text-lg"
+            data-icon="laptop_mac"
+            style="background-color: whitesmoke;border-radius: 5px;padding:4px;">
+            laptop_mac
+        </span>
+        <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
+        </td>
+        <td>{{ item.raised_by }}</td>
+        <td>
+        {% if item.authorised_by %}
+            {{ item.authorised_by }}
+        {% else %}
+            Unauthorised
+        {% endif %}
+        </td>
+        <td>{{ item.destination_vendor.name }}</td>
+        <td>
+        <span
+            class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit"
+        >
+            
+            {% if item.movement_type == 0 %}
+            <span
+            class="material-symbols-outlined text-xs"
+            data-icon="logout"
+            >logout</span>
+            Outward
+            {% else %}
+            <span
+            class="material-symbols-outlined text-xs"
+            data-icon="login"
+            >login</span>
+            Inward
+            {% endif %}
+        </span>
+        </td>
+        <td class="px-6 py-5">
+        <span
+            class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700"
+            >{%if item.status == 0 %}Pending{% else %}Approved{% endif %}</span
+        >
+        </td>
+        <td class="d-flex justify-content-center me-5">
+        <a
+            class=""
+            href="{% url 'gate-pass:detail' item.id %}"
+            >
+            <i class="bi bi-display"></i>
+        </a>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>

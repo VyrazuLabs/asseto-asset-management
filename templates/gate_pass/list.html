@@ -1,0 +1,536 @@
+<!-- <!-- {% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+{% endblock css %}
+
+{% block content %}
+<!doctype html>
+<html lang="en">
+  <style>
+
+  </style>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Gate Pass List - Asseto</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6e3900",
+              "on-tertiary-fixed": "#2f1500",
+              "on-surface-variant": "#444652",
+              outline: "#757684",
+              "primary-fixed": "#dce1ff",
+              background: "#f7f9ff",
+              "on-primary": "#ffffff",
+              "surface-dim": "#d5dae2",
+              tertiary: "#773e00",
+              "on-secondary-container": "#00447e",
+              "surface-container-low": "#eff4fc",
+              "on-background": "#161c22",
+              "inverse-on-surface": "#ecf1f9",
+              "tertiary-container": "#9a5200",
+              surface: "#f7f9ff",
+              "surface-container": "#e9eef6",
+              "surface-bright": "#f7f9ff",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb77e",
+              "on-tertiary-container": "#ffdcc3",
+              error: "#ba1a1a",
+              primary: "#2845a4",
+              "outline-variant": "#c5c5d4",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#ffdcc3",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#a4c9ff",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#b7c4ff",
+              "surface-container-highest": "#dee3eb",
+              "surface-container-high": "#e3e8f0",
+              "on-primary-fixed": "#001551",
+              "primary-container": "#435ebe",
+              "inverse-primary": "#b7c4ff",
+              "surface-variant": "#dee3eb",
+              "secondary-container": "#7ab3ff",
+              "secondary-fixed": "#d4e3ff",
+              "on-primary-fixed-variant": "#203e9e",
+              "inverse-surface": "#2b3137",
+              "on-secondary-fixed": "#001c39",
+              "surface-tint": "#3c57b7",
+              secondary: "#1960a6",
+              "on-primary-container": "#dde1ff",
+              "on-surface": "#161c22",
+              "on-secondary-fixed-variant": "#004883",
+              "on-secondary": "#ffffff",
+            },
+            fontFamily: {
+              headline: ["Inter"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .bg-primary-gradient {
+        background: linear-gradient(135deg, #2845a4 0%, #435ebe 100%);
+      }
+    </style>
+  </head>
+    <div class="assets-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item active">Gate Pass</li>
+          </ol>
+        </nav>
+        <h1>Movement Authorisations</h1>
+        <p class="page-subtitle">Manage and track all inward and outward asset logistical passes.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-1">
+        <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn-trash" title="Recycle Bin">
+          <i class="bi bi-trash3"></i> Trash
+          {% if deleted_asset_count %}<span class="count-badge">{{ deleted_asset_count }}</span>{% endif %}
+        </a>
+        {% if perms.authentication.add_asset %}
+          <a href="{% url 'gate-pass:add' %}" class="btn-register">
+            <i class="bi bi-plus-lg"></i> Register New Gate Pass
+          </a>
+        {% endif %}
+      </div>
+    </div>
+        <!-- <div class="flex justify-between items-end">
+          <div>
+            <h1>Movement Authorisations</h1>
+            <nav aria-label="breadcrumb " class="d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" style="color: #4F46E5;"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Gate-Pass</li>
+                </ol>
+            </nav>
+            <p class="text-body-lg text-on-surface-variant mt-1 font-semibold ">
+              Manage and track all inward and outward asset logistical passes.
+            </p>
+          </div>
+          <a
+            class="bg-primary-gradient text-white px-6 py-3 rounded-[0.7rem] font-semibold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95" href="{% url 'gate-pass:add' %}"
+          >
+            <span class="material-symbols-outlined" data-icon="add_circle"
+              >add_circle</span
+            >
+            New Gate Pass
+          </a>
+        </div> -->
+        <!-- Summary Bento Grid -->
+    <div class="stats-grid">
+      <a class="stat-card">
+        <!-- Card 1 -->
+        <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
+        <div>
+          <div class="stat-label">Pending Authorisations</div>
+          <div class="stat-value">{{ pending_authorization_count }}</div>
+        </div>
+      </a>
+      <a  class="stat-card">
+        <!-- Card 2 -->
+        <div class="stat-icon green"><i class="bi bi-clipboard2-data"></i></div>
+        <div>
+          <div class="stat-label">Active Inward Passes</div>
+          <div class="stat-value">{{ inward_pass_count }}</div>
+        </div>
+      </a>
+      <a  class="stat-card">
+        <!-- Card 3 -->
+        <div class="stat-icon orange"><i class="bi bi-clipboard2-data"></i></div>
+        <div>
+          <div class="stat-label">Total Passes Today</div>
+          <div class="stat-value">{{ passes_created_today_count }}</div>
+        </div>
+      </a>
+    </div>
+    <div class="filter-card">
+      {% csrf_token %}
+      <form id="asset-filter-form"
+            hx-get="{% url 'gate-pass:search' %}"
+            hx-target="#search_result"
+            hx-trigger="change, keyup changed delay:400ms from:input">
+        <div class="row g-2 align-items-end">
+
+          <div class="col-12 col-sm-6 col-lg">
+            <div class="filter-label">Search Pass</div>
+            <input name="search_text" type="search"
+              autocomplete="off" placeholder="Tag or Name…"
+              hx-get="{% url 'gate-pass:search' %}"
+              hx-trigger="keyup changed delay:400ms, search"
+              hx-target="#search_result"
+              aria-label="Search assets"/>
+          </div>
+
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">Status</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
+                All Status
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-filter-form','change');">All Status</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='0';document.getElementById('status-btn').childNodes[0].textContent='Pending ';htmx.trigger('#asset-filter-form','change');">Pending</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='1';document.getElementById('status-btn').childNodes[0].textContent='Approved ';htmx.trigger('#asset-filter-form','change');">Approved</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='2';document.getElementById('status-btn').childNodes[0].textContent='Draft ';htmx.trigger('#asset-filter-form','change');">Draft</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='3';document.getElementById('status-btn').childNodes[0].textContent='Rejected ';htmx.trigger('#asset-filter-form','change');">Rejected</a></li>
+                
+              </ul>
+              <input type="hidden" name="status">
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">To Vendor</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
+                All Vendors
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors ';htmx.trigger('#asset-filter-form','change');">All Vendors</a></li>
+                {% for vendor in destination_vendor_list %}
+                  <li><a href="#" class="dropdown-item"
+                    onclick="event.preventDefault();document.querySelector('[name=vendor]').value='{{ vendor.destination_vendor__id }}';document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.destination_vendor__name }} ';htmx.trigger('#asset-filter-form','change');">
+                    {{ vendor.destination_vendor__name }}
+                  </a></li>
+                {% endfor %}
+              </ul>
+              <input type="hidden" name="vendor">
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">Type</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
+                All Types
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value=1;document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">In-Ward</a></li>
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value=0;document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">Out-Ward</a></li>
+                <!-- {% for type in movement_type_list %}
+                <li><a href="#" class="dropdown-item"
+                  onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
+                  {{ type.name }}
+                </a></li>
+                {% endfor %} -->
+              </ul>
+              <input type="hidden" name="type">
+            </div>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">Raised By</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn" aria-label="Filter by location">
+                All Raisers
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=location]').value='';document.getElementById('location-btn').childNodes[0].textContent='All Locations ';htmx.trigger('#asset-filter-form','change');">All Raisers</a></li>
+                {% for raised_by in raised_by_list %}
+                  <li><a href="#" class="dropdown-item"
+                    onclick="event.preventDefault();document.querySelector('[name=raised_by]').value='{{ raised_by.raised_by__id }}';document.getElementById('location-btn').childNodes[0].textContent='{{ raised_by.raised_by__full_name }} ';htmx.trigger('#asset-filter-form','change');">
+                    {{ raised_by.raised_by__full_name }}
+                  </a></li>
+                {% endfor %}
+              </ul>
+              <input type="hidden" name="raised_by">
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">Authorised By</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn" aria-label="Filter by department">
+                All Authorised
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=department]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All Authorised</a></li>
+                {% for authorised_by in authorised_by_list %}
+                  <li><a href="#" class="dropdown-item"
+                    onclick="event.preventDefault();document.querySelector('[name=authorised_by]').value='{{ authorised_by.authorised_by__id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ authorised_by.authorised_by__full_name }} ';htmx.trigger('#asset-filter-form','change');">
+                    {{ authorised_by.authorised_by__full_name }}
+                  </a></li>
+                {% endfor %}
+              </ul>
+              <input type="hidden" name="authorised_by">
+            </div>
+          </div>
+          <div class="col-6 col-sm-4 col-lg-auto">
+            <div class="filter-label">Asset</div>
+            <div class="dropdown">
+              <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn" aria-label="Filter by department">
+                All Asset
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=asset]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All Assets</a></li>
+                {% for asset in asset_list %}
+                  <li><a href="#" class="dropdown-item"
+                    onclick="event.preventDefault();document.querySelector('[name=asset]').value='{{ asset.asset_id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ asset.asset__name }} ';htmx.trigger('#asset-filter-form','change');">
+                    {{ asset.asset__name }}
+                  </a></li>
+                {% endfor %}
+              </ul>
+              <input type="hidden" name="asset">
+            </div>
+          </div>
+          <div class="col-auto">
+            <a href="{% url 'gate_pass:list' %}" class="btn-reset p-2" title="Reset all filters">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset
+            </a>
+          </div>
+        </div>
+      </form>
+      {% if is_demo is True %}
+        <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
+      {% endif %}
+    </div>
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="assets-table" id="table1">
+          <thead>
+            <tr>
+              <th>Pass #</th>
+              <th>Asset</th>
+              <th>Raised By</th>
+              <th>Authorised By</th>
+              <th>To Vendor</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          {% if filtered is None %}
+            <tbody id="search_result">
+              {% for item in items %}
+                <tr>
+                    <td class="table-index-cell">
+                      <span class="asset-tag-pill">{{ item.id }}</span>
+                    </td>
+                  <td class="d-flex gap-3 align-items-center mt-4">
+                    <span
+                          class="material-symbols-outlined text-slate-500 text-lg"
+                          data-icon="laptop_mac"
+                          style="background-color: whitesmoke;border-radius: 5px;padding:4px;"
+                          >laptop_mac</span>
+                    <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
+                  </td>
+                  <td>{{ item.raised_by }}</td>
+                  <td>
+                    {% if item.authorised_by %}
+                      {{ item.authorised_by }}
+                    {% else %}
+                      Unauthorised
+                    {% endif %}
+                  </td>
+                  <td>{{ item.destination_vendor.name }}</td>
+                  <td>
+                    {% if item.movement_type == 0 %}
+                      <span
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit"
+                      >
+                        <span
+                        class="material-symbols-outlined text-xs"
+                        data-icon="logout"
+                        >logout</span>
+                        Outward
+                      </span>
+                      
+                    {% else %}
+                      <span
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white flex items-center gap-1 w-fit"
+                      >
+                        <span
+                        class="material-symbols-outlined text-xs"
+                        data-icon="login"
+                        >login</span>
+                        Inward
+                      
+                    {% endif %}
+                    </span>
+                  </td>
+                  <td class="px-6 py-5">
+                    {% if item.status == 0 %}
+                      <span
+                        class="px-3 py-1 rounded-lg text-xs font-semibold bg-orange-100 text-orange-700"
+                        >Pending
+                      </span>
+                    {% elif item.status == 1 %}
+                      <span
+                        class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700"
+                        >Approved
+                      </span>
+                    {% elif item.status == 2 %}
+                      <span
+                        class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700"
+                        >Draft
+                      </span>
+                    {% else %}
+                      <span
+                          class="px-3 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-700"
+                          >Rejected
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="d-flex justify-content-center me-5">
+                    <a
+                      class=""
+                      href="{% url 'gate-pass:detail' item.id %}"
+                      >
+                      <i class="bi bi-display"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          {% else %}
+            {% include 'gate_pass/search-data.html' %}
+          {% endif %}
+      </table>
+    </div>
+    <div class="pagination-wrap">
+      <span>
+        Showing <strong>{{ page_object.start_index }}1 –{{ page_object.end_index }}1</strong>
+        of <strong>{{ page_object.paginator.count }}</strong>1 assets
+      </span>
+      <div class="pagination-nav">
+        {% if page_object.has_previous %}
+          <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
+        {% else %}
+          <span class="page-btn disabled" aria-disabled="true">‹</span>
+        {% endif %}
+        {% for num in page_object.paginator.page_range %}
+          {% if page_object.number == num %}
+            <span class="page-btn active" aria-current="page">{{ num }}</span>
+          {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+          {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+            <span class="page-ellipsis">…</span>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_object.has_next %}
+          <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
+        {% else %}
+          <span class="page-btn disabled" aria-disabled="true">›</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  </br>
+  <div class="col-md-12">
+    <!-- Contextual Insights Section -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="stat-card pb-2 rounded-bottom-5">
+          <div class="stat-value">
+            Vendor Distribution
+          </div>
+        </div>
+        <div class="stat-card rounded-top-3 d-block pb-5">
+          {% for vendor in vendor_count %}
+            <div class="block items-center gap-4 p-1">
+              <div class="d-block">
+                <div
+                  class="flex justify-between text-xs mb-1.5 font-semibold"
+                >
+                  <span>{{ vendor.destination_vendor__name }}</span>
+                  <span>{{ vendor.count|floatformat:2 }}%</span>
+                </div>
+                <div
+                  class="h-2 bg-surface-container-low rounded-full overflow-hidden"
+                >
+                  <div
+                    class="h-full bg-primary rounded-full"
+                    style="width: {{ vendor.count|floatformat:2 }}%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="bg-primary-gradient p-8 rounded-[0.7rem] text-white relative overflow-hidden flex flex-col justify-between m">
+          <div class="relative z-10">
+            <h4 class="text-xl font-bold mb-2 text-white">Weekly Compliance Rate</h4>
+            <p class="text-white/70 text-sm max-w-[200px]">
+              Asset movement tracking is at an all-time high this week.
+            </p>
+          </div>
+          <div class="relative z-10 flex items-end gap-2 mt-8">
+            <span class="text-5xl font-black">98.4%</span>
+            <span
+              class="text-sm font-bold bg-white/20 px-2 py-0.5 rounded flex items-center gap-1 mb-1"
+            >
+              <span
+                class="material-symbols-outlined text-xs"
+                data-icon="trending_up"
+                >trending_up</span
+              >
+              +2.1%
+            </span>
+          </div>
+          <!-- Decorative background graphic -->
+          <div class="absolute -right-10 -bottom-10 opacity-10">
+            <span
+              class="material-symbols-outlined text-[200px]"
+              data-icon="verified"
+              >verified</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
+{% endblock content %}
