@@ -114,7 +114,7 @@ INSTALLED_APPS = [
     'audit',
     'license',
     # 'silk'
-
+    'gate_pass'
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True

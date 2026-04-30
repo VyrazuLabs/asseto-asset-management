@@ -1,0 +1,551 @@
+{% extends 'layouts/main-layout.html' %} 
+{% load static %} 
+
+{% block css %}
+<!-- <link rel="stylesheet" href="{% static 'css/pages/audit.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+{% endblock css %}
+
+{% block content %}
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>New Gate Pass | Precision Ledger</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed-variant": "#6e3900",
+              "on-tertiary-fixed": "#2f1500",
+              "on-surface-variant": "#444652",
+              outline: "#757684",
+              "primary-fixed": "#dce1ff",
+              background: "#f7f9ff",
+              "on-primary": "#ffffff",
+              "surface-dim": "#d5dae2",
+              tertiary: "#773e00",
+              "on-secondary-container": "#00447e",
+              "surface-container-low": "#eff4fc",
+              "on-background": "#161c22",
+              "inverse-on-surface": "#ecf1f9",
+              "tertiary-container": "#9a5200",
+              surface: "#f7f9ff",
+              "surface-container": "#e9eef6",
+              "surface-bright": "#f7f9ff",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb77e",
+              "on-tertiary-container": "#ffdcc3",
+              error: "#ba1a1a",
+              primary: "#2845a4",
+              "outline-variant": "#c5c5d4",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#ffdcc3",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#a4c9ff",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#b7c4ff",
+              "surface-container-highest": "#dee3eb",
+              "surface-container-high": "#e3e8f0",
+              "on-primary-fixed": "#001551",
+              "primary-container": "#435ebe",
+              "inverse-primary": "#b7c4ff",
+              "surface-variant": "#dee3eb",
+              "secondary-container": "#7ab3ff",
+              "secondary-fixed": "#d4e3ff",
+              "on-primary-fixed-variant": "#203e9e",
+              "inverse-surface": "#2b3137",
+              "on-secondary-fixed": "#001c39",
+              "surface-tint": "#3c57b7",
+              secondary: "#1960a6",
+              "on-primary-container": "#dde1ff",
+              "on-surface": "#161c22",
+              "on-secondary-fixed-variant": "#004883",
+              "on-secondary": "#ffffff",
+            },
+            fontFamily: {
+              headline: ["Inter"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .bg-cta-gradient {
+        background: linear-gradient(135deg, #2845a4 0%, #435ebe 100%);
+      }
+    </style>
+  </head>
+  <!-- <body class="bg-background text-on-background font-body antialiased"> -->
+    <!-- <div class="p-3 max-w-6xl mx-auto"> -->
+    <form method="POST" action="{% url 'gate-pass:add' %}" class="p-3 max-w-6xl mx-auto">
+      {% csrf_token %}
+      <div class="assets-page-header">
+        <div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+              <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+              <li class="breadcrumb-item active">Gate-Pass</li>
+              <li class="breadcrumb-item active">Add</li>
+            </ol>
+          </nav>
+          <h1>Register New Gate Pass</h1>
+          <p class="page-subtitle"> Issue an authorization for asset movement within or outside the
+          facility.</p>
+        </div>
+        <button type="submit" class="btn-save-asset mt-1">
+          <i class="bi bi-floppy2"></i> Save Pass
+        </button>
+        </div>
+        <!-- New Div -->
+      <div class="row g-4">
+
+        {# ── LEFT COLUMN ──────────────────────────────────── #}
+        <div class="col-lg-8">
+
+          {# General Information #}
+          <div class="form-section">
+            <div class="section-header">
+              <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
+              <h2>General Information</h2>
+            </div>
+            <div class="section-body">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="field-label">Asset Search <span class="required">*</span></label>
+                  <!-- <input type="text" class="field-input autogenerated" name="search" value="{{ form.data.tag }}"
+                        placeholder="e.g. PL-2024-X982" autocomplete="off"> -->
+                  <div style="position:relative;">
+                    <input type="text" class="field-input" name="search" id="tag-input"
+                        placeholder="e.g. ASSET-1002" autocomplete="off">
+                    <ul id="tag-suggestions" class="audit-suggestions"></ul>
+                  </div>
+                  <!-- {{ form.name }}
+                  {% for error in form.name.errors %}<span class="field-error">{{ error }}</span>{% endfor %} -->
+                </div>
+
+                <div class="col-md-6">
+                  <label class="field-label">Movement Type <span class="required">*</span></label>
+                  <!-- <input type="text" class="field-input autogenerated" name="movement-type" value="{{ form.data.tag }}"
+                        placeholder="e.g. Out-Ward" autocomplete="off">
+                  {% for error in form.tag.errors %}<span class="field-error">{{ error }}</span>{% endfor %} -->
+                  <select name="movement-type" class="field-input">
+                    <option value="0">Outward</option>
+                    <option value="1">Inward</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="field-label">Destination Vendor <span class="required">*</span></label>
+                  <!-- <input type="text" class="field-input autogenerated" name="destination-vendor" value="{{ form.data.tag }}"
+                        placeholder="e.g. Vyrazu Vendor" autocomplete="off">
+                  {{ form.serial_no }}
+                  {% for error in form.serial_no.errors %}<span class="field-error">{{ error }}</span>{% endfor %} -->
+                  <select name="destination-vendor" class="field-input">
+                    {% for vendor in vendors %}
+                      <option value="{{ vendor.id }}">{{ vendor.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="field-label">Expected Return Date <span class="required">*</span></label>
+                  <input type="date" id="expectedReturnDate" class="field-input autogenerated" name="expected-return-date" value="{{ form.data.tag }}"
+                        autocomplete="off">
+                  {{ form.product }}
+                  {% for error in form.product.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="col-12">
+                  <label class="field-label">Purpose of Movement</label>
+                  <input type="text" class="h-100" class="field-input autogenerated" name="purpose-movement" autocomplete="off">
+                  {{ form.location }}
+                  {% for error in form.location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                </div>
+                <br/>
+                <div class="mt-4">
+                  <div class="bg-secondary-fixed/30 rounded-lg p-6 flex items-start gap-4 mt-4">
+                    <div class="p-3 bg-secondary-fixed rounded-full text-secondary">
+                      <span class="material-symbols-outlined" data-icon="analytics"
+                        >analytics</span
+                      >
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="font-bold text-sm text-on-secondary-fixed">
+                        Infrastructure Impact Check
+                      </h4>
+                      <p class="page-subtitle">
+                        Check if this asset movement affects connected dependencies
+                        or active service level agreements.
+                      </p>
+                      <button type="button" id="impact-btn" class="btn-save-asset mt-1">
+                        Check for Impact
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+        <!-- Right Sidebar / Insights -->
+        <div class="col-lg-4 mb-4">
+          <!-- Warning Card (Contextual) -->
+          <div class="form-section">
+            <div class="rounded-xl p-6 backdrop-blur-sm">
+              <div class="sidebar-section-header">
+                <span class="text-danger">
+                  <i class="bi bi-exclamation-triangle text-danger"></i>
+                  Dependency Impact
+                </span>
+              </div>
+              <div class="sidebar-body" id="impact-result">
+                <p class="page-subtitle text-danger">
+                  <strong>Impact Analysis</strong><p>Shows the dependency impact of this current asset for movement</p>
+                </p>
+                <div class="mt-4 p-3 bg-light rounded-lg d-none">
+                  <div class="flex justify-between text-xs font-bold mb-1">
+                    <span class="text-dark">Active Dependencies</span>
+                    <span class="text-dark">12</span>
+                  </div>
+                  <div
+                    class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden"
+                  >
+                    <div class="bg-error h-full w-[85%]"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Quick Reference Card -->
+          <div class=" form-section">
+            <div class="sidebar-section-header">
+              <span>
+                Verification Steps
+              </span>
+            </div>
+            <div class="sidebar-body">
+              <ul >
+                <li class="flex gap-3">
+                  <i class="bi bi-check-circle"></i>
+                  <div class="text-sm">
+                    <p class="font-bold">Security Clearance</p>
+                    <p class="page-subtitle">
+                      Asset requires Level 2 physical tag verification.
+                    </p>
+                  </div>
+                </li>
+                <li class="flex gap-3 opacity-50">
+                  <i class="bi bi-circle"></i>
+                  <div class="text-sm">
+                    <p class="font-bold">Vendor ACK</p>
+                    <p class="page-subtitle">
+                      Waiting for Destination Vendor to acknowledge receipt.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Visual Summary Decor -->
+          <div class="relative overflow-hidden rounded-xl h-48 group">
+            <img
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              data-alt="modern industrial warehouse interior with organized shelving and high-end logistics equipment in soft daylight"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCITNCQ6F8gjwrauhn49RPwkvVRww7W43wjF4aELftWO4QFvLNxpFPvd13YE0d-iAz6CuvVfFeVnmzWLvnRtXS5EBkeUlwrAN9gH2dIcWy4ELnQR-_sr7-Mr42tbtJMA8_FJdEGk69rSkKkuqt29QuMMj_5gXHZvuxtCpGVDUvsOp6_FcdeJfpfJbxe5_LKJqVYBh0ffKY8QlYbTS-bvGxO3P6kGPvoy-p6T4KV_-NS-UdrAjhEyuQfHsDH33nt-YIrTlMcymUcLGM"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent flex flex-col justify-end p-6"
+            >
+              <span
+                class="text-white/70 text-[10px] uppercase font-black tracking-widest"
+                >Live Facility View</span
+              >
+              <h5 class="text-white font-bold text-lg">
+                South Warehouse Gate 4
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAB (Suppressed as per rules for Details/Focused pages, but included as a small utility for global actions) -->
+    <div class="fixed bottom-8 right-8 flex flex-col gap-4">
+      <button
+        class="w-14 h-14 bg-cta-gradient rounded-full shadow-2xl flex items-center justify-center text-white hover:scale-110 transition-transform"
+      >
+        <span class="material-symbols-outlined" data-icon="help_center"
+          >help_center</span
+        >
+      </button>
+    </div>
+</html>
+<!-- <script>
+const tagInput = document.getElementById('tag-input');
+const suggestionBox = document.getElementById('tag-suggestions');
+
+if (tagInput && suggestionBox) {
+  let debounce;
+  tagInput.addEventListener('input', function () {
+    clearTimeout(debounce);
+    const q = this.value.trim();
+    if (!q) { suggestionBox.innerHTML = ''; suggestionBox.style.display = 'none'; return; }
+    debounce = setTimeout(() => {
+      fetch(`/audit/get-tags-list/?tag=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(data => {
+          const tags = data.tags || [];
+          suggestionBox.innerHTML = '';
+          suggestionBox.style.display = tags.length ? 'block' : 'none';
+          tags.forEach(tag => {
+            const li = document.createElement('li');
+            li.className = 'audit-suggestion-item';
+            li.textContent = tag;
+            li.onclick = () => {
+              tagInput.value = tag;
+              tagInput.dispatchEvent(new Event('keyup'));
+              suggestionBox.innerHTML = '';
+              suggestionBox.style.display = 'none';
+              impactBtn.click()
+            };
+            suggestionBox.appendChild(li);
+          });
+        });
+    }, 300);
+  });
+
+  tagInput.addEventListener('keyup', function () {
+    const tag = this.value.trim();
+    console.log("Fetching assigned user for tag:", tag);
+    if (!tag) return;
+    fetch(`/audit/get-assigned-user/${tag}`)
+      .then(r => r.json())
+      .then(data => {
+        const inp = document.getElementById('assigned-to-input');
+        const msg = document.getElementById('assigned-to-msg');
+        inp.disabled = true;
+        inp.value = data.exists ? (data.assigned_user || 'Not Assigned') : '';
+        msg.textContent = data.exists
+          ? (data.assigned_user ? 'Assigned user found.' : 'Asset exists but not assigned.')
+          : 'No asset found with this tag.';
+        if (!data.exists) inp.disabled = false;
+      })
+      .catch(console.error);
+  });
+}
+</script>
+<script>
+const impactBtn = document.getElementById('impact-btn');
+const tagInput = document.getElementById('tag-input');
+console.log(impactBtn, tagInput);
+const resultBox = document.getElementById('impact-result');
+
+impactBtn.addEventListener('click', function () {
+  e.preventDefault();
+  const tag = tagInput.value.trim();
+  console.log(impactBtn, tagInput);
+  if (!tag) {
+    alert("Enter asset tag first");
+    return;
+  }
+
+  fetch(`/gate-pass/impact/${tag}/`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        resultBox.innerHTML = `<p class="text-danger">${data.message}</p>`;
+        return;
+      }
+
+      resultBox.innerHTML = `
+        <p class="page-subtitle text-danger">
+          <strong>${data.risk} Risk:</strong> Impact analysis completed.
+        </p>
+
+        <div class="mt-4 p-3 bg-light rounded-lg">
+          <div class="flex justify-between text-xs font-bold mb-1">
+            <span class="text-dark">Active Dependencies</span>
+            <span class="text-dark">${data.count}</span>
+          </div>
+
+          <div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+            <div class="bg-error h-full" style="width: ${Math.min(data.count * 10, 100)}%"></div>
+          </div>
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error(err);
+      resultBox.innerHTML = `<p class="text-danger">Error fetching data</p>`;
+    });
+});
+</script> -->
+<script>
+const tagInput = document.getElementById('tag-input');
+const suggestionBox = document.getElementById('tag-suggestions');
+const impactBtn = document.getElementById('impact-btn');
+const resultBox = document.getElementById('impact-result');
+
+if (tagInput && suggestionBox) {
+
+  let debounce;
+
+  // ✅ Reusable Impact Function
+  function runImpactCheck(tag) {
+    if (!tag) return;
+
+    fetch(`/gate-pass/impact/${tag}/`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          resultBox.innerHTML = `<p class="text-danger">${data.message}</p>`;
+          return;
+        }
+
+        resultBox.innerHTML = `
+          <p class="page-subtitle text-danger">
+            <strong>${data.risk} Risk:</strong> Impact analysis completed.
+          </p>
+
+          <div class="mt-4 p-3 bg-light rounded-lg">
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-dark">Active Dependencies</span>
+              <span class="text-dark">${data.count}</span>
+            </div>
+
+            <div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+              <div class="bg-error h-full" style="width: ${Math.min(data.count * 10, 100)}%"></div>
+            </div>
+          </div>
+        `;
+      })
+      .catch(err => {
+        console.error(err);
+        resultBox.innerHTML = `<p class="text-danger">Error fetching data</p>`;
+      });
+  }
+
+  // ✅ Suggestions (debounced)
+  tagInput.addEventListener('input', function () {
+    // clearTimeout(debounce);
+    const q = this.value.trim();
+
+    if (!q) {
+      suggestionBox.innerHTML = '';
+      suggestionBox.style.display = 'none';
+      return;
+    }
+
+    debounce = setTimeout(() => {
+      fetch(`/audit/get-tags-list/?tag=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(data => {
+          const tags = data.tags || [];
+          suggestionBox.innerHTML = '';
+          suggestionBox.style.display = tags.length ? 'block' : 'none';
+
+          tags.forEach(tag => {
+            const li = document.createElement('li');
+            li.className = 'audit-suggestion-item';
+            li.textContent = tag
+
+            li.onclick = () => {
+              tagInput.value = tag;
+
+              suggestionBox.innerHTML = '';
+              suggestionBox.style.display = 'none';
+
+              // 🔥 auto trigger both actions
+              tagInput.dispatchEvent(new Event('keyup'));
+              runImpactCheck(tag);
+            };
+
+            suggestionBox.appendChild(li);
+          });
+        });
+    }, 300);
+  });
+
+  // ✅ Assigned User Fetch
+  tagInput.addEventListener('keyup', function () {
+    const tag = this.value.trim();
+    if (!tag) return;
+
+    fetch(`/audit/get-assigned-user/${tag}`)
+      .then(r => r.json())
+      .then(data => {
+        const inp = document.getElementById('assigned-to-input');
+        const msg = document.getElementById('assigned-to-msg');
+
+        inp.disabled = true;
+        inp.value = data.exists ? (data.assigned_user || 'Not Assigned') : '';
+
+        msg.textContent = data.exists
+          ? (data.assigned_user ? 'Assigned user found.' : 'Asset exists but not assigned.')
+          : 'No asset found with this tag.';
+
+        if (!data.exists) inp.disabled = false;
+      })
+      .catch(console.error);
+  });
+
+  // ✅ Button click (manual trigger)
+  if (impactBtn) {
+    impactBtn.addEventListener('click', function (e) {
+      e.preventDefault(); // prevent form submit
+      const tag = tagInput.value.trim();
+
+      if (!tag) {
+        alert("Enter asset tag first");
+        return;
+      }
+
+      runImpactCheck(tag);
+    });
+  }
+}
+</script>
+<script>
+  const today = new Date();
+  const formatted = today.toISOString().split('T')[0]; // YYYY-MM-DD
+
+  document.getElementById('expectedReturnDate').value = formatted;
+</script>
+{% endblock content %}

@@ -71,10 +71,10 @@
                             <select name="currency-format" class="form-control w-100 w-2"  style="margin-right: 20px;">
                                 {% if get_default_currency_format %}
                                     <option value="{{ get_default_currency_format.id }}" selected>
-                                        {{ get_default_currency_format.name }}
+                                        {{ get_default_currency_format }}
                                     </option>
                                 {% elif org_data is not None %}
-                                    <option value="{{ org_data.currency }}">{{ org_data.currency }}</option>
+                                    <option value="{{ org_data.currency }}">{{ org_data.get_currency_display_value }}</option>
                                 {% endif %}
                                 {% for code, name in currency_choices %}
                                     <option value="{{ code }}">{{ name }}</option>
