@@ -46,12 +46,41 @@
   outline: none;
 }
 
+.audit-suggestions {
+  position: absolute;
+  z-index: 100;
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  list-style: none;
+  margin: .25rem 0 0;
+  padding: .25rem 0;
+  max-height: 220px;
+  overflow-y: auto;
+  width: 100%;
+  display: none;
+}
+
+.audit-suggestion-item {
+  padding: .5rem .85rem;
+  font-size: .875rem;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.audit-suggestion-item:hover { background: var(--color-primary-light); color: var(--color-primary); }
+
 /* ─────────────────────────────────────────────────────────────────────────────
    DARK MODE OVERRIDES
    ───────────────────────────────────────────────────────────────────────────── */
 body.theme-dark .assets-table thead th { background: #16162a; border-color: var(--color-border); }
 body.theme-dark .assets-table tbody tr { border-color: var(--color-border); }
 body.theme-dark .assets-table tbody tr:hover { background: #22223a; }
+
+body.theme-dark .audit-suggestions {
+  background: #1e1e2d;
+}
 
 body.theme-dark .status-select-inline {
   background: #151521;

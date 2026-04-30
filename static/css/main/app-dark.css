@@ -377,13 +377,13 @@ body.theme-dark th {
   display: inline-block;
 } */
 body.theme-dark button {
-  border-radius: 0;
+  border-radius: 7px;
 }
 body.theme-dark button:focus:not(:focus-visible) {
   outline: 0;
 }
 body.theme-dark input,
-body.theme-dark button,
+/* body.theme-dark button, */
 body.theme-dark select,
 body.theme-dark optgroup,
 body.theme-dark textarea {
