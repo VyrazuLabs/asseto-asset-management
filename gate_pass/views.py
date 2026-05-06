@@ -68,16 +68,9 @@ def detail(request,id):
         return redirect('gate_pass:list')
     get_items=GatePass.objects.filter(id=id).first()
     obj=get_currency_and_datetime_format(request.user.organization)
-    #When went to the detail save the gatepass as draft if not authorised/unauthorised
-    drafted=get_items.status
-    if drafted==0:   #Save the gatepass object as drafted if its pending else not
-        drafted=2    #Drafted gatepass
-        get_items.status=drafted
-        get_items.save()
     context={
         'items':get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
-        # 'datetime_format': obj['datetime_format'] if obj['datetime_format'] else '%Y-%m-%d %H:%M:%S',
     }
     # context=details_of_asset(request,id)
     # return render(request,'gate_pass/detail.html',context=context)
@@ -95,15 +88,18 @@ def print_doc(request,id):
     return render(request,'gate_pass/print-doc.html', context=context)
 
 def authorisation(request,id,status):
-    gate_pass = GatePass.objects.filter(id=id,status=status).first()
-    if gate_pass.status==0: # Pending
-        gate_pass.authorised_by = request.user
-        gate_pass.status = 1  # Approved
-        gate_pass.save()
-    else:
+    gate_pass = GatePass.objects.filter(id=id).first()
+    if not gate_pass:
+        return redirect('gate_pass:list')
+
+    if gate_pass.status == 1:  # Currently Approved
         gate_pass.authorised_by = None
-        gate_pass.status = 3  # Revert to Rejected
-        gate_pass.save()
+        gate_pass.status = 3  # Set to Rejected/Revoked
+    else:  # Currently Pending, Draft, or Rejected
+        gate_pass.authorised_by = request.user
+        gate_pass.status = 1  # Approve it
+    
+    gate_pass.save()
     return redirect('gate_pass:list')
 
 # def check_impact(request,id):

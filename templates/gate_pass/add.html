@@ -114,14 +114,14 @@
   </head>
   <!-- <body class="bg-background text-on-background font-body antialiased"> -->
     <!-- <div class="p-3 max-w-6xl mx-auto"> -->
-    <form method="POST" action="{% url 'gate-pass:add' %}" class="p-3 max-w-6xl mx-auto">
+    <form method="POST" action="{% url 'gate-pass:add' %}" class="p-3">
       {% csrf_token %}
       <div class="assets-page-header">
         <div>
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb page-breadcrumb">
               <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-              <li class="breadcrumb-item active">Gate-Pass</li>
+              <li class="breadcrumb-item"><a href="{% url 'gate-pass:list' %}" class="breadcrumb-link">Gate-Pass</a></li>
               <li class="breadcrumb-item active">Add</li>
             </ol>
           </nav>
