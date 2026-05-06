@@ -106,6 +106,8 @@ def get_product_details(request,id):
     page_object = paginator.get_page(page_number)
     get_product_img=ProductImage.objects.filter(product=product).order_by('-uploaded_at').values()
     img_array=[]
+    if product.product_picture:
+        img_array.append({'image': product.product_picture.name})
     for it in get_product_img:
         img_array.append(it)
     get_custom_data=[]

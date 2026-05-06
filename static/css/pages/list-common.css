@@ -231,10 +231,10 @@ body.theme-dark .list-page-header h1 {
   letter-spacing: .05em;
 }
 .stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--color-text);
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 /* ── Filter card ─────────────────────────────────────────────────────────── */
@@ -643,10 +643,35 @@ body.theme-dark .btn-primary i {
 }
 
 body.theme-dark .btn-trash {
-  color: #fca5a5 !important;
+  color: #fee2e2 !important;
+  background: #450a0a !important;
+  border-color: #7f1d1d !important;
 }
 body.theme-dark .btn-trash i {
-  color: #fca5a5 !important;
+  color: #fee2e2 !important;
+}
+body.theme-dark .btn-trash:hover {
+  background: #dc2626 !important;
+  color: #fff !important;
+}
+body.theme-dark .btn-trash:hover i {
+  color: #fff !important;
+}
+
+body.theme-dark .btn-approve {
+  background: #14532d !important;
+  color: #86efac !important;
+  border-color: #166534 !important;
+}
+body.theme-dark .btn-approve i {
+  color: #86efac !important;
+}
+body.theme-dark .btn-approve:hover {
+  background: #22c55e !important;
+  color: #fff !important;
+}
+body.theme-dark .btn-approve:hover i {
+  color: #fff !important;
 }
 
 body.theme-dark .btn-reset,

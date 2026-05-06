@@ -62,7 +62,7 @@ class GatePassList(APIView):
         data=[]
         get_pending_authorization_count=get_items.filter(authorised_by=None).count()
         get_passes_created_today_count=get_items.filter(created_at__date=datetime.datetime.now(tz=ZoneInfo("Asia/Kolkata")).date()).count()
-        get_inward_pass_count=get_items.filter(movement_type=0).count()
+        get_inward_pass_count=get_items.filter(movement_type=1).count()
 
         for item in get_items:
             # print(item.keys())

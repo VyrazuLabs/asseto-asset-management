@@ -35,6 +35,16 @@
   color: #fff;
 }
 
+.btn-approve {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border: 1.5px solid #bbf7d0 !important;
+}
+.btn-approve:hover {
+  background: #16a34a !important;
+  color: #fff !important;
+}
+
 .btn-assign {
   background: var(--color-primary-light);
   color: var(--color-primary);
@@ -206,7 +216,7 @@ body.theme-dark .btn-assign { background: var(--color-primary-light); border-col
 body.theme-dark .btn-add-row { background: var(--color-primary-light); border-color: #3d3780; }
 body.theme-dark .btn-rm-row { background: #3a1c1c; border-color: #5c2020; }
 
-body.theme-dark .asset-tag-pill { background: var(--color-primary-light); }
+body.theme-dark .asset-tag-pill { background: var(--color-primary-light); color: #a8b4ff; }
 
 body.theme-dark .assets-page-header h1 {
   font-size: 1.75rem;
