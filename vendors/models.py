@@ -2,7 +2,7 @@ import uuid
 from django.db import models
 from dashboard.models import TimeStampModel, Organization, SoftDeleteModel, Address
 from simple_history.models import HistoricalRecords
-# Create your models here.
+# Create your models here
 
 
 class Vendor(TimeStampModel, SoftDeleteModel):

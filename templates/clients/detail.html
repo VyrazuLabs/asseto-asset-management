@@ -1,0 +1,789 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}{{ client.name }} | Asseto Details{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}">
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --accent-blue: #4361ee;
+        --accent-red: #ef4444;
+        --text-main: #1a1a24;
+        --text-muted: #64748b;
+        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    }
+
+    .detail-wrapper {
+        padding: 0;
+        background-color: transparent;
+        min-height: 100vh;
+    }
+
+    /* Top Stats Bar */
+    .client-header-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid #f1f5f9;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .client-header-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--accent-blue), #4cc9f0);
+    }
+
+    .client-badges {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .badge-cid {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-status {
+        background: #eef2ff;
+        color: var(--accent-blue);
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-status::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--accent-blue);
+        border-radius: 50%;
+    }
+
+    .badge-client-id {
+        background: #f0e7ff;
+        color: #7c3aed;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .client-info-left h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 10px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .client-desc {
+        color: var(--text-muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+        max-width: 600px;
+    }
+
+    .stat-box {
+        text-align: right;
+    }
+
+    .stat-box .stat-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        display: block;
+    }
+
+    .stat-box .stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-main);
+        display: block;
+        line-height: 1.2;
+    }
+
+    .stat-box.stat-red .stat-value {
+        color: var(--accent-red);
+    }
+
+    .stat-box .stat-currency {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-right: 4px;
+        font-weight: 600;
+    }
+
+    /* Left Column: Inventory Ledger */
+    .inventory-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid #f1f5f9;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .card-header-styled {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        background: #e4eaf1;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .card-title-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .card-icon {
+        width: 36px;
+        height: 36px;
+        background: #f8fafc;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-blue);
+        font-size: 16px;
+    }
+
+    .card-title-group h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .inventory-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+    }
+
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 12px;
+    }
+
+    .search-input-wrapper input {
+        padding: 7px 12px 7px 34px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 12px;
+        width: 220px;
+        background: #f8fafc;
+        outline: none;
+        transition: all 0.2s;
+    }
+
+    .search-input-wrapper input:focus {
+        border-color: var(--accent-blue);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .btn-secondary-outline {
+        padding: 7px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-main);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-secondary-outline:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .inventory-table th {
+        background: #f8fafc;
+        padding: 12px 25px;
+        text-align: left;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .inventory-table tbody tr:nth-child(odd) {
+        background: #f0f4f8;
+    }
+
+    .inventory-table tbody tr:nth-child(even) {
+        background: #ffffff;
+    }
+
+    .inventory-table td {
+        padding: 12px 25px;
+        vertical-align: middle;
+        font-size: 13px;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .tag-cell {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .item-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .item-icon-box {
+        width: 34px;
+        height: 34px;
+        background: #f1f5f9;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .item-icon-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-name {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    /* Sidebar Widgets */
+    .sidebar-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid #f1f5f9;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .sidebar-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #e4eaf1;
+        padding: 15px 20px;
+        border-radius: 12px 12px 0 0;
+        margin: -20px -20px 15px -20px;
+    }
+
+    .sidebar-icon {
+        width: 30px;
+        height: 30px;
+        background: #eef2ff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-blue);
+        font-size: 14px;
+    }
+
+    .sidebar-card-header h4 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .contact-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .contact-avatar {
+        width: 32px;
+        height: 32px;
+        background: #f1f5f9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        color: #475569;
+        flex-shrink: 0;
+    }
+
+    .contact-info h5 {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 1px 0;
+        color: var(--text-main);
+    }
+
+    .contact-info .contact-role {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .contact-social {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .contact-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--accent-blue);
+        text-decoration: none;
+    }
+
+    /* Activities */
+    .activity-timeline {
+        padding-left: 15px;
+        position: relative;
+    }
+
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 1px;
+        background: #e2e8f0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: -18px;
+        top: 4px;
+        width: 7px;
+        height: 7px;
+        background: #fff;
+        border: 2px solid var(--accent-blue);
+        border-radius: 50%;
+        z-index: 1;
+    }
+
+    .timeline-time {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-bottom: 3px;
+        display: block;
+    }
+
+    .timeline-content h6 {
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 0 3px 0;
+        color: var(--text-main);
+    }
+
+    .timeline-content p {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.4;
+        margin: 0;
+    }
+
+    /* Dark Mode Overrides */
+    body.theme-dark .detail-wrapper {
+        background-color: #12121e;
+    }
+
+    body.theme-dark .client-header-card,
+    body.theme-dark .inventory-card,
+    body.theme-dark .sidebar-card {
+        background: #1e1e2d;
+        border-color: #2d2d3f;
+    }
+
+    body.theme-dark .inventory-table th {
+        background: #161625;
+        border-bottom-color: #2d2d3f;
+        color: #9ca3af;
+    }
+
+    body.theme-dark .inventory-table td {
+        border-bottom-color: #262635;
+        color: #e2e8f0;
+    }
+
+    body.theme-dark .client-info-left h1,
+    body.theme-dark .stat-value,
+    body.theme-dark .card-title-group h3,
+    body.theme-dark .sidebar-card-header h4,
+    body.theme-dark .contact-info h5,
+    body.theme-dark .timeline-content h6 {
+        color: #f8fafc;
+    }
+
+    body.theme-dark .badge-cid {
+        background: #2a2a3f;
+        color: #9ca3af;
+    }
+
+    body.theme-dark .search-input-wrapper input {
+        background: #161625;
+        border-color: #2d2d3f;
+        color: #f8fafc;
+    }
+
+    body.theme-dark .btn-secondary-outline {
+        background: #1e1e2d;
+        border-color: #2d2d3f;
+        color: #f8fafc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{# ── Page header ───────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+        <li class="breadcrumb-item active">{{ client.name }}</li>
+      </ol>
+    </nav>
+    <h1>Client Details</h1>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <a href="{% url 'clients:list' %}" class="btn-back">
+      <i class="bi bi-arrow-left"></i> Back to Listing
+    </a>
+  </div>
+</div>
+
+<div class="detail-wrapper">
+    <div class="container-fluid p-0">
+        <!-- Header Card -->
+        <div class="client-header-card">
+            <div class="row align-items-end">
+                <div class="col-lg-8">
+                    <div class="client-badges">
+                        <span class="badge-client-id">
+                            ID: {{ client.client_id }}
+                        </span>
+                        <span class="badge-status">
+                            {% if client.status == '1' %}Active Institutional{% elif client.status == '2' %}In Review{%
+                            elif client.status == '3' %}Dormant{% else %}Inactive Archive{% endif %}
+                        </span>
+                    </div>
+                    <div class="client-info-left">
+                        <h1>{{ client.name }}</h1>
+                        <p class="client-desc">
+                            Enterprise-grade asset management account. Managing diverse portfolio of IT infrastructure,
+                            medical equipment, and office supplies across multiple regions.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                    <div class="row g-4 justify-content-end">
+                        <div class="col-auto">
+                            <div class="stat-box">
+                                <span class="stat-label">Total Assets</span>
+                                <span class="stat-value">
+                                    <span class="stat-currency">USD</span>{% if total_asset_value %}{{ total_asset_value|floatformat:1 }}{% else %}0.0{% endif %}M
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-box"
+                                style="padding: 0 20px; border-left: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                                <span class="stat-label">Active Rentals</span>
+                                <span class="stat-value">{{ client.active_rentals|default:assets.count }}</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-box stat-red">
+                                <span class="stat-label">Overdue Tickets</span>
+                                <span class="stat-value">{{ client.open_tickets|default:0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="row g-4">
+            <!-- Main Ledger -->
+            <div class="col-xl-8">
+                <div class="inventory-card">
+                    <div class="card-header-styled">
+                        <div class="card-title-group">
+                            <div class="card-icon"><i class="bi bi-box-seam"></i></div>
+                            <h3>Asset Inventory Ledger</h3>
+                        </div>
+                        <div class="inventory-actions">
+                            <div class="search-input-wrapper">
+                                <i class="bi bi-search"></i>
+                                <input type="text" id="assetSearchInput" placeholder="Search Tag or Item...">
+                            </div>
+                            <!-- <button class="btn-secondary-outline"><i class="bi bi-filter"></i> Filters</button> -->
+                            <button id="exportInventoryBtn" class="btn-secondary-outline"><i class="bi bi-download"></i> Export</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="inventory-table" id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th>Tag</th>
+                                    <th>Item</th>
+                                    <th>Category</th>
+                                    <th>Condition</th>
+                                    <th>Serial No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in assets %}
+                                <tr class="asset-row">
+                                    <td class="tag-cell">{{ asset.tag }}</td>
+                                    <td class="item-cell">
+                                        <div class="item-icon-box">
+                                            {% if asset.images.first %}
+                                            <img src="{{ asset.images.first.image.url }}" alt="{{ asset.name }}">
+                                            {% else %}
+                                            <i class="bi bi-image text-muted" style="font-size: 14px; opacity: 0.5;"></i>
+                                            {% endif %}
+                                        </div>
+                                        <span class="item-name">{{ asset.name }}</span>
+                                    </td>
+                                    <td>{{ asset.product.category.name|default:"General" }}</td>
+                                    <td>
+                                        <span
+                                            class="badge {% if forloop.counter|divisibleby:3 %}bg-success{% elif forloop.counter|divisibleby:2 %}bg-primary{% else %}bg-info{% endif %} bg-opacity-10 {% if forloop.counter|divisibleby:3 %}text-success{% elif forloop.counter|divisibleby:2 %}text-primary{% else %}text-info{% endif %} border-0 px-2 py-1"
+                                            style="font-size: 10px; font-weight: 700;">
+                                            {% if forloop.counter|divisibleby:3 %}Excellent{% elif
+                                            forloop.counter|divisibleby:2 %}Good{% else %}New{% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-muted">{{ asset.serial_no|default:"—" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
+                                        No active assets identified for this ledger.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                <tr id="noResultsRow" style="display: none;">
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
+                                        No matching assets found.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-xl-4">
+                <!-- Contacts -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div class="sidebar-icon"><i class="bi bi-person-lines-fill"></i></div>
+                        <h4>Contact Directory</h4>
+                    </div>
+
+                    <div class="contact-list">
+                        {% if client.contact_person %}
+                        <div class="contact-item">
+                            <div class="contact-avatar">{{ client.initials }}</div>
+                            <div class="contact-info">
+                                <h5>{{ client.contact_person }}</h5>
+                                <div class="contact-social">
+                                    {% if client.contact_email %}
+                                    <a href="mailto:{{ client.contact_email }}" class="contact-link">
+                                        <i class="bi bi-envelope"></i> {{ client.contact_email }}
+                                    </a>
+                                    {% endif %}
+                                    {% if client.contact_phone %}
+                                    <a href="tel:{{ client.contact_phone }}" class="contact-link"
+                                        style="color: #64748b">
+                                        <i class="bi bi-telephone"></i> {{ client.contact_phone }}
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                {% if client.notes %}
+                                <div class="contact-notes">
+                                    <small><i class="bi bi-journal-text"></i> {{ client.notes }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Activities -->
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div class="sidebar-icon"><i class="bi bi-clock-history"></i></div>
+                        <h4>Recent Activity</h4>
+                    </div>
+
+                    <div class="activity-timeline">
+                        {% for activity in activities %}
+                        <div class="timeline-item">
+                            <span class="timeline-time">{{ activity.date|timesince }} ago</span>
+                            <div class="timeline-content">
+                                <h6>{{ activity.type }} {{ activity.action }}</h6>
+                                <p>{{ activity.notes }}</p>
+                                {% if activity.user %}
+                                <small class="text-muted" style="font-size: 9px;">by {{ activity.user.username }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">No recent activity recorded.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('assetSearchInput');
+    const table = document.getElementById('inventoryTable');
+    if (searchInput && table) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            const rows = table.querySelectorAll('tbody tr.asset-row');
+            const noResults = document.getElementById('noResultsRow');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const tag = row.querySelector('.tag-cell').innerText.toLowerCase();
+                const item = row.querySelector('.item-name').innerText.toLowerCase();
+                if (tag.includes(query) || item.includes(query)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            if (noResults) {
+                noResults.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+            }
+        });
+    }
+
+    const exportBtn = document.getElementById('exportInventoryBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function() {
+            const table = document.getElementById('inventoryTable');
+            if (!table) return;
+            
+            const rows = table.querySelectorAll('tbody tr.asset-row');
+            let csv = [];
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
+            csv.push(headers.join(','));
+            
+            rows.forEach(row => {
+                const tag = row.querySelector('.tag-cell').innerText.trim();
+                const item = row.querySelector('.item-name').innerText.trim();
+                const category = row.querySelectorAll('td')[2].innerText.trim();
+                const condition = row.querySelector('.badge').innerText.trim();
+                const serial = row.querySelector('.text-muted').innerText.trim().replace('—', '');
+                
+                const rowData = [tag, item, category, condition, serial];
+                csv.push(rowData.map(v => `"${v.replace(/"/g, '""')}"`).join(','));
+            });
+            
+            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'asset_inventory.csv');
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        });
+    }
+});
+</script>
+{% endblock %}

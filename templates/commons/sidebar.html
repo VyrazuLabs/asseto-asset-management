@@ -68,6 +68,14 @@
                         </a>
                     {% endif %}
                 </li>
+
+                <li class="sidebar-item {% if sidebar == 'clients' %}active{% endif %}">
+                    <a href="{% url 'clients:list' %}" class="sidebar-link">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Clients</span>
+                    </a>
+                </li>
+
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">

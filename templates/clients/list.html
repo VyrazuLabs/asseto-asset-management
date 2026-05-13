@@ -1,0 +1,171 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Client Directory | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/clients.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="client-page-header d-flex justify-content-between align-items-start mb-4">
+  <div class="header-text-content">
+    <h1 class="institutional-title">INSTITUTIONAL OVERVIEW</h1>
+    <p class="institutional-subtitle">
+      Manage and monitor your global asset rentals and support<br>
+      tickets with precision tracking of inventory flows and<br>
+      resolution statuses.
+    </p>
+  </div>
+  <div class="header-action">
+    <a href="{% url 'clients:add' %}" class="btn-register-new">
+      <i class="bi bi-person-plus"></i> Register New Client
+    </a>
+  </div>
+</div>
+
+{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+<div class="clients-stats-grid">
+  <!-- Card 1 -->
+  <div class="c-stat-card">
+    <div class="c-stat-badge badge-blue">+4.2%</div>
+    <div class="c-stat-icon icon-blue"><i class="bi bi-people-fill"></i></div>
+    <div class="c-stat-value">{{ total_client_count|default:"0" }}</div>
+    <div class="c-stat-label">TOTAL RENTERS</div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="c-stat-card">
+    <div class="c-stat-badge badge-orange">Active</div>
+    <div class="c-stat-icon icon-blue"><i class="bi bi-box-seam"></i></div>
+    <div class="c-stat-value">{{ active_rentals_count|default:"0" }}</div>
+    <div class="c-stat-label">ACTIVE RENTALS</div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="c-stat-card">
+    <div class="c-stat-badge badge-lightblue">New</div>
+    <div class="c-stat-icon icon-blue"><i class="bi bi-headset"></i></div>
+    <div class="c-stat-value">{{ review_client_count|default:"0" }}</div>
+    <div class="c-stat-label">OPEN SUPPORT TICKETS</div>
+  </div>
+</div>
+
+{# ── Filter bar ───────────────────────────────────────────────────────────── #}
+<div class="c-filter-bar d-flex justify-content-between align-items-center">
+  <form method="GET" id="filterForm" class="c-filters-left d-flex align-items-center gap-3">
+    <div class="c-search-input-wrapper" style="position: relative;">
+      <i class="bi bi-search"
+        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 13px;"></i>
+      <input type="text" name="search" class="c-filter-select" placeholder="Search Client Name or ID..."
+        value="{{ search_query|default:'' }}" style="padding-left: 35px; width: 400px;">
+    </div>
+
+    <div class="c-filter-select-wrapper">
+      <select name="status" class="c-filter-select" aria-label="Statuses" onchange="this.form.submit()">
+        <option value="All Statuses">All Statuses</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" style="display: none;"></button>
+  </form>
+
+  <div class="c-filters-right d-flex gap-2">
+    <a href="{% url 'clients:list' %}" class="c-btn-reset">
+      <i class="bi bi-arrow-clockwise"></i> Reset
+    </a>
+    <button type="button" id="exportBtn" class="c-btn-export" onclick="exportClientData()">
+      <i class="bi bi-download"></i> Export Data
+    </button>
+  </div>
+
+  {# ── Hidden Export Form ── #}
+  <form id="exportForm" method="GET" action="{% url 'clients:export' %}" style="display: none;">
+    <input type="hidden" name="search" id="exportSearchInput">
+    <input type="hidden" name="status" id="exportStatusInput">
+  </form>
+</div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="c-table-container">
+  <div class="table-responsive">
+    <table class="c-list-table" id="client-table">
+      <thead>
+        <tr>
+          <th>SL NO.</th>
+          <th>CLIENT NAME</th>
+          <th>RENTAL TYPE</th>
+          <th>CONTACT PERSON</th>
+          <th class="text-center">ACTIVE RENTALS</th>
+          <th class="text-center">OPEN TICKETS</th>
+          <th>STATUS</th>
+          {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
+          <th>Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+
+      {% if page_object %}
+      <tbody id="client_search_result">
+        {% include 'clients/clients-data.html' %}
+      </tbody>
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="8">
+            <div class="table-empty-state">
+              <i class="bi bi-people d-block"></i>
+              <p>No clients found.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  {% include 'commons/list-pagination.html' with item_label="clients" %}
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+  window.exportClientData = function() {
+    var searchInput = document.querySelector('input[name="search"]');
+    var statusSelect = document.querySelector('select[name="status"]');
+    
+    var searchVal = searchInput ? searchInput.value : '';
+    var statusVal = statusSelect ? statusSelect.value : '';
+    
+    var url = '/clients/export?search=' + encodeURIComponent(searchVal);
+    if (statusVal && statusVal !== 'All Statuses') {
+      url += '&status=' + encodeURIComponent(statusVal);
+    }
+    
+    window.location.href = url;
+  };
+
+  window.addEventListener('load', function () {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.querySelector('input[name="search"]');
+
+    // Auto-submit search after typing (with debounce)
+    let timeout = null;
+    if (searchInput && filterForm) {
+      searchInput.addEventListener('input', function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          filterForm.submit();
+        }, 800);
+      });
+    }
+  });
+</script>
+{% endblock %}

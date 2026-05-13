@@ -8,6 +8,8 @@ from authentication.models import User
 from simple_history.models import HistoricalRecords
 
 
+from clients.models import Client
+
 def path_and_rename(instance, filename):
     upload_to = 'asset_images/'
     ext = filename.split('.')[-1]
@@ -69,6 +71,7 @@ class Asset(TimeStampModel, SoftDeleteModel):
     is_assigned = models.BooleanField(default=False)
     product = models.ForeignKey(Product, models.PROTECT, blank=True, null=True)
     vendor = models.ForeignKey(Vendor, models.PROTECT, blank=True, null=True)
+    client = models.ForeignKey('clients.Client', models.DO_NOTHING, blank=True, null=True, related_name='assets')
     location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
     organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
     history = HistoricalRecords()
