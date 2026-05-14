@@ -133,20 +133,34 @@ def client_detail(request, id):
     # Combine and sort history
     activities = []
     for h in client_history:
+        h_type = h.get_history_type_display()
+        if h_type == 'Created':
+            action = 'Client Registration'
+            notes = 'Initial registration of the client record.'
+        elif h_type == 'Changed':
+            action = 'Updated'
+            notes = 'Client profile information was updated.'
+        else:
+            action = h_type
+            notes = f'Client record {h_type.lower()}.'
+
         activities.append({
             'date': h.history_date,
             'user': h.history_user,
             'type': 'Client',
-            'action': h.get_history_type_display(),
-            'notes': f'Client record {h.get_history_type_display().lower()}ed.'
+            'action': action,
+            'notes': notes
         })
+
     for h in asset_history:
+        h_type = h.get_history_type_display()
+        action = 'Updated' if h_type == 'Changed' else h_type
         activities.append({
             'date': h.history_date,
             'user': h.history_user,
             'type': 'Asset',
-            'action': h.get_history_type_display(),
-            'notes': f'Asset {h.tag} {h.get_history_type_display().lower()}ed.'
+            'action': action,
+            'notes': f'Asset {h.tag} was {h_type.lower()}.'
         })
     
     activities.sort(key=lambda x: x['date'], reverse=True)

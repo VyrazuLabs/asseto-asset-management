@@ -47,24 +47,21 @@
 .btn-back {
     display: inline-flex;
     align-items: center;
-    padding: 0 1rem;
-    height: 34px;
-    min-height: 34px;
-    max-height: 34px;
-    background: #fff;
-    border: 1.5px solid var(--color-border);
+    padding: 13px 20px;
+    background: #3b5998;
+    border: none;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--color-text);
+    color: #fff;
     text-decoration: none;
-    gap: 0.4rem;
+    gap: 8px;
     transition: all 0.2s ease;
 }
 
 .btn-back:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    background: #2d4373;
+    color: #fff;
 }
 
 .btn-update {
@@ -212,13 +209,12 @@ body.theme-dark .info-item .value {
 }
 
 body.theme-dark .btn-back {
-    background: #1E1E2D;
-    border-color: #2D2D3F;
-    color: var(--color-text);
+    background: #4f46e5;
+    color: #fff;
 }
 body.theme-dark .btn-back:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+    background: #4338ca;
+    color: #fff;
 }
 
 body.theme-dark .btn-update {

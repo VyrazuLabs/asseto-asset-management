@@ -129,7 +129,8 @@
         line-height: 1.2;
     }
 
-    .stat-box.stat-red .stat-value {
+    .stat-box.stat-red .stat-value,
+    .stat-box.stat-red .stat-label {
         color: var(--accent-red);
     }
 
@@ -466,6 +467,11 @@
         border-color: #2d2d3f;
     }
 
+    body.theme-dark .sidebar-card-header {
+        background: #161625;
+        border-bottom-color: #2d2d3f;
+    }
+
     body.theme-dark .inventory-table th {
         background: #161625;
         border-bottom-color: #2d2d3f;
@@ -473,14 +479,37 @@
     }
 
     body.theme-dark .inventory-table td {
+        background: #1e1e2d;
         border-bottom-color: #262635;
         color: #e2e8f0;
     }
 
+    body.theme-dark .inventory-table tr:hover td {
+        background: #252536;
+    }
+
+    body.theme-dark .card-header-styled {
+        background: #161625;
+        border-bottom-color: #2d2d3f;
+    }
+
+    body.theme-dark .card-icon {
+        background: #2a2a45;
+        color: #a5b4fc;
+    }
+
     body.theme-dark .client-info-left h1,
     body.theme-dark .stat-value,
-    body.theme-dark .card-title-group h3,
-    body.theme-dark .sidebar-card-header h4,
+    body.theme-dark .card-title-group h3 {
+        font-size: 20px;
+        color: #f8fafc;
+    }
+
+    body.theme-dark .sidebar-card-header h4 {
+        font-size: 14px;
+        color: #f8fafc;
+    }
+
     body.theme-dark .contact-info h5,
     body.theme-dark .timeline-content h6 {
         color: #f8fafc;
@@ -491,15 +520,117 @@
         color: #9ca3af;
     }
 
+    body.theme-dark .stat-box.stat-red .stat-value,
+    body.theme-dark .stat-box.stat-red .stat-label {
+        color: #ef4444;
+    }
+
     body.theme-dark .search-input-wrapper input {
         background: #161625;
         border-color: #2d2d3f;
         color: #f8fafc;
     }
 
+    body.theme-dark .sidebar-icon {
+        background: #2a2a45;
+        color: #a5b4fc;
+    }
+
     body.theme-dark .btn-secondary-outline {
         background: #1e1e2d;
         border-color: #2d2d3f;
+        color: #f8fafc;
+    }
+
+    /* Empty Ledger State */
+    .empty-ledger-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 100px 40px;
+        text-align: center;
+        background: #fff;
+    }
+
+    .empty-ledger-icon-wrapper {
+        position: relative;
+        margin-bottom: 25px;
+    }
+
+    .empty-ledger-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        color: var(--accent-blue);
+        box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.1);
+        transform: rotate(-4deg);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .empty-ledger-state:hover .empty-ledger-icon {
+        transform: rotate(0deg) scale(1.08);
+    }
+
+    .empty-ledger-icon i {
+        filter: drop-shadow(0 4px 8px rgba(67, 97, 238, 0.2));
+    }
+
+    .empty-ledger-badge {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 36px;
+        height: 36px;
+        background: #fff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: #94a3b8;
+        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+        border: 2px solid #f8fafc;
+    }
+
+    .empty-ledger-state h4 {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text-main);
+        margin: 0 0 12px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .empty-ledger-state p {
+        color: var(--text-muted);
+        font-size: 15px;
+        max-width: 360px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    body.theme-dark .empty-ledger-state {
+        background: #1e1e2d;
+    }
+
+    body.theme-dark .empty-ledger-icon {
+        background: linear-gradient(135deg, #2a2a3f 0%, #1e1e2d 100%);
+        color: #a5b4fc;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    body.theme-dark .empty-ledger-badge {
+        background: #2a2a3f;
+        border-color: #1e1e2d;
+        color: #64748b;
+    }
+
+    body.theme-dark .empty-ledger-state h4 {
         color: #f8fafc;
     }
 </style>
@@ -586,6 +717,7 @@
                             <div class="card-icon"><i class="bi bi-box-seam"></i></div>
                             <h3>Asset Inventory Ledger</h3>
                         </div>
+                        {% if assets %}
                         <div class="inventory-actions">
                             <div class="search-input-wrapper">
                                 <i class="bi bi-search"></i>
@@ -594,9 +726,11 @@
                             <!-- <button class="btn-secondary-outline"><i class="bi bi-filter"></i> Filters</button> -->
                             <button id="exportInventoryBtn" class="btn-secondary-outline"><i class="bi bi-download"></i> Export</button>
                         </div>
+                        {% endif %}
                     </div>
 
                     <div class="table-responsive">
+                        {% if assets %}
                         <table class="inventory-table" id="inventoryTable">
                             <thead>
                                 <tr>
@@ -632,13 +766,6 @@
                                     </td>
                                     <td class="text-muted">{{ asset.serial_no|default:"—" }}</td>
                                 </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
-                                        No active assets identified for this ledger.
-                                    </td>
-                                </tr>
                                 {% endfor %}
                                 <tr id="noResultsRow" style="display: none;">
                                     <td colspan="5" class="text-center py-5 text-muted">
@@ -648,6 +775,20 @@
                                 </tr>
                             </tbody>
                         </table>
+                        {% else %}
+                        <div class="empty-ledger-state">
+                            <div class="empty-ledger-icon-wrapper">
+                                <div class="empty-ledger-icon">
+                                    <i class="bi bi-inbox"></i>
+                                </div>
+                                <div class="empty-ledger-badge">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                            </div>
+                            <h4>Clear Inventory Ledger</h4>
+                            <p>No active assets have been identified for this client. The ledger will automatically populate once assets are assigned or registered.</p>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

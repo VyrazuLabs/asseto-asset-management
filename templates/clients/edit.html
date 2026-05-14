@@ -126,11 +126,22 @@
     margin-top: 20px;
     margin-bottom: 50px;
 }
+.action-buttons-top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+}
 .btn-discard {
     color: #1a1a24;
     font-weight: 600;
     text-decoration: none;
     font-size: 14px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 13px 20px;
+    display: inline-block;
 }
 .btn-finalize {
     background: #3b5998;
@@ -305,6 +316,16 @@ body.theme-dark .website-input i {
 
 body.theme-dark .btn-discard {
     color: #9ca3af;
+    background: #1e1e2d;
+    border-color: #2d2d3f;
+}
+
+body.theme-dark .btn-discard:hover {
+    color: #e5e7eb;
+}
+
+body.theme-dark .action-buttons-top {
+    margin-bottom: 30px;
 }
 
 body.theme-dark .btn-finalize {
@@ -338,15 +359,25 @@ body.theme-dark .info-card-text p {
 
 {% block content %}
 <div class="client-form-container">
-  <a href="{% url 'clients:list' %}" class="back-link">
-    <i class="bi bi-arrow-left"></i> BACK TO CLIENT DIRECTORY
-  </a>
-  
-  <h3 class="page-title">Update Client: {{ client.name }}</h3>
-  <p class="page-desc">Modify institutional or private asset records. Ensure all regulatory information is updated accurately before finalizing changes.</p>
-
   <form method="post">
     {% csrf_token %}
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div class="flex-grow-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+                    <li class="breadcrumb-item active">Update: {{ client.name }}</li>
+                </ol>
+            </nav>
+            <h3 class="page-title">Update Client: {{ client.name }}</h3>
+            <p class="page-desc">Modify institutional or private asset records. Ensure all regulatory information is updated accurately before finalizing changes.</p>
+        </div>
+        <div class="action-buttons-top ms-3">
+            <a href="{% url 'clients:list' %}" class="btn-discard">Cancel Changes</a>
+            <button type="submit" class="btn-finalize">Update Client Record</button>
+        </div>
+    </div>
     
     {% if form.non_field_errors or form.errors %}
     <div class="alert alert-danger mb-4">
@@ -466,12 +497,6 @@ body.theme-dark .info-card-text p {
                {% if form.zip_code.errors %}<div class="text-danger mt-1 small">{{ form.zip_code.errors.0 }}</div>{% endif %}
            </div>
        </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-       <a href="{% url 'clients:list' %}" class="btn-discard">Cancel Changes</a>
-       <button type="submit" class="btn-finalize">Update Client Record</button>
     </div>
   </form>
 

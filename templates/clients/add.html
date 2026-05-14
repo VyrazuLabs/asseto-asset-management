@@ -137,6 +137,13 @@
         font-size: 16px;
     }
 
+    .action-buttons-top {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 20px;
+    }
+
     .action-buttons {
         display: flex;
         justify-content: flex-end;
@@ -151,6 +158,11 @@
         font-weight: 600;
         text-decoration: none;
         font-size: 14px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 13px 20px;
+        display: inline-block;
     }
 
     .btn-finalize {
@@ -338,6 +350,16 @@
 
     body.theme-dark .btn-discard {
         color: #9ca3af;
+        background: #1e1e2d;
+        border-color: #2d2d3f;
+    }
+
+    body.theme-dark .btn-discard:hover {
+        color: #e5e7eb;
+    }
+
+    body.theme-dark .action-buttons-top {
+        margin-bottom: 30px;
     }
 
     body.theme-dark .btn-finalize {
@@ -362,7 +384,7 @@
         color: #f9fafb;
     }
 
-    body.theme-dark .info-card-text p {
+body.theme-dark .info-card-text p {
         color: #9ca3af;
     }
 </style>
@@ -371,20 +393,26 @@
 
 {% block content %}
 <div class="client-form-container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
-            <li class="breadcrumb-item active">Add Client</li>
-        </ol>
-    </nav>
-
-    <h3 class="page-title">Register New Client</h3>
-    <p class="page-desc">Establish a new institutional or private asset record. Ensure all regulatory <br>information
-        accurate before submission to the custodial review board.</p>
-
     <form method="post">
-        {% csrf_token %}
+    {% csrf_token %}
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div class="flex-grow-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+                    <li class="breadcrumb-item active">Add Client</li>
+                </ol>
+            </nav>
+            <h3 class="page-title">Register New Client</h3>
+            <p class="page-desc">Establish a new institutional or private asset record. Ensure all regulatory <br>information
+                accurate before submission to the custodial review board.</p>
+        </div>
+        <div class="action-buttons-top ms-3">
+            <a href="{% url 'clients:list' %}" class="btn-discard">Discard Changes</a>
+            <button type="submit" class="btn-finalize">Finalize Registration</button>
+        </div>
+    </div>
         <!-- Basic Information -->
         <div class="section-card">
             <div class="section-header">
@@ -500,12 +528,7 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-            <a href="{% url 'clients:list' %}" class="btn-discard">Discard Draft</a>
-            <button type="submit" class="btn-finalize">Finalize Registration</button>
-        </div>
-    </form>
+        </form>
 
     <!-- Bottom Info Cards -->
     <div class="row info-cards">
