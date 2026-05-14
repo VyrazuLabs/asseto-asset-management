@@ -33,6 +33,7 @@ def _stats(request):
         'dormant_client_count':  qs.filter(status='3').count(),
         'inactive_client_count': qs.filter(status='0').count(),
         'active_rentals_count':  total_active_rentals,
+        'deleted_client_count':  Client.deleted_objects.filter(organization=request.user.organization).count(),
     }
 
 
@@ -144,11 +145,15 @@ def update_client(request, id):
             messages.success(request, 'Client updated successfully.')
             return redirect('clients:list')
 
+    from roles.models import Role
+    roles = Role.objects.filter(organization=request.user.organization).order_by('related_name')
+    
     context = {
         'sidebar': 'clients',
         'title': f'Edit {client.name} | Asseto',
         'form': form,
         'client': client,
+        'roles': roles,
     }
     return render(request, 'clients/edit.html', context)
 

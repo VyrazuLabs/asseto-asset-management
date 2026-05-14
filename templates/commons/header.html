@@ -52,6 +52,11 @@
             right: -370%;
         }
     }
+    
+    /* Ensure user dropdown doesn't show the caret and stays properly aligned */
+    .user-avatar-area .dropdown-toggle::after {
+        display: none !important;
+    }
 </style>
 
 <body>
@@ -174,7 +179,7 @@
                                     </div>
                                     <div class="user-avatar-area">
                                         <div class="dropdown">
-                                            <a href="#" class="d-flex align-items-center justify-content-end"
+                                            <a href="javascript:void(0)" class="d-flex align-items-center justify-content-end dropdown-toggle"
                                                 id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <div class="user-menu d-flex align-items-center">
                                                     <div class="user-name text-end me-3 d-none d-lg-block">

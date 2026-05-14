@@ -11,79 +11,103 @@
 {% block content %}
 
 {# ── Page header ──────────────────────────────────────────────────────────── #}
-<div class="client-page-header d-flex justify-content-between align-items-start mb-4">
-  <div class="header-text-content">
-    <h1 class="institutional-title">INSTITUTIONAL OVERVIEW</h1>
-    <p class="institutional-subtitle">
-      Manage and monitor your global asset rentals and support<br>
-      tickets with precision tracking of inventory flows and<br>
-      resolution statuses.
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Clients</li>
+      </ol>
+    </nav>
+    <h1>Client Directory</h1>
+    <p class="page-subtitle">
+      Manage and monitor your global asset rentals and support tickets.
     </p>
   </div>
-  <div class="header-action">
-    <a href="{% url 'clients:add' %}" class="btn-register-new">
-      <i class="bi bi-person-plus"></i> Register New Client
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'recycle_bin:deleted_clients' %}" class="btn-trash" title="Recycle Bin">
+      <i class="bi bi-trash3"></i> Trash
+      {% if deleted_client_count %}<span class="count-badge">{{ deleted_client_count }}</span>{% endif %}
     </a>
+    {% if perms.authentication.add_client %}
+    <a href="{% url 'clients:add' %}" class="btn-register">
+      <i class="bi bi-plus-lg"></i> Register Client
+    </a>
+    {% endif %}
   </div>
 </div>
 
 {# ── Stat cards ───────────────────────────────────────────────────────────── #}
-<div class="clients-stats-grid">
+<div class="stats-grid">
   <!-- Card 1 -->
-  <div class="c-stat-card">
-    <div class="c-stat-badge badge-blue">+4.2%</div>
-    <div class="c-stat-icon icon-blue"><i class="bi bi-people-fill"></i></div>
-    <div class="c-stat-value">{{ total_client_count|default:"0" }}</div>
-    <div class="c-stat-label">TOTAL RENTERS</div>
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+    <div>
+      <div class="stat-label">Total Renters</div>
+      <div class="stat-value">{{ total_client_count|default:"0" }}</div>
+    </div>
   </div>
 
   <!-- Card 2 -->
-  <div class="c-stat-card">
-    <div class="c-stat-badge badge-orange">Active</div>
-    <div class="c-stat-icon icon-blue"><i class="bi bi-box-seam"></i></div>
-    <div class="c-stat-value">{{ active_rentals_count|default:"0" }}</div>
-    <div class="c-stat-label">ACTIVE RENTALS</div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-box-seam"></i></div>
+    <div>
+      <div class="stat-label">Active Rentals</div>
+      <div class="stat-value">{{ active_rentals_count|default:"0" }}</div>
+    </div>
   </div>
 
   <!-- Card 3 -->
-  <div class="c-stat-card">
-    <div class="c-stat-badge badge-lightblue">New</div>
-    <div class="c-stat-icon icon-blue"><i class="bi bi-headset"></i></div>
-    <div class="c-stat-value">{{ review_client_count|default:"0" }}</div>
-    <div class="c-stat-label">OPEN SUPPORT TICKETS</div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-headset"></i></div>
+    <div>
+      <div class="stat-label">Open Support Tickets</div>
+      <div class="stat-value">{{ review_client_count|default:"0" }}</div>
+    </div>
   </div>
+
+  <!-- Card 4 -->
+  <a href="{% url 'recycle_bin:deleted_clients' %}" class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
+    <div>
+      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-value">{{ deleted_client_count|default:"0" }}</div>
+    </div>
+  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
-<div class="c-filter-bar d-flex justify-content-between align-items-center">
-  <form method="GET" id="filterForm" class="c-filters-left d-flex align-items-center gap-3">
-    <div class="c-search-input-wrapper" style="position: relative;">
-      <i class="bi bi-search"
-        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 13px;"></i>
-      <input type="text" name="search" class="c-filter-select" placeholder="Search Client Name or ID..."
-        value="{{ search_query|default:'' }}" style="padding-left: 35px; width: 400px;">
+<div class="filter-card">
+  <form method="GET" id="filterForm">
+    <div class="row g-2 align-items-end">
+      <div class="col">
+        <div class="filter-label">Search Client</div>
+        <input name="search" type="search" autocomplete="off" placeholder="Search Client Name or ID..."
+          value="{{ search_query|default:'' }}">
+      </div>
+      <div class="col-auto">
+        <div class="filter-label">Status</div>
+        <select name="status" class="filter-select-btn" style="min-width: 150px;" onchange="this.form.submit()">
+          <option value="All Statuses">All Statuses</option>
+          {% for val, label in status_choices %}
+          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <!-- Export Button -->
+        <button type="button" id="exportBtn" class="btn-export" onclick="exportClientData()">
+          <i class="bi bi-download"></i> Export
+        </button>
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'clients:list' %}" class="btn-reset" title="Reset">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
+      <button type="submit" style="display: none;"></button>
     </div>
-
-    <div class="c-filter-select-wrapper">
-      <select name="status" class="c-filter-select" aria-label="Statuses" onchange="this.form.submit()">
-        <option value="All Statuses">All Statuses</option>
-        {% for val, label in status_choices %}
-        <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <button type="submit" style="display: none;"></button>
   </form>
-
-  <div class="c-filters-right d-flex gap-2">
-    <a href="{% url 'clients:list' %}" class="c-btn-reset">
-      <i class="bi bi-arrow-clockwise"></i> Reset
-    </a>
-    <button type="button" id="exportBtn" class="c-btn-export" onclick="exportClientData()">
-      <i class="bi bi-download"></i> Export Data
-    </button>
-  </div>
 
   {# ── Hidden Export Form ── #}
   <form id="exportForm" method="GET" action="{% url 'clients:export' %}" style="display: none;">
@@ -93,18 +117,18 @@
 </div>
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
-<div class="c-table-container">
+<div class="table-card">
   <div class="table-responsive">
-    <table class="c-list-table" id="client-table">
+    <table class="list-table" id="client-table">
       <thead>
         <tr>
-          <th>SL NO.</th>
-          <th>CLIENT NAME</th>
-          <th>RENTAL TYPE</th>
-          <th>CONTACT PERSON</th>
-          <th class="text-center">ACTIVE RENTALS</th>
-          <th class="text-center">OPEN TICKETS</th>
-          <th>STATUS</th>
+          <th>Sl No.</th>
+          <th>Client Name</th>
+          <th>Rental Type</th>
+          <th>Contact Person</th>
+          <th class="text-center">Active Rentals</th>
+          <th class="text-center">Open Tickets</th>
+          <th>Status</th>
           {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
           <th>Actions</th>
           {% endif %}
@@ -120,8 +144,10 @@
         <tr>
           <td colspan="8">
             <div class="table-empty-state">
-              <i class="bi bi-people d-block"></i>
-              <p>No clients found.</p>
+              <i class="bi bi-people"></i>
+              <p>No clients found.<br>
+                <a href="{% url 'clients:add' %}" class="link-primary">Add your first client</a>
+              </p>
             </div>
           </td>
         </tr>
@@ -137,18 +163,18 @@
 
 {% block script %}
 <script>
-  window.exportClientData = function() {
+  window.exportClientData = function () {
     var searchInput = document.querySelector('input[name="search"]');
     var statusSelect = document.querySelector('select[name="status"]');
-    
+
     var searchVal = searchInput ? searchInput.value : '';
     var statusVal = statusSelect ? statusSelect.value : '';
-    
+
     var url = '/clients/export?search=' + encodeURIComponent(searchVal);
     if (statusVal && statusVal !== 'All Statuses') {
       url += '&status=' + encodeURIComponent(statusVal);
     }
-    
+
     window.location.href = url;
   };
 

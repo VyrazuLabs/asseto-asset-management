@@ -274,13 +274,15 @@
 </div>
 <script>
     function conditionalRender(){
-        const slack_bool=sessionStorage.getItem('slack');
-        if(slack_bool){ 
-            document.getElementById('slack').style.display='block';
-        }
-        else{
-            document.getElementById('slack').style.display='none';
+        const slack_bool = sessionStorage.getItem('slack');
+        const slackEl = document.getElementById('slack');
+        if (slackEl) {
+            if (slack_bool) { 
+                slackEl.style.display = 'block';
+            } else {
+                slackEl.style.display = 'none';
+            }
         }
     }
-    conditionalRender()
+    conditionalRender();
 </script>

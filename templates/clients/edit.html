@@ -4,579 +4,218 @@
 {% block title %}Update Client | Asseto{% endblock %}
 
 {% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.3">
 <style>
-.client-form-container {
-    max-width: 100%;
-    margin: 0;
-    color: #333;
-    padding-bottom: 50px;
-}
-.back-link {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-decoration: none;
-    color: #4a5568;
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 25px;
-}
-.back-link i {
-    margin-right: 8px;
-    font-size: 14px;
-}
-.page-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #1a1a24;
-}
-.page-desc {
-    font-size: 14px;
-    color: #6c757d;
-    margin-bottom: 35px;
-    line-height: 1.5;
-}
-.section-card {
-    border: 1px solid #eaedf2;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    background: #fff;
-    padding: 30px;
-    margin-bottom: 25px;
-}
-.section-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 25px;
-}
-.section-icon {
-    width: 38px;
-    height: 38px;
-    background: #edf2ff;
-    color: #4361ee;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-    font-size: 18px;
-}
-.section-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0;
-    color: #1a1a24;
-}
-.add-contact-link {
-    margin-left: auto;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: #3b5998;
-    border: none;
-    background: none;
-    letter-spacing: 0.5px;
-}
-.form-label {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #3b5998;
-    margin-bottom: 10px;
-}
-.form-control, .form-select {
-    border-color: #e8eef7;
-    padding: 12px 16px;
-    font-size: 14px;
-    border-radius: 8px;
-    background-color: #f8fafc;
-    color: #334155;
-    box-shadow: none;
-}
-.form-control::placeholder {
-    color: #94a3b8;
-}
-.form-control:focus, .form-select:focus {
-    background-color: #ffffff;
-    border-color: #93c5fd;
-    box-shadow: 0 0 0 0.15rem rgba(59, 91, 219, 0.12);
-}
-.website-input {
-    position: relative;
-}
-.website-input .form-control {
-    padding-left: 45px;
-}
-.website-input i {
-    position: absolute;
-    left: 16px;
-    top: 13px;
-    color: #6c757d;
-    font-size: 16px;
-}
-.action-buttons {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 25px;
-    margin-top: 20px;
-    margin-bottom: 50px;
-}
-.action-buttons-top {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 20px;
-}
-.btn-discard {
-    color: #1a1a24;
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 14px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 13px 20px;
-    display: inline-block;
-}
-.btn-finalize {
-    background: #3b5998;
-    color: #fff;
-    border-radius: 8px;
-    padding: 14px 30px;
-    font-weight: 600;
-    font-size: 14px;
-    border: none;
-    transition: background 0.2s;
-}
-.btn-finalize:hover {
-    background: #2d4373;
-}
-
-.info-cards {
-    margin-bottom: 20px;
-}
-.info-card {
-    border-radius: 12px;
-    padding: 25px;
-    display: flex;
-    gap: 15px;
-    background: #fdfdfd;
-    border: 1px solid #eaedf2;
-}
-.info-card.blue-card {
-    background: #3b5998;
-    color: #fff;
-    display: block;
-    height: 100%;
-    border: none;
-}
-.info-card-text h5 {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #1a1a24;
-}
-.info-card-text p {
-    font-size: 13px;
-    color: #6c757d;
-    margin: 0;
-    line-height: 1.6;
-}
-.blue-card .shield-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid rgba(255,255,255,0.7);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    margin-bottom: 20px;
-}
-.blue-card h5 {
-    color: #fff;
-    margin-bottom: 12px;
-    font-size: 15px;
-}
-.blue-card p {
-    color: rgba(255,255,255,0.85);
-    font-size: 12px;
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-.secure-portal {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-}
-.secure-portal::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: #a6b8f5;
-    border-radius: 50%;
-    margin-right: 10px;
-}
-.kyc-img-wrapper {
-    min-width: 65px;
-    max-width: 65px;
-    height: 65px;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-}
-.kyc-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* ── Dark Mode ────────────────────────────────────────────────────────────── */
-body.theme-dark .client-form-container {
-    color: #e0e0f0;
-}
-
-body.theme-dark .back-link {
-    color: #9ca3af;
-}
-
-body.theme-dark h3.page-title,
-body.theme-dark .page-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #f9fafb;
-}
-
-body.theme-dark .page-desc {
-    color: #9ca3af;
-}
-
-body.theme-dark .section-card {
-    background: #1e1e2d;
-    border-color: #2d2d3f;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
-
-body.theme-dark .section-header {
-    border-bottom-color: #2d2d3f;
-}
-
-body.theme-dark .section-icon {
-    background: #2a2a45;
-    color: #a5b4fc;
-}
-
-body.theme-dark .section-title,
-body.theme-dark h4.section-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin: 0;
-    color: #f9fafb;
-}
-
-body.theme-dark .add-contact-link {
-    color: #a5b4fc;
-}
-
-body.theme-dark .form-label {
-    color: #a5b4fc;
-}
-
-body.theme-dark .form-control,
-body.theme-dark .form-select {
-    background-color: #161625;
-    border-color: #2d2d3f;
-    color: #f9fafb;
-}
-
-body.theme-dark .form-control::placeholder {
-    color: #6b7280;
-}
-
-body.theme-dark .form-control:focus,
-body.theme-dark .form-select:focus {
-    background-color: #161625;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 0.15rem rgba(99, 102, 241, 0.2);
-}
-
-body.theme-dark .website-input i {
-    color: #6b7280;
-}
-
-body.theme-dark .btn-discard {
-    color: #9ca3af;
-    background: #1e1e2d;
-    border-color: #2d2d3f;
-}
-
-body.theme-dark .btn-discard:hover {
-    color: #e5e7eb;
-}
-
-body.theme-dark .action-buttons-top {
-    margin-bottom: 30px;
-}
-
-body.theme-dark .btn-finalize {
-    background: #4f46e5;
-    color: #fff;
-}
-
-body.theme-dark .btn-finalize:hover {
-    background: #4338ca;
-}
-
-body.theme-dark .info-card {
-    background: #1e1e2d;
-    border-color: #2d2d3f;
-}
-
-body.theme-dark .info-card.blue-card {
-    background: #2a2a45;
-}
-
-body.theme-dark .info-card-text h5 {
-    color: #f9fafb;
-}
-
-body.theme-dark .info-card-text p {
-    color: #9ca3af;
-}
+    .website-input {
+        position: relative;
+    }
+    .website-input .form-control {
+        padding-left: 45px;
+    }
+    .website-input i {
+        position: absolute;
+        left: 16px;
+        top: 9px;
+        color: #6c757d;
+        font-size: 16px;
+    }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 {% endblock %}
 
 {% block content %}
-<div class="client-form-container">
-  <form method="post">
-    {% csrf_token %}
-    <div class="d-flex justify-content-between align-items-start mb-3">
-        <div class="flex-grow-1">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb page-breadcrumb">
-                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
-                    <li class="breadcrumb-item active">Update: {{ client.name }}</li>
-                </ol>
-            </nav>
-            <h3 class="page-title">Update Client: {{ client.name }}</h3>
-            <p class="page-desc">Modify institutional or private asset records. Ensure all regulatory information is updated accurately before finalizing changes.</p>
-        </div>
-        <div class="action-buttons-top ms-3">
-            <a href="{% url 'clients:list' %}" class="btn-discard">Cancel Changes</a>
-            <button type="submit" class="btn-finalize">Update Client Record</button>
-        </div>
-    </div>
-    
-    {% if form.non_field_errors or form.errors %}
-    <div class="alert alert-danger mb-4">
-        <ul class="mb-0">
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-            {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
-    <!-- Basic Information -->
-    <div class="section-card">
-       <div class="section-header">
-           <div class="section-icon"><i class="bi bi-building"></i></div>
-           <h4 class="section-title">Basic Information</h4>
-       </div>
-       <div class="row">
-           <div class="col-md-6 mb-4">
-               <label class="form-label">Company Name</label>
-               {{ form.name }}
-               {% if form.name.errors %}<div class="text-danger mt-1 small">{{ form.name.errors.0 }}</div>{% endif %}
-           </div>
-           <div class="col-md-6 mb-4">
-               <label class="form-label">Industry</label>
-               {{ form.industry }}
-               {% if form.industry.errors %}<div class="text-danger mt-1 small">{{ form.industry.errors.0 }}</div>{% endif %}
-           </div>
-       </div>
-
-       <div class="row">
-           <div class="col-12">
-               <label class="form-label">Corporate Website</label>
-               <div class="website-input">
-                   <i class="bi bi-globe"></i>
-                   {{ form.corporate_website }}
-                   {% if form.corporate_website.errors %}<div class="text-danger mt-1 small">{{ form.corporate_website.errors.0 }}</div>{% endif %}
-               </div>
-           </div>
-       </div>
+<div class="add-product-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+            <li class="breadcrumb-item active">Update Client</li>
+          </ol>
+        </nav>
+        <h1>Update Client: {{ client.name }}</h1>
+        <p class="subtitle">Modify institutional or private asset records. Ensure all regulatory information is updated accurately.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'clients:list' %}" class="btn-back-listing">
+          <i class="bi bi-x-lg"></i> Cancel Changes
+        </a>
+        <button type="submit" form="client-form" class="btn-save-asset">
+          <i class="bi bi-floppy2"></i> Update Client Record
+        </button>
+      </div>
     </div>
 
-    <!-- Contact Details -->
-    <div class="section-card">
-       <div class="section-header">
-           <div class="section-icon"><i class="bi bi-person-badge"></i></div>
-           <h4 class="section-title">Contact Details</h4>
-           <button type="button" class="add-contact-link" id="addContactBtn">+ ADD CONTACT</button>
-       </div>
-       <div id="contactsContainer">
-           {% if client.contacts.all %}
-                {% for contact in client.contacts.all %}
-                <div class="contact-block position-relative mb-4 pb-4 border-bottom">
-                    <div class="position-absolute" style="right: 0; top: 0; z-index: 10;">
-                        <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn"><i class="bi bi-trash"></i></button>
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="client-form" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors or form.errors %}
+            <div class="alert alert-danger mb-4">
+                <ul class="mb-0">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Basic Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-building"></i> <span>Basic Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>COMPANY NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="row mb-4 pt-2">
-                        <div class="col-12">
-                            <label class="form-label">Contact Name</label>
-                            <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name" value="{{ contact.name }}">
-                        </div>
+                    <div class="form-group">
+                        <label>INDUSTRY <span class="required">*</span></label>
+                        {{ form.industry }}
+                        {% if form.industry.errors %}<div class="text-danger small mt-1">{{ form.industry.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com" value="{{ contact.email|default:'' }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone Number</label>
-                            <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000" value="{{ contact.phone|default:'' }}">
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Role</label>
-                            <select name="contact_role[]" class="form-control">
-                                <option value="">Select Role</option>
-                                {% for r in roles %}
-                                <option value="{{ r.id }}" {% if contact.role_id == r.id %}selected{% endif %}>{{ r.related_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <label class="form-label">Notes</label>
-                            <textarea name="contact_notes[]" class="form-control" rows="3" placeholder="Additional instructions or internal notes regarding this contact...">{{ contact.notes|default:'' }}</textarea>
+                    <div class="form-group full-width">
+                        <label>CORPORATE WEBSITE</label>
+                        <div class="website-input">
+                            <i class="bi bi-globe"></i>
+                            {{ form.corporate_website }}
+                            {% if form.corporate_website.errors %}<div class="text-danger small mt-1">{{ form.corporate_website.errors.0 }}</div>{% endif %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-           {% else %}
-               <div class="contact-block position-relative mb-4 pb-4 border-bottom">
-                    <div class="position-absolute" style="right: 0; top: 0; z-index: 10;">
-                        <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="display: none;"><i class="bi bi-trash"></i></button>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-person-badge"></i> <span>Contact Details</span>
+                </div>
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="addContactBtn">
+                        <i class="bi bi-plus-lg me-1"></i> Add Contact
+                    </button>
+                </div>
+                <div id="contactsContainer">
+                    {% if client.contacts.all %}
+                         {% for contact in client.contacts.all %}
+                         <div class="contact-block custom-field-row mb-4">
+                             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                 <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
+                                     <i class="bi bi-person me-1"></i> Contact Person
+                                 </h6>
+                                 <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i class="bi bi-trash"></i> Remove</button>
+                             </div>
+                             <div class="form-grid">
+                                 <div class="form-group full-width">
+                                     <label>CONTACT NAME</label>
+                                     <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name" value="{{ contact.name }}">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>EMAIL ADDRESS</label>
+                                     <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com" value="{{ contact.email|default:'' }}">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>PHONE NUMBER</label>
+                                     <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000" value="{{ contact.phone|default:'' }}">
+                                 </div>
+                                 <div class="form-group full-width">
+                                     <label>ROLE</label>
+                                     <select name="contact_role[]" class="form-control">
+                                         <option value="">Select Role</option>
+                                         {% for r in roles %}
+                                         <option value="{{ r.id }}" {% if contact.role_id == r.id %}selected{% endif %}>{{ r.related_name }}</option>
+                                         {% endfor %}
+                                     </select>
+                                 </div>
+                                 <div class="form-group full-width">
+                                     <label>NOTES</label>
+                                     <textarea name="contact_notes[]" class="form-control" rows="2" placeholder="Additional instructions or internal notes regarding this contact...">{{ contact.notes|default:'' }}</textarea>
+                                 </div>
+                             </div>
+                         </div>
+                         {% endfor %}
+                    {% else %}
+                        <div class="contact-block custom-field-row mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                                <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
+                                    <i class="bi bi-person me-1"></i> Contact Person
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="display: none; padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i class="bi bi-trash"></i> Remove</button>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label>CONTACT NAME</label>
+                                    <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name">
+                                </div>
+                                <div class="form-group">
+                                    <label>EMAIL ADDRESS</label>
+                                    <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>PHONE NUMBER</label>
+                                    <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>ROLE</label>
+                                    <select name="contact_role[]" class="form-control">
+                                        <option value="">Select Role</option>
+                                        {% for r in roles %}
+                                        <option value="{{ r.id }}">{{ r.related_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>NOTES</label>
+                                    <textarea name="contact_notes[]" class="form-control" rows="2" placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Billing Address -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-wallet2"></i> <span>Billing Address</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>STREET ADDRESS</label>
+                        {{ form.street_address }}
+                        {% if form.street_address.errors %}<div class="text-danger small mt-1">{{ form.street_address.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="row mb-4 pt-2">
-                        <div class="col-12">
-                            <label class="form-label">Contact Name</label>
-                            <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name">
-                        </div>
+                    <div class="form-group">
+                        <label>CITY</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="row mb-4">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phone Number</label>
-                            <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000">
-                        </div>
+                    <div class="form-group">
+                        <label>STATE / PROVINCE</label>
+                        {{ form.state }}
+                        {% if form.state.errors %}<div class="text-danger small mt-1">{{ form.state.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Role</label>
-                            <select name="contact_role[]" class="form-control">
-                                <option value="">Select Role</option>
-                                {% for r in roles %}
-                                <option value="{{ r.id }}">{{ r.related_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <label class="form-label">Notes</label>
-                            <textarea name="contact_notes[]" class="form-control" rows="3" placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label>ZIP</label>
+                        {{ form.zip_code }}
+                        {% if form.zip_code.errors %}<div class="text-danger small mt-1">{{ form.zip_code.errors.0 }}</div>{% endif %}
                     </div>
                 </div>
-           {% endif %}
-       </div>
-    </div>
+            </div>
 
-    <!-- Billing Address -->
-    <div class="section-card">
-       <div class="section-header">
-           <div class="section-icon"><i class="bi bi-wallet2"></i></div>
-           <h4 class="section-title">Billing Address</h4>
-       </div>
-       <div class="row mb-4">
-           <div class="col-12">
-               <label class="form-label">Street Address</label>
-               {{ form.street_address }}
-               {% if form.street_address.errors %}<div class="text-danger mt-1 small">{{ form.street_address.errors.0 }}</div>{% endif %}
-           </div>
-       </div>
-       <div class="row">
-           <div class="col-md-4 mb-4 mb-md-0">
-               <label class="form-label">City</label>
-               {{ form.city }}
-               {% if form.city.errors %}<div class="text-danger mt-1 small">{{ form.city.errors.0 }}</div>{% endif %}
-           </div>
-           <div class="col-md-4 mb-4 mb-md-0">
-               <label class="form-label">State / Province</label>
-               {{ form.state }}
-               {% if form.state.errors %}<div class="text-danger mt-1 small">{{ form.state.errors.0 }}</div>{% endif %}
-           </div>
-           <div class="col-md-4">
-               <label class="form-label">Zip</label>
-               {{ form.zip_code }}
-               {% if form.zip_code.errors %}<div class="text-danger mt-1 small">{{ form.zip_code.errors.0 }}</div>{% endif %}
-           </div>
-       </div>
+        </form>
     </div>
-  </form>
-
-  <!-- Bottom Info Cards -->
-  <div class="row info-cards">
-      <div class="col-lg-8 col-md-6 mb-4">
-          <div class="info-card h-100 align-items-center">
-             <div class="kyc-img-wrapper">
-                 <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Building">
-             </div>
-             <div class="info-card-text">
-                 <h5>Automated KYC Integration</h5>
-                 <p>Updates to client profiles are automatically re-validated against global regulatory databases. Changes to core identity fields may trigger a brief custodial re-review.</p>
-             </div>
-          </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mb-4">
-          <div class="info-card blue-card">
-              <div class="shield-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              </div>
-              <h5>Data Integrity</h5>
-              <p>Precision Ledger encrypts all client records with AES-256 standards. Our architecture ensures your custodial data remains siloed and secure.</p>
-              <div class="secure-portal">
-                  SECURE PORTAL ACTIVE
-              </div>
-          </div>
-      </div>
-  </div>
-</div>
 </div>
 
 <script>

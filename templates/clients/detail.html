@@ -5,7 +5,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
-<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/product-details.css' %}?v=1.2">
 <style>
     :root {
         --glass-bg: rgba(255, 255, 255, 0.7);
@@ -25,12 +25,12 @@
 
     /* Top Stats Bar */
     .client-header-card {
-        background: #fff;
+        background: var(--pd-card-bg);
         border-radius: 20px;
         padding: 30px;
         margin-bottom: 30px;
         box-shadow: var(--card-shadow);
-        border: 1px solid #f1f5f9;
+        border: 1px solid var(--pd-border);
         position: relative;
         overflow: hidden;
     }
@@ -94,13 +94,13 @@
     .client-info-left h1 {
         font-size: 32px;
         font-weight: 800;
-        color: var(--text-main);
+        color: var(--pd-text-main);
         margin: 0 0 10px 0;
         letter-spacing: -0.5px;
     }
 
     .client-desc {
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         font-size: 14px;
         line-height: 1.6;
         margin: 0;
@@ -116,7 +116,7 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         margin-bottom: 2px;
         display: block;
     }
@@ -124,7 +124,7 @@
     .stat-box .stat-value {
         font-size: 28px;
         font-weight: 800;
-        color: var(--text-main);
+        color: var(--pd-text-main);
         display: block;
         line-height: 1.2;
     }
@@ -136,30 +136,30 @@
 
     .stat-box .stat-currency {
         font-size: 12px;
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         margin-right: 4px;
         font-weight: 600;
     }
 
     /* Left Column: Inventory Ledger */
     .inventory-card {
-        background: #fff;
+        background: var(--pd-card-bg);
         border-radius: 20px;
         box-shadow: var(--card-shadow);
-        border: 1px solid #f1f5f9;
+        border: 1px solid var(--pd-border);
         overflow: hidden;
         height: 100%;
     }
 
     .card-header-styled {
         padding: 20px 25px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--pd-border);
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 15px;
-        background: #e4eaf1;
+        background: var(--pd-border);
         border-radius: 12px 12px 0 0;
     }
 
@@ -172,7 +172,7 @@
     .card-icon {
         width: 36px;
         height: 36px;
-        background: #f8fafc;
+        background: rgba(255,255,255,0.1);
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -185,6 +185,7 @@
         font-size: 15px;
         font-weight: 700;
         margin: 0;
+        color: var(--pd-text-main);
     }
 
     .inventory-actions {
@@ -202,35 +203,30 @@
         left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         font-size: 12px;
     }
 
     .search-input-wrapper input {
         padding: 7px 12px 7px 34px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--pd-border);
         border-radius: 8px;
         font-size: 12px;
         width: 220px;
-        background: #f8fafc;
+        background: var(--pd-card-bg);
+        color: var(--pd-text-main);
         outline: none;
         transition: all 0.2s;
     }
 
-    .search-input-wrapper input:focus {
-        border-color: var(--accent-blue);
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-    }
-
     .btn-secondary-outline {
         padding: 7px 12px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--pd-border);
         border-radius: 8px;
         font-size: 12px;
         font-weight: 600;
-        color: var(--text-main);
-        background: #fff;
+        color: var(--pd-text-main);
+        background: var(--pd-card-bg);
         display: flex;
         align-items: center;
         gap: 6px;
@@ -239,47 +235,35 @@
         text-decoration: none;
     }
 
-    .btn-secondary-outline:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-    }
-
     .inventory-table {
         width: 100%;
         border-collapse: collapse;
     }
 
     .inventory-table th {
-        background: #f8fafc;
+        background: rgba(0,0,0,0.02);
         padding: 12px 25px;
         text-align: left;
         font-size: 10px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: var(--text-muted);
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .inventory-table tbody tr:nth-child(odd) {
-        background: #f0f4f8;
-    }
-
-    .inventory-table tbody tr:nth-child(even) {
-        background: #ffffff;
+        color: var(--pd-text-muted);
+        border-bottom: 1px solid var(--pd-border);
     }
 
     .inventory-table td {
         padding: 12px 25px;
         vertical-align: middle;
         font-size: 13px;
-        border-bottom: 1px solid #f8fafc;
+        border-bottom: 1px solid var(--pd-border);
+        color: var(--pd-text-main);
     }
 
     .tag-cell {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 600;
-        color: #64748b;
+        color: var(--pd-text-muted);
         font-size: 12px;
     }
 
@@ -292,7 +276,7 @@
     .item-icon-box {
         width: 34px;
         height: 34px;
-        background: #f1f5f9;
+        background: rgba(0,0,0,0.05);
         border-radius: 6px;
         display: flex;
         align-items: center;
@@ -301,23 +285,17 @@
         flex-shrink: 0;
     }
 
-    .item-icon-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
     .item-name {
         font-weight: 600;
-        color: var(--text-main);
+        color: var(--pd-text-main);
     }
 
     /* Sidebar Widgets */
     .sidebar-card {
-        background: #fff;
+        background: var(--pd-card-bg);
         border-radius: 20px;
         box-shadow: var(--card-shadow);
-        border: 1px solid #f1f5f9;
+        border: 1px solid var(--pd-border);
         padding: 20px;
         margin-bottom: 25px;
     }
@@ -326,7 +304,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        background: #e4eaf1;
+        background: var(--pd-border);
         padding: 15px 20px;
         border-radius: 12px 12px 0 0;
         margin: -20px -20px 15px -20px;
@@ -335,7 +313,7 @@
     .sidebar-icon {
         width: 30px;
         height: 30px;
-        background: #eef2ff;
+        background: rgba(255,255,255,0.1);
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -348,7 +326,7 @@
         margin: 0;
         font-size: 14px;
         font-weight: 700;
-        color: var(--text-main);
+        color: var(--pd-text-main);
     }
 
     .contact-item {
@@ -360,14 +338,14 @@
     .contact-avatar {
         width: 32px;
         height: 32px;
-        background: #f1f5f9;
+        background: rgba(0,0,0,0.05);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 10px;
         font-weight: 700;
-        color: #475569;
+        color: var(--pd-text-main);
         flex-shrink: 0;
     }
 
@@ -375,12 +353,12 @@
         font-size: 13px;
         font-weight: 600;
         margin: 0 0 1px 0;
-        color: var(--text-main);
+        color: var(--pd-text-main);
     }
 
     .contact-info .contact-role {
         font-size: 10px;
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         margin-bottom: 6px;
         display: block;
     }
@@ -413,7 +391,7 @@
         top: 4px;
         bottom: 4px;
         width: 1px;
-        background: #e2e8f0;
+        background: var(--pd-border);
     }
 
     .timeline-item {
@@ -428,7 +406,7 @@
         top: 4px;
         width: 7px;
         height: 7px;
-        background: #fff;
+        background: var(--pd-card-bg);
         border: 2px solid var(--accent-blue);
         border-radius: 50%;
         z-index: 1;
@@ -436,7 +414,7 @@
 
     .timeline-time {
         font-size: 10px;
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         margin-bottom: 3px;
         display: block;
     }
@@ -445,101 +423,14 @@
         font-size: 12px;
         font-weight: 600;
         margin: 0 0 3px 0;
-        color: var(--text-main);
+        color: var(--pd-text-main);
     }
 
     .timeline-content p {
         font-size: 11px;
-        color: var(--text-muted);
+        color: var(--pd-text-muted);
         line-height: 1.4;
         margin: 0;
-    }
-
-    /* Dark Mode Overrides */
-    body.theme-dark .detail-wrapper {
-        background-color: #12121e;
-    }
-
-    body.theme-dark .client-header-card,
-    body.theme-dark .inventory-card,
-    body.theme-dark .sidebar-card {
-        background: #1e1e2d;
-        border-color: #2d2d3f;
-    }
-
-    body.theme-dark .sidebar-card-header {
-        background: #161625;
-        border-bottom-color: #2d2d3f;
-    }
-
-    body.theme-dark .inventory-table th {
-        background: #161625;
-        border-bottom-color: #2d2d3f;
-        color: #9ca3af;
-    }
-
-    body.theme-dark .inventory-table td {
-        background: #1e1e2d;
-        border-bottom-color: #262635;
-        color: #e2e8f0;
-    }
-
-    body.theme-dark .inventory-table tr:hover td {
-        background: #252536;
-    }
-
-    body.theme-dark .card-header-styled {
-        background: #161625;
-        border-bottom-color: #2d2d3f;
-    }
-
-    body.theme-dark .card-icon {
-        background: #2a2a45;
-        color: #a5b4fc;
-    }
-
-    body.theme-dark .client-info-left h1,
-    body.theme-dark .stat-value,
-    body.theme-dark .card-title-group h3 {
-        font-size: 20px;
-        color: #f8fafc;
-    }
-
-    body.theme-dark .sidebar-card-header h4 {
-        font-size: 14px;
-        color: #f8fafc;
-    }
-
-    body.theme-dark .contact-info h5,
-    body.theme-dark .timeline-content h6 {
-        color: #f8fafc;
-    }
-
-    body.theme-dark .badge-cid {
-        background: #2a2a3f;
-        color: #9ca3af;
-    }
-
-    body.theme-dark .stat-box.stat-red .stat-value,
-    body.theme-dark .stat-box.stat-red .stat-label {
-        color: #ef4444;
-    }
-
-    body.theme-dark .search-input-wrapper input {
-        background: #161625;
-        border-color: #2d2d3f;
-        color: #f8fafc;
-    }
-
-    body.theme-dark .sidebar-icon {
-        background: #2a2a45;
-        color: #a5b4fc;
-    }
-
-    body.theme-dark .btn-secondary-outline {
-        background: #1e1e2d;
-        border-color: #2d2d3f;
-        color: #f8fafc;
     }
 
     /* Empty Ledger State */
@@ -548,381 +439,283 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 100px 40px;
+        padding: 80px 40px;
         text-align: center;
-        background: #fff;
-    }
-
-    .empty-ledger-icon-wrapper {
-        position: relative;
-        margin-bottom: 25px;
     }
 
     .empty-ledger-icon {
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 42px;
-        color: var(--accent-blue);
-        box-shadow: 0 10px 25px -5px rgba(67, 97, 238, 0.1);
-        transform: rotate(-4deg);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .empty-ledger-state:hover .empty-ledger-icon {
-        transform: rotate(0deg) scale(1.08);
-    }
-
-    .empty-ledger-icon i {
-        filter: drop-shadow(0 4px 8px rgba(67, 97, 238, 0.2));
-    }
-
-    .empty-ledger-badge {
-        position: absolute;
-        bottom: -5px;
-        right: -5px;
-        width: 36px;
-        height: 36px;
-        background: #fff;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        color: #94a3b8;
-        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
-        border: 2px solid #f8fafc;
-    }
-
-    .empty-ledger-state h4 {
-        font-size: 22px;
-        font-weight: 800;
-        color: var(--text-main);
-        margin: 0 0 12px 0;
-        letter-spacing: -0.5px;
-    }
-
-    .empty-ledger-state p {
-        color: var(--text-muted);
-        font-size: 15px;
-        max-width: 360px;
-        margin: 0 auto;
-        line-height: 1.6;
-    }
-
-    body.theme-dark .empty-ledger-state {
-        background: #1e1e2d;
-    }
-
-    body.theme-dark .empty-ledger-icon {
-        background: linear-gradient(135deg, #2a2a3f 0%, #1e1e2d 100%);
-        color: #a5b4fc;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    }
-
-    body.theme-dark .empty-ledger-badge {
-        background: #2a2a3f;
-        border-color: #1e1e2d;
-        color: #64748b;
-    }
-
-    body.theme-dark .empty-ledger-state h4 {
-        color: #f8fafc;
+        font-size: 48px;
+        color: var(--pd-text-muted);
+        margin-bottom: 20px;
+        opacity: 0.3;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-{# ── Page header ───────────────────────────────────────────────────────── #}
-<div class="list-page-header">
-  <div>
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
-        <li class="breadcrumb-item active">{{ client.name }}</li>
-      </ol>
-    </nav>
-    <h1>Client Details</h1>
-  </div>
-  <div class="d-flex align-items-center gap-2">
-    <a href="{% url 'clients:list' %}" class="btn-back">
-      <i class="bi bi-arrow-left"></i> Back to Listing
-    </a>
-  </div>
-</div>
+<div class="product-details-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+            <li class="breadcrumb-item active">Client Details</li>
+          </ol>
+        </nav>
+        <h1>{{ client.name }}</h1>
+        <p class="page-subtitle">View and manage comprehensive client profile and asset inventory.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'clients:list' %}" class="btn-back-listing">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <a href="{% url 'clients:update' client.id %}" class="btn-save-asset">
+          <i class="bi bi-pencil"></i> Update Client
+        </a>
+      </div>
+    </div>
 
-<div class="detail-wrapper">
-    <div class="container-fluid p-0">
-        <!-- Header Card -->
-        <div class="client-header-card">
-            <div class="row align-items-end">
-                <div class="col-lg-8">
-                    <div class="client-badges">
-                        <span class="badge-client-id">
-                            ID: {{ client.client_id }}
-                        </span>
-                        <span class="badge-status">
-                            {% if client.status == '1' %}Active Institutional{% elif client.status == '2' %}In Review{%
-                            elif client.status == '3' %}Dormant{% else %}Inactive Archive{% endif %}
-                        </span>
-                    </div>
-                    <div class="client-info-left">
-                        <h1>{{ client.name }}</h1>
-                        <p class="client-desc">
-                            Enterprise-grade asset management account. Managing diverse portfolio of IT infrastructure,
-                            medical equipment, and office supplies across multiple regions.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-4 mt-4 mt-lg-0">
-                    <div class="row g-4 justify-content-end">
-                        <div class="col-auto">
-                            <div class="stat-box">
-                                <span class="stat-label">Total Assets</span>
-                                <span class="stat-value">
-                                    <span class="stat-currency">USD</span>{% if total_asset_value %}{{ total_asset_value|floatformat:1 }}{% else %}0.0{% endif %}M
-                                </span>
-                            </div>
+    <div class="detail-wrapper">
+        <div class="container-fluid p-0">
+            <!-- Header Card -->
+            <div class="client-header-card">
+                <div class="row align-items-end">
+                    <div class="col-lg-8">
+                        <div class="client-badges">
+                            <span class="badge-client-id">
+                                ID: {{ client.client_id }}
+                            </span>
+                            <span class="badge-status">
+                                {% if client.status == '1' %}Active Institutional{% elif client.status == '2' %}In Review{%
+                                elif client.status == '3' %}Dormant{% else %}Inactive Archive{% endif %}
+                            </span>
                         </div>
-                        <div class="col-auto">
-                            <div class="stat-box"
-                                style="padding: 0 20px; border-left: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
-                                <span class="stat-label">Active Rentals</span>
-                                <span class="stat-value">{{ client.active_rentals|default:assets.count }}</span>
-                            </div>
+                        <div class="client-info-left">
+                            <h1>{{ client.name }}</h1>
+                            <p class="client-desc">
+                                Enterprise-grade asset management account. Managing diverse portfolio of IT infrastructure,
+                                medical equipment, and office supplies across multiple regions.
+                            </p>
                         </div>
-                        <div class="col-auto">
-                            <div class="stat-box stat-red">
-                                <span class="stat-label">Overdue Tickets</span>
-                                <span class="stat-value">{{ client.open_tickets|default:0 }}</span>
+                    </div>
+                    <div class="col-lg-4 mt-4 mt-lg-0">
+                        <div class="row g-4 justify-content-end">
+                            <div class="col-auto">
+                                <div class="stat-box">
+                                    <span class="stat-label">Total Assets</span>
+                                    <span class="stat-value">
+                                        <span class="stat-currency">USD</span>{% if total_asset_value %}{{ total_asset_value|floatformat:1 }}{% else %}0.0{% endif %}M
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="stat-box"
+                                    style="padding: 0 20px; border-left: 1px solid #f1f5f9; border-right: 1px solid #f1f5f9;">
+                                    <span class="stat-label">Active Rentals</span>
+                                    <span class="stat-value">{{ client.active_rentals|default:assets.count }}</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="stat-box stat-red">
+                                    <span class="stat-label">Overdue Tickets</span>
+                                    <span class="stat-value">{{ client.open_tickets|default:0 }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Content Grid -->
-        <div class="row g-4">
-            <!-- Main Ledger -->
-            <div class="col-xl-8">
-                <div class="inventory-card">
-                    <div class="card-header-styled">
-                        <div class="card-title-group">
-                            <div class="card-icon"><i class="bi bi-box-seam"></i></div>
-                            <h3>Asset Inventory Ledger</h3>
-                        </div>
-                        {% if assets %}
-                        <div class="inventory-actions">
-                            <div class="search-input-wrapper">
-                                <i class="bi bi-search"></i>
-                                <input type="text" id="assetSearchInput" placeholder="Search Tag or Item...">
+            <!-- Content Grid -->
+            <div class="row g-4">
+                <!-- Main Ledger -->
+                <div class="col-xl-8">
+                    <div class="inventory-card">
+                        <div class="card-header-styled">
+                            <div class="card-title-group">
+                                <div class="card-icon"><i class="bi bi-box-seam"></i></div>
+                                <h3>Asset Inventory Ledger</h3>
                             </div>
-                            <!-- <button class="btn-secondary-outline"><i class="bi bi-filter"></i> Filters</button> -->
-                            <button id="exportInventoryBtn" class="btn-secondary-outline"><i class="bi bi-download"></i> Export</button>
+                            {% if assets %}
+                            <div class="inventory-actions">
+                                <div class="search-input-wrapper">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="assetSearchInput" placeholder="Search Tag or Item...">
+                                </div>
+                                <button id="exportInventoryBtn" class="btn-secondary-outline"><i class="bi bi-download"></i> Export</button>
+                            </div>
+                            {% endif %}
                         </div>
-                        {% endif %}
-                    </div>
 
-                    <div class="table-responsive">
-                        {% if assets %}
-                        <table class="inventory-table" id="inventoryTable">
-                            <thead>
-                                <tr>
-                                    <th>Tag</th>
-                                    <th>Item</th>
-                                    <th>Category</th>
-                                    <th>Condition</th>
-                                    <th>Serial No</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for asset in assets %}
-                                <tr class="asset-row">
-                                    <td class="tag-cell">{{ asset.tag }}</td>
-                                    <td class="item-cell">
-                                        <div class="item-icon-box">
-                                            {% if asset.images.first %}
-                                            <img src="{{ asset.images.first.image.url }}" alt="{{ asset.name }}">
-                                            {% else %}
-                                            <i class="bi bi-image text-muted" style="font-size: 14px; opacity: 0.5;"></i>
-                                            {% endif %}
-                                        </div>
-                                        <span class="item-name">{{ asset.name }}</span>
-                                    </td>
-                                    <td>{{ asset.product.category.name|default:"General" }}</td>
-                                    <td>
-                                        <span
-                                            class="badge {% if forloop.counter|divisibleby:3 %}bg-success{% elif forloop.counter|divisibleby:2 %}bg-primary{% else %}bg-info{% endif %} bg-opacity-10 {% if forloop.counter|divisibleby:3 %}text-success{% elif forloop.counter|divisibleby:2 %}text-primary{% else %}text-info{% endif %} border-0 px-2 py-1"
-                                            style="font-size: 10px; font-weight: 700;">
-                                            {% if forloop.counter|divisibleby:3 %}Excellent{% elif
-                                            forloop.counter|divisibleby:2 %}Good{% else %}New{% endif %}
-                                        </span>
-                                    </td>
-                                    <td class="text-muted">{{ asset.serial_no|default:"—" }}</td>
-                                </tr>
-                                {% endfor %}
-                                <tr id="noResultsRow" style="display: none;">
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
-                                        No matching assets found.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        {% else %}
-                        <div class="empty-ledger-state">
-                            <div class="empty-ledger-icon-wrapper">
+                        <div class="table-responsive">
+                            {% if assets %}
+                            <table class="inventory-table" id="inventoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>Tag</th>
+                                        <th>Item</th>
+                                        <th>Category</th>
+                                        <th>Condition</th>
+                                        <th>Serial No</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asset in assets %}
+                                    <tr class="asset-row">
+                                        <td class="tag-cell">{{ asset.tag }}</td>
+                                        <td class="item-cell">
+                                            <div class="item-icon-box">
+                                                {% if asset.images.first %}
+                                                <img src="{{ asset.images.first.image.url }}" alt="{{ asset.name }}">
+                                                {% else %}
+                                                <i class="bi bi-image text-muted" style="font-size: 14px; opacity: 0.5;"></i>
+                                                {% endif %}
+                                            </div>
+                                            <span class="item-name">{{ asset.name }}</span>
+                                        </td>
+                                        <td>{{ asset.product.category.name|default:"General" }}</td>
+                                        <td>
+                                            <span
+                                                class="badge {% if forloop.counter|divisibleby:3 %}bg-success{% elif forloop.counter|divisibleby:2 %}bg-primary{% else %}bg-info{% endif %} bg-opacity-10 {% if forloop.counter|divisibleby:3 %}text-success{% elif forloop.counter|divisibleby:2 %}text-primary{% else %}text-info{% endif %} border-0 px-2 py-1"
+                                                style="font-size: 10px; font-weight: 700;">
+                                                {% if forloop.counter|divisibleby:3 %}Excellent{% elif
+                                                forloop.counter|divisibleby:2 %}Good{% else %}New{% endif %}
+                                            </span>
+                                        </td>
+                                        <td class="text-muted">{{ asset.serial_no|default:"—" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr id="noResultsRow" style="display: none;">
+                                        <td colspan="5" class="text-center py-5 text-muted">
+                                            <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
+                                            No matching assets found.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <div class="empty-ledger-state">
                                 <div class="empty-ledger-icon">
                                     <i class="bi bi-inbox"></i>
                                 </div>
-                                <div class="empty-ledger-badge">
-                                    <i class="bi bi-search"></i>
+                                <h4>Clear Inventory Ledger</h4>
+                                <p>No active assets have been identified for this client. The ledger will automatically populate once assets are assigned.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-xl-4">
+                    <!-- Contacts -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-header">
+                            <div class="sidebar-icon"><i class="bi bi-person-lines-fill"></i></div>
+                            <h4>Key Contacts</h4>
+                        </div>
+                        {% if client.contacts.all %}
+                            {% for contact in client.contacts.all %}
+                            <div class="contact-item">
+                                <div class="contact-avatar">{{ contact.initials }}</div>
+                                <div class="contact-info">
+                                    <h5>{{ contact.name }}</h5>
+                                    <span class="contact-role">{{ contact.role.related_name|default:"Primary Contact" }}</span>
+                                    <div class="contact-social">
+                                        {% if contact.email %}
+                                        <a href="mailto:{{ contact.email }}" class="contact-link"><i class="bi bi-envelope"></i> {{ contact.email }}</a>
+                                        {% endif %}
+                                        {% if contact.phone %}
+                                        <a href="tel:{{ contact.phone }}" class="contact-link"><i class="bi bi-telephone"></i> {{ contact.phone }}</a>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
-                            <h4>Clear Inventory Ledger</h4>
-                            <p>No active assets have been identified for this client. The ledger will automatically populate once assets are assigned or registered.</p>
-                        </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted small text-center py-3">No contacts listed.</p>
                         {% endif %}
                     </div>
-                </div>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-xl-4">
-                <!-- Contacts -->
-                <div class="sidebar-card">
-                    <div class="sidebar-card-header">
-                        <div class="sidebar-icon"><i class="bi bi-person-lines-fill"></i></div>
-                        <h4>Contact Directory</h4>
-                    </div>
-
-                    <div class="contact-list">
-                        {% for contact in client.contacts.all %}
-                        <div class="contact-item">
-                            <div class="contact-avatar">{{ contact.initials }}</div>
-                            <div class="contact-info">
-                                <h5>{{ contact.name }}</h5>
-                                <div class="contact-social">
-                                    {% if contact.email %}
-                                    <a href="mailto:{{ contact.email }}" class="contact-link">
-                                        <i class="bi bi-envelope"></i> {{ contact.email }}
-                                    </a>
-                                    {% endif %}
-                                    {% if contact.phone %}
-                                    <a href="tel:{{ contact.phone }}" class="contact-link"
-                                        style="color: #64748b">
-                                        <i class="bi bi-telephone"></i> {{ contact.phone }}
-                                    </a>
-                                    {% endif %}
+                    <!-- Activities -->
+                    <div class="sidebar-card">
+                        <div class="sidebar-card-header">
+                            <div class="sidebar-icon"><i class="bi bi-clock-history"></i></div>
+                            <h4>Recent Activities</h4>
+                        </div>
+                        <div class="activity-timeline">
+                            <div class="timeline-item">
+                                <span class="timeline-time">Today, 10:45 AM</span>
+                                <div class="timeline-content">
+                                    <h6>Asset Assigned</h6>
+                                    <p>MacBook Pro M2 Max assigned to Sarah Jenkins.</p>
                                 </div>
-                                {% if contact.notes %}
-                                <div class="contact-notes mt-1 text-muted">
-                                    <small><i class="bi bi-journal-text"></i> {{ contact.notes }}</small>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-time">Yesterday</span>
+                                <div class="timeline-content">
+                                    <h6>Contact Updated</h6>
+                                    <p>Updated phone number for John Doe.</p>
                                 </div>
-                                {% endif %}
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-time">Oct 12, 2023</span>
+                                <div class="timeline-content">
+                                    <h6>Profile Created</h6>
+                                    <p>Client onboarded to Precision Ledger.</p>
+                                </div>
                             </div>
                         </div>
-                        {% endfor %}
-
-                    </div>
-                </div>
-
-                <!-- Activities -->
-                <div class="sidebar-card">
-                    <div class="sidebar-card-header">
-                        <div class="sidebar-icon"><i class="bi bi-clock-history"></i></div>
-                        <h4>Recent Activity</h4>
-                    </div>
-
-                    <div class="activity-timeline">
-                        {% for activity in activities %}
-                        <div class="timeline-item">
-                            <span class="timeline-time">{{ activity.date|timesince }} ago</span>
-                            <div class="timeline-content">
-                                <h6>{{ activity.type }} {{ activity.action }}</h6>
-                                <p>{{ activity.notes }}</p>
-                                {% if activity.user %}
-                                <small class="text-muted" style="font-size: 9px;">by {{ activity.user.username }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% empty %}
-                        <p class="text-muted small">No recent activity recorded.</p>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('assetSearchInput');
     const table = document.getElementById('inventoryTable');
+    const noResults = document.getElementById('noResultsRow');
+
     if (searchInput && table) {
-        searchInput.addEventListener('input', function() {
-            const query = this.value.toLowerCase().trim();
-            const rows = table.querySelectorAll('tbody tr.asset-row');
-            const noResults = document.getElementById('noResultsRow');
-            let visibleCount = 0;
-            
+        const rows = table.querySelectorAll('.asset-row');
+        searchInput.addEventListener('keyup', function() {
+            const query = searchInput.value.toLowerCase();
+            let hasResults = false;
             rows.forEach(row => {
-                const tag = row.querySelector('.tag-cell').innerText.toLowerCase();
-                const item = row.querySelector('.item-name').innerText.toLowerCase();
-                if (tag.includes(query) || item.includes(query)) {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(query)) {
                     row.style.display = '';
-                    visibleCount++;
+                    hasResults = true;
                 } else {
                     row.style.display = 'none';
                 }
             });
-            
-            if (noResults) {
-                noResults.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
-            }
+            if (noResults) noResults.style.display = hasResults ? 'none' : '';
         });
     }
 
     const exportBtn = document.getElementById('exportInventoryBtn');
-    if (exportBtn) {
+    if (exportBtn && table) {
         exportBtn.addEventListener('click', function() {
-            const table = document.getElementById('inventoryTable');
-            if (!table) return;
-            
-            const rows = table.querySelectorAll('tbody tr.asset-row');
+            const rows = table.querySelectorAll('tr');
             let csv = [];
-            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
-            csv.push(headers.join(','));
-            
-            rows.forEach(row => {
-                const tag = row.querySelector('.tag-cell').innerText.trim();
-                const item = row.querySelector('.item-name').innerText.trim();
-                const category = row.querySelectorAll('td')[2].innerText.trim();
-                const condition = row.querySelector('.badge').innerText.trim();
-                const serial = row.querySelector('.text-muted').innerText.trim().replace('—', '');
-                
-                const rowData = [tag, item, category, condition, serial];
-                csv.push(rowData.map(v => `"${v.replace(/"/g, '""')}"`).join(','));
+            rows.forEach(r => {
+                let row = Array.from(r.querySelectorAll('td, th')).map(c => `"${c.innerText.trim().replace(/"/g, '""')}"`);
+                csv.push(row.join(','));
             });
-            
             const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'asset_inventory.csv');
+            a.href = url;
+            a.download = 'inventory_export.csv';
             document.body.appendChild(a);
             a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
+            document.body.removeChild(a);
         });
     }
 });

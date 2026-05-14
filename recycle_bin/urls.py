@@ -56,4 +56,9 @@ urlpatterns = [
     path('deleted_license_types/restore/<int:id>', views.deleted_license_types_restore, name='deleted_license_types_restore'),
     path('deleted_license_types/delete/<int:id>', views.deleted_license_types_permanently, name='deleted_license_types_permanently'),
     path('deleted_license_types_search/<str:page>', views.deleted_license_types_search, name='deleted_license_types_search'),
+
+    path('deleted-clients', views.deleted_clients, name='deleted_clients'),
+    path('deleted-clients/restore/<uuid:id>', views.deleted_clients_restore, name='deleted_clients_restore'),
+    path('deleted-clients/delete/<uuid:id>', views.deleted_clients_permanently, name='deleted_clients_permanently'),
+    path('deleted-clients-search/<str:page>', views.deleted_clients_search, name='deleted_clients_search'),
 ]
