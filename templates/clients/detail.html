@@ -402,7 +402,7 @@
 
     /* Activities */
     .activity-timeline {
-        padding-left: 15px;
+        padding-left: 8px;
         position: relative;
     }
 
@@ -424,7 +424,7 @@
     .timeline-item::after {
         content: '';
         position: absolute;
-        left: -18px;
+        left: -8px;
         top: 4px;
         width: 7px;
         height: 7px;
@@ -803,32 +803,32 @@
                     </div>
 
                     <div class="contact-list">
-                        {% if client.contact_person %}
+                        {% for contact in client.contacts.all %}
                         <div class="contact-item">
-                            <div class="contact-avatar">{{ client.initials }}</div>
+                            <div class="contact-avatar">{{ contact.initials }}</div>
                             <div class="contact-info">
-                                <h5>{{ client.contact_person }}</h5>
+                                <h5>{{ contact.name }}</h5>
                                 <div class="contact-social">
-                                    {% if client.contact_email %}
-                                    <a href="mailto:{{ client.contact_email }}" class="contact-link">
-                                        <i class="bi bi-envelope"></i> {{ client.contact_email }}
+                                    {% if contact.email %}
+                                    <a href="mailto:{{ contact.email }}" class="contact-link">
+                                        <i class="bi bi-envelope"></i> {{ contact.email }}
                                     </a>
                                     {% endif %}
-                                    {% if client.contact_phone %}
-                                    <a href="tel:{{ client.contact_phone }}" class="contact-link"
+                                    {% if contact.phone %}
+                                    <a href="tel:{{ contact.phone }}" class="contact-link"
                                         style="color: #64748b">
-                                        <i class="bi bi-telephone"></i> {{ client.contact_phone }}
+                                        <i class="bi bi-telephone"></i> {{ contact.phone }}
                                     </a>
                                     {% endif %}
                                 </div>
-                                {% if client.notes %}
-                                <div class="contact-notes">
-                                    <small><i class="bi bi-journal-text"></i> {{ client.notes }}</small>
+                                {% if contact.notes %}
+                                <div class="contact-notes mt-1 text-muted">
+                                    <small><i class="bi bi-journal-text"></i> {{ contact.notes }}</small>
                                 </div>
                                 {% endif %}
                             </div>
                         </div>
-                        {% endif %}
+                        {% endfor %}
 
                     </div>
                 </div>

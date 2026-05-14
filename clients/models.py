@@ -36,20 +36,13 @@ class Client(TimeStampModel, SoftDeleteModel):
         max_length=100, choices=RENTAL_TYPE_CHOICES,
         default='Tech Equipment', blank=True, null=True
     )
-    contact_person = models.CharField(max_length=255, blank=True, null=True)
-    contact_email = models.EmailField(max_length=255, blank=True, null=True)
-    contact_phone = models.CharField(max_length=45, blank=True, null=True)
     active_rentals = models.PositiveIntegerField(default=0)
     open_tickets = models.PositiveIntegerField(default=0)
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default='1'
     )
-    notes = models.TextField(blank=True, null=True)
     organization = models.ForeignKey(
         Organization, on_delete=models.DO_NOTHING, blank=True, null=True
-    )
-    role = models.ForeignKey(
-        'roles.Role', on_delete=models.SET_NULL, blank=True, null=True, related_name='client_roles'
     )
     industry = models.CharField(max_length=255, blank=True, null=True)
     corporate_website = models.URLField(max_length=500, blank=True, null=True)
@@ -81,3 +74,29 @@ class Client(TimeStampModel, SoftDeleteModel):
         elif parts:
             return parts[0][:2].upper()
         return 'CL'
+
+class ClientContact(TimeStampModel, SoftDeleteModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='contacts')
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=45, blank=True, null=True)
+    role = models.ForeignKey(
+        'roles.Role', on_delete=models.SET_NULL, blank=True, null=True, related_name='contact_roles'
+    )
+    notes = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def initials(self):
+        parts = self.name.split() if self.name else []
+        if len(parts) >= 2:
+            return (parts[0][0] + parts[1][0]).upper()
+        elif parts:
+            return parts[0][:2].upper()
+        return 'CT'

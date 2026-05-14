@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.http import HttpResponse
 
-from .models import Client, STATUS_CHOICES
+from .models import Client, ClientContact, STATUS_CHOICES
 from .forms import ClientForm
 from assets.models import Asset
 
@@ -79,6 +79,25 @@ def add_client(request):
             client.organization = request.user.organization
             client.created_by = request.user.id
             client.save()
+            
+            contact_names = request.POST.getlist('contact_name[]')
+            contact_emails = request.POST.getlist('contact_email[]')
+            contact_phones = request.POST.getlist('contact_phone[]')
+            contact_roles = request.POST.getlist('contact_role[]')
+            contact_notes = request.POST.getlist('contact_notes[]')
+            
+            for i, name in enumerate(contact_names):
+                name = name.strip()
+                if name:
+                    ClientContact.objects.create(
+                        client=client,
+                        name=name,
+                        email=contact_emails[i].strip() if i < len(contact_emails) else '',
+                        phone=contact_phones[i].strip() if i < len(contact_phones) else '',
+                        role_id=contact_roles[i] if i < len(contact_roles) and contact_roles[i] else None,
+                        notes=contact_notes[i].strip() if i < len(contact_notes) else ''
+                    )
+            
             messages.success(request, 'Client registered successfully.')
             return redirect('clients:list')
 
@@ -102,6 +121,26 @@ def update_client(request, id):
             client = form.save(commit=False)
             client.updated_by = request.user.id
             client.save()
+            
+            contact_names = request.POST.getlist('contact_name[]')
+            contact_emails = request.POST.getlist('contact_email[]')
+            contact_phones = request.POST.getlist('contact_phone[]')
+            contact_roles = request.POST.getlist('contact_role[]')
+            contact_notes = request.POST.getlist('contact_notes[]')
+            
+            client.contacts.all().delete()
+            for i, name in enumerate(contact_names):
+                name = name.strip()
+                if name:
+                    ClientContact.objects.create(
+                        client=client,
+                        name=name,
+                        email=contact_emails[i].strip() if i < len(contact_emails) else '',
+                        phone=contact_phones[i].strip() if i < len(contact_phones) else '',
+                        role_id=contact_roles[i] if i < len(contact_roles) and contact_roles[i] else None,
+                        notes=contact_notes[i].strip() if i < len(contact_notes) else ''
+                    )
+            
             messages.success(request, 'Client updated successfully.')
             return redirect('clients:list')
 
@@ -135,7 +174,7 @@ def client_detail(request, id):
     for h in client_history:
         h_type = h.get_history_type_display()
         if h_type == 'Created':
-            action = 'Client Registration'
+            action = 'Registration'
             notes = 'Initial registration of the client record.'
         elif h_type == 'Changed':
             action = 'Updated'
@@ -194,10 +233,10 @@ def search_clients(request, page):
         qs = qs.filter(
             Q(name__icontains=search_text) |
             Q(client_id__icontains=search_text) |
-            Q(contact_person__icontains=search_text) |
-            Q(contact_email__icontains=search_text) |
+            Q(contacts__name__icontains=search_text) |
+            Q(contacts__email__icontains=search_text) |
             Q(rental_type__icontains=search_text)
-        )
+        ).distinct()
     paginator = Paginator(qs, PAGE_SIZE, orphans=ORPHANS)
     page_object = paginator.get_page(page)
 
@@ -227,13 +266,14 @@ def export_clients(request):
     writer.writerow(['Client ID', 'Name', 'Industry', 'Contact Person', 'Email', 'Phone', 'Active Rentals', 'Open Tickets', 'Status'])
     
     for client in qs:
+        first_contact = client.contacts.first()
         writer.writerow([
             client.client_id,
             client.name,
             client.industry,
-            client.contact_person,
-            client.contact_email,
-            client.contact_phone,
+            first_contact.name if first_contact else '',
+            first_contact.email if first_contact else '',
+            first_contact.phone if first_contact else '',
             client.active_rentals,
             client.open_tickets,
             client.get_status_display()

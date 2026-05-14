@@ -450,46 +450,47 @@ body.theme-dark .info-card-text p {
             <div class="section-header">
                 <div class="section-icon"><i class="bi bi-person-badge"></i></div>
                 <h4 class="section-title">Contact Details</h4>
-                <button type="button" class="add-contact-link">+ ADD CONTACT</button>
+                <button type="button" class="add-contact-link" id="addContactBtn">+ ADD CONTACT</button>
             </div>
-            <div class="row mb-4">
-                <div class="col-12">
-                    <label class="form-label">Contact Name</label>
-                    <input type="text" name="{{ form.contact_person.name }}" class="form-control"
-                        placeholder="Full legal name" value="{{ form.contact_person.value|default:'' }}">
-                    {% if form.contact_person.errors %}<div class="text-danger mt-1 small">{{
-                        form.contact_person.errors.0 }}</div>{% endif %}
-                </div>
-            </div>
-            <div class="row mb-4">
-                <div class="col-md-6 mb-4 mb-md-0">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="{{ form.contact_email.name }}" class="form-control"
-                        placeholder="p.contact@company.com" value="{{ form.contact_email.value|default:'' }}">
-                    {% if form.contact_email.errors %}<div class="text-danger mt-1 small">{{ form.contact_email.errors.0
-                        }}</div>{% endif %}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" name="{{ form.contact_phone.name }}" class="form-control"
-                        placeholder="+1 (555) 000-0000" value="{{ form.contact_phone.value|default:'' }}">
-                    {% if form.contact_phone.errors %}<div class="text-danger mt-1 small">{{ form.contact_phone.errors.0
-                        }}</div>{% endif %}
-                </div>
-            </div>
-            <div class="row mb-4">
-                <div class="col-12">
-                    <label class="form-label">Role</label>
-                    {{ form.role }}
-                    {% if form.role.errors %}<div class="text-danger mt-1 small">{{ form.role.errors.0 }}</div>{% endif %}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <label class="form-label">Notes</label>
-                    <textarea name="{{ form.notes.name }}" class="form-control" rows="3"
-                        placeholder="Additional instructions or internal notes regarding this contact...">{{ form.notes.value|default:'' }}</textarea>
-                    {% if form.notes.errors %}<div class="text-danger mt-1 small">{{ form.notes.errors.0 }}</div>{% endif %}
+            
+            <div id="contactsContainer">
+                <div class="contact-block position-relative mb-4 pb-4 border-bottom">
+                    <div class="position-absolute" style="right: 0; top: 0; z-index: 10;">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="display: none;"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <div class="row mb-4 pt-2">
+                        <div class="col-12">
+                            <label class="form-label">Contact Name</label>
+                            <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name">
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000">
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Role</label>
+                            <select name="contact_role[]" class="form-control">
+                                <option value="">Select Role</option>
+                                {% for r in roles %}
+                                <option value="{{ r.id }}">{{ r.related_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label">Notes</label>
+                            <textarea name="contact_notes[]" class="form-control" rows="3" placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -563,5 +564,57 @@ body.theme-dark .info-card-text p {
             </div>
         </div>
     </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addContactBtn = document.getElementById('addContactBtn');
+        const contactsContainer = document.getElementById('contactsContainer');
+
+        function toggleRemoveButtons() {
+            const contactBlocks = contactsContainer.querySelectorAll('.contact-block');
+            const showRemove = contactBlocks.length > 1;
+            contactBlocks.forEach(block => {
+                const removeBtn = block.querySelector('.remove-contact-btn');
+                if (removeBtn) {
+                    removeBtn.style.display = showRemove ? 'block' : 'none';
+                }
+            });
+        }
+
+        addContactBtn.addEventListener('click', function() {
+            const firstBlock = contactsContainer.querySelector('.contact-block');
+            const newBlock = firstBlock.cloneNode(true);
+            
+            // Clear values in cloned block
+            const inputs = newBlock.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            // Add event listener to new remove button
+            const removeBtn = newBlock.querySelector('.remove-contact-btn');
+            removeBtn.addEventListener('click', function() {
+                newBlock.remove();
+                toggleRemoveButtons();
+            });
+
+            contactsContainer.appendChild(newBlock);
+            toggleRemoveButtons();
+        });
+
+        // Add event listener to the initial contact block if needed (in case there are existing ones)
+        const initialRemoveBtns = contactsContainer.querySelectorAll('.remove-contact-btn');
+        initialRemoveBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                btn.closest('.contact-block').remove();
+                toggleRemoveButtons();
+            });
+        });
+
+        toggleRemoveButtons();
+    });
+</script>
 {% endblock %}

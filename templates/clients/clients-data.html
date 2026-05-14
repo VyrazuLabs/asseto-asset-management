@@ -21,11 +21,12 @@
     {{ client.rental_type|default:"—"|slice:":25" }}{% if client.rental_type|length > 25 %}...{% endif %}
   </td>
   <td>
-    {% if client.contact_person %}
+    {% with contact=client.contacts.all|first %}
+    {% if contact %}
       <div class="c-contact-cell">
-        <span class="c-contact-name">{{ client.contact_person }}</span>
-        {% if client.contact_email %}
-          <a href="mailto:{{ client.contact_email }}" title="{{ client.contact_email }}" class="c-mail-icon">
+        <span class="c-contact-name">{{ contact.name }}</span>
+        {% if contact.email %}
+          <a href="mailto:{{ contact.email }}" title="{{ contact.email }}" class="c-mail-icon">
             <i class="bi bi-envelope"></i>
           </a>
         {% endif %}
@@ -33,6 +34,7 @@
     {% else %}
       —
     {% endif %}
+    {% endwith %}
   </td>
   <td class="text-center c-col-activerentals">
     <div class="c-rental-count-val">{{ client.asset_count|stringformat:"02d" }}</div>
