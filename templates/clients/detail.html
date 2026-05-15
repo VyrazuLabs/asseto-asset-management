@@ -449,6 +449,14 @@
         margin-bottom: 20px;
         opacity: 0.3;
     }
+
+    /* Dark mode overrides for specific titles - prevent font size increase */
+    body.theme-dark .card-title-group h3 {
+        font-size: 15px !important;
+    }
+    body.theme-dark .sidebar-card-header h4 {
+        font-size: 14px !important;
+    }
 </style>
 {% endblock %}
 

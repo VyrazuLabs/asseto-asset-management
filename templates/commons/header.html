@@ -26,12 +26,10 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <!-- ✅ jQuery (only once) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- ✅ Bootstrap 5 (Bundle includes Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
 
@@ -158,7 +156,7 @@
                                         <ul class="navbar-nav mb-0 me-3 justify-content-end">
                                             <li class="nav-item dropdown">
                                                 <a class="nav-link active dropdown-toggle text-gray-600" href="#"
-                                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                                    id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false"
                                                     style="padding-top: 0px;">
                                                     <i class="bi bi-bell bi-sub fs-4"></i>
                                                     <span
@@ -166,8 +164,7 @@
                                                         hx-get="{% url 'notifications:count' %}"
                                                         hx-target="this"></span>
                                                 </a>
-                                                <ul style="position: absolute;overflow-x: hidden;right: -370%;"
-                                                    class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
+                                                <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
                                                     onclick="event.stopPropagation();">
                                                     <span hx-get="{% url 'notifications:data' %}" hx-target="this"
                                                         hx-trigger="load, notificationListChanged from:body">
@@ -179,7 +176,7 @@
                                     </div>
                                     <div class="user-avatar-area">
                                         <div class="dropdown">
-                                            <a href="javascript:void(0)" class="d-flex align-items-center justify-content-end dropdown-toggle"
+                                            <a href="#" class="d-flex align-items-center justify-content-end dropdown-toggle"
                                                 id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <div class="user-menu d-flex align-items-center">
                                                     <div class="user-name text-end me-3 d-none d-lg-block">
@@ -297,5 +294,22 @@
                 {% endif %}
             </header>
             <script>
-
+                document.addEventListener('DOMContentLoaded', function() {
+                    function initDropdown(id) {
+                        var el = document.getElementById(id);
+                        if (el) {
+                            new bootstrap.Dropdown(el);
+                            el.addEventListener('click', function(e) {
+                                var dropdown = bootstrap.Dropdown.getInstance(el);
+                                if (dropdown) {
+                                    dropdown.toggle();
+                                }
+                                e.preventDefault();
+                            });
+                        }
+                    }
+                    
+                    initDropdown('userDropdown');
+                    initDropdown('notificationDropdown');
+                });
             </script>
