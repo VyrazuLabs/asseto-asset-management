@@ -379,6 +379,7 @@
     <table class="assets-table" id="table1">
       <thead>
         <tr>
+          <th>SL.No</th>
           <th>Pass #</th>
           <th>Asset</th>
           <th>Raised By</th>
@@ -393,8 +394,9 @@
       <tbody id="search_result">
         {% for item in items %}
         <tr>
+          <td>{{ forloop.counter|stringformat:"02d" }}</td>
           <td class="table-index-cell">
-            <span class="asset-tag-pill">{{ item.id }}</span>
+            <span class="asset-tag-pill">{{ item.gate_pass_no }}</span>
           </td>
           <td class="d-flex gap-3 align-items-center mt-4">
             <span class="material-symbols-outlined text-slate-500 text-lg" data-icon="laptop_mac"

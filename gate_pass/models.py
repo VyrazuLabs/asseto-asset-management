@@ -30,6 +30,11 @@ class GatePass(TimeStampModel):
     )
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
  
+    @property
+    def gate_pass_no(self):
+        """Returns a human-readable gate pass number."""
+        return f"GP-{str(self.id).split('-')[0].upper()}"
+ 
  
 # Ui seems to display asset_name,asset_id,product_category and cost($) which we can get from the asset by keeping it as a foreignkey here.
 # Currently the Status, Raised By and Authorized By is not present in the Add Gate Pass page we need to add it.

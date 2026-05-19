@@ -222,7 +222,7 @@
             Pass Identity
           </p>
           <p class="text-xl font-mono font-bold text-primary tracking-wider">
-            {{ gate_pass.id|slice:":8" }}
+            {{ gate_pass.gate_pass_no }}
           </p>
         </div>
       </header>
@@ -340,11 +340,11 @@
             class="md:col-span-4 flex flex-col items-center text-center space-y-6"
           >
             <div
-              class="p-4 bg-white border-2 border-surface-container-highest rounded-xl"
+              class="flex items-center justify-center mt-4"
             >
               <img
                 alt="Verification QR Code"
-                class="w-40 h-40"
+                class="w-56 h-56"
                 data-alt="A clean high-contrast QR code centered on a white background used for digital verification of a security document"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2vvgjIgYzt8YdFAZ5p9KYAOKwhzRzzhO4SfdnaO2XjaxKR5ElKt0qHI0GlIKWigcHwDge2xpp4tobAsQ6eUdqgGrejp00dlRka6zLFqFWvFYc0VrgyORC1TopCWdWs_GSGmLoJZ3KzSOrKFjC9Gl3f8TkS16S9griQmNm0wPXSvzPVZl7HpREF-fhvPqjynzQk4pBlXRokkPaD0swkSPLPtDPQ_rB7xek5N4zGML_raK4d7jkzZ5WxIDQ2Tq-lRdJYUkqkAkZs8"
               />
