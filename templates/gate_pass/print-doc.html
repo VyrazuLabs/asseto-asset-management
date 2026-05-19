@@ -1,4 +1,4 @@
-
+{% load static %}
 <!doctype html>
 
 <html lang="en">
@@ -197,13 +197,9 @@
         class="bg-surface-container-low p-8 flex justify-between items-start border-b border-outline-variant/20"
       >
         <div class="space-y-1">
-          <div class="flex items-center gap-2 text-primary">
-            <span
-              class="material-symbols-outlined"
-              style="font-variation-settings: &quot;FILL&quot; 1"
-              >security</span
-            >
-            <span class="text-lg font-bold tracking-tighter uppercase"
+          <div class="flex items-center gap-2">
+            <img src="{% static 'images/logo/logo.svg' %}" alt="Asseto Logo" class="w-10 h-auto">
+            <span class="text-xl font-bold tracking-tighter uppercase text-primary"
               >Asseto GatePass</span
             >
           </div>
