@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.urls import path
+from django.urls import path, reverse
 from configurations.utils import get_currency_and_datetime_format
 from products.models import ProductCategory
 from upload.views.product_type_views import product_type_list
@@ -78,14 +78,46 @@ def detail(request,id):
 
 def print_doc(request,id):
     gate_pass = GatePass.objects.filter(id=id).first()
+    if not gate_pass:
+        return HttpResponse("❌ Gate Pass not found", status=404)
+        
     get_status=gate_pass.status
     print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
+    checkout_url = request.build_absolute_uri(reverse('gate-pass:checkout', args=[gate_pass.id]))
+    
+    # Check if we are on localhost/127.0.0.1
+    host = request.get_host().split(':')[0]
+    is_local = host in ['127.0.0.1', 'localhost']
+    
     context={
         'gate_pass': gate_pass,
         'status': gate_pass.STATUS_CHOICES[gate_pass.status][1],
         'created_at': gate_pass.created_at.astimezone(ZoneInfo('Asia/Kolkata')).date(),
+        'checkout_url': checkout_url,
+        'is_local': is_local,
     }
     return render(request,'gate_pass/print-doc.html', context=context)
+
+def gate_pass_checkout(request, id):
+    gate_pass = GatePass.objects.filter(id=id).first()
+    if not gate_pass:
+        return HttpResponse("❌ Gate Pass not found", status=404)
+    
+    # Check if already checked out
+    if gate_pass.status == 4:
+        return render(request, 'gate_pass/public-checkout.html', {
+            'gate_pass': gate_pass,
+            'already_checked_out': True
+        })
+
+    # Update status to 'Checked Out' (4)
+    gate_pass.status = 4
+    gate_pass.save()
+    
+    return render(request, 'gate_pass/public-checkout.html', {
+        'gate_pass': gate_pass,
+        'already_checked_out': False
+    })
 
 def authorisation(request,id,status):
     gate_pass = GatePass.objects.filter(id=id).first()

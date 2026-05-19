@@ -1,0 +1,31 @@
+{% extends 'layouts/main-layout.html' %}
+{% block content %}
+<div class="flex items-center justify-center min-h-screen bg-surface">
+    <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg text-center">
+        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-symbols-outlined text-4xl">check_circle</span>
+        </div>
+        {% if already_checked_out %}
+        <h1 class="text-2xl font-bold text-amber-600 mb-2">Already Checked Out</h1>
+        <p class="text-on-surface-variant mb-6">
+            The gate pass <strong>{{ gate_pass.gate_pass_no }}</strong> was already processed and is currently marked as "Checked Out".
+        </p>
+        {% else %}
+        <h1 class="text-2xl font-bold text-green-600 mb-2">Gate Pass Checked Out!</h1>
+        <p class="text-on-surface-variant mb-6">
+            The gate pass <strong>{{ gate_pass.gate_pass_no }}</strong> has been successfully processed and marked as "Checked Out".
+        </p>
+        {% endif %}
+        <div class="space-y-4">
+            <div class="p-4 bg-surface-container rounded-lg text-left text-sm">
+                <p><strong>Asset:</strong> {{ gate_pass.asset.name }}</p>
+                <p><strong>Tag:</strong> {{ gate_pass.asset.tag }}</p>
+                <p><strong>To Vendor:</strong> {{ gate_pass.destination_vendor.name }}</p>
+            </div>
+            <a href="{% url 'gate-pass:list' %}" class="block w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-container transition-colors">
+                Return to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

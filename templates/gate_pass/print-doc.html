@@ -19,6 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -270,9 +271,14 @@
                     class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1"
                     >Status</label
                   >
-                  <span class="text-md font-bold text-on-surface"
-                    >{{ status }}</span
-                  >
+                  <span id="status-badge" 
+                        class="text-md font-bold text-on-surface"
+                        hx-get="{% url 'gate-pass:print_doc' gate_pass.id %}"
+                        hx-select="#status-badge"
+                        hx-trigger="every 2s"
+                        hx-swap="outerHTML">
+                    {{ status }}
+                  </span>
                 </div>
               </div>
             </section>
@@ -340,15 +346,81 @@
             class="md:col-span-4 flex flex-col items-center text-center space-y-6"
           >
             <div
-              class="flex items-center justify-center mt-4"
+              class="flex flex-col items-center justify-center mt-4 space-y-4"
             >
-              <img
-                alt="Verification QR Code"
-                class="w-56 h-56"
-                data-alt="A clean high-contrast QR code centered on a white background used for digital verification of a security document"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH2vvgjIgYzt8YdFAZ5p9KYAOKwhzRzzhO4SfdnaO2XjaxKR5ElKt0qHI0GlIKWigcHwDge2xpp4tobAsQ6eUdqgGrejp00dlRka6zLFqFWvFYc0VrgyORC1TopCWdWs_GSGmLoJZ3KzSOrKFjC9Gl3f8TkS16S9griQmNm0wPXSvzPVZl7HpREF-fhvPqjynzQk4pBlXRokkPaD0swkSPLPtDPQ_rB7xek5N4zGML_raK4d7jkzZ5WxIDQ2Tq-lRdJYUkqkAkZs8"
-              />
+              {% if is_local %}
+              <div id="local-warning" class="no-print bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-800 mb-4 max-w-[240px]">
+                <div class="flex items-center gap-2 mb-1 font-bold">
+                  <span class="material-symbols-outlined text-sm">warning</span>
+                  <span>Local Access Detected</span>
+                </div>
+                <p>The QR code below uses <b>127.0.0.1</b>, which your phone cannot reach.</p>
+                <div class="mt-2">
+                  <button id="show-manual-url" class="text-primary font-bold hover:underline">Use LAN IP or Tunnel URL Instead?</button>
+                  <div id="manual-url-container" class="hidden mt-2 space-y-2">
+                    <input type="text" id="custom-url" placeholder="http://192.168.1.x:8000" class="w-full p-1 border border-outline-variant rounded text-[10px]">
+                    <button id="apply-custom-url" class="w-full bg-primary text-white p-1 rounded text-[10px] font-bold">Update QR Code</button>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              
+              <div id="qrcode"></div>
             </div>
+            <script type="text/javascript">
+              let checkoutUrl = "{{ checkout_url }}";
+              let qrcode = new QRCode(document.getElementById("qrcode"), {
+                text: checkoutUrl,
+                width: 224,
+                height: 224,
+                colorDark: "#2845a4",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+              });
+
+              {% if is_local %}
+              const showManualBtn = document.getElementById('show-manual-url');
+              const manualContainer = document.getElementById('manual-url-container');
+              const applyBtn = document.getElementById('apply-custom-url');
+              const customInput = document.getElementById('custom-url');
+
+              if(showManualBtn) {
+                showManualBtn.addEventListener('click', () => {
+                  manualContainer.classList.toggle('hidden');
+                });
+              }
+
+              if(applyBtn) {
+                applyBtn.addEventListener('click', () => {
+                  let newBase = customInput.value.trim();
+                  if (newBase) {
+                    if (!newBase.endsWith('/')) newBase += '/';
+                    // We need to keep the checkout path
+                    const path = "/gate-pass/checkout/{{ gate_pass.id }}/";
+                    // If the user entered a full URL with protocol
+                    if (newBase.startsWith('http')) {
+                       // Try to replace the origin part of checkoutUrl
+                       try {
+                          const urlObj = new URL(checkoutUrl);
+                          const newBaseUrl = new URL(newBase);
+                          urlObj.protocol = newBaseUrl.protocol;
+                          urlObj.host = newBaseUrl.host;
+                          checkoutUrl = urlObj.toString();
+                       } catch(e) {
+                          checkoutUrl = newBase; // Fallback
+                       }
+                    } else {
+                        checkoutUrl = "http://" + newBase + path;
+                    }
+                    
+                    qrcode.clear();
+                    qrcode.makeCode(checkoutUrl);
+                    alert("QR Code updated to: " + checkoutUrl);
+                  }
+                });
+              }
+              {% endif %}
+            </script>
             <div class="space-y-1">
               <p
                 class="text-[0.6rem] font-bold text-on-surface-variant uppercase tracking-tighter"

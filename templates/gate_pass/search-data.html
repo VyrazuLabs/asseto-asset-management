@@ -44,13 +44,30 @@
     </td>
     <td class="px-6 py-5">
         {% if item.status == 0 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-orange-100 text-orange-700">Pending</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">pending</span>
+              Pending
+            </span>
         {% elif item.status == 1 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">Approved</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">check_circle</span>
+              Approved
+            </span>
         {% elif item.status == 2 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">Draft</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs">edit_note</span>
+              Draft
+            </span>
+        {% elif item.status == 4 %}
+            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">output</span>
+              Checked Out
+            </span>
         {% else %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-700">Rejected</span>
+            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">cancel</span>
+              Rejected
+            </span>
         {% endif %}
     </td>
     <td class="d-flex justify-content-center me-5">

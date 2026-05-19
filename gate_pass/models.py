@@ -6,7 +6,7 @@ from authentication.models import User
 import uuid
 
 class GatePass(TimeStampModel):
-    STATUS_CHOICES=[(0,'Pending'),(1,'Approved'),(2,'Draft'),(3,'Rejected'),]
+    STATUS_CHOICES = [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
     MOVEMENT_CHOICES=[(0,'Outward'),(1,'Inward')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset=models.ForeignKey(Asset,models.DO_NOTHING)					 
