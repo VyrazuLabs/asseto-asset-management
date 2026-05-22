@@ -17,7 +17,7 @@
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>Asseto GatePass - Administrative View</title>
+  <title>Gate Pass Detail | Asseto</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap"
     rel="stylesheet" />
@@ -132,11 +132,13 @@
       <h1 class="text-lg md:text-xl font-semibold text-on-surface">
         Gate Pass #{{ items.gate_pass_no }}
       </h1>
-<div class="flex items-center gap-2 mt-2">
-          {% if items.status == 1 or items.status == 0 %}
-          <span class="px-3 py-1 bg-success-container/30 text-success text-xs font-bold rounded-full bg-green-100 text-green-700">ACTIVE AUTHORIZATION</span>
-          {% endif %}
-        </div>
+      <div class="flex items-center gap-2 mt-2">
+        {% if items.status == 1 or items.status == 0 %}
+        <span
+          class="px-3 py-1 bg-success-container/30 text-success text-xs font-bold rounded-full bg-green-100 text-green-700">ACTIVE
+          AUTHORIZATION</span>
+        {% endif %}
+      </div>
     </div>
     <div class="flex gap-3">
       <a href="{% url 'gate_pass:print_doc' items.id  %}">
@@ -145,17 +147,15 @@
         </button>
       </a>
       {% if items.status == 1 %}
-      <a href="{% url 'gate_pass:authorise' items.id items.status %}">
-        <button type="button" class="btn-trash">
-          <i class="bi bi-x-circle"></i> Revoke Authorisation
-        </button>
-      </a>
+      <button type="button" class="btn-trash" data-bs-toggle="modal" data-bs-target="#confirmModal" data-action="revoke"
+        data-url="{% url 'gate_pass:authorise' items.id items.status %}">
+        <i class="bi bi-x-circle"></i> Revoke Authorisation
+      </button>
       {% else %}
-      <a href="{% url 'gate_pass:authorise' items.id items.status %}">
-        <button type="button" class="btn-trash btn-approve">
-          <i class="bi bi-check-circle"></i> Approve Authorisation
-        </button>
-      </a>
+      <button type="button" class="btn-trash btn-approve" data-bs-toggle="modal" data-bs-target="#confirmModal"
+        data-action="approve" data-url="{% url 'gate_pass:authorise' items.id items.status %}">
+        <i class="bi bi-check-circle"></i> Approve Authorisation
+      </button>
       {% endif %}
     </div>
   </div>
@@ -180,18 +180,19 @@
             <p class="stat-value">{{ items.asset.tag }}</p>
           </div>
 
-<div class="col-md-6">
+          <div class="col-md-6">
             <label class="field-label">Category</label>
             <p class="stat-value">{% if items.asset.product.product_sub_category %}{{ items.asset.product.product_sub_category }}{% else %}UnCategorised{% endif %}</p>
           </div>
 
           <div class="col-md-6">
             <label class="field-label">Declared Value</label>
-            <p class="stat-value">{% if items.asset.price %}{{ currency }} {{ items.asset.price }}{% else %}Not Declared{% endif %}</p>
+            <p class="stat-value">{% if items.asset.price %}{{ currency }} {{ items.asset.price }}{% else %}Not
+              Declared{% endif %}</p>
           </div>
           <br />
           <div class="mt-4">
-            <div class="bg-secondary-fixed/30 rounded-lg p-6 flex items-start gap-4 mt-4">
+            <!-- <div class="bg-secondary-fixed/30 rounded-lg p-6 flex items-start gap-4 mt-4">
               <div class="p-3 bg-secondary-fixed rounded-full text-secondary">
                 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
               </div>
@@ -203,11 +204,12 @@
                   Check if this asset movement affects connected dependencies
                   or active service level agreements.
                 </p>
-                <button type="submit" class="btn-trash mt-1" style="height: 34px !important; min-height: 34px !important; padding: 0 1rem !important; font-size: .8rem !important; border-radius: 8px !important;">
+                <button type="submit" class="btn-trash mt-1"
+                  style="height: 34px !important; min-height: 34px !important; padding: 0 1rem !important; font-size: .8rem !important; border-radius: 8px !important;">
                   Check for Impact
                 </button>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -228,16 +230,18 @@
         <div class="flex items-center gap-3">
           <span class="field-label shrink-0 dark:text-gray-400">Movement Type:</span>
           {% if items.movement_type == 0 %}
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit">
-              <span class="material-symbols-outlined text-xs" data-icon="logout">logout</span>
-              Outward
-            </span>
-            {% else %}
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white flex items-center gap-1 w-fit">
-              <span class="material-symbols-outlined text-xs" data-icon="login">login</span>
-              Inward
-            </span>
-            {% endif %}
+          <span
+            class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit">
+            <span class="material-symbols-outlined text-xs" data-icon="logout">logout</span>
+            Outward
+          </span>
+          {% else %}
+          <span
+            class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white flex items-center gap-1 w-fit">
+            <span class="material-symbols-outlined text-xs" data-icon="login">login</span>
+            Inward
+          </span>
+          {% endif %}
         </div>
         <div class="flex items-center gap-3">
           <span class="field-label shrink-0 dark:text-gray-400">Expected Return:</span>
@@ -246,7 +250,8 @@
         <div class="pt-4 border-t border-surface-container">
           <label class="field-label block mb-3 dark:text-gray-400">Destination Vendor</label>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
+            <div
+              class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
               <img alt="Vendor Logo"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF_G-px5T8aNiqvolUGAY-O9g0V17djKkLjdzc2uihQ0bT2I99EMs7hSTEtgFZcRs85soB5aGXMEEuHugqeEqWbRX0WAOnV6kUJ2KbXOX0jwn3deOt9fNkSghSD5hGFsOQw94Fk2bDz0LqXgk37Duzmcn0Pb4lby2hKD7Wh7qSiShkgqb2po1yX4gOgiIje5RAl4YTNKyGtfK2jjrFdr1h--vaxsB40RSUORpQsZLTuKvbkh8eueJwXFiRWiHUdmNhlA8UWZc1pUU" />
             </div>
@@ -262,7 +267,7 @@
     </div>
   </div>
   <!-- Movement Sidebar Info -->
-  <div class="detail-card">
+  <!-- <div class="detail-card">
     <div class="detail-card-header">
       <div class="d-flex justify-content-around gap-5 items-end">
         <div>
@@ -270,7 +275,8 @@
             Infrastructure Impact Check
           </h3>
         </div>
-        <div class="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg justify-content-between">
+        <div
+          class="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg justify-content-between">
           <span class="material-symbols-outlined text-sm" data-icon="check_circle"
             style="font-variation-settings: &quot;FILL&quot; 1">check_circle</span>
           <span class="text-sm font-bold tracking-tight">Low Risk - Continuity Secured</span>
@@ -325,12 +331,12 @@
                 <p class="text-[0.7rem] dark:text-gray-400">Verifying exit protocols and personnel clearance...</p>
               </div>
               <!--  -->
-            </a>
-          </div>
-        </tbody>
-      </table>
-    </div>
+  </a>
   </div>
+  </tbody>
+  </table>
+  </div>
+  </div> -->
   <!-- Infrastructure Impact Check - Bento Wide -->
   <!-- <div class="table-card">
         <div class="detail-card-header">
@@ -371,4 +377,44 @@
 </body>
 
 </html>
-{% endblock %}
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="confirmModalBody">
+        Are you sure?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" id="confirmActionBtn" class="btn btn-danger">Confirm</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var confirmModal = document.getElementById('confirmModal');
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+      var button = event.relatedTarget;
+      var action = button.getAttribute('data-action');
+      var url = button.getAttribute('data-url');
+      var modalTitle = confirmModal.querySelector('.modal-title');
+      var modalBody = confirmModal.querySelector('.modal-body');
+      var confirmBtn = document.getElementById('confirmActionBtn');
+      if (action === 'revoke') {
+        modalTitle.textContent = 'Revoke Authorisation';
+        modalBody.textContent = 'Are you sure you want to revoke this authorisation?';
+        confirmBtn.className = 'btn btn-danger';
+      } else {
+        modalTitle.textContent = 'Approve Authorisation';
+        modalBody.textContent = 'Are you sure you want to approve this authorisation?';
+        confirmBtn.className = 'btn btn-success';
+      }
+      confirmBtn.href = url;
+    });
+  });
+</script>
+{% endblock content %}

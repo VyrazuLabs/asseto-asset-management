@@ -268,98 +268,175 @@
             </svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">All
-                Types</a></li>
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=type]').value=1;document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">In-Ward</a>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='';
+                document.getElementById('type-btn').childNodes[0].textContent='All Types ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                All Types
+              </a>
             </li>
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=type]').value=0;document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">Out-Ward</a>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='1';
+                document.getElementById('type-btn').childNodes[0].textContent='In-Ward ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                In-Ward
+              </a>
             </li>
-            <!-- {% for type in movement_type_list %}
-                <li><a href="#" class="dropdown-item"
-                  onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
-                  {{ type.name }}
-                </a></li>
-                {% endfor %} -->
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='0';
+                document.getElementById('type-btn').childNodes[0].textContent='Out-Ward ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                Out-Ward
+              </a>
+            </li>
+
           </ul>
           <input type="hidden" name="type">
         </div>
       </div>
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">Raised By</div>
+
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn"
-            aria-label="Filter by location">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="raised-by-btn"
+            aria-label="Filter by raised by">
             All Raisers
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
+
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=location]').value='';document.getElementById('location-btn').childNodes[0].textContent='All Locations ';htmx.trigger('#asset-filter-form','change');">All
-                Raisers</a></li>
+
+            <!-- All Raisers -->
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=raised_by]').value='';
+                        document.getElementById('raised-by-btn').childNodes[0].textContent='All Raisers ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Raisers
+              </a>
+            </li>
+
             {% for raised_by in raised_by_list %}
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=raised_by]').value='{{ raised_by.raised_by__id }}';document.getElementById('location-btn').childNodes[0].textContent='{{ raised_by.raised_by__full_name }} ';htmx.trigger('#asset-filter-form','change');">
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=raised_by]').value='{{ raised_by.raised_by__id }}';
+                        document.getElementById('raised-by-btn').childNodes[0].textContent='{{ raised_by.raised_by__full_name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
                 {{ raised_by.raised_by__full_name }}
-              </a></li>
+              </a>
+            </li>
             {% endfor %}
+
           </ul>
+
           <input type="hidden" name="raised_by">
         </div>
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">Authorised By</div>
+
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn"
-            aria-label="Filter by department">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="authorised-btn"
+            aria-label="Filter by authorised by">
             All Authorised
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
+
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=department]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All
-                Authorised</a></li>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=authorised_by]').value='';
+                        document.getElementById('authorised-btn').childNodes[0].textContent='All Authorised ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Authorised
+              </a>
+            </li>
+
             {% for authorised_by in authorised_by_list %}
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=authorised_by]').value='{{ authorised_by.authorised_by__id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ authorised_by.authorised_by__full_name }} ';htmx.trigger('#asset-filter-form','change');">
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=authorised_by]').value='{{ authorised_by.authorised_by__id }}';
+                        document.getElementById('authorised-btn').childNodes[0].textContent='{{ authorised_by.authorised_by__full_name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
                 {{ authorised_by.authorised_by__full_name }}
-              </a></li>
+              </a>
+            </li>
             {% endfor %}
+
           </ul>
+
           <input type="hidden" name="authorised_by">
         </div>
       </div>
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">Asset</div>
+
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn"
-            aria-label="Filter by department">
-            All Asset
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="asset-btn"
+            aria-label="Filter by asset">
+            All Assets
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
+
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=asset]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All
-                Assets</a></li>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=asset]').value='';
+                        document.getElementById('asset-btn').childNodes[0].textContent='All Assets ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Assets
+              </a>
+            </li>
+
             {% for asset in asset_list %}
-            <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=asset]').value='{{ asset.asset_id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ asset.asset__name }} ';htmx.trigger('#asset-filter-form','change');">
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=asset]').value='{{ asset.asset_id }}';
+                        document.getElementById('asset-btn').childNodes[0].textContent='{{ asset.asset__name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
                 {{ asset.asset__name }}
-              </a></li>
+              </a>
+            </li>
             {% endfor %}
+
           </ul>
+
           <input type="hidden" name="asset">
         </div>
       </div>
@@ -398,18 +475,81 @@
           <td class="table-index-cell">
             <span class="asset-tag-pill">{{ item.gate_pass_no }}</span>
           </td>
-          <td class="d-flex gap-3 align-items-center mt-4">
-            <span class="material-symbols-outlined text-slate-500 text-lg" data-icon="laptop_mac"
-              style="background-color: whitesmoke;border-radius: 5px;padding:4px;">laptop_mac</span>
-            <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
-          </td>
-          <td>{{ item.raised_by }}</td>
           <td>
-            {% if item.authorised_by %}
-            {{ item.authorised_by }}
-            {% else %}
-            Unauthorised
-            {% endif %}
+            <div class="d-flex gap-3 align-items-center">
+              {% with item.asset.images.first as img %}
+              <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                alt="{{ item.asset.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% endwith %}
+              <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
+            </div>
+          </td>
+          <td style="vertical-align: middle;">
+            <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+              {% if item.raised_by.profile_pic %}
+              <img src="{{ item.raised_by.profile_pic.url }}" alt="{{ item.raised_by.full_name }}"
+                class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% else %}
+              <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+                style="width: 32px; height: 32px; object-fit: cover;">
+              {% endif %}
+
+              <div>
+                <div class="text-nowrap fw-semibold">
+                  {{ item.raised_by }}
+                </div>
+
+                <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+                  {{ item.created_at|date:"d M Y, h:i A" }}
+                </div>
+              </div>
+
+            </div>
+          </td>
+          <td style="vertical-align: middle;">
+            <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+              {% if item.authorised_by %}
+
+              {% if item.authorised_by.profile_pic %}
+              <img src="{{ item.authorised_by.profile_pic.url }}" alt="{{ item.authorised_by.full_name }}"
+                class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% else %}
+              <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+                style="width: 32px; height: 32px; object-fit: cover;">
+              {% endif %}
+
+              <div>
+                <div class="text-nowrap fw-semibold">
+                  {{ item.authorised_by }}
+                </div>
+                <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+                  {{ item.updated_at|date:"d M Y, h:i A" }}
+                </div>
+              </div>
+
+              {% else %}
+
+              <!-- Placeholder Avatar -->
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 32px; height: 32px; background: #F3F4F6; color: #6B7280; font-size: 14px;">
+                <i class="bi bi-person-x"></i>
+              </div>
+
+              <div>
+                <div class="text-nowrap fw-semibold text-danger">
+                  Unauthorised
+                </div>
+
+              </div>
+
+              {% endif %}
+
+            </div>
           </td>
           <td>{{ item.destination_vendor.name }}</td>
           <td>
@@ -431,34 +571,40 @@
           </td>
           <td class="px-6 py-5">
             {% if item.status == 0 %}
-            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50 flex items-center gap-1.5 w-fit">
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50 flex items-center gap-1.5 w-fit">
               <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">pending</span>
               Pending
             </span>
             {% elif item.status == 1 %}
-            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50 flex items-center gap-1.5 w-fit">
-              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">check_circle</span>
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs"
+                style="font-variation-settings: 'FILL' 1">check_circle</span>
               Approved
             </span>
             {% elif item.status == 2 %}
-            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5 w-fit">
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5 w-fit">
               <span class="material-symbols-outlined text-xs">edit_note</span>
               Draft
             </span>
             {% elif item.status == 4 %}
-            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/50 flex items-center gap-1.5 w-fit">
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/50 flex items-center gap-1.5 w-fit">
               <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">output</span>
               Checked Out
             </span>
             {% else %}
-            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/50 flex items-center gap-1.5 w-fit">
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/50 flex items-center gap-1.5 w-fit">
               <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">cancel</span>
               Rejected
             </span>
             {% endif %}
           </td>
-          <td class="d-flex justify-content-center me-5">
-            <a class="" href="{% url 'gate-pass:detail' item.id %}">
+          <td style="vertical-align: middle; text-align: center;">
+            <a href="{% url 'gate-pass:detail' item.id %}">
               <i class="bi bi-display"></i>
             </a>
           </td>
@@ -500,55 +646,7 @@
   </div>
 </div>
 </br>
-<div class="col-md-12">
-  <!-- Contextual Insights Section -->
-  <div class="row">
-    <div class="col-md-6">
-      <div class="stat-card pb-2 rounded-bottom-5">
-        <div class="stat-value">
-          Vendor Distribution
-        </div>
-      </div>
-      <div class="stat-card rounded-top-3 d-block pb-5">
-        {% for vendor in vendor_count %}
-        <div class="block items-center gap-4 p-1">
-          <div class="d-block">
-            <div class="flex justify-between text-xs mb-1.5 font-semibold">
-              <span>{{ vendor.destination_vendor__name }}</span>
-              <span>{{ vendor.count|floatformat:2 }}%</span>
-            </div>
-            <div class="h-2 bg-surface-container-low rounded-full overflow-hidden">
-              <div class="h-full bg-primary rounded-full" style="width: {{ vendor.count|floatformat:2 }}%"></div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div
-        class="bg-primary-gradient p-8 rounded-[0.7rem] text-white relative overflow-hidden flex flex-col justify-between m">
-        <div class="relative z-10">
-          <h4 class="text-xl font-bold mb-2 text-white">Weekly Compliance Rate</h4>
-          <p class="text-white/70 text-sm max-w-[200px]">
-            Asset movement tracking is at an all-time high this week.
-          </p>
-        </div>
-        <div class="relative z-10 flex items-end gap-2 mt-8">
-          <span class="text-5xl font-black">98.4%</span>
-          <span class="text-sm font-bold bg-white/20 px-2 py-0.5 rounded flex items-center gap-1 mb-1">
-            <span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
-            +2.1%
-          </span>
-        </div>
-        <!-- Decorative background graphic -->
-        <div class="absolute -right-10 -bottom-10 opacity-10">
-          <span class="material-symbols-outlined text-[200px]" data-icon="verified">verified</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 </html>
 {% endblock content %}

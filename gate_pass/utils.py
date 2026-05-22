@@ -76,35 +76,64 @@ def get_users_from_id(id_list):
     return arr
 
 def search_gate_passes(request):
-    search = request.GET.get('search_text')
+    search = request.GET.get('search_text', '')
     print("Search Query:", search)
+
     movement_type = request.GET.get('type')
     print("Movement Type:", movement_type)
-    raised_by = request.GET.get('raised_by',None) 
-    destination_vendor = request.GET.get('vendor',None)
-    expected_return_date = request.GET.get('expected-return-date')
-    status=request.GET.get('status',None)
-    asset=request.GET.get('asset',None)
 
-    filters = GatePass.objects.filter(
-        Q(asset__name__icontains=search) | 
-        Q(asset__tag__icontains=search) | 
-        Q(destination_vendor__name__icontains=search) | 
-        Q(asset__serial_no__icontains=search) | 
-        Q(raised_by__full_name__icontains=search) |
-        Q(authorised_by__full_name__icontains=search) 
-    )
+    raised_by = request.GET.get('raised_by', None)
+    authorised_by = request.GET.get('authorised_by', None)
+    destination_vendor = request.GET.get('vendor', None)
+    expected_return_date = request.GET.get('expected-return-date')
+    status = request.GET.get('status', None)
+    asset = request.GET.get('asset', None)
+
+    # Base Query
+    filters = GatePass.objects.all()
+
+    # Search Filter
+    if search:
+        filters = filters.filter(
+            Q(asset__name__icontains=search) |
+            Q(asset__tag__icontains=search) |
+            Q(destination_vendor__name__icontains=search) |
+            Q(asset__serial_no__icontains=search) |
+            Q(raised_by__full_name__icontains=search) |
+            Q(authorised_by__full_name__icontains=search)
+        )
+
+    # Status Filter
     if status:
         filters = filters.filter(status=status)
-    if movement_type:
+
+    # Movement Type Filter
+    if movement_type != "" and movement_type is not None:
         filters = filters.filter(movement_type=movement_type)
-    if raised_by:     
+
+    # Raised By Filter
+    if raised_by:
         filters = filters.filter(raised_by__id=raised_by)
+
+    # Authorised By Filter
+    if authorised_by:
+        filters = filters.filter(authorised_by__id=authorised_by)
+
+    # Vendor Filter
     if destination_vendor:
         filters = filters.filter(destination_vendor__id=destination_vendor)
+
+    # Expected Return Date Filter
     if expected_return_date:
         filters = filters.filter(expected_return_date=expected_return_date)
+
+    # Asset Filter
     if asset:
         filters = filters.filter(asset__id=asset)
+
+    # Remove duplicates
+    filters = filters.distinct().order_by('-created_at')
+
     print("Filters Applied:", filters)
+
     return filters
