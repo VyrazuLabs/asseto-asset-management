@@ -1,0 +1,86 @@
+{% load custom_filters %}
+{% load static %}
+{% for ticket in page_object %}
+<tr>
+    <td class="ps-4 fw-semibold text-muted">
+        {{ page_object.start_index|add:forloop.counter0 }}
+    </td>
+    <td class="ticket-id-cell">#{{ ticket.ticket_id }}</td>
+    <td>
+        <div class="d-flex align-items-center">
+            {% if ticket.asset %}
+                {% with img=asset_images|get_item:ticket.asset.id %}
+                    <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                         alt="{{ ticket.asset.name }}"
+                         class="rounded me-2"
+                         width="32" height="32"
+                         onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                {% endwith %}
+            {% else %}
+                <img src="{% static 'images/No_Image.jpg' %}"
+                     alt="No asset"
+                     class="rounded me-2"
+                     width="32" height="32">
+            {% endif %}
+            <span>{{ ticket.asset.name|default:"--" }}</span>
+        </div>
+    </td>
+    <td>
+        <div class="fw-bold">{{ ticket.subject }}</div>
+        <small class="text-muted">{{ ticket.description|truncatechars:50 }}</small>
+    </td>
+    <td>
+        <span class="priority-badge priority-{{ ticket.priority }}">
+            {{ ticket.get_priority_display|upper }}
+        </span>
+    </td>
+    <td>
+        <span class="status-badge status-{{ ticket.status }}">
+            {{ ticket.get_status_display|upper }}
+        </span>
+    </td>
+    <td>
+        {% if ticket.assigned_to %}
+        <div class="d-flex align-items-center">
+
+            {% if ticket.assigned_to.profile_pic %}
+            <img src="{{ ticket.assigned_to.profile_pic.url }}" class="rounded-circle me-2" width="32" height="32" alt="">
+            {% else %}
+            <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle me-2" width="32" height="32" alt="">
+            {% endif %}
+
+            <span>{{ ticket.assigned_to.get_full_name }}</span>
+
+        </div>
+        {% else %}
+        <span class="text-muted fst-italic">Unassigned</span>
+        {% endif %}
+    </td>
+    <td>
+        <div class="text-muted small">
+            <i class="bi bi-clock-history me-1"></i>
+            {{ ticket.updated_at|timesince }} ago
+        </div>
+    </td>
+    <td>
+        <div class="row-actions">
+            <a href="{% url 'support:ticket_detail' ticket.id %}" class="action-btn" title="View {{ ticket.subject }}">
+                <i class="bi bi-eye"></i>
+            </a>
+            <a href="{% url 'support:ticket_update' ticket.id %}" class="action-btn" title="Edit {{ ticket.subject }}">
+                <i class="bi bi-pencil"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="8" class="text-center py-5">
+        <div class="text-muted">
+            <i class="bi bi-ticket-perforated h1 d-block mb-3"></i>
+            <p>No maintenance tickets found.</p>
+            <a href="{% url 'support:ticket_add' %}" class="btn btn-primary btn-sm">Create First Ticket</a>
+        </div>
+    </td>
+</tr>
+{% endfor %}

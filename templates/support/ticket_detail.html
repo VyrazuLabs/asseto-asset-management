@@ -1,0 +1,588 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Ticket #{{ ticket.ticket_id }}: {{ ticket.subject }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/product-details.css' %}">
+<style>
+    .detail-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .t-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .t-badge-id {
+        background-color: #EBF1FF;
+        color: #3b5bec;
+    }
+
+    .t-badge-status-in_progress {
+        background-color: #FFF0E0;
+        color: #C26300;
+    }
+
+    .t-badge-status-open {
+        background-color: #E0F7FA;
+        color: #00838F;
+    }
+
+    .t-badge-status-resolved {
+        background-color: #E8F5E9;
+        color: #2E7D32;
+    }
+
+    .t-badge-status-closed {
+        background-color: #F1F3F5;
+        color: #495057;
+    }
+
+    .info-card-title {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: #6c757d;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #F8F9FA;
+        color: #3b5bec;
+        flex-shrink: 0;
+    }
+
+    .info-icon-wrapper.avatar-wrap {
+        padding: 0;
+        background: transparent;
+    }
+
+    .info-icon-wrapper img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .info-value-primary {
+        font-weight: 600;
+        color: #212529;
+        font-size: 0.9rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .info-value-secondary {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .desc-text {
+        font-size: 0.9rem;
+        color: #495057;
+        line-height: 1.6;
+    }
+
+    .impact-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: space-between;
+    }
+
+    .impact-item {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .impact-item .info-card-title {
+        margin-bottom: 0.4rem;
+    }
+
+    .impact-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .impact-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background-color: #FFEBEE;
+        color: #C62828;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .impact-badge::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #C62828;
+    }
+
+    .docs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .docs-count {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #3b5bec;
+        text-transform: uppercase;
+    }
+
+    .docs-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .doc-card {
+        display: flex;
+        align-items: center;
+        background-color: #F8F9FA;
+        border-radius: 12px;
+        padding: 0.75rem;
+        min-width: 240px;
+        gap: 0.75rem;
+        border: 1px solid #e9ecef;
+        text-decoration: none;
+        flex: 1;
+        max-width: 300px;
+    }
+
+    .doc-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid #e9ecef;
+    }
+
+    .doc-info {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .doc-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #212529;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 0.2rem;
+    }
+
+    .doc-meta {
+        font-size: 0.7rem;
+        color: #6c757d;
+    }
+
+    .doc-download {
+        color: #3b5bec;
+        background: none;
+        border: none;
+        padding: 0.2rem;
+        cursor: pointer;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 14px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+
+    .tl-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .tl-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .tl-icon {
+        position: absolute;
+        left: -32px;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: #6c757d;
+        z-index: 1;
+    }
+
+    .tl-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .tl-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 0.2rem;
+    }
+
+    .tl-desc {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .tl-time {
+        font-size: 0.75rem;
+        color: #adb5bd;
+        white-space: nowrap;
+        margin-left: 1rem;
+    }
+
+    .tl-internal-note {
+        background-color: #F8F9FF;
+        border-left: 3px solid #3b5bec;
+        border-radius: 0 8px 8px 0;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .tl-internal-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #3b5bec;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .tl-internal-text {
+        font-size: 0.85rem;
+        font-style: italic;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .tl-internal-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .tl-internal-author img {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+    }
+
+    .btn-view-history {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem;
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        color: #3b5bec;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        margin-top: 2rem;
+    }
+
+    .btn-view-history:hover {
+        background-color: #f8f9fa;
+        color: #2a41a8;
+    }
+
+    .btn-edit-ticket {
+        background-color: #3b5bec;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-edit-ticket:hover {
+        background-color: #2a41a8;
+        color: #fff;
+    }
+
+    .btn-back-list {
+        background: #fff;
+        color: #212529;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-back-list:hover {
+        border-color: #3b5bec;
+        color: #3b5bec;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="pb-5 mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}"
+                            class="breadcrumb-link">Tickets</a></li>
+                    <li class="breadcrumb-item active">Ticket Details</li>
+                </ol>
+            </nav>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="t-badge t-badge-id">#{{ ticket.ticket_id }}</span>
+                <span class="t-badge t-badge-status-{{ ticket.status }}">
+                    {% if ticket.status == 'in_progress' %}
+                    <i class="bi bi-clock-history small me-1" style="font-size:0.7rem;"></i>
+                    {% else %}
+                    <i class="bi bi-circle-fill small me-1" style="font-size:0.5rem;"></i>
+                    {% endif %}
+                    {{ ticket.get_status_display|upper }}
+                </span>
+            </div>
+            <h4 class="mb-0 fw-bold">{{ ticket.subject }}</h4>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'support:ticket_list' %}" class="btn-back-list">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+            <a href="{% url 'support:ticket_update' ticket.id %}" class="btn-edit-ticket shadow-sm">
+                <i class="bi bi-pencil-fill"></i> Edit Ticket
+            </a>
+        </div>
+    </div>
+
+    {# Four Top Cards #}
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Assigned Technician</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper avatar-wrap">
+                        {% if ticket.assigned_to.profile_pic %}
+                        <img src="{{ ticket.assigned_to.profile_pic.url }}" alt="">
+                        {% else %}
+                        <img src="{% static 'images/faces/1.jpg' %}" alt="" class="w-100 h-100 rounded-circle" style="object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.assigned_to.get_full_name|default:"Unassigned" }}
+                        </div>
+                        <div class="info-value-secondary">{{ ticket.assigned_to.role.related_name|default:"Technician" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Department</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper">
+                        <i class="bi bi-hdd-stack fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.department.name|default:"Infrastructure" }}</div>
+                        <div class="info-value-secondary">Operations Team</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Date Opened</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div>
+                        <div class="info-value-primary">{{ ticket.created_at|date:"M j" }}</div>
+                        <div class="info-value-secondary">{{ ticket.created_at|date:"Y, h:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Location</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper">
+                        <i class="bi bi-geo-alt fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.location.name|default:"Main Data Center" }}</div>
+                        <div class="info-value-secondary">{{ ticket.location.address.city|default:"Headquarters" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Technical Description #}
+    <div class="detail-card mb-4">
+        <div class="section-title">
+            <i class="bi bi-file-text text-primary fs-5"></i> Technical Description
+        </div>
+        <div class="desc-text mt-3">
+            {{ ticket.description|linebreaksbr|default:"No technical description provided." }}
+        </div>
+    </div>
+
+    {# Asset & Work Impact #}
+    <div class="detail-card mb-4">
+        <h6 class="fw-bold mb-4">Asset & Work Impact</h6>
+        <div class="impact-grid">
+            <div class="impact-item">
+                <div class="info-card-title">Asset Name/ID</div>
+                <div class="impact-value">{{ ticket.asset.name|default:"N/A" }}</div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Ticket Type</div>
+                <div class="impact-value">{{ ticket.get_ticket_type_display }}</div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Estimated ETA</div>
+                <div class="impact-value">
+                    {% if ticket.estimated_eta %}
+                    {{ ticket.estimated_eta|timeuntil }}
+                    {% else %}
+                    4.5 Hours
+                    {% endif %}
+                </div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Hours Worked</div>
+                <div class="impact-value">{{ ticket.hours_worked }} hrs</div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Impact Level</div>
+                <div>
+                    {% if ticket.impact_level == 'high' or ticket.impact_level == 'critical' %}
+                    <span class="impact-badge">{{ ticket.get_impact_level_display|upper }} IMPACT</span>
+                    {% else %}
+                    <div class="impact-value">{{ ticket.get_impact_level_display }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Service Level</div>
+                <div class="impact-value">{{ ticket.service_level|default:"SLA Gold Tier" }}</div>
+            </div>
+        </div>
+    </div>
+
+    {# Supporting Documents #}
+    <div class="docs-header mt-5">
+        <h6 class="fw-bold mb-0">Supporting Documents</h6>
+        {% if attachments %}
+        <span class="docs-count">{{ attachments|length }} FILES</span>
+        {% endif %}
+    </div>
+    <div class="docs-container mb-5">
+        {% for att in attachments %}
+        <a href="{{ att.file.url }}" target="_blank" class="doc-card">
+            <div class="doc-icon">
+                {% if "pdf" in att.file_name|lower %}
+                <span class="text-primary fw-bold" style="font-size: 0.6rem;">PDF</span>
+                {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
+                <img src="{{ att.file.url }}" alt="Preview"
+                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                {% else %}
+                <i class="bi bi-file-text text-secondary fs-5"></i>
+                {% endif %}
+            </div>
+            <div class="doc-info">
+                <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
+                <div class="doc-meta">{{ att.file_size|filesizeformat|default:"2.4 MB" }} • {% if "pdf" in att.file_name|lower %}PDF{% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}Image{% else %}File{% endif %}</div>
+            </div>
+            <div class="doc-download">
+                <i class="bi bi-download"></i>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-muted small">No supporting documents attached.</div>
+        {% endfor %}
+    </div>
+
+    {# Activity Log #}
+    <div class="pd-history-wrap mt-4">
+        {% include 'commons/history.html' %}
+    </div>
+
+</div>
+{% endblock content %}

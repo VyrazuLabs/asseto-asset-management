@@ -1,0 +1,253 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Initiate Maintenance Ticket | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
+<style>
+    /* Ensure selector buttons are always clickable and visible */
+    .selector-btn {
+        user-select: none;
+        -webkit-user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<form class="form" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  {# ── Form Errors ──────────────────────────────────────── #}
+  {% if form.errors %}
+    <div class="alert alert-danger mx-4 mt-4">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
+        <strong>Please correct the errors below.</strong>
+      </div>
+      {% if form.non_field_errors %}
+        <ul class="mb-0 mt-2">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {# Also show errors for hidden fields or fields not explicitly in the layout #}
+      {% for field in form %}
+        {% if field.is_hidden and field.errors %}
+          <ul class="mb-0 mt-2">
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="add-page-header">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb page-breadcrumb">
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}" class="breadcrumb-link">Tickets</a></li>
+          <li class="breadcrumb-item active">Create New Ticket</li>
+        </ol>
+      </nav>
+      <h1>New Support Request</h1>
+      <p class="subtitle">Log a new maintenance or repair request. Ensure asset details are correct to expedite
+        technician assignment.</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'support:ticket_list' %}" class="btn-back-listing">
+        Discard
+      </a>
+      <button type="submit" class="btn-save-asset">
+        <i class="bi bi-send-fill"></i> Create Ticket
+      </button>
+    </div>
+
+  </div>
+
+  {# ── Two-column layout ────────────────────────────────── #}
+  <div class="row g-4">
+
+    {# ── LEFT COLUMN ──────────────────────────────────── #}
+    <div class="col-lg-8">
+
+      {# Primary Details #}
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
+          <h2>Primary Details</h2>
+        </div>
+        <div class="section-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="field-label">Subject / Issue Summary <span class="required">*</span></label>
+              {{ form.subject }}
+              {% for error in form.subject.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="col-12">
+              <label class="field-label">Target Asset</label>
+              {{ form.asset }}
+              {% for error in form.asset.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="col-12 mt-2">
+              <label class="field-label">Issue Priority <span class="required">*</span></label>
+              {{ form.priority }}
+              {% for error in form.priority.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+              <div class="selector-group mt-2" id="priority-selector">
+                  <div class="selector-btn" data-value="emergency"><i class="bi bi-exclamation-circle-fill me-2"></i> EMERGENCY</div>
+                  <div class="selector-btn" data-value="high"><i class="bi bi-exclamation-triangle-fill me-2"></i> HIGH</div>
+                  <div class="selector-btn active" data-value="medium"><i class="bi bi-info-circle-fill me-2"></i> MEDIUM</div>
+                  <div class="selector-btn" data-value="low"><i class="bi bi-sliders me-2"></i> LOW</div>
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <label class="field-label">Detailed Description</label>
+              {{ form.description }}
+              {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# Work Details #}
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon"><i class="bi bi-tools"></i></div>
+          <h2>Work Details</h2>
+        </div>
+        <div class="section-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="field-label">Ticket Type</label>
+              {{ form.ticket_type }}
+              {% for error in form.ticket_type.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Estimated ETA</label>
+              {{ form.estimated_eta }}
+              {% for error in form.estimated_eta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="col-md-6">
+              <label class="field-label">Hours Worked</label>
+              {{ form.hours_worked }}
+              {% for error in form.hours_worked.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+            <div class="col-12 mt-3">
+              <label class="field-label">Impact Level</label>
+              {{ form.impact_level }}
+              {% for error in form.impact_level.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+              <div class="selector-group mt-2" id="impact-selector">
+                <div class="selector-btn" data-value="low">LOW</div>
+                <div class="selector-btn active" data-value="medium">MEDIUM</div>
+                <div class="selector-btn" data-value="high">HIGH</div>
+                <div class="selector-btn" data-value="critical">CRITICAL</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>{# /col-lg-8 #}
+
+    {# ── RIGHT SIDEBAR ────────────────────────────────── #}
+    <div class="col-lg-4">
+
+      {# Resolution Routing #}
+      <div class="sidebar-section">
+        <div class="sidebar-section-header"><span>Resolution Routing</span></div>
+        <div class="sidebar-body">
+          <label class="field-label small">Assign Technician</label>
+          {{ form.assigned_to }}
+          {% for error in form.assigned_to.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          <div class="compliance-box mt-3">
+            <i class="bi bi-lightbulb"></i>
+            <p>
+                <strong>Automation Note</strong>
+                Assigning a technician manually will bypass the automated queue distribution system.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {# Attachments #}
+      <div class="sidebar-section">
+        <div class="sidebar-section-header"><span>Attachments</span></div>
+        <div class="sidebar-body">
+          <div class="upload-area" id="upload-drop-area">
+            <input type="file" name="attachments" multiple id="ticket-file-input">
+            <i class="bi bi-cloud-arrow-up d-block"></i>
+            <div class="upload-label">Drop images here or click to browse</div>
+            <div class="upload-hint">PNG, JPG or PDF up to 10MB</div>
+          </div>
+          <div id="file-list" class="mt-3 text-start small"></div>
+        </div>
+      </div>
+
+      <p class="required-note mt-3">
+        <span class="required-star">*</span> Required field
+      </p>
+
+    </div>{# /col-lg-4 #}
+  </div>{# /row #}
+
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // ── Priority & Impact Selectors ────────────────────────────────────────
+    function setupSelector(groupId, inputName) {
+      const group = document.getElementById(groupId);
+      if (!group) return;
+      
+      const input = document.querySelector(`input[name="${inputName}"]`);
+      if (!input) return;
+
+      const buttons = group.querySelectorAll('.selector-btn');
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          buttons.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          input.value = this.getAttribute('data-value');
+          console.log(`Updated ${inputName} to: ${input.value}`);
+        });
+      });
+    }
+
+    setupSelector('priority-selector', 'priority');
+    setupSelector('impact-selector', 'impact_level');
+
+    // ── File Upload Logic ─────────────────────────────────────────────────
+    const fileInput = document.getElementById('ticket-file-input');
+    const fileList = document.getElementById('file-list');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', () => {
+          fileList.innerHTML = '';
+          Array.from(fileInput.files).forEach(file => {
+            const div = document.createElement('div');
+            div.className = 'p-2 border-bottom d-flex align-items-center';
+            div.innerHTML = `<i class="bi bi-file-earmark me-2 text-primary"></i> ${file.name}`;
+            fileList.appendChild(div);
+          });
+        });
+    }
+  });
+</script>
+{% endblock content %}
