@@ -57,6 +57,17 @@
   color: var(--color-primary);
 }
 
+body.theme-dark .btn-cancel {
+  background: #fff;
+  color: rgb(51, 51, 51);
+}
+
+body.theme-dark .btn-cancel:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #f0f0f0;
+}
+
 .btn-approve {
   background: #dcfce7 !important;
   color: #16a34a !important;
