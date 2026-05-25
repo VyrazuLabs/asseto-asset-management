@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from .api_views import GatePassList, GatePassSearch
 from . import api_views
-app_name = 'gate-pass'
+app_name = 'gate_pass'
 
 urlpatterns = [
     #template_urls
@@ -24,5 +24,5 @@ gate_pass_api_url_patterns = [
     path('api/gate-pass/list', api_views.GatePassList.as_view(), name='list_gate_passes'),
     path('api/gate-pass/search', api_views.GatePassSearch.as_view(), name='search_gate_passes'),
     path('api/gate-pass/create', api_views.GatePassCreate.as_view(), name='create_gate_pass'),
-    path('api/gate-pass/approve/<str:gate_pass_id>', api_views.GatePassApprove.as_view(), name='approve_gate_pass'),
+    path('api/gate-pass/approve/<uuid:gate_pass_id>', api_views.GatePassApprove.as_view(), name='approve_gate_pass'),
 ]

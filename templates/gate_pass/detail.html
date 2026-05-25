@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/gate-pass/gate-pass.css' %}">
 
 {% endblock css %}
 
@@ -203,7 +204,7 @@
                   Check if this asset movement affects connected dependencies
                   or active service level agreements.
                 </p>
-                <button type="submit" class="btn-trash mt-1" style="height: 34px !important; min-height: 34px !important; padding: 0 1rem !important; font-size: .8rem !important; border-radius: 8px !important;">
+                <button type="submit" class="btn-trash mt-1 btn-sm-override">
                   Check for Impact
                 </button>
               </div>
@@ -271,8 +272,7 @@
           </h3>
         </div>
         <div class="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg justify-content-between">
-          <span class="material-symbols-outlined text-sm" data-icon="check_circle"
-            style="font-variation-settings: &quot;FILL&quot; 1">check_circle</span>
+          <span class="material-symbols-outlined text-sm icon-filled" data-icon="check_circle">check_circle</span>
           <span class="text-sm font-bold tracking-tight">Low Risk - Continuity Secured</span>
         </div>
       </div>

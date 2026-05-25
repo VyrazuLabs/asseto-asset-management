@@ -227,14 +227,8 @@ def next_audit_due(audit):
     return days_remaining, is_pending
 
 def get_tag_list(tag):
-    # tags = Asset.undeleted_objects.filter(tag__icontains=tag)
-    print("here")
+    """Return a flat list of asset tags matching the given search string."""
     tags = AssignAsset.objects.filter(
         Q(asset__tag__icontains=tag) | Q(asset__name__icontains=tag)
-    # ).values_list('asset__tag','asset__name').distinct()
-    ).values_list('asset__tag').distinct()
-    arr=[]
-    for t in tags:
-        arr.append(t)
-    print("get_tag_list",arr)
-    return arr
+    ).values_list('asset__tag', flat=True).distinct()
+    return list(tags)

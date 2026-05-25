@@ -1,150 +1,120 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
-from django.urls import path
-from configurations.utils import get_currency_and_datetime_format
-from products.models import ProductCategory
-from upload.views.product_type_views import product_type_list
-from .models import GatePass
-from assets.models import Asset
-from .forms import GatePassForm
-from django.shortcuts import redirect
-from vendors.models import Vendor
-from django.db.models import Q, Count
-import datetime
+from django.shortcuts import redirect, render
+from django.db.models import Count
 from zoneinfo import ZoneInfo
-from gate_pass.utils import get_vendor_count,get_gate_pass_list, search_gate_passes
+
+from configurations.utils import get_currency_and_datetime_format
+from gate_pass.models import GatePass
+from gate_pass.utils import get_gate_pass_list, search_gate_passes, create_gate_pass
+from assets.models import Asset
+
+
+@login_required
 def listed(request):
-    # gate_passes = GatePass.objects.all
-    context=get_gate_pass_list(request)
+    """Render the gate pass list page for the current user's organization."""
+    context = get_gate_pass_list(request)
     return render(request, 'gate_pass/list.html', context=context)
 
+
+@login_required
 def search(request):
-    filters=search_gate_passes(request)
-    print("Filters Applied:", filters)
-    if filters is not None:
-        return render(request, 'gate_pass/search-data.html', {'filters': filters})
-    else:
-        get_obj=GatePass.objects.all()
-        return render(request, 'gate_pass/search-data.html', {'items': get_obj})
+    """Return search-data partial template filtered by query params."""
+    filters = search_gate_passes(request)
+    return render(request, 'gate_pass/search-data.html', {'filters': filters})
 
+
+@login_required
 def add(request):
+    """Render gate pass creation form; process POST to create a new gate pass."""
+    from vendors.models import Vendor
     if request.method == 'POST':
-        search = request.POST.get('search')
-        movement_type = request.POST.get('movement-type')
-        destination_vendor = request.POST.get('destination-vendor')
-        expected_return_date = request.POST.get('expected-return-date')
-        purpose_movement = request.POST.get('purpose-movement')
-        # We are selecting the asset from the dropddown in the UI, So this method is mandatory
-        asset = None
-        if search:
-            asset = Asset.objects.filter(
-                Q(name__icontains=search) | Q(tag__icontains=search)
-            ).first()
-
-        print("Asset:", asset)
-
-        if not asset:
-            return HttpResponse("❌ Asset not found")  # DEBUG safety
-
-        GatePass.objects.create(
-            asset=asset,
-            movement_type=movement_type,
-            destination_vendor_id=destination_vendor,
-            expected_return_date=expected_return_date,
-            purpose_of_movement=purpose_movement or None,
-            raised_by=request.user,
-            authorised_by=None
+        gate_pass = create_gate_pass(
+            request,
+            movement_type=request.POST.get('movement-type'),
+            destination_vendor_id=request.POST.get('destination-vendor'),
+            expected_return_date=request.POST.get('expected-return-date'),
+            purpose_movement=request.POST.get('purpose-movement'),
+            search=request.POST.get('search'),
         )
-
+        if not gate_pass:
+            return HttpResponse("Asset not found", status=404)
         return redirect('gate_pass:list')
 
-    vendors = Vendor.undeleted_objects.all()
+    vendors = Vendor.undeleted_objects.filter(organization=request.user.organization)
     return render(request, 'gate_pass/add.html', {'vendors': vendors})
 
-def detail(request,id):
-    if request.method=='POST':
-        status=request.POST.get('status')
-        
-        return redirect('gate_pass:list')
-    get_items=GatePass.objects.filter(id=id).first()
-    obj=get_currency_and_datetime_format(request.user.organization)
-    context={
-        'items':get_items,
+
+@login_required
+def detail(request, id):
+    """Render gate pass detail page."""
+    get_items = GatePass.objects.filter(
+        id=id, organization=request.user.organization
+    ).select_related('asset', 'destination_vendor', 'raised_by', 'authorised_by').first()
+    obj = get_currency_and_datetime_format(request.user.organization)
+    context = {
+        'items': get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
     }
-    # context=details_of_asset(request,id)
-    # return render(request,'gate_pass/detail.html',context=context)
-    return render(request,'gate_pass/detail.html',context=context)
+    return render(request, 'gate_pass/detail.html', context=context)
 
-def print_doc(request,id):
-    gate_pass = GatePass.objects.filter(id=id).first()
-    get_status=gate_pass.status
-    print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
-    context={
+
+@login_required
+def print_doc(request, id):
+    """Render the printable gate pass document."""
+    gate_pass = GatePass.objects.filter(
+        id=id, organization=request.user.organization
+    ).select_related('asset', 'destination_vendor', 'raised_by', 'authorised_by').first()
+    context = {
         'gate_pass': gate_pass,
         'status': gate_pass.STATUS_CHOICES[gate_pass.status][1],
         'created_at': gate_pass.created_at.astimezone(ZoneInfo('Asia/Kolkata')).date(),
     }
-    return render(request,'gate_pass/print-doc.html', context=context)
+    return render(request, 'gate_pass/print-doc.html', context=context)
 
-def authorisation(request,id,status):
-    gate_pass = GatePass.objects.filter(id=id).first()
+
+@login_required
+def authorisation(request, id, status):
+    """Toggle approval/rejection of a gate pass."""
+    gate_pass = GatePass.objects.filter(
+        id=id, organization=request.user.organization
+    ).first()
     if not gate_pass:
         return redirect('gate_pass:list')
 
-    if gate_pass.status == 1:  # Currently Approved
+    if gate_pass.status == 1:
         gate_pass.authorised_by = None
-        gate_pass.status = 3  # Set to Rejected/Revoked
-    else:  # Currently Pending, Draft, or Rejected
+        gate_pass.status = 3
+    else:
         gate_pass.authorised_by = request.user
-        gate_pass.status = 1  # Approve it
-    
+        gate_pass.status = 1
+
     gate_pass.save()
     return redirect('gate_pass:list')
 
-# def check_impact(request,id):
-#     gate_pass = GatePass.objects.filter(asset__tag=id).first()
-#     asset = gate_pass.asset
-#     base_query = ProductCategory.undeleted_objects.filter(organization=request.user.organization)
-#     product_type_list = base_query.order_by('-created_at')
-#     asset_counts = (
-#         asset
-#         .filter(
-#             organization=request.user.organization,
-#             product__product_type__in=product_type_list
-#         )
-#         .values("product__product_type")
-#         .annotate(asset_count=Count("id", distinct=True))
-#     )
 
-#     product_category_asset_count = {
-#         item['product__product_sub_category_id']: item['count']
-#         for item in asset_counts
-#     }
-#     print(product_category_asset_count)
-#     return product_category_asset_count
-
+@login_required
 def check_impact(request, tag):
-    gate_pass = GatePass.objects.filter(asset__tag=tag).first()
-    print("Gate Pass Found:", gate_pass)
+    """Return JSON with asset count and risk level for a given asset tag."""
+    gate_pass = GatePass.objects.filter(
+        asset__tag=tag, organization=request.user.organization
+    ).select_related('asset__product__product_type').first()
     if not gate_pass:
         return JsonResponse({"success": False, "message": "No asset found"})
 
     asset = gate_pass.asset
-
     asset_counts = (
         Asset.objects.filter(
             organization=request.user.organization,
-            product__product_type=asset.product.product_type
+            product__product_type=asset.product.product_type,
         )
         .values("product__product_type")
         .annotate(count=Count("id"))
     )
 
     total = sum(item["count"] for item in asset_counts)
-
     return JsonResponse({
         "success": True,
         "count": total,
-        "risk": "High" if total < 5 else "Low"
+        "risk": "High" if total < 5 else "Low",
     })

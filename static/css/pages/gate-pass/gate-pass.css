@@ -1,0 +1,25 @@
+.breadcrumb-primary {
+  color: #4F46E5;
+}
+
+.icon-chip {
+  background-color: whitesmoke;
+  border-radius: 5px;
+  padding: 4px;
+}
+
+.asset-search-wrapper {
+  position: relative;
+}
+
+.btn-sm-override {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 1rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 8px !important;
+}
+
+.icon-filled {
+  font-variation-settings: "FILL" 1;
+}

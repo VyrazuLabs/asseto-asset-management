@@ -2,15 +2,13 @@ from rest_framework import serializers
 from gate_pass.models import GatePass
 
 class SearchGatePassSerializer(serializers.Serializer):
-    search_text = serializers.CharField(required=False, allow_blank=True,allow_null=True)
+    """Validates the search_text query parameter for gate pass search."""
 
-    class Meta:
-        fields = ['search_text']
-    
-    def validate(self, search_text):
-        if not search_text:
-            return []
-        return search_text
+    search_text = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
+    def validate(self, attrs):
+        attrs['search_text'] = attrs.get('search_text') or ''
+        return attrs
     
 class GatePassCreateSerializer(serializers.Serializer):
     asset_id = serializers.UUIDField(required=True)
@@ -25,22 +23,16 @@ class GatePassCreateSerializer(serializers.Serializer):
         fields = ['asset_id', 'movement_type', 'destination_vendor_id', 'expected_return_date', 'purpose_of_movement', 'raised_by_id', 'authorised_by_id', 'status']
 
     def create(self, validated_data):
-        asset=validated_data.get('asset_id')
-        movement_type=validated_data.get('movement_type')
-        destination_vendor_id=validated_data.get('destination_vendor_id')
-        expected_return_date=validated_data.get('expected_return_date')
-        purpose_of_movement=validated_data.get('purpose_of_movement')
-        raised_by_id=validated_data.get('raised_by_id')
-        authorised_by_id=validated_data.get('authorised_by_id')
-        status=validated_data.get('status')
-        gate_pass=GatePass.objects.create(
-            asset_id=asset,
-            movement_type=movement_type,
-            destination_vendor_id=destination_vendor_id,    
-            expected_return_date=expected_return_date,    
-            purpose_of_movement=purpose_of_movement,    
-            raised_by_id=raised_by_id,    
-            authorised_by_id=authorised_by_id,    
-            status=status,    
+        """Create a GatePass scoped to the request user's organization."""
+        request = self.context.get('request')
+        return GatePass.objects.create(
+            organization=request.user.organization,
+            asset_id=validated_data.get('asset_id'),
+            movement_type=validated_data.get('movement_type'),
+            destination_vendor_id=validated_data.get('destination_vendor_id'),
+            expected_return_date=validated_data.get('expected_return_date'),
+            purpose_of_movement=validated_data.get('purpose_of_movement'),
+            raised_by_id=validated_data.get('raised_by_id'),
+            authorised_by_id=validated_data.get('authorised_by_id'),
+            status=validated_data.get('status', 0),
         )
-        return gate_pass

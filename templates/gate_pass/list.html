@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/gate-pass/gate-pass.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -140,7 +141,7 @@
             <h1>Movement Authorisations</h1>
             <nav aria-label="breadcrumb " class="d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item" style="color: #4F46E5;"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item breadcrumb-primary"><a href="/">Dashboard</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Gate-Pass</li>
                 </ol>
             </nav>
@@ -398,7 +399,7 @@
           </td>
           <td class="d-flex gap-3 align-items-center mt-4">
             <span class="material-symbols-outlined text-slate-500 text-lg" data-icon="laptop_mac"
-              style="background-color: whitesmoke;border-radius: 5px;padding:4px;">laptop_mac</span>
+              class="icon-chip">laptop_mac</span>
             <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
           </td>
           <td>{{ item.raised_by }}</td>
@@ -503,7 +504,7 @@
               <span>{{ vendor.count|floatformat:2 }}%</span>
             </div>
             <div class="h-2 bg-surface-container-low rounded-full overflow-hidden">
-              <div class="h-full bg-primary rounded-full" style="width: {{ vendor.count|floatformat:2 }}%"></div>
+              <div class="h-full bg-primary rounded-full gp-progress-bar" data-width="{{ vendor.count|floatformat:2 }}"></div>
             </div>
           </div>
         </div>
@@ -535,5 +536,10 @@
   </div>
 </div>
 
+<script>
+  document.querySelectorAll('.gp-progress-bar[data-width]').forEach(function(el) {
+    el.style.width = el.dataset.width + '%';
+  });
+</script>
 </html>
 {% endblock content %}
