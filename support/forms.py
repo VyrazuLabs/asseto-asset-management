@@ -9,7 +9,8 @@ class SupportTicketForm(forms.ModelForm):
     subject = forms.CharField(
         widget=TextInput(attrs={
             'placeholder': 'Summary of the technical difficulty...',
-            'class': 'form-control'
+            'class': 'form-control',
+            'required': 'required'
         })
     )
     description = forms.CharField(
@@ -22,16 +23,17 @@ class SupportTicketForm(forms.ModelForm):
     )
     asset = forms.ModelChoiceField(
         queryset=Asset.undeleted_objects.none(),
-        required=False,
+        required=True,
         widget=Select(attrs={
-            'class': 'form-control',
-            'data-placeholder': 'Search serial number, asset ID, or name...'
+            'class': 'form-control asset-select',
+            'data-placeholder': 'Search serial number, asset ID, or name...',
+            'required': 'required'
         })
     )
     priority = forms.ChoiceField(
         choices=PRIORITY_CHOICES,
         widget=forms.HiddenInput(),
-        initial='medium'
+        initial='1'
     )
     ticket_type = forms.ChoiceField(
         choices=TICKET_TYPE_CHOICES,
@@ -48,17 +50,20 @@ class SupportTicketForm(forms.ModelForm):
     impact_level = forms.ChoiceField(
         choices=IMPACT_CHOICES,
         widget=forms.HiddenInput(),
-        initial='medium'
+        initial='1'
     )
     status = forms.ChoiceField(
         choices=STATUS_CHOICES,
         widget=forms.HiddenInput(),
-        initial='open'
+        initial='0'
     )
     assigned_to = forms.ModelChoiceField(
         queryset=User.objects.none(),
         required=False,
-        widget=Select(attrs={'class': 'form-control'})
+        widget=Select(attrs={
+            'class': 'form-control assigned-select',
+            'data-placeholder': 'Search technician by name...'
+        })
     )
     
     class Meta:
@@ -67,7 +72,7 @@ class SupportTicketForm(forms.ModelForm):
             'subject', 'description', 'asset', 'priority',
             'ticket_type', 'estimated_eta', 'hours_worked',
             'impact_level', 'assigned_to', 'department', 'location',
-            'status', 'service_level'
+            'status'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -80,7 +85,7 @@ class SupportTicketForm(forms.ModelForm):
             self.fields['location'].queryset = Location.undeleted_objects.filter(organization=organization)
         
         # Ensure fields missing from the Add template are not required
-        optional_fields = ['status', 'service_level', 'department', 'location']
+        optional_fields = ['status', 'department', 'location']
         for field_name in optional_fields:
             if field_name in self.fields:
                 self.fields[field_name].required = False

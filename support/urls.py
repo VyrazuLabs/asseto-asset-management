@@ -14,5 +14,7 @@ urlpatterns = [
     path('tickets/search/<str:page>',  views.search_tickets, name='ticket_search'),
     path('tickets/export',             views.export_tickets, name='ticket_export'),
     path('tickets/attachment/delete/<uuid:id>', views.delete_ticket_attachment, name='ticket_attachment_delete'),
+    path('asset-search/', views.asset_search, name='asset_search'),
+    path('technician-search/', views.technician_search, name='technician_search'),
 ]
 

@@ -4,11 +4,14 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils.timezone import now
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import csv
+from django.db.models import Q
 
 from .models import *
 from .forms import SupportTicketForm, TicketNoteForm
+from assets.models import Asset, AssetImage
+from authentication.models import User
 
 def check_admin(user):
     return user.is_superuser
@@ -26,10 +29,10 @@ def _ticket_stats(request):
     """Compute stat card values."""
     qs = _ticket_base_qs(request)
     return {
-        'total_active': qs.exclude(status='closed').count(),
-        'pending_parts': qs.filter(status='open', ticket_type='hardware_repair').count(),
-        'overdue_count': qs.filter(status='open', estimated_eta__lt=now()).count(),
-        'critical_count': qs.filter(priority__in=['emergency', 'high'], status='open').count(),
+        'total_active': qs.exclude(status='4').count(),
+        'pending_parts': qs.filter(status='0', ticket_type='hardware_repair').count(),
+        'overdue_count': qs.filter(status='0', estimated_eta__lt=now()).count(),
+        'critical_count': qs.filter(priority__in=['3', '2'], status='0').count(),
     }
 
 @login_required
@@ -40,16 +43,20 @@ def ticket_list(request):
     search = request.GET.get('search', '').strip()
     status = request.GET.get('status')
     priority = request.GET.get('priority')
+    ticket_type = request.GET.get('ticket_type')
     
     if search:
         qs = qs.filter(
             Q(ticket_id__icontains=search) |
             Q(subject__icontains=search) |
             Q(asset__name__icontains=search) |
-            Q(assigned_to__first_name__icontains=search)
+            Q(assigned_to__full_name__icontains=search)
         )
     if status: qs = qs.filter(status=status)
     if priority: qs = qs.filter(priority=priority)
+    if ticket_type: qs = qs.filter(ticket_type=ticket_type)
+    
+    qs = qs.order_by('-created_at')
     
     paginator = Paginator(qs, 10, orphans=1)
     page_object = paginator.get_page(request.GET.get('page', 1))
@@ -66,6 +73,7 @@ def ticket_list(request):
         'all_tickets': qs,  # For Kanban view
         'status_choices': STATUS_CHOICES,
         'priority_choices': PRIORITY_CHOICES,
+        'ticket_type_choices': TICKET_TYPE_CHOICES,
         'asset_images': asset_images,
         **_ticket_stats(request),
     }
@@ -209,18 +217,23 @@ def search_tickets(request, page):
     search = request.GET.get('search', '').strip()
     status = request.GET.get('status')
     priority = request.GET.get('priority')
+    ticket_type = request.GET.get('ticket_type')
     
     if search:
         qs = qs.filter(
             Q(ticket_id__icontains=search) |
             Q(subject__icontains=search) |
             Q(asset__name__icontains=search) |
-            Q(assigned_to__first_name__icontains=search)
+            Q(assigned_to__full_name__icontains=search)
         )
     if status:
         qs = qs.filter(status=status)
     if priority:
         qs = qs.filter(priority=priority)
+    if ticket_type:
+        qs = qs.filter(ticket_type=ticket_type)
+    
+    qs = qs.order_by('-created_at')
     
     paginator = Paginator(qs, 10, orphans=1)
     page_object = paginator.get_page(page)
@@ -259,3 +272,45 @@ def delete_ticket_attachment(request, id):
     attachment.delete()
     messages.success(request, 'Attachment deleted successfully.')
     return redirect('support:ticket_update', id=ticket_id)
+
+@login_required
+def asset_search(request):
+    query = request.GET.get('q', '').strip()
+    if not query:
+        assets = Asset.undeleted_objects.filter(organization=request.user.organization).order_by('-created_at')[:10]
+    else:
+        assets = Asset.undeleted_objects.filter(
+            Q(organization=request.user.organization),
+            Q(name__icontains=query) | Q(tag__icontains=query) | Q(serial_no__icontains=query)
+        )[:10]
+    
+    results = []
+    for asset in assets:
+        results.append({
+            'id': str(asset.id),
+            'name': asset.name,
+            'tag': asset.tag,
+        })
+    
+    return JsonResponse({'results': results})
+
+@login_required
+def technician_search(request):
+    query = request.GET.get('q', '').strip()
+    if not query:
+        users = User.objects.filter(organization=request.user.organization).order_by('full_name')[:10]
+    else:
+        users = User.objects.filter(
+            Q(organization=request.user.organization),
+            Q(full_name__icontains=query) | Q(email__icontains=query)
+        )[:10]
+    
+    results = []
+    for user in users:
+        results.append({
+            'id': str(user.id),
+            'full_name': user.get_full_name(),
+            'email': user.email,
+        })
+    
+    return JsonResponse({'results': results})

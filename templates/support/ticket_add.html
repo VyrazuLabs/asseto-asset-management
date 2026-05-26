@@ -9,15 +9,15 @@
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
 <style>
-    /* Ensure selector buttons are always clickable and visible */
-    .selector-btn {
-        user-select: none;
-        -webkit-user-select: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-    }
+  /* Ensure selector buttons are always clickable and visible */
+  .selector-btn {
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
 </style>
 {% endblock css %}
 
@@ -27,29 +27,29 @@
 
   {# ── Form Errors ──────────────────────────────────────── #}
   {% if form.errors %}
-    <div class="alert alert-danger mx-4 mt-4">
-      <div class="d-flex align-items-center">
-        <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
-        <strong>Please correct the errors below.</strong>
-      </div>
-      {% if form.non_field_errors %}
-        <ul class="mb-0 mt-2">
-          {% for error in form.non_field_errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      {# Also show errors for hidden fields or fields not explicitly in the layout #}
-      {% for field in form %}
-        {% if field.is_hidden and field.errors %}
-          <ul class="mb-0 mt-2">
-            {% for error in field.errors %}
-              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endfor %}
+  <div class="alert alert-danger mx-4 mt-4">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
+      <strong>Please correct the errors below.</strong>
     </div>
+    {% if form.non_field_errors %}
+    <ul class="mb-0 mt-2">
+      {% for error in form.non_field_errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {# Also show errors for hidden fields or fields not explicitly in the layout #}
+    {% for field in form %}
+    {% if field.is_hidden and field.errors %}
+    <ul class="mb-0 mt-2">
+      {% for error in field.errors %}
+      <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endfor %}
+  </div>
   {% endif %}
 
   <div class="add-page-header">
@@ -91,16 +91,49 @@
         </div>
         <div class="section-body">
           <div class="row g-3">
+
+
+            <div class="col-12">
+              <label class="field-label">
+                Target Asset <span class="required">*</span>
+              </label>
+
+              <div style="position: relative;">
+
+                <!-- Visible Search Input -->
+                <input type="text" id="asset-search-input" class="field-input"
+                  placeholder="Search asset by name, code, serial..." autocomplete="off" required>
+
+                <!-- Hidden Actual Select -->
+                {{ form.asset }}
+
+                <!-- Suggestions -->
+                <ul id="asset-suggestions" class="audit-suggestions" style="
+                  max-height: 400px;
+                  overflow-y: auto;
+                  z-index: 9999;
+                  position: absolute;
+                  width: 100%;
+                  display: none;
+                  background: white;
+                  border: 1px solid #e0e0e0;
+                  border-radius: 10px;
+                  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+                  padding: 0;
+                  margin: 0;
+                  list-style: none;
+                "></ul>
+              </div>
+
+              {% for error in form.asset.errors %}
+              <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
             <div class="col-12">
               <label class="field-label">Subject / Issue Summary <span class="required">*</span></label>
               {{ form.subject }}
               {% for error in form.subject.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
-            </div>
-
-            <div class="col-12">
-              <label class="field-label">Target Asset</label>
-              {{ form.asset }}
-              {% for error in form.asset.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
 
             <div class="col-12 mt-2">
@@ -108,10 +141,11 @@
               {{ form.priority }}
               {% for error in form.priority.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
               <div class="selector-group mt-2" id="priority-selector">
-                  <div class="selector-btn" data-value="emergency"><i class="bi bi-exclamation-circle-fill me-2"></i> EMERGENCY</div>
-                  <div class="selector-btn" data-value="high"><i class="bi bi-exclamation-triangle-fill me-2"></i> HIGH</div>
-                  <div class="selector-btn active" data-value="medium"><i class="bi bi-info-circle-fill me-2"></i> MEDIUM</div>
-                  <div class="selector-btn" data-value="low"><i class="bi bi-sliders me-2"></i> LOW</div>
+                <div class="selector-btn" data-value="3"><i class="bi bi-exclamation-circle-fill me-2"></i> EMERGENCY
+                </div>
+                <div class="selector-btn" data-value="2"><i class="bi bi-exclamation-triangle-fill me-2"></i> HIGH</div>
+                <div class="selector-btn active" data-value="1"><i class="bi bi-info-circle-fill me-2"></i> MEDIUM</div>
+                <div class="selector-btn" data-value="0"><i class="bi bi-sliders me-2"></i> LOW</div>
               </div>
             </div>
 
@@ -152,12 +186,13 @@
               {{ form.impact_level }}
               {% for error in form.impact_level.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
               <div class="selector-group mt-2" id="impact-selector">
-                <div class="selector-btn" data-value="low">LOW</div>
-                <div class="selector-btn active" data-value="medium">MEDIUM</div>
-                <div class="selector-btn" data-value="high">HIGH</div>
-                <div class="selector-btn" data-value="critical">CRITICAL</div>
+                <div class="selector-btn" data-value="0">LOW</div>
+                <div class="selector-btn active" data-value="1">MEDIUM</div>
+                <div class="selector-btn" data-value="2">HIGH</div>
+                <div class="selector-btn" data-value="3">CRITICAL</div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -172,13 +207,37 @@
         <div class="sidebar-section-header"><span>Resolution Routing</span></div>
         <div class="sidebar-body">
           <label class="field-label small">Assign Technician</label>
-          {{ form.assigned_to }}
+          <div style="position: relative;">
+            <!-- Visible Search Input -->
+            <input type="text" id="assigned-search-input" class="field-input" placeholder="Search technician by name..."
+              autocomplete="off">
+
+            <!-- Hidden Actual Select -->
+            {{ form.assigned_to }}
+
+            <!-- Suggestions -->
+            <ul id="assigned-suggestions" class="audit-suggestions" style="
+              max-height: 400px;
+              overflow-y: auto;
+              z-index: 9999;
+              position: absolute;
+              width: 100%;
+              display: none;
+              background: white;
+              border: 1px solid #e0e0e0;
+              border-radius: 10px;
+              box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+              padding: 0;
+              margin: 0;
+              list-style: none;
+            "></ul>
+          </div>
           {% for error in form.assigned_to.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
           <div class="compliance-box mt-3">
             <i class="bi bi-lightbulb"></i>
             <p>
-                <strong>Automation Note</strong>
-                Assigning a technician manually will bypass the automated queue distribution system.
+              <strong>Automation Note</strong>
+              Assigning a technician manually will bypass the automated queue distribution system.
             </p>
           </div>
         </div>
@@ -207,25 +266,68 @@
 
 </form>
 
+<style>
+  #id_asset,
+  #id_assigned_to {
+    display: none;
+  }
+
+  .audit-suggestion-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: all 0.2s ease;
+  }
+
+  .audit-suggestion-item:hover {
+    background-color: #f0f7ff;
+    border-left: 3px solid #0056b3;
+  }
+
+  .audit-suggestion-item:last-child {
+    border-bottom: none;
+  }
+
+  .suggestion-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .suggestion-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+  }
+
+  .suggestion-tag,
+  .suggestion-email {
+    font-size: 12px;
+    color: #64748b;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     // ── Priority & Impact Selectors ────────────────────────────────────────
     function setupSelector(groupId, inputName) {
       const group = document.getElementById(groupId);
       if (!group) return;
-      
+
       const input = document.querySelector(`input[name="${inputName}"]`);
       if (!input) return;
 
       const buttons = group.querySelectorAll('.selector-btn');
 
       buttons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
           e.preventDefault();
           buttons.forEach(b => b.classList.remove('active'));
           this.classList.add('active');
           input.value = this.getAttribute('data-value');
-          console.log(`Updated ${inputName} to: ${input.value}`);
         });
       });
     }
@@ -238,16 +340,156 @@
     const fileList = document.getElementById('file-list');
 
     if (fileInput) {
-        fileInput.addEventListener('change', () => {
-          fileList.innerHTML = '';
-          Array.from(fileInput.files).forEach(file => {
-            const div = document.createElement('div');
-            div.className = 'p-2 border-bottom d-flex align-items-center';
-            div.innerHTML = `<i class="bi bi-file-earmark me-2 text-primary"></i> ${file.name}`;
-            fileList.appendChild(div);
-          });
+      fileInput.addEventListener('change', () => {
+        fileList.innerHTML = '';
+        Array.from(fileInput.files).forEach(file => {
+          const div = document.createElement('div');
+          div.className = 'p-2 border-bottom d-flex align-items-center';
+          div.innerHTML = `<i class="bi bi-file-earmark me-2 text-primary"></i> ${file.name}`;
+          fileList.appendChild(div);
         });
+      });
     }
+
+    // ── Common Search Suggestion Handler ──────────────────────────────────
+    function setupSearch(inputEl, suggestionsEl, selectEl, searchUrl, resultFormatter, clickHandler) {
+      let debounceTimer;
+
+      function fetchResults(query) {
+        fetch(`${searchUrl}?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(data => {
+            suggestionsEl.innerHTML = '';
+            if (data.results && data.results.length > 0) {
+              data.results.forEach(item => {
+                const li = document.createElement('li');
+                li.classList.add('audit-suggestion-item');
+                li.innerHTML = resultFormatter(item);
+                li.addEventListener('click', () => clickHandler(item, inputEl, selectEl, suggestionsEl));
+                suggestionsEl.appendChild(li);
+              });
+              suggestionsEl.style.display = 'block';
+            } else {
+              if (query) {
+                suggestionsEl.innerHTML = '<li class="p-3 text-center text-muted small">No results found</li>';
+                suggestionsEl.style.display = 'block';
+              } else {
+                suggestionsEl.style.display = 'none';
+              }
+            }
+          })
+          .catch(err => console.error('Search error:', err));
+      }
+
+      inputEl.addEventListener('input', function () {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+        if (query.length < 1) {
+          suggestionsEl.innerHTML = '';
+          suggestionsEl.style.display = 'none';
+          return;
+        }
+        debounceTimer = setTimeout(() => fetchResults(query), 300);
+      });
+
+      inputEl.addEventListener('focus', function () {
+        if (this.value.trim().length === 0) fetchResults('');
+        else if (suggestionsEl.children.length > 0) suggestionsEl.style.display = 'block';
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest(`#${inputEl.id}`) && !e.target.closest(`#${suggestionsEl.id}`)) {
+          suggestionsEl.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Setup Asset Search ────────────────────────────────────────────────
+    const assetInput = document.getElementById('asset-search-input');
+    const assetSuggestions = document.getElementById('asset-suggestions');
+    const assetSelect = document.getElementById('id_asset');
+
+    setupSearch(
+      assetInput,
+      assetSuggestions,
+      assetSelect,
+      '/support/asset-search/',
+      (item) => `
+          <div class="suggestion-info">
+            <span class="suggestion-name">${item.name}</span>
+            <span class="suggestion-tag">${item.tag || 'No Tag'}</span>
+          </div>
+        `,
+      (item, input, select, suggs) => {
+        input.value = `${item.name} (${item.tag})`;
+        let option = Array.from(select.options).find(opt => opt.value === item.id);
+        if (!option) {
+          option = new Option(item.name, item.id);
+          select.add(option);
+        }
+        select.value = item.id;
+        suggs.style.display = 'none';
+
+        // Clear error state
+        input.style.borderColor = '';
+        input.style.boxShadow = '';
+        const errorSpan = input.parentElement.querySelector('.field-error');
+        if (errorSpan) errorSpan.remove();
+      }
+    );
+
+    // ── Setup Technician Search ───────────────────────────────────────────
+    const assignedInput = document.getElementById('assigned-search-input');
+    const assignedSuggestions = document.getElementById('assigned-suggestions');
+    const assignedSelect = document.getElementById('id_assigned_to');
+
+    setupSearch(
+      assignedInput,
+      assignedSuggestions,
+      assignedSelect,
+      '/support/technician-search/',
+      (item) => `
+          <div class="suggestion-info">
+            <span class="suggestion-name">${item.full_name}</span>
+          </div>
+        `,
+      (item, input, select, suggs) => {
+        input.value = item.full_name;
+        let option = Array.from(select.options).find(opt => opt.value === item.id);
+        if (!option) {
+          option = new Option(item.full_name, item.id);
+          select.add(option);
+        }
+        select.value = item.id;
+        suggs.style.display = 'none';
+      }
+    );
+
+    // Handle clearing assigned input
+    assignedInput.addEventListener('input', function () {
+      if (this.value === '') assignedSelect.value = '';
+    });
+
+    // ── Form Validation ───────────────────────────────────────────────────
+    const form = document.querySelector('form.form');
+    form.addEventListener('submit', function (e) {
+      if (!assetSelect.value) {
+        e.preventDefault();
+        assetInput.style.borderColor = '#dc3545';
+        assetInput.style.boxShadow = '0 0 0 0.25rem rgba(220, 53, 69, 0.25)';
+        assetInput.focus();
+
+        if (!assetInput.parentElement.querySelector('.field-error')) {
+          const errorSpan = document.createElement('span');
+          errorSpan.className = 'field-error';
+          errorSpan.style.display = 'block';
+          errorSpan.style.marginTop = '5px';
+          errorSpan.textContent = 'Please select a valid asset from the dropdown suggestions.';
+          assetInput.parentElement.appendChild(errorSpan);
+        }
+        return false;
+      }
+    });
   });
 </script>
 {% endblock content %}

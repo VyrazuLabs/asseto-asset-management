@@ -7,18 +7,18 @@ from simple_history.models import HistoricalRecords
 from dashboard.models import TimeStampModel, SoftDeleteModel
 
 PRIORITY_CHOICES = [
-    ('emergency', 'Emergency'),
-    ('high', 'High'),
-    ('medium', 'Medium'),
-    ('low', 'Low'),
+    ('3', 'Emergency'),
+    ('2', 'High'),
+    ('1', 'Medium'),
+    ('0', 'Low'),
 ]
 
 STATUS_CHOICES = [
-    ('open', 'Open'),
-    ('in_progress', 'In Progress'),
-    ('in_testing', 'In Testing'),
-    ('resolved', 'Resolved'),
-    ('closed', 'Closed'),
+    ('0', 'Open'),
+    ('1', 'In Progress'),
+    ('2', 'In Testing'),
+    ('3', 'Resolved'),
+    ('4', 'Closed'),
 ]
 
 TICKET_TYPE_CHOICES = [
@@ -32,10 +32,10 @@ TICKET_TYPE_CHOICES = [
 ]
 
 IMPACT_CHOICES = [
-    ('low', 'Low'),
-    ('medium', 'Medium'),
-    ('high', 'High'),
-    ('critical', 'Critical'),
+    ('3', 'Critical'),
+    ('2', 'High'),
+    ('1', 'Medium'),
+    ('0', 'Low'),
 ]
 
 ACTIVITY_TYPE_CHOICES = [
@@ -65,16 +65,16 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
     asset         = models.ForeignKey('assets.Asset', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
     
     # Priority
-    priority      = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
+    priority      = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='1')
     
     # Status
-    status        = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    status        = models.CharField(max_length=20, choices=STATUS_CHOICES, default='0')
     
     # Work Details
     ticket_type   = models.CharField(max_length=100, choices=TICKET_TYPE_CHOICES, default='hardware_repair')
     estimated_eta = models.DateTimeField(blank=True, null=True)
     hours_worked  = models.DecimalField(max_digits=8, decimal_places=1, default=0.0)
-    impact_level  = models.CharField(max_length=20, choices=IMPACT_CHOICES, default='medium')
+    impact_level  = models.CharField(max_length=20, choices=IMPACT_CHOICES, default='1')
     service_level = models.CharField(max_length=100, blank=True, null=True)
     
     # Assignment

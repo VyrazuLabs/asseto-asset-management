@@ -5,22 +5,19 @@
     <td class="ps-4 fw-semibold text-muted">
         {{ page_object.start_index|add:forloop.counter0 }}
     </td>
-    <td class="ticket-id-cell">#{{ ticket.ticket_id }}</td>
+    <td class="table-index-cell">
+        <span class="ticket-tag-pill">{{ ticket.ticket_id }}</span>
+    </td>
     <td>
         <div class="d-flex align-items-center">
             {% if ticket.asset %}
-                {% with img=asset_images|get_item:ticket.asset.id %}
-                    <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
-                         alt="{{ ticket.asset.name }}"
-                         class="rounded me-2"
-                         width="32" height="32"
-                         onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
-                {% endwith %}
+            {% with img=asset_images|get_item:ticket.asset.id %}
+            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                alt="{{ ticket.asset.name }}" class="rounded me-2" width="32" height="32"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            {% endwith %}
             {% else %}
-                <img src="{% static 'images/No_Image.jpg' %}"
-                     alt="No asset"
-                     class="rounded me-2"
-                     width="32" height="32">
+            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
             {% endif %}
             <span>{{ ticket.asset.name|default:"--" }}</span>
         </div>
@@ -44,7 +41,8 @@
         <div class="d-flex align-items-center">
 
             {% if ticket.assigned_to.profile_pic %}
-            <img src="{{ ticket.assigned_to.profile_pic.url }}" class="rounded-circle me-2" width="32" height="32" alt="">
+            <img src="{{ ticket.assigned_to.profile_pic.url }}" class="rounded-circle me-2" width="32" height="32"
+                alt="">
             {% else %}
             <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle me-2" width="32" height="32" alt="">
             {% endif %}
@@ -76,8 +74,8 @@
 {% empty %}
 <tr>
     <td colspan="8" class="text-center py-5">
-        <div class="text-muted">
-            <i class="bi bi-ticket-perforated h1 d-block mb-3"></i>
+        <div class="text-muted d-flex flex-column align-items-center">
+            <i class="bi bi-ticket-perforated h1 mb-3"></i>
             <p>No maintenance tickets found.</p>
             <a href="{% url 'support:ticket_add' %}" class="btn btn-primary btn-sm">Create First Ticket</a>
         </div>

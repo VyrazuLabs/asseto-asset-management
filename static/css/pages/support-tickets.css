@@ -31,22 +31,27 @@
     border-color: var(--color-primary);
 }
 
-.selector-btn.active[data-value="emergency"],
-.selector-btn.active[data-value="critical"] {
+.selector-group:not(.status-selector-group) .selector-btn.active[data-value="3"] {
     background: #DC2626;
     border-color: #DC2626;
     color: #fff;
 }
 
-.selector-btn.active[data-value="high"] {
+.selector-group:not(.status-selector-group) .selector-btn.active[data-value="2"] {
     background: #EA580C;
     border-color: #EA580C;
     color: #fff;
 }
 
-.selector-btn.active[data-value="medium"] {
+.selector-group:not(.status-selector-group) .selector-btn.active[data-value="1"] {
     background: #D97706;
     border-color: #D97706;
+    color: #fff;
+}
+
+.selector-group:not(.status-selector-group) .selector-btn.active[data-value="0"] {
+    background: #059669;
+    border-color: #059669;
     color: #fff;
 }
 
@@ -69,37 +74,31 @@
     justify-content: center;
 }
 
-.selector-btn.active[data-value="low"] {
-    background: #059669;
-    border-color: #059669;
-    color: #fff;
-}
-
-.selector-btn.active[data-value="open"] {
+.status-selector-group .selector-btn.active[data-value="0"] {
     background: #2563EB;
     border-color: #2563EB;
     color: #fff;
 }
 
-.selector-btn.active[data-value="in_progress"] {
+.status-selector-group .selector-btn.active[data-value="1"] {
     background: #1E3A8A;
     border-color: #1E3A8A;
     color: #fff;
 }
 
-.selector-btn.active[data-value="review"] {
+.status-selector-group .selector-btn.active[data-value="2"] {
     background: #D97706;
     border-color: #D97706;
     color: #fff;
 }
 
-.selector-btn.active[data-value="resolved"] {
+.status-selector-group .selector-btn.active[data-value="3"] {
     background: #059669;
     border-color: #059669;
     color: #fff;
 }
 
-.selector-btn.active[data-value="closed"] {
+.status-selector-group .selector-btn.active[data-value="4"] {
     background: #6B7280;
     border-color: #6B7280;
     color: #fff;
@@ -163,6 +162,19 @@
 }
 
 /* ── Ticket List Styles ──────────────────────────────────────────────── */
+.ticket-tag-pill {
+    display: inline-block;
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    font-size: .82rem;
+    font-weight: 700;
+    padding: .25rem .6rem;
+    border-radius: 20px;
+    letter-spacing: .02em;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
 .ticket-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -244,30 +256,30 @@
     display: inline-block;
 }
 
-.status-open {
+.status-0 {
     background: #EFF6FF;
     color: #2563EB;
     border: 1px solid #BFDBFE;
 }
 
-.status-in_progress {
+.status-1 {
     background: #1E3A8A;
     color: #fff;
 }
 
-.status-review {
+.status-2 {
     background: #FEF3C7;
     color: #D97706;
     border: 1px solid #FDE68A;
 }
 
-.status-resolved {
+.status-3 {
     background: #ECFDF5;
     color: #065F46;
     border: 1px solid #A7F3D0;
 }
 
-.status-closed {
+.status-4 {
     background: #F3F4F6;
     color: #6B7280;
     border: 1px solid #D1D5DB;
@@ -287,25 +299,25 @@
 }
 
 /* Emergency */
-.priority-emergency {
+.priority-3 {
     background: #fee2e2;
     color: #dc2626;
 }
 
 /* High */
-.priority-high {
+.priority-2 {
     background: #fef3c7;
     color: #d97706;
 }
 
 /* Medium */
-.priority-medium {
+.priority-1 {
     background: #dbeafe;
     color: #2563eb;
 }
 
 /* Low */
-.priority-low {
+.priority-0 {
     background: #dcfce7;
     color: #16a34a;
 }
@@ -470,7 +482,7 @@
     background: #6366f1;
 }
 
-.dot-review {
+.dot-in-testing {
     background: #f59e0b;
 }
 
@@ -628,22 +640,22 @@
 }
 
 /* Priority Colors for Kanban */
-.prio-emergency {
+.prio-3 {
     background: #fee2e2;
     color: #dc2626;
 }
 
-.prio-high {
+.prio-2 {
     background: #ffedd5;
     color: #ea580c;
 }
 
-.prio-medium {
+.prio-1 {
     background: #eff6ff;
     color: #2563eb;
 }
 
-.prio-low {
+.prio-0 {
     background: #f0fdf4;
     color: #16a34a;
 }
@@ -668,4 +680,31 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Dark Theme  */
+body.theme-dark .ticket-tag-pill {
+    background: var(--color-primary-light);
+    color: #a8b4ff;
+}
+
+body.theme-dark .ticket-table thead th {
+    background: #16162a;
+    border-color: var(--color-border);
+}
+
+body.theme-dark .ticket-table tbody tr {
+    border-color: var(--color-border);
+}
+
+body.theme-dark .ticket-table tbody tr:hover {
+    background: #22223a;
+}
+
+body.theme-dark .ticket-stat-card {
+    background: #22223a;
+}
+
+body.theme-dark .stat-number {
+    color: #fff;
 }

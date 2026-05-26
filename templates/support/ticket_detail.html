@@ -32,24 +32,29 @@
         color: #3b5bec;
     }
 
-    .t-badge-status-in_progress {
+    .t-badge-status-1 {
         background-color: #FFF0E0;
         color: #C26300;
     }
 
-    .t-badge-status-open {
+    .t-badge-status-0 {
         background-color: #E0F7FA;
         color: #00838F;
     }
 
-    .t-badge-status-resolved {
+    .t-badge-status-3 {
         background-color: #E8F5E9;
         color: #2E7D32;
     }
 
-    .t-badge-status-closed {
+    .t-badge-status-4 {
         background-color: #F1F3F5;
         color: #495057;
+    }
+
+    .t-badge-status-2 {
+        background-color: #FEF3C7;
+        color: #D97706;
     }
 
     .info-card-title {
@@ -410,7 +415,7 @@
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="t-badge t-badge-id">#{{ ticket.ticket_id }}</span>
                 <span class="t-badge t-badge-status-{{ ticket.status }}">
-                    {% if ticket.status == 'in_progress' %}
+                    {% if ticket.status == '1' %}
                     <i class="bi bi-clock-history small me-1" style="font-size:0.7rem;"></i>
                     {% else %}
                     <i class="bi bi-circle-fill small me-1" style="font-size:0.5rem;"></i>
@@ -532,7 +537,7 @@
             <div class="impact-item">
                 <div class="info-card-title">Impact Level</div>
                 <div>
-                    {% if ticket.impact_level == 'high' or ticket.impact_level == 'critical' %}
+                    {% if ticket.impact_level == '2' or ticket.impact_level == '3' %}
                     <span class="impact-badge">{{ ticket.get_impact_level_display|upper }} IMPACT</span>
                     {% else %}
                     <div class="impact-value">{{ ticket.get_impact_level_display }}</div>
