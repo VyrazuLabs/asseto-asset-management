@@ -6,7 +6,7 @@ from authentication.models import User
 import uuid
 
 class GatePass(TimeStampModel):
-    STATUS_CHOICES=[(0,'Pending'),(1,'Approved'),(2,'Draft'),(3,'Rejected'),]
+    STATUS_CHOICES = [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
     MOVEMENT_CHOICES=[(0,'Outward'),(1,'Inward')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset=models.ForeignKey(Asset,models.DO_NOTHING)					 
@@ -29,6 +29,11 @@ class GatePass(TimeStampModel):
         blank=True
     )
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+ 
+    @property
+    def gate_pass_no(self):
+        """Returns a human-readable gate pass number."""
+        return f"GP-{str(self.id).split('-')[0].upper()}"
  
  
 # Ui seems to display asset_name,asset_id,product_category and cost($) which we can get from the asset by keeping it as a foreignkey here.

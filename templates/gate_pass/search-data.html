@@ -1,64 +1,147 @@
+{% load static %}
 {% for item in filters %}
 <tr>
-    <td class="table-index-cell">
-        <span class="asset-tag-pill">{{ item.id }}</span>
-    </td>
-    <td class="d-flex gap-3 align-items-center mt-4">
+  <td>{{ forloop.counter|stringformat:"02d" }}</td>
+  <td class="table-index-cell">
+    <span class="asset-tag-pill">{{ item.gate_pass_no }}</span>
+  </td>
+  <td>
+    <div class="d-flex gap-3 align-items-center">
+      {% with item.asset.images.first as img %}
+      <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+        alt="{{ item.asset.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
+        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+      {% endwith %}
+      <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
+    </div>
+  </td>
+  <td style="vertical-align: middle;">
+    <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+      {% if item.raised_by.profile_pic %}
+      <img src="{{ item.raised_by.profile_pic.url }}" alt="{{ item.raised_by.full_name }}"
+        class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+      {% else %}
+      <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+        style="width: 32px; height: 32px; object-fit: cover;">
+      {% endif %}
+
+      <div>
+        <div class="text-nowrap fw-semibold">
+          {{ item.raised_by }}
+        </div>
+
+        <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+          {{ item.created_at|date:"d M Y, h:i A" }}
+        </div>
+      </div>
+
+    </div>
+  </td>
+  <td style="vertical-align: middle;">
+    <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+      {% if item.authorised_by %}
+
+      {% if item.authorised_by.profile_pic %}
+      <img src="{{ item.authorised_by.profile_pic.url }}" alt="{{ item.authorised_by.full_name }}"
+        class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+      {% else %}
+      <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+        style="width: 32px; height: 32px; object-fit: cover;">
+      {% endif %}
+
+      <div>
+        <div class="text-nowrap fw-semibold">
+          {{ item.authorised_by }}
+        </div>
+        <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+          {{ item.updated_at|date:"d M Y, h:i A" }}
+        </div>
+      </div>
+
+      {% else %}
+
+      <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+        style="width: 32px; height: 32px; background: #F3F4F6; color: #6B7280; font-size: 14px;">
+        <i class="bi bi-person-x"></i>
+      </div>
+
+      <div>
+        <div class="text-nowrap fw-semibold text-danger">
+          Unauthorised
+        </div>
+      </div>
+
+      {% endif %}
+
+    </div>
+  </td>
+  <td>{{ item.destination_vendor.name }}</td>
+  <td>
+    {% if item.movement_type == 0 %}
+
+    <!-- Outward -->
     <span
-        class="material-symbols-outlined text-slate-500 text-lg"
-        data-icon="laptop_mac"
-        style="background-color: whitesmoke;border-radius: 5px;padding:4px;">
-        laptop_mac
+      class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit">
+      <span class="material-symbols-outlined text-xs" data-icon="logout">
+        logout
+      </span>
+      Outward
     </span>
-    <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
-    </td>
-    <td>{{ item.raised_by }}</td>
-    <td>
-    {% if item.authorised_by %}
-        {{ item.authorised_by }}
+
     {% else %}
-        Unauthorised
-    {% endif %}
-    </td>
-    <td>{{ item.destination_vendor.name }}</td>
-    <td>
+
+    <!-- Inward -->
     <span
-        class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit"
-    >
-        
-        {% if item.movement_type == 0 %}
-        <span
-        class="material-symbols-outlined text-xs"
-        data-icon="logout"
-        >logout</span>
-        Outward
-        {% else %}
-        <span
-        class="material-symbols-outlined text-xs"
-        data-icon="login"
-        >login</span>
-        Inward
-        {% endif %}
+      class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white flex items-center gap-1 w-fit">
+      <span class="material-symbols-outlined text-xs" data-icon="login">
+        login
+      </span>
+      Inward
     </span>
-    </td>
-    <td class="px-6 py-5">
-        {% if item.status == 0 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-orange-100 text-orange-700">Pending</span>
-        {% elif item.status == 1 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">Approved</span>
-        {% elif item.status == 2 %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-green-100 text-green-700">Draft</span>
-        {% else %}
-            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-red-100 text-red-700">Rejected</span>
-        {% endif %}
-    </td>
-    <td class="d-flex justify-content-center me-5">
-    <a
-        class=""
-        href="{% url 'gate-pass:detail' item.id %}"
-        >
-        <i class="bi bi-display"></i>
+
+    {% endif %}
+  </td>
+  <td class="px-6 py-5">
+    {% if item.status == 0 %}
+    <span
+      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50 flex items-center gap-1.5 w-fit">
+      <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">pending</span>
+      Pending
+    </span>
+    {% elif item.status == 1 %}
+    <span
+      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50 flex items-center gap-1.5 w-fit">
+      <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">check_circle</span>
+      Approved
+    </span>
+    {% elif item.status == 2 %}
+    <span
+      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5 w-fit">
+      <span class="material-symbols-outlined text-xs">edit_note</span>
+      Draft
+    </span>
+    {% elif item.status == 4 %}
+    <span
+      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/50 flex items-center gap-1.5 w-fit">
+      <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">output</span>
+      Checked Out
+    </span>
+    {% else %}
+    <span
+      class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/50 flex items-center gap-1.5 w-fit">
+      <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">cancel</span>
+      Rejected
+    </span>
+    {% endif %}
+  </td>
+  <td style="vertical-align: middle; text-align: center;">
+    <a href="{% url 'gate-pass:detail' item.id %}">
+      <i class="bi bi-display fs-5"></i>
     </a>
-    </td>
+  </td>
 </tr>
 {% endfor %}

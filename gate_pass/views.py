@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.urls import path
+from django.urls import path, reverse
 from configurations.utils import get_currency_and_datetime_format
 from products.models import ProductCategory
 from upload.views.product_type_views import product_type_list
@@ -28,38 +28,72 @@ def search(request):
         return render(request, 'gate_pass/search-data.html', {'items': get_obj})
 
 def add(request):
+    errors = {}
+    old = {}
+
     if request.method == 'POST':
-        search = request.POST.get('search')
+        search = request.POST.get('search', '').strip()
         movement_type = request.POST.get('movement-type')
         destination_vendor = request.POST.get('destination-vendor')
         expected_return_date = request.POST.get('expected-return-date')
         purpose_movement = request.POST.get('purpose-movement')
-        # We are selecting the asset from the dropddown in the UI, So this method is mandatory
-        asset = None
-        if search:
+
+        vendor_name = ''
+        if destination_vendor:
+            try:
+                v = Vendor.objects.get(id=destination_vendor)
+                vendor_name = v.name
+            except Vendor.DoesNotExist:
+                pass
+
+        old = {
+            'search': search,
+            'movement_type': movement_type,
+            'destination_vendor': destination_vendor,
+            'destination_vendor_name': vendor_name,
+            'expected_return_date': expected_return_date,
+            'purpose_movement': purpose_movement,
+        }
+
+        if not search:
+            errors['search'] = 'Please select an asset.'
+        else:
             asset = Asset.objects.filter(
                 Q(name__icontains=search) | Q(tag__icontains=search)
             ).first()
+            if not asset:
+                errors['search'] = 'No asset found with this tag/name.'
+            elif GatePass.objects.filter(asset=asset, status=0).exists():
+                errors['search'] = 'This asset already has a pending gate pass.'
 
-        print("Asset:", asset)
+        if not movement_type:
+            errors['movement_type'] = 'Please select movement type.'
 
-        if not asset:
-            return HttpResponse("❌ Asset not found")  # DEBUG safety
+        if not destination_vendor:
+            errors['destination_vendor'] = 'Please select a destination vendor.'
 
-        GatePass.objects.create(
-            asset=asset,
-            movement_type=movement_type,
-            destination_vendor_id=destination_vendor,
-            expected_return_date=expected_return_date,
-            purpose_of_movement=purpose_movement or None,
-            raised_by=request.user,
-            authorised_by=None
-        )
+        if not expected_return_date:
+            errors['expected_return_date'] = 'Please select expected return date.'
 
-        return redirect('gate_pass:list')
+        if not errors:
+            GatePass.objects.create(
+                asset=asset,
+                movement_type=movement_type,
+                destination_vendor_id=destination_vendor,
+                expected_return_date=expected_return_date,
+                purpose_of_movement=purpose_movement or None,
+                raised_by=request.user,
+                authorised_by=None
+            )
+            return redirect('gate_pass:list')
 
     vendors = Vendor.undeleted_objects.all()
-    return render(request, 'gate_pass/add.html', {'vendors': vendors})
+    return render(request, 'gate_pass/add.html', {
+        'vendors': vendors,
+        'title': 'Register New Gate Pass',
+        'errors': errors,
+        'old': old,
+    })
 
 def detail(request,id):
     if request.method=='POST':
@@ -71,6 +105,7 @@ def detail(request,id):
     context={
         'items':get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
+        'title': 'Gate Pass Detail',
     }
     # context=details_of_asset(request,id)
     # return render(request,'gate_pass/detail.html',context=context)
@@ -78,14 +113,62 @@ def detail(request,id):
 
 def print_doc(request,id):
     gate_pass = GatePass.objects.filter(id=id).first()
+    if not gate_pass:
+        return HttpResponse("❌ Gate Pass not found", status=404)
+        
     get_status=gate_pass.status
     print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
+    checkout_url = request.build_absolute_uri(reverse('gate-pass:checkout', args=[gate_pass.id]))
+    
+    # Check if we are on localhost/127.0.0.1
+    host = request.get_host().split(':')[0]
+    is_local = host in ['127.0.0.1', 'localhost']
+    
     context={
         'gate_pass': gate_pass,
         'status': gate_pass.STATUS_CHOICES[gate_pass.status][1],
         'created_at': gate_pass.created_at.astimezone(ZoneInfo('Asia/Kolkata')).date(),
+        'checkout_url': checkout_url,
+        'is_local': is_local,
     }
     return render(request,'gate_pass/print-doc.html', context=context)
+
+def gate_pass_checkout(request, id):
+    gate_pass = GatePass.objects.filter(id=id).first()
+    if not gate_pass:
+        return HttpResponse("❌ Gate Pass not found", status=404)
+    
+    # Check if already checked out
+    if gate_pass.status == 4:
+        return render(request, 'gate_pass/public-checkout.html', {
+            'gate_pass': gate_pass,
+            'already_checked_out': True
+        })
+
+    # Update status to 'Checked Out' (4)
+    gate_pass.status = 4
+    gate_pass.save()
+    
+    return render(request, 'gate_pass/public-checkout.html', {
+        'gate_pass': gate_pass,
+        'already_checked_out': False
+    })
+
+def vendor_search(request):
+    q = request.GET.get('q', '').strip()
+    vendors = Vendor.undeleted_objects.filter(
+        Q(name__icontains=q) | Q(email__icontains=q) | Q(gstin_number__icontains=q),
+        organization=request.user.organization
+    )[:15]
+    data = [
+        {
+            'id': str(v.id), 
+            'name': v.name, 
+            'email': v.email or '', 
+            'gstin': v.gstin_number or ''
+        } for v in vendors
+    ]
+    return JsonResponse({'vendors': data})
 
 def authorisation(request,id,status):
     gate_pass = GatePass.objects.filter(id=id).first()
