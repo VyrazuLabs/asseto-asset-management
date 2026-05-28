@@ -708,3 +708,8 @@ body.theme-dark .ticket-stat-card {
 body.theme-dark .stat-number {
     color: #fff;
 }
+
+body.theme-dark .btn-edit-ticket {
+    background: var(--color-primary);
+    color: #fff !important;
+}
