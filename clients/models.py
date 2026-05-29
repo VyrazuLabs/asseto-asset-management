@@ -23,6 +23,27 @@ RENTAL_TYPE_CHOICES = [
 ]
 
 
+INDUSTRY_CHOICES = [
+    ('1', 'Technology'),
+    ('2', 'Healthcare'),
+    ('3', 'Finance'),
+    ('4', 'Manufacturing'),
+    ('5', 'Retail'),
+    ('6', 'Education'),
+    ('7', 'Real Estate'),
+    ('8', 'Transportation'),
+    ('9', 'Energy'),
+    ('10', 'Construction'),
+    ('11', 'Hospitality'),
+    ('12', 'Media & Entertainment'),
+    ('13', 'Telecommunications'),
+    ('14', 'Agriculture'),
+    ('15', 'Other'),
+]
+
+INDUSTRY_MAP = dict(INDUSTRY_CHOICES)
+
+
 def generate_client_id():
     """Generate a unique client ID like CL-XXXXX"""
     return f"CL-{random.randint(10000, 99999)}"
@@ -74,6 +95,10 @@ class Client(TimeStampModel, SoftDeleteModel):
         elif parts:
             return parts[0][:2].upper()
         return 'CL'
+
+    @property
+    def industry_name(self):
+        return INDUSTRY_MAP.get(self.industry, self.industry or 'Not Specified')
 
 class ClientContact(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

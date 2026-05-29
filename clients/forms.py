@@ -1,27 +1,9 @@
 from django import forms
 from django.db import models
 from roles.models import Role
-from .models import Client, STATUS_CHOICES, RENTAL_TYPE_CHOICES
+from .models import Client, STATUS_CHOICES, RENTAL_TYPE_CHOICES, INDUSTRY_CHOICES
 
-
-INDUSTRY_CHOICES = [
-    ('', 'Select Industry Type'),
-    ('1', 'Technology'),
-    ('2', 'Healthcare'),
-    ('3', 'Finance'),
-    ('4', 'Manufacturing'),
-    ('5', 'Retail'),
-    ('6', 'Education'),
-    ('7', 'Real Estate'),
-    ('8', 'Transportation'),
-    ('9', 'Energy'),
-    ('10', 'Construction'),
-    ('11', 'Hospitality'),
-    ('12', 'Media & Entertainment'),
-    ('13', 'Telecommunications'),
-    ('14', 'Agriculture'),
-    ('15', 'Other'),
-]
+INDUSTRY_FORM_CHOICES = [('', 'Select Industry Type')] + INDUSTRY_CHOICES
 
 
 class ClientForm(forms.ModelForm):
@@ -34,8 +16,8 @@ class ClientForm(forms.ModelForm):
         })
     )
     industry = forms.ChoiceField(
-        required=False,
-        choices=INDUSTRY_CHOICES,
+        required=True,
+        choices=INDUSTRY_FORM_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     corporate_website = forms.URLField(

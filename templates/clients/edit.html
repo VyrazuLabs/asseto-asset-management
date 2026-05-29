@@ -10,9 +10,11 @@
     .website-input {
         position: relative;
     }
+
     .website-input .form-control {
         padding-left: 45px;
     }
+
     .website-input i {
         position: absolute;
         left: 16px;
@@ -20,17 +22,31 @@
         color: #6c757d;
         font-size: 16px;
     }
+
     body.theme-dark .website-input .form-control {
         padding-left: 45px;
         background-color: #1e1e2d;
         border-color: #3d3d56;
         color: #e2e8f0;
     }
+
     body.theme-dark .website-input i {
         color: #94a3b8;
     }
+
     body.theme-dark .website-input .form-control::placeholder {
         color: #94a3b8;
+    }
+
+    /* Error Handling Styles */
+    .form-group:has(.text-danger) .form-control {
+        border-color: #dc3545 !important;
+    }
+    .form-group:has(.text-danger) label {
+        color: #dc3545 !important;
+    }
+    .alert-danger {
+        border-left: 4px solid #dc3545;
     }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -40,25 +56,27 @@
 <div class="add-product-container">
     {# ── Page header ───────────────────────────────────────────────────────── #}
     <div class="add-page-header">
-      <div>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
-            <li class="breadcrumb-item active">Update Client</li>
-          </ol>
-        </nav>
-        <h1>Update Client: {{ client.name }}</h1>
-        <p class="subtitle">Modify institutional or private asset records. Ensure all regulatory information is updated accurately.</p>
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <a href="{% url 'clients:list' %}" class="btn-back-listing">
-          <i class="bi bi-x-lg"></i> Cancel Changes
-        </a>
-        <button type="submit" form="client-form" class="btn-save-asset">
-          <i class="bi bi-floppy2"></i> Update Client Record
-        </button>
-      </div>
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a>
+                    </li>
+                    <li class="breadcrumb-item active">Update Client</li>
+                </ol>
+            </nav>
+            <h1>Update Client: {{ client.name }}</h1>
+            <p class="subtitle">Modify institutional or private asset records. Ensure all regulatory information is
+                updated accurately.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'clients:list' %}" class="btn-back-listing" style="flex: 1;">
+                <i class="bi bi-arrow-left"></i>Back to Listing Page
+            </a>
+            <button type="submit" form="client-form" class="btn-save-asset" style="flex: 1;">
+                <i class="bi bi-floppy2"></i> Update
+            </button>
+        </div>
     </div>
 
     {# ── Form Card ─────────────────────────────────────────────────────────── #}
@@ -66,9 +84,13 @@
         <form method="post" id="client-form" novalidate>
             {% csrf_token %}
 
-            {% if form.non_field_errors or form.errors %}
-            <div class="alert alert-danger mb-4">
-                <ul class="mb-0">
+            {% if form.errors or form.non_field_errors %}
+            <div class="alert alert-danger mb-4" role="alert">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <h6 class="mb-0 fw-bold">Please correct the following errors:</h6>
+                </div>
+                <ul class="mb-0 ps-3">
                     {% for field in form %}
                         {% for error in field.errors %}
                             <li><strong>{{ field.label }}:</strong> {{ error }}</li>
@@ -120,79 +142,91 @@
                 </div>
                 <div id="contactsContainer">
                     {% if client.contacts.all %}
-                         {% for contact in client.contacts.all %}
-                         <div class="contact-block custom-field-row mb-4">
-                             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                 <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
-                                     <i class="bi bi-person me-1"></i> Contact Person
-                                 </h6>
-                                 <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i class="bi bi-trash"></i> Remove</button>
-                             </div>
-                             <div class="form-grid">
-                                 <div class="form-group full-width">
-                                     <label>CONTACT NAME</label>
-                                     <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name" value="{{ contact.name }}">
-                                 </div>
-                                 <div class="form-group">
-                                     <label>EMAIL ADDRESS</label>
-                                     <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com" value="{{ contact.email|default:'' }}">
-                                 </div>
-                                 <div class="form-group">
-                                     <label>PHONE NUMBER</label>
-                                     <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000" value="{{ contact.phone|default:'' }}">
-                                 </div>
-                                 <div class="form-group full-width">
-                                     <label>ROLE</label>
-                                     <select name="contact_role[]" class="form-control">
-                                         <option value="">Select Role</option>
-                                         {% for r in roles %}
-                                         <option value="{{ r.id }}" {% if contact.role_id == r.id %}selected{% endif %}>{{ r.related_name }}</option>
-                                         {% endfor %}
-                                     </select>
-                                 </div>
-                                 <div class="form-group full-width">
-                                     <label>NOTES</label>
-                                     <textarea name="contact_notes[]" class="form-control" rows="2" placeholder="Additional instructions or internal notes regarding this contact...">{{ contact.notes|default:'' }}</textarea>
-                                 </div>
-                             </div>
-                         </div>
-                         {% endfor %}
-                    {% else %}
-                        <div class="contact-block custom-field-row mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                                <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
-                                    <i class="bi bi-person me-1"></i> Contact Person
-                                </h6>
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn" style="display: none; padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i class="bi bi-trash"></i> Remove</button>
+                    {% for contact in client.contacts.all %}
+                    <div class="contact-block custom-field-row mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
+                                <i class="bi bi-person me-1"></i> Contact Person
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn"
+                                style="padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i class="bi bi-trash"></i>
+                                Remove</button>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>CONTACT NAME</label>
+                                <input type="text" name="contact_name[]" class="form-control"
+                                    placeholder="Full legal name" value="{{ contact.name }}">
                             </div>
-                            <div class="form-grid">
-                                <div class="form-group full-width">
-                                    <label>CONTACT NAME</label>
-                                    <input type="text" name="contact_name[]" class="form-control" placeholder="Full legal name">
-                                </div>
-                                <div class="form-group">
-                                    <label>EMAIL ADDRESS</label>
-                                    <input type="email" name="contact_email[]" class="form-control" placeholder="p.contact@company.com">
-                                </div>
-                                <div class="form-group">
-                                    <label>PHONE NUMBER</label>
-                                    <input type="text" name="contact_phone[]" class="form-control" placeholder="+1 (555) 000-0000">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label>ROLE</label>
-                                    <select name="contact_role[]" class="form-control">
-                                        <option value="">Select Role</option>
-                                        {% for r in roles %}
-                                        <option value="{{ r.id }}">{{ r.related_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="form-group full-width">
-                                    <label>NOTES</label>
-                                    <textarea name="contact_notes[]" class="form-control" rows="2" placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
-                                </div>
+                            <div class="form-group">
+                                <label>EMAIL ADDRESS</label>
+                                <input type="email" name="contact_email[]" class="form-control"
+                                    placeholder="p.contact@company.com" value="{{ contact.email|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label>PHONE NUMBER</label>
+                                <input type="text" name="contact_phone[]" class="form-control"
+                                    placeholder="+1 (555) 000-0000" value="{{ contact.phone|default:'' }}">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>ROLE</label>
+                                <select name="contact_role[]" class="form-control">
+                                    <option value="">Select Role</option>
+                                    {% for r in roles %}
+                                    <option value="{{ r.id }}" {% if contact.role_id == r.id %}selected{% endif %}>{{ r.related_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>NOTES</label>
+                                <textarea name="contact_notes[]" class="form-control" rows="2"
+                                    placeholder="Additional instructions or internal notes regarding this contact...">{{ contact.notes|default:'' }}</textarea>
                             </div>
                         </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="contact-block custom-field-row mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
+                                <i class="bi bi-person me-1"></i> Contact Person
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn"
+                                style="display: none; padding: 0.2rem 0.5rem; font-size: 0.8rem;"><i
+                                    class="bi bi-trash"></i> Remove</button>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>CONTACT NAME</label>
+                                <input type="text" name="contact_name[]" class="form-control"
+                                    placeholder="Full legal name">
+                            </div>
+                            <div class="form-group">
+                                <label>EMAIL ADDRESS</label>
+                                <input type="email" name="contact_email[]" class="form-control"
+                                    placeholder="p.contact@company.com">
+                            </div>
+                            <div class="form-group">
+                                <label>PHONE NUMBER</label>
+                                <input type="text" name="contact_phone[]" class="form-control"
+                                    placeholder="+1 (555) 000-0000">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>ROLE</label>
+                                <select name="contact_role[]" class="form-control">
+                                    <option value="">Select Role</option>
+                                    {% for r in roles %}
+                                    <option value="{{ r.id }}">{{ r.related_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>NOTES</label>
+                                <textarea name="contact_notes[]" class="form-control" rows="2"
+                                    placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -231,7 +265,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const addContactBtn = document.getElementById('addContactBtn');
         const contactsContainer = document.getElementById('contactsContainer');
 
@@ -246,14 +280,14 @@
             });
         }
 
-        addContactBtn.addEventListener('click', function() {
+        addContactBtn.addEventListener('click', function () {
             const firstBlock = contactsContainer.querySelector('.contact-block');
             const newBlock = firstBlock.cloneNode(true);
-            
+
             // Clear values in cloned block
             const inputs = newBlock.querySelectorAll('input, textarea, select');
             inputs.forEach(input => {
-                if(input.tagName === 'SELECT') {
+                if (input.tagName === 'SELECT') {
                     input.selectedIndex = 0;
                 } else {
                     input.value = '';
@@ -262,7 +296,7 @@
 
             // Add event listener to new remove button
             const removeBtn = newBlock.querySelector('.remove-contact-btn');
-            removeBtn.addEventListener('click', function() {
+            removeBtn.addEventListener('click', function () {
                 newBlock.remove();
                 toggleRemoveButtons();
             });
@@ -274,7 +308,7 @@
         // Add event listener to existing buttons
         const initialRemoveBtns = contactsContainer.querySelectorAll('.remove-contact-btn');
         initialRemoveBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 btn.closest('.contact-block').remove();
                 toggleRemoveButtons();
             });

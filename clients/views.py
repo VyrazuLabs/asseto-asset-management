@@ -164,7 +164,7 @@ def client_detail(request, id):
                                organization=request.user.organization)
     
     # Fetch related assets
-    assets = client.assets.filter(is_deleted=False).select_related('product', 'location')
+    assets = client.assets.filter(is_deleted=False).select_related('product__product_sub_category', 'location').prefetch_related('images')
     
     # Calculate total asset value in Millions
     total_val = assets.aggregate(total=models.Sum('price'))['total'] or 0
@@ -193,7 +193,8 @@ def client_detail(request, id):
             'user': h.history_user,
             'type': 'Client',
             'action': action,
-            'notes': notes
+            'notes': notes,
+            'history_type': h.history_type,
         })
 
     for h in asset_history:
@@ -204,7 +205,8 @@ def client_detail(request, id):
             'user': h.history_user,
             'type': 'Asset',
             'action': action,
-            'notes': f'Asset {h.tag} was {h_type.lower()}.'
+            'notes': f'Asset {h.tag} was {h_type.lower()}.',
+            'history_type': h.history_type,
         })
     
     activities.sort(key=lambda x: x['date'], reverse=True)
