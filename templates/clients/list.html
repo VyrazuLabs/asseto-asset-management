@@ -97,10 +97,15 @@
         </select>
       </div>
       <div class="col-auto">
-        <!-- Export Button -->
-        <button type="button" id="exportBtn" class="btn-export" onclick="exportClientData()">
-          <i class="bi bi-download"></i> Export
-        </button>
+        <div class="dropdown">
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
+            <i class="bi bi-download"></i> Export
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'clients:export_csv' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
+            <li><a class="dropdown-item" href="{% url 'clients:export_pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+          </ul>
+        </div>
       </div>
       <div class="col-auto">
         <a href="{% url 'clients:list' %}" class="btn-reset" title="Reset">
@@ -111,11 +116,6 @@
     </div>
   </form>
 
-  {# ── Hidden Export Form ── #}
-  <form id="exportForm" method="GET" action="{% url 'clients:export' %}" style="display: none;">
-    <input type="hidden" name="search" id="exportSearchInput">
-    <input type="hidden" name="status" id="exportStatusInput">
-  </form>
 </div>
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
@@ -165,21 +165,6 @@
 
 {% block script %}
 <script>
-  window.exportClientData = function () {
-    var searchInput = document.querySelector('input[name="search"]');
-    var statusSelect = document.querySelector('select[name="status"]');
-
-    var searchVal = searchInput ? searchInput.value : '';
-    var statusVal = statusSelect ? statusSelect.value : '';
-
-    var url = '/clients/export?search=' + encodeURIComponent(searchVal);
-    if (statusVal && statusVal !== 'All Statuses') {
-      url += '&status=' + encodeURIComponent(statusVal);
-    }
-
-    window.location.href = url;
-  };
-
   window.addEventListener('load', function () {
     const filterForm = document.getElementById('filterForm');
     const searchInput = document.querySelector('input[name="search"]');

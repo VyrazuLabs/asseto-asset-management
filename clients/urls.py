@@ -11,5 +11,6 @@ urlpatterns = [
     path('status/<uuid:id>',      views.toggle_status,  name='status'),
     path('delete/<uuid:id>',      views.delete_client,  name='delete'),
     path('search/<str:page>',     views.search_clients, name='search'),
-    path('export',                views.export_clients, name='export'),
+    path('export-csv',            views.export_clients_csv, name='export_csv'),
+    path('export-pdf',            views.export_clients_pdf, name='export_pdf'),
 ]

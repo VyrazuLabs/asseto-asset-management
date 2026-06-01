@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 from .models import Client, ClientContact, STATUS_CHOICES
 from .forms import ClientForm
+from .utils import export_clients_csv_utils, export_clients_pdf_utils
 from assets.models import Asset, AssetImage, AssignAsset
 from audit.models import Audit
 from collections import defaultdict
@@ -45,7 +46,7 @@ def client_list(request):
     
     # Filtering & Search
     search = request.GET.get('search', '').strip()
-    status = request.GET.get('status')
+    status = request.GET.get('status', '')
     
     if search:
         qs = qs.filter(Q(name__icontains=search) | Q(client_id__icontains=search))
@@ -300,37 +301,10 @@ def search_clients(request, page):
     }
     return render(request, 'clients/clients-data.html', context)
 @login_required
-def export_clients(request):
-    import csv
-    qs = _base_qs(request)
-    
-    # Apply filters from request
-    search = request.GET.get('search', '').strip()
-    status = request.GET.get('status')
-    
-    if search:
-        qs = qs.filter(Q(name__icontains=search) | Q(client_id__icontains=search))
-    if status and status != 'All Statuses':
-        qs = qs.filter(status=status)
+def export_clients_csv(request):
+    return export_clients_csv_utils(request)
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="clients_export.csv"'
-    
-    writer = csv.writer(response)
-    writer.writerow(['Client ID', 'Name', 'Industry', 'Contact Person', 'Email', 'Phone', 'Active Rentals', 'Open Tickets', 'Status'])
-    
-    for client in qs:
-        first_contact = client.contacts.first()
-        writer.writerow([
-            client.client_id,
-            client.name,
-            client.industry,
-            first_contact.name if first_contact else '',
-            first_contact.email if first_contact else '',
-            first_contact.phone if first_contact else '',
-            client.active_rentals,
-            client.open_tickets,
-            client.get_status_display()
-        ])
-        
-    return response
+
+@login_required
+def export_clients_pdf(request):
+    return export_clients_pdf_utils(request)
