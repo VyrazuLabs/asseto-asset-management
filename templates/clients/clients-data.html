@@ -49,7 +49,7 @@
   </td>
   <td class="text-center c-col-opentickets">
     {% if client.open_tickets == 0 %}
-      <div class="c-ticket-count text-danger">{{ client.open_tickets|stringformat:"02d" }}</div>
+      <div class="c-ticket-count text-muted">{{ client.open_tickets|stringformat:"02d" }}</div>
     {% elif client.open_tickets > 10 %}
       <div class="c-ticket-count text-danger">{{ client.open_tickets|stringformat:"02d" }}</div>
     {% elif client.open_tickets > 5 %}
