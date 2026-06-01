@@ -124,10 +124,9 @@
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-filter-form','change');">All
-                Status</a></li>
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=status]').value='0';document.getElementById('status-btn').childNodes[0].textContent='Pending ';htmx.trigger('#asset-filter-form','change');">Pending</a>
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value='0'; document.getElementById('status-btn').childNodes[0].textContent='Pending '; htmx.trigger(form,'change');">Pending</a>
             </li>
             <li><a href="#" class="dropdown-item"
                 onclick="event.preventDefault();document.querySelector('[name=status]').value='1';document.getElementById('status-btn').childNodes[0].textContent='Approved ';htmx.trigger('#asset-filter-form','change');">Approved</a>
@@ -161,7 +160,7 @@
                 Vendors</a></li>
             {% for vendor in destination_vendor_list %}
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=vendor]').value='{{ vendor.destination_vendor__id }}';document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.destination_vendor__name }} ';htmx.trigger('#asset-filter-form','change');">
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value='{{ vendor.destination_vendor__id }}'; document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.destination_vendor__name }} '; htmx.trigger(form,'change');">
                 {{ vendor.destination_vendor__name }}
               </a></li>
             {% endfor %}

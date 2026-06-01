@@ -72,6 +72,12 @@
       </div>
 
       <div class="col-md-4 col-12">
+        <label class="field-label">Client</label>
+        {{ form.client }}
+        {% for e in form.client.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+      </div>
+
+      <div class="col-md-4 col-12">
         <label class="field-label">Office Location</label>
         {{ form.location }}
         {% for e in form.location.errors %}<span class="field-error">{{ e }}</span>{% endfor %}

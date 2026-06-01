@@ -76,7 +76,13 @@
                 {% for error in form.vendor.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
               </div>
 
-              <div class="col-12">
+              <div class="col-md-6">
+                <label class="field-label">Client</label>
+                {{ form.client }}
+                {% for error in form.client.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+              </div>
+
+              <div class="col-md-6">
                 <label class="field-label">Office Location</label>
                 {{ form.location }}
                 {% for error in form.location.errors %}<span class="field-error">{{ error }}</span>{% endfor %}

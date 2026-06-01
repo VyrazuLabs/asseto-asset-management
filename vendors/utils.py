@@ -37,28 +37,38 @@ def export_vendor_csv_utils(request):
     response['Content-Disposition'] = f'attachment; filename="export-vendors-{today}.csv"'
     return response
 
-def search_utils(request,page):
+def search_utils(request, page):
     search_text = (request.GET.get('search_text') or "").strip()
+    status = request.GET.get('status')
+
+    filters = Q(organization=request.user.organization)
 
     if search_text:
-        vendors_list = searched_data(request,search_text)
-        page_object = vendors_list
-    else:
-        vendors_list = Vendor.undeleted_objects.filter(
-            organization=request.user.organization
-        ).order_by("-created_at")
+        filters &= (
+            Q(name__icontains=search_text) |
+            Q(email__icontains=search_text) |
+            Q(phone__icontains=search_text) |
+            Q(designation__icontains=search_text) |
+            Q(gstin_number__icontains=search_text) |
+            Q(contact_person__icontains=search_text)
+        )
 
-        paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
-        page_number = page
-        page_object = paginator.get_page(page_number)
+    if status:
+        status_val = True if status == 'active' else False
+        filters &= Q(status=status_val)
+
+    vendors_list = Vendor.undeleted_objects.filter(filters).order_by("-created_at")
+
+    paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+    page_object = paginator.get_page(page)
 
     count_array = []
     for it in page_object:
         get_count = get_count_of_assets(request, it.id)
         count_array.append(get_count)
 
-    deleted_vendor_count = Vendor.deleted_objects.count()
-    return page_object,count_array,deleted_vendor_count
+    deleted_vendor_count = Vendor.deleted_objects.filter(organization=request.user.organization).count()
+    return page_object, count_array, deleted_vendor_count
 
 def get_vendor_details(request, id):
     vendor = get_object_or_404(

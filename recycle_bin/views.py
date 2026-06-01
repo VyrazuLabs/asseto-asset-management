@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from clients.models import Client
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -863,3 +864,72 @@ def deleted_license_types_search(request, page):
     page_number = page
     page_object = paginator.get_page(page_number)
     return render(request, 'recycle_bin/deleted-asset-status-data.html', {'page_object': page_object})
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_clients(request):
+    clients_list = Client.deleted_objects.filter(
+        organization=request.user.organization).order_by('-updated_at')
+    paginator = Paginator(clients_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        'sidebar': 'trash',
+        'submenu': 'clients',
+        'page_object': page_object,
+        'title': 'Deleted Clients'
+    }
+
+    return render(request, 'recycle_bin/deleted-clients.html', context=context)
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_clients_restore(request, id):
+    try:
+        if request.method == 'POST':
+            client = get_object_or_404(
+                Client.deleted_objects, pk=id, organization=request.user.organization)
+            client.restore()
+            messages.success(request, 'Client restored successfully')
+    except:
+        messages.error(request, 'Client can not be restored')
+
+    return redirect('recycle_bin:deleted_clients')
+
+
+@login_required
+@user_passes_test(check_admin)
+def deleted_clients_permanently(request, id):
+    try:
+        if request.method == 'POST':
+            client = get_object_or_404(
+                Client.deleted_objects, pk=id, organization=request.user.organization)
+            client.delete()
+            messages.success(request, 'Client deleted permanently')
+    except ProtectedError:
+        messages.error(request, 'Error! Client is used in asset or other records')
+    except:
+        messages.error(request, 'Client can not be deleted')
+
+    return redirect('recycle_bin:deleted_clients')
+
+
+@login_required
+def deleted_clients_search(request, page):
+    search_text = (request.GET.get('search_text') or '').strip()
+    if search_text:
+        return render(request, 'recycle_bin/deleted-clients-data.html', {
+            'page_object': Client.deleted_objects.filter(Q(organization=request.user.organization) & (Q(
+                name__icontains=search_text) | Q(client_id__icontains=search_text) | Q(industry__icontains=search_text)
+            )).order_by('-updated_at')[:10]
+        })
+
+    clients_list = Client.deleted_objects.filter(
+        organization=request.user.organization).order_by('-updated_at')
+    paginator = Paginator(clients_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(request, 'recycle_bin/deleted-clients-data.html', {'page_object': page_object})

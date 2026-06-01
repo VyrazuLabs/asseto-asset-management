@@ -1,0 +1,108 @@
+{% load custom_filters %}
+
+{% for client in page_object %}
+<tr>
+  <td class="c-col-slno">
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+  </td>
+  <td>
+    <div class="c-client-name-cell">
+      <!-- Light blue circle like the image -->
+      <div class="c-client-avatar">
+        {{ client.initials }}
+      </div>
+      <div>
+        <div class="c-cell-name-main">{{ client.name }}</div>
+        <div class="c-cell-name-sub">ID: {{ client.client_id }}</div>
+      </div>
+    </div>
+  </td>
+  <td class="c-col-industry">
+    {% if client.industry and client.industry_name %}
+      {{ client.industry_name }}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+  <td>
+    {% with contact=client.contacts.all|first %}
+    {% if contact %}
+      <div class="c-contact-cell">
+        <span class="c-contact-name">{{ contact.name }}</span>
+        {% if contact.email %}
+          <a href="mailto:{{ contact.email }}" title="{{ contact.email }}" class="c-mail-icon">
+            <i class="bi bi-envelope"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% else %}
+      —
+    {% endif %}
+    {% endwith %}
+  </td>
+  <td class="text-center">
+    {% if client.asset_count %}
+      <span class="count-pill">{{ client.asset_count }}</span>
+    {% else %}
+      <span class="count-pill zero">0</span>
+    {% endif %}
+  </td>
+  <td class="text-center c-col-opentickets">
+    {% if client.open_tickets == 0 %}
+      <div class="c-ticket-count text-muted">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% elif client.open_tickets > 10 %}
+      <div class="c-ticket-count text-danger">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% elif client.open_tickets > 5 %}
+      <div class="c-ticket-count text-warning">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% else %}
+      <div class="c-ticket-count text-success">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% endif %}
+  </td>
+  <td>
+    {% if request.user.is_superuser %}
+      <div class="form-check form-switch status-toggle">
+        <input class="form-check-input"
+          hx-post="{% url 'clients:status' client.id %}"
+          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+          type="checkbox" {% if client.status != '0' %}checked{% endif %}>
+      </div>
+    {% else %}
+      {% if client.status == '1' %}
+        <span class="c-status-badge status-active"><span class="dot"></span> Active</span>
+      {% elif client.status == '2' %}
+        <span class="c-status-badge status-review"><span class="dot"></span> Review</span>
+      {% elif client.status == '3' %}
+        <span class="c-status-badge status-dormant"><span class="dot"></span> Dormant</span>
+      {% else %}
+        <span class="c-status-badge status-inactive"><span class="dot"></span> Inactive</span>
+      {% endif %}
+    {% endif %}
+  </td>
+  {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
+  <td>
+    <div class="row-actions">
+      {% if perms.authentication.view_client %}
+        <a href="{% url 'clients:details' client.id %}" class="action-btn" title="View {{ client.name }}">
+          <i class="bi bi-eye"></i>
+        </a>
+      {% endif %}
+      {% if perms.authentication.edit_client %}
+        <a href="{% url 'clients:update' client.id %}"
+          class="action-btn" title="Edit {{ client.name }}">
+          <i class="bi bi-pencil"></i>
+        </a>
+      {% endif %}
+      {% if perms.authentication.delete_client %}
+        <form action="{% url 'clients:delete' client.id %}" method="post" class="form-row-action"
+              onsubmit="return confirm('Delete {{ client.name }}? It can be restored from Recycle Bin.')">
+          {% csrf_token %}
+          <button type="submit" class="action-btn danger" title="Delete {{ client.name }}">
+            <i class="bi bi-trash3"></i>
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </td>
+  {% endif %}
+</tr>
+{% endfor %}

@@ -1,0 +1,270 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Register Client | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.3">
+<style>
+    .website-input {
+        position: relative;
+    }
+
+    .website-input .form-control {
+        padding-left: 45px;
+    }
+
+    .website-input i {
+        position: absolute;
+        left: 16px;
+        top: 9px;
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    body.theme-dark .website-input .form-control {
+        padding-left: 45px;
+        background-color: #1e1e2d;
+        border-color: #3d3d56;
+        color: #e2e8f0;
+    }
+
+    body.theme-dark .website-input i {
+        color: #94a3b8;
+    }
+
+    body.theme-dark .website-input .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    /* Error Handling Styles */
+    .form-group:has(.text-danger) .form-control {
+        border-color: #dc3545 !important;
+    }
+    .form-group:has(.text-danger) label {
+        color: #dc3545 !important;
+    }
+    .alert-danger {
+        border-left: 4px solid #dc3545;
+    }
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block content %}
+<div class="add-product-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a>
+                    </li>
+                    <li class="breadcrumb-item active">Add Client</li>
+                </ol>
+            </nav>
+            <h1>Register New Client</h1>
+            <p class="subtitle">Establish a new institutional or private asset record. Ensure all regulatory information
+                accurate before submission.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'clients:list' %}" class="btn-back-listing">
+                <i class="bi bi-arrow-left"></i> Back to Listing
+            </a>
+            <button type="submit" form="client-form" class="btn-save-asset">
+                <i class="bi bi-floppy2"></i> Save
+            </button>
+        </div>
+    </div>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="client-form" novalidate>
+            {% csrf_token %}
+
+            {% if form.errors or form.non_field_errors %}
+            <div class="alert alert-danger mb-4" role="alert">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <h6 class="mb-0 fw-bold">Please correct the following errors:</h6>
+                </div>
+                <ul class="mb-0 ps-3">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Basic Information -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-building"></i> <span>Basic Information</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>COMPANY NAME <span class="required">*</span></label>
+                        {{ form.name }}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>INDUSTRY <span class="required">*</span></label>
+                        {{ form.industry }}
+                        {% if form.industry.errors %}<div class="text-danger small mt-1">{{ form.industry.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group full-width">
+                        <label>CORPORATE WEBSITE</label>
+                        <div class="website-input">
+                            <i class="bi bi-globe"></i>
+                            {{ form.corporate_website }}
+                            {% if form.corporate_website.errors %}<div class="text-danger small mt-1">{{ form.corporate_website.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-person-badge"></i> <span>Contact Details</span>
+                </div>
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="addContactBtn">
+                        <i class="bi bi-plus-lg me-1"></i> Add Contact
+                    </button>
+                </div>
+                <div id="contactsContainer">
+                    <div class="contact-block custom-field-row mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
+                                <i class="bi bi-person me-1"></i> Contact Person
+                            </h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn"
+                                style="display: none; padding: 0.2rem 0.5rem; font-size: 0.8rem;">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>CONTACT NAME</label>
+                                <input type="text" name="contact_name[]" class="form-control"
+                                    placeholder="Full legal name">
+                            </div>
+                            <div class="form-group">
+                                <label>EMAIL ADDRESS</label>
+                                <input type="email" name="contact_email[]" class="form-control"
+                                    placeholder="p.contact@company.com">
+                            </div>
+                            <div class="form-group">
+                                <label>PHONE NUMBER</label>
+                                <input type="text" name="contact_phone[]" class="form-control"
+                                    placeholder="+1 (555) 000-0000">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>ROLE</label>
+                                <select name="contact_role[]" class="form-control">
+                                    <option value="">Select Role</option>
+                                    {% for r in roles %}
+                                    <option value="{{ r.id }}">{{ r.related_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>NOTES</label>
+                                <textarea name="contact_notes[]" class="form-control" rows="2"
+                                    placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Address -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-wallet2"></i> <span>Billing Address</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>STREET ADDRESS</label>
+                        {{ form.street_address }}
+                        {% if form.street_address.errors %}<div class="text-danger small mt-1">{{ form.street_address.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>CITY</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>STATE / PROVINCE</label>
+                        {{ form.state }}
+                        {% if form.state.errors %}<div class="text-danger small mt-1">{{ form.state.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>ZIP</label>
+                        {{ form.zip_code }}
+                        {% if form.zip_code.errors %}<div class="text-danger small mt-1">{{ form.zip_code.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addContactBtn = document.getElementById('addContactBtn');
+        const contactsContainer = document.getElementById('contactsContainer');
+
+        function toggleRemoveButtons() {
+            const contactBlocks = contactsContainer.querySelectorAll('.contact-block');
+            const showRemove = contactBlocks.length > 1;
+            contactBlocks.forEach(block => {
+                const removeBtn = block.querySelector('.remove-contact-btn');
+                if (removeBtn) {
+                    removeBtn.style.display = showRemove ? 'block' : 'none';
+                }
+            });
+        }
+
+        addContactBtn.addEventListener('click', function () {
+            const firstBlock = contactsContainer.querySelector('.contact-block');
+            const newBlock = firstBlock.cloneNode(true);
+
+            // Clear values in cloned block
+            const inputs = newBlock.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            // Add event listener to new remove button
+            const removeBtn = newBlock.querySelector('.remove-contact-btn');
+            removeBtn.addEventListener('click', function () {
+                newBlock.remove();
+                toggleRemoveButtons();
+            });
+
+            contactsContainer.appendChild(newBlock);
+            toggleRemoveButtons();
+        });
+
+        const initialRemoveBtns = contactsContainer.querySelectorAll('.remove-contact-btn');
+        initialRemoveBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                btn.closest('.contact-block').remove();
+                toggleRemoveButtons();
+            });
+        });
+
+        toggleRemoveButtons();
+    });
+</script>
+{% endblock %}
