@@ -314,7 +314,7 @@
   color: #6b7280;
 }
 
-.c-col-rentaltype {
+.c-col-industry {
   font-size: 0.85rem;
   color: #111827;
   font-weight: 500;
@@ -572,7 +572,7 @@ body.theme-dark .c-cell-name-sub {
   color: #9ca3af;
 }
 
-body.theme-dark .c-col-rentaltype {
+body.theme-dark .c-col-industry {
   color: #e0e0f0;
 }
 

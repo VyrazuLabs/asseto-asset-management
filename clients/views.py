@@ -8,7 +8,9 @@ from django.http import HttpResponse
 
 from .models import Client, ClientContact, STATUS_CHOICES
 from .forms import ClientForm
-from assets.models import Asset
+from assets.models import Asset, AssetImage, AssignAsset
+from audit.models import Audit
+from collections import defaultdict
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -58,7 +60,7 @@ def client_list(request):
         'sidebar': 'clients',
         'title': 'Client Directory | Asseto',
         'page_object': page_object,
-        'status_choices': STATUS_CHOICES,
+        'status_choices': [s for s in STATUS_CHOICES if s[0] in ('1', '0')],
         'search_query': search,
         'selected_status': status,
         **_stats(request),
@@ -163,11 +165,42 @@ def client_detail(request, id):
     client = get_object_or_404(Client.undeleted_objects, pk=id,
                                organization=request.user.organization)
     
-    # Fetch related assets
-    assets = client.assets.filter(is_deleted=False).select_related('product__product_sub_category', 'location').prefetch_related('images')
+    # Fetch related assets with pagination
+    assets_qs = client.assets.filter(is_deleted=False).select_related('product__product_type', 'product__product_sub_category', 'location').prefetch_related('images').order_by('-created_at')
+
+    asset_search = request.GET.get('asset_search', '').strip()
+    if asset_search:
+        assets_qs = assets_qs.filter(
+            Q(tag__icontains=asset_search) | Q(name__icontains=asset_search)
+        )
+
+    assets_paginator = Paginator(assets_qs, 10, orphans=1)
+    assets_page_number = request.GET.get('asset_page')
+    assets_page_object = assets_paginator.get_page(assets_page_number)
     
+    asset_ids = [a.id for a in assets_page_object]
+    
+    # Asset Images
+    asset_images = {}
+    for img in AssetImage.objects.filter(asset__organization=request.user.organization, asset_id__in=asset_ids).order_by('-uploaded_at'):
+        if img.asset_id not in asset_images:
+            asset_images[img.asset_id] = img
+
+    # Asset User Map
+    asset_user_map = {}
+    for assign in AssignAsset.objects.select_related('user').filter(asset_id__in=asset_ids).order_by('-assigned_date'):
+        if assign.asset_id not in asset_user_map:
+            asset_user_map[assign.asset_id] = None
+        if assign.user:
+            asset_user_map[assign.asset_id] = {"full_name": assign.user.full_name, "image": assign.user.profile_pic}
+
+    # Asset Conditions Map
+    asset_conditions_map = defaultdict(list)
+    for audit in Audit.objects.filter(asset_id__in=asset_ids):
+        asset_conditions_map[audit.asset_id].append(audit.condition)
+
     # Calculate total asset value in Millions
-    total_val = assets.aggregate(total=models.Sum('price'))['total'] or 0
+    total_val = assets_qs.aggregate(total=models.Sum('price'))['total'] or 0
     total_asset_value = total_val / 1_000_000
     
     # Fetch History
@@ -215,7 +248,11 @@ def client_detail(request, id):
         'sidebar': 'clients',
         'title': f'{client.name} | Asseto',
         'client': client,
-        'assets': assets,
+        'assets_page_object': assets_page_object,
+        'asset_images': asset_images,
+        'asset_user_map': asset_user_map,
+        'asset_conditions_map': asset_conditions_map,
+        'asset_search': asset_search,
         'total_asset_value': total_asset_value,
         'activities': activities[:15],
     }
@@ -230,6 +267,16 @@ def delete_client(request, id):
         client.soft_delete()
         messages.success(request, 'Client deleted successfully.')
     return redirect('clients:list')
+
+
+@login_required
+def toggle_status(request, id):
+    if request.method == 'POST' and request.user.is_superuser:
+        client = get_object_or_404(Client.undeleted_objects, pk=id,
+                                   organization=request.user.organization)
+        client.status = '0' if client.status == '1' else '1'
+        client.save()
+    return HttpResponse(status=204)
 
 
 @login_required

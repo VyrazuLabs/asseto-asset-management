@@ -246,49 +246,22 @@
           <div class="section-icon bg-green"><i class="bi bi-laptop"></i></div>
           <h2>Asset Inventory Ledger</h2>
         </div>
-        {% if assets %}
-        <a href="#" class="detail-view-all" id="exportAssetsBtn"><i class="bi bi-download"></i> Export Records</a>
-        {% endif %}
+        <form method="GET" class="d-flex align-items-center gap-2" style="margin-left: auto;">
+          <input type="hidden" name="asset_page" value="1">
+          <input type="search" name="asset_search" class="form-control form-control-sm"
+            placeholder="Search by tag or name…" value="{{ asset_search|default:'' }}"
+            style="width: 320px;" id="assetSearchInput">
+          {% if assets_page_object %}
+          <button type="button" class="btn-export" id="exportAssetsBtn"><i class="bi bi-download"></i> Export</button>
+          {% endif %}
+        </form>
       </div>
       <div class="detail-card-body p-0">
-        {% if assets %}
-        <table class="detail-audit-table" id="assetsTable">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Category</th>
-              <th>Serial No</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for asset in assets %}
-            <tr>
-              <td>
-                <div class="d-flex align-items-center gap-2">
-                  {% with first_img=asset.images.first %}
-                  <img src="{% if first_img and first_img.image %}{{ first_img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
-                       style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;"
-                       alt="">
-                  {% endwith %}
-                  <div>
-                    <div class="fw-bold text-dark">{{ asset.tag }}</div>
-                    <div class="small text-muted">{{ asset.name }}</div>
-                  </div>
-                </div>
-              </td>
-              <td>{{ asset.product.product_sub_category.name|default:"General" }}</td>
-              <td class="detail-mono">{{ asset.serial_no|default:"—" }}</td>
-              <td>
-                <span class="badge bg-success bg-opacity-10 text-success border-0 px-2 py-1"
-                  style="font-size: 10px; font-weight: 700;">
-                  ACTIVE
-                </span>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        {% if assets_page_object %}
+          {% include 'commons/assets-table.html' %}
+          <div class="px-3">
+            {% include 'commons/list-pagination.html' with page_object=assets_page_object page_var='asset_page' %}
+          </div>
         {% else %}
         <div class="detail-empty-state">
           <i class="bi bi-inbox"></i> <br>
@@ -387,6 +360,18 @@
 </div>{# /detail-layout #}
 
 <script>
+  const assetSearchForm = document.querySelector('#assetSearchInput')?.closest('form');
+  const assetSearchInput = document.getElementById('assetSearchInput');
+  if (assetSearchInput && assetSearchForm) {
+    let debounceTimer;
+    assetSearchInput.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        assetSearchForm.submit();
+      }, 500);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const exportBtn = document.getElementById('exportAssetsBtn');
     const table = document.getElementById('assetsTable');

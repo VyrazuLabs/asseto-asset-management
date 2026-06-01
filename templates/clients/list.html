@@ -37,7 +37,7 @@
   </div>
 </div>
 
-{# ── Stat cards ───────────────────────────────────────────────────────────── #}
+{# ─ Stat cards ───────────────────────────────────────────────────────────── #}
 <div class="stats-grid">
   <!-- Card 1 -->
   <div class="stat-card">
@@ -52,7 +52,7 @@
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-box-seam"></i></div>
     <div>
-      <div class="stat-label">Active Rentals</div>
+      <div class="stat-label">Total Assests</div>
       <div class="stat-value">{{ active_rentals_count|default:"0" }}</div>
     </div>
   </div>
@@ -88,9 +88,11 @@
       <div class="col-auto">
         <div class="filter-label">Status</div>
         <select name="status" class="filter-select-btn" style="min-width: 150px;" onchange="this.form.submit()">
-          <option value="All Statuses">All Statuses</option>
+          <option value="All Statuses">All Status</option>
           {% for val, label in status_choices %}
-          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
+            {{ label }}
+          </option>
           {% endfor %}
         </select>
       </div>
@@ -124,9 +126,9 @@
         <tr>
           <th>Sl No.</th>
           <th>Client Name</th>
-          <th>Rental Type</th>
+          <th>Industry Type</th>
           <th>Contact Person</th>
-          <th class="text-center">Active Rentals</th>
+          <th class="text-center">Total Assets</th>
           <th class="text-center">Open Tickets</th>
           <th>Status</th>
           {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}

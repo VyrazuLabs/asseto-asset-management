@@ -17,8 +17,12 @@
       </div>
     </div>
   </td>
-  <td class="c-col-rentaltype">
-    {{ client.rental_type|default:"—"|slice:":25" }}{% if client.rental_type|length > 25 %}...{% endif %}
+  <td class="c-col-industry">
+    {% if client.industry and client.industry_name %}
+      {{ client.industry_name }}
+    {% else %}
+      —
+    {% endif %}
   </td>
   <td>
     {% with contact=client.contacts.all|first %}
@@ -36,9 +40,12 @@
     {% endif %}
     {% endwith %}
   </td>
-  <td class="text-center c-col-activerentals">
-    <div class="c-rental-count-val">{{ client.asset_count|stringformat:"02d" }}</div>
-    <div class="c-rental-count-label">Assets</div>
+  <td class="text-center">
+    {% if client.asset_count %}
+      <span class="count-pill">{{ client.asset_count }}</span>
+    {% else %}
+      <span class="count-pill zero">0</span>
+    {% endif %}
   </td>
   <td class="text-center c-col-opentickets">
     {% if client.open_tickets == 0 %}
@@ -52,14 +59,23 @@
     {% endif %}
   </td>
   <td>
-    {% if client.status == '1' %}
-      <span class="c-status-badge status-active"><span class="dot"></span> Active</span>
-    {% elif client.status == '2' %}
-      <span class="c-status-badge status-review"><span class="dot"></span> Review</span>
-    {% elif client.status == '3' %}
-      <span class="c-status-badge status-dormant"><span class="dot"></span> Dormant</span>
+    {% if request.user.is_superuser %}
+      <div class="form-check form-switch status-toggle">
+        <input class="form-check-input"
+          hx-post="{% url 'clients:status' client.id %}"
+          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+          type="checkbox" {% if client.status != '0' %}checked{% endif %}>
+      </div>
     {% else %}
-      <span class="c-status-badge status-inactive"><span class="dot"></span> Inactive</span>
+      {% if client.status == '1' %}
+        <span class="c-status-badge status-active"><span class="dot"></span> Active</span>
+      {% elif client.status == '2' %}
+        <span class="c-status-badge status-review"><span class="dot"></span> Review</span>
+      {% elif client.status == '3' %}
+        <span class="c-status-badge status-dormant"><span class="dot"></span> Dormant</span>
+      {% else %}
+        <span class="c-status-badge status-inactive"><span class="dot"></span> Inactive</span>
+      {% endif %}
     {% endif %}
   </td>
   {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}

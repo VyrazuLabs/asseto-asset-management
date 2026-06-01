@@ -127,11 +127,11 @@ def filtered_asset(request):
     product=request.POST.get("product")# gets the id of the product
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
-    status_id = request.POST.get("status")
-    department_id = request.POST.get("department")
-    location_id = request.POST.get("location")
-    category_id = request.POST.get("category")
-    type_id = request.POST.get("type")
+    status_id = request.GET.get("status")
+    department_id = request.GET.get("department")
+    location_id = request.GET.get("location")
+    category_id = request.GET.get("category")
+    type_id = request.GET.get("type")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(organization=request.user.organization if request.user.organization else None)
     # filters = Q(organization=None)

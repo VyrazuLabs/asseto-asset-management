@@ -1,0 +1,105 @@
+{% load static %}
+{% load custom_filters %}
+
+<div class="table-responsive">
+    <table class="assets-table list-table" id="assetsTable">
+        <thead>
+            <tr>
+                <th>Sl No.</th>
+                <th>Image</th>
+                <th>Asset Tag</th>
+                <th>Asset Name</th>
+                <th>Product Type</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets_page_object %}
+            <tr>
+                <td class="table-index-cell">
+                    {% if assets_page_object.start_index %}
+                      {{ assets_page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+                    {% else %}
+                      {{ forloop.counter|stringformat:"02d" }}
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% with img=asset_images|get_item:asset.id %}
+                      <img class="asset-thumb"
+                        src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                        alt="{{ asset.name }}"
+                        width="52" height="52"
+                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                    {% endwith %}
+                </td>
+
+                <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
+
+                <td>
+                    {% with asset_conditions_map|get_item:asset.id as condition_list %}
+                      {% with condition_list|default:''|last as condition %}
+                        <div class="asset-name-main">{{ asset.name }}</div>
+                        <div class="asset-name-sub">
+                          {% if asset.product %}{{ asset.product.name }}{% endif %}
+                          {% if condition == 0 or condition == 1 %}
+                            &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+                          {% elif condition == 2 %}
+                            &nbsp;·&nbsp;<span class="state-good">● Good</span>
+                          {% elif condition == 3 or condition == 4 %}
+                            &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+                          {% endif %}
+                        </div>
+                      {% endwith %}
+                    {% endwith %}
+                </td>
+
+                <td>{{ asset.product.product_type }}</td>
+
+                <td>
+                    {% if asset.is_assigned %}
+                      {% with map=asset_user_map|get_item:asset.id %}
+                        <div class="assignee-chip mb-1">
+                          {% if map.image %}
+                            <img src="{{ map.image.url }}"
+                              onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
+                              alt="{{ map.full_name }}" width="22" height="22">
+                          {% else %}
+                            <span class="assignee-initials">
+                              {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
+                            </span>
+                          {% endif %}
+                          <span>{{ map.full_name|default:"Unknown User" }}</span>
+                        </div>
+                      {% endwith %}
+                    {% else %}
+                      <span class="unassigned-label">Unassigned</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if not asset.is_assigned %}
+                      <span class="status-badge" style="background:var(--color-bg-secondary); color:var(--color-text);">{{ asset.asset_status.name }}</span>
+                    {% else %}
+                      <span class="status-badge status-allocated">Allocated</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <div class="row-actions">
+                        <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View details">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8"><div class="text-center py-4 text-muted">No assets assigned.</div></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
