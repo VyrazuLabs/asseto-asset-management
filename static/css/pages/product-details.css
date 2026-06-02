@@ -648,23 +648,37 @@ body.theme-dark .pd-history-wrap .timeline-header-left h3 {
 }
 
 body.theme-dark .pd-history-wrap .timeline-title {
-    color: var(--color-primary);
+    color: #a5b4fc;
 }
 
 body.theme-dark .pd-history-wrap .timeline-desc {
-    color: #A0AEC0;
+    color: #cbd5e1;
+}
+
+body.theme-dark .pd-history-wrap .timeline-time {
+    color: #94a3b8;
 }
 
 body.theme-dark .pd-history-wrap .timeline-user {
-    color: #D1D5DB;
+    color: #f1f5f9;
 }
 
 body.theme-dark .pd-history-wrap .timeline-body::before {
-    background: #2D3748;
+    background: #2D2D3F;
 }
 
 body.theme-dark .pd-history-wrap .timeline-header {
-    border-color: #2D3748;
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .pd-history-wrap .timeline-footer {
+    border-top: 1px solid #2D2D3F;
+    padding-top: 0.5rem;
+}
+
+body.theme-dark .pd-history-wrap .timeline-avatar {
+    background-color: #2D2D3F;
+    color: #e2e8f0;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

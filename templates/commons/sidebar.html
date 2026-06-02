@@ -249,25 +249,12 @@
                         </a>
                     </li>
                 {% endif %}
-                <!-- {% if request.user.is_superuser %}
-                    <li class="sidebar-item has-sub {% if sidebar == 'support' %}active{% endif %}">
-                        <a href="javascript:void(0)" class="sidebar-link">
-                            <i class="bi bi-person-video3"></i>
-                            <span>Support</span>
-                        </a>
-                        <ul class="submenu {% if sidebar == 'support' %}active{% endif %}">
-                            <li class="submenu-item {% if submenu == 'faq' %}active{% endif %}">
-                                <a href="{% url 'support:support_faq' %}">FAQs</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="mailto:anand@vyrazu.com?subject=Help%20and%20Support%20[AM-From {{request.user.username}}]">Help & Support</a>
-                            </li>
-                            <li class="submenu-item">
-                                <a href="#">Demo Videos</a>
-                            </li>
-                        </ul>
-                    </li>
-                {% endif %} -->
+                <li class="sidebar-item {% if sidebar == 'support' %}active{% endif %}">
+                    <a href="{% url 'support:ticket_list' %}" class="sidebar-link">
+                        <i class="bi bi-headset"></i>
+                        <span>Support Ticket</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
