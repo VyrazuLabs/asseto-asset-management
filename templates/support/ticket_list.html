@@ -201,13 +201,13 @@
     <div id="kanban-view-container" style="display: none;">
         <div class="kanban-board">
             {# Column: New #}
-            <div class="kanban-column" id="col-open">
+            <div class="kanban-column" id="col-0">
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-open"></span>
                         <span class="column-title">New</span>
                     </div>
-                    <span class="column-count" id="count-open">0</span>
+                    <span class="column-count" id="count-0">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
@@ -244,13 +244,13 @@
             </div>
 
             {# Column: In Progress #}
-            <div class="kanban-column" id="col-in_progress">
+            <div class="kanban-column" id="col-1">
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-inprogress"></span>
                         <span class="column-title">In Progress</span>
                     </div>
-                    <span class="column-count" id="count-in_progress">0</span>
+                    <span class="column-count" id="count-1">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
@@ -287,13 +287,13 @@
             </div>
 
             {# Column: In Testing #}
-            <div class="kanban-column" id="col-in_testing">
+            <div class="kanban-column" id="col-2">
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-in-testing"></span>
                         <span class="column-title">In Testing</span>
                     </div>
-                    <span class="column-count" id="count-in_testing">0</span>
+                    <span class="column-count" id="count-2">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
@@ -330,13 +330,13 @@
             </div>
 
             {# Column: Resolved #}
-            <div class="kanban-column" id="col-resolved">
+            <div class="kanban-column" id="col-3">
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-resolved"></span>
                         <span class="column-title">Resolved</span>
                     </div>
-                    <span class="column-count" id="count-resolved">0</span>
+                    <span class="column-count" id="count-3">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
@@ -410,7 +410,7 @@
         }
 
         function updateKanbanCounts() {
-            ['open', 'in_progress', 'in_testing', 'resolved'].forEach(status => {
+            ['0', '1', '2', '3'].forEach(status => {
                 const container = document.querySelector(`#col-${status} .kanban-cards-container`);
                 if (container) {
                     const cards = container.querySelectorAll('.kanban-card');

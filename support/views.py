@@ -1,21 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils.timezone import now
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_POST
 import csv
-from django.db.models import Q
 
-from .models import *
-from .forms import SupportTicketForm, TicketNoteForm
-from assets.models import Asset, AssetImage
+from .models import (
+    SupportTicket, TicketAttachment, TicketActivity,
+    STATUS_CHOICES, PRIORITY_CHOICES, TICKET_TYPE_CHOICES,
+)
+from .forms import SupportTicketForm
+from assets.models import Asset
 from authentication.models import User
-
-def check_admin(user):
-    return user.is_superuser
-
 
 
 # Helper Functions
@@ -56,8 +55,7 @@ def ticket_list(request):
     if priority: qs = qs.filter(priority=priority)
     if ticket_type: qs = qs.filter(ticket_type=ticket_type)
     
-    qs = qs.order_by('-created_at')
-    
+
     paginator = Paginator(qs, 10, orphans=1)
     page_object = paginator.get_page(request.GET.get('page', 1))
     
@@ -124,7 +122,6 @@ def ticket_detail(request, id):
         ), pk=id, organization=request.user.organization
     )
     
-    from django.core.paginator import Paginator
     history_qs = ticket.history.all().order_by('-history_date')
     paginator = Paginator(history_qs, 10, orphans=1)
     page_object = paginator.get_page(request.GET.get('page', 1))
@@ -157,7 +154,7 @@ def update_ticket(request, id):
             if old_status != ticket.status:
                 TicketActivity.objects.create(
                     ticket=ticket, activity_type='status_changed',
-                    description=f'Status changed from {old_status} to {ticket.status}.',
+                    description=f'Status changed from {dict(STATUS_CHOICES).get(old_status, old_status)} to {dict(STATUS_CHOICES).get(ticket.status, ticket.status)}.',
                     performed_by=request.user
                 )
             
@@ -203,12 +200,12 @@ def update_ticket(request, id):
     return render(request, 'support/ticket_edit.html', context)
 
 @login_required
+@require_POST
 def delete_ticket(request, id):
     ticket = get_object_or_404(SupportTicket.undeleted_objects, pk=id,
                                organization=request.user.organization)
-    if request.method == 'POST':
-        ticket.soft_delete()
-        messages.success(request, 'Ticket deleted successfully.')
+    ticket.soft_delete()
+    messages.success(request, 'Ticket deleted successfully.')
     return redirect('support:ticket_list')
 
 @login_required
@@ -233,11 +230,9 @@ def search_tickets(request, page):
     if ticket_type:
         qs = qs.filter(ticket_type=ticket_type)
     
-    qs = qs.order_by('-created_at')
-    
     paginator = Paginator(qs, 10, orphans=1)
     page_object = paginator.get_page(page)
-    
+
     asset_images = {}
     for ticket in page_object:
         if ticket.asset:

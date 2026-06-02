@@ -1,6 +1,6 @@
 import uuid
 import random
-from django.db import models
+from django.db import models, IntegrityError
 from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -82,9 +82,7 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
     department    = models.ForeignKey('dashboard.Department', on_delete=models.SET_NULL, null=True, blank=True)
     location      = models.ForeignKey('dashboard.Location', on_delete=models.SET_NULL, null=True, blank=True)
     
-    # Client link
-    # client        = models.ForeignKey('clients.Client', on_delete=models.SET_NULL, null=True, blank=True, related_name='support_tickets')
-    
+
     # Organization
     organization  = models.ForeignKey('dashboard.Organization', on_delete=models.DO_NOTHING, null=True, blank=True)
     
@@ -93,9 +91,16 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
 
     def save(self, *args, **kwargs):
         if not self.ticket_id:
-            self.ticket_id = generate_ticket_id()
-            while SupportTicket.objects.filter(ticket_id=self.ticket_id).exists():
+            # Retry on IntegrityError to handle concurrent writes safely
+            for _ in range(10):
                 self.ticket_id = generate_ticket_id()
+                try:
+                    super().save(*args, **kwargs)
+                    return
+                except IntegrityError:
+                    self.ticket_id = ''
+            # Final attempt — let any remaining IntegrityError propagate
+            self.ticket_id = generate_ticket_id()
         super().save(*args, **kwargs)
 
     def __str__(self):
