@@ -54,7 +54,11 @@ PERMISSION_LIST = [
     # assign assets
     'delete_assign_asset',
     'reassign_assign_asset',
-    'add_assign_asset'
+    'add_assign_asset',
+
+    # gate pass
+    'view_gate_pass',
+    'add_gate_pass',
 
     # departments
     'edit_department',
