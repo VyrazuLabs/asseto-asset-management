@@ -29,6 +29,34 @@
                         </div>
 
                         <div class="permissions-modules-grid">
+                            <!-- Clients -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Clients" id="chk-Clients">
+                                        <label class="form-check-label" for="chk-Clients">Clients</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Clients" id="view_client" name="permissions[]" type="checkbox" value="view_client" {% if 'view_client' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_client">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Clients" id="add_client" name="permissions[]" type="checkbox" value="add_client" {% if 'add_client' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_client">Add</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Clients" id="edit_client" name="permissions[]" type="checkbox" value="edit_client" {% if 'edit_client' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_client">Edit</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Clients" id="delete_client" name="permissions[]" type="checkbox" value="delete_client" {% if 'delete_client' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_client">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Vendors -->
                             <div class="module-permission-card">
                                 <div class="module-card-header">
@@ -161,6 +189,26 @@
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assign_Assets" id="delete_assign_asset" name="permissions[]" type="checkbox" value="delete_assign_asset" {% if 'delete_assign_asset' in permissions %} checked {% endif %}>
                                         <label class="form-check-label" for="delete_assign_asset">Unassign</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gate Pass -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Gate_Pass" id="chk-Gate_Pass">
+                                        <label class="form-check-label" for="chk-Gate_Pass">Gate Pass</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Gate_Pass" id="view_gate_pass" name="permissions[]" type="checkbox" value="view_gate_pass" {% if 'view_gate_pass' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_gate_pass">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Gate_Pass" id="add_gate_pass" name="permissions[]" type="checkbox" value="add_gate_pass" {% if 'add_gate_pass' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_gate_pass">Add</label>
                                     </div>
                                 </div>
                             </div>
