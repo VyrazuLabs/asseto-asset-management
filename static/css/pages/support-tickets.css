@@ -1,5 +1,31 @@
 /* static/css/pages/support-tickets.css */
 
+/* ── Page Header (matching assets-page-header) ─────────────────────────── */
+.assets-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.assets-page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 .3rem;
+}
+.assets-page-header .page-subtitle {
+  color: var(--color-muted);
+  font-size: .925rem;
+  margin-top: .25rem;
+}
+body.theme-dark .assets-page-header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 .3rem;
+}
+body.theme-dark .assets-page-header .page-subtitle {
+  margin-top: .25rem;
+}
+
 /* ── Priority/Impact Selector Buttons (Specialized for Support) ── */
 .selector-group {
     display: flex;
@@ -184,18 +210,22 @@
 
 .ticket-stat-card {
     background: #fff;
-    padding: 1.25rem;
+    padding: 1.25rem 1.5rem;
     border-radius: 12px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 1.25rem;
     text-decoration: none;
-    transition: transform 0.2s;
+    transition: all 0.2s;
+    border: 1px solid transparent;
 }
 
 .ticket-stat-card:hover {
     transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-color: var(--color-primary-light);
 }
 
 .stat-icon-wrap {
@@ -206,6 +236,7 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
 .stat-icon-wrap.active {
@@ -224,13 +255,15 @@
 }
 
 .stat-icon-wrap.critical {
-    background: #7F1D1D;
-    color: #fff;
+    background: #FFF1F2;
+    color: #E11D48;
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .stat-name {

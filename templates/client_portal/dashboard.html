@@ -1,0 +1,253 @@
+{% extends 'client_portal/layout.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
+<style>
+    .bi{
+        width: 1rem !important;
+        height: 1rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+{% if show_welcome_banner %}
+<!-- Welcome Banner -->
+<div class="alert bg-success-banner alert-dismissible fade show rounded-4 p-4 mb-4 border-0 d-flex align-items-center" role="alert">
+    <div class="me-3">
+        <i class="bi bi-hand-thumbs-up fs-3 text-white"></i>
+    </div>
+    <div>
+        <h6 class="mb-0 fw-bold text-white">Welcome back, {{ contact.name }}</h6>
+    </div>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <a href="{% url 'client_portal:assets' %}" class="text-decoration-none text-reset d-block h-100">
+            <div class="card card-stats border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="stats-icon-box">
+                            <i class="bi bi-box-seam text-primary fs-4"></i>
+                        </div>
+                        <span class="badge badge-outline-success px-3 py-2 rounded-pill">Active</span>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-1">Total Assets</div>
+                        <h2 class="fw-800 mb-1">{{ total_assets }}</h2>
+                        <div class="text-muted smaller">Managed Precision Equipment</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-stats border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div class="stats-icon-box" style="background: #e6f0ff;">
+                        <i class="bi bi-currency-dollar text-info fs-4"></i>
+                    </div>
+                    <span class="badge badge-outline-info px-3 py-2 rounded-pill">Value</span>
+                </div>
+                <div>
+                    <div class="text-muted small fw-bold text-uppercase mb-1">Total Asset Value</div>
+                    <h2 class="fw-800 mb-1">₹ {{ total_value|floatformat:0 }}</h2>
+                    <div class="text-muted smaller">Total Portfolio Valuation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <a href="{% url 'client_portal:support_tickets' %}" class="text-decoration-none text-reset d-block h-100">
+            <div class="card card-stats border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="stats-icon-box" style="background: #fff8e6;">
+                            <i class="bi bi-ticket-perforated text-warning fs-4"></i>
+                    </div>
+                        <span class="badge badge-outline-warning px-3 py-2 rounded-pill">Pending</span>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-bold text-uppercase mb-1">Open Tickets</div>
+                        <h2 class="fw-800 mb-1">
+                            {% if open_tickets %}{{ open_tickets|stringformat:"02d" }}{% else %}0{% endif %}
+                        </h2>
+                        <div class="text-muted smaller">Active Support Requests</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+</div>
+
+<div class="row g-4">
+    <!-- Recent Activity Table -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-uppercase mb-0" style="color: #25396f;">Recent Ticket Activity</h6>
+                <a href="{% url 'client_portal:support_tickets' %}" class="btn btn-sm btn-outline-indigo px-4">View All Tickets</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 ticket-table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">SL No.</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in recent_tickets %}
+                        <tr>
+                             <td class="ps-4 fw-semibold text-muted">
+                                {{ forloop.counter }}
+                            </td>
+                            <td class="ps-4 table-index-cell">
+                                <span class="ticket-tag-pill">{{ ticket.ticket_id }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if ticket.asset %}
+                                    {% with img=recent_asset_images|get_item:ticket.asset.id %}
+                                    <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                        alt="{{ ticket.asset.name }}" class="rounded me-2" width="32" height="32"
+                                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                    {% endwith %}
+                                    {% else %}
+                                    <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
+                                    {% endif %}
+                                    <span>{{ ticket.asset.name|default:"--" }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ ticket.subject }}</div>
+                                <small class="text-muted">{{ ticket.description|truncatechars:50 }}</small>
+                            </td>
+                            <td>
+                                <span class="priority-badge priority-{{ ticket.priority }}">
+                                    {{ ticket.get_priority_display|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ ticket.status }}">
+                                    {{ ticket.get_status_display|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    {{ ticket.updated_at|timesince }} ago
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted d-flex flex-column align-items-center">
+                                    <i class="bi bi-ticket-perforated h1 mb-3"></i> <br>
+                                    <p>No maintenance tickets found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Distribution -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-uppercase mb-1" style="color: #25396f;">Asset Category Distribution</h6>
+                <p class="text-muted small mb-4">Distribution across product categories</p>
+                
+                <div class="chart-container mb-4">
+                    <canvas id="categoryChart"></canvas>
+                    <div class="chart-center-text">
+                        <div class="h4 fw-800 mb-0">{{ total_assets }}</div>
+                        <div class="smaller text-muted fw-bold">TOTAL</div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mb-4">
+                    {% for label in cat_labels %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 12px; height: 12px; background: {{ cat_colors|get_at_index:forloop.counter0 }}; border-radius: 3px;"></div>
+                            <span class="small fw-bold">{{ label }}</span>
+                        </div>
+                        <span class="small text-muted">{{ cat_values|get_at_index:forloop.counter0 }} units</span>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted small py-3">No assets found</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        
+        const catValues = [{% for v in cat_values %}{{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+        const catColors = [{% for c in cat_colors %}'{{ c }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
+        
+        // Handle empty state: Use a single gray segment if no data
+        const chartData = catValues.length > 0 ? catValues : [1];
+        const chartColors = catValues.length > 0 ? catColors : ['#e9ecef'];
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: chartColors,
+                    borderWidth: 0,
+                    cutout: '80%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: catValues.length > 0 }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,325 @@
+/* 
+   ==========================================================================
+   CLIENT PORTAL MASTER STYLES 
+   ==========================================================================
+*/
+
+:root {
+    --portal-primary: #435ebe;
+    --portal-primary-hover: #3a56d4;
+    --portal-bg: #f2f7ff;
+    --portal-card-bg: #ffffff;
+    --portal-text: #25396f;
+    --portal-muted: #7c8db5;
+    --portal-navy: #ffffff;
+    --portal-navy-light: #f0f1f5;
+}
+
+body.portal-body {
+    background-color: var(--portal-bg);
+    font-family: 'Nunito', sans-serif;
+    color: var(--portal-text);
+}
+
+/* 
+   --------------------------------------------------------------------------
+   LOGIN & OTP PAGE STYLES 
+   --------------------------------------------------------------------------
+*/
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: #f2f7ff;
+}
+
+.login-card {
+    background: var(--portal-card-bg);
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    width: 100%;
+    max-width: 480px;
+    min-height: 520px;
+    overflow: hidden;
+    padding: 2.5rem;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo {
+    max-width: 160px;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+.login-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--portal-text);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    color: var(--portal-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.login-tabs {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.login-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--portal-muted);
+}
+
+.login-tab.active {
+    background: white;
+    color: var(--portal-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.login-tab:hover:not(.active) {
+    color: var(--portal-text);
+}
+
+.form-label-portal {
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-bottom: 0.6rem;
+    display: block;
+    color: #4b5a83;
+}
+
+.input-with-icon {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a3aed0;
+}
+
+.portal-input {
+    width: 100%;
+    padding: 14px 14px 14px 3.25rem;
+    border: 2px solid #e1e7f3;
+    border-radius: 12px;
+    background: #fff;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.portal-input:focus {
+    outline: none;
+    border-color: var(--portal-primary);
+    box-shadow: 0 0 0 4px rgba(67, 94, 190, 0.1);
+}
+
+.portal-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--portal-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.portal-btn:hover {
+    background: var(--portal-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(67, 94, 190, 0.2);
+}
+
+.portal-footer-text {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--portal-muted);
+    font-weight: 700;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.25rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--portal-muted);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #435ebe;
+    border-radius: 50%;
+}
+
+/* 
+   --------------------------------------------------------------------------
+   DASHBOARD & INTERNAL MODULES 
+   --------------------------------------------------------------------------
+*/
+
+.bg-success-banner {
+    background-color: #00714b;
+    border: none;
+}
+
+.card-stats {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    height: 100%;
+    transition: transform 0.2s;
+}
+
+.card-stats:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon-box {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #f0f3ff;
+}
+
+.stats-icon-box i {
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-outline-success {
+    background: #e6f7ef;
+    color: #00714b;
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.badge-outline-warning {
+    background: #fff8e6;
+    color: #b28900;
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.badge-outline-info {
+    background: #e6f0ff;
+    color: #0052cc;
+    font-weight: 800;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+/* Table Design */
+.portal-table thead th {
+    background: #f8fafd;
+    color: #7c8db5;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid #edf1f7;
+    letter-spacing: 0.5px;
+}
+
+.portal-table tbody td {
+    padding: 1.4rem 1rem;
+    color: #25396f;
+    font-weight: 600;
+    border-bottom: 1px solid #edf1f7;
+    font-size: 0.9rem;
+}
+
+.btn-outline-indigo {
+    border: 2px solid #435ebe;
+    color: #435ebe;
+    font-weight: 700;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-outline-indigo:hover {
+    background: #435ebe;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(67, 94, 190, 0.2);
+}
+
+.badge-in-progress { background: #fff8e6; color: #b28900; font-weight: 700; border-radius: 8px; }
+.badge-resolved { background: #e6f7ef; color: #00714b; font-weight: 700; border-radius: 8px; }
+.badge-critical { background: #ffe6e6; color: #cc0000; font-weight: 700; border-radius: 8px; }
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    margin: 2rem auto;
+    height: 220px;
+    width: 220px;
+}
+
+.chart-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.fw-800 { font-weight: 800 !important; }
+.smaller { font-size: 0.75rem !important; }

@@ -55,6 +55,7 @@ urlpatterns = [
 	path('configurations/',include('configurations.urls',namespace='configurations')),
 	path('gate-pass/', include('gate_pass.urls', namespace='gate_pass')),
     path('clients/', include('clients.urls', namespace='clients')),
+    path('client-portal/', include('client_portal.urls', namespace='client_portal')),
 
     # django smart select urls
     path('chaining/', include('smart_selects.urls')),
