@@ -22,7 +22,7 @@ coverage==6.4.2
 cryptography==46.0.7
 cssselect2==0.8.0
 dj-database-url==0.5.0
-Django==5.2.13
+Django==5.2.14
 django-crontab==0.7.1
 django-htmx==1.23.2
 django-resized==1.0.2
@@ -55,7 +55,7 @@ html5lib==1.1
 httpcore==1.0.9
 httpx==0.28.1
 hyperframe==6.1.0
-idna==3.10
+idna==3.15
 inflection==0.5.1
 jsonschema==4.25.1
 jsonschema-specifications==2025.9.1
@@ -83,7 +83,7 @@ pyasn1_modules==0.4.2
 pycparser==2.23
 pyHanko==0.30.0
 pyhanko-certvalidator==0.28.0
-PyJWT==2.12.1
+PyJWT==2.13.0
 PyMySQL==1.1.1
 pyotp==2.9.0
 pypdf==6.10.2
@@ -124,7 +124,7 @@ tzdata==2025.3
 tzlocal==5.3.1
 uritemplate==4.2.0
 uritools==5.0.0
-urllib3==2.6.3
+urllib3==2.7.0
 vine==5.1.0
 wcwidth==0.6.0
 webencodings==0.5.1
