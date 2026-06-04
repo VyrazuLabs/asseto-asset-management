@@ -70,35 +70,54 @@
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
-  <div class="row g-2 align-items-end">
-    <div class="col">
-      <div class="filter-label">Search Vendor</div>
-      <input name="search_text" type="search"
-        autocomplete="off" placeholder="Name, email or contact…"
-        hx-get="{% url 'vendors:search' page_object.number %}"
-        hx-trigger="keyup changed delay:400ms, search"
-        hx-target="#search_result"
-        aria-label="Search vendors">
-    </div>
-    {% if request.user.is_superuser %}
+  <form id="vendor-filter-form"
+    hx-get="{% url 'vendors:search' page_object.number %}"
+    hx-target="#search_result"
+    hx-trigger="change, keyup changed delay:400ms from:input">
+    <div class="row g-2 align-items-end">
+      <div class="col">
+        <div class="filter-label">Search Vendor</div>
+        <input name="search_text" type="search"
+          autocomplete="off" placeholder="Name, email or contact…"
+          aria-label="Search vendors">
+      </div>
+
       <div class="col-auto">
+        <div class="filter-label">Status</div>
         <div class="dropdown">
-          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-            <i class="bi bi-download"></i> Export
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
+            All Status
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
-            <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='active'; document.getElementById('status-btn').childNodes[0].textContent='Active '; htmx.trigger(form,'change');">Active</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='inactive'; document.getElementById('status-btn').childNodes[0].textContent='Inactive '; htmx.trigger(form,'change');">Inactive</a></li>
           </ul>
+          <input type="hidden" name="status">
         </div>
       </div>
-    {% endif %}
-    <div class="col-auto">
-      <a href="{% url 'vendors:list' %}" class="btn-reset" title="Reset">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset
-      </a>
+
+      {% if request.user.is_superuser %}
+        <div class="col-auto">
+          <div class="dropdown">
+            <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
+              <i class="bi bi-download"></i> Export
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
+              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+      <div class="col-auto">
+        <a href="{% url 'vendors:list' %}" class="btn-reset" title="Reset">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
     </div>
-  </div>
+  </form>
   {% if is_demo is True %}
     <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
   {% endif %}

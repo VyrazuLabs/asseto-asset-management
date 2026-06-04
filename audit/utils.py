@@ -2,8 +2,9 @@ from datetime import datetime, timedelta,timezone
 from .constants import AUDIT_INTERVAL_VALUE
 from dateutil.relativedelta import relativedelta
 from .models import Audit
-from assets.models import Asset
+from assets.models import Asset, AssignAsset
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def get_audit_stats(request):
     """Return stat card counts for the audit list pages."""
@@ -226,8 +227,15 @@ def next_audit_due(audit):
     return days_remaining, is_pending
 
 def get_tag_list(tag):
-    tags = Asset.undeleted_objects.filter(tag__icontains=tag)
-    arr=[]
-    for t in tags:
-        arr.append(t.tag)
+    assets = Asset.undeleted_objects.filter(
+        Q(tag__icontains=tag) | Q(name__icontains=tag)
+    )[:10]
+    arr = []
+    for asset in assets:
+        img = asset.images.first()
+        arr.append({
+            'tag': asset.tag,
+            'name': asset.name,
+            'image': img.image.url if img and img.image else None,
+        })
     return arr

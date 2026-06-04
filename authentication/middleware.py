@@ -21,11 +21,13 @@ class DBConnectionMiddleware:
             reverse('authentication:db_configure'),
             reverse('authentication:email_configure'),
             reverse('authentication:register'),
-            '/api/authentication/token/refresh/'
+            '/api/authentication/token/refresh/',
+            # Allow public access to gate pass checkout via QR
+            '/gate-pass/checkout/'
         ]
 
 
-        if request.path in skip_paths:
+        if request.path in skip_paths or request.path.startswith('/gate-pass/checkout/'):
             return self.get_response(request)
         
         if not os.environ.get('EMAIL_HOST'):

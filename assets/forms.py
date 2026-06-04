@@ -2,6 +2,7 @@ from django import forms
 from assets.models import Asset, AssignAsset,AssetImage,AssetStatus
 from products.models import Product
 from vendors.models import Vendor
+from clients.models import Client
 from dashboard.models import Location
 from authentication.models import User
 from django.forms import ModelForm
@@ -66,7 +67,15 @@ class AssetForm(forms.ModelForm):
         widget=forms.Select(
             attrs={'class': 'form-select'}
         ))
-    
+
+    client = forms.ModelChoiceField(
+        required=False,
+        queryset=None,
+        empty_label="--SELECT--",
+        widget=forms.Select(
+            attrs={'class': 'form-select'}
+        ))
+
     location = forms.ModelChoiceField(
         required=False,
         queryset=None,
@@ -80,6 +89,7 @@ class AssetForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['product'].queryset = Product.undeleted_objects.filter(organization=self._organization, status=True)
         self.fields['vendor'].queryset = Vendor.undeleted_objects.filter(organization=self._organization, status=True)
+        self.fields['client'].queryset = Client.undeleted_objects.filter(organization=self._organization)
         self.fields['location'].queryset = Location.undeleted_objects.filter(organization=self._organization, status=True)
     
     def get_status(self):
@@ -94,7 +104,7 @@ class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = ['name', 'serial_no', 'price', 'purchase_date', 'warranty_expiry_date', 'description',
-                  'purchase_type', 'product', 'vendor', 'location','tag',
+                  'purchase_type', 'product', 'vendor', 'client', 'location','tag',
                   'status'
                   ]
 class MultipleFileInput(forms.ClearableFileInput):

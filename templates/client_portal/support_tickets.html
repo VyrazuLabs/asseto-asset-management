@@ -1,0 +1,517 @@
+{% extends 'client_portal/layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Support Tickets{% endblock %}
+{% block header_title %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
+<style>
+    /* Ensure the portal layout compatible styles */
+    .page-heading { padding: 0; }
+    .ticket-stats-grid { margin-bottom: 2rem; }
+    .filter-card { margin-bottom: 2rem; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .card { border-radius: 12px; }
+    .bi{
+    width: 1rem !important;
+    height: 1rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    }
+    .stat-icon-wrap i.bi {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        font-size: 1.5rem !important;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="page-heading">
+    {# ── Page Header ───────────────────────────────────────────────────────── #}
+    <div class="assets-page-header">
+        <div>
+            <h1>Support Tickets</h1>
+            <p class="page-subtitle">Managing organization maintenance requests and schedules.</p>
+        </div>
+        <div class="d-flex flex-column align-items-end gap-3">
+            <div class="btn-group btn-group-sm view-toggle-group">
+                <button type="button" class="btn btn-primary active" id="list-view-btn" onclick="switchView('list')">
+                    <i class="bi bi-list-task me-1"></i> List View
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="kanban-view-btn"
+                    onclick="switchView('kanban')">
+                    <i class="bi bi-kanban me-1"></i> Kanban
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {# ── Stat Cards ────────────────────────────────────────────────────────── #}
+    <div class="ticket-stats-grid" id="list-only-section">
+        <div class="ticket-stat-card">
+            <div class="stat-icon-wrap active">
+                <i class="bi bi-ticket-detailed"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-name">Total Active</span>
+                <span class="stat-number">{{ total_active|stringformat:"02d" }}</span>
+            </div>
+        </div>
+        <div class="ticket-stat-card">
+            <div class="stat-icon-wrap pending">
+                <i class="bi bi-wrench-adjustable"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-name">Pending Parts</span>
+                <span class="stat-number">{{ pending_parts|stringformat:"02d" }}</span>
+            </div>
+        </div>
+        <div class="ticket-stat-card">
+            <div class="stat-icon-wrap overdue">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-name">Overdue</span>
+                <span class="stat-number">{{ overdue_count|stringformat:"02d" }}</span>
+            </div>
+        </div>
+        <div class="ticket-stat-card">
+            <div class="stat-icon-wrap critical">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-name">Critical Alarms</span>
+                <span class="stat-number">{{ critical_count|stringformat:"02d" }}</span>
+            </div>
+        </div>
+    </div>
+
+    {# ── Filter Bar ─────────────────────────────────────────────────────────── #}
+    <div class="filter-card" id="filter-bar-section">
+        <form id="ticket-filter-form" method="get">
+            <div class="row g-2 align-items-end">
+                <div class="col">
+                    <div class="filter-label">Search</div>
+                    <input type="text" name="search" class="form-control"
+                        placeholder="Search tickets, assets, or technicians..." value="{{ request.GET.search }}" autocomplete="off">
+                </div>
+                <div class="col-auto">
+                    <div class="filter-label">Status</div>
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+                        {% for val, label in status_choices %}
+                        <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <div class="filter-label">Priority</div>
+                    <select name="priority" class="form-select">
+                        <option value="">All Priorities</option>
+                        {% for val, label in priority_choices %}
+                        <option value="{{ val }}" {% if request.GET.priority == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'client_portal:support_tickets_export' %}{% if request.GET.search %}?search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.ticket_type %}&ticket_type={{ request.GET.ticket_type }}{% endif %}" class="btn-export">
+                        <i class="bi bi-download"></i> Export
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'client_portal:support_tickets' %}" class="btn-reset" title="Reset">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="list-view-container">
+        {# ── Table Card ────────────────────────────────────────── #}
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 ticket-table">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">SL No.</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Last Activity</th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody id="ticket-table-body">
+                        {% for ticket in page_object %}
+                        <tr>
+                            <td class="ps-4 fw-semibold text-muted">
+                                {{ page_object.start_index|add:forloop.counter0 }}
+                            </td>
+                            <td class="table-index-cell">
+                                <span class="ticket-tag-pill">{{ ticket.ticket_id }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if ticket.asset %}
+                                    {% with img=asset_images|get_item:ticket.asset.id %}
+                                    <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                        alt="{{ ticket.asset.name }}" class="rounded me-2" width="32" height="32"
+                                        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                    {% endwith %}
+                                    {% else %}
+                                    <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
+                                    {% endif %}
+                                    <span>{{ ticket.asset.name|default:"--" }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ ticket.subject }}</div>
+                                <small class="text-muted">{{ ticket.description|truncatechars:50 }}</small>
+                            </td>
+                            <td>
+                                <span class="priority-badge priority-{{ ticket.priority }}">
+                                    {{ ticket.get_priority_display|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ ticket.status }}">
+                                    {{ ticket.get_status_display|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if ticket.assigned_to %}
+                                <div class="d-flex align-items-center">
+                                    {% if ticket.assigned_to.profile_pic %}
+                                    <img src="{{ ticket.assigned_to.profile_pic.url }}" class="rounded-circle me-2" width="32" height="32"
+                                        alt="">
+                                    {% else %}
+                                    <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle me-2" width="32" height="32" alt="">
+                                    {% endif %}
+                                    <span>{{ ticket.assigned_to.get_full_name }}</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted fst-italic">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    {{ ticket.updated_at|timesince }} ago
+                                </div>
+                            </td>
+                            
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-5">
+                                <div class="text-muted d-flex flex-column align-items-center">
+                                    <i class="bi bi-ticket-perforated h1 mb-3"></i> <br>
+                                    <p>No maintenance tickets found.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# ── Pagination ─────────────────────────────────────────────────────── #}
+            {% if page_object.paginator.num_pages > 1 %}
+            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center border-top">
+                <div class="text-muted small">
+                    Showing {{ page_object.start_index }} to {{ page_object.end_index }} of {{ page_object.paginator.count }} tickets
+                </div>
+                <nav aria-label="Table navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_object.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_object.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
+                                    class="bi bi-chevron-left"></i></a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_object.paginator.page_range %}
+                        {% if page_object.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_object.number|add:'-3' and num < page_object.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_object.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_object.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
+                                    class="bi bi-chevron-right"></i></a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="kanban-view-container" style="display: none;">
+        <div class="kanban-board">
+            {# Column: New #}
+            <div class="kanban-column" id="col-open">
+                <div class="kanban-column-header">
+                    <div class="column-title-wrap">
+                        <span class="status-dot dot-open"></span>
+                        <span class="column-title">New</span>
+                    </div>
+                    <span class="column-count" id="count-open">0</span>
+                </div>
+                <div class="kanban-cards-container">
+                    {% for ticket in all_tickets %}
+                    {% if ticket.status == '0' %}
+                    <div class="kanban-card">
+                        <div class="card-top-meta">
+                            <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
+                            <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        <h3 class="kanban-card-title">{{ ticket.subject }}</h3>
+                        <div class="card-info-item">
+                            {% if ticket.asset %}
+                            {% with img=asset_images|get_item:ticket.asset.id %}
+                            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ ticket.asset.name }}" class="kanban-asset-thumb"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                            {% else %}
+                            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
+                            {% endif %}
+                            <span>{{ ticket.asset.name|default:"General" }}</span>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:"Unassigned" }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="kanban-empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <span>No new tickets</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Column: In Progress #}
+            <div class="kanban-column" id="col-in_progress">
+                <div class="kanban-column-header">
+                    <div class="column-title-wrap">
+                        <span class="status-dot dot-inprogress"></span>
+                        <span class="column-title">In Progress</span>
+                    </div>
+                    <span class="column-count" id="count-in_progress">0</span>
+                </div>
+                <div class="kanban-cards-container">
+                    {% for ticket in all_tickets %}
+                    {% if ticket.status == '1' %}
+                    <div class="kanban-card">
+                        <div class="card-top-meta">
+                            <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
+                            <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        <h3 class="kanban-card-title">{{ ticket.subject }}</h3>
+                        <div class="card-info-item">
+                            {% if ticket.asset %}
+                            {% with img=asset_images|get_item:ticket.asset.id %}
+                            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ ticket.asset.name }}" class="kanban-asset-thumb"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                            {% else %}
+                            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
+                            {% endif %}
+                            <span>{{ ticket.asset.name|default:"General" }}</span>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:"Unassigned" }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="kanban-empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <span>No tickets in progress</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Column: In Testing #}
+            <div class="kanban-column" id="col-in_testing">
+                <div class="kanban-column-header">
+                    <div class="column-title-wrap">
+                        <span class="status-dot dot-in-testing"></span>
+                        <span class="column-title">In Testing</span>
+                    </div>
+                    <span class="column-count" id="count-in_testing">0</span>
+                </div>
+                <div class="kanban-cards-container">
+                    {% for ticket in all_tickets %}
+                    {% if ticket.status == '2' %}
+                    <div class="kanban-card">
+                        <div class="card-top-meta">
+                            <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
+                            <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        <h3 class="kanban-card-title">{{ ticket.subject }}</h3>
+                        <div class="card-info-item">
+                            {% if ticket.asset %}
+                            {% with img=asset_images|get_item:ticket.asset.id %}
+                            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ ticket.asset.name }}" class="kanban-asset-thumb"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                            {% else %}
+                            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
+                            {% endif %}
+                            <span>{{ ticket.asset.name|default:"General" }}</span>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:"Unassigned" }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="kanban-empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <span>No tickets in review</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Column: Resolved #}
+            <div class="kanban-column" id="col-resolved">
+                <div class="kanban-column-header">
+                    <div class="column-title-wrap">
+                        <span class="status-dot dot-resolved"></span>
+                        <span class="column-title">Resolved</span>
+                    </div>
+                    <span class="column-count" id="count-resolved">0</span>
+                </div>
+                <div class="kanban-cards-container">
+                    {% for ticket in all_tickets %}
+                    {% if ticket.status == '3' or ticket.status == '4' %}
+                    <div class="kanban-card">
+                        <div class="card-top-meta">
+                            <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
+                            <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        <h3 class="kanban-card-title">{{ ticket.subject }}</h3>
+                        <div class="card-info-item">
+                            {% if ticket.asset %}
+                            {% with img=asset_images|get_item:ticket.asset.id %}
+                            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ ticket.asset.name }}" class="kanban-asset-thumb"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                            {% else %}
+                            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
+                            {% endif %}
+                            <span>{{ ticket.asset.name|default:"General" }}</span>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:"Unassigned" }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="kanban-empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <span>No resolved tickets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitFilterForm() {
+            document.getElementById('ticket-filter-form').submit();
+        }
+
+        var searchTimeout;
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.querySelector('#ticket-filter-form input[name="search"]');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(submitFilterForm, 400);
+                });
+            }
+            document.querySelectorAll('#ticket-filter-form select').forEach(function(sel) {
+                sel.addEventListener('change', submitFilterForm);
+            });
+        });
+
+        function switchView(view) {
+            const listBtn = document.getElementById('list-view-btn');
+            const kanbanBtn = document.getElementById('kanban-view-btn');
+            const listCont = document.getElementById('list-view-container');
+            const kanbanCont = document.getElementById('kanban-view-container');
+            const statsSection = document.getElementById('list-only-section');
+            const filterSection = document.getElementById('filter-bar-section');
+
+            if (view === 'list') {
+                listBtn.classList.add('btn-primary', 'active');
+                listBtn.classList.remove('btn-outline-primary');
+                kanbanBtn.classList.add('btn-outline-primary');
+                kanbanBtn.classList.remove('btn-primary', 'active');
+
+                listCont.style.display = 'block';
+                kanbanCont.style.display = 'none';
+                statsSection.style.display = 'grid';
+                filterSection.style.display = 'block';
+                localStorage.setItem('portal_ticket_view_pref', 'list');
+            } else {
+                kanbanBtn.classList.add('btn-primary', 'active');
+                kanbanBtn.classList.remove('btn-outline-primary');
+                listBtn.classList.add('btn-outline-primary');
+                listBtn.classList.remove('btn-primary', 'active');
+
+                listCont.style.display = 'none';
+                kanbanCont.style.display = 'block';
+                statsSection.style.display = 'none';
+                filterSection.style.display = 'none';
+                updateKanbanCounts();
+                localStorage.setItem('portal_ticket_view_pref', 'kanban');
+            }
+        }
+
+        function updateKanbanCounts() {
+            ['open', 'in_progress', 'in_testing', 'resolved'].forEach(status => {
+                const container = document.querySelector(`#col-${status} .kanban-cards-container`);
+                if (container) {
+                    const cards = container.querySelectorAll('.kanban-card');
+                    const emptyState = container.querySelector('.kanban-empty-state');
+                    const count = cards.length;
+                    const countEl = document.getElementById(`count-${status}`);
+                    if (countEl) countEl.textContent = count;
+                    if (emptyState) {
+                        emptyState.style.display = count === 0 ? 'flex' : 'none';
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pref = localStorage.getItem('portal_ticket_view_pref');
+            if (pref === 'kanban') {
+                switchView('kanban');
+            } else {
+                updateKanbanCounts();
+            }
+        });
+    </script>
+</div>
+{% endblock content %}

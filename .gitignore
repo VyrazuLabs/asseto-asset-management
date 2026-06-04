@@ -26,7 +26,7 @@ agents.md
 .cursorrules
 .windsurfrules
 .cursorignore
-.knowledge-base
+**/.knowledge-base
 
 # macOS System Files
 .DS_Store
@@ -37,3 +37,6 @@ Icon
 ._*
 .Spotlight-V100
 .Trashes
+
+docs
+CLAUDE.md

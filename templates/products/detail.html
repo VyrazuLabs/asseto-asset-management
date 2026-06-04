@@ -149,8 +149,10 @@
                                  alt="Primary View" 
                                  {% if img_array|length > 1 %}
                                  data-bs-toggle="modal" data-bs-target="#productImageCarousel" data-bs-slide-to="0"
-                                 style="cursor:pointer"
+                                 {% else %}
+                                 data-bs-toggle="modal" data-bs-target="#productImageSingle"
                                  {% endif %}
+                                 style="cursor:pointer"
                                  onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
                         {% else %}
                             <div class="no-image-available">
@@ -193,6 +195,25 @@
     </div>
 </div>
 
+{% if img_array|length == 1 %}
+<div class="modal fade" id="productImageSingle" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Product Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="{% get_media_prefix %}{{ img_array.0.image }}" 
+             class="detail-modal-image" 
+             alt="Product Image"
+             onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 {# ── Image Carousel Modal ────────────────────────────────────────────────────── #}
 {% if img_array and img_array|length > 1 %}
 <div class="modal fade" id="productImageCarousel" tabindex="-1">
@@ -202,15 +223,17 @@
         <h5 class="modal-title">Image <span id="productImageCounter">1</span> of {{ img_array|length }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body p-0">
         <div id="productCarouselMain" class="carousel slide" data-bs-ride="false">
           <div class="carousel-inner">
             {% for it in img_array %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{% get_media_prefix %}{{ it.image }}"
-                     class="detail-modal-image"
-                     alt="Product Image {{ forloop.counter }}"
-                     onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                <div class="d-flex align-items-center justify-content-center">
+                  <img src="{% get_media_prefix %}{{ it.image }}"
+                       class="detail-modal-image"
+                       alt="Product Image {{ forloop.counter }}"
+                       onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                </div>
               </div>
             {% endfor %}
           </div>
@@ -268,11 +291,27 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         var carouselEl = document.getElementById('productCarouselMain');
+        var modalEl = document.getElementById('productImageCarousel');
+        var counterEl = document.getElementById('productImageCounter');
+
         if (carouselEl) {
-            var counterEl = document.getElementById('productImageCounter');
             carouselEl.addEventListener('slide.bs.carousel', function(e) {
                 if (counterEl) {
                     counterEl.textContent = e.to + 1;
+                }
+            });
+        }
+
+        if (modalEl && carouselEl) {
+            modalEl.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var slideIndex = button.getAttribute('data-bs-slide-to');
+                var carousel = bootstrap.Carousel.getOrCreateInstance(carouselEl);
+                if (slideIndex !== null) {
+                    carousel.to(parseInt(slideIndex));
+                    if (counterEl) {
+                        counterEl.textContent = parseInt(slideIndex) + 1;
+                    }
                 }
             });
         }

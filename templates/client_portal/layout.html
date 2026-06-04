@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | Asseto Client Portal</title>
+
+    <!-- Favicon -->
+    {% if get_favicon %}
+    <link rel="shortcut icon" href="/media{{ get_favicon }}" type="image/x-icon" />
+    {% else %}
+    <link rel="shortcut icon" href="{% static 'images/logo/Logo.svg' %}" type="image/x-icon" />
+    {% endif %}
+    <link rel="shortcut icon" href="{% static 'images/logo/Logo.png' %}" type="image/png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'css/main/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/client-portal.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --portal-sidebar-width: 280px;
+            --portal-navy: #ffffff;
+            --portal-navy-light: #f0f1f5;
+            --portal-accent: #435ebe;
+        }
+
+        #app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .portal-sidebar {
+            width: var(--portal-sidebar-width);
+            background: var(--portal-navy);
+            color: #25396f;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            max-width: 140px;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #7c8db5;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 600;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            color: #25396f;
+            background: var(--portal-navy-light);
+        }
+
+        .menu-item.active {
+            color: #ffffff;
+            background: #435ebe;
+            border-left-color: var(--portal-accent);
+        }
+
+        .menu-item i {
+            font-size: 1.25rem;
+        }
+
+        .sidebar-footer {
+            padding: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #435ebe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        /* Main Content */
+        .portal-main {
+            flex-grow: 1;
+            margin-left: var(--portal-sidebar-width);
+            background: #f2f7ff;
+            min-height: 100vh;
+        }
+
+        .portal-header {
+            background: white;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .portal-content {
+            padding: 2rem;
+        }
+
+        .client-badge {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--portal-text);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="portal-body">
+    <div id="app">
+        <!-- Sidebar -->
+        <div class="portal-sidebar">
+            <div class="sidebar-header">
+                <img src="{% static 'images/asseto-logo.svg' %}" alt="Asseto" class="sidebar-logo">
+                <div class="small fw-bold text-uppercase tracking-widest" style="color: #7c8db5;">Client Portal</div>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="{% url 'client_portal:dashboard' %}" class="menu-item {% if cp_sidebar == 'overview' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2-fill"></i> Overview
+                </a>
+                <a href="{% url 'client_portal:assets' %}" class="menu-item {% if cp_sidebar == 'assets' %}active{% endif %}">
+                    <i class="bi bi-box-seam"></i> My Assets
+                </a>
+                <a href="{% url 'client_portal:support_tickets' %}" class="menu-item {% if cp_sidebar == 'support' %}active{% endif %}">
+                    <i class="bi bi-headset"></i> Support Ticket
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-pill">
+                    <div class="user-avatar text-white">
+                        {{ contact.name|slice:":1" }}
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="small fw-bold text-truncate" style="color: #25396f;">{{ contact.name }}</div>
+                        <div style="font-size: 0.7rem; color: #7c8db5;">{{ client.name|truncatechars:15 }}</div>
+                    </div>
+                    <a href="{% url 'client_portal:logout' %}" style="color: #7c8db5;" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="portal-main">
+            <header class="portal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <h5 class="mb-0 fw-800 text-uppercase">{% block header_title %}Overview{% endblock %}</h5>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="client-badge">
+                        <i class="bi bi-building me-2"></i> {{ client.name }}
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-link link-dark p-0" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell fs-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="portal-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

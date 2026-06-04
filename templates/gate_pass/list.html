@@ -1,0 +1,561 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+{% endblock css %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: { colors: { "on-tertiary-fixed-variant": "#6e3900", "on-tertiary-fixed": "#2f1500", "on-surface-variant": "#444652", outline: "#757684", "primary-fixed": "#dce1ff", background: "#f7f9ff", "on-primary": "#ffffff", "surface-dim": "#d5dae2", tertiary: "#773e00", "on-secondary-container": "#00447e", "surface-container-low": "#eff4fc", "on-background": "#161c22", "inverse-on-surface": "#ecf1f9", "tertiary-container": "#9a5200", surface: "#f7f9ff", "surface-container": "#e9eef6", "surface-bright": "#f7f9ff", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "tertiary-fixed-dim": "#ffb77e", "on-tertiary-container": "#ffdcc3", error: "#ba1a1a", primary: "#2845a4", "outline-variant": "#c5c5d4", "on-error": "#ffffff", "tertiary-fixed": "#ffdcc3", "on-error-container": "#93000a", "secondary-fixed-dim": "#a4c9ff", "surface-container-lowest": "#ffffff", "primary-fixed-dim": "#b7c4ff", "surface-container-highest": "#dee3eb", "surface-container-high": "#e3e8f0", "on-primary-fixed": "#001551", "primary-container": "#435ebe", "inverse-primary": "#b7c4ff", "surface-variant": "#dee3eb", "secondary-container": "#7ab3ff", "secondary-fixed": "#d4e3ff", "on-primary-fixed-variant": "#203e9e", "inverse-surface": "#2b3137", "on-secondary-fixed": "#001c39", "surface-tint": "#3c57b7", secondary: "#1960a6", "on-primary-container": "#dde1ff", "on-surface": "#161c22", "on-secondary-fixed-variant": "#004883", "on-secondary": "#ffffff" }, fontFamily: { headline: ["Inter"], body: ["Inter"], label: ["Inter"] }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" } } }
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+  .bg-primary-gradient {
+    background: linear-gradient(135deg, #2845a4 0%, #435ebe 100%);
+  }
+</style>
+    <div class="assets-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item active">Gate Pass</li>
+          </ol>
+        </nav>
+        <h1>Movement Authorisations</h1>
+        <p class="page-subtitle">Manage and track all inward and outward asset logistical passes.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 mt-1">
+        
+        {% if perms.authentication.add_asset %}
+          <a href="{% url 'gate-pass:add' %}" class="btn-register">
+            <i class="bi bi-plus-lg"></i> Register New Gate Pass
+          </a>
+        {% endif %}
+      </div>
+    </div>
+        <!-- <div class="flex justify-between items-end">
+          <div>
+            <h1>Movement Authorisations</h1>
+            <nav aria-label="breadcrumb " class="d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" style="color: #4F46E5;"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Gate-Pass</li>
+                </ol>
+            </nav>
+            <p class="text-body-lg text-on-surface-variant mt-1 font-semibold ">
+              Manage and track all inward and outward asset logistical passes.
+            </p>
+          </div>
+          <a
+            class="bg-primary-gradient text-white px-6 py-3 rounded-[0.7rem] font-semibold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95" href="{% url 'gate-pass:add' %}"
+          >
+            <span class="material-symbols-outlined" data-icon="add_circle"
+              >add_circle</span
+            >
+            New Gate Pass
+          </a>
+        </div> -->
+<!-- Summary Bento Grid -->
+<div class="stats-grid">
+  <a class="stat-card">
+    <!-- Card 1 -->
+    <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
+    <div>
+      <div class="stat-label">Pending Authorisations</div>
+      <div class="stat-value">{{ pending_authorization_count }}</div>
+    </div>
+  </a>
+  <a class="stat-card">
+    <!-- Card 2 -->
+    <div class="stat-icon green"><i class="bi bi-clipboard2-data"></i></div>
+    <div>
+      <div class="stat-label">Active Inward Passes</div>
+      <div class="stat-value">{{ inward_pass_count }}</div>
+    </div>
+  </a>
+  <a class="stat-card">
+    <!-- Card 3 -->
+    <div class="stat-icon orange"><i class="bi bi-clipboard2-data"></i></div>
+    <div>
+      <div class="stat-label">Total Passes Today</div>
+      <div class="stat-value">{{ passes_created_today_count }}</div>
+    </div>
+  </a>
+</div>
+<div class="filter-card">
+  {% csrf_token %}
+  <form id="asset-filter-form" hx-get="{% url 'gate-pass:search' %}" hx-target="#search_result"
+    hx-trigger="change, keyup changed delay:400ms from:input">
+    <div class="row g-2 align-items-end">
+
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="filter-label">Search Pass</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="Tag or Name…"
+          hx-get="{% url 'gate-pass:search' %}" hx-trigger="keyup changed delay:400ms, search"
+          hx-target="#search_result" aria-label="Search assets" />
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Status</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn"
+            aria-label="Filter by status">
+            All Status
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value='0'; document.getElementById('status-btn').childNodes[0].textContent='Pending '; htmx.trigger(form,'change');">Pending</a>
+            </li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='1';document.getElementById('status-btn').childNodes[0].textContent='Approved ';htmx.trigger('#asset-filter-form','change');">Approved</a>
+            </li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='2';document.getElementById('status-btn').childNodes[0].textContent='Draft ';htmx.trigger('#asset-filter-form','change');">Draft</a>
+            </li>
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='3';document.getElementById('status-btn').childNodes[0].textContent='Rejected ';htmx.trigger('#asset-filter-form','change');">Rejected</a>
+            </li>
+
+          </ul>
+          <input type="hidden" name="status">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">To Vendor</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn"
+            aria-label="Filter by vendor">
+            All Vendors
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors ';htmx.trigger('#asset-filter-form','change');">All
+                Vendors</a></li>
+            {% for vendor in destination_vendor_list %}
+            <li><a href="#" class="dropdown-item"
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value='{{ vendor.destination_vendor__id }}'; document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.destination_vendor__name }} '; htmx.trigger(form,'change');">
+                {{ vendor.destination_vendor__name }}
+              </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="vendor">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Type</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn"
+            aria-label="Filter by product type">
+            All Types
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          <ul class="dropdown-menu">
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='';
+                document.getElementById('type-btn').childNodes[0].textContent='All Types ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                All Types
+              </a>
+            </li>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='1';
+                document.getElementById('type-btn').childNodes[0].textContent='In-Ward ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                In-Ward
+              </a>
+            </li>
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                event.preventDefault();
+                document.querySelector('[name=type]').value='0';
+                document.getElementById('type-btn').childNodes[0].textContent='Out-Ward ';
+                htmx.trigger('#asset-filter-form','change');
+           ">
+                Out-Ward
+              </a>
+            </li>
+
+          </ul>
+          <input type="hidden" name="type">
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Raised By</div>
+
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="raised-by-btn"
+            aria-label="Filter by raised by">
+            All Raisers
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <ul class="dropdown-menu">
+
+            <!-- All Raisers -->
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=raised_by]').value='';
+                        document.getElementById('raised-by-btn').childNodes[0].textContent='All Raisers ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Raisers
+              </a>
+            </li>
+
+            {% for raised_by in raised_by_list %}
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=raised_by]').value='{{ raised_by.raised_by__id }}';
+                        document.getElementById('raised-by-btn').childNodes[0].textContent='{{ raised_by.raised_by__full_name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                {{ raised_by.raised_by__full_name }}
+              </a>
+            </li>
+            {% endfor %}
+
+          </ul>
+
+          <input type="hidden" name="raised_by">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Authorised By</div>
+
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="authorised-btn"
+            aria-label="Filter by authorised by">
+            All Authorised
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <ul class="dropdown-menu">
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=authorised_by]').value='';
+                        document.getElementById('authorised-btn').childNodes[0].textContent='All Authorised ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Authorised
+              </a>
+            </li>
+
+            {% for authorised_by in authorised_by_list %}
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=authorised_by]').value='{{ authorised_by.authorised_by__id }}';
+                        document.getElementById('authorised-btn').childNodes[0].textContent='{{ authorised_by.authorised_by__full_name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                {{ authorised_by.authorised_by__full_name }}
+              </a>
+            </li>
+            {% endfor %}
+
+          </ul>
+
+          <input type="hidden" name="authorised_by">
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Asset</div>
+
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="asset-btn"
+            aria-label="Filter by asset">
+            All Assets
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <ul class="dropdown-menu">
+
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=asset]').value='';
+                        document.getElementById('asset-btn').childNodes[0].textContent='All Assets ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                All Assets
+              </a>
+            </li>
+
+            {% for asset in asset_list %}
+            <li>
+              <a href="#" class="dropdown-item" onclick="
+                        event.preventDefault();
+                        document.querySelector('[name=asset]').value='{{ asset.asset_id }}';
+                        document.getElementById('asset-btn').childNodes[0].textContent='{{ asset.asset__name }} ';
+                        htmx.trigger('#asset-filter-form','change');
+                   ">
+                {{ asset.asset__name }}
+              </a>
+            </li>
+            {% endfor %}
+
+          </ul>
+
+          <input type="hidden" name="asset">
+        </div>
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'gate_pass:list' %}" class="btn-reset p-2" title="Reset all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
+    </div>
+  </form>
+  {% if is_demo is True %}
+  <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
+  {% endif %}
+</div>
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="assets-table" id="table1">
+      <thead>
+        <tr>
+          <th>SL.No</th>
+          <th>Pass #</th>
+          <th>Asset</th>
+          <th>Raised By</th>
+          <th>Authorised By</th>
+          <th>To Vendor</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      {% if filtered is None %}
+      <tbody id="search_result">
+        {% for item in items %}
+        <tr>
+          <td>{{ forloop.counter|stringformat:"02d" }}</td>
+          <td class="table-index-cell">
+            <span class="asset-tag-pill">{{ item.gate_pass_no }}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-3 align-items-center">
+              {% with item.asset.images.first as img %}
+              <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                alt="{{ item.asset.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% endwith %}
+              <span>{{ item.asset.name }} - #{{ item.asset.tag }}</span>
+            </div>
+          </td>
+          <td style="vertical-align: middle;">
+            <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+              {% if item.raised_by.profile_pic %}
+              <img src="{{ item.raised_by.profile_pic.url }}" alt="{{ item.raised_by.full_name }}"
+                class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% else %}
+              <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+                style="width: 32px; height: 32px; object-fit: cover;">
+              {% endif %}
+
+              <div>
+                <div class="text-nowrap fw-semibold">
+                  {{ item.raised_by }}
+                </div>
+
+                <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+                  {{ item.created_at|date:"d M Y, h:i A" }}
+                </div>
+              </div>
+
+            </div>
+          </td>
+          <td style="vertical-align: middle;">
+            <div class="d-flex align-items-center gap-2" style="min-height: 40px;">
+
+              {% if item.authorised_by %}
+
+              {% if item.authorised_by.profile_pic %}
+              <img src="{{ item.authorised_by.profile_pic.url }}" alt="{{ item.authorised_by.full_name }}"
+                class="rounded-circle flex-shrink-0" style="width: 32px; height: 32px; object-fit: cover;"
+                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+              {% else %}
+              <img src="{% static 'images/No_Image.jpg' %}" alt="Default" class="rounded-circle flex-shrink-0"
+                style="width: 32px; height: 32px; object-fit: cover;">
+              {% endif %}
+
+              <div>
+                <div class="text-nowrap fw-semibold">
+                  {{ item.authorised_by }}
+                </div>
+                <div class="text-muted text-nowrap" style="font-size: 0.75rem;">
+                  {{ item.updated_at|date:"d M Y, h:i A" }}
+                </div>
+              </div>
+
+              {% else %}
+
+              <!-- Placeholder Avatar -->
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                style="width: 32px; height: 32px; background: #F3F4F6; color: #6B7280; font-size: 14px;">
+                <i class="bi bi-person-x"></i>
+              </div>
+
+              <div>
+                <div class="text-nowrap fw-semibold text-danger">
+                  Unauthorised
+                </div>
+
+              </div>
+
+              {% endif %}
+
+            </div>
+          </td>
+          <td>{{ item.destination_vendor.name }}</td>
+          <td>
+            {% if item.movement_type == 0 %}
+            <span
+              class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit">
+              <span class="material-symbols-outlined text-xs" data-icon="logout">logout</span>
+              Outward
+            </span>
+
+            {% else %}
+            <span
+              class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white flex items-center gap-1 w-fit">
+              <span class="material-symbols-outlined text-xs" data-icon="login">login</span>
+              Inward
+
+              {% endif %}
+            </span>
+          </td>
+          <td class="px-6 py-5">
+            {% if item.status == 0 %}
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">pending</span>
+              Pending
+            </span>
+            {% elif item.status == 1 %}
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs"
+                style="font-variation-settings: 'FILL' 1">check_circle</span>
+              Approved
+            </span>
+            {% elif item.status == 2 %}
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs">edit_note</span>
+              Draft
+            </span>
+            {% elif item.status == 4 %}
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">output</span>
+              Checked Out
+            </span>
+            {% else %}
+            <span
+              class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/50 flex items-center gap-1.5 w-fit">
+              <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1">cancel</span>
+              Rejected
+            </span>
+            {% endif %}
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+            <a href="{% url 'gate-pass:detail' item.id %}">
+              <i class="bi bi-display"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% else %}
+      {% include 'gate_pass/search-data.html' %}
+      {% endif %}
+    </table>
+  </div>
+  <div class="pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index }}1 –{{ page_object.end_index }}1</strong>
+      of <strong>{{ page_object.paginator.count }}</strong>1 assets
+    </span>
+    <div class="pagination-nav">
+      {% if page_object.has_previous %}
+      <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
+      {% else %}
+      <span class="page-btn disabled" aria-disabled="true">‹</span>
+      {% endif %}
+      {% for num in page_object.paginator.page_range %}
+      {% if page_object.number == num %}
+      <span class="page-btn active" aria-current="page">{{ num }}</span>
+      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <=
+        page_object.number|add:"2" %} <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+        <span class="page-ellipsis">…</span>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_object.has_next %}
+        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
+        {% else %}
+        <span class="page-btn disabled" aria-disabled="true">›</span>
+        {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock content %}

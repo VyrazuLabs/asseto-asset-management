@@ -57,7 +57,7 @@ def exports_product_csv_utils(request):
     header_list = ['Product Name', 'Product Category',
                    'Product Type', 'Manufacturer', 'Description']
     product_list = Product.undeleted_objects.filter(organization=request.user.organization).order_by(
-        '-created_at').values_list('name', 'product_category__name', 'product_type__name', 'manufacturer', 'description')
+        '-created_at').values_list('name', 'product_sub_category__name', 'product_type__name', 'manufacturer', 'description')
     context = {'header_list': header_list, 'rows': product_list}
     response = render_to_csv(context_dict=context)
     response['Content-Disposition'] = f'attachment; filename="export-products-{today}.csv"'
@@ -106,6 +106,8 @@ def get_product_details(request,id):
     page_object = paginator.get_page(page_number)
     get_product_img=ProductImage.objects.filter(product=product).order_by('-uploaded_at').values()
     img_array=[]
+    if product.product_picture:
+        img_array.append({'image': product.product_picture.name})
     for it in get_product_img:
         img_array.append(it)
     get_custom_data=[]

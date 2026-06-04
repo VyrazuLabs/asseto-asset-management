@@ -1,12 +1,12 @@
 <footer class="site-footer">
-    <div class="footer clearfix mb-0 text-muted d-flex flex-column flex-sm-row align-items-center justify-content-sm-between">
-        <div class="float-start">
-            <p>{% now 'Y' %} &copy; Asset Management</p>
+    <div class="footer mb-0 text-muted d-flex flex-column flex-sm-row justify-content-between align-items-center">
+        <div class="text-center text-sm-start">
+            <p class="mb-0">{% now 'Y' %} &copy; Asset Management</p>
         </div>
-        <div class="float-end">
-            <p>
+        <div class="text-center text-sm-end">
+            <p class="mb-0">
                 Powered by
-                <a href="https://vyrazu.com">Vyrazu Labs</a>
+                <a href="https://vyrazu.com" target="_blank">Vyrazu Labs</a>
             </p>
         </div>
     </div>
@@ -23,91 +23,96 @@
 </script>
 
 <script>
-    const searchInput = document.getElementById('global-search');
+    const searchInput = document.getElementById('globalSearch');
 
-    // Save the current page URL as the origin page on every non-search page load
-    if (!window.location.pathname.startsWith('/search')) {
-        sessionStorage.setItem('searchOriginPage', window.location.href);
-    }
-
-    function highlightText(container, text) {
-        if (!text) return;
-
-        const regex = new RegExp(`(${text})`, 'gi');
-
-        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
-        const nodes = [];
-
-        while (walker.nextNode()) {
-            nodes.push(walker.currentNode);
+    if (searchInput) {
+        // Save the current page URL as the origin page on every non-search page load
+        if (!window.location.pathname.startsWith('/search')) {
+            sessionStorage.setItem('searchOriginPage', window.location.href);
         }
 
-        for (const node of nodes) {
-            if (node.parentNode && !node.parentNode.classList.contains('highlight')) {
-                const replaced = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
-                if (replaced !== node.nodeValue) {
-                    const wrapper = document.createElement('span');
-                    wrapper.innerHTML = replaced;
-                    node.parentNode.replaceChild(wrapper, node);
+        function highlightText(container, text) {
+            if (!text) return;
+
+            const regex = new RegExp(`(${text})`, 'gi');
+
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+            const nodes = [];
+
+            while (walker.nextNode()) {
+                nodes.push(walker.currentNode);
+            }
+
+            for (const node of nodes) {
+                if (node.parentNode && !node.parentNode.classList.contains('highlight')) {
+                    const replaced = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                    if (replaced !== node.nodeValue) {
+                        const wrapper = document.createElement('span');
+                        wrapper.innerHTML = replaced;
+                        node.parentNode.replaceChild(wrapper, node);
+                    }
                 }
             }
         }
-    }
 
-    function doSearch(query) {
-        const originPage = sessionStorage.getItem('searchOriginPage') || '/';
-        document.querySelectorAll('h3').forEach(h3 => {
-            h3.innerText = 'Search Results';
-        });
+        function doSearch(query) {
+            const originPage = sessionStorage.getItem('searchOriginPage') || '/';
+            document.querySelectorAll('h3').forEach(h3 => {
+                h3.innerText = 'Search Results';
+            });
 
-        if (!query.trim()) {
-            // Clear and go back to the origin page
-            sessionStorage.removeItem('searchOriginPage');
-            window.location.href = originPage;
-            return;
+            if (!query.trim()) {
+                // Clear and go back to the origin page
+                sessionStorage.removeItem('searchOriginPage');
+                window.location.href = originPage;
+                return;
+            }
+
+            fetch(`/admin/global-search/?search_text=${encodeURIComponent(query)}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch');
+                return response.text();
+            })
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newSection = doc.querySelector('section');
+                const currentSection = document.querySelector('section');
+
+                if (newSection && currentSection) {
+                    currentSection.innerHTML = newSection.innerHTML;
+
+                    // Highlight after injecting the new content
+                    highlightText(currentSection, query);
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+            });
         }
 
-        fetch(`/admin/global-search/?search_text=${encodeURIComponent(query)}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Failed to fetch');
-            return response.text();
-        })
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-
-            const newSection = doc.querySelector('section');
-            const currentSection = document.querySelector('section');
-
-            if (newSection && currentSection) {
-                currentSection.innerHTML = newSection.innerHTML;
-
-                // Highlight after injecting the new content
-                highlightText(currentSection, query);
-            }
-        })
-        .catch(error => {
-            console.error('Search error:', error);
+        // Live search on input
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value;
+            doSearch(query);
         });
     }
-
-    // Live search on input
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value;
-        doSearch(query);
-    });
 </script>
 
 <script>
-document.getElementById('global-search').addEventListener('keyup', function(e) {
-    if (e.key === 'Enter' || this.value.length > 2) {
-        performSearch();
+    const searchKeyInput = document.getElementById('globalSearch');
+    if (searchKeyInput) {
+        searchKeyInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter' || this.value.length > 2) {
+                performSearch();
+            }
+        });
     }
-});
 </script>
 
 <script>
@@ -185,16 +190,19 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Button click: check camera first
-    document.getElementById("scanButton").addEventListener("click", async () => {
-        const hasCamera = await cameraAvailable();
-        if (!hasCamera) {
-            alert("⚠️ No camera device found.");
-            return;
-        }
+    const scannerBtn = document.getElementById("scanButton");
+    if (scannerBtn) {
+        scannerBtn.addEventListener("click", async () => {
+            const hasCamera = await cameraAvailable();
+            if (!hasCamera) {
+                alert("⚠️ No camera device found.");
+                return;
+            }
 
-        modalInstance.show();
-        setTimeout(startQuagga, 300); // start scanning
-    });
+            modalInstance.show();
+            setTimeout(startQuagga, 300); // start scanning
+        });
+    }
 
     // Stop scanner when modal closes
     modalEl.addEventListener("hidden.bs.modal", stopQuagga);
@@ -202,38 +210,40 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <script>
-    document.getElementById("download-btn").addEventListener("click", function() {
-        var svgElement = document.querySelector('.asset-barcode').querySelector("svg");
-        console.log(svgElement,"svgElement")
-        
-        // Add necessary attributes
-        if (!svgElement.hasAttribute('xmlns')) {
-            console.log("if1")
-            svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        }
-        if (!svgElement.hasAttribute('width')) {
-            console.log("if2")
-            svgElement.setAttribute('width', '300');
-        }
-        if (!svgElement.hasAttribute('height')) {
-            console.log("if3")
-            svgElement.setAttribute('height', '150');
-        }
-        
-        var serializer = new XMLSerializer();
-        var svgString = serializer.serializeToString(svgElement);
-        
-        var blob = new Blob([svgString], {type: "image/svg+xml"});
-        var url = URL.createObjectURL(blob);
-        
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'barcode.svg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
+    const dlBtn = document.getElementById("download-btn");
+    if (dlBtn) {
+        dlBtn.addEventListener("click", function() {
+            var barcodeArea = document.querySelector('.asset-barcode');
+            if (!barcodeArea) return;
+            var svgElement = barcodeArea.querySelector("svg");
+            if (!svgElement) return;
+            
+            // Add necessary attributes
+            if (!svgElement.hasAttribute('xmlns')) {
+                svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            }
+            if (!svgElement.hasAttribute('width')) {
+                svgElement.setAttribute('width', '300');
+            }
+            if (!svgElement.hasAttribute('height')) {
+                svgElement.setAttribute('height', '150');
+            }
+            
+            var serializer = new XMLSerializer();
+            var svgString = serializer.serializeToString(svgElement);
+            
+            var blob = new Blob([svgString], {type: "image/svg+xml"});
+            var url = URL.createObjectURL(blob);
+            
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'barcode.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
     
 </script>
 

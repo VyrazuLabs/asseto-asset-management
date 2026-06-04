@@ -114,7 +114,9 @@ INSTALLED_APPS = [
     'audit',
     'license',
     # 'silk'
-
+    'gate_pass',
+    'clients',
+    'client_portal',
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK=True
@@ -134,6 +136,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     "django_htmx.middleware.HtmxMiddleware",
+    "client_portal.middleware.ClientPortalMiddleware",
     # 'silk.middleware.SilkyMiddleware'
 ]
 
@@ -273,7 +276,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'authentication.User'
 LOGIN_URL = 'authentication:login'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')

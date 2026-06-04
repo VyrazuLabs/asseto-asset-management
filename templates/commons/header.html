@@ -26,8 +26,7 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <!-- ✅ jQuery (only once) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-        integrity="sha256-/xUj+3OJ+0+5TCkL1ZJkJb+OGtOeZzfvZnUAghj5CDo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- ✅ Bootstrap 5 (Bundle includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -52,6 +51,11 @@
             overflow-x: hidden;
             right: -370%;
         }
+    }
+    
+    /* Ensure user dropdown doesn't show the caret and stays properly aligned */
+    .user-avatar-area .dropdown-toggle::after {
+        display: none !important;
     }
 </style>
 
@@ -154,7 +158,7 @@
                                         <ul class="navbar-nav mb-0 me-3 justify-content-end">
                                             <li class="nav-item dropdown">
                                                 <a class="nav-link active dropdown-toggle text-gray-600" href="#"
-                                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                                    id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false"
                                                     style="padding-top: 0px;">
                                                     <i class="bi bi-bell bi-sub fs-4"></i>
                                                     <span
@@ -162,8 +166,7 @@
                                                         hx-get="{% url 'notifications:count' %}"
                                                         hx-target="this"></span>
                                                 </a>
-                                                <ul style="position: absolute;overflow-x: hidden;right: -370%;"
-                                                    class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
+                                                <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
                                                     onclick="event.stopPropagation();">
                                                     <span hx-get="{% url 'notifications:data' %}" hx-target="this"
                                                         hx-trigger="load, notificationListChanged from:body">
@@ -175,7 +178,7 @@
                                     </div>
                                     <div class="user-avatar-area">
                                         <div class="dropdown">
-                                            <a href="#" class="d-flex align-items-center justify-content-end"
+                                            <a href="#" class="d-flex align-items-center justify-content-end dropdown-toggle"
                                                 id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <div class="user-menu d-flex align-items-center">
                                                     <div class="user-name text-end me-3 d-none d-lg-block">
@@ -292,6 +295,3 @@
                 {% endfor %}
                 {% endif %}
             </header>
-            <script>
-
-            </script>

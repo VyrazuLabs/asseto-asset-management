@@ -97,10 +97,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-filter-form','change');">All Status</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
             {% for status in asset_status_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=status]').value='{{ status.id }}';document.getElementById('status-btn').childNodes[0].textContent='{{ status.name }} ';htmx.trigger('#asset-filter-form','change');">
+              onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value='{{ status.id }}'; document.getElementById('status-btn').childNodes[0].textContent='{{ status.name }} '; htmx.trigger(form,'change');">
               {{ status.name }}
             </a></li>
             {% endfor %}
@@ -117,10 +117,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors ';htmx.trigger('#asset-filter-form','change');">All Vendors</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors '; htmx.trigger(form,'change');">All Vendors</a></li>
             {% for vendor in vendor_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=vendor]').value='{{ vendor.id }}';document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.name }} ';htmx.trigger('#asset-filter-form','change');">
+              onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value='{{ vendor.id }}'; document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.name }} '; htmx.trigger(form,'change');">
               {{ vendor.name }}
             </a></li>
             {% endfor %}
@@ -157,10 +157,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=category]').value='';document.getElementById('category-btn').childNodes[0].textContent='All Categories ';htmx.trigger('#asset-filter-form','change');">All Categories</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value=''; document.getElementById('category-btn').childNodes[0].textContent='All Categories '; htmx.trigger(form,'change');">All Categories</a></li>
             {% for category in product_category_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=category]').value='{{ category.id }}';document.getElementById('category-btn').childNodes[0].textContent='{{ category.name }} ';htmx.trigger('#asset-filter-form','change');">
+              onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value='{{ category.id }}'; document.getElementById('category-btn').childNodes[0].textContent='{{ category.name }} '; htmx.trigger(form,'change');">
               {{ category.name }}
             </a></li>
             {% endfor %}
@@ -177,10 +177,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=location]').value='';document.getElementById('location-btn').childNodes[0].textContent='All Locations ';htmx.trigger('#asset-filter-form','change');">All Locations</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value=''; document.getElementById('location-btn').childNodes[0].textContent='All Locations '; htmx.trigger(form,'change');">All Locations</a></li>
             {% for loc in location_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=location]').value='{{ loc.id }}';document.getElementById('location-btn').childNodes[0].textContent='{{ loc.office_name }} ';htmx.trigger('#asset-filter-form','change');">
+              onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value='{{ loc.id }}'; document.getElementById('location-btn').childNodes[0].textContent='{{ loc.office_name }} '; htmx.trigger(form,'change');">
               {{ loc.office_name }}
             </a></li>
             {% endfor %}
@@ -197,7 +197,7 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=department]').value='';document.getElementById('dept-btn').childNodes[0].textContent='All Dept ';htmx.trigger('#asset-filter-form','change');">All Dept</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=department]').value=''; document.getElementById('dept-btn').childNodes[0].textContent='All Dept '; htmx.trigger(form,'change');">All Dept</a></li>
             {% for dept in department_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault();document.querySelector('[name=department]').value='{{ dept.id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ dept.name }} ';htmx.trigger('#asset-filter-form','change');">

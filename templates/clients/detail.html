@@ -1,0 +1,399 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}{{ client.name }} | Client Details | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
+<style>
+  /* Colourful Section Icons */
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+
+  .section-icon.bg-blue {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+
+  .section-icon.bg-green {
+    background: #ecfdf5;
+    color: #10b981;
+  }
+
+  .section-icon.bg-purple {
+    background: #f5f3ff;
+    color: #8b5cf6;
+  }
+
+  .section-icon.bg-orange {
+    background: #fff7ed;
+    color: #f97316;
+  }
+
+  /* Empty State Centering Fix */
+  .detail-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 180px;
+  }
+
+  .detail-empty-state i {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Key Contacts Styling */
+  .detail-contact-card {
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--pd-border);
+  }
+
+  .detail-contact-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .client-assignee-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 14px;
+  }
+
+  /* Dynamic Avatar Colors */
+  .avatar-blue {
+    background: #eff6ff;
+    color: #3b82f6;
+  }
+
+  .avatar-green {
+    background: #ecfdf5;
+    color: #10b981;
+  }
+
+  .avatar-purple {
+    background: #f5f3ff;
+    color: #8b5cf6;
+  }
+
+  .avatar-orange {
+    background: #fff7ed;
+    color: #f97316;
+  }
+
+  .detail-contact-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #475569;
+    text-decoration: none;
+    margin-top: 6px;
+  }
+
+  .detail-contact-link i {
+    color: #8b5cf6;
+  }
+
+  .detail-contact-link:hover {
+    color: #8b5cf6;
+  }
+
+  /* Timeline Adjustments */
+  .activity-log-item {
+    border-left: 2px solid #f1f5f9;
+    padding-bottom: 24px;
+  }
+
+  .detail-sub-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed var(--pd-border);
+  }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="detail-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb mb-2">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
+        <li class="breadcrumb-item active">Client Details</li>
+      </ol>
+    </nav>
+    <h1 class="page-title">Client Details</h1>
+    <p class="page-subtitle">Detailed overview for <strong class="detail-tag-inline">{{ client.name }}</strong></p>
+  </div>
+  <div class="header-actions">
+    <a href="{% url 'clients:list' %}" class="btn-reset">
+      <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+    <a href="{% url 'clients:update' client.id %}" class="btn-register ms-2">
+      <i class="bi bi-pencil-square"></i> Update Client
+    </a>
+  </div>
+</div>
+
+{# ── Two-column layout ────────────────────────────────────────────────────── #}
+<div class="detail-layout">
+
+  {# ── Left / main column ──────────────────────────────────────────────────── #}
+  <div class="detail-main">
+
+    {# Client Information card #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-blue"><i class="bi bi-building"></i></div>
+          <h2>Client Information</h2>
+        </div>
+        <span class="detail-status-badge {% if client.status == '1' %}badge-available{% else %}badge-in-use{% endif %}">
+          {% if client.status == '1' %}ACTIVE{% elif client.status == '2' %}IN REVIEW{%
+          elif client.status == '3' %}DORMANT{% else %}INACTIVE{% endif %}
+        </span>
+      </div>
+      <div class="detail-card-body">
+
+        <div class="detail-fields-grid">
+
+          <div class="detail-field">
+            <span class="detail-field-label">Company Name</span>
+            <span class="detail-field-value fw-semibold">{{ client.name }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Client ID</span>
+            <span class="detail-field-value"><span class="asset-tag-pill">{{ client.client_id }}</span></span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Industry</span>
+            <span class="detail-field-value">{{ client.industry_name }}</span>
+          </div>
+
+          <div class="detail-field">
+            <span class="detail-field-label">Corporate Website</span>
+            <span class="detail-field-value">
+              {% if client.corporate_website %}
+              <a href="{{ client.corporate_website }}" target="_blank" class="text-decoration-none"
+                style="color: #6366f1;">
+                <i class="bi bi-globe me-1"></i> {{ client.corporate_website }}
+              </a>
+              {% else %}—{% endif %}
+            </span>
+          </div>
+
+
+
+
+
+          <div class="detail-field">
+            <span class="detail-field-label">Street Address</span>
+            <span class="detail-field-value">{{ client.street_address|default:"—" }}</span>
+          </div>
+          <div class="detail-field">
+            <span class="detail-field-label">City</span>
+            <span class="detail-field-value">{{ client.city|default:"—" }}</span>
+          </div>
+          <div class="detail-field">
+            <span class="detail-field-label">State / Province</span>
+            <span class="detail-field-value">{{ client.state|default:"—" }}</span>
+          </div>
+          <div class="detail-field">
+            <span class="detail-field-label">Zip Code</span>
+            <span class="detail-field-value">{{ client.zip_code|default:"—" }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {# Assets Table #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-green"><i class="bi bi-laptop"></i></div>
+          <h2>Asset Inventory Ledger</h2>
+        </div>
+        <form method="GET" class="d-flex align-items-center gap-2" style="margin-left: auto;">
+          <input type="hidden" name="asset_page" value="1">
+          <input type="search" name="asset_search" class="form-control form-control-sm"
+            placeholder="Search by tag or name…" value="{{ asset_search|default:'' }}"
+            style="width: 320px;" id="assetSearchInput">
+          {% if assets_page_object %}
+          <button type="button" class="btn-export" id="exportAssetsBtn"><i class="bi bi-download"></i> Export</button>
+          {% endif %}
+        </form>
+      </div>
+      <div class="detail-card-body p-0">
+        {% if assets_page_object %}
+          {% include 'commons/assets-table.html' %}
+          <div class="px-3">
+            {% include 'commons/list-pagination.html' with page_object=assets_page_object page_var='asset_page' %}
+          </div>
+        {% else %}
+        <div class="detail-empty-state">
+          <i class="bi bi-inbox"></i> <br>
+          <p>No assets assigned to this client yet</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>{# /detail-main #}
+
+  {# ── Right / sidebar column ──────────────────────────────────────────────── #}
+  <div class="detail-sidebar">
+
+    {# Key Contacts #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-purple"><i class="bi bi-person-lines-fill"></i></div>
+          <h2>Key Contacts</h2>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        {% if client.contacts.all %}
+        {% for contact in client.contacts.all %}
+        <div class="detail-contact-card">
+          <div class="d-flex align-items-center mb-2">
+            <div class="client-assignee-avatar 
+                        {% if forloop.counter|divisibleby:4 %}avatar-blue
+                        {% elif forloop.counter|divisibleby:3 %}avatar-green
+                        {% elif forloop.counter|divisibleby:2 %}avatar-orange
+                        {% else %}avatar-purple{% endif %}">
+              {{ contact.initials }}
+            </div>
+            <div>
+              <div class="fw-bold" style="font-size: 15px;">{{ contact.name }}</div>
+              <div class="small text-muted" style="font-size: 12px;">{{ contact.role.related_name|default:"Primary Contact" }}</div>
+              {% if contact.email %}
+              <div><a href="mailto:{{ contact.email }}" class="detail-contact-link"><i class="bi bi-envelope"></i> {{ contact.email }}</a></div>
+              {% endif %}
+              {% if contact.phone %}
+              <div><a href="tel:{{ contact.phone }}" class="detail-contact-link"><i class="bi bi-telephone"></i> {{ contact.phone }}</a></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="detail-empty-state py-3">
+          <p>No contacts listed</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Activity Log #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-orange"><i class="bi bi-clock-history"></i></div>
+          <h2>Activity Log</h2>
+        </div>
+      </div>
+      <div class="detail-card-body p-0">
+        <ul class="activity-log-list">
+          {% if activities %}
+          {% for activity in activities %}
+          <li class="activity-log-item">
+            <div class="activity-dot
+              {% if activity.history_type == '+' %}dot-create
+              {% elif activity.history_type == '-' %}dot-delete
+              {% else %}dot-update{% endif %}">
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.action }} {{ activity.type }}</div>
+              <div class="activity-meta">
+                {{ activity.date|date:"M d, Y" }} · {{ activity.notes }}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+          {% else %}
+          <li class="activity-log-item">
+            <div class="activity-dot" style="border-color: #cbd5e1; border-width: 2px;"></div>
+            <div class="activity-content">
+              <div class="activity-title">No activity recorded</div>
+            </div>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+  </div>{# /detail-sidebar #}
+
+</div>{# /detail-layout #}
+
+<script>
+  const assetSearchForm = document.querySelector('#assetSearchInput')?.closest('form');
+  const assetSearchInput = document.getElementById('assetSearchInput');
+  if (assetSearchInput && assetSearchForm) {
+    let debounceTimer;
+    assetSearchInput.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        assetSearchForm.submit();
+      }, 500);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const exportBtn = document.getElementById('exportAssetsBtn');
+    const table = document.getElementById('assetsTable');
+    if (exportBtn && table) {
+      exportBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const rows = table.querySelectorAll('tr');
+        let csv = [];
+        rows.forEach(r => {
+          let row = Array.from(r.querySelectorAll('td, th')).map(c => `"${c.innerText.trim().replace(/"/g, '""')}"`);
+          csv.push(row.join(','));
+        });
+        const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'client_assets_export.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    }
+  });
+</script>
+{% endblock content %}

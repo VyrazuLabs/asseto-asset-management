@@ -5,13 +5,13 @@
 
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  --color-primary:       #4F46E5;
+  --color-primary: #4F46E5;
   --color-primary-light: #EEF2FF;
-  --color-card:          #FFFFFF;
-  --color-border:        #E5E7EB;
-  --color-text:          #111827;
-  --color-muted:         #6B7280;
-  --card-radius:         10px;
+  --color-card: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-text: #111827;
+  --color-muted: #6B7280;
+  --card-radius: 10px;
 }
 
 /* ── Asset-specific buttons ───────────────────────────────────────────────── */
@@ -30,9 +30,53 @@
   text-decoration: none;
   cursor: pointer;
 }
+
 .btn-save-asset:hover {
   background: #4338CA;
   color: #fff;
+}
+
+.btn-cancel {
+  background: #fff;
+  color: rgb(51, 51, 51);
+  border: none;
+  padding: .55rem 1.2rem;
+  border-radius: 8px;
+  font-size: .875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+body.theme-dark .btn-cancel {
+  background: #fff;
+  color: rgb(51, 51, 51);
+}
+
+body.theme-dark .btn-cancel:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #f0f0f0;
+}
+
+.btn-approve {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  border: 1.5px solid #bbf7d0 !important;
+}
+
+.btn-approve:hover {
+  background: #16a34a !important;
+  color: #fff !important;
 }
 
 .btn-assign {
@@ -45,6 +89,7 @@
   font-weight: 600;
   cursor: pointer;
 }
+
 .btn-assign:hover {
   background: var(--color-primary);
   color: #fff;
@@ -62,7 +107,11 @@
   cursor: pointer;
   white-space: nowrap;
 }
-.btn-unassign:hover { background: #DC2626; color: #fff; }
+
+.btn-unassign:hover {
+  background: #DC2626;
+  color: #fff;
+}
 
 .btn-add-row {
   background: var(--color-primary-light);
@@ -77,6 +126,7 @@
   align-items: center;
   gap: .3rem;
 }
+
 .btn-add-row:hover {
   background: var(--color-primary);
   color: #fff;
@@ -97,7 +147,11 @@
   font-size: .8rem;
   flex-shrink: 0;
 }
-.btn-rm-row:hover { background: #DC2626; color: #fff; }
+
+.btn-rm-row:hover {
+  background: #DC2626;
+  color: #fff;
+}
 
 /* ── Asset appearance ─────────────────────────────────────────────────────── */
 .asset-thumb {
@@ -121,13 +175,35 @@
   white-space: nowrap;
 }
 
-.asset-name-main { font-weight: 600; color: var(--color-text); }
-.asset-name-sub  { font-size: .8rem; color: var(--color-muted); margin-top: .1rem; }
+.asset-name-main {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.asset-name-sub {
+  font-size: .8rem;
+  color: var(--color-muted);
+  margin-top: .1rem;
+}
 
 /* ── Condition indicators ─────────────────────────────────────────────────── */
-.state-excellent { color: #059669; font-size: .85rem; font-weight: 500; }
-.state-good      { color: #B45309; font-size: .85rem; font-weight: 500; }
-.state-poor      { color: #DC2626; font-size: .85rem; font-weight: 500; }
+.state-excellent {
+  color: #059669;
+  font-size: .85rem;
+  font-weight: 500;
+}
+
+.state-good {
+  color: #B45309;
+  font-size: .85rem;
+  font-weight: 500;
+}
+
+.state-poor {
+  color: #DC2626;
+  font-size: .85rem;
+  font-weight: 500;
+}
 
 /* ── Status badges ────────────────────────────────────────────────────────── */
 .status-badge {
@@ -140,16 +216,56 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.status-allocated { background: #F3F4F6; color: #374151; border: 1.5px solid #D1D5DB; }
-.status-available { background: #ECFDF5; color: #065F46; border: 1.5px solid #A7F3D0; }
-.status-repair    { background: #FFF7ED; color: #92400E; border: 1.5px solid #FDE68A; }
-.status-lost      { background: #FEF2F2; color: #991B1B; border: 1.5px solid #FECACA; }
-.status-deploy    { background: #EFF6FF; color: #1E40AF; border: 1.5px solid #BFDBFE; }
+
+.status-allocated {
+  background: #F3F4F6;
+  color: #374151;
+  border: 1.5px solid #D1D5DB;
+}
+
+.status-available {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1.5px solid #A7F3D0;
+}
+
+.status-repair {
+  background: #FFF7ED;
+  color: #92400E;
+  border: 1.5px solid #FDE68A;
+}
+
+.status-lost {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1.5px solid #FECACA;
+}
+
+.status-deploy {
+  background: #EFF6FF;
+  color: #1E40AF;
+  border: 1.5px solid #BFDBFE;
+}
 
 /* ── Assignee chip ────────────────────────────────────────────────────────── */
-.assignee-chip { display: flex; align-items: center; gap: .4rem; }
-.assignee-chip img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
-.assignee-chip span { font-size: .85rem; font-weight: 500; }
+.assignee-chip {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.assignee-chip img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.assignee-chip span {
+  font-size: .85rem;
+  font-weight: 500;
+}
+
 .assignee-initials {
   width: 22px;
   height: 22px;
@@ -163,6 +279,7 @@
   justify-content: center;
   flex-shrink: 0;
 }
+
 .unassigned-label {
   display: block;
   font-size: .82rem;
@@ -178,12 +295,14 @@
   justify-content: space-between;
   margin-bottom: 1.5rem;
 }
+
 .assets-page-header h1 {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 .3rem;
 }
+
 .assets-page-header .page-subtitle {
   color: var(--color-muted);
   font-size: .925rem;
@@ -195,26 +314,46 @@
    ───────────────────────────────────────────────────────────────────────────── */
 body.theme-dark {
   --color-primary-light: #2a2650;
-  --color-card:          #1e1e2d;
-  --color-border:        #2e2e42;
-  --color-text:          #e0e0f0;
-  --color-muted:         #8b8ba4;
+  --color-card: #1e1e2d;
+  --color-border: #2e2e42;
+  --color-text: #e0e0f0;
+  --color-muted: #8b8ba4;
 }
 
-body.theme-dark .btn-unassign { background: #3a1c1c; border-color: #5c2020; }
-body.theme-dark .btn-assign { background: var(--color-primary-light); border-color: #3d3780; }
-body.theme-dark .btn-add-row { background: var(--color-primary-light); border-color: #3d3780; }
-body.theme-dark .btn-rm-row { background: #3a1c1c; border-color: #5c2020; }
+body.theme-dark .btn-unassign {
+  background: #3a1c1c;
+  border-color: #5c2020;
+}
 
-body.theme-dark .asset-tag-pill { background: var(--color-primary-light); }
+body.theme-dark .btn-assign {
+  background: var(--color-primary-light);
+  border-color: #3d3780;
+}
+
+body.theme-dark .btn-add-row {
+  background: var(--color-primary-light);
+  border-color: #3d3780;
+}
+
+body.theme-dark .btn-rm-row {
+  background: #3a1c1c;
+  border-color: #5c2020;
+}
+
+body.theme-dark .asset-tag-pill {
+  background: var(--color-primary-light);
+  color: #a8b4ff;
+}
 
 body.theme-dark .assets-page-header h1 {
   font-size: 1.75rem;
   margin: 0 0 .3rem;
 }
+
 body.theme-dark .assets-page-header .page-subtitle {
   margin-top: .25rem;
 }
+
 /* .assets-page-header h1
  {
     font-size: 1.75rem;
@@ -223,8 +362,32 @@ body.theme-dark .assets-page-header .page-subtitle {
     margin: 0 0 .3rem;
 } */
 
-body.theme-dark .status-allocated { background: #2a2a3d; color: #b0b0c8; border-color: #3e3e55; }
-body.theme-dark .status-available { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
-body.theme-dark .status-repair    { background: #302515; color: #fbbf24; border-color: #4a3515; }
-body.theme-dark .status-lost      { background: #301515; color: #fca5a5; border-color: #5c2020; }
-body.theme-dark .status-deploy    { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
+body.theme-dark .status-allocated {
+  background: #2a2a3d;
+  color: #b0b0c8;
+  border-color: #3e3e55;
+}
+
+body.theme-dark .status-available {
+  background: #15302a;
+  color: #6ee7b7;
+  border-color: #1c4a3a;
+}
+
+body.theme-dark .status-repair {
+  background: #302515;
+  color: #fbbf24;
+  border-color: #4a3515;
+}
+
+body.theme-dark .status-lost {
+  background: #301515;
+  color: #fca5a5;
+  border-color: #5c2020;
+}
+
+body.theme-dark .status-deploy {
+  background: #15203a;
+  color: #93c5fd;
+  border-color: #1e3a5f;
+}

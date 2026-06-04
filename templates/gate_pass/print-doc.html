@@ -1,0 +1,378 @@
+{% load static %}
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Asseto GatePass - Official Document</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "tertiary-fixed-dim": "#ffb77e",
+            "surface-bright": "#f7f9ff",
+            "secondary-fixed-dim": "#a4c9ff",
+            tertiary: "#773e00",
+            "error-container": "#ffdad6",
+            "on-tertiary": "#ffffff",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed": "#001551",
+            "on-primary-fixed-variant": "#203e9e",
+            "inverse-primary": "#b7c4ff",
+            "on-surface-variant": "#444652",
+            "tertiary-fixed": "#ffdcc3",
+            "surface-container-highest": "#dee3eb",
+            "on-secondary-fixed-variant": "#004883",
+            "surface-container-low": "#eff4fc",
+            "on-secondary-fixed": "#001c39",
+            "inverse-on-surface": "#ecf1f9",
+            "on-secondary-container": "#00447e",
+            "on-primary-container": "#dde1ff",
+            "surface-tint": "#3c57b7",
+            "surface-container": "#e9eef6",
+            outline: "#757684",
+            "on-surface": "#161c22",
+            "secondary-container": "#7ab3ff",
+            "on-background": "#161c22",
+            "on-tertiary-fixed-variant": "#6e3900",
+            "on-tertiary-container": "#ffdcc3",
+            "primary-fixed-dim": "#b7c4ff",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            secondary: "#1960a6",
+            "surface-variant": "#dee3eb",
+            "surface-dim": "#d5dae2",
+            background: "#f7f9ff",
+            "on-tertiary-fixed": "#2f1500",
+            "secondary-fixed": "#d4e3ff",
+            "outline-variant": "#c5c5d4",
+            "inverse-surface": "#2b3137",
+            primary: "#2845a4",
+            "on-secondary": "#ffffff",
+            error: "#ba1a1a",
+            "tertiary-container": "#9a5200",
+            "primary-fixed": "#dce1ff",
+            "surface-container-high": "#e3e8f0",
+            surface: "#f7f9ff",
+            "on-error-container": "#93000a",
+            "primary-container": "#435ebe",
+          },
+          fontFamily: {
+            headline: ["Inter"],
+            body: ["Inter"],
+            label: ["Inter"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      .no-print, #print-header, #local-warning {
+        display: none !important;
+      }
+
+      body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        zoom: 0.88;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .print-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+
+      .py-8, .md\:py-12 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex flex-col items-center py-8 md:py-12">
+  <!-- Print Action Header (Hidden on Print) -->
+  <div class="no-print w-full max-w-3xl mb-8 flex justify-between items-center px-4" id="print-header">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary text-3xl">confirmation_number</span>
+      <h1 class="text-xl font-bold tracking-tight text-primary">
+        Print Document
+      </h1>
+    </div>
+    <button
+      class="flex items-center gap-2 bg-primary hover:bg-primary-container text-white px-6 py-2.5 rounded-xl transition-all shadow-sm active:scale-85"
+      onclick="window.print()">
+      <span class="material-symbols-outlined text-sm">print</span>
+      <span class="font-semibold text-sm">Print Gate Pass</span>
+    </button>
+  </div>
+  <!-- Main Gate Pass Container -->
+  <main
+    class="print-container w-full max-w-3xl bg-surface-container-lowest rounded-xl shadow-[0_10px_40px_-10px_rgba(40,69,164,0.08)] overflow-hidden border border-outline-variant/10">
+    <!-- Header Section -->
+    <header class="bg-surface-container-low p-8 flex justify-between items-start border-b border-outline-variant/20">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <img src="{% static 'images/logo/logo.svg' %}" alt="Asseto Logo" class="w-10 h-auto">
+          <span class="text-xl font-bold tracking-tighter uppercase text-primary">Asseto GatePass</span>
+        </div>
+        <h2 class="text-2xl font-extrabold text-on-surface leading-tight">
+          OFFICIAL MOVEMENT PASS
+        </h2>
+        <p class="text-on-surface-variant text-xs font-semibold tracking-widest uppercase opacity-70">
+          Precision Ledger Security Protocol
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="text-[0.65rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1">
+          Pass Identity
+        </p>
+        <p class="text-xl font-mono font-bold text-primary tracking-wider">
+          {{ gate_pass.gate_pass_no }}
+        </p>
+      </div>
+    </header>
+    <!-- Document Content -->
+    <div class="p-8 md:p-12">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+        <!-- Left Column: Details -->
+        <div class="md:col-span-8 space-y-8">
+          <!-- Asset Info -->
+          <section class="space-y-4">
+            <div>
+              <label class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-2">Asset
+                Name &amp; Description</label>
+              <h3 class="text-xl font-semibold text-on-surface">
+                {{ gate_pass.asset.name }}
+              </h3>
+              <p class="text-on-surface-variant text-sm mt-1">
+                {% if gate_pass.asset.description %}{{ gate_pass.asset.description }}{% else %}No Description Provided{% endif %}
+              </p>
+              <p>
+                #{{ gate_pass.asset.tag }}
+              </p>
+            </div>
+            <div class="grid grid-cols-2 gap-6 pt-4">
+              <div>
+                <label
+                  class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Movement
+                  Type</label>
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                  <span class="text-md font-bold text-tertiary uppercase">{% if gate_pass.movement_type == 0 %}Outward{% else %}Inward{% endif %}</span>
+                </div>
+              </div>
+              <div>
+                <!-- <label
+                    class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1"
+                    >Priority Status</label
+                  > -->
+                <label
+                  class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Status</label>
+                <span id="status-badge" class="text-md font-bold text-on-surface"
+                  hx-get="{% url 'gate-pass:print_doc' gate_pass.id %}" hx-select="#status-badge" hx-trigger="every 2s"
+                  hx-swap="outerHTML">
+                  {{ status }}
+                </span>
+              </div>
+            </div>
+          </section>
+          <!-- Validity Period -->
+          <section class="bg-surface-container-low p-2 rounded-xl border border-outline-variant/10">
+            <div class="grid grid-cols-2 gap-8">
+              <div>
+                <label
+                  class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Valid
+                  From</label>
+                <div class="flex items-center gap-2 text-on-surface">
+                  <span class="material-symbols-outlined text-sm opacity-60">calendar_today</span>
+                  <span class="font-bold">{{ created_at }}</span>
+                </div>
+                <!-- <span class="text-[0.65rem] text-on-surface-variant ml-6"
+                    >08:00 AM IST</span> -->
+              </div>
+              <div>
+                <label
+                  class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Valid
+                  Until</label>
+                <div class="flex items-center gap-2 text-on-surface">
+                  <span class="material-symbols-outlined text-sm opacity-60">event_busy</span>
+                  <span class="font-bold text-error">{{ gate_pass.expected_return_date }}</span>
+                </div>
+                <!--<span class="text-[0.65rem] text-on-surface-variant ml-6"
+                    >06:00 PM IST</span> -->
+              </div>
+            </div>
+          </section>
+          <!-- Personnel Info -->
+          <section class="grid grid-cols-2 gap-8">
+            <div>
+              <label class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Bearer
+                Name</label>
+              <p class="font-bold text-on-surface">{{ gate_pass.raised_by }}</p>
+              <p class="text-[0.7rem] text-on-surface-variant">
+                {{ gate_pass.raised_by.role.related_name|default:"Admin" }}
+              </p>
+            </div>
+            <div>
+              <label
+                class="text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Department</label>
+              <p class="font-bold text-on-surface">{% if gate_pass.raised_by.department %}{{ gate_pass.raised_by.department.name }}{% else %}No Assigned Department{% endif %}</p>
+              <p class="text-[0.7rem] text-on-surface-variant">
+                Cost Center: CC-902
+              </p>
+            </div>
+          </section>
+        </div>
+        <!-- Right Column: Verification -->
+        <div class="md:col-span-4 flex flex-col items-center text-center space-y-6">
+          <div class="flex flex-col items-center justify-center mt-4 space-y-4">
+            {% if is_local %}
+            <div id="local-warning"
+              class="no-print bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-800 mb-4 max-w-[240px]">
+              <div class="flex items-center gap-2 mb-1 font-bold">
+                <span class="material-symbols-outlined text-sm">warning</span>
+                <span>Local Access Detected</span>
+              </div>
+              <p>The QR code below uses <b>127.0.0.1</b>, which your phone cannot reach.</p>
+              <div class="mt-2">
+                <button id="show-manual-url" class="text-primary font-bold hover:underline">Use LAN IP or Tunnel URL
+                  Instead?</button>
+                <div id="manual-url-container" class="hidden mt-2 space-y-2">
+                  <input type="text" id="custom-url" placeholder="http://192.168.1.x:8000"
+                    class="w-full p-1 border border-outline-variant rounded text-[10px]">
+                  <button id="apply-custom-url"
+                    class="w-full bg-primary text-white p-1 rounded text-[10px] font-bold">Update QR Code</button>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            <div id="qrcode"></div>
+          </div>
+          <script type="text/javascript">
+            let checkoutUrl = "{{ checkout_url }}";
+            let qrcode = new QRCode(document.getElementById("qrcode"), {
+              text: checkoutUrl,
+              width: 224,
+              height: 224,
+              colorDark: "#2845a4",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.H
+            });
+
+            {% if is_local %}
+            const showManualBtn = document.getElementById('show-manual-url');
+            const manualContainer = document.getElementById('manual-url-container');
+            const applyBtn = document.getElementById('apply-custom-url');
+            const customInput = document.getElementById('custom-url');
+
+            if (showManualBtn) {
+              showManualBtn.addEventListener('click', () => {
+                manualContainer.classList.toggle('hidden');
+              });
+            }
+
+            if (applyBtn) {
+              applyBtn.addEventListener('click', () => {
+                let newBase = customInput.value.trim();
+                if (newBase) {
+                  if (!newBase.endsWith('/')) newBase += '/';
+                  // We need to keep the checkout path
+                  const path = "/gate-pass/checkout/{{ gate_pass.id }}/";
+                  // If the user entered a full URL with protocol
+                  if (newBase.startsWith('http')) {
+                    // Try to replace the origin part of checkoutUrl
+                    try {
+                      const urlObj = new URL(checkoutUrl);
+                      const newBaseUrl = new URL(newBase);
+                      urlObj.protocol = newBaseUrl.protocol;
+                      urlObj.host = newBaseUrl.host;
+                      checkoutUrl = urlObj.toString();
+                    } catch (e) {
+                      checkoutUrl = newBase; // Fallback
+                    }
+                  } else {
+                    checkoutUrl = "http://" + newBase + path;
+                  }
+
+                  qrcode.clear();
+                  qrcode.makeCode(checkoutUrl);
+                  alert("QR Code updated to: " + checkoutUrl);
+                }
+              });
+            }
+            {% endif %}
+          </script>
+          <div class="space-y-1">
+            <p class="text-[0.6rem] font-bold text-on-surface-variant uppercase tracking-tighter">
+              Security Scan Point
+            </p>
+
+          </div>
+          <div class="w-full pt-4 border-t border-outline-variant/10">
+            <div class="flex items-center justify-center gap-1 text-primary">
+              <span class="material-symbols-outlined text-sm"
+                style="font-variation-settings: &quot;FILL&quot; 1">verified_user</span>
+              <span class="text-[0.65rem] font-bold uppercase tracking-widest">Digital Audit Logged</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Signature Section -->
+      <div class="mt-5 grid grid-cols-2 gap-16">
+        <div class="space-y-6">
+          <div class="h-16 border-b border-on-surface-variant/40 relative">
+            <span
+              class="absolute -bottom-6 left-0 text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest">Bearer's
+              Signature</span>
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div class="h-16 border-b border-on-surface-variant/40 relative">
+            <span
+              class="absolute -bottom-6 left-0 text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest">Security
+              Officer Signature</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer Audit Note -->
+
+  </main>
+
+</body>
+
+</html>

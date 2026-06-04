@@ -12,6 +12,8 @@ The Asset Management Project is a comprehensive solution designed to help organi
 - [Unit Testing](#unit-testing)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
+- [Releasing](#releasing)
+- [Changelog](CHANGELOG.md)
 - [License](#license)
 - [Contact](#contact)
 
@@ -198,6 +200,17 @@ We welcome contributions! To contribute:
 5. Open a pull request.
 
 Please ensure your code follows our [coding standards](CONTRIBUTING.md).
+
+## Releasing
+
+To publish a new version of Asseto to GitHub for the community, follow the step-by-step guide in [RELEASING.md](RELEASING.md).
+
+It covers:
+- Versioning conventions (SemVer)
+- Pre-release checklist (tests, security audit, changelog)
+- Branch workflow (`release/X.Y.Z` → `main` → tag → back to `develop`)
+- How to create a GitHub Release
+- Hotfix process for urgent patches
 
 ## License
 

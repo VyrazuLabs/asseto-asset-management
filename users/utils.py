@@ -26,6 +26,13 @@ PERMISSION_LIST = [
     'edit_product',
     'add_product',
 
+    # clients
+    'view_client',
+    'delete_client',
+    'edit_client',
+    'add_client',
+
+
     # users
     'view_users',
     'delete_users',
@@ -47,7 +54,11 @@ PERMISSION_LIST = [
     # assign assets
     'delete_assign_asset',
     'reassign_assign_asset',
-    'add_assign_asset'
+    'add_assign_asset',
+
+    # gate pass
+    'view_gate_pass',
+    'add_gate_pass',
 
     # departments
     'edit_department',
