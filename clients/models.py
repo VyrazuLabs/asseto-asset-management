@@ -110,6 +110,7 @@ class ClientContact(TimeStampModel, SoftDeleteModel):
         'roles.Role', on_delete=models.SET_NULL, blank=True, null=True, related_name='contact_roles'
     )
     notes = models.TextField(blank=True, null=True)
+    is_portal_active = models.BooleanField(default=False)
     
     class Meta:
         ordering = ['created_at']

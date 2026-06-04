@@ -247,13 +247,34 @@ def search_tickets(request, page):
 
 @login_required
 def export_tickets(request):
+    qs = _ticket_base_qs(request)
+
+    search = request.GET.get('search', '').strip()
+    status = request.GET.get('status')
+    priority = request.GET.get('priority')
+    ticket_type = request.GET.get('ticket_type')
+
+    if search:
+        qs = qs.filter(
+            Q(ticket_id__icontains=search) |
+            Q(subject__icontains=search) |
+            Q(asset__name__icontains=search) |
+            Q(assigned_to__full_name__icontains=search)
+        )
+    if status:
+        qs = qs.filter(status=status)
+    if priority:
+        qs = qs.filter(priority=priority)
+    if ticket_type:
+        qs = qs.filter(ticket_type=ticket_type)
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="tickets.csv"'
-    
+
     writer = csv.writer(response)
     writer.writerow(['Ticket ID', 'Subject', 'Asset', 'Priority', 'Status', 'Assigned To', 'Created At'])
-    
-    for ticket in _ticket_base_qs(request):
+
+    for ticket in qs:
         writer.writerow([
             ticket.ticket_id,
             ticket.subject,
@@ -263,7 +284,7 @@ def export_tickets(request):
             ticket.assigned_to.get_full_name() if ticket.assigned_to else 'Unassigned',
             ticket.created_at
         ])
-    
+
     return response
 @login_required
 def delete_ticket_attachment(request, id):

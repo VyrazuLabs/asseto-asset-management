@@ -83,7 +83,8 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
     location      = models.ForeignKey('dashboard.Location', on_delete=models.SET_NULL, null=True, blank=True)
     
     # Client link
-    # client        = models.ForeignKey('clients.Client', on_delete=models.SET_NULL, null=True, blank=True, related_name='support_tickets')
+    client = models.ForeignKey('clients.Client', on_delete=models.SET_NULL, null=True, blank=True, related_name='support_tickets')
+    created_by_contact = models.ForeignKey('clients.ClientContact', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_tickets')
     
     # Organization
     organization  = models.ForeignKey('dashboard.Organization', on_delete=models.DO_NOTHING, null=True, blank=True)

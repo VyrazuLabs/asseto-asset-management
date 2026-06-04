@@ -1,0 +1,5 @@
+nohup: ignoring input
+2026-06-03 12:27:25 [info     ] asset_signals_loaded
+2026-06-03 12:27:25 [info     ] asset_signals_loaded
+Watching for file changes with StatReloader
+Error: That port is already in use.

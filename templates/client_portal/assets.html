@@ -1,0 +1,207 @@
+{% extends 'client_portal/layout.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block title %}My Assets{% endblock %}
+{% block header_title %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="assets-page-header">
+  <div>
+    <h1>Assets Inventory</h1>
+    <p class="page-subtitle">View the precision assets assigned to your organization.</p>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
+    <div>
+      <div class="stat-label">Total Assets</div>
+      <div class="stat-value">{{ total_assets }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Active</div>
+      <div class="stat-value">{{ active_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-tools"></i></div>
+    <div>
+      <div class="stat-label">Assigned</div>
+      <div class="stat-value">{{ assigned_count }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-card">
+  <form id="asset-filter-form" method="get">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-sm-6 col-lg">
+        <div class="filter-label">Search Asset</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="Tag or Name…" value="{{ request.GET.search_text }}" aria-label="Search assets">
+      </div>
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Product Type</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
+            All Types
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=type]').value=''; form.submit();">All Types</a></li>
+            {% for type in product_type_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=type]').value='{{ type.id }}'; form.submit();">{{ type.name }}</a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="type" value="{{ request.GET.type }}">
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Vendor</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
+            All Vendors
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; form.submit();">All Vendors</a></li>
+            {% for vendor in vendor_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value='{{ vendor.id }}'; form.submit();">{{ vendor.name }}</a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="vendor" value="{{ request.GET.vendor }}">
+        </div>
+      </div>
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Location</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn" aria-label="Filter by location">
+            All Locations
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value=''; form.submit();">All Locations</a></li>
+            {% for loc in location_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value='{{ loc.id }}'; form.submit();">{{ loc.office_name }}</a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="location" value="{{ request.GET.location }}">
+        </div>
+      </div>
+      <div class="col-auto">
+        <a href="{% url 'client_portal:assets' %}" class="btn-reset" title="Reset all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="assets-table" id="table1">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Image</th>
+          <th>Asset Tag</th>
+          <th>Asset Name</th>
+          <th>Product Type</th>
+          <th>Vendor</th>
+          <th>Location</th>
+            <th>Description</th>
+          <th>Status</th>
+        
+        </tr>
+      </thead>
+      {% if page_object %}
+      <tbody>
+        {% for asset in page_object %}
+        <tr>
+          <td class="table-index-cell">{{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}</td>
+          <td>
+            {% with img=asset_images|get_item:asset.id %}
+              <img class="asset-thumb" src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}" alt="{{ asset.name }}" width="52" height="52" onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            {% endwith %}
+          </td>
+          <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
+          <td>
+            <div class="asset-name-main">{{ asset.name }}</div>
+            <div class="asset-name-sub">{% if asset.product %}{{ asset.product.name }}{% endif %}</div>
+          </td>
+          <td>{{ asset.product.product_type }}</td>
+          <td>
+            {{ asset.vendor }}
+            {% if asset.vendor.is_deleted %}
+              <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            {% endif %}
+          </td>
+          <td>{% if asset.location %}{{ asset.location.office_name }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+           <td style="max-width: 200px;">
+            <div class="asset-name-sub" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{% if asset.description %}{{ asset.description }}{% else %}<span class="text-muted">—</span>{% endif %}</div>
+          </td>
+          <td>
+            {% if asset.is_assigned %}
+              <span class="status-badge status-allocated">Allocated</span>
+            {% else %}
+              <span class="status-badge status-available">{{ asset.asset_status.name }}</span>
+            {% endif %}
+          </td>
+         
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="9">
+            <div class="table-empty-state">
+              <i class="bi bi-inbox d-block"></i>
+              <p>No assets found.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  <div class="pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+      of <strong>{{ page_object.paginator.count }}</strong> assets
+    </span>
+    <div class="pagination-nav">
+      {% if page_object.has_previous %}
+        <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.vendor %}&vendor={{ request.GET.vendor }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="page-btn" aria-label="Previous page">‹</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">‹</span>
+      {% endif %}
+      {% for num in page_object.paginator.page_range %}
+        {% if page_object.number == num %}
+          <span class="page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+          <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.vendor %}&vendor={{ request.GET.vendor }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="page-btn">{{ num }}</a>
+        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+      {% if page_object.has_next %}
+        <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}{% if request.GET.vendor %}&vendor={{ request.GET.vendor }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="page-btn" aria-label="Next page">›</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">›</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
