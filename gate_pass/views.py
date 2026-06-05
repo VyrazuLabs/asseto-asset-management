@@ -93,6 +93,7 @@ def add(request):
         'title': 'Register New Gate Pass',
         'errors': errors,
         'old': old,
+        'sidebar': 'gate-pass',
     })
 
 def detail(request,id):
@@ -106,6 +107,7 @@ def detail(request,id):
         'items':get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
         'title': 'Gate Pass Detail',
+        'sidebar': 'gate-pass',
     }
     # context=details_of_asset(request,id)
     # return render(request,'gate_pass/detail.html',context=context)

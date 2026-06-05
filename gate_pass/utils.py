@@ -48,6 +48,7 @@ def get_gate_pass_list(request):
     print("get_asset_list",get_asset_list)
 
     context={
+        'sidebar': 'gate-pass',
         'vendor_count': vendor_count,
         'status_list':get_status_list,
         'authorised_by_list':get_authorised_by_list,
