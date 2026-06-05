@@ -159,7 +159,14 @@
                                     placeholder="Full legal name" value="{{ contact.name }}">
                             </div>
                             <div class="form-group">
-                                <label>EMAIL ADDRESS</label>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label>EMAIL ADDRESS</label>
+                                    <div class="form-check form-switch status-toggle mb-1">
+                                        <input class="form-check-input portal-access-toggle" type="checkbox" role="switch" id="portalAccess_{{ forloop.counter0 }}" {% if contact.is_portal_active %}checked{% endif %}>
+                                        <label class="form-check-label small text-muted" style="font-size: 0.75rem;color:var(--color-primary) !important;" for="portalAccess_{{ forloop.counter0 }}">Client Portal Access</label>
+                                        <input type="hidden" name="is_portal_active[]" value="{% if contact.is_portal_active %}1{% else %}0{% endif %}">
+                                    </div>
+                                </div>
                                 <input type="email" name="contact_email[]" class="form-control"
                                     placeholder="p.contact@company.com" value="{{ contact.email|default:'' }}">
                             </div>
@@ -202,7 +209,14 @@
                                     placeholder="Full legal name">
                             </div>
                             <div class="form-group">
-                                <label>EMAIL ADDRESS</label>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label>EMAIL ADDRESS</label>
+                                    <div class="form-check form-switch status-toggle mb-1">
+                                        <input class="form-check-input portal-access-toggle" type="checkbox" role="switch" id="portalAccess_new">
+                                        <label class="form-check-label small text-muted" style="font-size: 0.75rem;color:var(--color-primary) !important;" for="portalAccess_new">Client Portal Access</label>
+                                        <input type="hidden" name="is_portal_active[]" value="0">
+                                    </div>
+                                </div>
                                 <input type="email" name="contact_email[]" class="form-control"
                                     placeholder="p.contact@company.com">
                             </div>
@@ -289,6 +303,18 @@
             inputs.forEach(input => {
                 if (input.tagName === 'SELECT') {
                     input.selectedIndex = 0;
+                } else if (input.type === 'checkbox') {
+                    input.checked = false;
+                    // Reset ID for cloned toggle to avoid duplicates
+                    if (input.id.includes('portalAccess_')) {
+                        input.id = 'portalAccess_new_' + Date.now();
+                        const label = input.nextElementSibling;
+                        if (label && label.tagName === 'LABEL') {
+                            label.setAttribute('for', input.id);
+                        }
+                    }
+                } else if (input.name === 'is_portal_active[]') {
+                    input.value = '0';
                 } else {
                     input.value = '';
                 }
@@ -303,6 +329,14 @@
 
             contactsContainer.appendChild(newBlock);
             toggleRemoveButtons();
+        });
+
+        // Handle portal access toggle
+        contactsContainer.addEventListener('change', function(e) {
+            if (e.target.classList.contains('portal-access-toggle')) {
+                const hiddenInput = e.target.closest('.form-check').querySelector('input[type="hidden"]');
+                hiddenInput.value = e.target.checked ? '1' : '0';
+            }
         });
 
         // Add event listener to existing buttons
