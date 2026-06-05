@@ -297,7 +297,12 @@
               {{ contact.initials }}
             </div>
             <div>
-              <div class="fw-bold" style="font-size: 15px;">{{ contact.name }}</div>
+              <div class="d-flex align-items-center gap-2">
+                <div class="fw-bold" style="font-size: 15px;">{{ contact.name }}</div>
+                {% if contact.is_portal_active %}
+                <span class="badge bg-success-light text-success" style="font-size: 10px; padding: 2px 6px; border-radius: 4px;">Access Granted</span>
+                {% endif %}
+              </div>
               <div class="small text-muted" style="font-size: 12px;">{{ contact.role.related_name|default:"Primary Contact" }}</div>
               {% if contact.email %}
               <div><a href="mailto:{{ contact.email }}" class="detail-contact-link"><i class="bi bi-envelope"></i> {{ contact.email }}</a></div>
