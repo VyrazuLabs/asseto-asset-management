@@ -10,9 +10,12 @@
 {% endblock css %}
 
 {% block content %}
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.tailwindcss.com?plugins=container-queries"></script>
 <script>
   tailwind.config = {
+    corePlugins: {
+      preflight: false,
+    },
     darkMode: "class",
     theme: { extend: { colors: { "tertiary-fixed-dim": "#ffb77e", "surface-bright": "#f7f9ff", "secondary-fixed-dim": "#a4c9ff", tertiary: "#773e00", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "on-primary-fixed": "#001551", "on-primary-fixed-variant": "#203e9e", "inverse-primary": "#b7c4ff", "on-surface-variant": "#444652", "tertiary-fixed": "#ffdcc3", "surface-container-highest": "#dee3eb", "on-secondary-fixed-variant": "#004883", "surface-container-low": "#eff4fc", "on-secondary-fixed": "#001c39", "inverse-on-surface": "#ecf1f9", "on-secondary-container": "#00447e", "on-primary-container": "#dde1ff", "surface-tint": "#3c57b7", "surface-container": "#e9eef6", outline: "#757684", "on-surface": "#161c22", "secondary-container": "#7ab3ff", "on-background": "#161c22", "on-tertiary-fixed-variant": "#6e3900", "on-tertiary-container": "#ffdcc3", "primary-fixed-dim": "#b7c4ff", "on-error": "#ffffff", "on-primary": "#ffffff", secondary: "#1960a6", "surface-variant": "#dee3eb", "surface-dim": "#d5dae2", background: "#f7f9ff", "on-tertiary-fixed": "#2f1500", "secondary-fixed": "#d4e3ff", "outline-variant": "#c5c5d4", "inverse-surface": "#2b3137", primary: "#2845a4", "on-secondary": "#ffffff", error: "#ba1a1a", "tertiary-container": "#9a5200", "primary-fixed": "#dce1ff", "surface-container-high": "#e3e8f0", surface: "#f7f9ff", "on-error-container": "#93000a", "primary-container": "#435ebe" }, fontFamily: { headline: ["Inter"], body: ["Inter"], label: ["Inter"] }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" } } }
   };
@@ -23,7 +26,6 @@
   .material-symbols-outlined {
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   }
-  body { font-family: "Inter", sans-serif; }
   .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
 </style>
   <div class=" py-3 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -99,27 +101,7 @@
             <p class="stat-value">{% if items.asset.price %}{{ currency }} {{ items.asset.price }}{% else %}Not
               Declared{% endif %}</p>
           </div>
-          <br />
-          <div class="mt-4">
-            <!-- <div class="bg-secondary-fixed/30 rounded-lg p-6 flex items-start gap-4 mt-4">
-              <div class="p-3 bg-secondary-fixed rounded-full text-secondary">
-                <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-              </div>
-              <div class="flex-1">
-                <h4 class="font-bold text-sm dark:text-gray-100">
-                  Infrastructure Impact Check
-                </h4>
-                <p class="page-subtitle dark:text-gray-400">
-                  Check if this asset movement affects connected dependencies
-                  or active service level agreements.
-                </p>
-                <button type="submit" class="btn-trash mt-1"
-                  style="height: 34px !important; min-height: 34px !important; padding: 0 1rem !important; font-size: .8rem !important; border-radius: 8px !important;">
-                  Check for Impact
-                </button>
-              </div>
-            </div> -->
-          </div>
+
         </div>
       </div>
     </div>
@@ -174,113 +156,6 @@
         </div>
       </div>
     </div>
-  </div>
-  <!-- Movement Sidebar Info -->
-  <!-- <div class="detail-card">
-    <div class="detail-card-header">
-      <div class="d-flex justify-content-around gap-5 items-end">
-        <div>
-          <h3 class="font-bold text-sm dark:text-gray-100">
-            Infrastructure Impact Check
-          </h3>
-        </div>
-        <div
-          class="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg justify-content-between">
-          <span class="material-symbols-outlined text-sm" data-icon="check_circle"
-            style="font-variation-settings: &quot;FILL&quot; 1">check_circle</span>
-          <span class="text-sm font-bold tracking-tight">Low Risk - Continuity Secured</span>
-        </div>
-      </div>
-    </div>
-    <div class="detail-card-body p-5">
-      <table class="detail-specs-table">
-        <tbody>
-          <div class="stats-grid">
-            <a class="stat-card">
-              <div>
-                <div class="stat-icon blue"><span class="material-symbols-outlined text-primary"
-                    data-icon="backup">backup</span>
-                </div>
-                <div>
-                  <div class="stat-label dark:text-gray-300">Redundancy Check</div>
-                </div>
-              </div>
-              <div>
-                <p class="text-[0.7rem] dark:text-gray-400">Checking for backup assets in the current facility
-                  area...</p>
-                <p class="text-[0.7rem] dark:text-gray-400">2 Standby Units Found For The Time Being...</p>
-              </div>
-            </a>
-            <a class="stat-card">
-              <div>
-                <div class="stat-icon blue"><span class="material-symbols-outlined text-primary"
-                    data-icon="backup">backup</span>
-                </div>
-                <div>
-                  <div class="stat-label dark:text-gray-300">Production Impact</div>
-                </div>
-              </div>
-              <div>
-                <p class="text-[0.7rem] dark:text-gray-400">Production Impact</p>
-                <p class="text-[0.7rem] dark:text-gray-400">Analyzing scheduled workflows for the laser cutter...
-                </p>
-              </div>
-            </a>
-            <a class="stat-card">
-              <div>
-                <div class="stat-icon blue"><span class="material-symbols-outlined text-primary"
-                    data-icon="backup">backup</span>
-                </div>
-                <div>
-                  <div class="stat-label dark:text-gray-300">Security Audit</div>
-                </div>
-              </div>
-              <div>
-                <p class="text-[0.7rem] dark:text-gray-400">Production Impact</p>
-                <p class="text-[0.7rem] dark:text-gray-400">Verifying exit protocols and personnel clearance...</p>
-              </div>
-              <!--  -->
-  </a>
-  </div>
-  </tbody>
-  </table>
-  </div>
-  </div> -->
-  <!-- Infrastructure Impact Check - Bento Wide -->
-  <!-- <div class="table-card">
-        <div class="detail-card-header">
-          <h3 class="font-bold text-sm text-on-secondary-fixed">
-            Audit Trail &amp; Timeline
-          </h3>
-          <button class="text-xs font-bold text-primary hover:underline">
-            Download Log
-          </button>
-        </div>
-        <div class="table-responsive">
-          <table class="assets-table" id="table1">
-            <thead>
-              <tr>
-                <th>Event</th>
-                <th>Actor</th>
-                <th>Location</th>
-                <th>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><p class="w-2 h-2 rounded-full bg-green-500"></p>Pass Generated</td>
-                <td>System Automated</td>
-                <td>Server Hub A</td>
-                <td>14 Oct, 09:30:12</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div> -->
-  <br />
-  <br />
-  <!-- Footer Details Table Style -->
-  <div class="lg:col-span-12 bg-white rounded-[0.7rem] overflow-hidden shadow-sm">
   </div>
 
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">

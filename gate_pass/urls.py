@@ -15,10 +15,6 @@ urlpatterns = [
     path('impact/<str:tag>/', views.check_impact, name='impact'),
     path('checkout/<uuid:id>/', views.gate_pass_checkout, name='checkout'),
     path('vendor-search/', views.vendor_search, name='vendor_search'),
-    # API urls
-    # path('api/create', views.create_gate_pass, name='create_gate_pass'),
-    # path('api/update/<str:gate_pass_id>', views.update_gate_pass, name='update_gate_pass'),
-    # path('api/details/<str:gate_pass_id>', views.get_gate_pass, name='get_gate_pass'),
 ]
 
 # API urls

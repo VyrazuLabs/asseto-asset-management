@@ -35,10 +35,10 @@
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon orange"><i class="bi bi-tools"></i></div>
+    <div class="stat-icon orange"><i class="bi bi-cash-stack"></i></div>
     <div>
-      <div class="stat-label">Assigned</div>
-      <div class="stat-value">{{ assigned_count }}</div>
+      <div class="stat-label">Total Value</div>
+      <div class="stat-value">{{ total_value|floatformat:0 }}</div>
     </div>
   </div>
 </div>
@@ -164,9 +164,9 @@
       {% else %}
       <tbody>
         <tr>
-          <td colspan="9">
-            <div class="table-empty-state">
-              <i class="bi bi-inbox d-block"></i>
+          <td colspan="9" class="text-center py-5">
+            <div class="text-muted d-flex flex-column align-items-center">
+              <i class="bi bi-inbox h1 mb-3"></i> <br>
               <p>No assets found.</p>
             </div>
           </td>

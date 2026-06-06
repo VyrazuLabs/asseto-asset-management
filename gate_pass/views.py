@@ -14,17 +14,15 @@ import datetime
 from zoneinfo import ZoneInfo
 from gate_pass.utils import get_vendor_count,get_gate_pass_list, search_gate_passes
 def listed(request):
-    # gate_passes = GatePass.objects.all
     context=get_gate_pass_list(request)
     return render(request, 'gate_pass/list.html', context=context)
 
 def search(request):
-    filters=search_gate_passes(request)
-    print("Filters Applied:", filters)
+    filters = search_gate_passes(request)
     if filters is not None:
         return render(request, 'gate_pass/search-data.html', {'filters': filters})
     else:
-        get_obj=GatePass.objects.all()
+        get_obj = GatePass.objects.all()
         return render(request, 'gate_pass/search-data.html', {'items': get_obj})
 
 def add(request):
@@ -93,6 +91,7 @@ def add(request):
         'title': 'Register New Gate Pass',
         'errors': errors,
         'old': old,
+        'sidebar': 'gate-pass',
     })
 
 def detail(request,id):
@@ -100,24 +99,22 @@ def detail(request,id):
         status=request.POST.get('status')
         
         return redirect('gate_pass:list')
-    get_items=GatePass.objects.filter(id=id).first()
-    obj=get_currency_and_datetime_format(request.user.organization)
-    context={
-        'items':get_items,
+    get_items = GatePass.objects.filter(id=id).first()
+    obj = get_currency_and_datetime_format(request.user.organization)
+    context = {
+        'items': get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
         'title': 'Gate Pass Detail',
+        'sidebar': 'gate-pass',
     }
-    # context=details_of_asset(request,id)
-    # return render(request,'gate_pass/detail.html',context=context)
-    return render(request,'gate_pass/detail.html',context=context)
+    return render(request, 'gate_pass/detail.html', context=context)
 
 def print_doc(request,id):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
         return HttpResponse("❌ Gate Pass not found", status=404)
         
-    get_status=gate_pass.status
-    print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
+    get_status = gate_pass.status
     checkout_url = request.build_absolute_uri(reverse('gate-pass:checkout', args=[gate_pass.id]))
     
     # Check if we are on localhost/127.0.0.1
@@ -184,32 +181,8 @@ def authorisation(request,id,status):
     
     gate_pass.save()
     return redirect('gate_pass:list')
-
-# def check_impact(request,id):
-#     gate_pass = GatePass.objects.filter(asset__tag=id).first()
-#     asset = gate_pass.asset
-#     base_query = ProductCategory.undeleted_objects.filter(organization=request.user.organization)
-#     product_type_list = base_query.order_by('-created_at')
-#     asset_counts = (
-#         asset
-#         .filter(
-#             organization=request.user.organization,
-#             product__product_type__in=product_type_list
-#         )
-#         .values("product__product_type")
-#         .annotate(asset_count=Count("id", distinct=True))
-#     )
-
-#     product_category_asset_count = {
-#         item['product__product_sub_category_id']: item['count']
-#         for item in asset_counts
-#     }
-#     print(product_category_asset_count)
-#     return product_category_asset_count
-
 def check_impact(request, tag):
     gate_pass = GatePass.objects.filter(asset__tag=tag).first()
-    print("Gate Pass Found:", gate_pass)
     if not gate_pass:
         return JsonResponse({"success": False, "message": "No asset found"})
 

@@ -90,6 +90,8 @@ def add_client(request):
             contact_roles = request.POST.getlist('contact_role[]')
             contact_notes = request.POST.getlist('contact_notes[]')
             
+            contact_portal_access = request.POST.getlist('is_portal_active[]')
+            
             for i, name in enumerate(contact_names):
                 name = name.strip()
                 if name:
@@ -99,7 +101,8 @@ def add_client(request):
                         email=contact_emails[i].strip() if i < len(contact_emails) else '',
                         phone=contact_phones[i].strip() if i < len(contact_phones) else '',
                         role_id=contact_roles[i] if i < len(contact_roles) and contact_roles[i] else None,
-                        notes=contact_notes[i].strip() if i < len(contact_notes) else ''
+                        notes=contact_notes[i].strip() if i < len(contact_notes) else '',
+                        is_portal_active=contact_portal_access[i] == '1' if i < len(contact_portal_access) else False
                     )
             
             messages.success(request, 'Client registered successfully.')
@@ -132,6 +135,8 @@ def update_client(request, id):
             contact_roles = request.POST.getlist('contact_role[]')
             contact_notes = request.POST.getlist('contact_notes[]')
             
+            contact_portal_access = request.POST.getlist('is_portal_active[]')
+
             client.contacts.all().delete()
             for i, name in enumerate(contact_names):
                 name = name.strip()
@@ -142,7 +147,8 @@ def update_client(request, id):
                         email=contact_emails[i].strip() if i < len(contact_emails) else '',
                         phone=contact_phones[i].strip() if i < len(contact_phones) else '',
                         role_id=contact_roles[i] if i < len(contact_roles) and contact_roles[i] else None,
-                        notes=contact_notes[i].strip() if i < len(contact_notes) else ''
+                        notes=contact_notes[i].strip() if i < len(contact_notes) else '',
+                        is_portal_active=contact_portal_access[i] == '1' if i < len(contact_portal_access) else False
                     )
             
             messages.success(request, 'Client updated successfully.')

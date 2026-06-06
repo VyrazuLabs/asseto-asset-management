@@ -236,12 +236,19 @@ def client_portal_assets(request):
     total_assets = client_assets.count()
     active_count = client_assets.filter(is_assigned=False).count()
     assigned_count = client_assets.filter(is_assigned=True).count()
+    total_value = client_assets.aggregate(total=Sum('price'))['total'] or 0
 
-    # Filter dropdown data
-    org_filter = Q(organization=None) | Q(organization=client.organization)
-    product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by('-created_at')
-    vendor_list = Vendor.objects.filter(org_filter).order_by('-created_at')
-    location_list = Location.undeleted_objects.filter(org_filter)
+    # Filter dropdown data – only show options related to this client's assets
+    client_asset_ids = Asset.undeleted_objects.filter(client=client).values('id')
+    product_type_list = ProductType.undeleted_objects.filter(
+        product__asset__id__in=client_asset_ids
+    ).distinct().order_by('-created_at')
+    vendor_list = Vendor.objects.filter(
+        asset__id__in=client_asset_ids
+    ).distinct().order_by('-created_at')
+    location_list = Location.undeleted_objects.filter(
+        asset__id__in=client_asset_ids
+    ).distinct().order_by('-created_at')
 
     context = {
         'cp_sidebar': 'assets',
@@ -255,6 +262,7 @@ def client_portal_assets(request):
         'total_assets': total_assets,
         'active_count': active_count,
         'assigned_count': assigned_count,
+        'total_value': total_value,
     }
     return render(request, 'client_portal/assets.html', context)
 
