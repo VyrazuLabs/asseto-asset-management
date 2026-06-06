@@ -14,7 +14,6 @@ import datetime
 from zoneinfo import ZoneInfo
 from gate_pass.utils import get_vendor_count,get_gate_pass_list, search_gate_passes
 def listed(request):
-    # gate_passes = GatePass.objects.all
     context=get_gate_pass_list(request)
     return render(request, 'gate_pass/list.html', context=context)
 
@@ -182,29 +181,6 @@ def authorisation(request,id,status):
     
     gate_pass.save()
     return redirect('gate_pass:list')
-
-# def check_impact(request,id):
-#     gate_pass = GatePass.objects.filter(asset__tag=id).first()
-#     asset = gate_pass.asset
-#     base_query = ProductCategory.undeleted_objects.filter(organization=request.user.organization)
-#     product_type_list = base_query.order_by('-created_at')
-#     asset_counts = (
-#         asset
-#         .filter(
-#             organization=request.user.organization,
-#             product__product_type__in=product_type_list
-#         )
-#         .values("product__product_type")
-#         .annotate(asset_count=Count("id", distinct=True))
-#     )
-
-#     product_category_asset_count = {
-#         item['product__product_sub_category_id']: item['count']
-#         for item in asset_counts
-#     }
-#     print(product_category_asset_count)
-#     return product_category_asset_count
-
 def check_impact(request, tag):
     gate_pass = GatePass.objects.filter(asset__tag=tag).first()
     if not gate_pass:

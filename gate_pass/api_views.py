@@ -65,43 +65,30 @@ class GatePassList(APIView):
         get_inward_pass_count=get_items.filter(movement_type=1).count()
 
         for item in get_items:
-            # print(item.keys())
             dict={
                 "id": item.id,
                 "status": item.status,
                 "asset_detail": {
-                    # "id": item.asset.id,
                     "name": item.asset.name,
                     "tag": item.asset.tag,
-                    # "asset_status": {
-                    #     "name": item.asset.asset_status.name,
-
-                    # }
                 },
                 "movement_type": item.movement_type,
                 "destination_vendor": {
-                    # "id": item.destination_vendor.id,
                     "name": item.destination_vendor.name,
-                    # "address": item.destination_vendor.address.address_line_one if item.destination_vendor.address else "",
-                    # "email": item.destination_vendor.email,
                 },
                 "expected_return_date": item.expected_return_date,
                 "purpose_of_movement": item.purpose_of_movement,
                 "raised_by": {
-                    # "id": item.raised_by.id,
                     "profile_image": item.raised_by.profile_pic.url if item.raised_by.profile_pic else "",
                     "name": item.raised_by.full_name,
-                    # "email": item.raised_by.email,
                 },
                 "authorised_by":{
-                    # "id":item.authorised_by.id,
                     "profile_image":item.authorised_by.profile_pic.url if item.authorised_by is not None else "",
                     "name":item.authorised_by.full_name if item.authorised_by is not None else ""
                 }
 
             }
             data.append(dict)
-        # data.append(data_card_dict)
         page=int(request.GET.get('page') or 1)
         paginated_data=add_pagination(data,page=page)
         return api_response(data={
@@ -223,9 +210,6 @@ class GatePassApprove(APIView):
             gate_pass = GatePass.objects.get(id=gate_pass_id)
         except GatePass.DoesNotExist:
             return api_response(message="GatePass not found", status=status.HTTP_404_NOT_FOUND)
-
-        # if gate_pass.authorised_by is not None:
-        #     return api_response(message="GatePass already approved", status=status.HTTP_400_BAD_REQUEST)
         if gate_pass.status==1:
             gate_pass.authorised_by = None
             gate_pass.status = 3  # '3' means unapproved or rejected
