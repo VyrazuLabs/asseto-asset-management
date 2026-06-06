@@ -19818,6 +19818,18 @@ body .bi::before,
 .sidebar-wrapper .menu .sidebar-link svg,
 .sidebar-wrapper .menu .sidebar-link i {
   color: #7c8db5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
+}
+.sidebar-wrapper .menu .sidebar-link i img,
+.sidebar-wrapper .menu .sidebar-link i svg {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 .sidebar-wrapper .menu .sidebar-link span {
   margin-left: 1rem;

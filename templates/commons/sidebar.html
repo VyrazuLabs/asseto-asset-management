@@ -34,11 +34,11 @@
             <div class="d-flex justify-content-between align-items-center">
                 {% if get_logo %}
                     <div class="logo">
-                        <a href="/"><img src="/media{{ get_logo }}" alt="Logo" srcset="" style="max-width: 90%;  height: auto;"/></a>
+                        <a href="/"><img src="/media{{ get_logo }}" alt="Logo" srcset=""/></a>
                     </div>
                 {% else %}
                     <div class="logo pt-2" >
-                        <a href="/"><img src="{% static 'images/asseto-logo.svg' %}" alt="Logo" srcset="" style="max-width: 90%;  height: auto;"/></a>
+                        <a href="/"><img src="{% static 'images/asseto-logo.svg' %}" alt="Logo" srcset=""/></a>
                     </div>
                 {% endif %}
 
@@ -115,7 +115,7 @@
                 {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
                     <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
                         <a href="{% url 'users:list' %}" class="sidebar-link">
-                            <i><img src="{% static 'images/new_logo/user.svg' %}" fill="#A9A9A9" alt="Users" width="20" height="20"></i>
+                            <i><img src="{% static 'images/new_logo/user.svg' %}" alt="Users" width="20" height="20"></i>
                             <span>Users</span>
                         </a>
                     </li>
@@ -264,7 +264,7 @@
                 {% if request.user.is_superuser %}
                     <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
                         <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
-                            <i><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></i>
+                            <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></span>
                             <span>Extensions</span>
                         </a>
                     </li>

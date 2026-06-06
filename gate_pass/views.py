@@ -19,12 +19,11 @@ def listed(request):
     return render(request, 'gate_pass/list.html', context=context)
 
 def search(request):
-    filters=search_gate_passes(request)
-    print("Filters Applied:", filters)
+    filters = search_gate_passes(request)
     if filters is not None:
         return render(request, 'gate_pass/search-data.html', {'filters': filters})
     else:
-        get_obj=GatePass.objects.all()
+        get_obj = GatePass.objects.all()
         return render(request, 'gate_pass/search-data.html', {'items': get_obj})
 
 def add(request):
@@ -101,25 +100,22 @@ def detail(request,id):
         status=request.POST.get('status')
         
         return redirect('gate_pass:list')
-    get_items=GatePass.objects.filter(id=id).first()
-    obj=get_currency_and_datetime_format(request.user.organization)
-    context={
-        'items':get_items,
+    get_items = GatePass.objects.filter(id=id).first()
+    obj = get_currency_and_datetime_format(request.user.organization)
+    context = {
+        'items': get_items,
         'currency': obj['currency'] if obj['currency'] else 'INR',
         'title': 'Gate Pass Detail',
         'sidebar': 'gate-pass',
     }
-    # context=details_of_asset(request,id)
-    # return render(request,'gate_pass/detail.html',context=context)
-    return render(request,'gate_pass/detail.html',context=context)
+    return render(request, 'gate_pass/detail.html', context=context)
 
 def print_doc(request,id):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
         return HttpResponse("❌ Gate Pass not found", status=404)
         
-    get_status=gate_pass.status
-    print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
+    get_status = gate_pass.status
     checkout_url = request.build_absolute_uri(reverse('gate-pass:checkout', args=[gate_pass.id]))
     
     # Check if we are on localhost/127.0.0.1
@@ -211,7 +207,6 @@ def authorisation(request,id,status):
 
 def check_impact(request, tag):
     gate_pass = GatePass.objects.filter(asset__tag=tag).first()
-    print("Gate Pass Found:", gate_pass)
     if not gate_pass:
         return JsonResponse({"success": False, "message": "No asset found"})
 
