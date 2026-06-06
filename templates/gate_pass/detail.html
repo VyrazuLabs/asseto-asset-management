@@ -10,9 +10,12 @@
 {% endblock css %}
 
 {% block content %}
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.tailwindcss.com?plugins=container-queries"></script>
 <script>
   tailwind.config = {
+    corePlugins: {
+      preflight: false,
+    },
     darkMode: "class",
     theme: { extend: { colors: { "tertiary-fixed-dim": "#ffb77e", "surface-bright": "#f7f9ff", "secondary-fixed-dim": "#a4c9ff", tertiary: "#773e00", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "on-primary-fixed": "#001551", "on-primary-fixed-variant": "#203e9e", "inverse-primary": "#b7c4ff", "on-surface-variant": "#444652", "tertiary-fixed": "#ffdcc3", "surface-container-highest": "#dee3eb", "on-secondary-fixed-variant": "#004883", "surface-container-low": "#eff4fc", "on-secondary-fixed": "#001c39", "inverse-on-surface": "#ecf1f9", "on-secondary-container": "#00447e", "on-primary-container": "#dde1ff", "surface-tint": "#3c57b7", "surface-container": "#e9eef6", outline: "#757684", "on-surface": "#161c22", "secondary-container": "#7ab3ff", "on-background": "#161c22", "on-tertiary-fixed-variant": "#6e3900", "on-tertiary-container": "#ffdcc3", "primary-fixed-dim": "#b7c4ff", "on-error": "#ffffff", "on-primary": "#ffffff", secondary: "#1960a6", "surface-variant": "#dee3eb", "surface-dim": "#d5dae2", background: "#f7f9ff", "on-tertiary-fixed": "#2f1500", "secondary-fixed": "#d4e3ff", "outline-variant": "#c5c5d4", "inverse-surface": "#2b3137", primary: "#2845a4", "on-secondary": "#ffffff", error: "#ba1a1a", "tertiary-container": "#9a5200", "primary-fixed": "#dce1ff", "surface-container-high": "#e3e8f0", surface: "#f7f9ff", "on-error-container": "#93000a", "primary-container": "#435ebe" }, fontFamily: { headline: ["Inter"], body: ["Inter"], label: ["Inter"] }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" } } }
   };
