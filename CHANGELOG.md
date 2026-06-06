@@ -12,6 +12,17 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.2] — 2026-06-06
+
+### Changed
+- **Tailwind Play CDN Integration** — Disabled Tailwind Preflight (global CSS reset) on gate pass pages to prevent layout margin and font distortion.
+- **Form Switch Toggle Fix** — Removed Tailwind Forms plugin from the gate pass templates to prevent overriding Bootstrap's switch toggle styling for the dark/light mode button.
+
+### Fixed
+- **Cleaned Codebase** — Removed legacy commented-out HTML sections, duplicate scripts, and old Python API routing code from the gate pass module.
+
+---
+
 ## [1.6.1] — 2026-06-04
 
 ### Security
