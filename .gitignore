@@ -7,6 +7,7 @@ media
 db.sqlite3
 staticfiles
 firebase-credentials.json
+*.log
 
 # AI assistant config files — keep local only, never push to GitHub
 INSTRUCTIONS.md
