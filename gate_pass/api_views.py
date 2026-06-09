@@ -1,106 +1,43 @@
-# GatePass Details API Views
-# {
-#     id: UUID,
-#     asset_detail: {
-#         id: UUID,
-#         name: String,
-#         tag: String,
-#         asset_status: {
-#             name: String,
-#             colour: String
-#         }
-#     },
-#     movement_type: enum,
-#     destination_vendor: {
-#         id: UUID,
-#         name: String,
-#         address: String,
-#         email: String,
-#         phone: String
-#     },
-#     expected_return_date: Date,
-#     purpose_of_movement: String,
-#     raised_by: {
-#         id: UUID,
-#         name: String,
-#         email: String,
-#         phone: String
-#     },
-#     authorised_by: {
-        # id: UUID,  #User uuid
-#         name: String,
-#         email: String,
-#         phone: String
-#     },
-#     status: enum
-# }
-
-from zoneinfo import ZoneInfo
-import datetime
-from drf_spectacular.types import OpenApiTypes
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from assets.api_utils import convert_to_list
-from gate_pass.models import GatePass
-from gate_pass.serializers import SearchGatePassSerializer,GatePassCreateSerializer
-from gate_pass.utils import get_vendor_count,get_gate_pass_list
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from common.API_custom_response import api_response
-from rest_framework.views import APIView
 from django.db.models import Q
-from drf_spectacular.utils import extend_schema
-from common.API_custom_response import api_response, format_validation_errors
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
-from common.pagination import add_pagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
+from common.API_custom_response import api_response, format_validation_errors
+from gate_pass.models import GatePass
+from gate_pass.serializers import (GatePassCreateSerializer,
+                                   SearchGatePassSerializer)
+from gate_pass.utils import (GatePassFilterService, GatePassRepositoryImpl,
+                             GatePassSerializer, GatePassService)
+from django.shortcuts import get_object_or_404
 
 class GatePassList(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = GatePassService(GatePassRepositoryImpl())
+
     @extend_schema(parameters=[OpenApiParameter(name='page', type=int, default=1, description="Page number for pagination")])
     def get(self, request):
-        get_items = GatePass.objects.all()
-        data=[]
-        get_pending_authorization_count=get_items.filter(authorised_by=None).count()
-        get_passes_created_today_count=get_items.filter(created_at__date=datetime.datetime.now(tz=ZoneInfo("Asia/Kolkata")).date()).count()
-        get_inward_pass_count=get_items.filter(movement_type=1).count()
+        try:
+            page = int(request.GET.get("page") or 1)
+            data = self.service.get_list_with_stats(page,request)
+            return api_response(success=True, status=200, data=data)
 
-        for item in get_items:
-            dict={
-                "id": item.id,
-                "status": item.status,
-                "asset_detail": {
-                    "name": item.asset.name,
-                    "tag": item.asset.tag,
-                },
-                "movement_type": item.movement_type,
-                "destination_vendor": {
-                    "name": item.destination_vendor.name,
-                },
-                "expected_return_date": item.expected_return_date,
-                "purpose_of_movement": item.purpose_of_movement,
-                "raised_by": {
-                    "profile_image": item.raised_by.profile_pic.url if item.raised_by.profile_pic else "",
-                    "name": item.raised_by.full_name,
-                },
-                "authorised_by":{
-                    "profile_image":item.authorised_by.profile_pic.url if item.authorised_by is not None else "",
-                    "name":item.authorised_by.full_name if item.authorised_by is not None else ""
-                }
+        except ValueError as e:
+            return api_response(success=False, status=400, message=str(e))
 
-            }
-            data.append(dict)
-        page=int(request.GET.get('page') or 1)
-        paginated_data=add_pagination(data,page=page)
-        return api_response(data={
-            'inward_pass_count': get_inward_pass_count,
-            'pending_authorization_count': get_pending_authorization_count,
-            'passes_created_today_count': get_passes_created_today_count,
-            "data": paginated_data["data"],
-            "pagination": paginated_data["pagination"]
-        }, message="List get Successfully")
-
+        except Exception as e:
+            return api_response(status=500, success=False, error_message=str(e), message="Something went wrong!")
 
 class GatePassSearch(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.repository= GatePassRepositoryImpl()
+        self.filter_service=GatePassFilterService()
 
     @extend_schema(description='from frontend the search field name must be "search_text"',
         parameters=[
@@ -109,77 +46,23 @@ class GatePassSearch(APIView):
         ),]
     )
     def get(self, request):
-        serializer=SearchGatePassSerializer(data=request.GET)
-        if not serializer.is_valid():
-            return api_response(
-                    status=400,error_type="Validation_error",
-                    error_location="Serializer",
-                    validation_errors=format_validation_errors(serializer.errors)
-                )
-        # search_text=serializer.validated_data["search_text"]
-        search = serializer.validated_data.get("search_text")
-        # search = request.GET.get('search_text')
-        movement_type = request.GET.get('movement-type')
-        raised_by = request.GET.get('raised-by')
-        destination_vendor = request.GET.get('destination-vendor')
-        expected_return_date = request.GET.get('expected-return-date')
-        asset = request.GET.get('asset')
+        try:
+            serializer=SearchGatePassSerializer(data=request.GET)
+            if not serializer.is_valid():
+                return api_response(
+                        status=400,error_type="Validation_error",
+                        error_location="Serializer",
+                        validation_errors=format_validation_errors(serializer.errors)
+                    )
+            queryset= self.filter_service.apply_filters(self.repository.get_all(), request.GET)
+            
+            data=[GatePassSerializer.serialize_list_item(item,request) for item in queryset]
 
-        queryset = GatePass.objects.all()
-
-        # 🔍 Search (OR conditions)
-        if search:
-            queryset = queryset.filter(
-                Q(asset__name__icontains=search) |
-                Q(asset__tag__icontains=search) |
-                Q(destination_vendor__name__icontains=search) |
-                Q(asset__serial_no__icontains=search) |
-                Q(raised_by__full_name__icontains=search) |
-                Q(authorised_by__full_name__icontains=search)
-            )
-
-        # 🎯 Filters (AND conditions)
-        if movement_type:
-            queryset = queryset.filter(movement_type=movement_type)
-
-        if raised_by:
-            queryset = queryset.filter(raised_by__id=raised_by)
-
-        if destination_vendor:
-            queryset = queryset.filter(destination_vendor__id=destination_vendor)
-
-        if expected_return_date:
-            queryset = queryset.filter(expected_return_date=expected_return_date)
-
-        if asset:
-            queryset = queryset.filter(asset__id=asset)
-
-        # 📦 Response formatting
-        data = []
-        for item in queryset:
-            data.append({
-                "id": item.id,
-                "asset_detail": {
-                    "id": item.asset.id,
-                    "name": item.asset.name,
-                    "tag": item.asset.tag,
-                },
-                "movement_type": item.movement_type,
-                "destination_vendor": {
-                    "id": item.destination_vendor.id,
-                    "name": item.destination_vendor.name,
-                    "address": item.destination_vendor.address.address_line_one if item.destination_vendor.address else "",
-                },
-                "expected_return_date": item.expected_return_date,
-                "purpose_of_movement": item.purpose_of_movement,
-                "raised_by": {
-                    "id": item.raised_by.id,
-                    "name": item.raised_by.full_name,
-                    "email": item.raised_by.email,
-                }
-            })
-
-        return api_response(data=data, message="Search results fetched successfully")
+            return api_response(status=200, success=True,data=data)
+        except ValueError as e:
+            return api_response(status=400, success=False, message=str(e))
+        except Exception as e:
+            return api_response(status=500, success=False, error_message=str(e), message="Something went wrong!")
     
 class GatePassCreate(APIView):
 
@@ -198,7 +81,10 @@ class GatePassCreate(APIView):
         )    
     
 class GatePassApprove(APIView):
-    # To Apporve/Unapprove a gate pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service= GatePassService(GatePassRepositoryImpl())
+
     @extend_schema(description='from frontend name must be "id"',
         parameters=[
             OpenApiParameter(name='id',type=OpenApiTypes.STR,location=OpenApiParameter.QUERY,required=False,
@@ -207,16 +93,12 @@ class GatePassApprove(APIView):
     )
     def post(self, request, gate_pass_id):
         try:
-            gate_pass = GatePass.objects.get(id=gate_pass_id)
-        except GatePass.DoesNotExist:
-            return api_response(message="GatePass not found", status=status.HTTP_404_NOT_FOUND)
-        if gate_pass.status==1:
-            gate_pass.authorised_by = None
-            gate_pass.status = 3  # '3' means unapproved or rejected
-            gate_pass.save()
-            return api_response(message="GatePass Rejected Successfully")
-        gate_pass.authorised_by = request.user
-        gate_pass.status = 1          # '1' means approved
-        gate_pass.save()
-
-        return api_response(message="GatePass Approved Successfully")
+            gate_pass = get_object_or_404(GatePass, id=gate_pass_id)        
+            action=self.service.approved_or_reject(request, gate_pass)
+            return api_response(success=True, status=200, message=action)
+        
+        except ValueError as e:
+            return api_response(status=400, success=False, message=str(e))
+        
+        except Exception as e:
+            return api_response(status=500, success=False, error_message=str(e), message="Something went wrong!")
