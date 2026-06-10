@@ -1,124 +1,207 @@
-from django.db.models import Count
-from gate_pass.models import GatePass
 import datetime
 from zoneinfo import ZoneInfo
-from authentication.models import User
-from vendors.models import Vendor
-from django.db.models import Q
 
+from django.db.models import Q, QuerySet
+from django.utils import timezone
+from abc import ABC, abstractmethod
+from common.pagination import add_pagination
+from gate_pass.models import GatePass
+from django.shortcuts import get_object_or_404
 
-def get_vendor_count(get_items):
-    total_vendor_count = get_items.count()
-    if total_vendor_count == 0:
-        return []
-    
-    vendor_count = get_items.values('destination_vendor__name').annotate(
-        count=Count('destination_vendor__name') * 100.0 / total_vendor_count
-    ).order_by('-count')
-    
-    return vendor_count
+FILTER_FIELDS = {
+    'status':'status',
+    'type':'movement_type',
+    'vendor':'destination_vendor__id',
+    'raised_by':'raised_by__id',
+    'authorised_by':'authorised_by__id',
+    'asset':'asset__id',
+}
 
-def get_gate_pass_list(request):
-    org = request.user.organization
-    get_items = GatePass.objects.filter(asset__organization=org)
-    get_inward_pass_count = get_items.filter(movement_type=1, status=1).count()
-    get_pending_authorization_count = get_items.filter(status=0).count()
-    from django.utils import timezone
+SEARCH_FIELDS = [
+    'asset__name', 'asset__tag', 'asset__serial_no',
+    'destination_vendor__name',
+    'raised_by__full_name', 'authorised_by__full_name',
+]
+
+def get_gate_pass_list():
+    get_items=GatePass.objects.all()
+    get_inward_pass_count=get_items.filter(movement_type=1, status=1).count()
+    get_pending_authorization_count=get_items.filter(status=0).count()
     now = timezone.localtime(timezone.now())
     start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    get_passes_created_today_count = get_items.filter(created_at__gte=start_of_day).count()
+    get_passes_created_today_count=get_items.filter(created_at__gte=start_of_day).count()
+    
     #Filter By item List
-    get_movement_type_list = get_items.values_list('movement_type', flat=True).distinct()
-    raised_by_users = get_items.values('raised_by__id', 'raised_by__full_name').distinct()
-    get_authorised_by_list = get_items.values('authorised_by__id', 'authorised_by__full_name').distinct()
-    get_destination_vendor_list = get_items.values('destination_vendor__id', 'destination_vendor__name').distinct()
-    get_asset_list = get_items.values('asset_id', 'asset__name').distinct()
-    get_status_list = GatePass.STATUS_CHOICES
-    vendor_count = get_vendor_count(get_items)
+    raised_by_users = GatePass.objects.values('raised_by__id','raised_by__full_name').distinct()
+    get_authorised_by_list=GatePass.objects.values('authorised_by__id','authorised_by__full_name').distinct()
+    get_destination_vendor_list=GatePass.objects.values('destination_vendor__id','destination_vendor__name').distinct()
+    get_asset_list=GatePass.objects.values('asset_id','asset__name').distinct()
 
     context = {
-        'sidebar': 'gate-pass',
-        'vendor_count': vendor_count,
-        'status_list': get_status_list,
-        'authorised_by_list': get_authorised_by_list,
-        'raised_by_list': raised_by_users,
-        'destination_vendor_list': get_destination_vendor_list,
-        'asset_list': get_asset_list,
-        'movement_type_list': get_movement_type_list,
         'items': get_items,
         'inward_pass_count': get_inward_pass_count,
         'pending_authorization_count': get_pending_authorization_count,
-        'passes_created_today_count': get_passes_created_today_count
+        'passes_created_today_count': get_passes_created_today_count,
+        'destination_vendor_list': get_destination_vendor_list,
+        'raised_by_list': raised_by_users,
+        'authorised_by_list': get_authorised_by_list,
+        'asset_list': get_asset_list,
     }
     return context
 
-def get_users_from_id(id_list):
-    user_list = User.objects.filter(id__in=id_list).values('id', 'full_name', 'email', 'phone')
-    arr = []
-    user_dict = {}
-    for user in user_list:
-        user_dict[user['id']] = {
-            'name': user['full_name'],
-            'email': user['email'],
-            'phone': user['phone']
-        }
-        arr.append(user_dict)
-    return arr
-
-def search_gate_passes(request):
-    search = request.GET.get('search_text', '')
-    movement_type = request.GET.get('type')
-    raised_by = request.GET.get('raised_by', None)
-    authorised_by = request.GET.get('authorised_by', None)
-    destination_vendor = request.GET.get('vendor', None)
-    expected_return_date = request.GET.get('expected-return-date')
-    status = request.GET.get('status', None)
-    asset = request.GET.get('asset', None)
-
-    # Base Query — scoped to the user's organization
-    org = request.user.organization
-    filters = GatePass.objects.filter(asset__organization=org)
-
-    # Search Filter
+def search_and_filter_gate_passes(request):
+    search = request.GET.get('search_text')
+    
+    queryset = GatePass.objects.all()
     if search:
-        filters = filters.filter(
-            Q(asset__name__icontains=search) |
-            Q(asset__tag__icontains=search) |
-            Q(destination_vendor__name__icontains=search) |
-            Q(asset__serial_no__icontains=search) |
-            Q(raised_by__full_name__icontains=search) |
-            Q(authorised_by__full_name__icontains=search)
+        query = Q()
+        for field in SEARCH_FIELDS:
+            query |= Q(**{f'{field}__icontains': search})
+        queryset = queryset.filter(query)
+
+    for param, field in FILTER_FIELDS.items():
+        if value := request.GET.get(param):
+            queryset = queryset.filter(**{field: value})
+
+    return queryset.distinct().order_by('-created_at')
+
+
+class GatePassRepository(ABC):
+
+    @abstractmethod
+    def get_all(self)-> QuerySet: ...
+
+    @abstractmethod
+    def get_by_id(self, gate_pass_id)-> GatePass: ...
+
+    @abstractmethod
+    def save(self,gate_pass:GatePass)-> GatePass: ...
+
+class GatePassRepositoryImpl(GatePassRepository):
+
+    def get_all(self) -> QuerySet:
+        return GatePass.objects.all()
+    
+    def get_by_id(self, gate_pass_id)-> GatePass:
+        return get_object_or_404(GatePass,pk=gate_pass_id)
+    
+    def save(self, gate_pass:GatePass)-> GatePass:
+
+        gate_pass.save()
+
+        return gate_pass
+class BaseFilter(ABC):
+
+    @abstractmethod
+    def apply(self, query_set:QuerySet, value)-> QuerySet:...
+
+
+class SearchGatePass(BaseFilter):
+
+    def apply(self, query_set: QuerySet, value:str)->QuerySet:
+        return query_set.filter(
+            Q(asset__name__icontains=value) |
+            Q(asset__tag__icontains=value) |
+            Q(destination_vendor__name__icontains=value) |
+            Q(asset__serial_no__icontains=value) |
+            Q(raised_by__full_name__icontains=value) |
+            Q(authorised_by__full_name__icontains=value)
         )
 
-    # Status Filter
-    if status:
-        filters = filters.filter(status=status)
+class MovementTypeFilter(BaseFilter):
+    def apply(self, queryset: QuerySet, value: str) -> QuerySet:
+        return queryset.filter(movement_type=value)
 
-    # Movement Type Filter
-    if movement_type != "" and movement_type is not None:
-        filters = filters.filter(movement_type=movement_type)
+class RaisedByFilter(BaseFilter):
+    def apply(self, queryset: QuerySet, value: str) -> QuerySet:
+        return queryset.filter(raised_by__id=value)
 
-    # Raised By Filter
-    if raised_by:
-        filters = filters.filter(raised_by__id=raised_by)
+class DestinationVendorFilter(BaseFilter):
+    def apply(self, queryset: QuerySet, value: str) -> QuerySet:
+        return queryset.filter(destination_vendor__id=value)
 
-    # Authorised By Filter
-    if authorised_by:
-        filters = filters.filter(authorised_by__id=authorised_by)
+class ExpectedReturnDateFilter(BaseFilter):
+    def apply(self, queryset: QuerySet, value: str) -> QuerySet:
+        return queryset.filter(expected_return_date=value)
 
-    # Vendor Filter
-    if destination_vendor:
-        filters = filters.filter(destination_vendor__id=destination_vendor)
+class AssetFilter(BaseFilter):
+    def apply(self, queryset: QuerySet, value: str) -> QuerySet:
+        return queryset.filter(asset__id=value)
 
-    # Expected Return Date Filter
-    if expected_return_date:
-        filters = filters.filter(expected_return_date=expected_return_date)
 
-    # Asset Filter
-    if asset:
-        filters = filters.filter(asset__id=asset)
+FILTER_MAP: dict[str, BaseFilter] = {
+    "search_text":SearchGatePass(),
+    "movement-type":MovementTypeFilter(),
+    "raised-by":RaisedByFilter(),
+    "destination-vendor":DestinationVendorFilter(),
+    "expected-return-date":ExpectedReturnDateFilter(),
+    "asset":AssetFilter(),
+}
 
-    # Remove duplicates
-    filters = filters.distinct().order_by('-created_at')
+class GatePassFilterService:
+    def apply_filters(self, query_set, parms:dict):
+        for key, filter_object in FILTER_MAP.items():
+            if value:= parms.get(key):
+                query_set=filter_object.apply(query_set, value)
+        
+        return query_set
 
-    return filters
+
+class GatePassSerializer:
+    @staticmethod
+    def serialize_list_item(item,request):
+        current_host=request.get_host()
+        return {
+            "id": item.id,
+            "status": item.status,
+            "asset_detail": {
+                "name": item.asset.name,
+                "tag": item.asset.tag,
+            },
+            "movement_type": item.movement_type,
+            "destination_vendor": {
+                "name": item.destination_vendor.name,
+            },
+            "expected_return_date": item.expected_return_date,
+            "purpose_of_movement": item.purpose_of_movement,
+            "raised_by": {
+                "profile_image": f"http//{current_host}"+item.raised_by.profile_pic.url if item.raised_by.profile_pic else "",
+                "name": item.raised_by.full_name,
+            },
+            "authorised_by":{
+                "profile_image":f"http//{current_host}"+item.authorised_by.profile_pic.url if item.authorised_by and item.authorised_by.profile_pic else "",
+                "name":item.authorised_by.full_name if item.authorised_by is not None else ""
+            }
+        }
+
+class GatePassService:
+
+    def __init__(self, repository: GatePassRepository):
+        self.repository=repository
+
+    def get_list_with_stats(self, page,request)-> dict:
+        gate_passes=self.repository.get_all()
+        today = datetime.datetime.now(tz=ZoneInfo("Asia/Kolkata")).date()
+        stats = {
+            "inward_pass_count":gate_passes.filter(movement_type=1).count(),
+            "pending_authorization_count":gate_passes.filter(authorised_by=None).count(),
+            "passes_created_today_count":gate_passes.filter(created_at__date=today).count(),
+        }
+        data=[GatePassSerializer.serialize_list_item(gate_pass,request) for gate_pass in gate_passes]
+        paginated_data= add_pagination(data,page=page)
+        return {**paginated_data, **stats}
+    
+    def approved_or_reject(self,request,gate_pass:GatePass):
+        # [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
+        
+        if gate_pass.status==1:
+            gate_pass.authorised_by = None
+            gate_pass.status = 3
+            
+            self.repository.save(gate_pass)
+            return "GatePass Rejected"
+        gate_pass.authorised_by = request.user
+        gate_pass.status = 1 
+        
+        self.repository.save(gate_pass)
+        return "GatePass Approved"

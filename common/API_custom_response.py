@@ -79,7 +79,7 @@ def api_response(success=True,status=200,data=None,message=None,validation_error
         response["success"] = False
  
     if status == 500:
-        response["error_message"] = "Something went wrong. Please try again later."
+        response["error_message"] =error_message
     if (
         include_traceback
         and trace_back is None
