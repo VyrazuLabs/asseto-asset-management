@@ -10,32 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
 import os
-from decouple import config
 from datetime import timedelta
+from pathlib import Path
+
 # import pysqlite3 as sqlite3
 import pymysql
+from decouple import config
+from dotenv import load_dotenv
+
 pymysql.install_as_MySQLdb()
-from django.db.utils import OperationalError
-import firebase_admin
-from firebase_admin import credentials
-import json
 import base64
+import json
+
+import firebase_admin
 from cryptography.fernet import Fernet
+from django.db.utils import OperationalError
+from firebase_admin import credentials
+
 # from firebase_admin import initialize_app
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env', override=True)
-# # os.environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-# cipher_suite = Fernet(os.environ.get('FERNET_KEY'))
-# # secret_key=''
-# encrypted_bytes = cipher_suite.encrypt(str(data).encode('utf-8'))
-# print(encrypted_bytes)
-# data=cipher_suite.decrypt(encrypted_bytes).decode('utf-8')                 Decrypted Data
-# cred_path = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY')
 cipher_suite = Fernet(b'NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=')
 # print("FERNET_KEY:", cipher_suite)
 file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')

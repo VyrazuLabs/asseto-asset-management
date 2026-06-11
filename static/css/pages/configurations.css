@@ -1,0 +1,32 @@
+/* CSS for Configurations and Organization Page */
+
+.config-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.config-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+body.theme-dark .config-label {
+    color: #dde5ec;
+}
+
+.config-input {
+    width: 100%;
+}
+
+.config-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+}
+
+.config-btn-width {
+    width: 100px;
+}

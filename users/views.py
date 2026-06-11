@@ -1,31 +1,30 @@
-from django.shortcuts import render, redirect
-from license.models import AssignLicense
-from .forms import UserForm, UserUpdateForm, AddressForm
-from django.contrib import messages
-from django.http import HttpResponse
-from django.core.paginator import Paginator
-from authentication.models import User,UserTotp
-from assets.models import AssignAsset
-from dashboard.models import Address
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import Group
-from .utils import assigned_asset_to_user,export_users_pdf_utils,get_user_detail_utils,export_users_csv_utils,search_user_utils,create_user_notification_type_utils, create_all_perm_role, get_all_assigned_license,toggle_two_factor_auth_utils
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from vendors.utils import render_to_csv, render_to_pdf
-from django.db.models import Q,Prefetch
-from django.contrib.auth.decorators import permission_required
+import os
 from datetime import date
-from assets.models import Asset,AssetImage
-from configurations.utils import dynamic_display_name
-from configurations.models import LocalizationConfiguration
+
+from django.contrib import messages
+from django.contrib.auth.decorators import (login_required,
+                                            permission_required,
+                                            user_passes_test)
+from django.contrib.auth.models import Group
+from django.core.paginator import Paginator
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from assets.models import AssignAsset
+from authentication.models import User
 from configurations.constants import NAME_FORMATS
-from django.http import JsonResponse
+from configurations.utils import dynamic_display_name
+from dashboard.models import Address
+
+from .forms import AddressForm, UserForm, UserUpdateForm
+from .utils import (assigned_asset_to_user, create_all_perm_role,
+                    create_user_notification_type_utils,
+                    export_users_csv_utils, export_users_pdf_utils,
+                    get_user_detail_utils, search_user_utils,
+                    toggle_two_factor_auth_utils)
 
 today = date.today()
-import os
 IS_DEMO = os.environ.get('IS_DEMO')
-
 PAGE_SIZE = 10
 ORPHANS = 1
 
@@ -47,6 +46,7 @@ def create_user_notification_type(request):
 # changes to 1, So that next time the user has to again scan the QR for a new OTP.
 # Else if the User dosen't scan for a new otp the 2FA method won't be used.
 # Similarly if the user enables the 2FA toggle while being logged in using 2FA then the status changes to 1
+
 def toggle_two_factor_auth(request):
     if request.method == "POST":
         # Convert checkbox values to booleans

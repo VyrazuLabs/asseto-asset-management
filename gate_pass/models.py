@@ -36,6 +36,3 @@ class GatePass(TimeStampModel):
         return f"GP-{str(self.id).split('-')[0].upper()}"
  
  
-# Ui seems to display asset_name,asset_id,product_category and cost($) which we can get from the asset by keeping it as a foreignkey here.
-# Currently the Status, Raised By and Authorized By is not present in the Add Gate Pass page we need to add it.
- 

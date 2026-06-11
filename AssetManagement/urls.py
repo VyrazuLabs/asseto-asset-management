@@ -13,26 +13,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.contrib.staticfiles.views import serve
-from django.urls import re_path
-from django.urls import path, include
-from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
-from authentication.forms import UserPasswordChangeForm, UserPasswordResetForm, UserPasswordResetRequestForm
-from authentication.decorators import unauthenticated_user
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from django.contrib import admin
+from django.contrib.auth import views as auth_views
+from django.contrib.staticfiles.views import serve
+from django.urls import include, path, re_path
+from drf_spectacular.views import (SpectacularAPIView, SpectacularRedocView,
+                                   SpectacularSwaggerView)
+
 from assets.urls import api_url_patterns
-from configurations.models import Extensions
-from users.urls import user_api_url_patterns
-from authentication.urls import authentication_url_patterns
-from vendors.urls import vendor_api_urlpatterns
-from products.urls import product_api_urlpattrens
-from dashboard.urls import dashboard_api_urlpatterns
 from audit.urls import audit_api_url_patterns
+from authentication.decorators import unauthenticated_user
+from authentication.forms import (UserPasswordChangeForm,
+                                  UserPasswordResetForm,
+                                  UserPasswordResetRequestForm)
+from authentication.urls import authentication_url_patterns
 from configurations.urls import configuration_api_url_patterns
+from dashboard.urls import dashboard_api_urlpatterns
 from gate_pass.urls import gate_pass_api_url_patterns
+from products.urls import product_api_urlpattrens
+from users.urls import user_api_url_patterns
+from vendors.urls import vendor_api_urlpatterns
 
 urlpatterns = [
 	path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -92,7 +94,6 @@ urlpatterns += [
 ]
 if settings.DEBUG:
 	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-	# urlpatterns +=[path('silk/', include('silk.urls', namespace='silk'))]
 
 # Error Handlers
 handler403 = 'error_handlers.views.handle_403'
