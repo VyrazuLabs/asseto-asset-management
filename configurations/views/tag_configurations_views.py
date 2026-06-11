@@ -1,4 +1,6 @@
 
+from django.http import HttpResponse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -33,9 +35,7 @@ def create_or_update_tag_configuration(request, id=None):
         "is_update": bool(instance),
         "configurations": instance,
     }
-    template_name = (
-        "configurations/add_tag.html" if instance else "configurations/add_tag.html"
-    )
+    template_name = "configurations/add_tag.html"
     return render(request, template_name, context)
 
 
@@ -94,4 +94,18 @@ def toggle_default_settings(request, id):
     )
     config.use_default_settings = not config.use_default_settings
     config.save()
-    return
+    
+    # Return the updated checkbox HTML so HTMX can swap it in-place
+    checked = "checked" if config.use_default_settings else ""
+    url = reverse("configurations:toggle_default_settings", args=[config.id])
+    
+    html = f"""<input type="checkbox" 
+        id="use_default_settings_{config.id}"
+        name="use_default_settings"
+        class="form-check-input"
+        {checked}
+        hx-post="{url}"
+        hx-trigger="change"
+        hx-target="#use_default_settings_{config.id}"
+        hx-swap="outerHTML">"""
+    return HttpResponse(html)

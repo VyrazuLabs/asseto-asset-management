@@ -94,7 +94,12 @@ class Organization(TimeStampModel):
     history = HistoricalRecords()
 
     def get_currency_display_value(self):
-        return (dict(CURRENCY_CHOICES).get(int(self.currency))if self.currency else "")
+        if not self.currency:
+            return ""
+        try:
+            return dict(CURRENCY_CHOICES).get(int(self.currency), self.currency)
+        except ValueError:
+            return self.currency
 
     def __str__(self):
         return self.name
