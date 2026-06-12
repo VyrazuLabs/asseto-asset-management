@@ -20,16 +20,16 @@
 <table style="width: 100%">
     <thead>
         <tr>
-            <th>Sl No.</th>
-            <th>Client ID</th>
-            <th>Name</th>
-            <th>Industry</th>
-            <th>Contact Person</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Total Assets</th>
-            <th>Open Tickets</th>
-            <th>Status</th>
+            <th>{{ trans.sl_no }}</th>
+            <th>{{ trans.id_label }}</th>
+            <th>{{ trans.name_label }}</th>
+            <th>{{ trans.industry }}</th>
+            <th>{{ trans.contact_person }}</th>
+            <th>{{ trans.email_label }}</th>
+            <th>{{ trans.phone_no }}</th>
+            <th>{{ trans.total_assets_client }}</th>
+            <th>{{ trans.open_tickets_client }}</th>
+            <th>{{ trans.status_label }}</th>
         </tr>
     </thead>
     {% if clients %}
@@ -51,7 +51,7 @@
     </tbody>
     {% else %}
     <tr>
-        <td colspan="10">No record available!</td>
+        <td colspan="10">{{ trans.no_record_available }}</td>
     </tr>
     {% endif %}
 </table>

@@ -28,7 +28,8 @@ FIELDS={
 }
 
 def listed(request):
-    context=get_gate_pass_list()
+    context=get_gate_pass_list(request)
+    context['title']='Gate Passes'
     return render(request, 'gate_pass/list.html', context=context)
 
 def filter_and_search(request):
@@ -137,6 +138,7 @@ def print_doc(request,id):
         'created_at': gate_pass.created_at.astimezone(ZoneInfo('Asia/Kolkata')).date(),
         'checkout_url': checkout_url,
         'is_local': is_local,
+        'title':'Gate Pass Document',
     }
     return render(request,'gate_pass/print-doc.html', context=context)
 

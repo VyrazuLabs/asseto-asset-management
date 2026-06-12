@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Location Management | Asseto{% endblock %}
+{% block title %}{{ trans.location_management }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -30,22 +30,22 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Locations</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.locations }}</li>
       </ol>
     </nav>
-    <h1>Location Management</h1>
-    <p class="page-subtitle">Oversee and manage your organization's geographical office locations.</p>
+    <h1>{{ trans.location_management }}</h1>
+    <p class="page-subtitle">{{ trans.location_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_locations' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_locations' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_location_count %}<span class="count-badge">{{ deleted_location_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_location %}
     <button type="button" class="btn-register" id="add-location-button" hx-get="{% url 'dashboard:add_location' %}"
       hx-target="#add-location-modal-content" data-bs-toggle="modal" data-bs-target="#add-location-modal">
-      <i class="bi bi-plus-lg"></i> Add Location
+      <i class="bi bi-plus-lg"></i> {{ trans.add_location }}
     </button>
     {% endif %}
   </div>
@@ -56,28 +56,28 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-building"></i></div>
     <div>
-      <div class="stat-label">Total Locations</div>
+      <div class="stat-label">{{ trans.total_locations }}</div>
       <div class="stat-value" id="total-count">{{ total_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Active</div>
+      <div class="stat-label">{{ trans.active }}</div>
       <div class="stat-value" id="active-count">{{ active_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Inactive</div>
+      <div class="stat-label">{{ trans.inactive }}</div>
       <div class="stat-value" id="inactive-count">{{ inactive_locations }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Deleted</div>
+      <div class="stat-label">{{ trans.deleted }}</div>
       <div class="stat-value" id="deleted-count">{{ deleted_location_count }}</div>
     </div>
   </div>
@@ -91,30 +91,29 @@
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-6 col-lg">
-        <div class="filter-label">Search Location</div>
-        <input name="search_text" type="search" autocomplete="off" placeholder="Name, city, contact..."
+        <div class="filter-label">{{ trans.search_location }}</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_location_placeholder }}"
           hx-get="{% url 'dashboard:search_location' 1 %}"
           hx-trigger="keyup changed delay:200ms, input changed delay:200ms" hx-target="#location-list-container" aria-label="Search locations">
       </div>
 
       <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
-        <div class="filter-label">Status</div>
+        <div class="filter-label">{{ trans.status_label }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
-            All Status
+            {{ trans.all_status }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#location-filter-form','change');">All
-                Status</a></li>
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} ';htmx.trigger('#location-filter-form','change');">{{ trans.all_status }}</a></li>
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#location-filter-form','change');">Active</a>
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} ';htmx.trigger('#location-filter-form','change');">{{ trans.active }}</a>
             </li>
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#location-filter-form','change');">Inactive</a>
+                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} ';htmx.trigger('#location-filter-form','change');">{{ trans.inactive }}</a>
             </li>
           </ul>
           <input type="hidden" name="status">
@@ -122,15 +121,15 @@
       </div>
 
       <div class="col-auto">
-        <a href="{% url 'dashboard:locations' %}" class="btn-reset" title="Reset all filters">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        <a href="{% url 'dashboard:locations' %}" class="btn-reset" title="{{ trans.reset_all_filters }}">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
 
     </div>
   </form>
   {% if is_demo is True %}
-  <p class="demo-note">* Demo mode: some features are disabled.</p>
+  <p class="demo-note">{{ trans.demo_mode_disabled }}</p>
   {% endif %}
 </div>
 
@@ -140,15 +139,15 @@
     <table class="list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Office Name</th>
-          <th>Total Assets</th>
-          <th>Contact Person</th>
-          <th>State / City</th>
-          <th>Zip Code</th>
-          <th>Status</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.office_name_label }}</th>
+          <th>{{ trans.total_assets }}</th>
+          <th>{{ trans.contact_person }}</th>
+          <th>{{ trans.state_city }}</th>
+          <th>{{ trans.zip_code_label }}</th>
+          <th>{{ trans.status_label }}</th>
           {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
-          <th>Actions</th>
+          <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -204,9 +203,9 @@
             </div>
             {% else %}
             {% if location.status %}
-            <span class="status-badge status-active">Active</span>
+            <span class="status-badge status-active">{{ trans.active }}</span>
             {% else %}
-            <span class="status-badge status-inactive">Inactive</span>
+            <span class="status-badge status-inactive">{{ trans.inactive }}</span>
             {% endif %}
             {% endif %}
           </td>
@@ -215,12 +214,12 @@
           <td>
             <div class="row-actions">
               {% if perms.authentication.view_location %}
-              <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="View Details">
+              <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="{{ trans.view_details }}">
                 <i class="bi bi-eye"></i>
               </a>
               {% endif %}
               {% if perms.authentication.edit_location %}
-              <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Location"
+              <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_location }}"
                 hx-get="{% url 'dashboard:update_location' location.id %}?modal=1&_={{ forloop.counter }}"
                 hx-target="#edit-location-modal-content"
                 hx-cache="false"
@@ -231,10 +230,10 @@
               {% endif %}
               {% if perms.authentication.delete_location %}
               <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
-                onsubmit="return confirm('Are you sure you want to delete this location?')">
+                onsubmit="return confirm('{{ trans.delete_confirm_location }}')">
                 {% csrf_token %}
                 <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}"
-                  title="Delete Location" {% if is_demo %}disabled{% endif %}>
+                  title="{{ trans.delete_location }}" {% if is_demo %}disabled{% endif %}>
                   <i class="bi bi-trash3"></i>
                 </button>
               </form>
@@ -251,11 +250,11 @@
           <td colspan="8">
             <div class="table-empty-state">
               <i class="bi bi-building d-block"></i>
-              <p>No locations found.<br>
+              <p>{{ trans.no_locations_found }}<br>
                 {% if perms.authentication.add_location %}
                 <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                   hx-get="{% url 'dashboard:add_location' %}" hx-target="#add-location-modal-content"
-                  data-bs-toggle="modal" data-bs-target="#add-location-modal">Register your first location</button>
+                  data-bs-toggle="modal" data-bs-target="#add-location-modal">{{ trans.register_first_location }}</button>
                 {% endif %}
               </p>
             </div>
@@ -269,8 +268,8 @@
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
   <div class="pagination-wrap" id="location-pagination">
     <span>
-      Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-      of <strong>{{ page_object.paginator.count|default:0 }}</strong> locations
+      {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+      {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.locations_lower }}
     </span>
     <div class="pagination-nav">
       {% if page_object.has_previous %}
@@ -326,8 +325,8 @@
     }
   }
   function sendNotification() {
-    new Notification("New Location Added", {
-      body: "A new office location has been successfully registered.",
+    new Notification("{{ trans.location_added_notification_title }}", {
+      body: "{{ trans.location_added_notification_body }}",
       icon: "{% static 'images/logo/favicon.png' %}",
     });
   }

@@ -1,6 +1,6 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-shield-lock"></i> Add Role</h5>
+        <h5 class="modal-title"><i class="bi bi-shield-lock"></i> {{ trans.add_role_modal_title }}</h5>
         <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -11,7 +11,7 @@
         <div class="modal-body-custom">
             <div class="row">
                 <div class="form-group mb-4">
-                    <label for="name" class="form-label">Role Name <span class="text-danger">*</span></label>
+                    <label for="name" class="form-label">{{ trans.role_name_label }} <span class="text-danger">*</span></label>
 
                     {{form.related_name}}
                     {% for error in form.related_name.errors %}
@@ -22,11 +22,10 @@
                 <div class="form-group mb-0">
                     <div class="permissions-section-container">
                         <div class="permissions-section-header">
-                            <h6 class="permissions-title"><i class="bi bi-shield-check"></i> Assign Permissions to
-                                Module</h6>
+                            <h6 class="permissions-title"><i class="bi bi-shield-check"></i> {{ trans.assign_permissions_module }}</h6>
                             <div class="form-check form-switch select-all-toggle">
                                 <input class="form-check-input" type="checkbox" id="checkall">
-                                <label class="form-check-label" for="checkall">Select All Permissions</label>
+                                <label class="form-check-label" for="checkall">{{ trans.select_all_permissions }}</label>
                             </div>
                         </div>
 
@@ -37,29 +36,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Clients"
                                             id="chk-Clients">
-                                        <label class="form-check-label" for="chk-Clients">Clients</label>
+                                        <label class="form-check-label" for="chk-Clients">{{ trans.clients }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Clients" id="view_client"
                                             name="permissions[]" type="checkbox" value="view_client">
-                                        <label class="form-check-label" for="view_client">View</label>
+                                        <label class="form-check-label" for="view_client">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Clients" id="add_client"
                                             name="permissions[]" type="checkbox" value="add_client">
-                                        <label class="form-check-label" for="add_client">Add</label>
+                                        <label class="form-check-label" for="add_client">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Clients" id="edit_client"
                                             name="permissions[]" type="checkbox" value="edit_client">
-                                        <label class="form-check-label" for="edit_client">Edit</label>
+                                        <label class="form-check-label" for="edit_client">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Clients" id="delete_client"
                                             name="permissions[]" type="checkbox" value="delete_client">
-                                        <label class="form-check-label" for="delete_client">Delete</label>
+                                        <label class="form-check-label" for="delete_client">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -70,29 +69,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Vendors"
                                             id="chk-Vendors">
-                                        <label class="form-check-label" for="chk-Vendors">Vendors</label>
+                                        <label class="form-check-label" for="chk-Vendors">{{ trans.vendors }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Vendors" id="view_vendor"
                                             name="permissions[]" type="checkbox" value="view_vendor">
-                                        <label class="form-check-label" for="view_vendor">View</label>
+                                        <label class="form-check-label" for="view_vendor">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Vendors" id="add_vendor"
                                             name="permissions[]" type="checkbox" value="add_vendor">
-                                        <label class="form-check-label" for="add_vendor">Add</label>
+                                        <label class="form-check-label" for="add_vendor">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Vendors" id="edit_vendor"
                                             name="permissions[]" type="checkbox" value="edit_vendor">
-                                        <label class="form-check-label" for="edit_vendor">Edit</label>
+                                        <label class="form-check-label" for="edit_vendor">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Vendors" id="delete_vendor"
                                             name="permissions[]" type="checkbox" value="delete_vendor">
-                                        <label class="form-check-label" for="delete_vendor">Delete</label>
+                                        <label class="form-check-label" for="delete_vendor">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -103,29 +102,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Products"
                                             id="chk-Products">
-                                        <label class="form-check-label" for="chk-Products">Products</label>
+                                        <label class="form-check-label" for="chk-Products">{{ trans.products }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Products" id="view_product"
                                             name="permissions[]" type="checkbox" value="view_product">
-                                        <label class="form-check-label" for="view_product">View</label>
+                                        <label class="form-check-label" for="view_product">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Products" id="add_product"
                                             name="permissions[]" type="checkbox" value="add_product">
-                                        <label class="form-check-label" for="add_product">Add</label>
+                                        <label class="form-check-label" for="add_product">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Products" id="edit_product"
                                             name="permissions[]" type="checkbox" value="edit_product">
-                                        <label class="form-check-label" for="edit_product">Edit</label>
+                                        <label class="form-check-label" for="edit_product">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Products" id="delete_product"
                                             name="permissions[]" type="checkbox" value="delete_product">
-                                        <label class="form-check-label" for="delete_product">Delete</label>
+                                        <label class="form-check-label" for="delete_product">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -136,29 +135,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="users"
                                             id="chk-users">
-                                        <label class="form-check-label" for="chk-users">Users</label>
+                                        <label class="form-check-label" for="chk-users">{{ trans.users }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_users" id="view_users"
                                             name="permissions[]" type="checkbox" value="view_users">
-                                        <label class="form-check-label" for="view_users">View</label>
+                                        <label class="form-check-label" for="view_users">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_users" id="add_users"
                                             name="permissions[]" type="checkbox" value="add_users">
-                                        <label class="form-check-label" for="add_users">Add</label>
+                                        <label class="form-check-label" for="add_users">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_users" id="edit_users"
                                             name="permissions[]" type="checkbox" value="edit_users">
-                                        <label class="form-check-label" for="edit_users">Edit</label>
+                                        <label class="form-check-label" for="edit_users">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_users" id="delete_users"
                                             name="permissions[]" type="checkbox" value="delete_users">
-                                        <label class="form-check-label" for="delete_users">Delete</label>
+                                        <label class="form-check-label" for="delete_users">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -169,29 +168,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Assets"
                                             id="chk-Assets">
-                                        <label class="form-check-label" for="chk-Assets">Assets</label>
+                                        <label class="form-check-label" for="chk-Assets">{{ trans.assets }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assets" id="view_asset"
                                             name="permissions[]" type="checkbox" value="view_asset">
-                                        <label class="form-check-label" for="view_asset">View</label>
+                                        <label class="form-check-label" for="view_asset">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assets" id="add_asset"
                                             name="permissions[]" type="checkbox" value="add_asset">
-                                        <label class="form-check-label" for="add_asset">Add</label>
+                                        <label class="form-check-label" for="add_asset">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assets" id="edit_asset"
                                             name="permissions[]" type="checkbox" value="edit_asset">
-                                        <label class="form-check-label" for="edit_asset">Edit</label>
+                                        <label class="form-check-label" for="edit_asset">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assets" id="delete_asset"
                                             name="permissions[]" type="checkbox" value="delete_asset">
-                                        <label class="form-check-label" for="delete_asset">Delete</label>
+                                        <label class="form-check-label" for="delete_asset">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +201,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Assign_Assets"
                                             id="chk-Assign_Assets">
-                                        <label class="form-check-label" for="chk-Assign_Assets">Assign Assets</label>
+                                        <label class="form-check-label" for="chk-Assign_Assets">{{ trans.assign_assets_module }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
@@ -210,19 +209,19 @@
                                         <input class="form-check-input isscheck isscheck_Assign_Assets"
                                             id="add_assign_asset" name="permissions[]" type="checkbox"
                                             value="add_assign_asset">
-                                        <label class="form-check-label" for="add_assign_asset">Add</label>
+                                        <label class="form-check-label" for="add_assign_asset">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assign_Assets"
                                             id="reassign_assign_asset" name="permissions[]" type="checkbox"
                                             value="reassign_assign_asset">
-                                        <label class="form-check-label" for="reassign_assign_asset">Reassign</label>
+                                        <label class="form-check-label" for="reassign_assign_asset">{{ trans.perm_reassign }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Assign_Assets"
                                             id="delete_assign_asset" name="permissions[]" type="checkbox"
                                             value="delete_assign_asset">
-                                        <label class="form-check-label" for="delete_assign_asset">Unassign</label>
+                                        <label class="form-check-label" for="delete_assign_asset">{{ trans.perm_unassign }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -233,19 +232,19 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Gate_Pass"
                                             id="chk-Gate_Pass">
-                                        <label class="form-check-label" for="chk-Gate_Pass">Gate Pass</label>
+                                        <label class="form-check-label" for="chk-Gate_Pass">{{ trans.gate_pass }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Gate_Pass" id="view_gate_pass"
                                             name="permissions[]" type="checkbox" value="view_gate_pass">
-                                        <label class="form-check-label" for="view_gate_pass">View</label>
+                                        <label class="form-check-label" for="view_gate_pass">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Gate_Pass" id="add_gate_pass"
                                             name="permissions[]" type="checkbox" value="add_gate_pass">
-                                        <label class="form-check-label" for="add_gate_pass">Add</label>
+                                        <label class="form-check-label" for="add_gate_pass">{{ trans.perm_add }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -256,29 +255,29 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Locations"
                                             id="chk-Locations">
-                                        <label class="form-check-label" for="chk-Locations">Locations</label>
+                                        <label class="form-check-label" for="chk-Locations">{{ trans.locations }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Locations" id="view_location"
                                             name="permissions[]" type="checkbox" value="view_location">
-                                        <label class="form-check-label" for="view_location">View</label>
+                                        <label class="form-check-label" for="view_location">{{ trans.view }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Locations" id="add_location"
                                             name="permissions[]" type="checkbox" value="add_location">
-                                        <label class="form-check-label" for="add_location">Add</label>
+                                        <label class="form-check-label" for="add_location">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Locations" id="edit_location"
                                             name="permissions[]" type="checkbox" value="edit_location">
-                                        <label class="form-check-label" for="edit_location">Edit</label>
+                                        <label class="form-check-label" for="edit_location">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Locations" id="delete_location"
                                             name="permissions[]" type="checkbox" value="delete_location">
-                                        <label class="form-check-label" for="delete_location">Delete</label>
+                                        <label class="form-check-label" for="delete_location">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -289,7 +288,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Departments"
                                             id="chk-Departments">
-                                        <label class="form-check-label" for="chk-Departments">Departments</label>
+                                        <label class="form-check-label" for="chk-Departments">{{ trans.departments }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
@@ -297,19 +296,19 @@
                                         <input class="form-check-input isscheck isscheck_Departments"
                                             id="add_department" name="permissions[]" type="checkbox"
                                             value="add_department">
-                                        <label class="form-check-label" for="add_department">Add</label>
+                                        <label class="form-check-label" for="add_department">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Departments"
                                             id="edit_department" name="permissions[]" type="checkbox"
                                             value="edit_department">
-                                        <label class="form-check-label" for="edit_department">Edit</label>
+                                        <label class="form-check-label" for="edit_department">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Departments"
                                             id="delete_department" name="permissions[]" type="checkbox"
                                             value="delete_department">
-                                        <label class="form-check-label" for="delete_department">Delete</label>
+                                        <label class="form-check-label" for="delete_department">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -320,7 +319,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox" data-id="Product_type"
                                             id="chk-Product_type">
-                                        <label class="form-check-label" for="chk-Product_type">Product Types</label>
+                                        <label class="form-check-label" for="chk-Product_type">{{ trans.product_types }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
@@ -328,19 +327,19 @@
                                         <input class="form-check-input isscheck isscheck_Product_type"
                                             id="add_product_type" name="permissions[]" type="checkbox"
                                             value="add_product_type">
-                                        <label class="form-check-label" for="add_product_type">Add</label>
+                                        <label class="form-check-label" for="add_product_type">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Product_type"
                                             id="edit_product_type" name="permissions[]" type="checkbox"
                                             value="edit_product_type">
-                                        <label class="form-check-label" for="edit_product_type">Edit</label>
+                                        <label class="form-check-label" for="edit_product_type">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Product_type"
                                             id="delete_product_type" name="permissions[]" type="checkbox"
                                             value="delete_product_type">
-                                        <label class="form-check-label" for="delete_product_type">Delete</label>
+                                        <label class="form-check-label" for="delete_product_type">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -351,8 +350,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input ischeck" type="checkbox"
                                             data-id="Product_category" id="chk-Product_category">
-                                        <label class="form-check-label" for="chk-Product_category">Product
-                                            Categories</label>
+                                        <label class="form-check-label" for="chk-Product_category">{{ trans.product_categories }}</label>
                                     </div>
                                 </div>
                                 <div class="module-card-body">
@@ -360,19 +358,19 @@
                                         <input class="form-check-input isscheck isscheck_Product_category"
                                             id="add_product_category" name="permissions[]" type="checkbox"
                                             value="add_product_category">
-                                        <label class="form-check-label" for="add_product_category">Add</label>
+                                        <label class="form-check-label" for="add_product_category">{{ trans.perm_add }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Product_category"
                                             id="edit_product_category" name="permissions[]" type="checkbox"
                                             value="edit_product_category">
-                                        <label class="form-check-label" for="edit_product_category">Edit</label>
+                                        <label class="form-check-label" for="edit_product_category">{{ trans.edit }}</label>
                                     </div>
                                     <div class="perm-item">
                                         <input class="form-check-input isscheck isscheck_Product_category"
                                             id="delete_product_category" name="permissions[]" type="checkbox"
                                             value="delete_product_category">
-                                        <label class="form-check-label" for="delete_product_category">Delete</label>
+                                        <label class="form-check-label" for="delete_product_category">{{ trans.delete }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -383,10 +381,10 @@
         </div>
         <div class="modal-footer-custom">
             <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                <i class="bi bi-x-lg"></i> Cancel
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save" id="save-role-btn">
-                <i class="bi bi-check-lg"></i> Save Role
+                <i class="bi bi-check-lg"></i> {{ trans.save_role }}
             </button>
         </div>
     </form>
@@ -662,7 +660,7 @@
 
         // HTMX and Notifications
         document.body.addEventListener("roleAdded", () => {
-            if (Notification.permission === "granted") new Notification("Success", { body: "New Role Added Successfully." });
+            if (Notification.permission === "granted") new Notification("{{ trans.role_added_notification_title }}", { body: "{{ trans.role_added_notification_body }}" });
         });
 
         htmx.on("htmx:beforeSwap", (e) => {
@@ -673,7 +671,7 @@
         if (form) {
             form.addEventListener('submit', () => {
                 const btn = document.querySelector('.btn-save');
-                btn.innerHTML = '<span class="spinner-grow spinner-grow-sm"></span> Saving...';
+                btn.innerHTML = '<span class="spinner-grow spinner-grow-sm"></span> {{ trans.saving }}';
                 btn.disabled = true;
             });
         }

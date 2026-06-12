@@ -12,7 +12,7 @@
         <td>
             {{ license.vendor.name|default:"-" }}
             {% if license.vendor.is_deleted %}
-              <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+              <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.vendor_deleted_warning }}"></i>
             {% endif %}
         </td>
         <td>
@@ -28,17 +28,17 @@
                                 {% if map.name %}{{ map.name|slice:":2"|upper }}{% else %}??{% endif %}
                             </span>
                         {% endif %}
-                        <span>{{ map.name|default:"Unknown User" }}</span>
+                        <span>{{ map.name|default:trans.unknown_user }}</span>
                     </div>
                 {% endwith %}
                 <form action="{% url 'license:unassign_license' license.id %}" method="post"
                     class="form-row-action"
-                    onsubmit="return confirm('Unassign this license?')">
+                    onsubmit="return confirm('{{ trans.unassign_confirm }}')">
                     {% csrf_token %}
-                    <button type="submit" class="btn-unassign">Unassign</button>
+                    <button type="submit" class="btn-unassign">{{ trans.unassign }}</button>
                 </form>
             {% else %}
-                <span class="unassigned-label">Unassigned</span>
+                <span class="unassigned-label">{{ trans.unassigned }}</span>
                 <button type="button" class="btn-assign mt-1"
                     hx-get="{% url 'license:assign_license' license.id %}"
                     hx-target="#assign-license-modal-content"
@@ -46,7 +46,7 @@
                     data-bs-toggle="modal"
                     data-bs-target="#assign-license-list-modal"
                     aria-label="Assign {{ license.name }}">
-                    + Assign
+                    {{ trans.assign_label }}
                 </button>
             {% endif %}
         </td>
@@ -55,14 +55,14 @@
         <td>
             <div class="row-actions">
                 {% if perms.authentication.view_license %}
-                    <a href="{% url 'license:license_details' license.id %}" class="action-btn" title="View {{ license.name }}">
+                    <a href="{% url 'license:license_details' license.id %}" class="action-btn" title="{{ trans.view }} {{ license.name }}">
                         <i class="bi bi-eye"></i>
                     </a>
                 {% endif %}
                 {% if perms.authentication.edit_license %}
                     <a href="{% url 'license:update_license' license.id %}"
                         class="action-btn"
-                        title="Edit {{ license.name }}">
+                        title="{{ trans.edit }} {{ license.name }}">
                         <i class="bi bi-pencil"></i>
                     </a>
                 {% endif %}
@@ -72,7 +72,7 @@
                         {% csrf_token %}
                         <button type="submit"
                             class="action-btn danger"
-                            title="Delete {{ license.name }}">
+                            title="{{ trans.delete }} {{ license.name }}">
                             <i class="bi bi-trash3"></i>
                         </button>
                     </form>
@@ -86,7 +86,7 @@
         <td colspan="9">
             <div class="table-empty-state">
                 <i class="bi bi-inbox d-block"></i>
-                <p>No licenses found.</p>
+                <p>{{ trans.no_licenses_found }}</p>
             </div>
         </td>
     </tr>

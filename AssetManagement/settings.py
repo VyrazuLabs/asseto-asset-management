@@ -167,6 +167,7 @@ try:
                     'configurations.context_processors.favicon_image',
                     'configurations.context_processors.login_page_logo',
                     'django.template.context_processors.request',
+                    'configurations.context_processors.translations',
                 ],
             },
         },
@@ -182,7 +183,8 @@ except Exception:
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages'
+                'django.contrib.messages.context_processors.messages',
+                'configurations.context_processors.translations',
             ],
         },
     },

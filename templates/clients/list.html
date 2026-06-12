@@ -15,23 +15,23 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Clients</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.clients }}</li>
       </ol>
     </nav>
-    <h1>Client Directory</h1>
+    <h1>{{ trans.client_directory }}</h1>
     <p class="page-subtitle">
-      Manage and monitor your global asset rentals and support tickets.
+      {{ trans.manage_clients }}
     </p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_clients' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_clients' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_client_count %}<span class="count-badge">{{ deleted_client_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_client %}
     <a href="{% url 'clients:add' %}" class="btn-register">
-      <i class="bi bi-plus-lg"></i> Register Client
+      <i class="bi bi-plus-lg"></i> {{ trans.register_client }}
     </a>
     {% endif %}
   </div>
@@ -43,7 +43,7 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
     <div>
-      <div class="stat-label">Total Renters</div>
+      <div class="stat-label">{{ trans.total_renters }}</div>
       <div class="stat-value">{{ total_client_count|default:"0" }}</div>
     </div>
   </div>
@@ -52,7 +52,7 @@
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-box-seam"></i></div>
     <div>
-      <div class="stat-label">Total Assests</div>
+      <div class="stat-label">{{ trans.total_assets_client }}</div>
       <div class="stat-value">{{ active_rentals_count|default:"0" }}</div>
     </div>
   </div>
@@ -61,7 +61,7 @@
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-headset"></i></div>
     <div>
-      <div class="stat-label">Open Support Tickets</div>
+      <div class="stat-label">{{ trans.open_tickets_client }}</div>
       <div class="stat-value">{{ review_client_count|default:"0" }}</div>
     </div>
   </div>
@@ -70,7 +70,7 @@
   <a href="{% url 'recycle_bin:deleted_clients' %}" class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-label">{{ trans.recycle_bin }}</div>
       <div class="stat-value">{{ deleted_client_count|default:"0" }}</div>
     </div>
   </a>
@@ -81,14 +81,14 @@
   <form method="GET" id="filterForm">
     <div class="row g-2 align-items-end">
       <div class="col">
-        <div class="filter-label">Search Client</div>
-        <input name="search" type="search" autocomplete="off" placeholder="Search Client Name or ID..."
+        <div class="filter-label">{{ trans.search_client }}</div>
+        <input name="search" type="search" autocomplete="off" placeholder="{{ trans.search_client_placeholder }}"
           value="{{ search_query|default:'' }}">
       </div>
       <div class="col-auto">
-        <div class="filter-label">Status</div>
+        <div class="filter-label">{{ trans.status_label }}</div>
         <select name="status" class="filter-select-btn" style="min-width: 150px;" onchange="this.form.submit()">
-          <option value="All Statuses">All Status</option>
+          <option value="All Statuses">{{ trans.all_statuses }}</option>
           {% for val, label in status_choices %}
           <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
             {{ label }}
@@ -99,17 +99,17 @@
       <div class="col-auto">
         <div class="dropdown">
           <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-            <i class="bi bi-download"></i> Export
+            <i class="bi bi-download"></i> {{ trans.export }}
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'clients:export_csv' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
-            <li><a class="dropdown-item" href="{% url 'clients:export_pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+            <li><a class="dropdown-item" href="{% url 'clients:export_csv' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'clients:export_pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
           </ul>
         </div>
       </div>
       <div class="col-auto">
-        <a href="{% url 'clients:list' %}" class="btn-reset" title="Reset">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        <a href="{% url 'clients:list' %}" class="btn-reset" title="{{ trans.reset }}">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
       <button type="submit" style="display: none;"></button>
@@ -124,15 +124,15 @@
     <table class="list-table" id="client-table">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Client Name</th>
-          <th>Industry Type</th>
-          <th>Contact Person</th>
-          <th class="text-center">Total Assets</th>
-          <th class="text-center">Open Tickets</th>
-          <th>Status</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.name_label }}</th>
+          <th>{{ trans.industry_type }}</th>
+          <th>{{ trans.contact_person }}</th>
+          <th class="text-center">{{ trans.total_assets_client }}</th>
+          <th class="text-center">{{ trans.open_tickets_client }}</th>
+          <th>{{ trans.status_label }}</th>
           {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
-          <th>Actions</th>
+          <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -147,8 +147,8 @@
           <td colspan="8">
             <div class="table-empty-state">
               <i class="bi bi-people"></i>
-              <p>No clients found.<br>
-                <a href="{% url 'clients:add' %}" class="link-primary">Add your first client</a>
+              <p>{{ trans.no_clients_found }}<br>
+                <a href="{% url 'clients:add' %}" class="link-primary">{{ trans.add_first_client }}</a>
               </p>
             </div>
           </td>

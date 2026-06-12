@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Product Catalog | Asseto{% endblock %}
+{% block title %}{{ trans.product_catalog }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -16,21 +16,21 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Products</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.products }}</li>
       </ol>
     </nav>
-    <h1>Product Catalog</h1>
-    <p class="page-subtitle">Manage your organization's product inventory and categories.</p>
+    <h1>{{ trans.product_catalog }}</h1>
+    <p class="page-subtitle">{{ trans.manage_products }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_products' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_products' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_product_count %}<span class="count-badge">{{ deleted_product_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_product %}
       <a href="{% url 'products:add' %}" class="btn-register">
-        <i class="bi bi-plus-lg"></i> Add Product
+        <i class="bi bi-plus-lg"></i> {{ trans.add_product }}
       </a>
     {% endif %}
   </div>
@@ -41,28 +41,28 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
     <div>
-      <div class="stat-label">Total Products</div>
+      <div class="stat-label">{{ trans.total_products }}</div>
       <div class="stat-value">{{ total_product_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Active</div>
+      <div class="stat-label">{{ trans.active }}</div>
       <div class="stat-value">{{ active_product_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-link-45deg"></i></div>
     <div>
-      <div class="stat-label">With Assets</div>
+      <div class="stat-label">{{ trans.with_assets }}</div>
       <div class="stat-value">{{ with_assets_count }}</div>
     </div>
   </div>
   <a href="{% url 'recycle_bin:deleted_products' %}" class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-label">{{ trans.recycle_bin }}</div>
       <div class="stat-value">{{ deleted_product_count }}</div>
     </div>
   </a>
@@ -72,35 +72,35 @@
 <div class="filter-card">
   <div class="row g-2 align-items-end">
     <div class="col">
-      <div class="filter-label">Search Product</div>
+      <div class="filter-label">{{ trans.search_product }}</div>
       <input name="search_text" type="search"
-        autocomplete="off" placeholder="Name, type or category…"
+        autocomplete="off" placeholder="{{ trans.search_product_placeholder }}"
         hx-get="{% url 'products:search' page_object.number|default:'1' %}"
         hx-trigger="keyup changed delay:400ms, search"
         hx-target="#search_result"
-        aria-label="Search products">
+        aria-label="{{ trans.search_product }}">
     </div>
     {% if request.user.is_superuser %}
       <div class="col-auto">
         <div class="dropdown">
-          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-            <i class="bi bi-download"></i> Export
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="{{ trans.export }}">
+            <i class="bi bi-download"></i> {{ trans.export }}
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'products:export_products_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
-            <li><a class="dropdown-item" href="{% url 'products:export_products_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+            <li><a class="dropdown-item" href="{% url 'products:export_products_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'products:export_products_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
           </ul>
         </div>
       </div>
     {% endif %}
     <div class="col-auto">
-      <a href="{% url 'products:list' %}" class="btn-reset" title="Reset">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      <a href="{% url 'products:list' %}" class="btn-reset" title="{{ trans.reset }}">
+        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
       </a>
     </div>
   </div>
   {% if is_demo is True %}
-    <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
+    <p class="demo-note">{{ trans.demo_mode_disabled }}</p>
   {% endif %}
 </div>
 
@@ -110,15 +110,15 @@
     <table class="list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Image</th>
-          <th>Product Name</th>
-          <th>Product Type</th>
-          <th>Category</th>
-          <th>Total Assets</th>
-          <th>Status</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.image_label }}</th>
+          <th>{{ trans.product_name }}</th>
+          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.category }}</th>
+          <th>{{ trans.total_assets }}</th>
+          <th>{{ trans.status_label }}</th>
           {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
-            <th>Actions</th>
+            <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -148,14 +148,14 @@
           <td>
             {{ products.product_type }}
             {% if products.product_type.is_deleted %}
-              <i class="bi bi-exclamation-triangle text-warning" title="Product type is deleted"></i>
+              <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.product_type_deleted_warning }}"></i>
             {% endif %}
           </td>
 
           <td>
             {{ products.product_sub_category.name }}
             {% if products.product_category.parent.is_deleted %}
-              <i class="bi bi-exclamation-triangle text-warning" title="Category is deleted"></i>
+              <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.category_deleted_warning }}"></i>
             {% endif %}
           </td>
 
@@ -182,9 +182,9 @@
               </div>
             {% else %}
               {% if products.status %}
-                <span class="status-badge status-active">Active</span>
+                <span class="status-badge status-active">{{ trans.active_status }}</span>
               {% else %}
-                <span class="status-badge status-inactive">Inactive</span>
+                <span class="status-badge status-inactive">{{ trans.inactive_status }}</span>
               {% endif %}
             {% endif %}
           </td>
@@ -193,24 +193,24 @@
           <td>
             <div class="row-actions">
               {% if perms.authentication.view_product %}
-                <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="View {{ products.name }}">
+                <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
                   <i class="bi bi-eye"></i>
                 </a>
               {% endif %}
               {% if perms.authentication.edit_product %}
                 <a href="{% url 'products:update_product' products.id %}"
                   class="action-btn {% if is_demo %}disabled{% endif %}"
-                  title="Edit {{ products.name }}">
+                  title="{{ trans.update_product }} {{ products.name }}">
                   <i class="bi bi-pencil"></i>
                 </a>
               {% endif %}
               {% if perms.authentication.delete_product %}
                 <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('Delete {{ products.name }}? It can be restored from Recycle Bin.')">
+                      onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
                   {% csrf_token %}
                   <button type="submit"
                     class="action-btn danger {% if is_demo %}disabled{% endif %}"
-                    title="Delete {{ products.name }}"
+                    title="{{ trans.delete_confirm_product }}"
                     {% if is_demo %}disabled{% endif %}>
                     <i class="bi bi-trash3"></i>
                   </button>
@@ -229,8 +229,8 @@
           <td colspan="8">
             <div class="table-empty-state">
               <i class="bi bi-box-seam d-block"></i>
-              <p>No products found.<br>
-                <a href="{% url 'products:add' %}" class="link-primary">Add your first product</a>
+              <p>{{ trans.no_products_found }}<br>
+                <a href="{% url 'products:add' %}" class="link-primary">{{ trans.add_first_product }}</a>
               </p>
             </div>
           </td>
@@ -269,5 +269,4 @@ document.body.addEventListener('htmx:afterSwap', (e) => {
   }
 });
 </script>
-
 {% endblock %}

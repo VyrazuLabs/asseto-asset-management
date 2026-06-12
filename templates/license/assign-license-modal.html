@@ -1,5 +1,5 @@
 <div class="modal-header bg-dark text-center">
-    <h5 class="modal-title white w-100">Assign License</h5>
+    <h5 class="modal-title white w-100">{{ trans.assign_license }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 
@@ -8,12 +8,12 @@
 
     <div class="modal-body">
         <div class="form-group">
-            <label>License</label>
+            <label>{{ trans.license_label }}</label>
             <input type="text" class="form-control" value="{{ license.name }}" disabled>
         </div>
 
         <div class="form-group mt-2">
-            <label>Assign To</label>
+            <label>{{ trans.assign_to }}</label>
             {{ form.user }}
             {% if form.user.errors %}
             <div class="text-danger">{{ form.user.errors }}</div>
@@ -22,8 +22,8 @@
     </div>
 
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-info">Assign</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.close }}</button>
+        <button type="submit" class="btn btn-info">{{ trans.assign }}</button>
     </div>
 </form>
 <script>

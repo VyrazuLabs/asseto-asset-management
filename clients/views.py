@@ -50,10 +50,10 @@ def add_client(request):
     from roles.models import Role
     roles = Role.objects.filter(organization=request.user.organization).order_by("name")
     context = {
-        "sidebar": "clients",
-        "title": "Register Client | Asseto",
-        "form": form,
-        "roles": roles,
+        'sidebar': 'clients',
+        'title': 'Register Client',
+        'form': form,
+        'roles': roles,
     }
     return render(request, "clients/add.html", context)
 
@@ -79,11 +79,11 @@ def update_client(request, id):
     from roles.models import Role
     roles = Role.objects.filter(organization=request.user.organization).order_by("related_name")
     context = {
-        "sidebar": "clients",
-        "title": f"Edit {client.name} | Asseto",
-        "form": form,
-        "client": client,
-        "roles": roles,
+        'sidebar': 'clients',
+        'title': f'Edit {client.name}',
+        'form': form,
+        'client': client,
+        'roles': roles,
     }
     return render(request, "clients/edit.html", context)
 

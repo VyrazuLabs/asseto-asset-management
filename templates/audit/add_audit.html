@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}{% if get_asset %}Update Audit{% else %}Add Audit{% endif %} | Asseto{% endblock %}
+{% block title %}{% if get_asset %}{{ trans.update_audit }}{% else %}{{ trans.add_audit }}{% endif %} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/audit.css' %}">
@@ -12,17 +12,17 @@
 {# ── Page header ──────────────────────────────────────────────────────────── #}
 <div class="audit-page-header">
   <div>
-    <h1>{% if get_asset %}Update Audit{% else %}New Audit Entry{% endif %}</h1>
+    <h1>{% if get_asset %}{{ trans.update_audit }}{% else %}{{ trans.new_audit_entry }}{% endif %}</h1>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">Audit</a></li>
-        <li class="breadcrumb-item active">{% if get_asset %}Update Audit{% else %}Add Audit{% endif %}</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">{{ trans.audit }}</a></li>
+        <li class="breadcrumb-item active">{% if get_asset %}{{ trans.update_audit }}{% else %}{{ trans.add_audit }}{% endif %}</li>
       </ol>
     </nav>
   </div>
   <a href="{% url 'audit:completed_audits' %}" class="btn-back">
-    <i class="bi bi-arrow-left"></i> Back to Audit
+    <i class="bi bi-arrow-left"></i> {{ trans.back_to_audit }}
   </a>
 </div>
 
@@ -36,14 +36,14 @@
     <div class="audit-card">
       <div class="audit-card-header">
         <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
-        <h2>Audit Information</h2>
+        <h2>{{ trans.audit_information }}</h2>
       </div>
       <div class="audit-card-body">
 
         {# Asset Tag + Assigned To #}
         <div class="row g-3 mb-4">
           <div class="col-md-6 col-12">
-            <label class="field-label">Asset Id / Tag Number <span class="required-star">*</span></label>
+            <label class="field-label">{{ trans.asset_id_tag_number }} <span class="required-star">*</span></label>
             {% if get_asset %}
               <input type="text" class="field-input" name="tag" value="{{ get_asset.tag }}" disabled>
             {% elif get_audit.asset %}
@@ -51,20 +51,20 @@
             {% else %}
               <div style="position:relative;">
                 <input type="text" class="field-input" name="tag" id="tag-input"
-                       placeholder="e.g. ASSET-1002" autocomplete="off">
+                       placeholder="{{ trans.tag_placeholder_example }}" autocomplete="off">
                 <ul id="tag-suggestions" class="audit-suggestions"></ul>
               </div>
             {% endif %}
           </div>
 
           <div class="col-md-6 col-12">
-            <label class="field-label">Assigned To <span class="required-star">*</span></label>
+            <label class="field-label">{{ trans.assigned_to }} <span class="required-star">*</span></label>
             {% if get_asset and asset_assigned_users %}
               <input type="text" class="field-input" name="assigned_to"
                      id="assigned-to-input" value="{{ asset_assigned_users }}" disabled>
             {% else %}
               <input type="text" class="field-input" name="assigned_to"
-                     id="assigned-to-input" value="Not Assigned" disabled>
+                     id="assigned-to-input" value="{{ trans.not_assigned }}" disabled>
             {% endif %}
             <span id="assigned-to-msg" class="field-hint"></span>
           </div>
@@ -72,13 +72,13 @@
 
         {# Condition Status #}
         <div class="mb-4">
-          <label class="field-label">Condition Status <span class="required-star">*</span></label>
+          <label class="field-label">{{ trans.condition_status }} <span class="required-star">*</span></label>
           <div class="condition-btn-group">
-            <button type="button" data-value="0" class="condition-btn">Excellent</button>
-            <button type="button" data-value="1" class="condition-btn">Good</button>
-            <button type="button" data-value="2" class="condition-btn">Fair</button>
-            <button type="button" data-value="3" class="condition-btn">Bad</button>
-            <button type="button" data-value="4" class="condition-btn">Retired</button>
+            <button type="button" data-value="0" class="condition-btn">{{ trans.excellent }}</button>
+            <button type="button" data-value="1" class="condition-btn">{{ trans.good }}</button>
+            <button type="button" data-value="2" class="condition-btn">{{ trans.fair }}</button>
+            <button type="button" data-value="3" class="condition-btn">{{ trans.bad }}</button>
+            <button type="button" data-value="4" class="condition-btn">{{ trans.retired }}</button>
           </div>
           <input type="hidden" name="condition" id="condition-input">
           {% if errors.condition %}
@@ -88,9 +88,9 @@
 
         {# Comments #}
         <div>
-          <label class="field-label">Detailed Observations / Comments <span class="required-star">*</span></label>
+          <label class="field-label">{{ trans.detailed_observations }} <span class="required-star">*</span></label>
           <textarea class="field-textarea" name="comments" rows="6"
-                    placeholder="Enter comments">{% if get_audit.comments %}{{ get_audit.comments }}{% endif %}</textarea>
+                    placeholder="{{ trans.enter_comments }}">{% if get_audit.comments %}{{ get_audit.comments }}{% endif %}</textarea>
           {% if errors.comments %}
             <span class="field-error">{{ errors.comments }}</span>
           {% endif %}
@@ -107,19 +107,19 @@
     <div class="audit-card">
       <div class="audit-card-header">
         <div class="section-icon"><i class="bi bi-camera-fill"></i></div>
-        <h2>Audit Image</h2>
+        <h2>{{ trans.audit_image_section }}</h2>
       </div>
       <div class="audit-card-body">
         <label for="audit-image-input" class="audit-upload-area">
           <i class="bi bi-cloud-arrow-up pb-4"></i>
-          <div class="upload-label">Click to upload or drag &amp; drop</div>
-          <div class="upload-hint">PNG, JPG or PDF (MAX. 10MB)</div>
+          <div class="upload-label">{{ trans.click_to_upload }}</div>
+          <div class="upload-hint">{{ trans.upload_hint_png_jpg }}</div>
         </label>
         <input id="audit-image-input" type="file" name="image" multiple style="display:none;"
                onchange="updateFileLabel(this)">
         <div class="audit-file-label mt-2">
-          <span class="upload-hint">The number of files selected will be logged</span>
-          <span id="audit-file-chosen" class="audit-file-chosen">No file chosen</span>
+          <span class="upload-hint">{{ trans.files_selected_logged }}</span>
+          <span id="audit-file-chosen" class="audit-file-chosen">{{ trans.no_file_chosen }}</span>
         </div>
       </div>
     </div>
@@ -128,14 +128,14 @@
     <div class="audit-card">
       <div class="audit-card-body">
         <button type="submit" class="btn-save-audit"
-                onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\'></span>Saving...'">
-          <i class="bi bi-check-lg"></i> Save Audit Changes
+                onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\'></span>{{ trans.saving }}'">
+          <i class="bi bi-check-lg"></i> {{ trans.save_audit_changes }}
         </button>
         <a href="{% url 'audit:completed_audits' %}" class="btn-discard-audit">
-          Discard Changes
+          {{ trans.discard_changes }}
         </a>
         <p class="audit-compliance-note">
-          Saving this record will update the asset status in the system and log your administrator ID for compliance auditing.
+          {{ trans.compliance_note }}
         </p>
       </div>
     </div>

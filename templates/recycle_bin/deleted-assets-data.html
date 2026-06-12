@@ -38,17 +38,17 @@
         <div class="trash-actions">
           <form action="{% url 'recycle_bin:deleted_asset_restore' asset.id %}" method="post"
                 class="d-inline"
-                onsubmit="return confirm('Restore {{ asset.name }}? It will be moved back to your asset list.')">
+                onsubmit="return confirm('{{ trans.restore_confirm }}')">
             {% csrf_token %}
-            <button type="submit" class="trash-action-btn restore" title="Restore {{ asset.name }}">
+            <button type="submit" class="trash-action-btn restore" title="{{ trans.restore_label }} {{ asset.name }}">
               <i class="bi bi-arrow-counterclockwise"></i>
             </button>
           </form>
           <form action="{% url 'recycle_bin:deleted_asset_permanently' asset.id %}" method="post"
                 class="d-inline"
-                onsubmit="return confirm('Permanently delete {{ asset.name }}? This action cannot be undone.')">
+                onsubmit="return confirm('{{ trans.permanently_delete_confirm }}')">
             {% csrf_token %}
-            <button type="submit" class="trash-action-btn delete" title="Permanently delete {{ asset.name }}">
+            <button type="submit" class="trash-action-btn delete" title="{{ trans.permanently_delete }} {{ asset.name }}">
               <i class="bi bi-trash3"></i>
             </button>
           </form>
@@ -61,7 +61,7 @@
       <td colspan="7">
         <div class="trash-empty-state">
           <i class="bi bi-inbox d-block"></i>
-          <p>No assets found matching your search.</p>
+          <p>{{ trans.no_assets_found }}</p>
         </div>
       </td>
     </tr>

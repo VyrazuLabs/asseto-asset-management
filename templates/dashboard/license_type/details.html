@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}License Type Details - {{ license_type.name }} | Asseto{% endblock %}
+{% block title %}{{ trans.license_type_details }} - {{ license_type.name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,13 +15,13 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:license_type_list' %}" class="breadcrumb-link">License Types</a></li>
-            <li class="breadcrumb-item active">License Type Details</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:license_type_list' %}" class="breadcrumb-link">{{ trans.license_types }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.license_type_details }}</li>
           </ol>
         </nav>
         <h1>{{ license_type.name }}</h1>
-        <p class="page-subtitle">View and manage license type details and associated licenses.</p>
+        <p class="page-subtitle">{{ trans.license_type_detail_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'dashboard:license_type_list' %}" class="btn-back-listing">

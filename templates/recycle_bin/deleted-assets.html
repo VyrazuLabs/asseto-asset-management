@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Trash Bin | Asseto{% endblock %}
+{% block title %}{{ trans.trash_bin }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/recycle-bin.css' %}">
@@ -15,16 +15,16 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Inventory</a></li>
-        <li class="breadcrumb-item active">Trash Bin</li>
+        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">{{ trans.inventory_label }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.trash_bin }}</li>
       </ol>
     </nav>
-    <h1>Trash Bin</h1>
-    <p class="page-subtitle">Review and manage recently removed organization assets.</p>
+    <h1>{{ trans.trash_bin }}</h1>
+    <p class="page-subtitle">{{ trans.recycle_bin_subtitle }}</p>
   </div>
   <div>
     <a href="{% url 'assets:list' %}" class="btn btn-sm btn-outline-info my-3">
-      <i class="bi bi-arrow-left"></i> Back to Assets
+      <i class="bi bi-arrow-left"></i> {{ trans.back_to_assets }}
     </a>
   </div>
 </div>
@@ -34,9 +34,9 @@
 
   <div class="trash-table-header">
     <div class="d-flex align-items-center gap-2">
-      <h2>Deleted Assets List</h2>
+      <h2>{{ trans.deleted_assets_list }}</h2>
       {% if page_object %}
-        <span class="item-count-badge">{{ page_object.paginator.count }} Items</span>
+        <span class="item-count-badge">{{ page_object.paginator.count }} {{ trans.items_count }}</span>
       {% endif %}
     </div>
     {% if page_object %}
@@ -44,7 +44,7 @@
       <div class="trash-search-wrap">
         <i class="bi bi-search"></i>
         <input name="search_text" type="search" autocomplete="off"
-               placeholder="Search deleted assets…"
+               placeholder="{{ trans.search_deleted_assets }}"
                hx-get="{% url 'recycle_bin:deleted_assets_search' page_object.number %}"
                hx-trigger="keyup changed delay:400ms, search"
                hx-target="#search_result"
@@ -64,13 +64,13 @@
     <table class="trash-table">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Asset Name</th>
-          <th>Serial No</th>
-          <th>Product Type</th>
-          <th>Vendor</th>
-          <th>Deletion Date</th>
-          <th>Actions</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.asset_name }}</th>
+          <th>{{ trans.serial_number }}</th>
+          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.vendor }}</th>
+          <th>{{ trans.deletion_date }}</th>
+          <th>{{ trans.actions }}</th>
         </tr>
       </thead>
 
@@ -109,17 +109,17 @@
             <div class="trash-actions">
               <form action="{% url 'recycle_bin:deleted_asset_restore' asset.id %}" method="post"
                     class="d-inline"
-                    onsubmit="return confirm('Restore {{ asset.name }}? It will be moved back to your asset list.')">
+                    onsubmit="return confirm('{{ trans.restore_confirm }}')">
                 {% csrf_token %}
-                <button type="submit" class="trash-action-btn restore" title="Restore {{ asset.name }}">
+                <button type="submit" class="trash-action-btn restore" title="{{ trans.restore_label }} {{ asset.name }}">
                   <i class="bi bi-arrow-counterclockwise"></i>
                 </button>
               </form>
               <form action="{% url 'recycle_bin:deleted_asset_permanently' asset.id %}" method="post"
                     class="d-inline"
-                    onsubmit="return confirm('Permanently delete {{ asset.name }}? This action cannot be undone.')">
+                    onsubmit="return confirm('{{ trans.permanently_delete_confirm }}')">
                 {% csrf_token %}
-                <button type="submit" class="trash-action-btn delete" title="Permanently delete {{ asset.name }}">
+                <button type="submit" class="trash-action-btn delete" title="{{ trans.permanently_delete }} {{ asset.name }}">
                   <i class="bi bi-trash3"></i>
                 </button>
               </form>
@@ -135,8 +135,8 @@
           <td colspan="7">
             <div class="trash-empty-state">
               <i class="bi bi-trash3 d-block"></i>
-              <p>No deleted assets found.<br>
-                <a href="{% url 'assets:list' %}" class="link-primary">Back to Asset Inventory</a>
+              <p>{{ trans.no_deleted_assets }}<br>
+                <a href="{% url 'assets:list' %}" class="link-primary">{{ trans.back_to_assets }}</a>
               </p>
             </div>
           </td>
@@ -150,8 +150,8 @@
   {% if page_object %}
   <div class="trash-pagination-wrap">
     <span class="trash-pagination-info">
-      Showing {{ page_object.start_index }} to {{ page_object.end_index }}
-      of {{ page_object.paginator.count }} entries
+      {{ trans.showing_label }} {{ page_object.start_index }} {{ trans.to_pagination }} {{ page_object.end_index }}
+      {{ trans.of_label }} {{ page_object.paginator.count }} {{ trans.entries_pagination }}
     </span>
     <div class="trash-pagination-nav">
       {% if page_object.has_previous %}

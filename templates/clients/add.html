@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Register Client | Asseto{% endblock %}
+{% block title %}{{ trans.register_client }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -59,22 +59,21 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb page-breadcrumb">
-                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a>
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">{{ trans.clients }}</a>
                     </li>
-                    <li class="breadcrumb-item active">Add Client</li>
+                    <li class="breadcrumb-item active">{{ trans.add_client }}</li>
                 </ol>
             </nav>
-            <h1>Register New Client</h1>
-            <p class="subtitle">Establish a new institutional or private asset record. Ensure all regulatory information
-                accurate before submission.</p>
+            <h1>{{ trans.register_new_client }}</h1>
+            <p class="subtitle">{{ trans.client_form_subtitle }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <a href="{% url 'clients:list' %}" class="btn-back-listing">
-                <i class="bi bi-arrow-left"></i> Back to Listing
+                <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
             </a>
             <button type="submit" form="client-form" class="btn-save-asset">
-                <i class="bi bi-floppy2"></i> Save
+                <i class="bi bi-floppy2"></i> {{ trans.save }}
             </button>
         </div>
     </div>
@@ -88,7 +87,7 @@
             <div class="alert alert-danger mb-4" role="alert">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    <h6 class="mb-0 fw-bold">Please correct the following errors:</h6>
+                    <h6 class="mb-0 fw-bold">{{ trans.correct_errors }}</h6>
                 </div>
                 <ul class="mb-0 ps-3">
                     {% for field in form %}
@@ -106,21 +105,21 @@
             <!-- Basic Information -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-building"></i> <span>Basic Information</span>
+                    <i class="bi bi-building"></i> <span>{{ trans.basic_information }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>COMPANY NAME <span class="required">*</span></label>
+                        <label>{{ trans.company_name }} <span class="required">*</span></label>
                         {{ form.name }}
                         {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label>INDUSTRY <span class="required">*</span></label>
+                        <label>{{ trans.industry }} <span class="required">*</span></label>
                         {{ form.industry }}
                         {% if form.industry.errors %}<div class="text-danger small mt-1">{{ form.industry.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group full-width">
-                        <label>CORPORATE WEBSITE</label>
+                        <label>{{ trans.corporate_website }}</label>
                         <div class="website-input">
                             <i class="bi bi-globe"></i>
                             {{ form.corporate_website }}
@@ -133,60 +132,60 @@
             <!-- Contact Details -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-person-badge"></i> <span>Contact Details</span>
+                    <i class="bi bi-person-badge"></i> <span>{{ trans.contact_details }}</span>
                 </div>
                 <div class="mb-3 d-flex justify-content-end">
                     <button type="button" class="btn btn-sm btn-outline-primary" id="addContactBtn">
-                        <i class="bi bi-plus-lg me-1"></i> Add Contact
+                        <i class="bi bi-plus-lg me-1"></i> {{ trans.add_contact }}
                     </button>
                 </div>
                 <div id="contactsContainer">
                     <div class="contact-block custom-field-row mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                             <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
-                                <i class="bi bi-person me-1"></i> Contact Person
+                                <i class="bi bi-person me-1"></i> {{ trans.contact_person }}
                             </h6>
                             <button type="button" class="btn btn-sm btn-outline-danger remove-contact-btn"
                                 style="display: none; padding: 0.2rem 0.5rem; font-size: 0.8rem;">
-                                <i class="bi bi-trash"></i> Remove
+                                <i class="bi bi-trash"></i> {{ trans.remove }}
                             </button>
                         </div>
                         <div class="form-grid">
                             <div class="form-group full-width">
-                                <label>CONTACT NAME</label>
+                                <label>{{ trans.contact_name }}</label>
                                 <input type="text" name="contact_name[]" class="form-control"
-                                    placeholder="Full legal name">
+                                    placeholder="{{ trans.full_legal_name }}">
                             </div>
                             <div class="form-group">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <label>EMAIL ADDRESS</label>
+                                    <label>{{ trans.email_address }}</label>
                                     <div class="form-check form-switch status-toggle mb-1">
                                         <input class="form-check-input portal-access-toggle" type="checkbox" role="switch" id="portalAccess_0">
-                                        <label class="form-check-label small text-muted" style="font-size: 0.75rem;color:var(--color-primary) !important;" for="portalAccess_0">Client Portal Access</label>
+                                        <label class="form-check-label small text-muted" style="font-size: 0.75rem;color:var(--color-primary) !important;" for="portalAccess_0">{{ trans.client_portal_access }}</label>
                                         <input type="hidden" name="is_portal_active[]" value="0">
                                     </div>
                                 </div>
                                 <input type="email" name="contact_email[]" class="form-control"
-                                    placeholder="p.contact@company.com">
+                                    placeholder="{{ trans.contact_email_placeholder }}">
                             </div>
                             <div class="form-group">
-                                <label>PHONE NUMBER</label>
+                                <label>{{ trans.phone_number_label }}</label>
                                 <input type="text" name="contact_phone[]" class="form-control"
-                                    placeholder="+1 (555) 000-0000">
+                                    placeholder="{{ trans.phone_placeholder }}">
                             </div>
                             <div class="form-group full-width">
-                                <label>ROLE</label>
+                                <label>{{ trans.role_label }}</label>
                                 <select name="contact_role[]" class="form-control">
-                                    <option value="">Select Role</option>
+                                    <option value="">{{ trans.select_role }}</option>
                                     {% for r in roles %}
                                     <option value="{{ r.id }}">{{ r.related_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="form-group full-width">
-                                <label>NOTES</label>
+                                <label>{{ trans.notes_label }}</label>
                                 <textarea name="contact_notes[]" class="form-control" rows="2"
-                                    placeholder="Additional instructions or internal notes regarding this contact..."></textarea>
+                                    placeholder="{{ trans.contact_notes_placeholder }}"></textarea>
                             </div>
                         </div>
                     </div>
@@ -196,26 +195,26 @@
             <!-- Billing Address -->
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-wallet2"></i> <span>Billing Address</span>
+                    <i class="bi bi-wallet2"></i> <span>{{ trans.billing_address }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label>STREET ADDRESS</label>
+                        <label>{{ trans.street_address_label }}</label>
                         {{ form.street_address }}
                         {% if form.street_address.errors %}<div class="text-danger small mt-1">{{ form.street_address.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label>CITY</label>
+                        <label>{{ trans.city_label }}</label>
                         {{ form.city }}
                         {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label>STATE / PROVINCE</label>
+                        <label>{{ trans.state_label }}</label>
                         {{ form.state }}
                         {% if form.state.errors %}<div class="text-danger small mt-1">{{ form.state.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label>ZIP</label>
+                        <label>{{ trans.zip_label }}</label>
                         {{ form.zip_code }}
                         {% if form.zip_code.errors %}<div class="text-danger small mt-1">{{ form.zip_code.errors.0 }}</div>{% endif %}
                     </div>

@@ -5,19 +5,19 @@ from dashboard.models import Address
 
 class VendorForm(forms.ModelForm):
     name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Vendor Name', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     email = forms.EmailField(required=False, widget=forms.EmailInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Email', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     phone = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Phone number', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     contact_person = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Contact Person', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     designation = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Designation', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     gstin_number = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'GSTIN Number', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     description = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={'autocomplete': 'off', 'rows': '2', 'placeholder': 'Description', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'rows': '2', 'class': 'form-control'}))
     
     def clean_name(self):
         name = self.cleaned_data.get('name')
@@ -47,17 +47,17 @@ class VendorForm(forms.ModelForm):
 
 class AddressForm(forms.ModelForm):
     address_line_one = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2', 'placeholder': 'Address Line 1'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2'}))
     address_line_two = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2', 'placeholder': 'Address Line 2'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2'}))
     country = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Country', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     state = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'State', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     city = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'City', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
     pin_code = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off', 'placeholder': 'Zip Code', 'class': 'form-control'}))
+        attrs={'autocomplete': 'off', 'class': 'form-control'}))
 
     def clean_country(self):
         country = self.cleaned_data.get('country')

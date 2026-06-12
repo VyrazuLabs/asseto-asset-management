@@ -27,6 +27,13 @@ def get_at_index(list_obj, index):
 @register.filter
 def split(value, key=' '):
     return value.split(key)
+
+@register.filter
+def format_str(value, arg):
+    try:
+        return value.replace('{}', str(arg))
+    except Exception:
+        return value
 @register.simple_tag(takes_context=True)
 # @register.simple_tag(takes_context=True)
 def format_datetime(context,x):

@@ -19,7 +19,7 @@
             {% else %}
             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
             {% endif %}
-            <span>{{ ticket.asset.name|default:"--" }}</span>
+            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
         </div>
     </td>
     <td>
@@ -51,13 +51,13 @@
 
         </div>
         {% else %}
-        <span class="text-muted fst-italic">Unassigned</span>
+        <span class="text-muted fst-italic">{{ trans.unassigned }}</span>
         {% endif %}
     </td>
     <td>
         <div class="text-muted small">
             <i class="bi bi-clock-history me-1"></i>
-            {{ ticket.updated_at|timesince }} ago
+            {{ ticket.updated_at|timesince }} {{ trans.ago }}
         </div>
     </td>
     <td>
@@ -76,8 +76,8 @@
     <td colspan="8" class="text-center py-5">
         <div class="text-muted d-flex flex-column align-items-center">
             <i class="bi bi-ticket-perforated h1 mb-3"></i>
-            <p>No maintenance tickets found.</p>
-            <a href="{% url 'support:ticket_add' %}" class="btn btn-primary btn-sm">Create First Ticket</a>
+            <p>{{ trans.no_tickets_found }}</p>
+            <a href="{% url 'support:ticket_add' %}" class="btn btn-primary btn-sm">{{ trans.create_first_ticket }}</a>
         </div>
     </td>
 </tr>

@@ -75,7 +75,7 @@ def add_product_category(request):
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "productCategoryAdded"
             return response
-    context = {'form': form, "modal_title": "Add Product Category"}
+    context = {'form': form, "modal_title": "Add Product Category", "is_add_mode": True}
     return render(request, 'dashboard/product_category/product-category-modal.html', context)
 
 
@@ -134,7 +134,7 @@ def update_product_category(request, id):
             response["HX-Trigger"] = "productCategoryUpdated"
             return response
 
-    context = {'form': form, "modal_title": "Update Product Category"}
+    context = {'form': form, "modal_title": "Update Product Category", "is_add_mode": False}
     return render(request, 'dashboard/product_category/product-category-modal.html', context)
 
 

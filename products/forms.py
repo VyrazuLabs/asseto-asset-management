@@ -9,27 +9,24 @@ from audit.constants import AUDIT_INTERVAL
 class AddProductsForm(forms.ModelForm):
 
     name = forms.CharField(required=True, widget=forms.TextInput(
-        attrs={'autocomplete': 'off',
-               'placeholder': 'Product Name', 'class': 'form-control','required':'required'}
+        attrs={'autocomplete': 'off', 'class': 'form-control','required':'required'}
     ))
     product_picture = forms.ImageField(required=False, widget=forms.FileInput(
         attrs={'class': 'form-control d-flex', 'id': 'inputFile'}
     ))
     manufacturer = forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete': 'off',
-               'placeholder': 'Manufacturer', 'class': 'form-control'}
+        attrs={'autocomplete': 'off', 'class': 'form-control'}
     ))
     
     model=forms.CharField(required=False, widget=forms.TextInput(
-        attrs={'autocomplete':'off','placeholder':'Model Name','class':'form-control'}
+        attrs={'autocomplete':'off','class':'form-control'}
     ))
 
     eol=forms.IntegerField(required=False, widget=forms.NumberInput(
-        attrs={'autocomplete':'off','placeholder':'In Months','class':'form-control'}
+        attrs={'autocomplete':'off','class':'form-control'}
     )) 
     description = forms.CharField(required=False, widget=forms.Textarea(
-        attrs={'autocomplete': 'off', 'placeholder': 'Description',
-               'class': 'form-control', 'rows': '2'}
+        attrs={'autocomplete': 'off', 'class': 'form-control', 'rows': '2'}
     ))
     product_category = forms.ModelChoiceField(
         queryset=None,

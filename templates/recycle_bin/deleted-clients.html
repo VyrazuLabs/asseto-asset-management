@@ -1,20 +1,24 @@
 {% extends 'layouts/main-layout.html' %}
-{% block content %}
 {% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ trans.deleted_clients }} | Asseto{% endblock %}
+
+{% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3>Deleted Clients</h3>
+            <h3>{{ trans.deleted_clients }}</h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Clients</li>
-                    <li class="breadcrumb-item active" aria-current="page">Trash</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.clients }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ trans.trash_bin }}</li>
                 </ol>
             </nav>
         </div>
         <div>
-            <a href="{% url 'clients:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Clients</a>
+            <a href="{% url 'clients:list' %}" class="btn btn-sm btn-outline-info my-3"><i class="bi bi-arrow-left"></i> {{ trans.back_to_clients }}</a>
         </div>
     </div>
     <section class="section">
@@ -22,7 +26,7 @@
             <div class="card-body">
                 {% if page_object %}
                     <div class="d-flex justify-content-end my-2 gap-2">
-                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
+                        <input name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='{{ trans.search_here }}'
                             hx-get="{% url 'recycle_bin:deleted_clients_search' page_object.number %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
                     </div>
                 {% endif %}
@@ -30,13 +34,13 @@
                     <table class="table table-hover" id="table1">
                         <thead>
                             <tr>
-                                <th>Sl No.</th>
-                                <th>Client ID</th>
-                                <th>Name</th>
-                                <th>Industry</th>
-                                <th>Rental Type</th>
-                                <th>Deleted At</th>
-                                <th>Actions</th>
+                                <th>{{ trans.sl_no }}</th>
+                                <th>{{ trans.client_id }}</th>
+                                <th>{{ trans.name_label }}</th>
+                                <th>{{ trans.industry }}</th>
+                                <th>{{ trans.rental_type }}</th>
+                                <th>{{ trans.deleted_at }}</th>
+                                <th>{{ trans.actions }}</th>
                             </tr>
                         </thead>
                         {% if page_object %}
@@ -51,13 +55,13 @@
                                 <td>{{client.updated_at}}</td>
                                 <td>
                                     <div class="d-flex gap-1" role="group" aria-label="Basic example">
-                                        <form action="{% url 'recycle_bin:deleted_clients_restore' client.id %}" method="post" onsubmit="return confirm('Are you sure you want to restore it?')">
+                                        <form action="{% url 'recycle_bin:deleted_clients_restore' client.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-success btn-sm" title="Restore"><i class="bi bi-arrow-repeat"></i></button>
+                                            <button type="submit" class="btn btn-success btn-sm" title="{{ trans.restore_label }}"><i class="bi bi-arrow-repeat"></i></button>
                                         </form>
-                                        <form action="{% url 'recycle_bin:deleted_clients_permanently' client.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this permanently?')">
+                                        <form action="{% url 'recycle_bin:deleted_clients_permanently' client.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete"><i class="bi bi-trash3-fill"></i></button>
+                                            <button type="submit" class="btn btn-danger btn-sm" title="{{ trans.permanently_delete }}"><i class="bi bi-trash3-fill"></i></button>
                                         </form>                
                                     </div>
                                 </td>
@@ -66,7 +70,7 @@
                         </tbody>
                         {% else %}
                         <div class="alert alert-info" role="alert">
-                            No record available!
+                            {{ trans.no_record_available }}
                         </div>
                         {% endif %}
                     </table>

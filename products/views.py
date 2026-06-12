@@ -72,6 +72,7 @@ def add_product(request):
         image_form = ProductImageForm()
 
     context = {'form': form,
+               'title': 'Add New Product',
                'image_form': image_form,}
     return render(request, 'products/add.html', context)
 

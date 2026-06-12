@@ -90,7 +90,7 @@
                                         <button class="input-group-text bg-transparent" type="button"
                                             data-bs-toggle="modal" data-bs-target="#searchModal"
                                             style="padding-right: 18%;">
-                                            Search...
+                                            {{ trans.search }}
                                         </button>
                                     </div>
                                 </div>
@@ -215,12 +215,12 @@
                                                 <li>
                                                     <a class="dropdown-item"
                                                         href="{% if profile %}javascript:void(0){% else %}{% url 'authentication:profile' %}{% endif %}">
-                                                        <i class="icon-mid bi bi-person me-2"></i> My Profile
+                                                        <i class="icon-mid bi bi-person me-2"></i> {{ trans.my_profile }}
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item" href="{% url 'password_change' %}">
-                                                        <i class="icon-mid bi bi-key me-2"></i> Change Password
+                                                        <i class="icon-mid bi bi-key me-2"></i> {{ trans.change_password }}
                                                     </a>
                                                 </li>
                                                 <li>
@@ -228,7 +228,7 @@
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item" href="{% url 'authentication:logout' %}">
-                                                        <i class="icon-mid bi bi-box-arrow-left me-2"></i> Logout
+                                                        <i class="icon-mid bi bi-box-arrow-left me-2"></i> {{ trans.logout }}
                                                     </a>
                                                 </li>
                                             </ul>

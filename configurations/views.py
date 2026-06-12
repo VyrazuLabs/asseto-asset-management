@@ -13,7 +13,7 @@ import base64
 from dashboard.models import Organization
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
+from .constants import DEFAULT_COUNTRY,COUNTRY_CHOICES,CURRENCY_CHOICES,NAME_FORMATS,DEFAULT_LANGUAGE,ACTIVE_LANGUAGES,DATETIME_CHOICES,INTEGRATION_CHOICES,DEFAULT_CURRENCY
 
 @login_required
 def logo_upload(request):
@@ -28,7 +28,7 @@ def logo_upload(request):
 
     else:
         add_path_context=add_path(request.user.organization)
-        return render(request, 'configurations/logo.html',{'add_path_context':add_path_context,'submenu':'branding','sidebar':'configurations'})
+        return render(request, 'configurations/logo.html',{'add_path_context':add_path_context,'submenu':'branding','sidebar':'configurations','title':'Branding'})
 
 
 @login_required
@@ -86,7 +86,8 @@ def create_or_update_tag_configuration(request, id=None):
     context = {
         'form': form,
         'is_update': bool(instance),  # For optional UI changes
-        'configurations': instance
+        'configurations': instance,
+        'title':'Update Tag Configuration'
     }
     template_name = 'configurations/add_tag.html' if instance else 'configurations/add_tag.html'
     return render(request, template_name, context)
@@ -119,7 +120,7 @@ def list_tag_configurations(request):
         instance=None
         form = TagConfigurationForm(instance=instance)
         return render(request, 'configurations/add_tag.html',{'form': form,'is_update': bool(instance),'configurations': instance,'submenu':'tag-configuration','sidebar':'configurations'})
-    return render(request, 'configurations/list_tag.html', {'configurations': configurations,'submenu':'tag-configuration','sidebar':'configurations'})
+    return render(request, 'configurations/list_tag.html', {'configurations': configurations,'submenu':'tag-configuration','sidebar':'configurations','title':'Tag Configuration'})
 
 @login_required
 def toggle_default_settings(request, id):
@@ -131,11 +132,11 @@ def toggle_default_settings(request, id):
 @login_required
 def list_localizations(request):
     configurations = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-    get_default_language={"name": "English"}
-    get_default_name_display_format={}
-    get_default_time_format={}
-    get_default_currency_format={}
-    get_default_country_format={}
+    get_default_language={"name": "English", "id": 0}
+    get_default_name_display_format={'name':'{first} {last}','id':0}
+    get_default_time_format={'name':'YYYY-MM-DD','id':0}
+    get_default_currency_format={'name':'INR','id':6}
+    get_default_country_format={'name':'India','id':0}
     if configurations:
         for id,name in NAME_FORMATS:
             if id == configurations.name_display_format:
@@ -146,13 +147,35 @@ def list_localizations(request):
         for id,name in CURRENCY_CHOICES:
             if id == configurations.currency:
                 get_default_currency_format= {'name':name,'id':id}
+        # Determine language for translations
+        lang_id = configurations.default_language or 0
+        for id, name in DEFAULT_LANGUAGE:
+            if id == lang_id:
+                get_default_language = {'name': name, 'id': id}
     else:
         get_default_language={'name':'English','id':0}
         get_default_name_display_format={'name':'{first} {last}','id':0}
         get_default_time_format={'name':'YYYY-MM-DD','id':0}
         get_default_currency_format={'name':'INR','id':6}
         get_default_country_format={'name':'India','id':0}
-    return render(request, 'configurations/list_localization.html', {'configurations': configurations,'country_choices': COUNTRY_CHOICES,'currency_choices': CURRENCY_CHOICES,'name_display_format':NAME_FORMATS,'default_language':DEFAULT_LANGUAGE,'datetime_choices':DATETIME_CHOICES,'default_country':DEFAULT_COUNTRY,'get_default_language':get_default_language,'get_default_name_display_format':get_default_name_display_format,'get_default_time_format':get_default_time_format,'get_default_currency_format':get_default_currency_format,'get_default_country_format':get_default_country_format,'submenu':'localization','sidebar':'configurations'})
+    
+    return render(request, 'configurations/list_localization.html', {
+        'configurations': configurations,
+        'country_choices': COUNTRY_CHOICES,
+        'currency_choices': CURRENCY_CHOICES,
+        'name_display_format':NAME_FORMATS,
+        'default_language':ACTIVE_LANGUAGES,
+        'datetime_choices':DATETIME_CHOICES,
+        'default_country':DEFAULT_COUNTRY,
+        'get_default_language':get_default_language,
+        'get_default_name_display_format':get_default_name_display_format,
+        'get_default_time_format':get_default_time_format,
+        'get_default_currency_format':get_default_currency_format,
+        'get_default_country_format':get_default_country_format,
+        'submenu':'localization',
+        'sidebar':'configurations',
+        'title':'Localizations',
+    })
 
 @login_required
 def create_localization_configuration(request):
@@ -241,7 +264,7 @@ def list_extensions(request):
         request.session['slack'] = True
     else:
         request.session['slack'] = False
-    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions,'api_extension':get_api_extension})
+    return render(request, 'configurations/list-extensions.html',{'integration_choices':get_extensions,'api_extension':get_api_extension,'title':'Extensions'})
 
 @login_required
 def extension_status(request, id):
@@ -313,7 +336,7 @@ def add_organization(request):
             get_org_data=Organization.objects.filter(id=get_user_organization_id).first()
         else:
             get_org_data=None
-        return render(request, 'configurations/add_organization.html', context={'org_data': get_org_data,'currency_choices':CURRENCY_CHOICES,'submenu':'organization','sidebar':'configurations'})
+        return render(request, 'configurations/add_organization.html', context={'org_data': get_org_data,'currency_choices':CURRENCY_CHOICES,'submenu':'organization','sidebar':'configurations','title':'Organization'})
 
 @login_required  
 def api_extension_status(request,id):

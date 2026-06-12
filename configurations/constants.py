@@ -27,6 +27,12 @@ DEFAULT_LANGUAGE=[
     (8, 'Hindi'),
     (9, 'Bengali'),]
 
+ACTIVE_LANGUAGES=[
+    (0, 'English'),
+    (2, 'French'),
+    (8, 'Hindi'),
+    (9, 'Bengali'),]
+
 ASSET_STATUS_CHOICES = [
     ('ready', 'Ready to Deploy'),
     ('broken', 'Broken'),

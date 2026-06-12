@@ -1,6 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
-{% block title %}Update Asset | Asseto{% endblock %}
+{% block title %}{{ trans.update_asset }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,22 +15,22 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb mb-2">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
-        <li class="breadcrumb-item active">Update Asset</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">{{ trans.assets }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.update_asset }}</li>
       </ol>
     </nav>
-    <h1 class="page-title">Update Asset</h1>
+    <h1 class="page-title">{{ trans.update_asset }}</h1>
   </div>
   <div class="header-actions">
     <a href="{% url 'assets:list' %}" class="btn-reset">
-      <i class="bi bi-arrow-left"></i> Back to List
+      <i class="bi bi-arrow-left"></i> {{ trans.back_to_list }}
     </a>
     <a href="{% url 'assets:details' asset.id %}" class="btn-reset">
-      <i class="bi bi-arrow-left-short"></i> Back to Detail
+      <i class="bi bi-arrow-left-short"></i> {{ trans.back_to_detail }}
     </a>
     <button type="submit" form="update-asset-form" class="btn-register ms-2">
-      <i class="bi bi-floppy"></i> Save Changes
+      <i class="bi bi-floppy"></i> {{ trans.save_changes }}
     </button>
   </div>
 </div>
@@ -42,55 +42,55 @@
 <div class="form-section">
   <div class="section-header">
     <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
-    <h2>General Information</h2>
+    <h2>{{ trans.general_information }}</h2>
   </div>
   <div class="section-body">
     <div class="row g-3">
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Asset Tag</label>
+        <label class="field-label">{{ trans.asset_tag }}</label>
         {{ form.tag }}
         {% for e in form.tag.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Asset Name</label>
+        <label class="field-label">{{ trans.asset_name }}</label>
         {{ form.name }}
         {% for e in form.name.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Product Category</label>
+        <label class="field-label">{{ trans.product_category }}</label>
         {{ form.product }}
         {% for e in form.product.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Vendor</label>
+        <label class="field-label">{{ trans.vendor }}</label>
         {{ form.vendor }}
         {% for e in form.vendor.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Client</label>
+        <label class="field-label">{{ trans.client }}</label>
         {{ form.client }}
         {% for e in form.client.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Office Location</label>
+        <label class="field-label">{{ trans.location_label }}</label>
         {{ form.location }}
         {% for e in form.location.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Serial No.</label>
+        <label class="field-label">{{ trans.serial_number }}</label>
         {{ form.serial_no }}
         {% for e in form.serial_no.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-12">
-        <label class="field-label">Description &amp; Notes</label>
+        <label class="field-label">{{ trans.asset_description_notes }}</label>
         {{ form.description }}
         {% for e in form.description.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
@@ -103,31 +103,31 @@
 <div class="form-section">
   <div class="section-header">
     <div class="section-icon"><i class="bi bi-cash-coin"></i></div>
-    <h2>Purchase &amp; Lifecycle Details</h2>
+    <h2>{{ trans.finance_purchase_lifecycle }}</h2>
   </div>
   <div class="section-body">
     <div class="row g-3">
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Purchase Price (₹)</label>
+        <label class="field-label">{{ trans.purchase_price }}</label>
         {{ form.price }}
         {% for e in form.price.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Purchase Type</label>
+        <label class="field-label">{{ trans.purchase_type }}</label>
         {{ form.purchase_type }}
         {% for e in form.purchase_type.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Purchase Date</label>
+        <label class="field-label">{{ trans.purchase_date }}</label>
         {{ form.purchase_date }}
         {% for e in form.purchase_date.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
 
       <div class="col-md-4 col-12">
-        <label class="field-label">Warranty Expiry Date</label>
+        <label class="field-label">{{ trans.warranty_expiry }}</label>
         {{ form.warranty_expiry_date }}
         {% for e in form.warranty_expiry_date.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
       </div>
@@ -140,18 +140,18 @@
 <div class="form-section">
   <div class="section-header">
     <div class="section-icon"><i class="bi bi-images"></i></div>
-    <h2>Asset Media</h2>
+    <h2>{{ trans.asset_media }}</h2>
   </div>
   <div class="section-body">
 
     <div class="update-upload-area">
       <i class="bi bi-image-fill"></i>
       <div class="upload-text">
-        <div class="upload-label">Upload or Update Images</div>
-        <div class="upload-hint">Recommended size: 1200×800px. Max file size: 5MB.</div>
+        <div class="upload-label">{{ trans.upload_product_images }}</div>
+        <div class="upload-hint">{{ trans.upload_hint }}</div>
       </div>
-      <label for="image-upload" class="btn-choose-file">Choose File</label>
-      <span id="file-chosen-label" class="upload-hint">No file chosen</span>
+      <label for="image-upload" class="btn-choose-file">{{ trans.choose_file }}</label>
+      <span id="file-chosen-label" class="upload-hint">{{ trans.no_file_chosen }}</span>
     </div>
     <input id="image-upload" type="file" name="image" multiple class="d-none"
            onchange="document.getElementById('file-chosen-label').textContent = this.files.length > 1 ? this.files.length + ' files chosen' : (this.files[0]?.name || 'No file chosen')">
@@ -166,7 +166,7 @@
         <button type="button"
                 class="update-image-delete"
                 data-image-id="{{ img.id }}"
-                title="Delete image">
+                title="{{ trans.delete_image }}">
           <i class="bi bi-trash3"></i>
         </button>
       </div>
@@ -181,7 +181,7 @@
 <div class="form-section">
   <div class="section-header">
     <div class="section-icon"><i class="bi bi-sliders"></i></div>
-    <h2>Custom Fields</h2>
+    <h2>{{ trans.custom_fields }}</h2>
   </div>
   <div class="section-body">
     <div class="row g-3" id="custom-field-container">
@@ -198,7 +198,7 @@
     </div>
     <div class="row g-3 mt-1" id="custom-field-new-container"></div>
     <button type="button" id="addCustomFieldBtn" class="btn-add-row mt-3">
-      <i class="bi bi-plus-lg"></i> Add Custom Field
+      <i class="bi bi-plus-lg"></i> {{ trans.add_custom_field }}
     </button>
   </div>
 </div>
@@ -209,15 +209,15 @@
 <div class="form-section">
   <div class="section-header">
     <div class="section-icon"><i class="bi bi-list-check"></i></div>
-    <h2>Asset Specifications</h2>
+    <h2>{{ trans.asset_specifications }}</h2>
   </div>
   <div class="section-body">
     <div id="spec-container">
       {% for spec in assetSpecifications %}
       <div class="spec-row rmsection">
-        <input type="text" class="field-input" placeholder="Specification Name"
+        <input type="text" class="field-input" placeholder="{{ trans.specification_name }}"
                name="specifications_name" value="{{ spec.name }}" autocomplete="off">
-        <input type="text" class="field-input" placeholder="Value"
+        <input type="text" class="field-input" placeholder="{{ trans.value }}"
                name="specifications_value" value="{{ spec.value }}" autocomplete="off">
         {% if forloop.first %}
           <button type="button" id="newsectionbtn" class="btn-add-row" style="white-space:nowrap;">
@@ -241,10 +241,10 @@
 
 <div style="display:none">
   <div class="rm-custom-field" id="custom-field-template">
-    <label class="field-label">Custom Field Name</label>
-    <input type="text" class="field-input" placeholder="Field Name" name="custom_field_name" autocomplete="off">
-    <label class="field-label mt-2">Custom Field Value</label>
-    <input type="text" class="field-input" placeholder="Field Value" name="custom_field_value" autocomplete="off">
+    <label class="field-label">{{ trans.field_name }}</label>
+    <input type="text" class="field-input" placeholder="{{ trans.field_name }}" name="custom_field_name" autocomplete="off">
+    <label class="field-label mt-2">{{ trans.field_value }}</label>
+    <input type="text" class="field-input" placeholder="{{ trans.field_value }}" name="custom_field_value" autocomplete="off">
     <button type="button" onclick="removeCustomField(this)" class="btn-rm-row mt-2">
       <i class="bi bi-dash-lg"></i>
     </button>
@@ -253,8 +253,8 @@
 
 <div style="display:none">
   <div class="spec-row rmsection" id="spec-template">
-    <input type="text" class="field-input" placeholder="Specification Name" name="specifications_name" autocomplete="off">
-    <input type="text" class="field-input" placeholder="Value" name="specifications_value" autocomplete="off">
+    <input type="text" class="field-input" placeholder="{{ trans.specification_name }}" name="specifications_name" autocomplete="off">
+    <input type="text" class="field-input" placeholder="{{ trans.value }}" name="specifications_value" autocomplete="off">
     <button type="button" onclick="removeSpec(this)" class="btn-rm-row"><i class="bi bi-dash-lg"></i></button>
   </div>
 </div>

@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Add New Product | Asseto{% endblock %}
+{% block title %}{{ trans.add_product_page }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -26,20 +26,20 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="breadcrumb-link">Products</a></li>
-            <li class="breadcrumb-item active">Add Product</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:list' %}" class="breadcrumb-link">{{ trans.products }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.add_product }}</li>
           </ol>
         </nav>
-        <h1>Add New Product</h1>
-        <p class="subtitle">Create a new product in the system. Fill in the details below to add a new product to the inventory.</p>
+        <h1>{{ trans.add_product_page }}</h1>
+        <p class="subtitle">{{ trans.product_add_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'products:list' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         <button type="submit" form="product-form" class="btn-save-asset">
-          <i class="bi bi-floppy2"></i> Save
+          <i class="bi bi-floppy2"></i> {{ trans.save }}
         </button>
       </div>
     </div>
@@ -52,36 +52,28 @@
             {# ── Section 1: Basic Information ────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-box-seam"></i> <span>Basic Information</span>
+                    <i class="bi bi-box-seam"></i> <span>{{ trans.basic_information }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="{{ form.name.id_for_label }}">PRODUCT NAME <span class="required">*</span></label>
+                        <label for="{{ form.name.id_for_label }}">{{ trans.product_name_label }} <span class="required">*</span></label>
                         {{ form.name }}
-                        {% if form.name.errors %}
-                        <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.product_type.id_for_label }}">PRODUCT TYPE <span class="required">*</span></label>
+                        <label for="{{ form.product_type.id_for_label }}">{{ trans.product_type_label }} <span class="required">*</span></label>
                         {{ form.product_type }}
-                        {% if form.product_type.errors %}
-                        <div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.product_type.errors %}<div class="text-danger small mt-1">{{ form.product_type.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.product_category.id_for_label }}">PRODUCT CATEGORY <span class="required">*</span></label>
+                        <label for="{{ form.product_category.id_for_label }}">{{ trans.product_category_label }} <span class="required">*</span></label>
                         {{ form.product_category }}
-                        {% if form.product_category.errors %}
-                        <div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.product_category.errors %}<div class="text-danger small mt-1">{{ form.product_category.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.product_sub_category.id_for_label }}">PRODUCT SUB CATEGORY</label>
+                        <label for="{{ form.product_sub_category.id_for_label }}">{{ trans.product_sub_category_label }}</label>
                         {{ form.product_sub_category }}
-                        {% if form.product_sub_category.errors %}
-                        <div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.product_sub_category.errors %}<div class="text-danger small mt-1">{{ form.product_sub_category.errors.0 }}</div>{% endif %}
                     </div>
                 </div>
             </div>
@@ -89,39 +81,33 @@
             {# ── Section 2: Product Details ────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-info-circle"></i> <span>Product Details</span>
+                    <i class="bi bi-info-circle"></i> <span>{{ trans.product_details_section }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="{{ form.manufacturer.id_for_label }}">MANUFACTURER</label>
+                        <label for="{{ form.manufacturer.id_for_label }}">{{ trans.manufacturer_label }}</label>
                         {{ form.manufacturer }}
-                        {% if form.manufacturer.errors %}
-                        <div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.manufacturer.errors %}<div class="text-danger small mt-1">{{ form.manufacturer.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.model.id_for_label }}">MODEL</label>
+                        <label for="{{ form.model.id_for_label }}">{{ trans.model_label }}</label>
                         {{ form.model }}
-                        {% if form.model.errors %}
-                        <div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.model.errors %}<div class="text-danger small mt-1">{{ form.model.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.eol.id_for_label }}">PRODUCT EOL</label>
+                        <label for="{{ form.eol.id_for_label }}">{{ trans.product_eol_label }}</label>
                         {{ form.eol }}
-                        {% if form.eol.errors %}
-                        <div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.eol.errors %}<div class="text-danger small mt-1">{{ form.eol.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label>AUDIT INTERVAL</label>
+                        <label>{{ trans.audit_interval_label }}</label>
                         <select class="form-control" name="audit_interval">
-                            <option value="1">Yearly</option>
-                            <option value="2">Half Yearly</option>
-                            <option value="3">Quarterly</option>
-                            <option value="4">Bi-Monthly</option>
-                            <option value="4">Monthly</option>
-                            <option value="5">Not Applicable</option>
+                            <option value="1">{{ trans.yearly }}</option>
+                            <option value="2">{{ trans.half_yearly }}</option>
+                            <option value="3">{{ trans.quarterly }}</option>
+                            <option value="4">{{ trans.bi_monthly }}</option>
+                            <option value="4">{{ trans.monthly }}</option>
+                            <option value="5">{{ trans.not_applicable }}</option>
                         </select>
                     </div>
                 </div>
@@ -130,23 +116,19 @@
             {# ── Section 3: Description & Image ──────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-file-earmark-text"></i> <span>Description & Image</span>
+                    <i class="bi bi-file-earmark-text"></i> <span>{{ trans.description_image_section }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="{{ form.description.id_for_label }}">DESCRIPTION</label>
+                        <label for="{{ form.description.id_for_label }}">{{ trans.description_label }}</label>
                         {{ form.description }}
-                        {% if form.description.errors %}
-                        <div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>
-                        {% endif %}
+                        {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ image_form.image.id_for_label }}">PRODUCT IMAGE</label>
+                        <label for="{{ image_form.image.id_for_label }}">{{ trans.product_image_label }}</label>
                         {{ image_form.image }}
                         <div id="imagePreview"></div>
-                        {% if image_form.image.errors %}
-                        <div class="text-danger small mt-1">{{ image_form.image.errors.0 }}</div>
-                        {% endif %}
+                        {% if image_form.image.errors %}<div class="text-danger small mt-1">{{ image_form.image.errors.0 }}</div>{% endif %}
                     </div>
                 </div>
             </div>
@@ -154,20 +136,20 @@
             {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-list-stars"></i> <span>Custom Fields</span>
+                    <i class="bi bi-list-stars"></i> <span>{{ trans.custom_fields_section }}</span>
                 </div>
                 <div class="mb-3">
                     <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-plus-lg me-1"></i> Add Field
+                        <i class="bi bi-plus-lg me-1"></i> {{ trans.add_field }}
                     </button>
                 </div>
                 <div id="custom-field-container">
                     <div class="row custom-field-row">
                         <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <input type="text" class="form-control" placeholder="Field Name" name="custom_field_name">
+                            <input type="text" class="form-control" placeholder="{{ trans.field_name_placeholder }}" name="custom_field_name">
                         </div>
                         <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <input type="text" class="form-control" placeholder="Field Value" name="custom_field_value">
+                            <input type="text" class="form-control" placeholder="{{ trans.field_value_placeholder }}" name="custom_field_value">
                         </div>
                         <div class="col-md-2 col-12">
                             <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
@@ -182,10 +164,10 @@
             <template id="custom-field-template">
                 <div class="row custom-field-row mt-3 rm-custom-field">
                     <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="Field Name" name="custom_field_name">
+                        <input type="text" class="form-control" placeholder="{{ trans.field_name_placeholder }}" name="custom_field_name">
                     </div>
                     <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="Field Value" name="custom_field_value">
+                        <input type="text" class="form-control" placeholder="{{ trans.field_value_placeholder }}" name="custom_field_value">
                     </div>
                     <div class="col-md-2 col-12">
                         <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
@@ -201,18 +183,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Trigger on product category change to fetch subcategories
         $('#id_product_category').on('change', function () {
             const categoryId = $(this).val();
             const $subCatSelect = $('#id_product_sub_category');
-
             if (!categoryId) {
                 $subCatSelect.prop('disabled', true).html('<option value="">--SELECT--</option>');
                 return;
             }
-
             $subCatSelect.prop('disabled', false).html('<option value="">Loading...</option>');
-
             fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -227,14 +205,12 @@
                 });
         });
 
-        // Add new custom field row
         $("#addCustomFieldBtn").on('click', function () {
             const template = document.getElementById("custom-field-template");
             const clone = template.content.cloneNode(true);
             $("#custom-field-container").append(clone);
         });
 
-        // Image Preview
         $("#id_image").on('change', function () {
             const input = this;
             if (input.files && input.files[0]) {
@@ -249,7 +225,6 @@
         });
     });
 
-    // Remove a custom field row
     function removeCustomField(el) {
         $(el).closest(".custom-field-row").remove();
     }
