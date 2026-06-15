@@ -1,0 +1,28 @@
+STRINGS = {
+    'trash_bin': 'Corbeille',
+    'inventory_label': 'Inventaire',
+    'recycle_bin_subtitle': 'Examiner et gérer les actifs récemment supprimés de l\'organisation.',
+    'back_to_assets': 'Retour aux actifs',
+    'deleted_assets_list': 'Liste des actifs supprimés',
+    'items_count': 'Éléments',
+    'search_deleted_assets': 'Rechercher des actifs supprimés…',
+    'deletion_date': 'Date de suppression',
+    'restore_label': 'Restaurer',
+    'no_deleted_assets': 'Aucun actif supprimé trouvé.',
+    'entries_pagination': 'entrées',
+    'to_pagination': 'à',
+    'unassign': 'Désassigner',
+    'deleted_products': 'Produits supprimés',
+    'deleted_users': 'Utilisateurs supprimés',
+    'back_to_users': 'Retour aux utilisateurs',
+    'back_to_products': 'Retour aux produits',
+    'search_here': 'Rechercher ici...',
+    'datetime_label': 'Date et heure',
+    'restore': 'Restaurer',
+    'permanently_delete': 'Supprimer',
+    'restore_confirm': 'Êtes-vous sûr de vouloir le restaurer ?',
+    'delete_permanently_confirm': 'Êtes-vous sûr de vouloir supprimer définitivement ?',
+    'no_records_search': 'Aucun enregistrement trouvé correspondant à votre mot-clé de recherche.',
+
+
+}

@@ -1,0 +1,25 @@
+STRINGS = {
+    'view_all_history': 'View All History',
+    'record_created': 'Record Created',
+    'record_deleted': 'Record Deleted',
+    'record_restored': 'Record Restored',
+    'status_changed': 'Status Changed',
+    'assignment_changed': 'Assignment Changed',
+    'information_updated': 'Information Updated',
+    'record_created_desc': 'The record was successfully created and added to the system.',
+    'record_deleted_desc': 'The record was removed and moved to the recycle bin.',
+    'record_restored_desc': 'The record was restored from the recycle bin.',
+    'status_was': 'Status was',
+    'enabled_status': 'Enabled',
+    'disabled_status': 'Disabled',
+    'by_administrator': 'by the administrator.',
+    'record_was': 'Record was',
+    'assigned_status': 'Assigned',
+    'unassigned_status': 'Unassigned',
+    'information_updated_desc': 'Information was updated with new details.',
+    'system_user': 'System',
+    'administrator_role': 'Administrator',
+    'no_activity_log': 'No activity log found for this record.',
+
+
+}

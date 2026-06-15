@@ -28,7 +28,7 @@ FIELDS={
 }
 
 def listed(request):
-    context=get_gate_pass_list(request)
+    context=get_gate_pass_list()
     context['title']='Gate Passes'
     return render(request, 'gate_pass/list.html', context=context)
 

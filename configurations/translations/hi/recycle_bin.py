@@ -1,0 +1,28 @@
+STRINGS = {
+    'trash_bin': 'कचरा पेटी',
+    'inventory_label': 'इन्वेंटरी',
+    'recycle_bin_subtitle': 'हाल ही में हटाई गई संगठन संपत्तियों की समीक्षा और प्रबंधन करें।',
+    'back_to_assets': 'संपत्ति पर वापस जाएं',
+    'deleted_assets_list': 'हटाई गई संपत्तियों की सूची',
+    'items_count': 'आइटम',
+    'search_deleted_assets': 'हटाई गई संपत्तियां खोजें…',
+    'deletion_date': 'हटाने की तारीख',
+    'restore_label': 'पुनर्स्थापित करें',
+    'no_deleted_assets': 'कोई हटाई गई संपत्ति नहीं मिली।',
+    'entries_pagination': 'प्रविष्टियां',
+    'to_pagination': 'से',
+    'unassign': 'अनअसाइन करें',
+    'deleted_products': 'हटाए गए उत्पाद',
+    'deleted_users': 'हटाए गए उपयोगकर्ता',
+    'back_to_users': 'उपयोगकर्ताओं पर वापस जाएं',
+    'back_to_products': 'उत्पादों पर वापस जाएं',
+    'search_here': 'यहां खोजें...',
+    'datetime_label': 'दिनांक और समय',
+    'restore': 'पुनर्स्थापित करें',
+    'permanently_delete': 'हटाएं',
+    'restore_confirm': 'क्या आप वाकई इसे पुनर्स्थापित करना चाहते हैं?',
+    'delete_permanently_confirm': 'क्या आप वाकई इसे स्थायी रूप से हटाना चाहते हैं?',
+    'no_records_search': 'आपकी खोज से मेल खाने वाला कोई रिकॉर्ड नहीं मिला।',
+
+
+}

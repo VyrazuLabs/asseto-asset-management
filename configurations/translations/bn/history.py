@@ -1,0 +1,25 @@
+STRINGS = {
+    'view_all_history': 'সমস্ত ইতিহাস দেখুন',
+    'record_created': 'রেকর্ড তৈরি করা হয়েছে',
+    'record_deleted': 'রেকর্ড মুছে ফেলা হয়েছে',
+    'record_restored': 'রেকর্ড পুনরুদ্ধার করা হয়েছে',
+    'status_changed': 'স্থিতি পরিবর্তন করা হয়েছে',
+    'assignment_changed': 'বরাদ্দ পরিবর্তন করা হয়েছে',
+    'information_updated': 'তথ্য আপডেট করা হয়েছে',
+    'record_created_desc': 'রেকর্ড সফলভাবে তৈরি করা হয়েছে এবং সিস্টেমে যুক্ত করা হয়েছে।',
+    'record_deleted_desc': 'রেকর্ড সরিয়ে রিসাইকেল বিনে নেওয়া হয়েছে।',
+    'record_restored_desc': 'রেকর্ড রিসাইকেল বিন থেকে পুনরুদ্ধার করা হয়েছে।',
+    'status_was': 'স্থিতি ছিল',
+    'enabled_status': 'সক্রিয়',
+    'disabled_status': 'নিষ্ক্রিয়',
+    'by_administrator': 'অ্যাডমিনিস্ট্রেটর দ্বারা।',
+    'record_was': 'রেকর্ড ছিল',
+    'assigned_status': 'বরাদ্দ করা হয়েছে',
+    'unassigned_status': 'বরাদ্দ করা হয়নি',
+    'information_updated_desc': 'নতুন বিবরণ সহ তথ্য আপডেট করা হয়েছে।',
+    'system_user': 'সিস্টেম',
+    'administrator_role': 'অ্যাডমিনিস্ট্রেটর',
+    'no_activity_log': 'এই রেকর্ডের জন্য কোনো কার্যকলাপ লগ পাওয়া যায়নি।',
+
+
+}
