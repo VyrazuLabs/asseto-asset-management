@@ -8235,6 +8235,10 @@ body[data-theme="dark"] {
 
 .barcode-scanner{
   color: #435ebe !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #camera-preview {

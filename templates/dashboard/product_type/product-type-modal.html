@@ -1,6 +1,6 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-box-seam"></i> {{modal_title}}</h5>
+        <h5 class="modal-title"><i class="bi bi-box-seam"></i> {% if is_add_mode %}{{ trans.add_product_type }}{% else %}{{ trans.edit_product_type }}{% endif %}</h5>
         <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -21,7 +21,7 @@
                 <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save">
-                <i class="bi bi-check-lg"></i> {% if 'Add' in modal_title %}{{ trans.save }}{% else %}{{ trans.update }}{% endif %}
+                <i class="bi bi-check-lg"></i> {% if is_add_mode %}{{ trans.save }}{% else %}{{ trans.update }}{% endif %}
             </button>
         </div>
     </form>

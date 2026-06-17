@@ -25,11 +25,11 @@
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'dashboard:license_type_list' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_license_types }}
         </a>
         {% if perms.authentication.edit_license_type %}
         <button type="button" class="btn-save-asset" onclick="openEditLicenseTypeModal('{% url 'dashboard:update_license_type' license_type.id %}')" {% if is_demo %}disabled{% endif %}>
-          <i class="bi bi-pencil"></i> Update License Type
+          <i class="bi bi-pencil"></i> {{ trans.update_license_type }}
         </button>
         {% endif %}
       </div>
@@ -39,20 +39,20 @@
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-journal-check"></i>
-            <h2><span>License Type Information</span></h2>
+            <h2><span>{{ trans.license_type_information }}</span></h2>
         </div>
         <div class="info-grid">
             <div class="info-item">
-                <span class="label">License Type Name</span>
+                <span class="label">{{ trans.license_type_name_label }}</span>
                 <span class="value">{{ license_type.name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Status</span>
+                <span class="label">{{ trans.status }}</span>
                 <span class="value">
                     {% if license_type.status %}
-                    <span class="status-badge status-active">Active</span>
+                    <span class="status-badge status-active">{{ trans.active }}</span>
                     {% else %}
-                    <span class="status-badge status-inactive">Inactive</span>
+                    <span class="status-badge status-inactive">{{ trans.inactive }}</span>
                     {% endif %}
                 </span>
             </div>

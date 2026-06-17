@@ -95,6 +95,7 @@ STRINGS = {
 
     'demo_mode_note': '* डेमो मोड: कुछ सुविधाएँ निष्क्रिय हैं।',
 
+    'status': 'स्थिति',
     'status_name': 'स्थिति नाम',
     'total_assets': 'कुल एसेट',
 
@@ -105,6 +106,18 @@ STRINGS = {
 
     'asset_status_updated': 'एसेट स्थिति अपडेट की गई',
     'asset_status_updated_message': 'एसेट स्थिति रिकॉर्ड सफलतापूर्वक संशोधित किया गया है।',
+    'view_details': 'विवरण देखें',
+    'no_assets_assigned': 'कोई संपत्ति निर्धारित नहीं है।',
+
+    'add_asset_status': 'एसेट स्थिति जोड़ें',
+    'edit_asset_status': 'एसेट स्थिति अपडेट करें',
+    'asset_status_details': 'एसेट स्थिति विवरण',
+    'asset_status_information': 'एसेट स्थिति जानकारी',
+    'asset_status_detail_subtitle': 'एसेट स्थिति विवरण और संबंधित एसेट देखें और प्रबंधित करें।',
+    'back_to_asset_statuses': 'एसेट स्थितियों पर वापस जाएं',
+    'update_status': 'स्थिति अपडेट करें',
+    'delete_confirm_asset_status': 'क्या आप वाकई इस एसेट स्थिति को हटाना चाहते हैं?',
+    'no_asset_statuses_found': 'कोई एसेट स्थिति नहीं मिली।',
 
 
 }

@@ -95,6 +95,7 @@ STRINGS = {
 
     'demo_mode_note': '* Mode démo : certaines fonctionnalités sont désactivées.',
 
+    'status': 'Statut',
     'status_name': 'Nom du statut',
     'total_assets': 'Total des actifs',
 
@@ -105,6 +106,18 @@ STRINGS = {
 
     'asset_status_updated': "Statut de l'actif mis à jour",
     'asset_status_updated_message': "L'enregistrement du statut de l'actif a été modifié avec succès.",
+    'view_details': 'Voir les détails',
+    'no_assets_assigned': 'Aucun actif assigné.',
+
+    'add_asset_status': 'Ajouter un statut d\'actif',
+    'edit_asset_status': 'Modifier le statut d\'actif',
+    'asset_status_details': 'Détails du statut d\'actif',
+    'asset_status_information': 'Informations sur le statut d\'actif',
+    'asset_status_detail_subtitle': 'Consultez et gérez les détails du statut d\'actif et les actifs associés.',
+    'back_to_asset_statuses': 'Retour aux statuts d\'actif',
+    'update_status': 'Mettre à jour le statut',
+    'delete_confirm_asset_status': 'Êtes-vous sûr de vouloir supprimer ce statut d\'actif ?',
+    'no_asset_statuses_found': 'Aucun statut d\'actif trouvé.',
 
 
 }

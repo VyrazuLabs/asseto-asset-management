@@ -29,7 +29,7 @@ def manage_access(user):
     return any(user.has_perm(permission) for permission in permissions_list)
 
 
-# ✅ UPDATED LIST VIEW (USING UTILS)
+# UPDATED LIST VIEW (USING UTILS)
 @login_required
 @user_passes_test(manage_access)
 def product_type_list(request):
@@ -48,7 +48,7 @@ def product_type_list(request):
     return render(request, 'dashboard/product_type/list.html', context)
 
 
-# ✅ ADD
+# ADD
 @login_required
 @permission_required('authentication.add_product_type')
 def add_product_type(request):
@@ -69,11 +69,11 @@ def add_product_type(request):
 
     return render(request, 'dashboard/product_type/product-type-modal.html', {
         'form': form,
-        "modal_title": "Add Product Type"
+        'is_add_mode': True,
     })
 
 
-# ✅ DETAILS
+# DETAILS
 @login_required
 @user_passes_test(check_admin)
 def product_type_details(request, id):
@@ -95,7 +95,7 @@ def product_type_details(request, id):
     return render(request, 'dashboard/product_type/detail.html', context)
 
 
-# ✅ DELETE
+# DELETE
 @login_required
 @permission_required('authentication.delete_product_type')
 def delete_product_type(request, id):
@@ -128,7 +128,7 @@ def delete_product_type(request, id):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
-# ✅ STATUS TOGGLE
+# STATUS TOGGLE
 @login_required
 @user_passes_test(check_admin)
 def product_type_status(request, id):
@@ -144,7 +144,7 @@ def product_type_status(request, id):
     return HttpResponse(status=204)
 
 
-# ✅ UPDATE
+# UPDATE
 @login_required
 @permission_required('authentication.edit_product_type')
 def update_product_type(request, id):
@@ -171,11 +171,11 @@ def update_product_type(request, id):
 
     return render(request, 'dashboard/product_type/product-type-modal.html', {
         'form': form,
-        "modal_title": "Update Product Type"
+        'is_add_mode': False,
     })
 
 
-# ✅ UPDATED SEARCH (USING UTILS)
+# UPDATED SEARCH (USING UTILS)
 @login_required
 def search_product_type(request, page):
     page_object, _, product_type_asset_count, _ = get_product_type_list(request, page_number=page)

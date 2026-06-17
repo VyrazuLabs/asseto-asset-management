@@ -95,6 +95,7 @@ STRINGS = {
 
     'demo_mode_note': '* ডেমো মোড: কিছু ফিচার নিষ্ক্রিয় রয়েছে।',
 
+    'status': 'স্ট্যাটাস',
     'status_name': 'স্ট্যাটাসের নাম',
     'total_assets': 'মোট অ্যাসেট',
 
@@ -105,6 +106,18 @@ STRINGS = {
 
     'asset_status_updated': 'অ্যাসেট স্ট্যাটাস আপডেট হয়েছে',
     'asset_status_updated_message': 'অ্যাসেট স্ট্যাটাস রেকর্ড সফলভাবে পরিবর্তন করা হয়েছে।',
+    'view_details': 'বিবরণ দেখুন',
+    'no_assets_assigned': 'কোনো সম্পদ বরাদ্দ নেই।',
+
+    'add_asset_status': 'অ্যাসেট স্ট্যাটাস যোগ করুন',
+    'edit_asset_status': 'অ্যাসেট স্ট্যাটাস আপডেট করুন',
+    'asset_status_details': 'অ্যাসেট স্ট্যাটাসের বিবরণ',
+    'asset_status_information': 'অ্যাসেট স্ট্যাটাসের তথ্য',
+    'asset_status_detail_subtitle': 'অ্যাসেট স্ট্যাটাসের বিবরণ এবং সম্পর্কিত অ্যাসেট দেখুন এবং পরিচালনা করুন।',
+    'back_to_asset_statuses': 'অ্যাসেট স্ট্যাটাসে ফিরে যান',
+    'update_status': 'স্ট্যাটাস আপডেট করুন',
+    'delete_confirm_asset_status': 'আপনি কি নিশ্চিতভাবে এই অ্যাসেট স্ট্যাটাস মুছতে চান?',
+    'no_asset_statuses_found': 'কোনো অ্যাসেট স্ট্যাটাস পাওয়া যায়নি।',
 
 
 }

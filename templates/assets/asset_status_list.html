@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Asset Status Management | Asseto{% endblock %}
+{% block title %}{{ trans.asset_status_management }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -92,20 +92,19 @@
                 <div class="filter-label">{{ trans.all_status }}</div>
                 <div class="dropdown">
                     <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
-                        All Status
+                        {{ trans.all_status }}
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-status-filter-form','change');">All
-                                Status</a></li>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.all_status }}</a></li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#asset-status-filter-form','change');">Active</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.active }}</a>
                         </li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#asset-status-filter-form','change');">Inactive</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.inactive }}</a>
                         </li>
                     </ul>
                     <input type="hidden" name="status">
@@ -205,8 +204,8 @@
         }
     }
     function sendNotification() {
-        new Notification("Asset Status Updated", {
-            body: "The asset status record has been successfully modified.",
+        new Notification("{{ trans.asset_status_updated }}", {
+            body: "{{ trans.asset_status_updated_message }}",
             icon: "{% static 'images/logo/favicon.png' %}",
         });
     }

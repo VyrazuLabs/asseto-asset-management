@@ -57,7 +57,7 @@ def add_asset_status(request):
             
             # For regular requests fallback
             return HttpResponseRedirect(reverse('assets:asset_status_list'))
-    context = {'form': form, "modal_title": "Add Asset Status"}  
+    context = {'form': form, "is_add_mode": True}  
     return render(request,'assets/add_asset_status.html', context)
 
 @login_required
@@ -91,7 +91,7 @@ def edit_asset_status(request,id):
             response["HX-Trigger"] = "assetStatusUpdated"
             return response
 
-    context = {'form': form, "modal_title": "Update Asset Status"}
+    context = {'form': form, "is_add_mode": False}
     return render(request, 'assets/add_asset_status.html', context)
 
 @login_required

@@ -101,6 +101,8 @@ STRINGS = {
     'activity_log': 'Activity Log',
     'audit_history': 'Audit History',
     'condition': 'Condition',
+    'view_details': 'View details',
+    'no_assets_assigned': 'No assets assigned.',
 
     'asset_statuses': 'Asset Statuses',
     'asset_status_management': 'Asset Status Management',
@@ -119,6 +121,7 @@ STRINGS = {
 
     'demo_mode_note': '* Demo mode: some features are disabled.',
 
+    'status': 'Status',
     'status_name': 'Status Name',
     'total_assets': 'Total Assets',
 
@@ -129,6 +132,16 @@ STRINGS = {
 
     'asset_status_updated': 'Asset Status Updated',
     'asset_status_updated_message': 'The asset status record has been successfully modified.',
+
+    'add_asset_status': 'Add Asset Status',
+    'edit_asset_status': 'Update Asset Status',
+    'asset_status_details': 'Asset Status Details',
+    'asset_status_information': 'Asset Status Information',
+    'asset_status_detail_subtitle': 'View and manage asset status details and associated assets.',
+    'back_to_asset_statuses': 'Back to Asset Statuses',
+    'update_status': 'Update Status',
+    'delete_confirm_asset_status': 'Are you sure you want to delete this asset status?',
+    'no_asset_statuses_found': 'No asset statuses found.',
 
 
 }
