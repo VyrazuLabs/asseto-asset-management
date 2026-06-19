@@ -4,14 +4,24 @@ from .translations import get_translations
 def translations(request):
     """
     A context processor that adds the translation dictionary to every template context.
+
+    Performance: lang_id is cached in the session so that the DB is only queried
+    when the cached value is absent.  To invalidate the cache after a language
+    change, call:  del request.session['org_lang_id']  (or session.flush())
+    in the view that saves the localization settings.
     """
     if request.user.is_authenticated:
-        # Fetch the organization's localization settings
-        config = LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
-        lang_id = config.default_language if config else 0
+        lang_id = request.session.get('org_lang_id')
+        if lang_id is None:
+            config = LocalizationConfiguration.objects.filter(
+                organization=request.user.organization
+            ).first()
+            lang_id = config.default_language if config else 0
+            # Cache for the lifetime of this session
+            request.session['org_lang_id'] = lang_id
     else:
         lang_id = 0
-        
+
     return {
         'trans': get_translations(lang_id)
     }

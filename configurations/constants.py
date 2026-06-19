@@ -27,11 +27,16 @@ DEFAULT_LANGUAGE=[
     (8, 'Hindi'),
     (9, 'Bengali'),]
 
-ACTIVE_LANGUAGES=[
-    (0, 'English'),
-    (2, 'French'),
-    (8, 'Hindi'),
-    (9, 'Bengali'),]
+# Derived from translations.LANGUAGE_MAP so there is a single source of truth.
+# To add or remove a supported language, update LANGUAGE_MAP in
+# configurations/translations/__init__.py — this list will follow automatically.
+def _build_active_languages():
+    from configurations.translations import LANGUAGE_MAP
+    _label_map = dict(DEFAULT_LANGUAGE)
+    return [(lang_id, _label_map.get(lang_id, lang_code.upper()))
+            for lang_id, lang_code in LANGUAGE_MAP.items()]
+
+ACTIVE_LANGUAGES = _build_active_languages()
 
 ASSET_STATUS_CHOICES = [
     ('ready', 'Ready to Deploy'),

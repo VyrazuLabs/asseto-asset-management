@@ -30,9 +30,14 @@ def split(value, key=' '):
 
 @register.filter
 def format_str(value, arg):
+    """Replace the first '{}' placeholder in a translation string with `arg`.
+
+    Only the FIRST occurrence is replaced to match positional-argument semantics.
+    Use named placeholders and str.format() for strings with multiple substitutions.
+    """
     try:
-        return value.replace('{}', str(arg))
-    except Exception:
+        return value.replace('{}', str(arg), 1)
+    except (TypeError, AttributeError):
         return value
 @register.simple_tag(takes_context=True)
 # @register.simple_tag(takes_context=True)

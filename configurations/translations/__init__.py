@@ -39,4 +39,6 @@ def get_translations(lang_id):
         target_strings = getattr(module, 'STRINGS', {})
         return TranslationProxy(target_strings, fallback_strings)
     except (ImportError, AttributeError):
-        return fallback_strings
+        # Always return a TranslationProxy (not a plain dict) so that
+        # attribute-style access in templates (trans.some_key) never raises AttributeError.
+        return TranslationProxy(fallback_strings, fallback_strings)
