@@ -1,3 +1,5 @@
+{% load custom_filters %}
+{% load static %}
 {% autoescape off %}
 <style>
     th,
@@ -20,13 +22,13 @@
 <table style="width: 100%">
     <thead>
         <tr>
-            <th>Sl No.</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Manufacturer</th>
-            <th>Description</th>
+            <th>{{ trans.sl_no_caps }}</th>
+            <th>{{ trans.image_caps }}</th>
+            <th>{{ trans.name_caps }}</th>
+            <th>{{ trans.type_caps }}</th>
+            <th>{{ trans.category_caps }}</th>
+            <th>{{ trans.manufacturer_caps }}</th>
+            <th>{{ trans.description_caps }}</th>
         </tr>
     </thead>
     {% if products %}
@@ -37,7 +39,7 @@
             <td>
                 {% if product.product_picture %} 
                     <img src="{{product.product_picture.path}}" width="100" height="80" />
-                {% else %} Not Uploaded {% endif %}
+                {% else %} {{ trans.not_uploaded }} {% endif %}
             </td>
             <td>{{product.name}}</td>
             <td>{{product.product_category.name}}</td>
@@ -49,7 +51,7 @@
     </tbody>
     {% else %}
     <tr>
-        <td colspan="7">No record available!</td>
+        <td colspan="7">{{ trans.no_record_available }}</td>
     </tr>
     {% endif %}
 </table>

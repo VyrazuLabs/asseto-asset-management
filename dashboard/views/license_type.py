@@ -40,7 +40,7 @@ def license_type_add(request):
     
     return render(request, 'dashboard/license_type/license-type-modal.html', {
         'form': license_type_form,
-        'modal_title': 'Add License Type'
+        'is_add_mode': True,
     })
 
 @login_required
@@ -78,7 +78,7 @@ def update_license_type(request, id):
         
     context = {
         'form': license_type_form,
-        'modal_title': 'Update License Type',
+        'is_add_mode': False,
         'sidebar': 'admin',
         'submenu': 'license_type',
     }

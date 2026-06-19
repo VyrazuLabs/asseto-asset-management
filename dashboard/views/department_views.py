@@ -84,7 +84,7 @@ def add_department(request):
             response["HX-Trigger"] = "departmentAdded"
             return response
 
-    context = {"form": form, "modal_title": "Add Department"}
+    context = {"form": form, "is_add_mode": True}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
 
 
@@ -105,7 +105,7 @@ def update_department(request, id):
             response["HX-Trigger"] = "departmentUpdated"
             return response
 
-    context = {"form": form, "modal_title": "Edit Department"}
+    context = {"form": form, "is_add_mode": False}
     return render(request, 'dashboard/departments/department-modal.html', context=context)
 
 

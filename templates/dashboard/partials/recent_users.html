@@ -3,9 +3,9 @@
         <thead>
             <tr>
                 <th style="width: 60px;"></th>
-                <th>Full Name</th>
-                <th>Role</th>
-                <th>Date Added</th>
+                <th>{{ trans.full_name }}</th>
+                <th>{{ trans.role }}</th>
+                <th>{{ trans.date_added }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center py-4 text-muted">No recent users found</td>
+                <td colspan="4" class="text-center py-4 text-muted">{{ trans.no_recent_users }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -4,14 +4,14 @@
     <div class="d-flex justify-content-between">
         <div class="page-title">
             <h3 class="page-name">
-                Add Organization
+               {{ trans.add_organization }}
             </h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item"> <a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.configurations }}</li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        Organization
+                        {{ trans.organization }}
                     </li>
                 </ol>
             </nav>
@@ -35,39 +35,39 @@
                     {% endif %}
                     <div class="row p-2">
                         <div class="btn-group mt-1">
-                            <p style="margin-right: 150px;"><b>Organization Name</b></p>
+                            <p style="margin-right: 150px;"> <b>{{ trans.organization_name }}</b></p>
                             {% if org_data is not None %}
-                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Name" value="{{ org_data.name }}">
+                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_name }}" value="{{ org_data.name }}">
                             {% else %}
-                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Name">
+                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_name }}">
                             {% endif %}
                         </div>
                         <div class="btn-group mt-4">
-                            <p style="margin-right: 135px;"><b>Organization Website</b></p>
+                            <p style="margin-right: 135px;"><b>{{ trans.organization_website }}</b></p>
                             {% if org_data is not None %}
-                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Website" value="{{ org_data.website }}">
+                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_website }}" value="{{ org_data.website }}">
                             {% else %}
-                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Website">
+                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_website }}">
                             {% endif %}
                         </div>
                         <div class="btn-group mt-4">
-                            <p style="margin-right: 150px;"><b>Organization Email</b></p>
+                            <p style="margin-right: 150px;"><b>{{ trans.organization_email }}</b></p>
                             {% if org_data is not None %}
-                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Email" value="{{ org_data.email }}">
+                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_email }}" value="{{ org_data.email }}">
                             {% else %}
-                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Email">
+                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_email }}">
                             {% endif %}
                         </div>
                         <div class="btn-group  mt-4">
-                            <p style="margin-right: 145px;"><b>Organization Phone</b></p>
+                            <p style="margin-right: 145px;"><b>{{ trans.organization_phone }}</b></p>
                             {% if org_data is not None %}
-                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Phone" value="{{ org_data.phone }}">
+                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_phone }}" value="{{ org_data.phone }}">
                             {% else %}
-                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="Organization Phone">
+                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_phone }}">
                             {% endif %}
                         </div>
                         <div class="btn-group  mt-4">
-                            <p style="margin-right: 130px;"><b>Organization Currency</b></p>
+                            <p style="margin-right: 130px;"><b>{{ trans.organization_currency }}</b></p>
                             <select name="currency-format" class="form-control w-100 w-2"  style="margin-right: 20px;">
                                 {% if get_default_currency_format %}
                                     <option value="{{ get_default_currency_format.id }}" selected>
@@ -82,8 +82,8 @@
                             </select>
                         </div>
                         <div class="d-flex justify-content-end gap-3 p-4" style="padding-right: 20px;">
-                            <button type="button" class="btn btn-sm btn-danger" style="width: 100px">Cancel</button>
-                            <button type="submit" class="btn btn-sm btn-info" style="width: 100px;">Save</button>
+                            <button type="button" class="btn btn-sm btn-danger" style="width: 100px"> {{ trans.cancel }}</button>
+                            <button type="submit" class="btn btn-sm btn-info" style="width: 100px;"> {{ trans.save }}</button>
                         </div>
                     </div>
                 </div>

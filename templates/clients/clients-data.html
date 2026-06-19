@@ -68,13 +68,13 @@
       </div>
     {% else %}
       {% if client.status == '1' %}
-        <span class="c-status-badge status-active"><span class="dot"></span> Active</span>
+        <span class="c-status-badge status-active"><span class="dot"></span> {{ trans.active_client }}</span>
       {% elif client.status == '2' %}
-        <span class="c-status-badge status-review"><span class="dot"></span> Review</span>
+        <span class="c-status-badge status-review"><span class="dot"></span> {{ trans.review_client }}</span>
       {% elif client.status == '3' %}
-        <span class="c-status-badge status-dormant"><span class="dot"></span> Dormant</span>
+        <span class="c-status-badge status-dormant"><span class="dot"></span> {{ trans.dormant_client }}</span>
       {% else %}
-        <span class="c-status-badge status-inactive"><span class="dot"></span> Inactive</span>
+        <span class="c-status-badge status-inactive"><span class="dot"></span> {{ trans.inactive_client }}</span>
       {% endif %}
     {% endif %}
   </td>
@@ -94,7 +94,7 @@
       {% endif %}
       {% if perms.authentication.delete_client %}
         <form action="{% url 'clients:delete' client.id %}" method="post" class="form-row-action"
-              onsubmit="return confirm('Delete {{ client.name }}? It can be restored from Recycle Bin.')">
+              onsubmit="return confirm('{{ trans.delete_confirm_client }}')">
           {% csrf_token %}
           <button type="submit" class="action-btn danger" title="Delete {{ client.name }}">
             <i class="bi bi-trash3"></i>

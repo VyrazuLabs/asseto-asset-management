@@ -1,23 +1,28 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ trans.configuration_tags }} | Asseto{% endblock %}
+
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3 class="page-name">Configuration Tags</h3>
+            <h3 class="page-name">{{ trans.configuration_tags }}</h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.configurations }}</li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        {% if not configurations %}Add Tag Configurations{% else %}Update Tag Configurations{% endif %}
+                        {% if not configurations %}{{ trans.add_tag_configuration }}{% else %}{{ trans.update_tag_configuration }}{% endif %}
                     </li>
                 </ol>
             </nav>
             <div>
                 {% if configurations %}
-                    <a href="{% url 'configurations:update_tag_configuration' configurations.id %}" class="btn btn-sm btn-outline-info my-3 me-2">Update Tag</a>
+                    <a href="{% url 'configurations:update_tag_configuration' configurations.id %}" class="btn btn-sm btn-outline-info my-3 me-2">{{ trans.update_tag }}</a>
                 {% else %}
-                    <a href="{% url 'configurations:update_tag_configuration_without_id' %}" class="btn btn-sm btn-outline-info my-3 me-2">Tag Configuration</a>
+                    <a href="{% url 'configurations:update_tag_configuration_without_id' %}" class="btn btn-sm btn-outline-info my-3 me-2">{{ trans.tag_configuration }}</a>
                 {% endif %}
             </div>
         </div>
@@ -44,7 +49,7 @@
                             <div class="col gap-4 p-4 justify-content-around">
                                 <div class="col-md-4 col-12">
                                     <div class="form-group d-flex gap-4">
-                                        <label for="id_prefix">Prefix</label>
+                                        <label for="id_prefix">{{ trans.prefix }}</label>
                                         <input class="form-control w-100" value="{{ configurations.prefix }}" disabled></input>
                                         {% for error in form.prefix.errors %}
                                             <small class="text-danger mb-3">{{ error }}</small>
@@ -53,7 +58,7 @@
                                 </div>
                                 <div class="col-md-4 col-12">
                                     <div class="form-group d-flex gap-4">
-                                        <label for="id_number_suffix">Suffix</label>
+                                        <label for="id_number_suffix">{{ trans.suffix }}</label>
                                         <input class="form-control w-100" value="{{ configurations.number_suffix }}" disabled></input>
                                         {% for error in form.number_suffix.errors %}
                                             <small class="text-danger mb-3">{{ error }}</small>
@@ -74,7 +79,7 @@
                                     hx-target="#use_default_settings_{{ configurations.id }}"
                                     hx-swap="outerHTML">
                                 <label for="use_default_settings_{{ configurations.id }}" class="form-check-label">
-                                    Use This As Default Settings
+                                    {{ trans.use_default_settings }}
                                 </label>
                             </div>
                         </div>
@@ -85,7 +90,7 @@
     {% else %}
         <section class="section">
             <div class="alert alert-info">
-                No Tag Configuration found. Please create one.
+                {{ trans.no_tag_config_found }}
             </div>
         </section>
     {% endif %}

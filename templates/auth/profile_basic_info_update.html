@@ -1,7 +1,8 @@
 {% load static %}
+{% load custom_filters %}
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-person-circle"></i> Update Profile</h5>
+        <h5 class="modal-title"><i class="bi bi-person-circle"></i> {{ trans.update_profile }}</h5>
         <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
             <i class="bi bi-x-lg"></i>
         </button>
@@ -12,7 +13,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="form-group">
-                        <label>FULL NAME</label>
+                        <label>{{ trans.full_name_uppercase }}</label>
                         {{form.full_name}}
                         {% for error in form.full_name.errors %}
                         <small class="text-danger">{{ error }}</small>
@@ -21,7 +22,7 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label>EMAIL <span class="required">*</span></label>
+                        <label>{{ trans.email_uppercase }} <span class="required">*</span></label>
                         {{form.email}}
                         {% for error in form.email.errors %}
                         <small class="text-danger">{{ error }}</small>
@@ -30,7 +31,7 @@
                 </div>
                 <div class="col-12">
                     <div class="form-group">
-                        <label>PHONE</label>
+                        <label>{{ trans.phone_uppercase }}</label>
                         {{form.phone}}
                         {% for error in form.phone.errors %}
                         <small class="text-danger">{{ error }}</small>
@@ -40,7 +41,7 @@
                 {% if address_form is not None %}
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>ADDRESS LINE 1</label>
+                            <label>{{ trans.address_line_1_uppercase }}</label>
                             {{address_form.address_line_one}}
                             {% for error in address_form.address_line_one.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -49,7 +50,7 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>ADDRESS LINE 2</label>
+                            <label>{{ trans.address_line_2_uppercase }}</label>
                             {{address_form.address_line_two}}
                             {% for error in address_form.address_line_two.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -58,7 +59,7 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>COUNTRY</label>
+                            <label>{{ trans.country_uppercase }}</label>
                             {{address_form.country}}
                             {% for error in address_form.country.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -67,7 +68,7 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>STATE</label>
+                            <label>{{ trans.state_uppercase }}</label>
                             {{address_form.state}}
                             {% for error in address_form.state.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -76,7 +77,7 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>CITY</label>
+                            <label>{{ trans.city_uppercase }}</label>
                             {{address_form.city}}
                             {% for error in address_form.city.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -85,7 +86,7 @@
                     </div>
                     <div class="col-md-6 col-12">
                         <div class="form-group">
-                            <label>ZIP CODE</label>
+                            <label>{{ trans.zip_code_uppercase }}</label>
                             {{address_form.pin_code}}
                             {% for error in address_form.pin_code.errors %}
                             <small class="text-danger">{{ error }}</small>
@@ -95,7 +96,7 @@
                 {% endif %}
                 <div class="col-md-6 col-12">
                     <div class="form-group">
-                        <label>PROFILE PICTURE</label>
+                        <label>{{ trans.profile_picture_uppercase }}</label>
                         <input type="file" name="profile_pic" id="id_profile_pic" class="form-control" accept="image/*">
                         {% for error in form.profile_pic.errors %}
                         <small class="text-danger">{{ error }}</small>
@@ -115,12 +116,12 @@
         </div>
         <div class="modal-footer-custom">
             <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                <i class="bi bi-x-lg"></i> Cancel
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save"> 
-                <span class="save-text"><i class="bi bi-check-lg"></i> Save</span>
+                <span class="save-text"><i class="bi bi-check-lg"></i> {{ trans.save }}</span>
                 <span class="loading-spinner d-none">
-                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Saving...
+                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> {{ trans.saving }}
                 </span>
             </button>
         </div>

@@ -27,6 +27,18 @@ def get_at_index(list_obj, index):
 @register.filter
 def split(value, key=' '):
     return value.split(key)
+
+@register.filter
+def format_str(value, arg):
+    """Replace the first '{}' placeholder in a translation string with `arg`.
+
+    Only the FIRST occurrence is replaced to match positional-argument semantics.
+    Use named placeholders and str.format() for strings with multiple substitutions.
+    """
+    try:
+        return value.replace('{}', str(arg), 1)
+    except (TypeError, AttributeError):
+        return value
 @register.simple_tag(takes_context=True)
 # @register.simple_tag(takes_context=True)
 def format_datetime(context,x):

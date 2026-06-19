@@ -1,0 +1,25 @@
+STRINGS = {
+    'view_all_history': 'सभी इतिहास देखें',
+    'record_created': 'रिकॉर्ड बनाया गया',
+    'record_deleted': 'रिकॉर्ड हटा दिया गया',
+    'record_restored': 'रिकॉर्ड पुनर्स्थापित किया गया',
+    'status_changed': 'स्थिति बदली गई',
+    'assignment_changed': 'असाइनमेंट बदला गया',
+    'information_updated': 'जानकारी अपडेट की गई',
+    'record_created_desc': 'रिकॉर्ड सफलतापूर्वक बनाया गया और सिस्टम में जोड़ा गया।',
+    'record_deleted_desc': 'रिकॉर्ड हटा दिया गया और रीसायकल बिन में भेज दिया गया।',
+    'record_restored_desc': 'रिकॉर्ड रीसायकल बिन से पुनर्स्थापित किया गया।',
+    'status_was': 'स्थिति थी',
+    'enabled_status': 'सक्षम',
+    'disabled_status': 'अक्षम',
+    'by_administrator': 'व्यवस्थापक द्वारा।',
+    'record_was': 'रिकॉर्ड था',
+    'assigned_status': 'असाइन किया गया',
+    'unassigned_status': 'अनअसाइन किया गया',
+    'information_updated_desc': 'नए विवरण के साथ जानकारी अपडेट की गई।',
+    'system_user': 'सिस्टम',
+    'administrator_role': 'व्यवस्थापक',
+    'no_activity_log': 'इस रिकॉर्ड के लिए कोई गतिविधि लॉग नहीं मिला।',
+
+
+}

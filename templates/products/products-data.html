@@ -28,14 +28,14 @@
       <td>
         {{ products.product_type }}
         {% if products.product_type.is_deleted %}
-          <i class="bi bi-exclamation-triangle text-warning" title="Product type is deleted"></i>
+          <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.product_type_deleted_warning }}"></i>
         {% endif %}
       </td>
 
       <td>
         {{ products.product_sub_category.name }}
         {% if products.product_category.parent.is_deleted %}
-          <i class="bi bi-exclamation-triangle text-warning" title="Category is deleted"></i>
+          <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.category_deleted_warning }}"></i>
         {% endif %}
       </td>
 
@@ -62,9 +62,9 @@
           </div>
         {% else %}
           {% if products.status %}
-            <span class="status-badge status-active">Active</span>
+            <span class="status-badge status-active">{{ trans.active_status }}</span>
           {% else %}
-            <span class="status-badge status-inactive">Inactive</span>
+            <span class="status-badge status-inactive">{{ trans.inactive_status }}</span>
           {% endif %}
         {% endif %}
       </td>
@@ -73,20 +73,20 @@
       <td>
         <div class="row-actions">
           {% if perms.authentication.view_product %}
-            <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="View {{ products.name }}">
+            <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
               <i class="bi bi-eye"></i>
             </a>
           {% endif %}
           {% if perms.authentication.edit_product %}
-            <a href="{% url 'products:update_product' products.id %}" class="action-btn" title="Edit {{ products.name }}">
+            <a href="{% url 'products:update_product' products.id %}" class="action-btn" title="{{ trans.update_product }} {{ products.name }}">
               <i class="bi bi-pencil"></i>
             </a>
           {% endif %}
           {% if perms.authentication.delete_product %}
             <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
-                  onsubmit="return confirm('Delete {{ products.name }}? It can be restored from Recycle Bin.')">
+                  onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
               {% csrf_token %}
-              <button type="submit" class="action-btn danger" title="Delete {{ products.name }}">
+              <button type="submit" class="action-btn danger" title="{{ trans.delete_confirm_product }}">
                 <i class="bi bi-trash3"></i>
               </button>
             </form>
@@ -101,7 +101,7 @@
       <td colspan="8">
         <div class="table-empty-state">
           <i class="bi bi-search d-block"></i>
-          <p>No products found matching your search.</p>
+          <p>{{ trans.no_products_search }}</p>
         </div>
       </td>
     </tr>

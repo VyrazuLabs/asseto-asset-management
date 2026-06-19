@@ -1,0 +1,31 @@
+STRINGS = {
+    'trash_bin': 'Trash Bin',
+    'recycle_bin_subtitle': 'Review and manage recently removed organization assets.',
+    'back_to_assets': 'Back to Assets',
+    'deleted_assets_list': 'Deleted Assets List',
+    'items_count': 'Items',
+    'search_deleted_assets': 'Search deleted assets…',
+    'deletion_date': 'Deletion Date',
+    'restore_confirm': 'Restore this item? It will be moved back to your active list.',
+    'permanently_delete_confirm': 'Permanently delete this item? This action cannot be undone.',
+    'restore_label': 'Restore',
+    'permanently_delete': 'Permanently Delete',
+    'no_deleted_assets': 'No deleted assets found.',
+    'entries_pagination': 'entries',
+    'to_pagination': 'to',
+    'inventory_label': 'Inventory',
+
+    'deleted_products': 'Deleted Products',
+    'deleted_users': 'Deleted Users',
+    'back_to_users': 'Back to Users',
+    'back_to_products': 'Back to Products',
+    'search_here': 'Search here...',
+    'datetime_label': 'Datetime',
+    'restore': 'Restore',
+    'permanently_delete': 'Delete',
+    'restore_confirm': 'Are you sure you want to restore it?',
+    'delete_permanently_confirm': 'Are you sure you want to delete this permanently?',
+    'no_records_search': 'No record found related to your search keyword',
+
+
+}

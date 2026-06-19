@@ -3,9 +3,9 @@
         <thead>
             <tr>
                 <th style="width: 60px;"></th>
-                <th>Vendor Name</th>
-                <th>Contact</th>
-                <th>Date Added</th>
+                <th>{{ trans.vendor_name }}</th>
+                <th>{{ trans.contact }}</th>
+                <th>{{ trans.date_added }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center py-4 text-muted">No recent vendors found</td>
+                <td colspan="4" class="text-center py-4 text-muted">{{ trans.no_recent_vendors }}</td>
             </tr>
             {% endfor %}
         </tbody>

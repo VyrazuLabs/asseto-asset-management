@@ -746,3 +746,84 @@ body.theme-dark .btn-edit-ticket {
     background: var(--color-primary);
     color: #fff !important;
 }
+
+/* Kanban Dark Theme */
+body.theme-dark .kanban-column {
+    background: #1e1e30;
+}
+
+body.theme-dark .kanban-card {
+    background: #2a2a40;
+    border-color: var(--color-border);
+}
+
+body.theme-dark .kanban-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.theme-dark .kanban-card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #e0e0f0;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+}
+
+body.theme-dark .column-title {
+    color: var(--color-text);
+}
+
+body.theme-dark .card-info-item {
+    color: var(--color-muted);
+}
+
+body.theme-dark .card-footer-meta {
+    border-top-color: var(--color-border);
+}
+
+body.theme-dark .assigned-name {
+    color: var(--color-muted);
+}
+
+body.theme-dark .ticket-id-badge {
+    background: #2a2650;
+    color: #a8b4ff;
+}
+
+body.theme-dark .column-count {
+    background: #2d2d45;
+    color: var(--color-muted);
+}
+
+body.theme-dark .kanban-empty-state {
+    color: var(--color-muted);
+}
+
+body.theme-dark .kanban-cards-container::-webkit-scrollbar-thumb {
+    background: #3d3d55;
+}
+
+body.theme-dark .kanban-cards-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body.theme-dark .priority-badge-sm.prio-0 {
+    background: #064e3b;
+    color: #6ee7b7;
+}
+
+body.theme-dark .priority-badge-sm.prio-1 {
+    background: #1e3a5f;
+    color: #93c5fd;
+}
+
+body.theme-dark .priority-badge-sm.prio-2 {
+    background: #7c2d12;
+    color: #fdba74;
+}
+
+body.theme-dark .priority-badge-sm.prio-3 {
+    background: #7f1d1d;
+    color: #fca5a5;
+}

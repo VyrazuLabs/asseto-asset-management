@@ -84,7 +84,9 @@ def add_vendor(request):
             messages.success(request, 'Vendor added successfully')
             return redirect('vendors:list')
 
-    context = {'vendor_form': vendor_form, 'address_form': address_form}
+    context = {'vendor_form': vendor_form,
+    'title': 'Register Vendor',
+     'address_form': address_form}
     return render(request, 'vendors/add.html', context=context)
 
 """Get the details of the vendor based on id"""

@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Ticket #{{ ticket.ticket_id }}: {{ ticket.subject }} | Asseto{% endblock %}
+{% block title %}{{ trans.ticket_details }} #{{ ticket.ticket_id }}: {{ ticket.subject }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -378,6 +378,10 @@
         color: #fff;
     }
 
+    body.theme-dark .btn-edit-ticket{
+        color: white !important;
+    }
+
     .btn-back-list {
         background: #fff;
         color: #212529;
@@ -556,10 +560,10 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb page-breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
                     <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}"
-                            class="breadcrumb-link">Tickets</a></li>
-                    <li class="breadcrumb-item active">Ticket Details</li>
+                            class="breadcrumb-link">{{ trans.tickets_breadcrumb }}</a></li>
+                    <li class="breadcrumb-item active">{{ trans.ticket_details }}</li>
                 </ol>
             </nav>
             <div class="d-flex align-items-center gap-2 mb-2">
@@ -577,10 +581,10 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             <a href="{% url 'support:ticket_list' %}" class="btn-back-list">
-                <i class="bi bi-arrow-left"></i> Back to List
+                <i class="bi bi-arrow-left"></i> {{ trans.back_to_list }}
             </a>
             <a href="{% url 'support:ticket_update' ticket.id %}" class="btn-edit-ticket shadow-sm">
-                <i class="bi bi-pencil-fill"></i> Edit Ticket
+                <i class="bi bi-pencil-fill"></i> {{ trans.edit_ticket_btn }}
             </a>
         </div>
     </div>
@@ -589,7 +593,7 @@
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
-                <div class="info-card-title">Assigned Technician</div>
+                <div class="info-card-title">{{ trans.assigned_technician }}</div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="info-icon-wrapper avatar-wrap">
                         {% if ticket.assigned_to and ticket.assigned_to.profile_pic %}
@@ -601,11 +605,11 @@
                     </div>
                     <div>
                         <div class="info-value-primary">
-                            {{ ticket.assigned_to.get_full_name|default:"Unassigned" }}
+                            {{ ticket.assigned_to.get_full_name|default:trans.unassigned }}
                         </div>
                         <div class="info-value-secondary">
                             {% if ticket.assigned_to and ticket.assigned_to.role %}
-                                {{ ticket.assigned_to.role.related_name|default:ticket.assigned_to.role.name|default:"Technician" }}
+                                {{ ticket.assigned_to.role.related_name|default:ticket.assigned_to.role.name|default:trans.technician }}
                             {% else %}
                                 Technician
                             {% endif %}
@@ -616,23 +620,23 @@
         </div>
         <div class="col-md-3">
             <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
-                <div class="info-card-title">Department</div>
+                <div class="info-card-title">{{ trans.department_label }}</div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="info-icon-wrapper">
                         <i class="bi bi-hdd-stack fs-5"></i>
                     </div>
                     <div>
                         <div class="info-value-primary">
-                            {% if ticket.department %}{{ ticket.department.name }}{% else %}General Infrastructure{% endif %}
+                            {% if ticket.department %}{{ ticket.department.name }}{% else %}{{ trans.general_infrastructure }}{% endif %}
                         </div>
-                        <div class="info-value-secondary">Operations Team</div>
+                        <div class="info-value-secondary">{{ trans.operations_team }}</div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
-                <div class="info-card-title">Date Opened</div>
+                <div class="info-card-title">{{ trans.date_opened }}</div>
                 <div class="d-flex align-items-center gap-2">
                     <div>
                         <div class="info-value-primary">{{ ticket.created_at|date:"M j" }}</div>
@@ -643,17 +647,17 @@
         </div>
         <div class="col-md-3">
             <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
-                <div class="info-card-title">Location</div>
+                <div class="info-card-title">{{ trans.location }}</div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="info-icon-wrapper">
                         <i class="bi bi-geo-alt fs-5"></i>
                     </div>
                     <div>
                         <div class="info-value-primary">
-                            {% if ticket.location %}{{ ticket.location.name }}{% else %}Main Headquarters{% endif %}
+                            {% if ticket.location %}{{ ticket.location.name }}{% else %}{{ trans.main_headquarters }}{% endif %}
                         </div>
                         <div class="info-value-secondary">
-                            {% if ticket.location.address %}{{ ticket.location.address.city }}{% else %}Corporate Office{% endif %}
+                            {% if ticket.location.address %}{{ ticket.location.address.city }}{% else %}{{ trans.corporate_office }}{% endif %}
                         </div>
                     </div>
                 </div>
@@ -664,7 +668,7 @@
     {# Technical Description #}
     <div class="detail-card mb-4">
         <div class="section-title">
-            <i class="bi bi-file-text text-primary fs-5"></i> Technical Description
+            <i class="bi bi-file-text text-primary fs-5"></i> {{ trans.technical_description }}
         </div>
         <div class="desc-text mt-3">
             {% if ticket.description %}
@@ -674,7 +678,7 @@
                 <div class="empty-icon-wrap mb-2" style="width: 40px; height: 40px; font-size: 1rem;">
                     <i class="bi bi-file-earmark-text"></i>
                 </div>
-                <p class="small text-muted">No technical description provided for this ticket.</p>
+                <p class="small text-muted">{{ trans.no_technical_description }}</p>
             </div>
             {% endif %}
         </div>
@@ -682,18 +686,18 @@
 
     {# Asset & Work Impact #}
     <div class="detail-card mb-4">
-        <h6 class="fw-bold mb-4">Asset & Work Impact</h6>
+        <h6 class="fw-bold mb-4">{{ trans.asset_work_impact }}</h6>
         <div class="impact-grid">
             <div class="impact-item">
-                <div class="info-card-title">Asset Name/ID</div>
-                <div class="impact-value">{% if ticket.asset %}{{ ticket.asset.name }}{% else %}No Asset Linked{% endif %}</div>
+                <div class="info-card-title">{{ trans.asset_name_id }}</div>
+                <div class="impact-value">{% if ticket.asset %}{{ ticket.asset.name }}{% else %}{{ trans.no_asset_linked }}{% endif %}</div>
             </div>
             <div class="impact-item">
-                <div class="info-card-title">Ticket Type</div>
+                <div class="info-card-title">{{ trans.ticket_type }}</div>
                 <div class="impact-value">{{ ticket.get_ticket_type_display }}</div>
             </div>
             <div class="impact-item">
-                <div class="info-card-title">Estimated ETA</div>
+                <div class="info-card-title">{{ trans.estimated_eta }}</div>
                 <div class="impact-value">
                     {% if ticket.estimated_eta %}
                     {{ ticket.estimated_eta|timeuntil }}
@@ -703,11 +707,11 @@
                 </div>
             </div>
             <div class="impact-item">
-                <div class="info-card-title">Hours Worked</div>
+                <div class="info-card-title">{{ trans.hours_worked }}</div>
                 <div class="impact-value">{{ ticket.hours_worked }} hrs</div>
             </div>
             <div class="impact-item">
-                <div class="info-card-title">Impact Level</div>
+                <div class="info-card-title">{{ trans.impact_level }}</div>
                 <div>
                     {% if ticket.impact_level == '2' or ticket.impact_level == '3' %}
                     <span class="impact-badge">{{ ticket.get_impact_level_display|upper }} IMPACT</span>
@@ -717,17 +721,17 @@
                 </div>
             </div>
             <div class="impact-item">
-                <div class="info-card-title">Service Level</div>
-                <div class="impact-value">{{ ticket.service_level|default:"SLA Gold Tier" }}</div>
+                <div class="info-card-title">{{ trans.service_level }}</div>
+                <div class="impact-value">{{ ticket.service_level|default:trans.sla_gold_tier }}</div>
             </div>
         </div>
     </div>
 
     {# Supporting Documents #}
     <div class="docs-header mt-5">
-        <h6 class="fw-bold mb-0">Supporting Documents</h6>
+        <h6 class="fw-bold mb-0">{{ trans.supporting_documents }}</h6>
         {% if attachments %}
-        <span class="docs-count">{{ attachments|length }} FILES</span>
+        <span class="docs-count">{{ attachments|length }} {{ trans.files_label }}</span>
         {% endif %}
     </div>
     <div class="docs-container mb-5">
@@ -735,7 +739,7 @@
         <a href="{{ att.file.url }}" target="_blank" class="doc-card">
             <div class="doc-icon">
                 {% if "pdf" in att.file_name|lower %}
-                <span class="text-primary fw-bold" style="font-size: 0.6rem;">PDF</span>
+                <span class="text-primary fw-bold" style="font-size: 0.6rem;">{{ trans.pdf_label }}</span>
                 {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
                 <img src="{{ att.file.url }}" alt="Preview"
                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
@@ -747,9 +751,9 @@
                 <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
                 <div class="doc-meta">
                     {{ att.file_size|filesizeformat|default:"2.4 MB" }} • 
-                    {% if "pdf" in att.file_name|lower %}PDF
-                    {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}Image
-                    {% else %}File{% endif %}
+                    {% if "pdf" in att.file_name|lower %}{{ trans.pdf_label }}
+                    {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}{{ trans.image_label }}
+                    {% else %}{{ trans.file_label }}{% endif %}
                 </div>
             </div>
             <div class="doc-download">
@@ -761,8 +765,8 @@
             <div class="empty-icon-wrap">
                 <i class="bi bi-files"></i>
             </div>
-            <h6>No Supporting Documents</h6>
-            <p>There are no files or documents attached to this ticket yet.</p>
+            <h6>{{ trans.no_supporting_documents }}</h6>
+            <p>{{ trans.no_supporting_documents_text }}</p>
         </div>
         {% endfor %}
     </div>

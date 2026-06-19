@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}User Profile - {{ user.full_name }} | Asseto{% endblock %}
+{% block title %}{{ trans.user_profile }} - {{ user.full_name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -17,27 +17,27 @@
     <div>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb page-breadcrumb mb-2">
-          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'users:list' %}" class="breadcrumb-link">Users</a></li>
-          <li class="breadcrumb-item active">User Profile</li>
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'users:list' %}" class="breadcrumb-link">{{ trans.users }}</a></li>
+          <li class="breadcrumb-item active">{{ trans.user_profile }}</li>
         </ol>
       </nav>
-      <h1 class="page-title mb-0">Overview</h1>
+      <h1 class="page-title mb-0">{{ trans.overview }}</h1>
     </div>
     <div class="header-actions">
       {% if perms.authentication.edit_users %}
       <button type="button" class="btn-register" hx-get="{% url 'users:update' user.id %}"
         hx-target="#update-user-modal-content" data-bs-toggle="modal" data-bs-target="#update-user-modal">
-        <i class="bi bi-pencil-square"></i> Edit Profile
+        <i class="bi bi-pencil-square"></i> {{ trans.edit_profile }}
       </button>
       {% endif %}
       {% if perms.authentication.delete_users %}
       <form action="{% url 'users:status' user.id %}" method="post" style="display: inline;">
         {% csrf_token %}
         <button type="submit" class="{% if user.is_active %}btn-danger-solid{% else %}btn-success-solid{% endif %}"
-          onclick="return confirm('{% if user.is_active %}Suspend access for this user?{% else %}Restore access for this user?{% endif %}')">
+          onclick="return confirm('{% if user.is_active %}{{ trans.suspend_confirm|escapejs }}{% else %}{{ trans.restore_confirm_user|escapejs }}{% endif %}')">
           <i class="bi {% if user.is_active %}bi-person-x{% else %}bi-person-check{% endif %}"></i>
-          {% if user.is_active %}Suspend Access{% else %}Restore Access{% endif %}
+          {% if user.is_active %}{{ trans.suspend_access }}{% else %}{{ trans.restore_access }}{% endif %}
         </button>
       </form>
       {% endif %}
@@ -54,7 +54,7 @@
           <img class="profile-avatar" src="{{ user.profile_pic.url }}" alt="{{ user.full_name }}"
             onerror="this.onerror=null; this.src='{% static 'images/faces/1.jpg' %}';">
           {% else %}
-          <img class="profile-avatar" src="{% static 'images/faces/1.jpg' %}" alt="Default Avatar">
+          <img class="profile-avatar" src="{% static 'images/faces/1.jpg' %}" alt="{{ trans.default_avatar }}">
           {% endif %}
         </div>
         <h2 class="profile-name">{{ user.full_name }}</h2>
@@ -62,18 +62,18 @@
 
         <div class="profile-stats">
           <div class="stat-item">
-            <span class="stat-label">Status</span>
-            <span class="badge-profile-status">{% if user.is_active %}ACTIVE{% else %}INACTIVE{% endif %}</span>
+            <span class="stat-label">{{ trans.status }}</span>
+            <span class="badge-profile-status">{% if user.is_active %}{{ trans.active_badge }}{% else %}{{ trans.inactive_badge }}{% endif %}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Joined</span>
+            <span class="stat-label">{{ trans.joined }}</span>
             <span class="stat-value">{{ user.date_joined|date:"M Y" }}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Security Level</span>
+            <span class="stat-label">{{ trans.security_level }}</span>
             <div class="text-end">
-              <span class="stat-value security-level">Tier {{ user.role.level|default:"3" }}</span>
-              <div class="small text-muted">({{ user.role.related_name|default:"Admin" }})</div>
+              <span class="stat-value security-level">{{ trans.tier }} {{ user.role.level|default:"3" }}</span>
+              <div class="small text-muted">({{ user.role.related_name|default:trans.admin_role }})</div>
             </div>
           </div>
         </div>
@@ -81,14 +81,14 @@
 
       <!-- Contact Details Card -->
       <div class="card-contact">
-        <span class="section-title">Contact Details</span>
+        <span class="section-title">{{ trans.contact_details }}</span>
         <div class="contact-list">
           <div class="contact-item">
             <div class="contact-icon-circle">
               <i class="bi bi-envelope"></i>
             </div>
             <div class="contact-info">
-              <span class="contact-label">Email Address</span>
+              <span class="contact-label">{{ trans.email_address }}</span>
               <a href="mailto:{{ user.email }}" class="contact-value">{{ user.email }}</a>
             </div>
           </div>
@@ -98,7 +98,7 @@
               <i class="bi bi-phone"></i>
             </div>
             <div class="contact-info">
-              <span class="contact-label">Mobile Phone</span>
+              <span class="contact-label">{{ trans.mobile_phone }}</span>
               <span class="contact-value">{{ user.phone|default:"N/A" }}</span>
             </div>
           </div>
@@ -108,9 +108,9 @@
               <i class="bi bi-geo-alt"></i>
             </div>
             <div class="contact-info">
-              <span class="contact-label">Office Location</span>
+              <span class="contact-label">{{ trans.office_location }}</span>
               <span class="contact-value">
-                {{ user.location.office_name|default:"Global HQ" }}
+                {{ user.location.office_name|default:trans.global_hq }}
               </span>
             </div>
           </div>
@@ -126,18 +126,18 @@
       <div class="content-card">
         <div class="card-header-flex border-bottom-0 pb-3">
           <div>
-            <h3 class="card-header-title">Current Asset Assignments</h3>
-            <p class="text-muted mb-0 small">Inventory items currently registered to this profile.</p>
+            <h3 class="card-header-title">{{ trans.current_asset_assignments }}</h3>
+            <p class="text-muted mb-0 small">{{ trans.asset_assignments_subtitle }}</p>
           </div>
         </div>
         <div class="table-responsive">
           <table class="list-table mb-0">
             <thead>
               <tr>
-                <th width="35%">Asset</th>
-                <th width="20%">Asset Tag</th>
-                <th width="20%">Status</th>
-                <th width="25%">Assigned Date</th>
+                <th width="35%">{{ trans.asset_label }}</th>
+                <th width="20%">{{ trans.asset_tag }}</th>
+                <th width="20%">{{ trans.status_label }}</th>
+                <th width="25%">{{ trans.assigned_date }}</th>
               </tr>
             </thead>
             <tbody>
@@ -165,7 +165,7 @@
                   <span class="asset-tag-code">{{ assigned_asset.asset.tag }}</span>
                 </td>
                 <td>
-                  <span class="badge bg-light-success text-success fw-bold" style="font-size: 0.65rem;">IN USE</span>
+                  <span class="badge bg-light-success text-success fw-bold" style="font-size: 0.65rem;">{{ trans.in_use }}</span>
                 </td>
                 <td>
                   <div class="date-stacked">
@@ -186,17 +186,17 @@
       <!-- Assigned Licenses -->
       <div class="content-card">
         <div class="card-header-flex">
-          <h3 class="card-header-title">Assigned Licenses</h3>
+          <h3 class="card-header-title">{{ trans.assigned_licenses }}</h3>
           <span class="badge bg-primary rounded-pill">{{ assigned_licenses.paginator.count }}</span>
         </div>
         <div class="table-responsive">
           <table class="list-table mb-0">
             <thead>
               <tr>
-                <th>License Name</th>
-                <th>Type</th>
-                <th>License Key</th>
-                <th>Assigned Date</th>
+                <th>{{ trans.license_name }}</th>
+                <th>{{ trans.license_type }}</th>
+                <th>{{ trans.license_key }}</th>
+                <th>{{ trans.assigned_date }}</th>
               </tr>
             </thead>
             <tbody>
@@ -220,18 +220,18 @@
       {% if page_object %}
       <div class="content-card">
         <div class="card-header-flex border-bottom-0 pb-3">
-          <h3 class="card-header-title">Activity Log</h3>
-          <a href="#" class="btn-reset text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">VIEW ALL HISTORY</a>
+          <h3 class="card-header-title">{{ trans.activity_log }}</h3>
+          <a href="#" class="btn-reset text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">{{ trans.view_all_history }}</a>
         </div>
         
         <div class="table-responsive">
           <table class="activity-table">
             <thead>
               <tr>
-                <th width="35%">Action Type</th>
-                <th width="20%">Resource</th>
-                <th width="25%">Timestamp</th>
-                <th width="20%" class="text-end">Result</th>
+                <th width="35%">{{ trans.action_type }}</th>
+                <th width="20%">{{ trans.resource }}</th>
+                <th width="25%">{{ trans.timestamp }}</th>
+                <th width="20%" class="text-end">{{ trans.result }}</th>
               </tr>
             </thead>
             <tbody>
@@ -244,9 +244,9 @@
                     </div>
                     <div>
                       <span class="activity-title-main">
-                        {% if history.history_type == "+" %}Account Created{% elif history.history_type == "^" %}Record Restored{% elif history.history_type == "-" %}Account Deleted{% else %}Profile Updated{% endif %}
+                        {% if history.history_type == "+" %}{{ trans.account_created }}{% elif history.history_type == "^" %}{{ trans.record_restored }}{% elif history.history_type == "-" %}{{ trans.account_deleted }}{% else %}{{ trans.profile_updated }}{% endif %}
                       </span>
-                      <span class="activity-subtitle">by {{ history.history_user.full_name|default:"System" }}</span>
+                      <span class="activity-subtitle">{{ trans.by }} {{ history.history_user.full_name|default:trans.system_user }}</span>
                     </div>
                   </div>
                 </td>
@@ -261,7 +261,7 @@
                 </td>
                 <td class="activity-cell activity-result-cell">
                   <span class="activity-result-text {% if history.history_type == '+' %}text-success{% else %}text-primary{% endif %}">
-                    {% if history.history_type == '+' %}Verified{% else %}Success{% endif %}
+                    {% if history.history_type == '+' %}{{ trans.verified }}{% else %}{{ trans.success }}{% endif %}
                   </span>
                 </td>
               </tr>

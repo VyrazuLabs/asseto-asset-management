@@ -75,7 +75,7 @@ def add_audit(request):
         return redirect('audit:completed_audits')
 
     elif request.method == 'GET':
-        context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit'}
+        context = {'get_audit': get_audit, 'assigned_users': user_list,'sidebar': 'audit','title':'New Audit Entry'}
         return render(request, 'audit/add_audit.html', context)
 
 @login_required
@@ -100,6 +100,7 @@ def get_audits_by_id(request, id):
             return render(request, "audit/add_audit.html", {
                 "errors": errors,
                 "comments": comments,
+                "title": "Update Audit",
                 "assigned_users": User.undeleted_objects.all()
             })
         files=request.FILES.getlist('image')
@@ -125,9 +126,9 @@ def get_audits_by_id(request, id):
     elif request.method == 'GET':
         if get_assigned_user is None:
             user_list = list(User.undeleted_objects.all())
-            context = {'get_asset': get_asset, 'assigned_users': user_list,'sidebar': 'audit'}
+            context = {'get_asset': get_asset, 'assigned_users': user_list,'sidebar': 'audit','title':'Update Audit Entry'}
         else:
-            context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name,'sidebar': 'audit'}
+            context = {'get_asset': get_asset, 'asset_assigned_users': get_assigned_user.user.full_name,'sidebar': 'audit','title':'Update Audit Entry'}
         return render(request, 'audit/add_audit.html', context)
 
 @login_required
@@ -160,6 +161,7 @@ def completed_audits(request):
         'audits': audits_page,
         'sidebar': 'audit',
         'tab': 'completed',
+        'title':'Completed Audit List'
     }
     context.update(stats)
     return render(request, 'audit/audit_list.html', context)
@@ -171,6 +173,7 @@ def pending_audits(request):
     context = {
         'sidebar': 'audit',
         'tab': 'pending',
+        'title':'Pending Audit List'
     }
     context.update(pending_data)
     context.update(stats)

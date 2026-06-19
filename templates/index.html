@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="page-heading">
-    <h3>Dashboard</h3>
+    <h3>{{ trans.dashboard }}</h3>
 </div>
 
 <div class="page-content">
@@ -24,7 +24,7 @@
                         <i class="bi bi-laptop"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Assets</div>
+                        <div class="metric-label">{{ trans.assets }}</div>
                         <div class="metric-value">{{ asset_count }}</div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                         <i class="bi bi-person-workspace"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Assigned Assets</div>
+                        <div class="metric-label">{{ trans.assigned_assets }}</div>
                         <div class="metric-value">{{ assign_assets_counts }}</div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         <i class="bi bi-key-fill"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">License</div>
+                        <div class="metric-label">{{ trans.license }}</div>
                         <div class="metric-value">{{ license_count }}</div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                         <i class="bi bi-shop"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Vendors</div>
+                        <div class="metric-label">{{ trans.vendors }}</div>
                         <div class="metric-value">{{ vendor_count }}</div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                         <i class="bi bi-geo-alt-fill"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Locations</div>
+                        <div class="metric-label">{{ trans.locations }}</div>
                         <div class="metric-value">{{ location_count }}</div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                         <i class="bi bi-box-seam"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Products</div>
+                        <div class="metric-label">{{ trans.products }}</div>
                         <div class="metric-value">{{ product_count }}</div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <div class="metric-content">
-                        <div class="metric-label">Users</div>
+                        <div class="metric-label">{{ trans.users }}</div>
                         <div class="metric-value">{{ users_count }}</div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                     <i class="bi bi-currency-exchange"></i>
                 </div>
                 <div class="metric-content">
-                    <div class="metric-label">Total Asset Cost</div>
+                    <div class="metric-label">{{ trans.total_asset_cost }}</div>
                     <div class="metric-value" style="font-size: 1.1rem;">{{ currency }} {{ all_asset_cost }}</div>
                 </div>
             </div>
@@ -137,7 +137,7 @@
             <div class="chart-container-card">
                 <div class="chart-header">
                     <div class="chart-header-line"></div>
-                    <h5 class="chart-title">Assets Status</h5>
+                    <h5 class="chart-title">{{ trans.assets_status }}</h5>
                 </div>
                 <div id="assetsStatusChart" style="min-height: 300px;"></div>
             </div>
@@ -147,7 +147,7 @@
             <div class="chart-container-card">
                 <div class="chart-header">
                     <div class="chart-header-line" style="background: var(--metric-cyan);"></div>
-                    <h5 class="chart-title">Assets Utilization</h5>
+                    <h5 class="chart-title">{{ trans.assets_utilization }}</h5>
                 </div>
                 <div id="assetsUtilizationChart" style="min-height: 300px;"></div>
             </div>
@@ -160,11 +160,11 @@
         <div class="col-12 col-xl-5 mb-4">
             <div class="table-container-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="chart-title m-0">Upcoming Expiries</h5>
+                    <h5 class="chart-title m-0">{{ trans.upcoming_expiries }}</h5>
                     <div class="dropdown">
                         <i class="bi bi-three-dots-vertical text-muted cursor-pointer" data-bs-toggle="dropdown"></i>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'assets:list' %}">View All Assets</a></li>
+                            <li><a class="dropdown-item" href="{% url 'assets:list' %}">{{ trans.view_all_assets }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -172,9 +172,9 @@
                     <table class="table premium-table">
                         <thead>
                             <tr>
-                                <th>Asset</th>
-                                <th>Date</th>
-                                <th>Status</th>
+                                <th>{{ trans.asset_label }}</th>
+                                <th>{{ trans.date_label }}</th>
+                                <th>{{ trans.status_label }}</th>
                                 <th style="width: 40px;"></th>
                             </tr>
                         </thead>
@@ -185,7 +185,7 @@
                                 <td class="text-muted">{{ asset.warranty_expiry_date }}</td>
                                 <td>
                                     <span class="status-badge-premium status-active-p">
-                                        {% if asset.is_assigned %}ACTIVE{% else %}STORE{% endif %}
+                                        {% if asset.is_assigned %}{{ trans.active_caps }}{% else %}{{ trans.store_caps }}{% endif %}
                                     </span>
                                 </td>
                                 <td style="text-align: right;">
@@ -196,14 +196,14 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">No upcoming expiries</td>
+                                <td colspan="3" class="text-center py-4 text-muted">{{ trans.no_upcoming_expiries }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
                 <div class="text-center mt-3">
-                    <a href="#" class="btn btn-link text-decoration-none fw-bold" style="font-size: 0.75rem; color: var(--metric-blue);">VIEW ALL WARRANTIES</a>
+                    <a href="#" class="btn btn-link text-decoration-none fw-bold" style="font-size: 0.75rem; color: var(--metric-blue);">{{ trans.view_all_warranties }}</a>
                 </div>
             </div>
         </div>
@@ -212,24 +212,24 @@
         <div class="col-12 col-xl-7 mb-4">
             <div class="table-container-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="chart-title m-0">Recently Added</h5>
+                    <h5 class="chart-title m-0">{{ trans.recently_added }}</h5>
                     <div class="tab-nav-premium" id="recentTabs">
                         <button class="tab-link-premium active" 
                                 hx-get="{% url 'authentication:recent_vendors_partial' %}" 
                                 hx-target="#recentContent"
-                                onclick="setActiveTab(this)">Vendors</button>
+                                onclick="setActiveTab(this)">{{ trans.vendors }}</button>
                         <button class="tab-link-premium" 
                                 hx-get="{% url 'authentication:recent_products_partial' %}" 
                                 hx-target="#recentContent"
-                                onclick="setActiveTab(this)">Products</button>
+                                onclick="setActiveTab(this)">{{ trans.products }}</button>
                         <button class="tab-link-premium" 
                                 hx-get="{% url 'authentication:recent_locations_partial' %}" 
                                 hx-target="#recentContent"
-                                onclick="setActiveTab(this)">Locations</button>
+                                onclick="setActiveTab(this)">{{ trans.locations }}</button>
                         <button class="tab-link-premium" 
                                 hx-get="{% url 'authentication:recent_users_partial' %}" 
                                 hx-target="#recentContent"
-                                onclick="setActiveTab(this)">Users</button>
+                                onclick="setActiveTab(this)">{{ trans.users }}</button>
                     </div>
                 </div>
                 <div id="recentContent">
@@ -337,7 +337,7 @@
                                 show: true,
                                 total: {
                                     show: true,
-                                    label: 'TOTAL',
+                                    label: '{{ trans.total_label }}',
                                     fontSize: '12px',
                                     fontWeight: 600,
                                     color: config.labelColor,
@@ -393,7 +393,7 @@
                             fontSize: '12px',
                             fontWeight: 600,
                             offsetY: 20,
-                            label: 'UTILIZATION'
+                            label: '{{ trans.utilization_label }}'
                         },
                         value: {
                             offsetY: -10,
@@ -414,7 +414,7 @@
                     stops: [0, 100]
                 }
             },
-            labels: ['UTILIZATION'],
+            labels: ['{{ trans.utilization_label }}'],
             theme: { mode: config.mode }
         };
 

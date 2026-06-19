@@ -1,22 +1,23 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3 class="page-name">Update Location</h3>
+            <h3 class="page-name">{{ trans.update_location }}</h3>
 
 
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item">Locations</li>
-                    <li class="breadcrumb-item active" aria-current="page">Update Location</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item">{{ trans.locations }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ trans.update_location }}</li>
                 </ol>
             </nav>
 
         </div>
         <div>
-            <a href="{% url 'dashboard:locations' %}" class="btn btn-sm btn-outline-info my-3">Back to Location List</a>
+            <a href="{% url 'dashboard:locations' %}" class="btn btn-sm btn-outline-info my-3">{{ trans.back_to_location_list }}</a>
         </div>
     </div>
     <section class="section">
@@ -27,7 +28,7 @@
                     <div class="row">
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Office Name</label>
+                                <label>{{ trans.office_name_label }}</label>
                                 {{location_form.office_name}}
                                 {% for error in location_form.office_name.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -36,7 +37,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Contact Person Name</label>
+                                <label>{{ trans.contact_person_name_label }}</label>
                                 {{location_form.contact_person_name}}
                                 {% for error in location_form.contact_person_name.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -45,7 +46,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Contact Person Email</label>
+                                <label>{{ trans.contact_person_email_label }}</label>
                                 {{location_form.contact_person_email}}
                                 {% for error in location_form.contact_person_email.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -54,7 +55,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Contact Person Phone</label>
+                                <label>{{ trans.contact_person_phone_label }}</label>
                                 {{location_form.contact_person_phone}}
                                 {% for error in location_form.contact_person_phone.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -63,7 +64,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Address Line 1</label>
+                                <label>{{ trans.address_line_1_label }}</label>
                                 {{address_form.address_line_one}}
                                 {% for error in address_form.address_line_one.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -72,7 +73,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Address Line 2</label>
+                                <label>{{ trans.address_line_2_label }}</label>
                                 {{address_form.address_line_two}}
                                 {% for error in address_form.address_line_two.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -81,7 +82,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Country</label>
+                                <label>{{ trans.country_label }}</label>
                                 {{address_form.country}}
                                 {% for error in address_form.country.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -90,7 +91,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>State</label>
+                                <label>{{ trans.state_label }}</label>
                                 {{address_form.state}}
                                 {% for error in address_form.state.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -99,7 +100,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>City</label>
+                                <label>{{ trans.city_label }}</label>
                                 {{address_form.city}}
                                 {% for error in address_form.city.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -108,7 +109,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Zip Code</label>
+                                <label>{{ trans.zip_code_label }}</label>
                                 {{address_form.pin_code}}
                                 {% for error in address_form.pin_code.errors %}
                                 <small class="text-danger mb-3">{{ error }}</small>
@@ -118,7 +119,7 @@
                             </div>
                 </div>
                 <div class="card-header">
-                    <button type="submit" class="btn btn-sm btn-info float-end">Save</button>
+                    <button type="submit" class="btn btn-sm btn-info float-end">{{ trans.save }}</button>
                 </div>
             </div>
         </form>
@@ -138,9 +139,9 @@ function requestAndSendNotification() {
 }
 
 function sendNotification() {
-  const title = " Location Updated Successfully";
+  const title = "{{ trans.location_updated_notification_title }}";
   const options = {
-    body: " Location Updated Successfully.",
+    body: "{{ trans.location_updated_notification_body }}",
     icon: "/static/images/logo/favicon.png",
   };
 

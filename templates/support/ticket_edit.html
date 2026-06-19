@@ -1,7 +1,8 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters %}
 
-{% block title %}Edit Ticket: {{ ticket.ticket_id }} | Asseto{% endblock %}
+{% block title %}{{ trans.edit_ticket_title|format_str:ticket.ticket_id }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -20,7 +21,7 @@
   <div class="alert alert-danger mx-4 mt-4">
     <div class="d-flex align-items-center">
       <i class="bi bi-exclamation-octagon-fill me-2 fs-5"></i>
-      <strong>Please correct the errors below.</strong>
+      <strong>{{ trans.correct_errors_below }}</strong>
     </div>
     {% if form.non_field_errors %}
     <ul class="mb-0 mt-2">
@@ -45,23 +46,23 @@
     <div>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb page-breadcrumb">
-          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}" class="breadcrumb-link">Tickets</a></li>
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}" class="breadcrumb-link">{{ trans.tickets_breadcrumb }}</a></li>
           <li class="breadcrumb-item"><a href="{% url 'support:ticket_detail' ticket.id %}" class="breadcrumb-link">#{{
               ticket.ticket_id }}</a></li>
-          <li class="breadcrumb-item active">Edit</li>
+          <li class="breadcrumb-item active">{{ trans.edit }}</li>
         </ol>
       </nav>
-      <h1>Edit Ticket #{{ ticket.ticket_id }}</h1>
-      <p class="subtitle">Modify ticket details, update status, and add work logs for this maintenance request.</p>
+      <h1>{{ trans.edit_ticket_title|format_str:ticket.ticket_id }}</h1>
+      <p class="subtitle">{{ trans.edit_ticket_subtitle }}</p>
     </div>
 
     <div class="d-flex align-items-center gap-2">
       <a href="{% url 'support:ticket_list' %}" class="btn-back-listing">
-        Cancel
+        {{ trans.cancel }}
       </a>
       <button type="submit" class="btn-save-asset">
-        <i class="bi bi-check-all"></i> Update Ticket
+        <i class="bi bi-check-all"></i> {{ trans.update_ticket_btn }}
       </button>
     </div>
 
@@ -77,18 +78,18 @@
       <div class="form-section">
         <div class="section-header">
           <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
-          <h2>Primary Details</h2>
+          <h2>{{ trans.primary_details }}</h2>
         </div>
         <div class="section-body">
           <div class="row g-3">
 
 
             <div class="col-12">
-              <label class="field-label">Target Asset <span class="required">*</span></label>
+              <label class="field-label">{{ trans.target_asset }} <span class="required">*</span></label>
               <div style="position: relative;">
                 <!-- Visible Search Input -->
                 <input type="text" id="asset-search-input" class="field-input"
-                  placeholder="Search asset by name, code, serial..." autocomplete="off" required>
+                  placeholder="{{ trans.search_asset_placeholder }}" autocomplete="off" required>
 
                 <!-- Hidden Actual Select -->
                 {{ form.asset }}
@@ -114,26 +115,26 @@
             </div>
 
             <div class="col-12">
-              <label class="field-label">Subject / Issue Summary <span class="required">*</span></label>
+              <label class="field-label">{{ trans.subject_issue_summary }} <span class="required">*</span></label>
               {{ form.subject }}
               {% for error in form.subject.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
 
             <div class="col-12 mt-2">
-              <label class="field-label">Issue Priority <span class="required">*</span></label>
+              <label class="field-label">{{ trans.issue_priority }} <span class="required">*</span></label>
               {{ form.priority }}
               {% for error in form.priority.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
               <div class="selector-group mt-2" id="priority-selector">
-                <div class="selector-btn" data-value="3"><i class="bi bi-exclamation-circle-fill me-2"></i> EMERGENCY
+                <div class="selector-btn" data-value="3"><i class="bi bi-exclamation-circle-fill me-2"></i> {{ trans.emergency }}
                 </div>
-                <div class="selector-btn" data-value="2"><i class="bi bi-exclamation-triangle-fill me-2"></i> HIGH</div>
-                <div class="selector-btn" data-value="1"><i class="bi bi-info-circle-fill me-2"></i> MEDIUM</div>
-                <div class="selector-btn" data-value="0"><i class="bi bi-sliders me-2"></i> LOW</div>
+                <div class="selector-btn" data-value="2"><i class="bi bi-exclamation-triangle-fill me-2"></i> {{ trans.high }}</div>
+                <div class="selector-btn" data-value="1"><i class="bi bi-info-circle-fill me-2"></i> {{ trans.medium }}</div>
+                <div class="selector-btn" data-value="0"><i class="bi bi-sliders me-2"></i> {{ trans.low }}</div>
               </div>
             </div>
 
             <div class="col-12 mt-3">
-              <label class="field-label">Detailed Description</label>
+              <label class="field-label">{{ trans.detailed_description }}</label>
               {{ form.description }}
               {% for error in form.description.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
@@ -145,34 +146,34 @@
       <div class="form-section">
         <div class="section-header">
           <div class="section-icon"><i class="bi bi-tools"></i></div>
-          <h2>Work Details</h2>
+          <h2>{{ trans.work_details }}</h2>
         </div>
         <div class="section-body">
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="field-label">Ticket Type</label>
+              <label class="field-label">{{ trans.ticket_type }}</label>
               {{ form.ticket_type }}
               {% for error in form.ticket_type.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
             <div class="col-md-6">
-              <label class="field-label">Estimated ETA</label>
+              <label class="field-label">{{ trans.estimated_eta }}</label>
               {{ form.estimated_eta }}
               {% for error in form.estimated_eta.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
             <div class="col-md-6">
-              <label class="field-label">Hours Worked</label>
+              <label class="field-label">{{ trans.hours_worked }}</label>
               {{ form.hours_worked }}
               {% for error in form.hours_worked.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
             </div>
             <div class="col-12 mt-3">
-              <label class="field-label">Impact Level</label>
+              <label class="field-label">{{ trans.impact_level }}</label>
               {{ form.impact_level }}
               {% for error in form.impact_level.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
               <div class="selector-group mt-2" id="impact-selector">
-                <div class="selector-btn" data-value="0">LOW</div>
-                <div class="selector-btn" data-value="1">MEDIUM</div>
-                <div class="selector-btn" data-value="2">HIGH</div>
-                <div class="selector-btn" data-value="3">CRITICAL</div>
+                <div class="selector-btn" data-value="0">{{ trans.low }}</div>
+                <div class="selector-btn" data-value="1">{{ trans.medium }}</div>
+                <div class="selector-btn" data-value="2">{{ trans.high }}</div>
+                <div class="selector-btn" data-value="3">{{ trans.critical }}</div>
               </div>
             </div>
           </div>
@@ -187,29 +188,29 @@
 
       {# Ticket Status #}
       <div class="sidebar-section">
-        <div class="sidebar-section-header"><span>Ticket Status</span></div>
+        <div class="sidebar-section-header"><span>{{ trans.ticket_status }}</span></div>
         <div class="sidebar-body">
-          <label class="field-label small">Current Status</label>
+          <label class="field-label small">{{ trans.current_status }}</label>
           {{ form.status }}
           {% for error in form.status.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
           <div class="selector-group mt-2 status-selector-group" id="status-selector">
-            <div class="selector-btn" data-value="0"><i class="bi bi-envelope d-block mb-1"></i>OPEN</div>
-            <div class="selector-btn" data-value="1"><i class="bi bi-gear d-block mb-1"></i>IN PROGRESS</div>
-            <div class="selector-btn" data-value="2"><i class="bi bi-eye d-block mb-1"></i>IN TESTING</div>
-            <div class="selector-btn" data-value="3"><i class="bi bi-check-circle d-block mb-1"></i>RESOLVED</div>
-            <div class="selector-btn" data-value="4"><i class="bi bi-lock d-block mb-1"></i>CLOSED</div>
+            <div class="selector-btn" data-value="0"><i class="bi bi-envelope d-block mb-1"></i>{{ trans.open_status }}</div>
+            <div class="selector-btn" data-value="1"><i class="bi bi-gear d-block mb-1"></i>{{ trans.in_progress_status }}</div>
+            <div class="selector-btn" data-value="2"><i class="bi bi-eye d-block mb-1"></i>{{ trans.in_testing_status }}</div>
+            <div class="selector-btn" data-value="3"><i class="bi bi-check-circle d-block mb-1"></i>{{ trans.resolved_status }}</div>
+            <div class="selector-btn" data-value="4"><i class="bi bi-lock d-block mb-1"></i>{{ trans.closed_status }}</div>
           </div>
         </div>
       </div>
 
       {# Resolution Routing #}
       <div class="sidebar-section">
-        <div class="sidebar-section-header"><span>Resolution Routing</span></div>
+        <div class="sidebar-section-header"><span>{{ trans.resolution_routing }}</span></div>
         <div class="sidebar-body">
-          <label class="field-label small">Assign Technician</label>
+          <label class="field-label small">{{ trans.assign_technician }}</label>
           <div style="position: relative;">
             <!-- Visible Search Input -->
-            <input type="text" id="assigned-search-input" class="field-input" placeholder="Search technician by name..."
+            <input type="text" id="assigned-search-input" class="field-input" placeholder="{{ trans.search_technician_placeholder }}"
               autocomplete="off">
 
             <!-- Hidden Actual Select -->
@@ -236,8 +237,8 @@
           <div class="compliance-box mt-3">
             <i class="bi bi-lightbulb"></i>
             <p>
-              <strong>Handover Note</strong>
-              Changing the technician will notify both the old and new assignees.
+              <strong>{{ trans.handover_note }}</strong>
+              {{ trans.handover_note_body }}
             </p>
           </div>
         </div>
@@ -245,19 +246,19 @@
 
       {# Attachments #}
       <div class="sidebar-section">
-        <div class="sidebar-section-header"><span>Attachments</span></div>
+        <div class="sidebar-section-header"><span>{{ trans.attachments }}</span></div>
         <div class="sidebar-body">
           <div class="upload-area" id="upload-drop-area">
             <input type="file" name="attachments" multiple id="ticket-file-input">
             <i class="bi bi-cloud-arrow-up d-block"></i>
-            <div class="upload-label">Drop images here or click to browse</div>
-            <div class="upload-hint">PNG, JPG or PDF up to 10MB</div>
+            <div class="upload-label">{{ trans.drop_images_here }}</div>
+            <div class="upload-hint">{{ trans.upload_hint }}</div>
           </div>
           <div id="file-list" class="mt-3 text-start small"></div>
 
           {% if ticket.attachments.all %}
           <div class="mt-4">
-            <label class="field-label small d-block mb-2">Existing Attachments</label>
+            <label class="field-label small d-block mb-2">{{ trans.existing_attachments }}</label>
             <div class="list-group list-group-flush border rounded">
               {% for att in ticket.attachments.all %}
               <div class="list-group-item d-flex align-items-center justify-content-between small py-2">
@@ -266,8 +267,8 @@
                   <a href="{{ att.file.url }}" target="_blank" class="text-truncate text-decoration-none text-dark"
                     style="max-width: 150px;">{{ att.file_name }}</a>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm border-0 py-0 px-1" title="Delete Attachment"
-                  onclick="if(confirm('Are you sure you want to delete this attachment?')) { location.href='{% url 'support:ticket_attachment_delete' att.id %}' }">
+                <button type="button" class="btn btn-outline-danger btn-sm border-0 py-0 px-1" title="{{ trans.delete_attachment }}"
+                  onclick="if(confirm('{{ trans.delete_attachment_confirm }}')) { location.href='{% url 'support:ticket_attachment_delete' att.id %}' }">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -279,7 +280,7 @@
       </div>
 
       <p class="required-note mt-3">
-        <span class="required-star">*</span> Required field
+        <span class="required-star">*</span> {{ trans.required_field }}
       </p>
 
     </div>{# /col-lg-4 #}
@@ -361,7 +362,7 @@
               suggestionsEl.style.display = 'block';
             } else {
               if (query) {
-                suggestionsEl.innerHTML = '<li class="p-3 text-center text-muted small">No results found</li>';
+                suggestionsEl.innerHTML = '<li class="p-3 text-center text-muted small">{{ trans.no_results_found }}</li>';
                 suggestionsEl.style.display = 'block';
               } else {
                 suggestionsEl.style.display = 'none';
@@ -413,7 +414,7 @@
       (item) => `
         <div class="suggestion-info">
           <span class="suggestion-name">${item.name}</span>
-          <span class="suggestion-tag">${item.tag || 'No Tag'}</span>
+            <span class="suggestion-tag">${item.tag || '{{ trans.no_tag }}'}</span>
         </div>
       `,
       (item, input, select, suggs) => {

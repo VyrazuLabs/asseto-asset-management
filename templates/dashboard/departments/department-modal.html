@@ -1,7 +1,7 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-diagram-3"></i> {{modal_title}}</h5>
-        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+        <h5 class="modal-title"><i class="bi bi-diagram-3"></i> {% if is_add_mode %}{{ trans.add_department }}{% else %}{{ trans.edit_department }}{% endif %}</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
             <i class="bi bi-x-lg"></i>
         </button>
     </div>
@@ -10,28 +10,28 @@
         <div class="modal-body-custom">
             <div class="form-grid">
                 <div class="form-group">
-                    <label>DEPARTMENT NAME <span class="required">*</span></label>
+                    <label>{{ trans.department_name_required }} <span class="required">*</span></label>
                     {{form.name}}
                     {% for error in form.name.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON NAME <span class="required">*</span></label>
+                    <label>{{ trans.contact_person_name_required }} <span class="required">*</span></label>
                     {{form.contact_person_name}}
                     {% for error in form.contact_person_name.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON EMAIL <span class="required">*</span></label>
+                    <label>{{ trans.contact_person_email_required }} <span class="required">*</span></label>
                     {{form.contact_person_email}}
                     {% for error in form.contact_person_email.errors %}
                     <small class="text-danger">{{ error }}</small>
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    <label>CONTACT PERSON PHONE <span class="required">*</span></label>
+                    <label>{{ trans.contact_person_phone_required }} <span class="required">*</span></label>
                     {{form.contact_person_phone}}
                     {% for error in form.contact_person_phone.errors %}
                     <small class="text-danger">{{ error }}</small>
@@ -41,10 +41,10 @@
         </div>
         <div class="modal-footer-custom">
             <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                <i class="bi bi-x-lg"></i> Cancel
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save">
-                <i class="bi bi-check-lg"></i> {% if modal_title == 'Edit Department' %}Update{% else %}Save{% endif %}
+                <i class="bi bi-check-lg"></i> {% if is_add_mode %}{{ trans.save }}{% else %}{{ trans.update }}{% endif %}
             </button>
         </div>
     </form>
@@ -269,9 +269,9 @@ function requestAndSendNotification() {
 }
 
 function sendNotification() {
-  const title = "Department Updated Successfully";
+  const title = "{{ trans.department_updated_notification_title }}";
   const options = {
-    body: "Department Updated Successfully.", 
+    body: "{{ trans.department_updated_notification_body }}", 
     icon: "/static/images/logo/favicon.png", 
   };
   new Notification(title, options);

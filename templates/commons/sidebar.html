@@ -34,11 +34,11 @@
             <div class="d-flex justify-content-between align-items-center">
                 {% if get_logo %}
                     <div class="logo">
-                        <a href="/"><img src="/media{{ get_logo }}" alt="Logo" srcset=""/></a>
+                        <a href="/"><img src="/media{{ get_logo }}" alt="{{ trans.logo_alt }}" srcset=""/></a>
                     </div>
                 {% else %}
                     <div class="logo pt-2" >
-                        <a href="/"><img src="{% static 'images/asseto-logo.svg' %}" alt="Logo" srcset=""/></a>
+                        <a href="/"><img src="{% static 'images/asseto-logo.svg' %}" alt="{{ trans.logo_alt }}" srcset=""/></a>
                     </div>
                 {% endif %}
 
@@ -78,13 +78,13 @@
         </div>
         <div class="sidebar-menu">
             <ul class="menu">
-                <li class="sidebar-title">Menu</li>
+                <li class="sidebar-title">{{ trans.menu }}</li>
 
                 <li class="sidebar-item {% if sidebar == 'index' %}active{% endif %}">
                     {% if request.user.is_superuser %}
                         <a href="/" class="sidebar-link">
-                            <i><img src="{% static 'images/new_logo/dash.svg' %}" alt="Dashboard" width="20" height="20"></i>
-                            <span>Dashboard</span>
+                            <i><img src="{% static 'images/new_logo/dash.svg' %}" alt="{{ trans.dashboard }}" width="20" height="20"></i>
+                            <span>{{ trans.dashboard }}</span>
                         </a>
                     {% endif %}
                 </li>
@@ -92,59 +92,59 @@
                 <li class="sidebar-item {% if sidebar == 'clients' %}active{% endif %}">
                     <a href="{% url 'clients:list' %}" class="sidebar-link">
                         <i class="bi bi-people-fill"></i>
-                        <span>Clients</span>
+                        <span>{{ trans.clients }}</span>
                     </a>
                 </li>
 
                 {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">
-                            <i><img src="{% static 'images/new_logo/vendor_new.svg' %}" alt="Vendors" width="20" height="20"></i>
-                            <span>Vendors</span>
+                            <i><img src="{% static 'images/new_logo/vendor_new.svg' %}" alt="{{ trans.vendors }}" width="20" height="20"></i>
+                            <span>{{ trans.vendors }}</span>
                         </a>
                     </li>
                 {% endif %}
                 {% if perms.authentication.view_product or perms.authentication.delete_product or perms.authentication.edit_product or perms.authentication.add_product %}
                     <li class="sidebar-item {% if sidebar == 'products' %}active{% endif %}">
                         <a href="{% url 'products:list' %}" class="sidebar-link">
-                            <i><img src="{% static 'images/new_logo/product_new.svg' %}" alt="Products" width="20" height="20"></i>
-                            <span>Products</span>
+                            <i><img src="{% static 'images/new_logo/product_new.svg' %}" alt="{{ trans.products }}" width="20" height="20"></i>
+                            <span>{{ trans.products }}</span>
                         </a>
                     </li>
                 {% endif %}
                 {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
                     <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
                         <a href="{% url 'users:list' %}" class="sidebar-link">
-                            <i><img src="{% static 'images/new_logo/user.svg' %}" alt="Users" width="20" height="20"></i>
-                            <span>Users</span>
+                            <i><img src="{% static 'images/new_logo/user.svg' %}" alt="{{ trans.users }}" width="20" height="20"></i>
+                            <span>{{ trans.users }}</span>
                         </a>
                     </li>
                 {% endif %}
                 <li class="sidebar-item {% if sidebar == 'audit' %}active{% endif %}">
                     <a href="{% url 'audit:pending_audits' %}" class="sidebar-link">
-                        <i><img src="{% static 'images/new_logo/hourglass.svg' %}" alt="Audit" width="20" height="20"></i>
-                        <span>Audit</span>
+                        <i><img src="{% static 'images/new_logo/hourglass.svg' %}" alt="{{ trans.audit }}" width="20" height="20"></i>
+                        <span>{{ trans.audit }}</span>
                     </a>
                 </li>
                 {% if perms.authentication.edit_asset or perms.authentication.delete_asset or perms.authentication.delete_assign_asset or perms.authentication.add_assign_asset or perms.authentication.add_asset or perms.authentication.reassign_assign_asset %}
                 <li class="sidebar-item {% if sidebar == 'assets' %}active{% endif %}">
                     <a href="{% url 'assets:list' %}" class="sidebar-link">
-                        <i><img src="{% static 'images/new_logo/asset.svg' %}" alt="Assets" width="20" height="20"></i>
-                        <span>Assets</span>
+                        <i><img src="{% static 'images/new_logo/asset.svg' %}" alt="{{ trans.assets }}" width="20" height="20"></i>
+                        <span>{{ trans.assets }}</span>
                     </a>
                 </li>
                 {% endif %}
                 <li class="sidebar-item {% if sidebar == 'gate-pass' %}active{% endif %}">
                     <a href="{% url 'gate-pass:list' %}" class="sidebar-link">
                         <i class="bi bi-ticket-detailed-fill"></i>
-                        <span>Gate Pass</span>
+                        <span>{{ trans.gate_pass }}</span>
                     </a>
                 </li>
                 {% if perms.authentication.edit_license or perms.authentication.delete_license or perms.authentication.add_license %}
                 <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
                     <a href="{% url 'license:license_list' %}" class="sidebar-link">
                         <i class="bi bi-key-fill"></i>
-                        <span>License</span>
+                        <span>{{ trans.license }}</span>
                     </a>
                 </li>
                 {% endif %}
@@ -153,47 +153,47 @@
                     {% if request.user.is_superuser %}
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-person-fill"></i>
-                            <span>Admin</span>
+                            <span>{{ trans.admin }}</span>
                         </a>
                     {% endif %}
                     <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
                         {% if perms.authentication.add_location or perms.authentication.edit_location or perms.authentication.delete_location or perms.authentication.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
-                                <a href="{% url 'dashboard:locations' %}">Locations</a>
+                                <a href="{% url 'dashboard:locations' %}">{{ trans.locations }}</a>
                             </li>
                         {% endif %}
                         {% if perms.authentication.add_department or perms.authentication.delete_department or perms.authentication.edit_department %}
                             <li class="submenu-item {% if submenu == 'department' %}active{% endif %}">
-                                <a href="{% url 'dashboard:departments' %}">Departments</a>
+                                <a href="{% url 'dashboard:departments' %}">{{ trans.departments }}</a>
                             </li>
                         {% endif %}
                         {% if perms.authentication.add_product_type or perms.authentication.edit_product_type or perms.authentication.edit_product_type %}
                             <li class="submenu-item {% if submenu == 'product_type' %}active{% endif %}">
-                                <a href="{% url 'dashboard:product_type_list' %}">Product Types</a>
+                                <a href="{% url 'dashboard:product_type_list' %}">{{ trans.product_types }}</a>
                             </li>
                         {% endif %}
 
                         {% if perms.authentication.add_license_type or perms.authentication.edit_license_type %}
                             <li class="submenu-item {% if submenu == 'license_type' %}active{% endif %}">
-                                <a href="{% url 'dashboard:license_type_list' %}">License Types</a>
+                                <a href="{% url 'dashboard:license_type_list' %}">{{ trans.license_types }}</a>
                             </li>
                         {% endif %}
 
                         {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
                             <li class="submenu-item {% if submenu == 'product_category' %}active{% endif %}">
-                                <a href="{% url 'dashboard:product_category_list' %}">Product Categories</a>
+                                <a href="{% url 'dashboard:product_category_list' %}">{{ trans.product_categories }}</a>
                             </li>
                         {% endif %}
 
                         {% if perms.authentication.delete_product_category or perms.authentication.add_product_category or perms.authentication.edit_product_category %}
                             <li class="submenu-item {% if submenu == 'Asset_Status' %}active{% endif %}">
-                                <a href="{% url 'assets:asset_status_list' %}">Asset Status</a>
+                                <a href="{% url 'assets:asset_status_list' %}">{{ trans.asset_status }}</a>
                             </li>
                         {% endif %}
                         
                         {% if request.user.is_superuser %}
                             <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
-                                <a href="{% url 'roles:list' %}">Roles</a>
+                                <a href="{% url 'roles:list' %}">{{ trans.roles }}</a>
                             </li>
                         {% endif %}
                     </ul>
@@ -202,20 +202,20 @@
                     <li class="sidebar-item has-sub {% if sidebar == 'configurations' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-sliders2-vertical"></i>
-                            <span>Configuration</span>
+                            <span>{{ trans.configuration }}</span>
                         </a>
                         <ul class="submenu {% if sidebar == 'configurations' %}active{% endif %}">
                             <li class="submenu-item {% if submenu == 'branding' %}active{% endif %}">
-                                <a href="{% url 'configurations:upload_logo' %}">Branding</a>
+                                <a href="{% url 'configurations:upload_logo' %}">{{ trans.branding }}</a>
                             </li>
                             <li class="submenu-item {% if submenu == 'tag-configuration' %}active{% endif %}">
-                                <a href="{% url 'configurations:list_tag' %}">Tag Configuration</a>
+                                <a href="{% url 'configurations:list_tag' %}">{{ trans.tag_configuration }}</a>
                             </li>
                             <li class="submenu-item {% if submenu == 'localization' %}active{% endif %}">
-                                <a href="{% url 'configurations:list_localization' %}">Localizations</a>
+                                <a href="{% url 'configurations:list_localization' %}">{{ trans.localizations }}</a>
                             </li>
                             <li class="submenu-item {% if submenu == 'organization' %}active{% endif %}">
-                                <a href="{% url 'configurations:add_organization' %}">Organizations</a>
+                                <a href="{% url 'configurations:add_organization' %}">{{ trans.organizations }}</a>
                             </li>
                         </ul>
                     </li>
@@ -224,38 +224,38 @@
                     <li class="sidebar-item has-sub {% if sidebar == 'upload' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-hdd-fill"></i>
-                            <span>Upload</span>
+                            <span>{{ trans.upload }}</span>
                         </a>
                         <ul class="submenu {% if sidebar == 'upload' %}active{% endif %}">
                             {% if perms.authentication.add_vendor %}
                                 <li class="submenu-item {% if submenu == 'vendors' %}active{% endif %}">
-                                    <a href="{% url 'upload:vendor_list' %}">Vendors</a>
+                                    <a href="{% url 'upload:vendor_list' %}">{{ trans.vendors }}</a>
                                 </li>
                             {% endif %}
                             {% if perms.authentication.add_location %}
                                 <li class="submenu-item {% if submenu == 'locations' %}active{% endif %}">
-                                    <a href="{% url 'upload:location_list' %}">Locations</a>
+                                    <a href="{% url 'upload:location_list' %}">{{ trans.locations }}</a>
                                 </li>
                             {% endif %}
                             {% if perms.authentication.add_department %}
                                 <li class="submenu-item {% if submenu == 'departments' %} active {% endif %}">
-                                    <a href="{% url 'upload:department_list' %}">Departments</a>
+                                    <a href="{% url 'upload:department_list' %}">{{ trans.departments }}</a>
                                 </li> 
                             {% endif %}
                             {% if perms.authentication.add_product_type %}
                                 <li class="submenu-item {% if submenu == 'product_types' %}active{% endif %}">
-                                    <a href="{% url 'upload:product_type_list' %}">Product Types</a>
+                                    <a href="{% url 'upload:product_type_list' %}">{{ trans.product_types }}</a>
                                 </li>
                             {% endif %}
                             {% if perms.authentication.add_product_category %}
                                 <li class="submenu-item {% if submenu == 'product_categories' %}active{% endif %}"> 
-                                    <a href="{% url 'upload:product_category_list' %}">Product Categories</a>
+                                    <a href="{% url 'upload:product_category_list' %}">{{ trans.product_categories }}</a>
                                 </li>
                             {% endif %}
                             
                             {% if perms.authentication.add_users %}
                                 <li class="submenu-item {% if submenu == 'users' %}active{% endif %}"> 
-                                    <a href="{% url 'upload:user_list' %}">Users</a>
+                                    <a href="{% url 'upload:user_list' %}">{{ trans.users }}</a>
                                 </li>
                             {% endif %}
                         </ul>
@@ -264,15 +264,15 @@
                 {% if request.user.is_superuser %}
                     <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
                         <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
-                            <span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></span>
-                            <span>Extensions</span>
+                            <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></i>
+                            <span>{{ trans.extensions }}</span>
                         </a>
                     </li>
                 {% endif %}
                 <li class="sidebar-item {% if sidebar == 'support' %}active{% endif %}">
                     <a href="{% url 'support:ticket_list' %}" class="sidebar-link">
                         <i class="bi bi-headset"></i>
-                        <span>Support Ticket</span>
+                        <span>{{ trans.support_ticket }}</span>
                     </a>
                 </li>
             </ul>
