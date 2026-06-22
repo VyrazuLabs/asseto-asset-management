@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Address,Location,Organization,ProductType,ProductCategory,Department
+from dashboard.models import Address,Location,Organization,ProductType,ProductCategory,Department
 # Create your tests here.
 
 class Asseto_test_address(TestCase):

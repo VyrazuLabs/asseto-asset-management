@@ -139,6 +139,9 @@ from dashboard.models import ProductCategory, ProductType, Organization,Location
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 class AssetTest(LiveServerTestCase):
 

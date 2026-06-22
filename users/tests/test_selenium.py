@@ -64,6 +64,9 @@ from selenium.webdriver.common.by import By
 from authentication.models import User
 from dashboard.models import Organization
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class UserTest(LiveServerTestCase):

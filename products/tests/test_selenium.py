@@ -111,6 +111,9 @@ from authentication.models import User
 from products.models import Product
 from dashboard.models import ProductCategory, ProductType,Organization
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class ProductTest(LiveServerTestCase):

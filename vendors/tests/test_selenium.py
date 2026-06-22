@@ -395,6 +395,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from authentication.models import User
 from vendors.models import Vendor
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class VendorTest(LiveServerTestCase):
