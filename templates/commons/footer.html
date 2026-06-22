@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function() {
         scannerBtn.addEventListener("click", async () => {
             const hasCamera = await cameraAvailable();
             if (!hasCamera) {
-                alert("⚠️ No camera device found.");
+                alert("No camera device found.");
                 return;
             }
 

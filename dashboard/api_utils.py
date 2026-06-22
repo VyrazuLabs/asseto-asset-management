@@ -1,5 +1,4 @@
 from assets.models import Asset, AssignAsset, AssetImage
-from dashboard.models import CustomField
 from products.models import ProductImage,Product
 from django.db.models import Q,Count
 from authentication.models import User

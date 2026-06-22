@@ -415,6 +415,9 @@ body.theme-dark .pd-notif-card {
     .pd-info-grid {
         grid-template-columns: 1fr;
     }
+    .pd-info-item.full-width {
+        grid-column: span 1;
+    }
     .pd-2fa-content {
         flex-direction: column;
         align-items: flex-start;
@@ -422,4 +425,213 @@ body.theme-dark .pd-notif-card {
     .pd-2fa-actions {
         width: 100%;
     }
+    .pd-card {
+        padding: 1.5rem;
+    }
+    .pd-notif-card {
+        padding: 1.5rem;
+    }
+    .pd-section-title h3 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .pd-card {
+        padding: 1.25rem;
+    }
+    .pd-notif-card {
+        padding: 1.25rem;
+    }
+    .pd-page-title {
+        font-size: 1.35rem;
+    }
+    .pd-2fa-actions {
+        min-width: unset;
+        width: 100%;
+    }
+    .pd-2fa-icon {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        font-size: 1.25rem;
+    }
+    .pd-avatar-wrapper {
+        width: 110px;
+        height: 110px;
+    }
+    .pd-avatar-edit {
+        width: 28px;
+        height: 28px;
+        bottom: -6px;
+        right: -6px;
+        font-size: 0.75rem;
+    }
+    .pd-profile-name {
+        font-size: 1.2rem;
+    }
+    .pd-section-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .pd-notif-item {
+        padding: 1rem;
+    }
+    .pd-notif-icon {
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+        font-size: 1rem;
+    }
+    .pd-notif-title {
+        font-size: 0.9rem;
+    }
+    .pd-notif-desc {
+        font-size: 0.8rem;
+    }
+    .pd-contact-item {
+        gap: 0.75rem;
+    }
+    .pd-2fa-content {
+        gap: 1rem;
+    }
+    #userOtp {
+        width: 100% !important;
+    }
+    .otp-verify-btn {
+        width: 100%;
+        display: flex;
+    }
+    .pd-btn-primary {
+        width: 100%;
+        display: flex;
+    }
+    .verified-tick-circle {
+        width: 60px;
+        height: 60px;
+    }
+    .verified-tick-svg {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+.qr-code-image {
+    max-width: 250px;
+    border-radius: 36px;
+}
+
+/* OTP Input Boxes */
+.pd-otp-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pd-otp-box {
+    width: 48px;
+    height: 54px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 10px;
+    border: 2px solid var(--pd-input-border);
+    background: var(--pd-input-bg);
+    color: var(--pd-text-main);
+    transition: all 0.2s;
+}
+
+.pd-otp-box:focus {
+    border-color: var(--pd-primary);
+    box-shadow: 0 0 0 4px var(--pd-primary-light);
+    outline: none;
+}
+
+.pd-otp-box.filled {
+    border-color: var(--pd-primary);
+    background: var(--pd-primary-light);
+}
+
+/* Primary Button matching app theme */
+.pd-btn-primary {
+    background: var(--pd-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.2s;
+}
+
+.pd-btn-primary:hover {
+    background: var(--pd-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(45, 92, 240, 0.25);
+    color: white;
+}
+
+.pd-btn-primary:active {
+    transform: translateY(0);
+}
+
+.verified-tick-wrap {
+    padding: 20px 0;
+}
+.verified-tick-circle {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    position: relative;
+}
+.verified-tick-svg {
+    width: 80px;
+    height: 80px;
+}
+.verified-tick-circle-bg {
+    stroke: #28a745;
+    stroke-width: 2;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: strokeAnim 0.6s ease-in-out forwards;
+}
+.verified-tick-check {
+    stroke: #28a745;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: strokeAnim 0.4s ease-in-out 0.6s forwards;
+}
+.verified-text {
+    color: #28a745;
+    font-weight: 600;
+    opacity: 0;
+    animation: fadeInUp 0.4s ease-in-out 1s forwards;
+}
+@keyframes strokeAnim {
+    to { stroke-dashoffset: 0; }
+}
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.otp-verify-btn {
+    background: var(--pd-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.2s;
 }

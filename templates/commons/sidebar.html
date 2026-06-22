@@ -89,14 +89,16 @@
                     {% endif %}
                 </li>
 
+                {% if perms.authentication.view_client %}
                 <li class="sidebar-item {% if sidebar == 'clients' %}active{% endif %}">
                     <a href="{% url 'clients:list' %}" class="sidebar-link">
                         <i class="bi bi-people-fill"></i>
                         <span>{{ trans.clients }}</span>
                     </a>
                 </li>
+                {% endif %}
 
-                {% if perms.authentication.delete_vendor or perms.authentication.edit_vendor or perms.authentication.add_vendor or perms.authentication.view_vendor %}
+                {% if perms.authentication.view_vendor %}
                     <li class="sidebar-item {% if sidebar == 'vendors' %}active{% endif %}">
                         <a href="{% url 'vendors:list' %}" class="sidebar-link">
                             <i><img src="{% static 'images/new_logo/vendor_new.svg' %}" alt="{{ trans.vendors }}" width="20" height="20"></i>
@@ -104,7 +106,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if perms.authentication.view_product or perms.authentication.delete_product or perms.authentication.edit_product or perms.authentication.add_product %}
+                {% if perms.authentication.view_product %}
                     <li class="sidebar-item {% if sidebar == 'products' %}active{% endif %}">
                         <a href="{% url 'products:list' %}" class="sidebar-link">
                             <i><img src="{% static 'images/new_logo/product_new.svg' %}" alt="{{ trans.products }}" width="20" height="20"></i>
@@ -112,7 +114,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if perms.authentication.view_users or perms.authentication.delete_users or perms.authentication.edit_users or perms.authentication.add_users %}
+                {% if perms.authentication.view_users %}
                     <li class="sidebar-item {% if sidebar == 'users' %}active{% endif %}">
                         <a href="{% url 'users:list' %}" class="sidebar-link">
                             <i><img src="{% static 'images/new_logo/user.svg' %}" alt="{{ trans.users }}" width="20" height="20"></i>
@@ -120,13 +122,16 @@
                         </a>
                     </li>
                 {% endif %}
+
+                {% if perms.authentication.view_audit %}
                 <li class="sidebar-item {% if sidebar == 'audit' %}active{% endif %}">
                     <a href="{% url 'audit:pending_audits' %}" class="sidebar-link">
                         <i><img src="{% static 'images/new_logo/hourglass.svg' %}" alt="{{ trans.audit }}" width="20" height="20"></i>
                         <span>{{ trans.audit }}</span>
                     </a>
                 </li>
-                {% if perms.authentication.edit_asset or perms.authentication.delete_asset or perms.authentication.delete_assign_asset or perms.authentication.add_assign_asset or perms.authentication.add_asset or perms.authentication.reassign_assign_asset %}
+                {% endif %}
+                {% if perms.authentication.view_asset %}
                 <li class="sidebar-item {% if sidebar == 'assets' %}active{% endif %}">
                     <a href="{% url 'assets:list' %}" class="sidebar-link">
                         <i><img src="{% static 'images/new_logo/asset.svg' %}" alt="{{ trans.assets }}" width="20" height="20"></i>
@@ -134,12 +139,14 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if perms.authentication.gate_pass %}
                 <li class="sidebar-item {% if sidebar == 'gate-pass' %}active{% endif %}">
                     <a href="{% url 'gate-pass:list' %}" class="sidebar-link">
                         <i class="bi bi-ticket-detailed-fill"></i>
                         <span>{{ trans.gate_pass }}</span>
                     </a>
                 </li>
+                {% endif %}
                 {% if perms.authentication.edit_license or perms.authentication.delete_license or perms.authentication.add_license %}
                 <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
                     <a href="{% url 'license:license_list' %}" class="sidebar-link">
