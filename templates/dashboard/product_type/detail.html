@@ -78,7 +78,7 @@
 function openEditProductTypeModal(url) {
     var modalEl = document.getElementById('update-product-type-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-product-type-modal-content'
     }).then(function() {

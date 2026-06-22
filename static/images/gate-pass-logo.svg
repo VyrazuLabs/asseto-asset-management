@@ -2,12 +2,12 @@
 <svg width="128" height="128" viewBox="0 0 50 64" xmlns="http://www.w3.org/2000/svg">
   <!-- Door -->
   <rect x="18" y="14" width="20" height="35" rx="3" stroke="#333" stroke-width="2" fill="#EAEAEA"/>
-  
+
   <!-- Door knob -->
   <circle cx="34" cy="32" r="2" fill="#333"/>
-  
+
   <!-- Arrow (white fill with black border) -->
-  <polygon 
+  <polygon
     points="6,30 22,30 22,24 30,32 22,40 22,34 6,34"
     fill="#FFFFFF"
     stroke="#000000"

@@ -8,13 +8,23 @@ import django_resized.forms
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0016_alter_organization_logo'),
+        ("dashboard", "0016_alter_organization_logo"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organization',
-            name='logo',
-            field=django_resized.forms.ResizedImageField(blank=True, crop=None, force_format='JPEG', keep_meta=True, null=True, quality=75, scale=None, size=[1024, 768], upload_to=dashboard.models.path_and_rename),
+            model_name="organization",
+            name="logo",
+            field=django_resized.forms.ResizedImageField(
+                blank=True,
+                crop=None,
+                force_format="JPEG",
+                keep_meta=True,
+                null=True,
+                quality=75,
+                scale=None,
+                size=[1024, 768],
+                upload_to=dashboard.models.path_and_rename,
+            ),
         ),
     ]

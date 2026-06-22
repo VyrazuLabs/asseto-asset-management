@@ -29,7 +29,7 @@
         </a>
         {% if perms.authentication.edit_department %}
         <button type="button" class="btn-save-asset" hx-get="{% url 'dashboard:update_department' department.id %}"
-          hx-target="#update-department-modal-content" data-bs-toggle="modal" data-bs-target="#update-department-modal" 
+          hx-target="#update-department-modal-content" data-bs-toggle="modal" data-bs-target="#update-department-modal"
           {% if is_demo %}disabled{% endif %}>
           <i class="bi bi-pencil"></i> {{ trans.update_department }}
         </button>

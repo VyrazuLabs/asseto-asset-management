@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0007_remove_productcategory_product_type'),
+        ("dashboard", "0007_remove_productcategory_product_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='producttype',
-            name='is_deleted',
+            model_name="producttype",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
     ]

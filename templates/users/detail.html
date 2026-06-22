@@ -223,7 +223,7 @@
           <h3 class="card-header-title">{{ trans.activity_log }}</h3>
           <a href="#" class="btn-reset text-primary fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">{{ trans.view_all_history }}</a>
         </div>
-        
+
         <div class="table-responsive">
           <table class="activity-table">
             <thead>
@@ -269,7 +269,7 @@
             </tbody>
           </table>
         </div>
-        
+
         {% if page_object.paginator.num_pages > 1 %}
         <div class="border-top p-3">
           {% include 'commons/list-pagination.html' with item_label="history" page_object=page_object page_param="history_page" %}

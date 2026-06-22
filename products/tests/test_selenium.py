@@ -109,7 +109,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from authentication.models import User
 from products.models import Product
-from dashboard.models import ProductCategory, ProductType,Organization
+from dashboard.models import ProductCategory, ProductType, Organization
 import time
 import pytest
 
@@ -125,27 +125,25 @@ class ProductTest(LiveServerTestCase):
             username="testuser",
             full_name="Test User",
             phone="9808123456",
-            password="password123"
+            password="password123",
         )
         self.test_user.is_active = True
         self.test_user.save()
-        self.organization=Organization.objects.create(
+        self.organization = Organization.objects.create(
             name="Organization 1",
             website="www.example.com",
             email="organization@example.com",
-            phone="1234567890"
+            phone="1234567890",
         )
         self.root_category = ProductCategory.objects.create(
-            name="Root",
-            organization=self.organization,
-            parent=None
+            name="Root", organization=self.organization, parent=None
         )
-        self.product_category=ProductCategory.objects.create(
+        self.product_category = ProductCategory.objects.create(
             name="Product Category 1",
             organization=self.organization,
-            parent=self.root_category
+            parent=self.root_category,
         )
-        self.product_type=ProductType.objects.create(
+        self.product_type = ProductType.objects.create(
             name="Product Type 1",
             organization=self.organization,
         )
@@ -155,7 +153,7 @@ class ProductTest(LiveServerTestCase):
             product_type=self.product_type,
             product_sub_category=self.product_category,
             description="Old Product",
-        )  
+        )
         self.product.save()
         # Django test client
         self.client = Client()
@@ -164,7 +162,7 @@ class ProductTest(LiveServerTestCase):
         self.client.login(email="testuser@gmail.com", password="password123")
 
         # Get session cookie
-        self.session_cookie = self.client.cookies['sessionid']
+        self.session_cookie = self.client.cookies["sessionid"]
 
         # Start selenium driver
         self.driver = webdriver.Chrome()
@@ -174,12 +172,14 @@ class ProductTest(LiveServerTestCase):
         self.driver.get(self.live_server_url)
 
         # Inject session cookie into browser
-        self.driver.add_cookie({
-            'name': 'sessionid',
-            'value': self.session_cookie.value,
-            'path': '/',
-            'secure': False
-        })
+        self.driver.add_cookie(
+            {
+                "name": "sessionid",
+                "value": self.session_cookie.value,
+                "path": "/",
+                "secure": False,
+            }
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -216,10 +216,8 @@ class ProductTest(LiveServerTestCase):
         self.assertIn("Test Laptop", self.driver.page_source)
 
     def test_update_product(self):
-        print("prod_id",self.product.id)
-        self.driver.get(
-            f"{self.live_server_url}/products/update/{self.product.id}"
-        )
+        print("prod_id", self.product.id)
+        self.driver.get(f"{self.live_server_url}/products/update/{self.product.id}")
 
         name_field = self.driver.find_element(By.NAME, "name")
         name_field.clear()
@@ -232,15 +230,12 @@ class ProductTest(LiveServerTestCase):
         print("Product Updated")
         self.assertIn("Updated Laptop", self.driver.page_source)
 
-
     # -------------------------------
     # DELETE PRODUCT TEST
     # -------------------------------
     def test_delete_product(self):
-        print("prod_id",self.product.id)
-        self.driver.get(
-            f"{self.live_server_url}/products/list"
-        )
+        print("prod_id", self.product.id)
+        self.driver.get(f"{self.live_server_url}/products/list")
 
         # delete_button = self.driver.find_element(
         #     By.XPATH, f"//a[contains(@href,'/products/delete/{self.product.id}')]"
@@ -248,6 +243,6 @@ class ProductTest(LiveServerTestCase):
         delete_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
         delete_button.click()
 
-        time.sleep(2)   
+        time.sleep(2)
         print("Product Deleted")
         # self.assertNotIn("New Laptop", self.driver.page_source)

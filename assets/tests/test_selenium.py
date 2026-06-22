@@ -46,7 +46,7 @@
 
 #         # Step 3: click add asset
 #         # add_asset = self.driver.find_element(By.CSS_SELECTOR("button[class*='btn btn-sm btn-outline-info my-3 me-2']"))
-    
+
 #         # add_asset=self.driver.find_element(By.XPATH, "//button[text()='Add Asset']").click()
 #         add_asset = self.driver.find_element(By.ID, "asset-add")
 #         # add_asset = WebDriverWait(self.driver, 10).until(
@@ -116,7 +116,6 @@
 
 #         print("Uploading Asset Image ----------")
 
-        
 
 #         self.driver.get("http://10.0.0.91:9000/assets/update/1")
 
@@ -135,13 +134,14 @@ from authentication.models import User
 from assets.models import Asset, AssetStatus
 from products.models import Product
 from vendors.models import Vendor
-from dashboard.models import ProductCategory, ProductType, Organization,Location
+from dashboard.models import ProductCategory, ProductType, Organization, Location
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pytest
 
 pytestmark = pytest.mark.selenium
+
 
 class AssetTest(LiveServerTestCase):
 
@@ -155,7 +155,7 @@ class AssetTest(LiveServerTestCase):
             username="testuser",
             full_name="Test User",
             phone="9808123456",
-            password="password123"
+            password="password123",
         )
         self.test_user.is_active = True
         self.test_user.is_superuser = True
@@ -168,34 +168,29 @@ class AssetTest(LiveServerTestCase):
             name="Organization 1",
             website="www.example.com",
             email="organization@example.com",
-            phone="1234567890"
+            phone="1234567890",
         )
 
         # -------------------------
         # Product Setup
         # -------------------------
         self.root_category = ProductCategory.objects.create(
-            name="Root",
-            organization=self.organization,
-            parent=None
+            name="Root", organization=self.organization, parent=None
         )
 
         self.product_category = ProductCategory.objects.create(
-            name="Laptop",
-            organization=self.organization,
-            parent=self.root_category
+            name="Laptop", organization=self.organization, parent=self.root_category
         )
 
         self.product_type = ProductType.objects.create(
-            name="Electronics",
-            organization=self.organization
+            name="Electronics", organization=self.organization
         )
 
         self.product = Product.objects.create(
             name="Dell Laptop",
             product_type=self.product_type,
             product_sub_category=self.product_category,
-            organization=self.organization
+            organization=self.organization,
         )
 
         # -------------------------
@@ -205,23 +200,21 @@ class AssetTest(LiveServerTestCase):
             name="Test Vendor",
             email="vendor@test.com",
             phone="9999999999",
-            contact_person="John Doe"
+            contact_person="John Doe",
         )
 
         # -------------------------
         # Location
         # -------------------------
         self.location = Location.objects.create(
-            office_name="Head Office",
-            organization=self.organization
+            office_name="Head Office", organization=self.organization
         )
 
         # -------------------------
         # Asset Status
         # -------------------------
         self.asset_status = AssetStatus.objects.create(
-            name="Available",
-            organization=self.organization
+            name="Available", organization=self.organization
         )
 
         # -------------------------
@@ -236,16 +229,16 @@ class AssetTest(LiveServerTestCase):
             vendor=self.vendor,
             location=self.location,
             asset_status=self.asset_status,
-            organization=self.organization
+            organization=self.organization,
         )
-        print(self.asset,"IN ASSET SETUPPPPPPPPPPP")
+        print(self.asset, "IN ASSET SETUPPPPPPPPPPP")
         # -------------------------
         # Django Client Login
         # -------------------------
         self.client = Client()
         self.client.login(email="testuser@gmail.com", password="password123")
 
-        self.session_cookie = self.client.cookies['sessionid']
+        self.session_cookie = self.client.cookies["sessionid"]
 
         # -------------------------
         # Selenium Driver
@@ -255,12 +248,14 @@ class AssetTest(LiveServerTestCase):
 
         self.driver.get(self.live_server_url)
 
-        self.driver.add_cookie({
-            "name": "sessionid",
-            "value": self.session_cookie.value,
-            "path": "/",
-            "secure": False
-        })
+        self.driver.add_cookie(
+            {
+                "name": "sessionid",
+                "value": self.session_cookie.value,
+                "path": "/",
+                "secure": False,
+            }
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -286,21 +281,19 @@ class AssetTest(LiveServerTestCase):
         )
 
         add_asset_button.click()
-        
+
         time.sleep(2)
 
         self.driver.find_element(By.NAME, "tag").send_keys("ASSET002")
         self.driver.find_element(By.NAME, "name").send_keys("Test Laptop")
         self.driver.find_element(By.NAME, "serial_no").send_keys("SN98765")
         self.driver.find_element(By.NAME, "price").send_keys("60000")
-        print(self.asset.id,"ASSET_IDDDDDDDDDDDDDDDDDDDDDD")
+        print(self.asset.id, "ASSET_IDDDDDDDDDDDDDDDDDDDDDD")
         self.driver.find_element(By.NAME, "description").send_keys(
             "Asset created via Selenium"
         )
 
-        submit_button = self.driver.find_element(
-            By.XPATH, "//button[@type='submit']"
-        )
+        submit_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
 
         submit_button.click()
 
@@ -345,9 +338,7 @@ class AssetTest(LiveServerTestCase):
         )
 
         wait = WebDriverWait(self.driver, 10)
-        name_field = wait.until(
-            EC.presence_of_element_located((By.NAME, "name"))
-        )
+        name_field = wait.until(EC.presence_of_element_located((By.NAME, "name")))
         name_field.clear()
         name_field.send_keys("Updated Laptop")
 
@@ -357,6 +348,7 @@ class AssetTest(LiveServerTestCase):
         submit_button.click()
 
         self.assertIn("Updated Laptop", self.driver.page_source)
+
     # -------------------------
     # DELETE ASSET
     # -------------------------

@@ -7,6 +7,7 @@ from notifications.service import NotificationService
 
 User = get_user_model()
 
+
 @receiver(pre_save, sender=Product)
 def store_previous_product_state(sender, instance, **kwargs):
     if instance.pk:
@@ -21,12 +22,10 @@ def store_previous_product_state(sender, instance, **kwargs):
         instance._old_name = None
         instance._old_status = None
 
+
 @receiver(post_save, sender=Product)
 def product_notification(sender, instance, created, **kwargs):
-    admins = User.objects.filter(
-        is_superuser=True,
-        organization=instance.organization
-    )
+    admins = User.objects.filter(is_superuser=True, organization=instance.organization)
     if created:
         for admin in admins:
             NotificationService.send(
@@ -57,7 +56,7 @@ def product_notification(sender, instance, created, **kwargs):
 
         if old_value != new_value:
             changed_fields.append(field_name)
-        # Deleted
+            # Deleted
             if "is_deleted" in changed_fields and instance.is_deleted:
                 for admin in admins:
                     NotificationService.send(
@@ -82,13 +81,14 @@ def product_notification(sender, instance, created, **kwargs):
                         icon="bi-toggle-on",
                         link="/products/list",
                         object_id=str(instance.id),
-                        instance_id=instance.id
+                        instance_id=instance.id,
                     )
                 return
 
             # Other updates
             other_changes = [
-                field for field in changed_fields
+                field
+                for field in changed_fields
                 if field not in ["is_deleted", "status"]
             ]
 
@@ -104,5 +104,3 @@ def product_notification(sender, instance, created, **kwargs):
                         object_id=str(instance.id),
                     )
                 return
-
-            

@@ -31,10 +31,12 @@ from firebase_admin import credentials
 # from firebase_admin import initialize_app
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env', override=True)
-cipher_suite = Fernet(b'NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=')
+load_dotenv(BASE_DIR / ".env", override=True)
+cipher_suite = Fernet(b"NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=")
 # print("FERNET_KEY:", cipher_suite)
-file_name = os.getenv('FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY', 'firebase-credentials.json')
+file_name = os.getenv(
+    "FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY", "firebase-credentials.json"
+)
 cred_path = BASE_DIR / file_name
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
 
@@ -49,14 +51,14 @@ if firebase_credentials:
 elif cred_path.exists():
     cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
 
-DEBUG=True 
+DEBUG = True
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6380/0'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6380/0'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_URL = "redis://127.0.0.1:6380/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6380/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
 CELERY_TASK_TIME_LIMIT = 30  # hard kill
 CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
 
@@ -64,81 +66,89 @@ CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG') or False
+DEBUG = config("DEBUG") or False
 if DEBUG:
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ["*"]
 
 else:
-    ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')] if os.environ.get('ALLOWED_HOSTS') else ['.onrender.com']
+    ALLOWED_HOSTS = (
+        [os.environ.get("ALLOWED_HOSTS")]
+        if os.environ.get("ALLOWED_HOSTS")
+        else [".onrender.com"]
+    )
 
-CSRF_TRUSTED_ORIGINS = [os.environ.get('CSRF_TRUSTED_ORIGINS')] if os.environ.get('CSRF_TRUSTED_ORIGINS') else ['https://*.onrender.com']
+CSRF_TRUSTED_ORIGINS = (
+    [os.environ.get("CSRF_TRUSTED_ORIGINS")]
+    if os.environ.get("CSRF_TRUSTED_ORIGINS")
+    else ["https://*.onrender.com"]
+)
 
-LOCALHOST_URL = 'http:127.0.0.1:8000'
-DEV_URL = os.environ.get('DEV_URL') if os.getcwd() == "/app" else None
+LOCALHOST_URL = "http:127.0.0.1:8000"
+DEV_URL = os.environ.get("DEV_URL") if os.getcwd() == "/app" else None
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
     "django_htmx",
-    'authentication',
-    'vendors',
-    'products',
-    'assets',
-    'dashboard',
-    'recycle_bin',
-    'upload',
-    'error_handlers',
-    'smart_selects',
-    'roles',
-    'users',
-    'support',
-    'notifications',
-    'simple_history',
-    'configurations',
-    'drf_spectacular',
-    'audit',
-    'license',
+    "authentication",
+    "vendors",
+    "products",
+    "assets",
+    "dashboard",
+    "recycle_bin",
+    "upload",
+    "error_handlers",
+    "smart_selects",
+    "roles",
+    "users",
+    "support",
+    "notifications",
+    "simple_history",
+    "configurations",
+    "drf_spectacular",
+    "audit",
+    "license",
     # 'silk'
-    'gate_pass',
-    'clients',
-    'client_portal',
+    "gate_pass",
+    "clients",
+    "client_portal",
 ]
 # FIREBASE_APP = initialize_app()
-ENABLE_TRACEBACK=True
-TRACEBACK_SHOW_LOCALS=True
-TRACEBACK_LOCALS_MAX_LENGTH=None # Set to None to show full locals information
-PRINT_TRACEBACK_INFO_TO_CONSOLE=True # Set to False if not required
+ENABLE_TRACEBACK = True
+TRACEBACK_SHOW_LOCALS = True
+TRACEBACK_LOCALS_MAX_LENGTH = None  # Set to None to show full locals information
+PRINT_TRACEBACK_INFO_TO_CONSOLE = True  # Set to False if not required
 MIDDLEWARE = [
     "authentication.middleware.DBConnectionMiddleware",
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     # "authentication.middleware.DynamicCsrfMiddleware",
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "client_portal.middleware.ClientPortalMiddleware",
     # 'silk.middleware.SilkyMiddleware'
 ]
 
-ROOT_URLCONF = 'AssetManagement.urls'
+ROOT_URLCONF = "AssetManagement.urls"
 
-WSGI_APPLICATION = 'AssetManagement.wsgi.application'
+WSGI_APPLICATION = "AssetManagement.wsgi.application"
 
 # SILKY_PYTHON_PROFILER = True
 
@@ -149,48 +159,47 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
 try:
-    os.environ['DB_ENGINE']
+    os.environ["DB_ENGINE"]
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
-                    'configurations.context_processors.sidebar_logo',
-                    'configurations.context_processors.favicon_image',
-                    'configurations.context_processors.login_page_logo',
-                    'django.template.context_processors.request',
-                    'configurations.context_processors.translations',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                    "configurations.context_processors.sidebar_logo",
+                    "configurations.context_processors.favicon_image",
+                    "configurations.context_processors.login_page_logo",
+                    "django.template.context_processors.request",
+                    "configurations.context_processors.translations",
                 ],
             },
         },
     ]
 except Exception:
     TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'configurations.context_processors.translations',
-            ],
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            "OPTIONS": {
+                "context_processors": [
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.contrib.auth.context_processors.auth",
+                    "django.contrib.messages.context_processors.messages",
+                    "configurations.context_processors.translations",
+                ],
+            },
         },
-    },
-]
+    ]
 
-WSGI_APPLICATION = 'AssetManagement.wsgi.application'
+WSGI_APPLICATION = "AssetManagement.wsgi.application"
 
 
 # Database
@@ -198,13 +207,13 @@ WSGI_APPLICATION = 'AssetManagement.wsgi.application'
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME':  os.environ.get('DB_NAME'),
-        'USER':  os.environ.get('DB_USERNAME'),
-        'PASSWORD':  os.environ.get('DB_PASSWORD'),
-        'HOST':  os.environ.get('DB_HOST'),
-        'PORT':  os.environ.get('DB_PORT'),
+    "default": {
+        "ENGINE": os.environ.get("DB_ENGINE"),
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USERNAME"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 # DATABASES = {
@@ -215,24 +224,21 @@ DATABASES = {
 #    }
 
 
-
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -240,9 +246,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE =  'Asia/Kolkata'
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 
@@ -254,73 +260,68 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [
-    BASE_DIR/'static'
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
 
-MEDIA_ROOT = BASE_DIR/'media'
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'authentication.User'
-LOGIN_URL = 'authentication:login'
+AUTH_USER_MODEL = "authentication.User"
+LOGIN_URL = "authentication:login"
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 
-#Image Processing
+# Image Processing
 DJANGORESIZED_DEFAULT_SIZE = [1024, 768]
 DJANGORESIZED_DEFAULT_QUALITY = 75
 DJANGORESIZED_DEFAULT_KEEP_META = True
-DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
-DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
+DJANGORESIZED_DEFAULT_FORCE_FORMAT = "JPEG"
+DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {"JPEG": ".jpg"}
 DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000  # or higher if needed
 
 APPEND_SLASH = True
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication'     
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
-
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ],
-    
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.MultiPartParser',
-        'rest_framework.parsers.FormParser'
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.MultiPartParser",
+        "rest_framework.parsers.FormParser",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2) if not DEBUG else timedelta(minutes=720),
+    "ACCESS_TOKEN_LIFETIME": (
+        timedelta(minutes=2) if not DEBUG else timedelta(minutes=720)
+    ),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
-
     "ALGORITHM": "HS256",
-    "SIGNING_KEY":SECRET_KEY ,
+    "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,
@@ -334,11 +335,11 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
     "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
-    "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed"
+    "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed",
 }
 
 SPECTACULAR_SETTINGS = {
-    'COMPONENT_SPLIT_REQUEST': True,  # Splits FileField schemas for request/response
+    "COMPONENT_SPLIT_REQUEST": True,  # Splits FileField schemas for request/response
     # Other settings like TITLE, VERSION, etc.
-    'SWAGGER_OPTIONS': {'persistAuthorization': True}
+    "SWAGGER_OPTIONS": {"persistAuthorization": True},
 }

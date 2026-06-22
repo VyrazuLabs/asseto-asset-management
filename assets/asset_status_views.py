@@ -1,5 +1,5 @@
 import os
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -8,118 +8,144 @@ from assets.forms import AssetStatusForm
 from assets.models import Asset, AssetStatus
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q,Count
+from django.db.models import Q, Count
+
 PAGE_SIZE = 10
 ORPHANS = 1
 
 
 @login_required
-@permission_required('authentication.view_asset_status')
+@permission_required("authentication.view_asset_status")
 def asset_status_list(request):
-    page_number = request.GET.get('page', 1)
-    page_object, asset_status_asset_count, stats = get_asset_status_list_utils(request, page_number)
+    page_number = request.GET.get("page", 1)
+    page_object, asset_status_asset_count, stats = get_asset_status_list_utils(
+        request, page_number
+    )
 
-    is_demo = os.environ.get('IS_DEMO') == 'True'
+    is_demo = os.environ.get("IS_DEMO") == "True"
 
     context = {
-        'sidebar': 'admin',
-        'submenu': 'Asset_Status',
-        'page_object': page_object,
-        'asset_status_asset_count': asset_status_asset_count,
-        'total_statuses': stats['total_statuses'],
-        'active_statuses': stats['active_statuses'],
-        'inactive_statuses': stats['inactive_statuses'],
-        'deleted_asset_status_count': stats['deleted_statuses_count'],
-        'title': 'Asset Status',
-        'is_demo': is_demo
+        "sidebar": "admin",
+        "submenu": "Asset_Status",
+        "page_object": page_object,
+        "asset_status_asset_count": asset_status_asset_count,
+        "total_statuses": stats["total_statuses"],
+        "active_statuses": stats["active_statuses"],
+        "inactive_statuses": stats["inactive_statuses"],
+        "deleted_asset_status_count": stats["deleted_statuses_count"],
+        "title": "Asset Status",
+        "is_demo": is_demo,
     }
-    return render(request, 'assets/asset_status_list.html', context=context)
+    return render(request, "assets/asset_status_list.html", context=context)
 
 
 @login_required
-@permission_required('authentication.add_asset_status')
+@permission_required("authentication.add_asset_status")
 def add_asset_status(request):
-    form=AssetStatusForm(request.POST or None, request.user.organization)
+    form = AssetStatusForm(request.POST or None, request.user.organization)
 
-    if request.method=="POST":
+    if request.method == "POST":
         if form.is_valid():
-            asset_status=form.save(commit=False)
-            asset_status.organization=request.user.organization
+            asset_status = form.save(commit=False)
+            asset_status.organization = request.user.organization
             asset_status.save()
             messages.success(request, "Status added sucessfully")
             # return redirect('assets:asset_status_list')
-        
+
             # For HTMX: return 204 No Content to indicate success
-            if request.headers.get('Hx-Request') == 'true':
+            if request.headers.get("Hx-Request") == "true":
                 response = HttpResponse(status=204)
                 response["HX-Trigger"] = "assetStatusAdded"
                 return response
-            
+
             # For regular requests fallback
-            return HttpResponseRedirect(reverse('assets:asset_status_list'))
-    context = {'form': form, "is_add_mode": True}  
-    return render(request,'assets/add_asset_status.html', context)
+            return HttpResponseRedirect(reverse("assets:asset_status_list"))
+    context = {"form": form, "is_add_mode": True}
+    return render(request, "assets/add_asset_status.html", context)
+
 
 @login_required
-@permission_required('authentication.asset_status_details')
-def asset_status_details(request,id):
-    asset_status = get_object_or_404(
-    AssetStatus.undeleted_objects, pk=id)
+@permission_required("authentication.asset_status_details")
+def asset_status_details(request, id):
+    asset_status = get_object_or_404(AssetStatus.undeleted_objects, pk=id)
 
     history_list = asset_status.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
 
-    context = {'page_object': page_object,
-               'sidebar': 'admin','submenu': 'Asset_Status', 'asset_status': asset_status, 'title': f'Details-{asset_status.name}'}
-    return render(request, 'assets/asset_status_details.html', context=context)
+    context = {
+        "page_object": page_object,
+        "sidebar": "admin",
+        "submenu": "Asset_Status",
+        "asset_status": asset_status,
+        "title": f"Details-{asset_status.name}",
+    }
+    return render(request, "assets/asset_status_details.html", context=context)
+
 
 @login_required
-@permission_required('authentication.edit_asset_status')
-def edit_asset_status(request,id):
+@permission_required("authentication.edit_asset_status")
+def edit_asset_status(request, id):
     asset_status = get_object_or_404(
-    AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
-    form = AssetStatusForm(request.POST or None, instance=asset_status,organization=request.user.organization,  pk=asset_status.id)
+        AssetStatus.undeleted_objects, pk=id, organization=request.user.organization
+    )
+    form = AssetStatusForm(
+        request.POST or None,
+        instance=asset_status,
+        organization=request.user.organization,
+        pk=asset_status.id,
+    )
 
     if request.method == "POST":
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Asset Status updated successfully')
+            messages.success(request, "Asset Status updated successfully")
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "assetStatusUpdated"
             return response
 
-    context = {'form': form, "is_add_mode": False}
-    return render(request, 'assets/add_asset_status.html', context)
+    context = {"form": form, "is_add_mode": False}
+    return render(request, "assets/add_asset_status.html", context)
+
 
 @login_required
 def asset_status_search(request, page):
-    page_object, asset_status_asset_count, stats = get_asset_status_list_utils(request, page)
+    page_object, asset_status_asset_count, stats = get_asset_status_list_utils(
+        request, page
+    )
 
-    return render(request, 'assets/asset-status-data.html', {
-        'page_object': page_object,
-        'asset_status_asset_count': asset_status_asset_count,
-        'total_statuses': stats['total_statuses'],
-    })
+    return render(
+        request,
+        "assets/asset-status-data.html",
+        {
+            "page_object": page_object,
+            "asset_status_asset_count": asset_status_asset_count,
+            "total_statuses": stats["total_statuses"],
+        },
+    )
 
 
 @login_required
-@permission_required('authentication.delete_asset_status')
-def delete_asset_status(request,id):
-    if request.method == 'POST':
+@permission_required("authentication.delete_asset_status")
+def delete_asset_status(request, id):
+    if request.method == "POST":
         product_category = get_object_or_404(
-        AssetStatus.undeleted_objects, pk=id, organization=request.user.organization)
+            AssetStatus.undeleted_objects, pk=id, organization=request.user.organization
+        )
         # Delete the asset status if only the asset status is not assigned to any asset
         assigned_assets = Asset.objects.filter(asset_status=product_category).first()
         if assigned_assets is not None:
-            messages.error(request, 'Asset Status cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the asset status.')
-            return redirect('assets:asset_status_list')
+            messages.error(
+                request,
+                "Asset Status cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the asset status.",
+            )
+            return redirect("assets:asset_status_list")
         product_category.status = False
         product_category.soft_delete()
         history_id = product_category.history.first().history_id
-        product_category.history.filter(pk=history_id).update(history_type='-')
-        messages.success(request, 'Asset Status deleted successfully')
+        product_category.history.filter(pk=history_id).update(history_type="-")
+        messages.success(request, "Asset Status deleted successfully")
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.META.get("HTTP_REFERER"))

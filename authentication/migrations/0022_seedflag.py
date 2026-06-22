@@ -6,15 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0021_historicaluser'),
+        ("authentication", "0021_historicaluser"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SeedFlag',
+            name="SeedFlag",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('seeded', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("seeded", models.BooleanField(default=False)),
             ],
         ),
     ]

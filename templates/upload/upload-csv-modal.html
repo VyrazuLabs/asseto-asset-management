@@ -7,10 +7,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
-    <form 
+    <form
         method="post"
-        hx-post="{{ request.path }}" 
-        hx-target="{{ hx_target|default:'#mapping-vendors-modal-content' }}" 
+        hx-post="{{ request.path }}"
+        hx-target="{{ hx_target|default:'#mapping-vendors-modal-content' }}"
         hx-swap="innerHTML"
         hx-encoding="multipart/form-data"
         enctype="multipart/form-data"
@@ -20,7 +20,7 @@
             <div class="card">
                 <div class="card-content py-0">
                     <div class="card-body py-0 pt-2">
-                        <input class="form-control" type="file" id="formFile" name="file" 
+                        <input class="form-control" type="file" id="formFile" name="file"
                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                onchange="toggleSubmitButton()">
                         <small>* {{ trans.csv_file_instruction }}</small><br>

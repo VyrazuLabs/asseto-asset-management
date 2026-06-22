@@ -72,7 +72,7 @@
     font-size: 0.82rem;
 }
 
-.modal-premium .form-control, 
+.modal-premium .form-control,
 .modal-premium .form-select {
     background-color: #F8FAFC;
     border: 1px solid #E2E8F0;
@@ -83,7 +83,7 @@
     transition: all 0.2s ease;
 }
 
-.modal-premium .form-control:focus, 
+.modal-premium .form-control:focus,
 .modal-premium .form-select:focus {
     background-color: #FFFFFF;
     border-color: #4F46E5;

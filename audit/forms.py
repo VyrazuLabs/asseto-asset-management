@@ -1,5 +1,6 @@
 from .models import Audit
 from django import forms
+
 # class AuditForm(forms.ModelForm):
 #     tag =  forms.CharField(required=True, widget=forms.TextInput(
 #         attrs={'autocomplete': 'off', 'class': 'form-control',
@@ -8,6 +9,7 @@ from django import forms
 #     condition=forms.Select(choices=Audit.CONDITION_CHOICES, attrs={'class': 'form-select'})
 #     notes=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter comments'})
 #     assigned_to=forms.Select(attrs={'class': 'form-select'})
+
 
 #     def __init__(self, *args, **kwargs):
 #         self._organization = kwargs.pop('organization', None)
@@ -21,32 +23,31 @@ from django import forms
 class AuditForm(forms.ModelForm):
     class Meta:
         model = Audit
-        fields = ['condition', 'notes', 'assigned_to']
+        fields = ["condition", "notes", "assigned_to"]
         widgets = {
-            'condition': forms.Select(
-                choices=Audit.CONDITION_CHOICES,
-                attrs={'class': 'form-select'}
+            "condition": forms.Select(
+                choices=Audit.CONDITION_CHOICES, attrs={"class": "form-select"}
             ),
-            'notes': forms.Textarea(
-                attrs={'class': 'form-control', 'placeholder': 'Enter comments'}
+            "notes": forms.Textarea(
+                attrs={"class": "form-control", "placeholder": "Enter comments"}
             ),
-            'assigned_to': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Assigned to'}
+            "assigned_to": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Assigned to"}
             ),
         }
 
     def __init__(self, *args, **kwargs):
-        self._organization = kwargs.pop('organization', None)
+        self._organization = kwargs.pop("organization", None)
         super().__init__(*args, **kwargs)
 
-        self.fields['condition'].required = True
-        self.fields['notes'].required = True
+        self.fields["condition"].required = True
+        self.fields["notes"].required = True
 
-        self.fields['assigned_to'].required = False
-        self.fields['condition'].error_messages = {
+        self.fields["assigned_to"].required = False
+        self.fields["condition"].error_messages = {
             "required": "Please select  condition."
         }
-        self.fields['notes'].error_messages = {
+        self.fields["notes"].error_messages = {
             "required": "Please enter notes for the audit."
         }
 
@@ -69,8 +70,11 @@ class AuditForm(forms.ModelForm):
 
         return cleaned_data
 
+
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
+
+
 class MultipleFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("widget", MultipleFileInput())

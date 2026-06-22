@@ -9,14 +9,15 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.db.models import Q,Count
+from django.db.models import Q, Count
 from assets.models import AssignAsset
 import os
 from dashboard.utils import get_department_list
 
-IS_DEMO = os.environ.get('IS_DEMO')
+IS_DEMO = os.environ.get("IS_DEMO")
 PAGE_SIZE = 10
 ORPHANS = 1
+
 
 def check_admin(user):
     return user.is_superuser
@@ -24,9 +25,9 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        'authentication.edit_department',
-        'authentication.add_department',
-        'authentication.delete_department',
+        "authentication.edit_department",
+        "authentication.add_department",
+        "authentication.delete_department",
     ]
 
     for permission in permissions_list:
@@ -39,38 +40,47 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def departments(request):
-    page_object, department_form, department_asset_count, stats = get_department_list(request)
+    page_object, department_form, department_asset_count, stats = get_department_list(
+        request
+    )
 
     context = {
-        'sidebar': 'admin',
-        'submenu': 'department',
-        'page_object': page_object,
-        'department_form': department_form,
-        'department_asset_count': department_asset_count,
-        'title': 'Departments',
-        **stats
+        "sidebar": "admin",
+        "submenu": "department",
+        "page_object": page_object,
+        "department_form": department_form,
+        "department_asset_count": department_asset_count,
+        "title": "Departments",
+        **stats,
     }
-    return render(request, 'dashboard/departments/list.html', context=context)
+    return render(request, "dashboard/departments/list.html", context=context)
+
 
 @login_required
 @user_passes_test(check_admin)
 def department_details(request, id):
 
     department = get_object_or_404(
-        Department.undeleted_objects, pk=id, organization=request.user.organization)
+        Department.undeleted_objects, pk=id, organization=request.user.organization
+    )
 
     history_list = department.history.all()
     paginator = Paginator(history_list, 5, orphans=1)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
 
-    context = {'sidebar': 'admin', 'page_object': page_object,
-               'submenu': 'department', 'department': department, 'title': f'Details-{department.name}'}
-    return render(request, 'dashboard/departments/detail.html', context=context)
+    context = {
+        "sidebar": "admin",
+        "page_object": page_object,
+        "submenu": "department",
+        "department": department,
+        "title": f"Details-{department.name}",
+    }
+    return render(request, "dashboard/departments/detail.html", context=context)
 
 
 @login_required
-@permission_required('authentication.add_department')
+@permission_required("authentication.add_department")
 def add_department(request):
 
     form = DepartmentForm(request.POST or None)
@@ -79,72 +89,90 @@ def add_department(request):
             department = form.save(commit=False)
             department.organization = request.user.organization
             department.save()
-            messages.success(request, 'Department added successfully')
+            messages.success(request, "Department added successfully")
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "departmentAdded"
             return response
 
     context = {"form": form, "is_add_mode": True}
-    return render(request, 'dashboard/departments/department-modal.html', context=context)
+    return render(
+        request, "dashboard/departments/department-modal.html", context=context
+    )
 
 
 @login_required
-@permission_required('authentication.edit_department')
+@permission_required("authentication.edit_department")
 def update_department(request, id):
 
     department = get_object_or_404(
-        Department.undeleted_objects, pk=id, organization=request.user.organization)
-    form = DepartmentForm(
-        request.POST or None, instance=department)
+        Department.undeleted_objects, pk=id, organization=request.user.organization
+    )
+    form = DepartmentForm(request.POST or None, instance=department)
 
     if request.method == "POST":
         if form.is_valid():
             form.save()
-            messages.success(request, 'Department updated successfully')
+            messages.success(request, "Department updated successfully")
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "departmentUpdated"
             return response
 
     context = {"form": form, "is_add_mode": False}
-    return render(request, 'dashboard/departments/department-modal.html', context=context)
+    return render(
+        request, "dashboard/departments/department-modal.html", context=context
+    )
 
 
 @login_required
-@permission_required('authentication.delete_department')
+@permission_required("authentication.delete_department")
 def delete_department(request, id):
 
-    if request.method == 'POST':
+    if request.method == "POST":
         department = get_object_or_404(
-            Department.undeleted_objects, pk=id, organization=request.user.organization)
+            Department.undeleted_objects, pk=id, organization=request.user.organization
+        )
         # Delete the department if only the department is not assigned to any user
-        assigned_assets = AssignAsset.objects.filter(user__department=department).first()
+        assigned_assets = AssignAsset.objects.filter(
+            user__department=department
+        ).first()
         if assigned_assets is not None:
-            messages.error(request, 'Department cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the department.')
-            return redirect('dashboard:departments')
+            messages.error(
+                request,
+                "Department cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the department.",
+            )
+            return redirect("dashboard:departments")
         department.status = False
         department.soft_delete()
         history_id = department.history.first().history_id
-        department.history.filter(pk=history_id).update(history_type='-')
-        messages.success(request, 'Department deleted successfully')
-        return redirect(request.META.get('HTTP_REFERER'))
+        department.history.filter(pk=history_id).update(history_type="-")
+        messages.success(request, "Department deleted successfully")
+        return redirect(request.META.get("HTTP_REFERER"))
 
-    return redirect('/')
+    return redirect("/")
 
 
 @user_passes_test(check_admin)
 def department_status(request, id):
     if request.method == "POST":
         department = get_object_or_404(
-            Department.undeleted_objects, pk=id, organization=request.user.organization)
+            Department.undeleted_objects, pk=id, organization=request.user.organization
+        )
         department.status = False if department.status else True
         department.save()
     return HttpResponse(status=204)
 
+
 @login_required
 def search_department(request, page):
-    page_object, _, department_asset_count, stats = get_department_list(request, page_number=page)
-    return render(request, 'dashboard/departments/departments-data.html', {
-        'page_object': page_object,
-        'department_asset_count': department_asset_count,
-        **stats
-    })
+    page_object, _, department_asset_count, stats = get_department_list(
+        request, page_number=page
+    )
+    return render(
+        request,
+        "dashboard/departments/departments-data.html",
+        {
+            "page_object": page_object,
+            "department_asset_count": department_asset_count,
+            **stats,
+        },
+    )

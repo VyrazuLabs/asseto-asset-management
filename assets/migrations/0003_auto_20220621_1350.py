@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0002_alter_asset_specifications'),
+        ("assets", "0002_alter_asset_specifications"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='created_by',
+            model_name="asset",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='updated_by',
+            model_name="asset",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='created_by',
+            model_name="assetspecification",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='updated_by',
+            model_name="assetspecification",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='specification',
-            name='created_by',
+            model_name="specification",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='specification',
-            name='updated_by',
+            model_name="specification",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

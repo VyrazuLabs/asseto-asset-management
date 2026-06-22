@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asseto-asset-management"
+version = "0.1.0"
+description = "Django-based asset management SaaS platform"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "AssetManagement.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-m 'not selenium' --cov=. --cov-report=term-missing --cov-report=html"
+markers = [
+    "selenium: marks tests as selenium-based (deselect with '-m \"not selenium\"')",
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+]
+testpaths = [".", "tests"]
+norecursedirs = [".git", ".venv", "venv", "env", "node_modules", ".superpowers"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311", "py312", "py313"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | migrations
+  | node_modules
+  | venv
+)/
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    ".tox",
+    "migrations",
+    "node_modules",
+    ".superpowers",
+    "__pycache__",
+    ".eggs",
+    "build",
+    "dist",
+]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # Pyflakes
+    "I",     # isort
+    "C4",    # flake8-comprehensions
+    "B",     # flake8-bugbear
+    "UP",    # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.isort]
+known-first-party = ["AssetManagement"]
+known-django = ["django"]
+sections = ["FUTURE", "STDLIB", "DJANGO", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+check_untyped_defs = false
+disallow_untyped_defs = false
+plugins = ["mypy_django_plugin.main"]
+
+[[tool.mypy.overrides]]
+module = [
+    "django.*",
+    "rest_framework.*",
+    "celery.*",
+    "drf_spectacular.*",
+    "django_silk.*",
+    "django_htmx.*",
+]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "AssetManagement.settings"

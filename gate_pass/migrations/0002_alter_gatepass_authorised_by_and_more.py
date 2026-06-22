@@ -8,19 +8,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('gate_pass', '0001_initial'),
+        ("gate_pass", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='gatepass',
-            name='authorised_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='gatepasses_authorised', to=settings.AUTH_USER_MODEL),
+            model_name="gatepass",
+            name="authorised_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="gatepasses_authorised",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='gatepass',
-            name='raised_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='gatepasses_raised', to=settings.AUTH_USER_MODEL),
+            model_name="gatepass",
+            name="raised_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="gatepasses_raised",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

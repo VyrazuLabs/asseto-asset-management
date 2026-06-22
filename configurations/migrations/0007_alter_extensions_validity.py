@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0006_alter_extensions_status'),
+        ("configurations", "0006_alter_extensions_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='extensions',
-            name='validity',
+            model_name="extensions",
+            name="validity",
             field=models.IntegerField(default=0),
         ),
     ]

@@ -11,7 +11,7 @@
         {% if page_object.has_previous  %}
             <li class="page-item"><a class="page-link" href="?page={{ page_object.previous_page_number }}">{{ page_object.previous_page_number }} </a></li>
         {% endif %}
-        
+
         {% for i in page_object.paginator.page_range %}
             {% if page_object.number == i %}
                 <li class="page-item active"><a class="page-link" href="?page={{ i }}">{{ i}} </a></li>

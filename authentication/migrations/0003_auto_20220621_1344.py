@@ -6,16 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0002_register'),
+        ("authentication", "0002_register"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Register',
+            name="Register",
         ),
         migrations.AddField(
-            model_name='user',
-            name='username',
+            model_name="user",
+            name="username",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

@@ -34,7 +34,7 @@
                         hx-get="{% url 'assets:search' 1 %}"
                         hx-target="#search_result"
                         hx-trigger="change, keyup changed delay:500ms from:input">
-                        <div class="row g-3"> 
+                        <div class="row g-3">
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                                         hx-get="{% url 'assets:search' 1 %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
@@ -44,17 +44,17 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if status_header %}
                                         {{ status_header.asset_status }}
-                                    {% else %}    
+                                    {% else %}
                                         Select Status
                                     {% endif %}
-                                    
+
                                 </button>
                                 <ul class="dropdown-menu">
                                     {% for status in asset_status_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=status]').value='{{ status.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=status]').value='{{ status.id }}';
                                                 this.closest('.dropdown-asset-status').querySelector('button').innerText='{{ status.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ status.name }}
@@ -70,7 +70,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if vendor_header %}
                                         {{ vendor_header.name }}
-                                    {% else %}     
+                                    {% else %}
                                         Select Vendor
                                     {% endif %}
                                 </button>
@@ -78,8 +78,8 @@
                                     {% for vendor in vendor_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}';
                                                 this.closest('.dropdown-asset-vendors').querySelector('button').innerText='{{ vendor.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ vendor.name }}
@@ -95,7 +95,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if get_prod_type %}
                                         {{ get_prod_type }}
-                                    {% elif product_type_header %} 
+                                    {% elif product_type_header %}
                                         {{ product_type_header.product.product_type.name }}
                                     {% else %}
                                         Select Product Type
@@ -105,7 +105,7 @@
                                     {% for type in product_type_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
+                                        onclick="event.preventDefault();
                                                 this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
                                                 this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
@@ -124,7 +124,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if user_data %}
                                             {{ user_data.user.full_name }}
-                                    {% elif user_header %} 
+                                    {% elif user_header %}
                                         {{ user_header }}
                                     {% else %}
                                         Select User
@@ -134,12 +134,12 @@
                                     {% for user in user_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=user]').value='{{ user.id }}';
                                                 this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
-                                        {% if user_header %} 
-                                            {{ user_header }} 
+                                        {% if user_header %}
+                                            {{ user_header }}
                                         {% else %}
                                             {{ user.full_name }}
                                         {% endif %}
@@ -155,8 +155,8 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if get_prod_category %}
                                         {{ get_prod_category }}
-                                    {% elif product_category_header %} 
-                                        {{ product_category_header.product.product_category.name }} 
+                                    {% elif product_category_header %}
+                                        {{ product_category_header.product.product_category.name }}
                                     {% else %}
                                         Select Product Category
                                     {% endif %}
@@ -165,23 +165,23 @@
                                     {% for category in product_category_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
+                                        onclick="event.preventDefault();
                                                 this.closest('form').querySelector('[name=category]').value='{{ category.id }}';
                                                 this.closest('.dropdown-asset-product-category').querySelector('button').innerText='{{ category.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ category.name }}
                                     </a>
                                     </li>
-                                    
+
                                     {% endfor %}
-                                
+
                                 <input type="hidden" name="category">
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-location">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if location_header%} 
+                                    {% if location_header%}
                                         {{ location_header.asset.location.office_name }}
                                     {% else %}
                                         Select Location
@@ -191,8 +191,8 @@
                                     {% for location in location_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=location]').value='{{ location.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=location]').value='{{ location.id }}';
                                                 this.closest('.dropdown-asset-location').querySelector('button').innerText='{{ location.office_name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ location.office_name }}
@@ -216,8 +216,8 @@
                                     {% for department in department_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=department]').value='{{ department.id }}';
                                                 this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                             {{ department.name }}
@@ -298,7 +298,7 @@
                         hx-get="{% url 'assets:search' 1 %}"
                         hx-target="#search_result"
                         hx-trigger="change, keyup changed delay:500ms from:input">
-                        <div class="row g-3"> 
+                        <div class="row g-3">
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <input id="asset-search" name="search_text" type="search" class='dataTable-input data-search' autocomplete="off" placeholder='Search here...'
                                         hx-get="{% url 'assets:search' 1 %}" hx-trigger="keyup changed delay:500ms, search" hx-target="#search_result">
@@ -308,7 +308,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if status_header %}
                                         {{ status_header.asset_status }}
-                                    {% else %}    
+                                    {% else %}
                                         Select Status
                                     {% endif %}
                                 </button>
@@ -316,8 +316,8 @@
                                     {% for status in asset_status_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=status]').value='{{ status.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=status]').value='{{ status.id }}';
                                                 this.closest('.dropdown-asset-status').querySelector('button').innerText='{{ status.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ status.name }}
@@ -333,7 +333,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if vendor_header %}
                                         {{ vendor_header.name }}
-                                    {% else %}     
+                                    {% else %}
                                         Select Vendor
                                     {% endif %}
                                 </button>
@@ -341,8 +341,8 @@
                                     {% for vendor in vendor_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=vendor]').value='{{ vendor.id }}';
                                                 this.closest('.dropdown-asset-vendors').querySelector('button').innerText='{{ vendor.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ vendor.name }}
@@ -358,7 +358,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if get_prod_type %}
                                         {{ get_prod_type }}
-                                    {% elif product_type_header %} 
+                                    {% elif product_type_header %}
                                         {{ product_type_header.product.product_type.name }}
                                     {% else %}
                                         Select Product Type
@@ -368,7 +368,7 @@
                                     {% for type in product_type_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
+                                        onclick="event.preventDefault();
                                                 this.closest('form').querySelector('[name=type]').value='{{ type.id }}';
                                                 this.closest('.dropdown-asset-product-type').querySelector('button').innerText='{{ type.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
@@ -387,7 +387,7 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if user_data %}
                                             {{ user_data.user.full_name }}
-                                    {% elif user_header %} 
+                                    {% elif user_header %}
                                         {{ user_header }}
                                     {% else %}
                                         Select User
@@ -397,12 +397,12 @@
                                     {% for user in user_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=user]').value='{{ user.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=user]').value='{{ user.id }}';
                                                 this.closest('.dropdown-asset-users').querySelector('button').innerText='{{ user.full_name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
-                                        {% if user_header %} 
-                                            {{ user_header }} 
+                                        {% if user_header %}
+                                            {{ user_header }}
                                         {% else %}
                                             {{ user.full_name }}
                                         {% endif %}
@@ -418,8 +418,8 @@
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
                                     {% if get_prod_category %}
                                         {{ get_prod_category }}
-                                    {% elif product_category_header %} 
-                                        {{ product_category_header.product.product_category.name }} 
+                                    {% elif product_category_header %}
+                                        {{ product_category_header.product.product_category.name }}
                                     {% else %}
                                         Select Product Category
                                     {% endif %}
@@ -428,23 +428,23 @@
                                     {% for category in product_category_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
+                                        onclick="event.preventDefault();
                                                 this.closest('form').querySelector('[name=category]').value='{{ category.id }}';
                                                 this.closest('.dropdown-asset-product-category').querySelector('button').innerText='{{ category.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ category.name }}
                                     </a>
                                     </li>
-                                    
+
                                     {% endfor %}
-                                
+
                                 <input type="hidden" name="category">
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6 col-lg-3">
                                 <div class="dropdown-asset-location">
                                 <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
-                                    {% if location_header%} 
+                                    {% if location_header%}
                                         {{ location_header.asset.location.office_name }}
                                     {% else %}
                                         Select Location
@@ -454,8 +454,8 @@
                                     {% for location in location_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=location]').value='{{ location.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=location]').value='{{ location.id }}';
                                                 this.closest('.dropdown-asset-location').querySelector('button').innerText='{{ location.office_name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
                                         {{ location.office_name }}
@@ -479,8 +479,8 @@
                                     {% for department in department_list %}
                                     <li>
                                     <a href="#" class="dropdown-item"
-                                        onclick="event.preventDefault(); 
-                                                this.closest('form').querySelector('[name=department]').value='{{ department.id }}'; 
+                                        onclick="event.preventDefault();
+                                                this.closest('form').querySelector('[name=department]').value='{{ department.id }}';
                                                 this.closest('.dropdown-asset-department').querySelector('button').innerText='{{ department.name }}';
                                                 htmx.trigger(this.closest('form'),'change');">
 

@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('license', '0001_initial'),
+        ("license", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='license',
-            name='expiry_date',
+            model_name="license",
+            name="expiry_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='license',
-            name='seats',
+            model_name="license",
+            name="seats",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='license',
-            name='start_date',
+            model_name="license",
+            name="start_date",
             field=models.DateField(blank=True, null=True),
         ),
     ]

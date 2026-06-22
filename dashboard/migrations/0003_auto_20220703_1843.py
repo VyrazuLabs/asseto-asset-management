@@ -8,57 +8,70 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0002_auto_20220621_1350'),
+        ("dashboard", "0002_auto_20220621_1350"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Address',
+            name="Address",
             fields=[
-                ('status', models.IntegerField(default=1)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('updated_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('address_line_one', models.TextField(blank=True, null=True)),
-                ('address_line_two', models.TextField(blank=True, null=True)),
-                ('country', models.CharField(blank=True, max_length=255, null=True)),
-                ('state', models.CharField(blank=True, max_length=255, null=True)),
-                ('city', models.CharField(blank=True, max_length=255, null=True)),
-                ('pin_code', models.CharField(blank=True, max_length=255, null=True)),
+                ("status", models.IntegerField(default=1)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("created_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("updated_by", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("address_line_one", models.TextField(blank=True, null=True)),
+                ("address_line_two", models.TextField(blank=True, null=True)),
+                ("country", models.CharField(blank=True, max_length=255, null=True)),
+                ("state", models.CharField(blank=True, max_length=255, null=True)),
+                ("city", models.CharField(blank=True, max_length=255, null=True)),
+                ("pin_code", models.CharField(blank=True, max_length=255, null=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='address_line_one',
+            model_name="location",
+            name="address_line_one",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='address_line_two',
+            model_name="location",
+            name="address_line_two",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='city',
+            model_name="location",
+            name="city",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='country',
+            model_name="location",
+            name="country",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='pin_code',
+            model_name="location",
+            name="pin_code",
         ),
         migrations.RemoveField(
-            model_name='location',
-            name='state',
+            model_name="location",
+            name="state",
         ),
         migrations.AddField(
-            model_name='location',
-            name='address',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dashboard.address'),
+            model_name="location",
+            name="address",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dashboard.address",
+            ),
         ),
     ]

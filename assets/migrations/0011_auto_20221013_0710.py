@@ -6,26 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0010_alter_asset_product'),
+        ("assets", "0010_alter_asset_product"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='asset',
-            name='specifications',
+            model_name="asset",
+            name="specifications",
         ),
         migrations.RemoveField(
-            model_name='assetspecification',
-            name='specification',
+            model_name="assetspecification",
+            name="specification",
         ),
         migrations.AddField(
-            model_name='assetspecification',
-            name='name',
+            model_name="assetspecification",
+            name="name",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='assetspecification',
-            name='value',
+            model_name="assetspecification",
+            name="value",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

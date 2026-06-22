@@ -10,29 +10,51 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('dashboard', '0001_initial'),
+        ("dashboard", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Upload',
+            name="Upload",
             fields=[
-                ('status', models.IntegerField(default=1)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.IntegerField()),
-                ('updated_by', models.IntegerField()),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('entity_type', models.CharField(blank=True, max_length=255, null=True)),
-                ('entity_id', models.IntegerField(blank=True, null=True)),
-                ('filename', models.CharField(blank=True, max_length=255, null=True)),
-                ('orignal_filename', models.CharField(blank=True, max_length=255, null=True)),
-                ('notes', models.TextField(blank=True, null=True)),
-                ('size', models.CharField(blank=True, max_length=255, null=True)),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.organization')),
+                ("status", models.IntegerField(default=1)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("created_by", models.IntegerField()),
+                ("updated_by", models.IntegerField()),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "entity_type",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("entity_id", models.IntegerField(blank=True, null=True)),
+                ("filename", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "orignal_filename",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("notes", models.TextField(blank=True, null=True)),
+                ("size", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="dashboard.organization",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0027_phoneotp_usertotp'),
+        ("authentication", "0027_phoneotp_usertotp"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicaluser',
-            name='two_factor_auth',
+            model_name="historicaluser",
+            name="two_factor_auth",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='two_factor_auth',
+            model_name="user",
+            name="two_factor_auth",
             field=models.BooleanField(default=False),
         ),
     ]

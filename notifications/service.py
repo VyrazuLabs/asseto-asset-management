@@ -6,6 +6,7 @@
 # from .utils import send_data_message
 # from django.http import JsonResponse
 from kombu.exceptions import OperationalError
+
 # class NotificationService:
 
 #     @staticmethod
@@ -71,6 +72,7 @@ from kombu.exceptions import OperationalError
 
 from notifications.tasks import send_notification_task
 
+
 class NotificationService:
 
     @staticmethod
@@ -93,13 +95,15 @@ class NotificationService:
             "object_id": kwargs.get("object_id"),
             "instance_id": kwargs.get("instance_id"),
             "is_superuser": kwargs.get("is_superuser", False),
-            "updated_by": kwargs.get("updated_by").id if kwargs.get("updated_by") else None,
+            "updated_by": (
+                kwargs.get("updated_by").id if kwargs.get("updated_by") else None
+            ),
         }
 
         # async call
         try:
             send_notification_task.delay(payload)
         except OperationalError as e:
-            print("????",e)
+            print("????", e)
             print("⚠️ Celery broker unavailable, skipping async task")
             send_notification_task(payload)

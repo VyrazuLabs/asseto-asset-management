@@ -7,13 +7,15 @@ import products.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0006_rename_product_pic_product_product_picture'),
+        ("products", "0006_rename_product_pic_product_product_picture"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='product_picture',
-            field=models.ImageField(blank=True, null=True, upload_to=products.models.path_and_rename),
+            model_name="product",
+            name="product_picture",
+            field=models.ImageField(
+                blank=True, null=True, upload_to=products.models.path_and_rename
+            ),
         ),
     ]

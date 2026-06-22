@@ -1,4 +1,3 @@
-
 from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
 from django.conf import settings
@@ -7,7 +6,6 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from authentication.token import account_activation_token
-
 
 # @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 # def send_verification_mail(sender, instance, created, **kwargs):

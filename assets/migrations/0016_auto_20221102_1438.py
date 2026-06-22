@@ -6,32 +6,32 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0015_assignasset'),
+        ("assets", "0015_assignasset"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='assignasset',
-            name='created_at',
+            model_name="assignasset",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='assignasset',
-            name='created_by',
+            model_name="assignasset",
+            name="created_by",
         ),
         migrations.RemoveField(
-            model_name='assignasset',
-            name='is_deleted',
+            model_name="assignasset",
+            name="is_deleted",
         ),
         migrations.RemoveField(
-            model_name='assignasset',
-            name='status',
+            model_name="assignasset",
+            name="status",
         ),
         migrations.RemoveField(
-            model_name='assignasset',
-            name='updated_at',
+            model_name="assignasset",
+            name="updated_at",
         ),
         migrations.RemoveField(
-            model_name='assignasset',
-            name='updated_by',
+            model_name="assignasset",
+            name="updated_by",
         ),
     ]

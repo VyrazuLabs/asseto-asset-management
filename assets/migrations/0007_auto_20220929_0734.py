@@ -7,19 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0009_producttype_deleted'),
-        ('assets', '0006_alter_asset_vendor'),
+        ("dashboard", "0009_producttype_deleted"),
+        ("assets", "0006_alter_asset_vendor"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='asset',
-            name='is_deleted',
+            model_name="asset",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='location',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='dashboard.location'),
+            model_name="asset",
+            name="location",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="dashboard.location",
+            ),
         ),
     ]

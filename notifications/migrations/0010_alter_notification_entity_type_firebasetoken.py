@@ -8,22 +8,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0009_notification_entity_type'),
+        ("notifications", "0009_notification_entity_type"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='entity_type',
-            field=models.IntegerField(choices=[(0, 'browser'), (1, 'email'), (2, 'slack'), (3, 'inapp')], default=0),
+            model_name="notification",
+            name="entity_type",
+            field=models.IntegerField(
+                choices=[(0, "browser"), (1, "email"), (2, "slack"), (3, "inapp")],
+                default=0,
+            ),
         ),
         migrations.CreateModel(
-            name='FirebaseToken',
+            name="FirebaseToken",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token', models.CharField(max_length=225)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("token", models.CharField(max_length=225)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

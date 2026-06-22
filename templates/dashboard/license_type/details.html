@@ -76,7 +76,7 @@
 function openEditLicenseTypeModal(url) {
     var modalEl = document.getElementById('update-license-type-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-license-type-modal-content'
     }).then(function() {
