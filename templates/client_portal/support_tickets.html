@@ -3,13 +3,22 @@
 {% load custom_filters %}
 
 {% block title %}Support Tickets | Asseto{% endblock %}
+{% block title %}Support Tickets | Asseto{% endblock %}
 {% block header_title %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <style>
+    .btn-create-ticket {
+        padding: 0.65rem 1.5rem !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        font-size: 0.9rem !important;
+    }
     .btn-create-ticket {
         padding: 0.65rem 1.5rem !important;
         height: auto !important;
@@ -145,15 +154,14 @@
                 <table class="table table-hover align-middle mb-0 ticket-table">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">{{ trans.sl_no }}</th>
-                            <th>{{ trans.ticket_id }}</th>
-                            <th>{{ trans.asset_name }}</th>
-                            <th>{{ trans.subject_label }}</th>
-                            <th>{{ trans.issue_priority }}</th>
-                            <th>{{ trans.status_label }}</th>
-                            <th>{{ trans.assigned_to }}</th>
-                            <th>{{ trans.last_activity }}</th>
-
+                            <th class="ps-4">SL</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Activity</th>
+                            <th class="pe-4 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ticket-table-body">
@@ -163,7 +171,6 @@
                                 {{ page_object.start_index|add:forloop.counter0 }}
                             </td>
                             <td class="table-index-cell">
-                                <span class="asset-tag-pill">{{ ticket.ticket_id }}</span>
                                 <span class="asset-tag-pill">{{ ticket.ticket_id }}</span>
                             </td>
                             <td>
@@ -177,7 +184,6 @@
                                     {% else %}
                                     <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
                                     {% endif %}
-                                    <span>{{ ticket.asset.name|default:'General' }}</span>
                                     <span>{{ ticket.asset.name|default:'General' }}</span>
                                 </div>
                             </td>
