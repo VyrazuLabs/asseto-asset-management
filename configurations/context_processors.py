@@ -1,5 +1,5 @@
 from .models import LocalizationConfiguration, BrandingImages
-from .translations import get_translations
+from .translations.utils import get_translations
 
 def translations(request):
     """

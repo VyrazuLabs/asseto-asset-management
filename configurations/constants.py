@@ -1,5 +1,16 @@
 # configurations/constants.py
 
+# Maps the integer language ID (stored in LocalizationConfiguration.default_language)
+# to the language-code subdirectory under configurations/translations/.
+# Add new languages here; the translations package and ACTIVE_LANGUAGES list
+# will pick them up automatically.
+LANGUAGE_MAP = {
+    0: 'en',
+    2: 'fr',
+    8: 'hi',
+    9: 'bn',
+}
+
 # Example dropdown values
 COUNTRY_CHOICES = [
     (0, 'India'),
@@ -27,11 +38,10 @@ DEFAULT_LANGUAGE=[
     (8, 'Hindi'),
     (9, 'Bengali'),]
 
-# Derived from translations.LANGUAGE_MAP so there is a single source of truth.
-# To add or remove a supported language, update LANGUAGE_MAP in
-# configurations/translations/__init__.py — this list will follow automatically.
+# Derived from LANGUAGE_MAP above so there is a single source of truth.
+# To add or remove a supported language, update LANGUAGE_MAP above —
+# this list will follow automatically.
 def _build_active_languages():
-    from configurations.translations import LANGUAGE_MAP
     _label_map = dict(DEFAULT_LANGUAGE)
     return [(lang_id, _label_map.get(lang_id, lang_code.upper()))
             for lang_id, lang_code in LANGUAGE_MAP.items()]

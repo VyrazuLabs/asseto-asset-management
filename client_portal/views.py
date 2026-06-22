@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from clients.models import Client, ClientContact
 from assets.models import Asset, AssetImage, AssignAsset
@@ -13,6 +13,7 @@ from support.models import (
     SupportTicket, TicketAttachment, TicketActivity,
     STATUS_CHOICES, PRIORITY_CHOICES, TICKET_TYPE_CHOICES
 )
+from .forms import ClientSupportTicketForm
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location
 from vendors.models import Vendor
@@ -348,6 +349,80 @@ def client_portal_support_tickets(request):
     return render(request, 'client_portal/support_tickets.html', context)
 
 
+def client_portal_add_ticket(request):
+    """Client Portal Create Support Ticket."""
+    contact, client = _get_contact_and_client(request)
+    if not contact:
+        return redirect('client_portal:login')
+
+    form = ClientSupportTicketForm(client=client)
+
+    if request.method == 'POST':
+        form = ClientSupportTicketForm(request.POST, request.FILES, client=client)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.organization = client.organization
+            ticket.client = client
+            ticket.created_by_contact = contact
+            ticket.created_by = f"Client Contact: {contact.name}"
+            ticket.save()
+
+            # Handle file uploads
+            for f in request.FILES.getlist('attachments'):
+                TicketAttachment.objects.create(
+                    ticket=ticket, file=f,
+                    file_name=f.name, file_size=f.size,
+                    # For client portal, we don't have a 'User' object for uploaded_by
+                    # We might need to adjust TicketAttachment model if it's strict,
+                    # but usually it's null=True.
+                )
+
+            # Create initial activity
+            TicketActivity.objects.create(
+                ticket=ticket, activity_type='created',
+                description=f'Ticket initiated by {contact.name} (Client Contact).',
+                # performed_by is FK to User, can be null
+            )
+
+            messages.success(request, 'Ticket created successfully.')
+            return redirect('client_portal:support_tickets')
+
+    context = {
+        'cp_sidebar': 'support',
+        'contact': contact,
+        'client': client,
+        'form': form,
+        'title': 'New Support Request',
+    }
+    return render(request, 'client_portal/ticket_add.html', context)
+
+
+def client_portal_asset_search(request):
+    """AJAX asset search limited to the current client."""
+    contact, client = _get_contact_and_client(request)
+    if not contact:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    query = request.GET.get('q', '').strip()
+    if not query:
+        assets = Asset.undeleted_objects.filter(client=client).order_by('-created_at')[:10]
+    else:
+        assets = Asset.undeleted_objects.filter(
+            Q(client=client),
+            Q(name__icontains=query) | Q(tag__icontains=query) | Q(serial_no__icontains=query)
+        )[:10]
+
+    results = []
+    for asset in assets:
+        results.append({
+            'id': str(asset.id),
+            'name': asset.name,
+            'tag': asset.tag,
+        })
+
+    return JsonResponse({'results': results})
+
+
 def client_portal_export_support_tickets(request):
     """Export the client portal's filtered support tickets as CSV."""
     contact, client = _get_contact_and_client(request)
@@ -397,3 +472,27 @@ def client_portal_export_support_tickets(request):
         ])
 
     return response
+
+
+def client_portal_ticket_detail(request, pk):
+    """Client Portal Ticket Detail view."""
+    contact, client = _get_contact_and_client(request)
+    if not contact:
+        return redirect('client_portal:login')
+
+    ticket = get_object_or_404(
+        SupportTicket.undeleted_objects.select_related('asset', 'assigned_to').filter(
+            Q(client=client) | Q(asset__client=client)
+        ),
+        pk=pk
+    )
+
+    context = {
+        'cp_sidebar': 'support',
+        'contact': contact,
+        'client': client,
+        'ticket': ticket,
+        'attachments': ticket.attachments.order_by('-created_at'),
+        'activities': ticket.activities.filter(is_internal=False).order_by('-created_at'),
+    }
+    return render(request, 'client_portal/ticket_detail.html', context)

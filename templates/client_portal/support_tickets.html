@@ -2,18 +2,21 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}{{ trans.support_tickets }}{% endblock %}
+{% block title %}Support Tickets | Asseto{% endblock %}
 {% block header_title %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <style>
-    /* Ensure the portal layout compatible styles */
-    .page-heading { padding: 0; }
-    .ticket-stats-grid { margin-bottom: 2rem; }
-    .filter-card { margin-bottom: 2rem; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-    .card { border-radius: 12px; }
+    .btn-create-ticket {
+        padding: 0.65rem 1.5rem !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        font-size: 0.9rem !important;
+    }
     .bi{
     width: 1rem !important;
     height: 1rem !important;
@@ -21,30 +24,34 @@
     align-items: center !important;
     justify-content: center !important;
     }
-    .stat-icon-wrap i.bi {
-        width: 1.5rem !important;
-        height: 1.5rem !important;
-        font-size: 1.5rem !important;
-    }
 </style>
 {% endblock extra_css %}
 
 {% block content %}
 <div class="page-heading">
     {# ── Page Header ───────────────────────────────────────────────────────── #}
-    <div class="assets-page-header">
+    <div class="d-flex justify-content-between align-items-start mb-4">
         <div>
-            <h1>{{ trans.support_tickets }}</h1>
-            <p class="page-subtitle">{{ trans.portal_tickets_subtitle }}</p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'client_portal:dashboard' %}" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Support Tickets</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-1">Support Tickets</h1>
+            <p class="text-muted small mb-0">Monitoring {{ total_active }} active tickets across all assests.</p>
         </div>
         <div class="d-flex flex-column align-items-end gap-3">
+            <a href="{% url 'client_portal:support_tickets_add' %}" class="btn-register btn-create-ticket">
+                <i class="bi bi-plus-lg"></i> Create Ticket
+            </a>
             <div class="btn-group btn-group-sm view-toggle-group">
                 <button type="button" class="btn btn-primary active" id="list-view-btn" onclick="switchView('list')">
-                    <i class="bi bi-list-task me-1"></i> {{ trans.list_view }}
+                    <i class="bi bi-list-task me-1"></i> List View
                 </button>
                 <button type="button" class="btn btn-outline-primary" id="kanban-view-btn"
                     onclick="switchView('kanban')">
-                    <i class="bi bi-kanban me-1"></i> {{ trans.kanban_view }}
+                    <i class="bi bi-kanban me-1"></i> Kanban View
                 </button>
             </div>
         </div>
@@ -57,7 +64,7 @@
                 <i class="bi bi-ticket-detailed"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-name">{{ trans.total_active }}</span>
+                <span class="stat-name">Total Active</span>
                 <span class="stat-number">{{ total_active|stringformat:"02d" }}</span>
             </div>
         </div>
@@ -66,7 +73,7 @@
                 <i class="bi bi-wrench-adjustable"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-name">{{ trans.pending_parts }}</span>
+                <span class="stat-name">Pending Parts</span>
                 <span class="stat-number">{{ pending_parts|stringformat:"02d" }}</span>
             </div>
         </div>
@@ -75,7 +82,7 @@
                 <i class="bi bi-calendar-x"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-name">{{ trans.overdue }}</span>
+                <span class="stat-name">Overdue</span>
                 <span class="stat-number">{{ overdue_count|stringformat:"02d" }}</span>
             </div>
         </div>
@@ -84,7 +91,7 @@
                 <i class="bi bi-exclamation-triangle"></i>
             </div>
             <div class="stat-info">
-                <span class="stat-name">{{ trans.critical_alarms }}</span>
+                <span class="stat-name">Critical Alarms</span>
                 <span class="stat-number">{{ critical_count|stringformat:"02d" }}</span>
             </div>
         </div>
@@ -95,23 +102,23 @@
         <form id="ticket-filter-form" method="get">
             <div class="row g-2 align-items-end">
                 <div class="col">
-                    <div class="filter-label">{{ trans.search_label }}</div>
+                    <div class="filter-label">Search</div>
                     <input type="text" name="search" class="form-control"
-                        placeholder="{{ trans.search_tickets_placeholder }}" value="{{ request.GET.search }}" autocomplete="off">
+                        placeholder="Search tickets by ID or subject..." value="{{ request.GET.search }}" autocomplete="off">
                 </div>
                 <div class="col-auto">
-                    <div class="filter-label">{{ trans.status_label }}</div>
+                    <div class="filter-label">Status</div>
                     <select name="status" class="form-select">
-                        <option value="">{{ trans.all_statuses }}</option>
+                        <option value="">All Statuses</option>
                         {% for val, label in status_choices %}
                         <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-auto">
-                    <div class="filter-label">{{ trans.issue_priority }}</div>
+                    <div class="filter-label">Priority</div>
                     <select name="priority" class="form-select">
-                        <option value="">{{ trans.all_priorities }}</option>
+                        <option value="">All Priorities</option>
                         {% for val, label in priority_choices %}
                         <option value="{{ val }}" {% if request.GET.priority == val %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
@@ -119,12 +126,12 @@
                 </div>
                 <div class="col-auto">
                     <a href="{% url 'client_portal:support_tickets_export' %}{% if request.GET.search %}?search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.priority %}&priority={{ request.GET.priority }}{% endif %}{% if request.GET.ticket_type %}&ticket_type={{ request.GET.ticket_type }}{% endif %}" class="btn-export">
-                        <i class="bi bi-download"></i> {{ trans.export }}
+                        <i class="bi bi-download"></i> Export
                     </a>
                 </div>
                 <div class="col-auto">
                     <a href="{% url 'client_portal:support_tickets' %}" class="btn-reset" title="Reset">
-                        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
                     </a>
                 </div>
             </div>
@@ -138,15 +145,14 @@
                 <table class="table table-hover align-middle mb-0 ticket-table">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">{{ trans.sl_no }}</th>
-                            <th>{{ trans.ticket_id }}</th>
-                            <th>{{ trans.asset_name }}</th>
-                            <th>{{ trans.subject_label }}</th>
-                            <th>{{ trans.issue_priority }}</th>
-                            <th>{{ trans.status_label }}</th>
-                            <th>{{ trans.assigned_to }}</th>
-                            <th>{{ trans.last_activity }}</th>
-                        
+                            <th class="ps-4">SL</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Activity</th>
+                            <th class="pe-4 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ticket-table-body">
@@ -156,7 +162,7 @@
                                 {{ page_object.start_index|add:forloop.counter0 }}
                             </td>
                             <td class="table-index-cell">
-                                <span class="ticket-tag-pill">{{ ticket.ticket_id }}</span>
+                                <span class="asset-tag-pill">{{ ticket.ticket_id }}</span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -169,7 +175,7 @@
                                     {% else %}
                                     <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
                                     {% endif %}
-                                    <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+                                    <span>{{ ticket.asset.name|default:'General' }}</span>
                                 </div>
                             </td>
                             <td>
@@ -187,34 +193,23 @@
                                 </span>
                             </td>
                             <td>
-                                {% if ticket.assigned_to %}
-                                <div class="d-flex align-items-center">
-                                    {% if ticket.assigned_to.profile_pic %}
-                                    <img src="{{ ticket.assigned_to.profile_pic.url }}" class="rounded-circle me-2" width="32" height="32"
-                                        alt="">
-                                    {% else %}
-                                    <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle me-2" width="32" height="32" alt="">
-                                    {% endif %}
-                                    <span>{{ ticket.assigned_to.get_full_name }}</span>
-                                </div>
-                                {% else %}
-                                <span class="text-muted fst-italic">{{ trans.unassigned }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
                                 <div class="text-muted small">
                                     <i class="bi bi-clock-history me-1"></i>
-                                    {{ ticket.updated_at|timesince }} {{ trans.ago }}
+                                    {{ ticket.updated_at|timesince }} ago
                                 </div>
                             </td>
-                            
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="action-btn" title="View Ticket">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="10" class="text-center py-5">
                                 <div class="text-muted d-flex flex-column align-items-center">
                                     <i class="bi bi-ticket-perforated h1 mb-3"></i> <br>
-                                    <p>{{ trans.no_tickets_found }}</p>
+                                    <p>No tickets found matching your criteria.</p>
                                 </div>
                             </td>
                         </tr>
@@ -227,7 +222,7 @@
             {% if page_object.paginator.num_pages > 1 %}
             <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center border-top">
                 <div class="text-muted small">
-                    {{ trans.showing }} {{ page_object.start_index }} {{ trans.to_pagination }} {{ page_object.end_index }} {{ trans.of_label }} {{ page_object.paginator.count }} {{ trans.tickets_breadcrumb|lower }}
+                    Showing {{ page_object.start_index }} to {{ page_object.end_index }} of {{ page_object.paginator.count }} tickets
                 </div>
                 <nav aria-label="Table navigation">
                     <ul class="pagination pagination-sm mb-0">
@@ -266,14 +261,14 @@
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-open"></span>
-                        <span class="column-title">{{ trans.kanban_new }}</span>
+                        <span class="column-title">New</span>
                     </div>
                     <span class="column-count" id="count-open">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
                     {% if ticket.status == '0' %}
-                    <div class="kanban-card">
+                    <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
                         <div class="card-top-meta">
                             <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
                             <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
@@ -289,17 +284,17 @@
                             {% else %}
                             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
                             {% endif %}
-                            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+                            <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:trans.unassigned }}</span>
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
                         </div>
-                    </div>
+                    </a>
                     {% endif %}
                     {% endfor %}
                     <div class="kanban-empty-state">
                         <i class="bi bi-inbox"></i>
-                        <span>{{ trans.no_new_tickets }}</span>
+                        <span>No new tickets found</span>
                     </div>
                 </div>
             </div>
@@ -309,14 +304,14 @@
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-inprogress"></span>
-                        <span class="column-title">{{ trans.kanban_in_progress }}</span>
+                        <span class="column-title">In Progress</span>
                     </div>
                     <span class="column-count" id="count-in_progress">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
                     {% if ticket.status == '1' %}
-                    <div class="kanban-card">
+                    <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
                         <div class="card-top-meta">
                             <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
                             <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
@@ -332,17 +327,17 @@
                             {% else %}
                             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
                             {% endif %}
-                            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+                            <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:trans.unassigned }}</span>
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
                         </div>
-                    </div>
+                    </a>
                     {% endif %}
                     {% endfor %}
                     <div class="kanban-empty-state">
                         <i class="bi bi-inbox"></i>
-                        <span>{{ trans.no_tickets_in_progress }}</span>
+                        <span>No tickets in progress</span>
                     </div>
                 </div>
             </div>
@@ -352,14 +347,14 @@
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-in-testing"></span>
-                        <span class="column-title">{{ trans.kanban_in_testing }}</span>
+                        <span class="column-title">In Testing</span>
                     </div>
                     <span class="column-count" id="count-in_testing">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
                     {% if ticket.status == '2' %}
-                    <div class="kanban-card">
+                    <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
                         <div class="card-top-meta">
                             <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
                             <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
@@ -375,17 +370,17 @@
                             {% else %}
                             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
                             {% endif %}
-                            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+                            <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:trans.unassigned }}</span>
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
                         </div>
-                    </div>
+                    </a>
                     {% endif %}
                     {% endfor %}
                     <div class="kanban-empty-state">
                         <i class="bi bi-inbox"></i>
-                        <span>{{ trans.no_tickets_in_review }}</span>
+                        <span>No tickets in review</span>
                     </div>
                 </div>
             </div>
@@ -395,14 +390,14 @@
                 <div class="kanban-column-header">
                     <div class="column-title-wrap">
                         <span class="status-dot dot-resolved"></span>
-                        <span class="column-title">{{ trans.kanban_resolved }}</span>
+                        <span class="column-title">Resolved</span>
                     </div>
                     <span class="column-count" id="count-resolved">0</span>
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
                     {% if ticket.status == '3' or ticket.status == '4' %}
-                    <div class="kanban-card">
+                    <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
                         <div class="card-top-meta">
                             <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
                             <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
@@ -418,17 +413,17 @@
                             {% else %}
                             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
                             {% endif %}
-                            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+                            <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:trans.unassigned }}</span>
+                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
                         </div>
-                    </div>
+                    </a>
                     {% endif %}
                     {% endfor %}
                     <div class="kanban-empty-state">
                         <i class="bi bi-inbox"></i>
-                        <span>{{ trans.no_resolved_tickets }}</span>
+                        <span>No resolved tickets found</span>
                     </div>
                 </div>
             </div>
