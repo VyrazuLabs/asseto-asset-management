@@ -17,5 +17,8 @@ urlpatterns = [
 
     # Support Tickets
     path('support-tickets', views.client_portal_support_tickets, name='support_tickets'),
+    path('support-tickets/add', views.client_portal_add_ticket, name='support_tickets_add'),
+    path('support-tickets/asset-search', views.client_portal_asset_search, name='support_tickets_asset_search'),
     path('support-tickets/export', views.client_portal_export_support_tickets, name='support_tickets_export'),
+    path('support-tickets/<uuid:pk>', views.client_portal_ticket_detail, name='support_tickets_detail'),
 ]
