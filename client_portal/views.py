@@ -391,6 +391,7 @@ def client_portal_support_tickets(request):
         "ticket_type_choices": TICKET_TYPE_CHOICES,
         "all_tickets": tickets_qs,  # For kanban if needed
         **_client_ticket_stats(client),
+<<<<<<< HEAD
     }
     return render(request, "client_portal/support_tickets.html", context)
 
@@ -467,6 +468,10 @@ def client_portal_asset_search(request):
         })
 
     return JsonResponse({'results': results})
+=======
+    }
+    return render(request, "client_portal/support_tickets.html", context)
+>>>>>>> d71331c3b8a8fefe00b91463d6904a92479aa89b
 
 
 def client_portal_export_support_tickets(request):

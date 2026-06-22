@@ -2,6 +2,10 @@ from products.models import Product
 from products.utils import convert_to_list
 from django.db.models import Q
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d71331c3b8a8fefe00b91463d6904a92479aa89b
 def get_searched_data(request, search_text):
     status = request.GET.get("status")
     vendor = request.GET.get("vendor")

@@ -2,6 +2,7 @@ from .models import LocalizationConfiguration, BrandingImages
 from .translations.utils import get_translations
 
 
+
 def translations(request):
     """
     A context processor that adds the translation dictionary to every template context.

@@ -24,6 +24,7 @@ COUNTRY_CHOICES = [
     (8, "Germany"),
     (9, "France"),
     (10, "Japan"),
+<<<<<<< HEAD
 ]
 
 DEFAULT_LANGUAGE = [
@@ -38,6 +39,23 @@ DEFAULT_LANGUAGE = [
     (8, "Hindi"),
     (9, "Bengali"),
 ]
+=======
+]
+
+DEFAULT_LANGUAGE = [
+    (0, "English"),
+    (1, "Espaniol"),
+    (2, "French"),
+    (3, "German"),
+    (4, "Italian"),
+    (5, "Portuguese"),
+    (6, "Russian"),
+    (7, "Chinese"),
+    (8, "Hindi"),
+    (9, "Bengali"),
+]
+
+>>>>>>> d71331c3b8a8fefe00b91463d6904a92479aa89b
 
 
 # Derived from LANGUAGE_MAP above so there is a single source of truth.
