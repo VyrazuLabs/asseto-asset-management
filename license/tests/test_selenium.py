@@ -5,6 +5,9 @@ from authentication.models import User
 from license.models import License, LicenseType
 from vendors.models import Vendor
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class LicenseTest(LiveServerTestCase):

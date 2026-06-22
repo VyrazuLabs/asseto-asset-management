@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Product
+from products.models import Product
 from dashboard.models import ProductCategory,ProductType,Organization
 # Create your tests here.
 

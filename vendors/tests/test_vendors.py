@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Vendor
+from vendors.models import Vendor
 from dashboard.models import Address,Organization
 # Create your tests here.
 

@@ -9,6 +9,9 @@ from authentication.models import User
 from dashboard.models import Organization, Location, Address
 import time
 from selenium.common.exceptions import TimeoutException
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 class LocationTest(LiveServerTestCase):
 

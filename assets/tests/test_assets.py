@@ -2,7 +2,7 @@ from django.test import TestCase
 from dashboard.models import Organization,Address,Location,ProductType,ProductCategory,Department
 from vendors.models import Vendor
 from products.models import Product
-from .models import Asset
+from assets.models import Asset
 # Create your tests here.
 class Asseto_test(TestCase):
     def setUp(self):
