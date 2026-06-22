@@ -164,6 +164,7 @@
                             </td>
                             <td class="table-index-cell">
                                 <span class="asset-tag-pill">{{ ticket.ticket_id }}</span>
+                                <span class="asset-tag-pill">{{ ticket.ticket_id }}</span>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -176,6 +177,7 @@
                                     {% else %}
                                     <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
                                     {% endif %}
+                                    <span>{{ ticket.asset.name|default:'General' }}</span>
                                     <span>{{ ticket.asset.name|default:'General' }}</span>
                                 </div>
                             </td>
@@ -199,7 +201,11 @@
                                     {{ ticket.updated_at|timesince }} ago
                                 </div>
                             </td>
-
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="action-btn" title="View Ticket">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>

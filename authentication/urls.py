@@ -34,6 +34,7 @@ urlpatterns = [
     ),
     path("profile/toggle-2fa", views.toggle_2fa, name="toggle_2fa"),
     path("profile/regenerate-qr", views.regenerate_qr, name="regenerate_qr"),
+    
     # Dashboard Partials
     path(
         "dashboard/recent-vendors",
