@@ -17,9 +17,9 @@ class ProductCategoryListForFormDropdown(APIView):
                 data=[]
             return api_response(data=data, message='list of Product Category')
         except ValueError as e:
-            return api_response(status=400,error_message=str(e))
+            return api_response(status=400,success=False, error_message=str(e))
         except Exception as e:
-            return api_response(status=500,system_message=str(e))
+            return api_response(status=500,success=False,system_message=str(e))
         
 class ProductSubCategoryListForFormDropdown(APIView):
     permission_classes=[IsAuthenticated]
@@ -34,8 +34,8 @@ class ProductSubCategoryListForFormDropdown(APIView):
                 data=[{'id':product_sub_category.id,'name':product_sub_category.name} for product_sub_category in product_sub_categories]
             else:
                 data=["No sub category found"]
-            return api_response(data=data, message='list of Product sub Category')
+            return api_response(status=200, success=True, data=data, message='list of Product sub Category')
         except ValueError as e:
-            return api_response(status=400,error_message=str(e))
+            return api_response(success=False, status=400,error_message=str(e))
         except Exception as e:
-            return api_response(status=500,system_message=str(e))
+            return api_response(success= False, status=500,system_message=str(e))

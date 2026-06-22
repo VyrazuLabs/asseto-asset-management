@@ -1,19 +1,12 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.db.models import Q
-from django.db.models import Count
-from products.models import Product
-from assets.models import Asset
-from .serializers import SearchSerializer
-from authentication.models import User
-from rest_framework.parsers import MultiPartParser,FormParser,JSONParser
+from ..views.serializers import SearchSerializer
+from rest_framework.parsers import FormParser,JSONParser
 from drf_spectacular.utils import extend_schema
 from common.API_custom_response import api_response,format_validation_errors
-from assets.api_utils import asset_data, convert_to_list, delete_images, get_asset
 from common.API_custom_response import api_response, format_validation_errors, get_detailed_errors_info, log_error_to_terminal
-from users.utils import user_data
-from .api_utils import search_utils
+from ..api_utils import search_utils
 
 class GlobalSearch(APIView):
     permission_classes=[IsAuthenticated]
@@ -35,8 +28,6 @@ class GlobalSearch(APIView):
 
         try:
             response_data = search_utils(request,search_text)
-            print("Searched Noiw")
-            # -------- Final Response --------
             if not any(response_data.values()):
                 return api_response(data=response_data, message="Data not found")
 
@@ -56,10 +47,3 @@ class GlobalSearch(APIView):
                 system_message=error_info["message"],
                 trace_back=error_info['traceback']
             )
-
-        # context = {
-        #     'products': products,
-        #     'assets': assets,
-        #     'users':users,
-        #     'search_text': search_text,
-        # }

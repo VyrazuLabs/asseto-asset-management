@@ -163,15 +163,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         if self.full_name:
             return self.dynamic_display_name(self.full_name)
         return ""
-
 class UserTotp(models.Model):
-    user_id = models.CharField(max_length=255)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_totp", null=False)
     secret = models.CharField(max_length=255)
-    status = models.IntegerField(default=0)
+    is_validate = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_logged_in = models.BooleanField(default=False)
-
 class PhoneOtp(models.Model):
     user_id = models.CharField(max_length=255)
     otp = models.CharField(max_length=255)

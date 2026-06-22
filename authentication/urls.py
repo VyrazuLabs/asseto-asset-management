@@ -3,6 +3,7 @@ from authentication import views
 from django.contrib.auth import views as auth_views
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView,TokenBlacklistView
 from . import index_api_views
+from . two_factor_authentication_views import *;
 app_name = 'authentication'
 
 urlpatterns = [
@@ -10,7 +11,6 @@ urlpatterns = [
     path('introduce/', views.introduce, name = 'introduce'),
     path('data-base-configure/',views.db_configure, name="db_configure"),
     path('smtp-email-configure/',views.smtp_email_configure,name='email_configure'),
-    path('verify-otp/',views.verify_otp,name='verify_otp'),
     path('', views.index, name = 'index'),
     path('login', views.user_login, name = 'login'),
     path('register', views.user_register, name = 'register'),
@@ -19,8 +19,12 @@ urlpatterns = [
     path('logout/',views.logout_view, name='logout'),
     path('profile-basic-information/update', views.profile_basic_info_update, name='profile_basic_info_update'),
     path('organization-information/update', views.organization_info_update, name='organization_info_update'),
-    path('profile/toggle-2fa', views.toggle_2fa, name='toggle_2fa'),
-    path('profile/regenerate-qr', views.regenerate_qr, name='regenerate_qr'),
+
+    #--------------------------------------------------2FA--------------------------------------------------------------#
+    path('profile/toggle-2fa', toggle_2fa, name='toggle_2fa'),
+    path("profile/2fa/verify-and-enable",verify_and_enable, name="verify_and_enable"),
+    path('profile/regenerate-qr', regenerate_qr, name='regenerate_qr'),
+    path('verify-otp/',verify_otp,name='verify_otp'),
     
     # Dashboard Partials
     path('dashboard/recent-vendors', views.recent_vendors_partial, name='recent_vendors_partial'),
@@ -33,10 +37,8 @@ authentication_url_patterns=[
     #api urls
     path('api/authentication/login/', index_api_views.CustomTokenObtainPairView.as_view(),name='login'),
     path('api/authentication/generate-otp/',index_api_views.GenerateTOTP.as_view(),name='generate_otp'),
-    # path('api/authentication/login/', index_api_views.CustomTokenObtainPairView.as_view(),name='login'),
     path('api/authentication/login-otp/',index_api_views.LoginOtp.as_view(),name='login_otp'),
     path('api/authentication/token/refresh/',TokenRefreshView.as_view(),name='token_refresh'),
-    # path('api/authentication/token/refresh/',views.get_refresh_token,name='token_refresh'),
     path('api/authentication/logout/',TokenBlacklistView.as_view(),name='logout'),
 
     #dashboard api urls

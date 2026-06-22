@@ -66,24 +66,14 @@
                                 <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_phone }}">
                             {% endif %}
                         </div>
-                        <div class="btn-group  mt-4">
-                            <p style="margin-right: 130px;"><b>{{ trans.organization_currency }}</b></p>
-                            <select name="currency-format" class="form-control w-100 w-2"  style="margin-right: 20px;">
-                                {% if get_default_currency_format %}
-                                    <option value="{{ get_default_currency_format.id }}" selected>
-                                        {{ get_default_currency_format }}
-                                    </option>
-                                {% elif org_data is not None %}
-                                    <option value="{{ org_data.currency }}">{{ org_data.get_currency_display_value }}</option>
-                                {% endif %}
-                                {% for code, name in currency_choices %}
-                                    <option value="{{ code }}">{{ name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="d-flex justify-content-end gap-3 p-4" style="padding-right: 20px;">
-                            <button type="button" class="btn btn-sm btn-danger" style="width: 100px"> {{ trans.cancel }}</button>
-                            <button type="submit" class="btn btn-sm btn-info" style="width: 100px;"> {{ trans.save }}</button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-3 p-4" style="padding-right: 20px;">
+                                <button type="button" class="btn btn-sm btn-danger" style="width: 100px"> {{ trans.cancel }}</button>
+                                <button type="submit" class="btn btn-sm btn-info" style="width: 100px;"> {{ trans.save }}</button>
+                            </div>
                         </div>
                     </div>
                 </div>

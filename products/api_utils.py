@@ -1,6 +1,6 @@
 from products.models import Product
 from products.utils import convert_to_list
-
+from django.db.models import Q
 
 def get_searched_data(request,search_text):   
     status=request.GET.get('status')
@@ -27,6 +27,6 @@ def get_searched_data(request,search_text):
         searched_data=searched_data.filter(asset__location__id=location)
     if department:
         searched_data=searched_data.filter(asset__assigned_asset__user__department__id=department)
-    # searched_data=searched_data.distinct().order_by('-created_at')
+
     searched_product_data=convert_to_list(request,searched_data)
     return searched_product_data

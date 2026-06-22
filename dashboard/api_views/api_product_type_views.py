@@ -6,11 +6,9 @@ class ProductTypeListForFormDropdown(APIView):
     def get(self,request):
         try:
             get_product_types=ProductType.undeleted_objects.filter(status=True)
-            if get_product_types:
-                data=[{'id':product_type.id,'name':product_type.name} for product_type in get_product_types]
-            else:
-                data=[]
-            return api_response(data=data, message='list of Product Types')
+            data=[{'id':product_type.id,'name':product_type.name} for product_type in get_product_types] if get_product_types else []
+
+            return api_response(success=True, status=200, data=data)
         except ValueError as e:
             return api_response(status=400,error_message=str(e))
         except Exception as e:

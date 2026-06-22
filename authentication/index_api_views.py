@@ -1,25 +1,24 @@
-from datetime import datetime, timedelta
-from rest_framework.views import APIView
 from django.db.models import Q
-from assets.models import Asset, AssignAsset
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenViewBase
+
 from authentication.models import User
-from authentication.utils import asset_datas,user_information,asset_data_util,totp_and_qrcode_generation,handle_user_totp, location_datas, user_datas, vendor_datas, generate_totp_secret,generate_qrcode,verify_totp
+from authentication.serializers import (CustomTokenObtainPairSerializer,
+                                        LoginOTPSerializer)
+from authentication.utils import (asset_data_util, handle_user_totp,
+                                  location_datas, product_datas,
+                                  totp_and_qrcode_generation, user_datas,
+                                  vendor_datas)
 from common.API_custom_response import api_response
-from rest_framework.permissions import IsAuthenticated
 from dashboard.models import Location
 from products.models import Product
-from authentication.utils import product_datas
 from vendors.models import Vendor
-# from authentication.utils import user_information
-from authentication.serializers import LoginOTPSerializer
-from django.utils import timezone
-from rest_framework.response import Response
-from authentication.models import UserTotp,PhoneOtp
-from authentication.serializers import CustomTokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenViewBase
-from drf_spectacular.utils import extend_schema,OpenApiParameter
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
+
+
 class CustomTokenObtainPairView(TokenViewBase):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -34,8 +33,6 @@ class LoginOtp(APIView):
     )
     def post(self, request):
         try:
-            # Use request.data (NOT query_params for POST)
-            # print("Request method:", request.query_params)  # Debug log
             serializer = LoginOTPSerializer(
                 data=request.query_params,
                 context={'request': request}
@@ -53,27 +50,17 @@ class LoginOtp(APIView):
                     'message': 'Invalid credentials'
                 }, status=401)
 
-            is_valid,secret = handle_user_totp(request,entered_otp,user)
-            # print(f"Verifying OTP: secret={secret}, entered_otp={entered_otp}, is_valid={is_valid}")  # Debug log
+            is_valid = handle_user_totp(request,entered_otp,user)
             if not is_valid:
-                # Optional: increment failed attempts
-                # user_totp.failed_attempts = f'failed_attempts' + 1
-                # user_totp.save(update_fields=['failed_attempts'])
-
                 return Response({
                     'success': False,
                     'message': 'Invalid or expired OTP'
                 }, status=400)
-
-            # Reset failed attempts after success
-            # user_totp.failed_attempts = 0
-            # user_totp.last_verified_at = timezone.now()
-            # user_totp.save(update_fields=['failed_attempts', 'last_verified_at'])
-
+            
             # Generate login response
             refresh_token = RefreshToken.for_user(user)
             access_token = str(refresh_token.access_token)
-            # response = user_information(request, user)
+            
             response = {
                 "access": access_token,
                 "refresh": str(refresh_token),
@@ -81,10 +68,7 @@ class LoginOtp(APIView):
             return Response(response, status=200)
 
         except Exception as e:
-            return Response({
-                'success': False,
-                'message': 'Something went wrong'
-            }, status=500)
+            return api_response(success=False, status=500, error_message=e)
         
 class GenerateTOTP(APIView):
     def post(request):
