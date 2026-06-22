@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.db.models import Count
 from products.models import Product
 from assets.models import Asset
-from .serializers import SearchSerializer
+from ..views.serializers import SearchSerializer
 from authentication.models import User
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from drf_spectacular.utils import extend_schema
@@ -17,7 +17,7 @@ from common.API_custom_response import (
     log_error_to_terminal,
 )
 from users.utils import user_data
-from .api_utils import search_utils
+from ..views.api_utils import search_utils
 
 
 class GlobalSearch(APIView):

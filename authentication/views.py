@@ -2,8 +2,9 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, redirect, get_object_or_404
 from authentication.forms import (
     UserRegisterForm,
     OrganizationForm,

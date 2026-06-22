@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 from .views import (
-    api_view,
     global_search_views,
     api_location_views,
     api_product_type_views,
@@ -10,6 +9,7 @@ from .views import (
     api_department_views,
     license_type,
 )
+from .api_views import global_search_api_views as api_view
 
 app_name = "dashboard"
 
