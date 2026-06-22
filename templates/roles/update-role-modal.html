@@ -312,6 +312,118 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Support Ticket -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Support_Ticket" id="chk-Support_Ticket">
+                                        <label class="form-check-label" for="chk-Support_Ticket">Support Ticket</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Support_Ticket" id="view_ticket" name="permissions[]" type="checkbox" value="view_ticket" {% if 'view_ticket' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_ticket">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Support_Ticket" id="add_ticket" name="permissions[]" type="checkbox" value="add_ticket" {% if 'add_ticket' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_ticket">Add</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Support_Ticket" id="edit_ticket" name="permissions[]" type="checkbox" value="edit_ticket" {% if 'edit_ticket' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_ticket">Edit</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Support_Ticket" id="delete_ticket" name="permissions[]" type="checkbox" value="delete_ticket" {% if 'delete_ticket' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_ticket">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Extensions -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Extensions" id="chk-Extensions">
+                                        <label class="form-check-label" for="chk-Extensions">Extensions</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Extensions" id="view_extensions" name="permissions[]" type="checkbox" value="view_extensions" {% if 'view_extensions' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_extensions">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Extensions" id="add_extensions" name="permissions[]" type="checkbox" value="add_extensions" {% if 'add_extensions' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_extensions">Add</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Extensions" id="edit_extensions" name="permissions[]" type="checkbox" value="edit_extensions" {% if 'edit_extensions' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_extensions">Edit</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Extensions" id="delete_extensions" name="permissions[]" type="checkbox" value="delete_extensions" {% if 'delete_extensions' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_extensions">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Upload" id="chk-Upload">
+                                        <label class="form-check-label" for="chk-Upload">Upload</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Upload" id="view_upload" name="permissions[]" type="checkbox" value="view_upload" {% if 'view_upload' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_upload">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Upload" id="add_upload" name="permissions[]" type="checkbox" value="add_upload" {% if 'add_upload' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_upload">Add</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Upload" id="edit_upload" name="permissions[]" type="checkbox" value="edit_upload" {% if 'edit_upload' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_upload">Edit</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Upload" id="delete_upload" name="permissions[]" type="checkbox" value="delete_upload" {% if 'delete_upload' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_upload">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- License -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="License" id="chk-License">
+                                        <label class="form-check-label" for="chk-License">License</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_License" id="view_license" name="permissions[]" type="checkbox" value="view_license" {% if 'view_license' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_license">View</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_License" id="add_license" name="permissions[]" type="checkbox" value="add_license" {% if 'add_license' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_license">Add</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_License" id="edit_license" name="permissions[]" type="checkbox" value="edit_license" {% if 'edit_license' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_license">Edit</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_License" id="delete_license" name="permissions[]" type="checkbox" value="delete_license" {% if 'delete_license' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_license">Delete</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

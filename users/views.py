@@ -139,6 +139,7 @@ def add(request):
 
             if password1 == password2:
                 user.set_password(password1)
+                
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address

@@ -212,31 +212,50 @@
                     </div>
                     <div class="pd-2fa-actions shadow-sm">
                         <div class="pd-2fa-status">
-                            <span class="pd-2fa-status-label">{{ trans.active_status }}</span>
+                            <span class="pd-2fa-status-label">Active 2FA</span>
                             <div class="form-check form-switch p-0 m-0">
                                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                                 <input class="form-check-input" type="checkbox" id="twoFactorToggle"
-                                    name="two_factor_auth" {% if two_factor_auth %} checked {% endif %}>
+                                    name="two_factor_auth" {% if two_factor_auth %}checked{% endif %}
+                                    data-toggle-url="{% url 'authentication:toggle_2fa' %}"
+                                    data-qr-url="{% url 'authentication:regenerate_qr' %}"
+                                    data-is-validate="{{ get_user_totp.is_validate|lower }}">
                             </div>
                         </div>
-                        <button type="button" id="regenerateQrBtn" class="pd-btn-qr mt-3">
+                        <button type="button" id="regenerateQrBtn"
+                            class="pd-btn-qr mt-3 {% if not two_factor_auth %}d-none{% endif %}"
+                            data-regenerate-url="{% url 'authentication:regenerate_qr' %}">
                             <i class="bi bi-qr-code"></i> {{ trans.regenerate_qr_code }}
                         </button>
                     </div>
                 </div>
 
-                <!-- QR Code Container (Hidden by default based on JS) -->
-                <div id="qrContainer" class="text-center mt-4 {% if not two_factor_auth %}d-none{% endif %}">
+                <div id="qrContainer" class="text-center mt-4 {% if not two_factor_auth or get_user_totp.is_validate %}d-none{% endif %}" data-qr-data="{{ qr_code_data|default:'' }}">
                     <hr class="my-4 opacity-25">
                     <h5 class="mb-3">{{ trans.scan_qr_instruction }}</h5>
-
-                    <div id="otpInputContainer" class="mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">
-                        <input type="text" placeholder="{{ trans.enter_otp_placeholder }}" id="userOtp"
-                            class="form-control w-25 mx-auto text-center font-monospace" maxlength="6">
-                    </div>
-                    <button type="button" id="verify2faBtn" class="btn btn-success px-4 mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">{{ trans.verify_enable }}</button>
-
                     <div id="img-container"></div>
+                    <form method="POST" action="{% url 'authentication:verify_and_enable' %}" id="verifyOtpForm">
+                        {% csrf_token %}
+                        <div class="mt-3">
+                            <input type="text" placeholder="{{ trans.enter_otp_placeholder }}" id="userOtp"
+                            class="form-control w-25 mx-auto text-center font-monospace" maxlength="6", name="otp">
+                        </div>
+                        <button type="submit" class="otp-verify-btn px-4 mt-3">Verify & Enable</button>
+                    </form>
+                </div>
+                
+                
+                <div id="verifiedSuccess" class="text-center mt-4 {% if not two_factor_auth or not get_user_totp.is_validate %}d-none{% endif %}">
+                    <hr class="my-4 opacity-25">
+                    <div class="verified-tick-wrap">
+                        <div class="verified-tick-circle">
+                            <svg class="verified-tick-svg" viewBox="0 0 52 52">
+                                <circle class="verified-tick-circle-bg" cx="26" cy="26" r="25" fill="none"/>
+                                <path class="verified-tick-check" d="M14 27l7 7 16-16" fill="none"/>
+                            </svg>
+                        </div>
+                        <h5 class="verified-text mt-3">OTP Verified!</h5>
+                    </div>
                 </div>
             </div>
         </div>
@@ -259,120 +278,5 @@
 </div>
 
 <!-- Scripts -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggle = document.getElementById("twoFactorToggle");
-        const regenerateBtn = document.getElementById("regenerateQrBtn");
-        const verify2faBtn = document.getElementById("verify2faBtn");
-        const userOtp = document.getElementById("userOtp");
-        const qrSection = document.getElementById("qrContainer");
-
-        // 2FA Toggle Update
-        if (toggle) {
-            toggle.addEventListener("change", function () {
-                const isChecked = toggle.checked;
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-                fetch("{% url 'users:toggle_two_factor_auth' %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "X-CSRFToken": csrfToken
-                    },
-                    body: new URLSearchParams({
-                        two_factor_auth: isChecked ? "on" : ""
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (qrSection) {
-                            if (isChecked) {
-                                qrSection.classList.remove("d-none");
-                            } else {
-                                qrSection.classList.add("d-none");
-                            }
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-            });
-        }
-
-        // Regenerate QR
-        if (regenerateBtn) {
-            regenerateBtn.addEventListener("click", function () {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-                regenerateBtn.disabled = true;
-                regenerateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> {{ trans.generating }}';
-
-                fetch("{% url 'authentication:regenerate_qr' %}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            if (qrSection) qrSection.classList.remove("d-none");
-                            if (verify2faBtn) verify2faBtn.classList.remove("d-none");
-                            if (userOtp) userOtp.classList.remove("d-none");
-                            const otpContainer = document.getElementById("otpInputContainer");
-                            if (otpContainer) otpContainer.classList.remove("d-none");
-
-                            const existingImg = document.getElementById("dynamicQrImage");
-                            if (existingImg) existingImg.remove();
-
-                            const imgContainer = document.getElementById("img-container");
-                            const img = document.createElement("img");
-                            img.id = "dynamicQrImage";
-                            img.src = "data:image/png;base64," + data.qr_code;
-                            img.className = "img-fluid mt-3";
-                            img.style.maxWidth = "200px";
-                            imgContainer.appendChild(img);
-                        } else {
-                            alert(data.message || "{{ trans.failed_regenerate_qr }}");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("{{ trans.something_went_wrong }}");
-                    })
-                    .finally(() => {
-                        regenerateBtn.disabled = false;
-                        regenerateBtn.innerHTML = '<i class="bi bi-qr-code"></i> {{ trans.regenerate_qr_code }}';
-                    });
-            });
-        }
-
-        // Verify 2FA
-        if (verify2faBtn) {
-            verify2faBtn.addEventListener("click", function () {
-                const otp = userOtp ? userOtp.value.trim() : "";
-                const email = "{{request.user.email}}";
-
-                if (!otp) {
-                    alert("{{ trans.please_enter_otp }}");
-                    return;
-                }
-
-                fetch(`/api/authentication/login-otp/?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`, {
-                    method: "POST",
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.access) {
-                            alert("{{ trans.verification_successful }}");
-                            window.location.reload();
-                        } else {
-                            alert(data.message || "{{ trans.invalid_otp }}");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("{{ trans.something_went_wrong }}");
-                    });
-            });
-        }
-    });
-</script>
+<script src="{% static 'js/pages/user_profile.js' %}?v=2" defer></script>
 {% endblock content %}

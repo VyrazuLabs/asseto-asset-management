@@ -178,41 +178,6 @@ def deleted_product(request, id):
     history_id = product.history.first().history_id
     product.history.filter(pk=history_id).update(history_type='-')
 
-def product_search(request,search_text):
-    if search_text:
-        return render(request, 'products/products-data.html', {
-            'page_object': Product.undeleted_objects.filter(Q(organization=request.user.organization) & (Q(
-                name__icontains=search_text) | Q(manufacturer__icontains=search_text) | Q(product_sub_category__name__icontains=search_text) | Q(product_type__name__icontains=search_text)
-            )).annotate(
-            total_assets=Count('asset'),
-            available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
-        ).order_by('-created_at')
-        })
-
-    product_list = Product.undeleted_objects.filter(
-        organization=request.user.organization).order_by('-created_at')
-    paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    product_ids_in_page = [product.id for product in page_object]
-    images_qs = ProductImage.objects.filter(product_id__in=product_ids_in_page).order_by('uploaded_at')
-    # Map asset ID to its first image
-    product_images = {}
-    for img in images_qs:
-        if img.product_id not in product_images:
-            product_images[img.product_id] = img
-
-# def completed_audit(request):
-#     thirty_days_ago = datetime.now() - timedelta(days=30)
-
-#     audits = Audit.objects.filter(
-#         created_at__gte=thirty_days_ago
-#     ).order_by('-created_at')
-
-#     page = request.GET.get('page', 1)
-#     paginator = Paginator(audits, 10)
-#     audits_page = paginator.get_page(page)
-
 def convert_to_list(request,products):
     current_host=request.get_host()
     product_list=[]
@@ -257,7 +222,6 @@ def product_details(request,product):
     if get_product_image:
         for product_image in get_product_image:
             obj={}
-            # image_list.append(f"http://{current_host}"+product_image.image.url)
             obj['image_path']=f"http://{current_host}"+product_image.image.url
             obj['image_id']=product_image.id
             image_list.append(obj)
@@ -270,25 +234,6 @@ def product_details(request,product):
             custom_fields_dict={custom_field.field_name:custom_field.field_value}
             custome_fields_list.append(custom_fields_dict)
         product_detail['custom_fields']=custome_fields_list
-
-
-    # get_asset=Asset.objects.filter(product=product.id,organization=request.user.organization)
-    # asset_list=[]
-    # product_detail['assets']=asset_list
-    # if get_asset:
-    #     for asset in get_asset:
-    #         asset_dict={
-    #             'id':asset.id,
-    #             'name':asset.name,
-    #             'status':asset.asset_status.name
-    #         }
-    #         asset_dict['assigned_user']=None
-    #         assigned_user=AssignAsset.objects.get(asset=asset.id)
-    #         if assigned_user:
-    #             asset_dict['assigned_user']=assigned_user.user.full_name
-    #         asset_list.append(asset_dict)
-
-    #     product_detail['assets']=asset_list
     return product_detail
 
 def product_list_for_form(products):
@@ -307,5 +252,3 @@ def delete_product_images(deleted_image_ids):
             ProductImage.objects.filter(id=id).delete()
         except Exception as e:
             print(e)
-
-# def deleted

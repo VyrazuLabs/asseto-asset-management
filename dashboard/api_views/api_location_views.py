@@ -10,8 +10,8 @@ class LocationListForFormDropdown(APIView):
                 data=[{'id':location.id,'name':str(location)} for location in get_locations]
             else:
                 data=[]
-            return api_response(data=data, message='list of Locations')
+            return api_response(status=200, success=True, data=data)
         except ValueError as e:
-            return api_response(status=400,error_message=str(e))
+            return api_response(status=400, success= False, error_message=str(e))
         except Exception as e:
-            return api_response(status=500,system_message=str(e))
+            return api_response(status=500, success=False, system_message=str(e))

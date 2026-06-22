@@ -22,8 +22,5 @@ def seed_parent_category(category=None, organization=None):
                 name=category.strip(),
                 organization=organization,
         )
-
-
-
     SeedFlag.objects.create(seeded=True)
     return True
