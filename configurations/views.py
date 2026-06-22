@@ -277,9 +277,9 @@ def create_localization_configuration(request):
                 default_language=default_language,
                 time_format=time_format,
             )
-        return redirect("configurations:list_localization")
-
-    return redirect("configurations:list_localization")
+        if 'org_lang_id' in request.session:
+            del request.session['org_lang_id']
+        return redirect('configurations:list_localization')
 
 
 @login_required
