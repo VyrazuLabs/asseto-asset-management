@@ -1,7 +1,10 @@
 from .models import LocalizationConfiguration, BrandingImages
 from .translations.utils import get_translations
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> e67c487 (Removed the code from init.py files for the translation into the utils and constant files)
 
 def translations(request):
     """
