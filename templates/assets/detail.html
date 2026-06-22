@@ -423,7 +423,7 @@
       </div>
       <div class="modal-body text-center">
         <div id="carouselExampleControls" class="carousel{{ forloop.counter }} slide" data-bs-ride="carousel">
-          
+
           <div class="carousel-inner">
             {% for it in get_asset_img %}
               {% if it.image %}
@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (carouselEl) {
     var counterEl = document.getElementById('carouselImageCounter');
     var totalImages = {{ arr_size }};
-    
+
     carouselEl.addEventListener('slide.bs.carousel', function(e) {
       if (counterEl) {
         var currentIndex = e.to + 1;
@@ -515,4 +515,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock content %}
-

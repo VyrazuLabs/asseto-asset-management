@@ -34,7 +34,7 @@
                                     <th>{{ trans.parent_category_name }}</th>
                                     <th>{{ trans.actions }}</th>
                                 </tr>
-                            </thead>      
+                            </thead>
                             {% if page_object %}
                             <tbody id="search_result">
                                 {% for products in page_object %}
@@ -44,16 +44,16 @@
                                         <td>{{products.parent.name}}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                        <form action="{% url 'recycle_bin:deleted_product_categories_restore' products.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">  
+                                        <form action="{% url 'recycle_bin:deleted_product_categories_restore' products.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
                                         </form>
-                                        <form action="{% url 'recycle_bin:deleted_product_categories_permanently' products.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">  
+                                        <form action="{% url 'recycle_bin:deleted_product_categories_permanently' products.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
                                         </form>
                                     </div>
-                                </td>   
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -6,27 +6,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0026_historicaluser_password_reset_expires_and_more'),
+        ("authentication", "0026_historicaluser_password_reset_expires_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PhoneOtp',
+            name="PhoneOtp",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user_id', models.CharField(max_length=255)),
-                ('otp', models.CharField(max_length=255)),
-                ('expires_at', models.DateTimeField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("user_id", models.CharField(max_length=255)),
+                ("otp", models.CharField(max_length=255)),
+                ("expires_at", models.DateTimeField()),
             ],
         ),
         migrations.CreateModel(
-            name='UserTotp',
+            name="UserTotp",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user_id', models.CharField(max_length=255)),
-                ('secret', models.CharField(max_length=255)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("user_id", models.CharField(max_length=255)),
+                ("secret", models.CharField(max_length=255)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

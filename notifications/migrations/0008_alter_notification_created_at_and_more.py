@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0007_alter_notification_status'),
+        ("notifications", "0007_alter_notification_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='created_at',
+            model_name="notification",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='status',
+            model_name="notification",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='updated_at',
+            model_name="notification",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

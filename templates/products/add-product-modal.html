@@ -11,13 +11,13 @@
                     <li class="breadcrumb-item active" aria-current="page">{{ trans.add_product }}</li>
                 </ol>
             </nav>
-        </div>      
+        </div>
 
         <div>
             <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">{{ trans.back_to_product_list }}</a>
         </div>
     </div>
- 
+
     <section class="section">
         <form class="form row" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
@@ -129,7 +129,7 @@
                                     <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
                             </div>
-                            <div class="form-group rounded ml-2" id="imagePreview"></div>                    
+                            <div class="form-group rounded ml-2" id="imagePreview"></div>
                         </div>
                     </div>
                 </div>
@@ -184,7 +184,7 @@
                                         <i class="bi bi-dash-lg"></i>
                                     </button>
                                 </div>
-                            </div>   
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2254,7 +2254,7 @@ function create(input, value) {
         throw new ParchmentError("Unable to create " + input + " blot");
     }
     var BlotClass = match;
-    var node = 
+    var node =
     // @ts-ignore
     input instanceof Node || input['nodeType'] === Node.TEXT_NODE ? input : BlotClass.create(value);
     return new BlotClass(node, value);
@@ -13643,7 +13643,7 @@ module.exports = __nested_webpack_require_439588__(63);
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -13657,14 +13657,14 @@ module.exports = __nested_webpack_require_439588__(63);
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -13677,7 +13677,7 @@ module.exports = __nested_webpack_require_439588__(63);
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -13689,7 +13689,7 @@ module.exports = __nested_webpack_require_439588__(63);
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/global */
 /******/ 	(() => {
 /******/ 		__webpack_require__.g = (function() {
@@ -13701,12 +13701,12 @@ module.exports = __nested_webpack_require_439588__(63);
 /******/ 			}
 /******/ 		})();
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -13717,7 +13717,7 @@ module.exports = __nested_webpack_require_439588__(63);
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.

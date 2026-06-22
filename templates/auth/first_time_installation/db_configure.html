@@ -5,7 +5,7 @@
 {% include 'commons/progress-bar.html' with current_step=2 %}
             <h4 class="title mb-3">Setup the Database</h4>
             <form method="post">
-                
+
                 {% if messages %}
                     {% for message in messages %}
                     <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
@@ -35,12 +35,12 @@
                     <span class="text-danger">*</span>
                     <input type="password" class="form-control form-control-xl" name="password"  placeholder="Password" required>
                 </div>
-                            
+
                 <div class="form-group position-relative has-icon-left mb-3">
                     <span class="text-danger">*</span>
                     <input type="text" class="form-control form-control-xl" name="host_name"  placeholder="Host" required>
                 </div>
-                        
+
                 <div class="form-group position-relative has-icon-left mb-3">
                     <span class="text-danger">*</span>
                     <input type="text" class="form-control form-control-xl" name="port"  placeholder="Port Number" required>

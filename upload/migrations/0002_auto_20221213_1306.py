@@ -7,27 +7,43 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_delete_employee'),
-        ('upload', '0001_initial'),
+        ("dashboard", "0015_delete_employee"),
+        ("upload", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='upload',
-            name='created_by',
+            model_name="upload",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='upload',
-            name='updated_by',
+            model_name="upload",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.CreateModel(
-            name='File',
+            name="File",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to='files')),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.organization')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file", models.FileField(upload_to="files")),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="dashboard.organization",
+                    ),
+                ),
             ],
         ),
     ]

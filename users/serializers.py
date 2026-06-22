@@ -2,10 +2,12 @@ from rest_framework import serializers
 
 from authentication.models import User
 from dashboard.models import Address, Location
+
 # from dashboard.serializers import AddressSerializer
 from roles.models import Role
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
+
 
 class ResetPasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(write_only=True)
@@ -15,49 +17,66 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
-        model=User
-        fields="__all__"
+        model = User
+        fields = "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
-    role=serializers.CharField(required=False)
+    role = serializers.CharField(required=False)
     address_line_one = serializers.CharField(required=False)
     address_line_two = serializers.CharField(required=False)
-    email=serializers.EmailField(required=False)
+    email = serializers.EmailField(required=False)
     country = serializers.CharField(required=False)
     state = serializers.CharField(required=False)
     city = serializers.CharField(required=False)
     pin_code = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
     access_level = serializers.BooleanField(required=False)
-    profile_pic=serializers.ImageField(required=False)
+    profile_pic = serializers.ImageField(required=False)
+
     class Meta:
-        model=User
-        fields=['full_name','email','phone','password','department','role','access_level','location','profile_pic','address_line_one','address_line_two','country',
-            'state','city','pin_code']
-        
+        model = User
+        fields = [
+            "full_name",
+            "email",
+            "phone",
+            "password",
+            "department",
+            "role",
+            "access_level",
+            "location",
+            "profile_pic",
+            "address_line_one",
+            "address_line_two",
+            "country",
+            "state",
+            "city",
+            "pin_code",
+        ]
+
     # def format_role_type(self,role):
     #     if role:
     #         return role.id
     #     return None
-    
-    def validate_email(self,email):
-        domain='@'
+
+    def validate_email(self, email):
+        domain = "@"
         if domain not in email:
             raise serializers.ValidationError("Email is not valid")
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError("Email already exists")
         return email
-    
+
     def create(self, validated_data):
-        role_id = validated_data.pop('role', None)
+        role_id = validated_data.pop("role", None)
 
         address_fields = {
-            'address_line_one': validated_data.pop('address_line_one', None),
-            'address_line_two': validated_data.pop('address_line_two', None),
-            'country': validated_data.pop('country', None),
-            'state': validated_data.pop('state', None),
-            'city': validated_data.pop('city', None),
-            'pin_code': validated_data.pop('pin_code', None),
+            "address_line_one": validated_data.pop("address_line_one", None),
+            "address_line_two": validated_data.pop("address_line_two", None),
+            "country": validated_data.pop("country", None),
+            "state": validated_data.pop("state", None),
+            "city": validated_data.pop("city", None),
+            "pin_code": validated_data.pop("pin_code", None),
         }
 
         try:
@@ -69,7 +88,7 @@ class UserSerializer(serializers.ModelSerializer):
             if role_id:
                 role = Role.objects.filter(
                     id=int(role_id),
-                    organization=self.context["request"].user.organization
+                    organization=self.context["request"].user.organization,
                 ).first()
 
                 if not role:
@@ -82,7 +101,7 @@ class UserSerializer(serializers.ModelSerializer):
                 role=role,
                 address=address,
                 organization=self.context["request"].user.organization,
-                is_active=True
+                is_active=True,
             )
 
             if password:
@@ -94,7 +113,6 @@ class UserSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise ValueError(str(e))
 
-    
     def update(self, instance, validated_data):
         request = self.context["request"]
 
@@ -116,8 +134,7 @@ class UserSerializer(serializers.ModelSerializer):
                 raise ValidationError({"role": "Role must be a numeric value"})
 
             role = Role.objects.filter(
-                id=int(role_value),
-                organization=request.user.organization
+                id=int(role_value), organization=request.user.organization
             ).first()
 
             if not role:
@@ -153,13 +170,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SearchUserSerializer(serializers.ModelSerializer):
-    search_text=serializers.CharField(required=False)
-    role=serializers.CharField(required=False)
-    status=serializers.CharField(required=False)
+    search_text = serializers.CharField(required=False)
+    role = serializers.CharField(required=False)
+    status = serializers.CharField(required=False)
+
     class Meta:
-        model=User
-        fields=['search_text','role','status']
-    
+        model = User
+        fields = ["search_text", "role", "status"]
+
     def validate(self, search_text):
         if not search_text:
             return None

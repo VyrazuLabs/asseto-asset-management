@@ -1,0 +1,101 @@
+exclude: |
+  (?x)^(
+    env/.*|
+    venv/.*|
+    .venv/.*|
+    .*/migrations/.*|
+    htmlcov/.*|
+    staticfiles/.*|
+    mediafiles/.*
+  )$
+
+repos:
+  # Standard pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+      - id: end-of-file-fixer
+        name: Fix end of file
+      - id: check-yaml
+        name: Check YAML
+        args: ["--unsafe"]
+      - id: check-merge-conflict
+        name: Check merge conflict
+      - id: check-added-large-files
+        name: Check for large files
+        args: ["--maxkb=500"]
+      - id: no-commit-to-branch
+        name: Prevent commits to main/master
+        args: ["--branch=main", "--branch=master"]
+
+  # Ruff (linting and import sorting)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.18
+    hooks:
+      - id: ruff
+        name: Ruff lint
+        args: ["--fix"]
+      - id: ruff-format
+        name: Ruff format
+
+  # Black (code formatting)
+  - repo: https://github.com/psf/black
+    rev: 26.5.1
+    hooks:
+      - id: black
+        name: Black format
+        language_version: python3.11
+
+  # MyPy (static type checking)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.1.0
+    hooks:
+      - id: mypy
+        name: MyPy type check
+        additional_dependencies:
+          - "django-stubs"
+          - "types-redis"
+          - "types-requests"
+          - "djangorestframework-stubs"
+        args: ["--ignore-missing-imports"]
+        exclude: "^(migrations/|tests/)"
+
+  # Local hooks for code quality enforcement
+  - repo: local
+    hooks:
+      # No debug code (print, pdb, breakpoint, ipdb)
+      - id: no-debug-code
+        name: No debug code
+        description: Check for debug statements (print, pdb, breakpoint, ipdb)
+        entry: bash -c 'grep -r --include="*.py" --exclude-dir=env --exclude-dir=venv --exclude-dir=.venv --exclude-dir=.git --exclude-dir=migrations --exclude-dir=htmlcov -E "^\s*(print\(|pdb\.set_trace\(\)|breakpoint\(\)|ipdb\.)" . && exit 1 || exit 0'
+        language: system
+        stages: [commit]
+
+      # No commented-out code
+      - id: no-commented-code
+        name: No commented code
+        description: Check for commented-out code (def, class, return, import, etc.)
+        entry: bash -c 'grep -r --include="*.py" --exclude-dir=env --exclude-dir=venv --exclude-dir=.venv --exclude-dir=.git --exclude-dir=migrations --exclude-dir=htmlcov -E "^\s*#\s*(def |class |return |import |from |if |for |while |async )" . && exit 1 || exit 0'
+        language: system
+        stages: [commit]
+
+      # No backup files
+      - id: no-backup-files
+        name: No backup files
+        description: Check for backup files (_old, _backup, _bak, etc.)
+        entry: bash -c 'find . -type f \( -path "*/env/*" -o -path "*/venv/*" -o -path "*/.venv/*" -o -path "*/.git/*" -o -path "*/migrations/*" -o -path "*/htmlcov/*" \) -prune -o -type f \( -name "*_old.*" -o -name "*_backup.*" -o -name "*_bak.*" -o -name "*_copy.*" -o -name "*_orig.*" -o -name "*_temp.*" -o -name "*_tmp.*" -o -name "*_final.*" \) \( -name "*.py" -o -name "*.html" -o -name "*.js" -o -name "*.css" -o -name "*.md" \) -print | grep -q . && exit 1 || exit 0'
+        language: system
+        stages: [commit]
+
+default_language_version:
+  python: python3.11
+
+ci:
+  autofix_commit_msg: "chore: auto-fix pre-commit hooks"
+  autofix_prs: true
+  autoupdate_commit_msg: "chore: pre-commit hooks auto-update"
+  autoupdate_branch: ""
+  skip: []
+  submodules: false

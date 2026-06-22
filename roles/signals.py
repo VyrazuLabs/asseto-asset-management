@@ -2,20 +2,22 @@ from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 
 from .models import Role, AssetStatus
-from notifications.service import NotificationService   # adjust import path if needed
+from notifications.service import NotificationService  # adjust import path if needed
 from users.models import User
 
 
 def get_admins(instance):
     if hasattr(instance, "organization") and instance.organization:
         return User.objects.filter(
-            is_superuser=True,
-            organization=instance.organization
+            is_superuser=True, organization=instance.organization
         )
     return User.objects.filter(is_superuser=True)
+
+
 # -----------------------------
 # PRE SAVE → Detect Soft Delete / Restore
 # -----------------------------
+
 
 @receiver(pre_save)
 def detect_soft_delete_or_restore(sender, instance, **kwargs):
@@ -23,7 +25,7 @@ def detect_soft_delete_or_restore(sender, instance, **kwargs):
     if sender not in (AssetStatus,):
         return
 
-    if not hasattr(instance, 'is_deleted'):
+    if not hasattr(instance, "is_deleted"):
         return
 
     if not instance.pk:
@@ -44,7 +46,7 @@ def detect_soft_delete_or_restore(sender, instance, **kwargs):
                 icon="bi-trash",
                 link="#",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
 
     # Restore
@@ -57,7 +59,7 @@ def detect_soft_delete_or_restore(sender, instance, **kwargs):
                 icon="bi-arrow-counterclockwise",
                 link="#",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
 
 
@@ -65,10 +67,11 @@ def detect_soft_delete_or_restore(sender, instance, **kwargs):
 # POST SAVE → Create / Update
 # -----------------------------
 
+
 @receiver(post_save)
 def post_save_handler(sender, instance, created, **kwargs):
     tracked_models = (Role, AssetStatus)
-    admins=get_admins(instance)
+    admins = get_admins(instance)
     if sender not in tracked_models:
         return
 
@@ -100,10 +103,11 @@ def post_save_handler(sender, instance, created, **kwargs):
 # POST DELETE → Hard Delete
 # -----------------------------
 
+
 @receiver(post_delete)
 def post_delete_handler(sender, instance, **kwargs):
     tracked_models = (Role, AssetStatus)
-    admins=get_admins(instance)
+    admins = get_admins(instance)
     if sender not in tracked_models:
         return
     for admin in admins:

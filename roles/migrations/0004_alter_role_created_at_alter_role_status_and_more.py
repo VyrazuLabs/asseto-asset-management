@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('roles', '0003_alter_role_status'),
+        ("roles", "0003_alter_role_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='role',
-            name='created_at',
+            model_name="role",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='status',
+            model_name="role",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='updated_at',
+            model_name="role",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

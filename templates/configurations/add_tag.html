@@ -26,8 +26,8 @@
         </div>
     </div>
     <section class="section d-flex justify-content-center">
-        <form class="form col" 
-              action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}" 
+        <form class="form col"
+              action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}"
               method="POST" novalidate>
             {% csrf_token %}
             <div class="d-flex gap-2">
@@ -87,4 +87,3 @@
     </section>
 </div>
 {% endblock %}
-

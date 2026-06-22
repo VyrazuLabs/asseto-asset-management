@@ -7,11 +7,11 @@
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    
+
     <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
         {% csrf_token %}
         <div class="modal-body">
-            
+
             <!-- Section: Personal Information -->
             <div class="section-header">
                 <div class="icon-box">
@@ -19,7 +19,7 @@
                 </div>
                 <h6 class="section-title">{{ trans.personal_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="premium-input-group">
@@ -66,7 +66,7 @@
                 </div>
                 <h6 class="section-title">{{ trans.office_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="premium-input-group">
@@ -133,7 +133,7 @@
                         {% else %}
                             <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
                         {% endif %}
-                    </div>                    
+                    </div>
                 </div>
             </div>
 
@@ -144,7 +144,7 @@
                 </div>
                 <h6 class="section-title">{{ trans.address_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="premium-input-group">
@@ -200,8 +200,8 @@
 
         <div class="modal-footer">
             <button type="button" class="btn-discard" data-bs-dismiss="modal">{{ trans.discard }}</button>
-            <button type="submit" class="btn-save-user" 
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving }}`;"> 
+            <button type="submit" class="btn-save-user"
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving }}`;">
                 {{ trans.save_changes }}
             </button>
         </div>

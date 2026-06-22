@@ -197,7 +197,7 @@
                                 <a href="{% url 'assets:asset_status_list' %}">{{ trans.asset_status }}</a>
                             </li>
                         {% endif %}
-                        
+
                         {% if request.user.is_superuser %}
                             <li class="submenu-item {% if submenu == 'roles' %}active{% endif %}">
                                 <a href="{% url 'roles:list' %}">{{ trans.roles }}</a>
@@ -247,7 +247,7 @@
                             {% if perms.authentication.add_department %}
                                 <li class="submenu-item {% if submenu == 'departments' %} active {% endif %}">
                                     <a href="{% url 'upload:department_list' %}">{{ trans.departments }}</a>
-                                </li> 
+                                </li>
                             {% endif %}
                             {% if perms.authentication.add_product_type %}
                                 <li class="submenu-item {% if submenu == 'product_types' %}active{% endif %}">
@@ -255,13 +255,13 @@
                                 </li>
                             {% endif %}
                             {% if perms.authentication.add_product_category %}
-                                <li class="submenu-item {% if submenu == 'product_categories' %}active{% endif %}"> 
+                                <li class="submenu-item {% if submenu == 'product_categories' %}active{% endif %}">
                                     <a href="{% url 'upload:product_category_list' %}">{{ trans.product_categories }}</a>
                                 </li>
                             {% endif %}
-                            
+
                             {% if perms.authentication.add_users %}
-                                <li class="submenu-item {% if submenu == 'users' %}active{% endif %}"> 
+                                <li class="submenu-item {% if submenu == 'users' %}active{% endif %}">
                                     <a href="{% url 'upload:user_list' %}">{{ trans.users }}</a>
                                 </li>
                             {% endif %}
@@ -269,7 +269,7 @@
                     </li>
                 {% endif %}
                 {% if request.user.is_superuser %}
-                    <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">   
+                    <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">
                         <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
                             <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></i>
                             <span>{{ trans.extensions }}</span>
@@ -291,7 +291,7 @@
         const slack_bool = sessionStorage.getItem('slack');
         const slackEl = document.getElementById('slack');
         if (slackEl) {
-            if (slack_bool) { 
+            if (slack_bool) {
                 slackEl.style.display = 'block';
             } else {
                 slackEl.style.display = 'none';

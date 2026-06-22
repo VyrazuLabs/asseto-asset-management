@@ -8,13 +8,23 @@ import django_resized.forms
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0018_user_address'),
+        ("authentication", "0018_user_address"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='profile_pic',
-            field=django_resized.forms.ResizedImageField(blank=True, crop=None, force_format='JPEG', keep_meta=True, null=True, quality=75, scale=None, size=[1024, 768], upload_to=authentication.models.path_and_rename),
+            model_name="user",
+            name="profile_pic",
+            field=django_resized.forms.ResizedImageField(
+                blank=True,
+                crop=None,
+                force_format="JPEG",
+                keep_meta=True,
+                null=True,
+                quality=75,
+                scale=None,
+                size=[1024, 768],
+                upload_to=authentication.models.path_and_rename,
+            ),
         ),
     ]

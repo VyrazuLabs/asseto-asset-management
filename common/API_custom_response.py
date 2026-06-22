@@ -7,22 +7,23 @@ import traceback
 import structlog
 import sys
 
+
 def get_traceback(show_locals=True) -> list[dict[str]]:
     """Returns relevant traceback information in JSON Format.
 
-    This function can also be used to debug wherever necessary, 
+    This function can also be used to debug wherever necessary,
     you only need to make sure that an exception gets called first.
-    
+
     Reference: https://gitlab.com/-/snippets/2284049
     """
 
     exc_info = sys.exc_info()
 
     trace = structlog.tracebacks.extract(
-            *exc_info, 
-            show_locals=(settings.TRACEBACK_SHOW_LOCALS and show_locals),
-            locals_max_string=settings.TRACEBACK_LOCALS_MAX_LENGTH
-        )
+        *exc_info,
+        show_locals=(settings.TRACEBACK_SHOW_LOCALS and show_locals),
+        locals_max_string=settings.TRACEBACK_LOCALS_MAX_LENGTH,
+    )
 
     for stack in trace.stacks:
         if len(stack.frames) <= 50:
@@ -38,30 +39,40 @@ def get_traceback(show_locals=True) -> list[dict[str]]:
 
     stack_dicts = [
         {
-            'exc_type': stack.exc_type,
-            'exc_value': stack.exc_value,
-            'syntax_error': stack.syntax_error,
-            'is_cause': stack.is_cause,
-            'frames': [
+            "exc_type": stack.exc_type,
+            "exc_value": stack.exc_value,
+            "syntax_error": stack.syntax_error,
+            "is_cause": stack.is_cause,
+            "frames": [
                 {
-                    'filename': frame.filename,
-                    'lineno': frame.lineno,
-                    'name': frame.name,
-                    'locals': frame.locals,
+                    "filename": frame.filename,
+                    "lineno": frame.lineno,
+                    "name": frame.name,
+                    "locals": frame.locals,
                 }
-
                 for frame in stack.frames
             ],
         }
-
         for stack in trace.stacks
     ]
 
     return stack_dicts
 
-def api_response(success=True,status=200,data=None,message=None,validation_errors=None,error_message=None,
-    error_type=None,error_location=None,system_message=None,trace_back=None,include_traceback=True):
- 
+
+def api_response(
+    success=True,
+    status=200,
+    data=None,
+    message=None,
+    validation_errors=None,
+    error_message=None,
+    error_type=None,
+    error_location=None,
+    system_message=None,
+    trace_back=None,
+    include_traceback=True,
+):
+
     response = {
         "success": success,
         "status": status,
@@ -74,23 +85,21 @@ def api_response(success=True,status=200,data=None,message=None,validation_error
         "system_message": system_message,
         "trace_back": trace_back,
     }
- 
+
     if status != 200:
         response["success"] = False
- 
+
     if status == 500:
-        response["error_message"] =error_message
-    if (
-        include_traceback
-        and trace_back is None
-        and status >= 500):
+        response["error_message"] = error_message
+    if include_traceback and trace_back is None and status >= 500:
         try:
             trace_back = get_traceback()
         except Exception:
-            trace_back = None 
- 
+            trace_back = None
+
     response = {k: v for k, v in response.items() if v is not None}
     return Response(response, status=status)
+
 
 def format_validation_errors(errors, model_cls=None):
     formatted = {}
@@ -106,6 +115,7 @@ def format_validation_errors(errors, model_cls=None):
         }
 
     return formatted
+
 
 def get_detailed_errors_info(exception):
     exc_type, exc_value, exc_tb = sys.exc_info()
@@ -132,12 +142,14 @@ def get_detailed_errors_info(exception):
         else:
             continue
 
-        location.update({
-            "file": filename,
-            "line": frame.lineno,
-            "function": frame.name,
-            "code": frame.line,
-        })
+        location.update(
+            {
+                "file": filename,
+                "line": frame.lineno,
+                "function": frame.name,
+                "code": frame.line,
+            }
+        )
         break
 
     return {
@@ -146,6 +158,7 @@ def get_detailed_errors_info(exception):
         "location": location,
         "traceback": traceback.format_exc(),
     }
+
 
 def log_error_to_terminal(error_info):
     print("\n" + "=" * 60)

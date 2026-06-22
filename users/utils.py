@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
 from django.core.paginator import Paginator
 from configurations.utils import dynamic_display_name
-from authentication.models import User,UserTotp
+from authentication.models import User, UserTotp
 from assets.models import AssignAsset
 from django.db.models import Q
 from datetime import date
@@ -15,161 +15,195 @@ from configurations.constants import NAME_FORMATS
 from django.shortcuts import get_object_or_404
 from license.models import AssignLicense
 
-
-PAGE_SIZE = 10  
+PAGE_SIZE = 10
 ORPHANS = 1
 
 PERMISSION_LIST = [
     # products
-    'view_product',
-    'delete_product',
-    'edit_product',
-    'add_product',
-
+    "view_product",
+    "delete_product",
+    "edit_product",
+    "add_product",
     # clients
-    'view_client',
-    'delete_client',
-    'edit_client',
-    'add_client',
-
-
+    "view_client",
+    "delete_client",
+    "edit_client",
+    "add_client",
     # users
-    'view_users',
-    'delete_users',
-    'edit_users',
-    'add_users',
-
+    "view_users",
+    "delete_users",
+    "edit_users",
+    "add_users",
     # vendors
-    'edit_vendor',
-    'add_vendor',
-    'view_vendor',
-    'delete_vendor',
-
+    "edit_vendor",
+    "add_vendor",
+    "view_vendor",
+    "delete_vendor",
     # assets
-    'edit_asset',
-    'view_asset',
-    'delete_asset',
-    'add_asset',
-
+    "edit_asset",
+    "view_asset",
+    "delete_asset",
+    "add_asset",
     # assign assets
-    'delete_assign_asset',
-    'reassign_assign_asset',
-    'add_assign_asset',
-
+    "delete_assign_asset",
+    "reassign_assign_asset",
+    "add_assign_asset",
     # gate pass
-    'view_gate_pass',
-    'add_gate_pass',
-
+    "view_gate_pass",
+    "add_gate_pass",
     # departments
-    'edit_department',
-    'add_department',
-    'delete_department',
-
+    "edit_department",
+    "add_department",
+    "delete_department",
     # locations
-    'add_location',
-    'edit_location',
-    'delete_location',
-    'view_location',
-
+    "add_location",
+    "edit_location",
+    "delete_location",
+    "view_location",
     # product categories
-    'delete_product_category',
-    'edit_product_category',
-    'add_product_category',
-
+    "delete_product_category",
+    "edit_product_category",
+    "add_product_category",
     # product types
-    'delete_product_type',
-    'edit_product_type',
-    'add_product_type',
-
+    "delete_product_type",
+    "edit_product_type",
+    "add_product_type",
     # branding
-    'view_branding',
-    'add_branding'
-    'edit_branding',
-    'delete_branding',
-
-    #localization
-    'view_localization',
-    'add_localization',
-    'delete_localization',
-    'edit_localization',
-
-    #tag_configuration
-    'view_tag_configuration',
-    'add_tag_configuration',
-    'edit_tag_configuration',
-    'delete_tag_configuration',
-
-    #upload
-    'view_upload',
-    'add_upload'
+    "view_branding",
+    "add_branding" "edit_branding",
+    "delete_branding",
+    # localization
+    "view_localization",
+    "add_localization",
+    "delete_localization",
+    "edit_localization",
+    # tag_configuration
+    "view_tag_configuration",
+    "add_tag_configuration",
+    "edit_tag_configuration",
+    "delete_tag_configuration",
+    # upload
+    "view_upload",
+    "add_upload",
 ]
 
+
 def get_user_detail_utils(request, id):
-    user = get_object_or_404(User.undeleted_objects, pk=id, organization=request.user.organization)
+    user = get_object_or_404(
+        User.undeleted_objects, pk=id, organization=request.user.organization
+    )
     assigned_assets = AssignAsset.objects.filter(user=user)
     # Filter history specifically for this user
-    history_list = user.history.all().order_by('-history_date')
+    history_list = user.history.all().order_by("-history_date")
     history_paginator = Paginator(history_list, 5, orphans=1)
-    history_page_number = request.GET.get('history_page')
+    history_page_number = request.GET.get("history_page")
     history_page_object = history_paginator.get_page(history_page_number)
-    obj= LocalizationConfiguration.objects.filter(organization=request.user.organization).first()
+    obj = LocalizationConfiguration.objects.filter(
+        organization=request.user.organization
+    ).first()
     if obj is not None:
-        format_key= None
-        for id,it in NAME_FORMATS:
+        format_key = None
+        for id, it in NAME_FORMATS:
             if obj.name_display_format == id:
-                format_key=id
+                format_key = id
     asset_paginator = Paginator(assigned_assets, 10, orphans=1)
-    asset_page_number = request.GET.get('assets_page')
+    asset_page_number = request.GET.get("assets_page")
     asset_page_object = asset_paginator.get_page(asset_page_number)
-    get_user_full_name=user.dynamic_display_name(user.full_name)
-    assigned_licenses=AssignLicense.objects.filter(user=user.id).order_by("-assigned_date")
-    assigned_licenses_object=get_all_assigned_license(request,assigned_licenses)
-    return get_user_full_name, user, history_page_object, asset_page_object, assigned_licenses_object
-    
+    get_user_full_name = user.dynamic_display_name(user.full_name)
+    assigned_licenses = AssignLicense.objects.filter(user=user.id).order_by(
+        "-assigned_date"
+    )
+    assigned_licenses_object = get_all_assigned_license(request, assigned_licenses)
+    return (
+        get_user_full_name,
+        user,
+        history_page_object,
+        asset_page_object,
+        assigned_licenses_object,
+    )
+
 
 def export_users_pdf_utils(request):
     today = date.today()
 
-    users = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(
-        pk=request.user.id).order_by('-created_at')
-    context = {'users': users}
-    pdf = render_to_pdf('users/users-pdf.html', context_dict=context)
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.pdf"'
+    users = (
+        User.undeleted_objects.filter(
+            organization=request.user.organization, is_superuser=False
+        )
+        .exclude(pk=request.user.id)
+        .order_by("-created_at")
+    )
+    context = {"users": users}
+    pdf = render_to_pdf("users/users-pdf.html", context_dict=context)
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="export-users-{today}.pdf"'
     return response
+
 
 def export_users_csv_utils(request):
     today = date.today()
-    header_list = ['Name', 'Email', 'Phone', 'Designation', 'Department', 'Address Line One',
-                   'Address Line Two', 'City', 'Pin Code', 'State', 'Country', 'Office']
-    user_list = User.undeleted_objects.filter(organization=request.user.organization, is_superuser=False).exclude(pk=request.user.id).order_by('-created_at').values_list('full_name', 'email', 'phone', 'role__related_name',
-    'department__name', 'address__address_line_one', 'address__address_line_two', 'address__city', 'address__pin_code', 'address__state', 'address__country', 'location__office_name')
-    context = {'header_list': header_list, 'rows': user_list}
+    header_list = [
+        "Name",
+        "Email",
+        "Phone",
+        "Designation",
+        "Department",
+        "Address Line One",
+        "Address Line Two",
+        "City",
+        "Pin Code",
+        "State",
+        "Country",
+        "Office",
+    ]
+    user_list = (
+        User.undeleted_objects.filter(
+            organization=request.user.organization, is_superuser=False
+        )
+        .exclude(pk=request.user.id)
+        .order_by("-created_at")
+        .values_list(
+            "full_name",
+            "email",
+            "phone",
+            "role__related_name",
+            "department__name",
+            "address__address_line_one",
+            "address__address_line_two",
+            "address__city",
+            "address__pin_code",
+            "address__state",
+            "address__country",
+            "location__office_name",
+        )
+    )
+    context = {"header_list": header_list, "rows": user_list}
     response = render_to_csv(context_dict=context)
-    response['Content-Disposition'] = f'attachment; filename="export-users-{today}.csv"'
+    response["Content-Disposition"] = f'attachment; filename="export-users-{today}.csv"'
 
-def search_user_utils(request,page):
-    search_text = (request.GET.get('search_text') or "").strip()
+
+def search_user_utils(request, page):
+    search_text = (request.GET.get("search_text") or "").strip()
     if search_text:
         users_list = (
             User.undeleted_objects.filter(
                 Q(organization=request.user.organization),
                 Q(is_superuser=False),
                 (
-                    Q(username__icontains=search_text) |
-                    Q(full_name__icontains=search_text) |
-                    Q(phone__icontains=search_text) |
-                    Q(employee_id__icontains=search_text) |
-                    Q(department__name__icontains=search_text) |
-                    Q(role__related_name__icontains=search_text) |
-                    Q(location__office_name__icontains=search_text) |
-                    Q(address__address_line_one__icontains=search_text) |
-                    Q(address__address_line_two__icontains=search_text) |
-                    Q(address__country__icontains=search_text) |
-                    Q(address__state__icontains=search_text) |
-                    Q(address__pin_code__icontains=search_text) |
-                    Q(address__city__icontains=search_text)
-                )
+                    Q(username__icontains=search_text)
+                    | Q(full_name__icontains=search_text)
+                    | Q(phone__icontains=search_text)
+                    | Q(employee_id__icontains=search_text)
+                    | Q(department__name__icontains=search_text)
+                    | Q(role__related_name__icontains=search_text)
+                    | Q(location__office_name__icontains=search_text)
+                    | Q(address__address_line_one__icontains=search_text)
+                    | Q(address__address_line_two__icontains=search_text)
+                    | Q(address__country__icontains=search_text)
+                    | Q(address__state__icontains=search_text)
+                    | Q(address__pin_code__icontains=search_text)
+                    | Q(address__city__icontains=search_text)
+                ),
             )
             .exclude(pk=request.user.id)
             .order_by("-created_at")[:10]
@@ -188,25 +222,35 @@ def search_user_utils(request,page):
 
     user_ids = [u.id for u in page_object]
 
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related("asset")
+    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids).select_related(
+        "asset"
+    )
 
     user_asset_map_count = {}
     for aa in assigned_assets:
         user_asset_map_count.setdefault(aa.user_id, []).append(aa.asset)
 
-    user_asset_map_count_count = {uid: len(assets) for uid, assets in user_asset_map_count.items()}
+    user_asset_map_count_count = {
+        uid: len(assets) for uid, assets in user_asset_map_count.items()
+    }
 
     deleted_user_count = User.deleted_objects.count()
-    return page_object, deleted_user_count, user_asset_map_count, user_asset_map_count_count
+    return (
+        page_object,
+        deleted_user_count,
+        user_asset_map_count,
+        user_asset_map_count_count,
+    )
+
 
 def create_user_notification_type_utils(request):
-    use_expired_asset= request.POST.get("use_expired_assets")== "on"
+    use_expired_asset = request.POST.get("use_expired_assets") == "on"
     email = request.POST.get("email_notification") == "on"
     in_app = request.POST.get("in_app_notification") == "on"
     browser = request.POST.get("browser_notification") == "on"
-    slack=request.POST.get("slack_notification") == "on"
-    two_factor_auth=request.POST.get("two_factor_auth") == "on"
-    get_user=User.objects.filter(id=request.user.id).first()
+    slack = request.POST.get("slack_notification") == "on"
+    two_factor_auth = request.POST.get("two_factor_auth") == "on"
+    get_user = User.objects.filter(id=request.user.id).first()
     if get_user is not None:
         User.objects.filter(id=request.user.id).update(
             email_notification=email,
@@ -214,36 +258,37 @@ def create_user_notification_type_utils(request):
             browser_notification=browser,
             inapp_notification=in_app,
             two_factor_auth=two_factor_auth,
-            use_expired_assets=use_expired_asset
+            use_expired_assets=use_expired_asset,
         )
 
+
 def toggle_two_factor_auth_utils(request):
-    two_factor_auth=request.POST.get("two_factor_auth") == "on"
-    get_user=User.objects.filter(id=request.user.id).first()
+    two_factor_auth = request.POST.get("two_factor_auth") == "on"
+    get_user = User.objects.filter(id=request.user.id).first()
     if get_user is not None:
-        User.objects.filter(id=request.user.id).update(
-            two_factor_auth=two_factor_auth
-        )
-    get_totp=UserTotp.objects.filter(user_id=get_user.id).first()
-    get_totp.status=1
+        User.objects.filter(id=request.user.id).update(two_factor_auth=two_factor_auth)
+    get_totp = UserTotp.objects.filter(user_id=get_user.id).first()
+    get_totp.status = 1
     get_totp.save()
+
 
 def create_all_perm_role():
 
-    all_perms, created = Group.objects.get_or_create(
-        name='all_perms')
+    all_perms, created = Group.objects.get_or_create(name="all_perms")
     all_perms.permissions.clear()
     content_type = ContentType.objects.get_for_model(User)
 
     for cname in PERMISSION_LIST:
-        temp_name = cname.split('_')
-        name = ''
+        temp_name = cname.split("_")
+        name = ""
         for ele in temp_name:
-            name += ele+' '
+            name += ele + " "
 
         permission, created = Permission.objects.get_or_create(
-            codename=cname, name=f'Can {name}', content_type=content_type)
+            codename=cname, name=f"Can {name}", content_type=content_type
+        )
         all_perms.permissions.add(permission)
+
 
 def make_fields_optional(form, fields=None):
     """
@@ -257,92 +302,141 @@ def make_fields_optional(form, fields=None):
             form.fields[field_name].required = False
 
 
-
-
 def get_asset_by_users(id):
-    get_user=User.objects.filter(id=id).first()
-    get_asset=AssignAsset.objects.filter(user=get_user)
+    get_user = User.objects.filter(id=id).first()
+    get_asset = AssignAsset.objects.filter(user=get_user)
     return get_asset
 
 
 def assigned_asset_to_user(page_object):
     user_ids = [u.id for u in page_object]
 
-    assigned_assets = AssignAsset.objects.filter(user_id__in=user_ids,asset__is_deleted=False).select_related("asset")
+    assigned_assets = AssignAsset.objects.filter(
+        user_id__in=user_ids, asset__is_deleted=False
+    ).select_related("asset")
 
     user_asset_map = {}
     for aa in assigned_assets:
         user_asset_map.setdefault(aa.user_id, []).append(aa.asset)
-    
+
     return user_asset_map
 
-def get_all_assigned_license(request,assigned_licenses):
-    license_paginator=Paginator(assigned_licenses,10,orphans=1)
-    license_page_number=request.GET.get('license_page')
-    license_page_object=license_paginator.get_page(license_page_number)
+
+def get_all_assigned_license(request, assigned_licenses):
+    license_paginator = Paginator(assigned_licenses, 10, orphans=1)
+    license_page_number = request.GET.get("license_page")
+    license_page_object = license_paginator.get_page(license_page_number)
 
     return license_page_object
 
-def user_data(request,user_list):
-    current_host=request.get_host()                                                                                                           
-    user_data_list=[]
+
+def user_data(request, user_list):
+    current_host = request.get_host()
+    user_data_list = []
     for user in user_list:
-        user_data_list.append({
-            'id':user.id,
-            'department_id':user.department.id if user.department else None,
-            'location_id':user.location.id if user.location else None,
-            'role_id':str(user.role.id) if user.role else None,
-            'full_name':dynamic_display_name(request,fullname=user.full_name) if user.full_name else None,
-            'email':user.email,
-            'role':user.role.related_name if user.role else None,
-            'is_active':user.is_active,
-            'last_login':user.last_login,
-            'profile_picture':f'http://{current_host}'+user.profile_pic.url if user.profile_pic else None,
-            'asset_count':AssignAsset.objects.filter(user=user.id).count(),
-            'department':user.department.name if user.department else None,
-            'location':user.location.office_name if user.location else None,
-        })
+        user_data_list.append(
+            {
+                "id": user.id,
+                "department_id": user.department.id if user.department else None,
+                "location_id": user.location.id if user.location else None,
+                "role_id": str(user.role.id) if user.role else None,
+                "full_name": (
+                    dynamic_display_name(request, fullname=user.full_name)
+                    if user.full_name
+                    else None
+                ),
+                "email": user.email,
+                "role": user.role.related_name if user.role else None,
+                "is_active": user.is_active,
+                "last_login": user.last_login,
+                "profile_picture": (
+                    f"http://{current_host}" + user.profile_pic.url
+                    if user.profile_pic
+                    else None
+                ),
+                "asset_count": AssignAsset.objects.filter(user=user.id).count(),
+                "department": user.department.name if user.department else None,
+                "location": user.location.office_name if user.location else None,
+            }
+        )
     return user_data_list
 
-def user_details(request,get_user,assigned_assets):
-    current_host=request.get_host()
-    user_details={
-        'user_id':get_user.id,
-        'name':get_user.full_name,
-        'department_id':get_user.department.id if get_user.department else None,
-        'location_id':get_user.location.id if get_user.location else None,
-        'role_id':get_user.role.id if get_user.role else None,
-        'email':get_user.email,
-        'isActive':get_user.is_active,
-        'phone_number':get_user.phone,
-        'profile_picture':f'http://{current_host}'+get_user.profile_pic.url if get_user.profile_pic else None,
-        'department':get_user.department.name if get_user.department else None,
-        'location':get_user.location.office_name if get_user.location else None,
-        'role':get_user.role.related_name if get_user.role else None,
-        'address_line_one':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None,
-        'address_line_two':get_user.address.address_line_two if get_user.address and get_user.address.address_line_two else None,
-        'city':get_user.address.city if get_user.address and get_user.address.city else None,
-        'country':get_user.address.country if get_user.address and get_user.address.country else None,
-        'state':get_user.address.state if get_user.address and get_user.address.state else None,
-        'pin_code':get_user.address.pin_code if get_user.address and get_user.address.pin_code else None,
-        'address':get_user.address.address_line_one if get_user.address and get_user.address.address_line_one else None
+
+def user_details(request, get_user, assigned_assets):
+    current_host = request.get_host()
+    user_details = {
+        "user_id": get_user.id,
+        "name": get_user.full_name,
+        "department_id": get_user.department.id if get_user.department else None,
+        "location_id": get_user.location.id if get_user.location else None,
+        "role_id": get_user.role.id if get_user.role else None,
+        "email": get_user.email,
+        "isActive": get_user.is_active,
+        "phone_number": get_user.phone,
+        "profile_picture": (
+            f"http://{current_host}" + get_user.profile_pic.url
+            if get_user.profile_pic
+            else None
+        ),
+        "department": get_user.department.name if get_user.department else None,
+        "location": get_user.location.office_name if get_user.location else None,
+        "role": get_user.role.related_name if get_user.role else None,
+        "address_line_one": (
+            get_user.address.address_line_one
+            if get_user.address and get_user.address.address_line_one
+            else None
+        ),
+        "address_line_two": (
+            get_user.address.address_line_two
+            if get_user.address and get_user.address.address_line_two
+            else None
+        ),
+        "city": (
+            get_user.address.city
+            if get_user.address and get_user.address.city
+            else None
+        ),
+        "country": (
+            get_user.address.country
+            if get_user.address and get_user.address.country
+            else None
+        ),
+        "state": (
+            get_user.address.state
+            if get_user.address and get_user.address.state
+            else None
+        ),
+        "pin_code": (
+            get_user.address.pin_code
+            if get_user.address and get_user.address.pin_code
+            else None
+        ),
+        "address": (
+            get_user.address.address_line_one
+            if get_user.address and get_user.address.address_line_one
+            else None
+        ),
     }
-    assigned_assets_list=[]
+    assigned_assets_list = []
     for assigned_asset in assigned_assets:
-        assigned_assets_data={
-            'assigned_asset_id':assigned_asset.id,
-            'asset_id':assigned_asset.asset.id,
-            'assigned_asset_name':assigned_asset.asset.name,
-            'asset_tag':assigned_asset.asset.tag,
-            'vendor':assigned_asset.asset.vendor.name if assigned_asset.asset and assigned_asset.asset.vendor else None,
-            'assigned_date':assigned_asset.assigned_date,
+        assigned_assets_data = {
+            "assigned_asset_id": assigned_asset.id,
+            "asset_id": assigned_asset.asset.id,
+            "assigned_asset_name": assigned_asset.asset.name,
+            "asset_tag": assigned_asset.asset.tag,
+            "vendor": (
+                assigned_asset.asset.vendor.name
+                if assigned_asset.asset and assigned_asset.asset.vendor
+                else None
+            ),
+            "assigned_date": assigned_asset.assigned_date,
         }
-        asset_images=AssetImage.objects.filter(asset=assigned_asset.asset.id).all()
-        asset_images_list=[]
+        asset_images = AssetImage.objects.filter(asset=assigned_asset.asset.id).all()
+        asset_images_list = []
         for asset_image in asset_images:
-            asset_images_list.append(f'http://{current_host}'+asset_image.image.url)
-        assigned_assets_data["asset_images_list"]=asset_images_list
+            asset_images_list.append(f"http://{current_host}" + asset_image.image.url)
+        assigned_assets_data["asset_images_list"] = asset_images_list
 
         assigned_assets_list.append(assigned_assets_data)
-    user_details["assigned_assets_list"]=assigned_assets_list
+    user_details["assigned_assets_list"] = assigned_assets_list
     return user_details

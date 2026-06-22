@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0023_alter_customfield_organization'),
+        ("dashboard", "0023_alter_customfield_organization"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customfield',
-            name='object_id',
+            model_name="customfield",
+            name="object_id",
             field=models.UUIDField(default=uuid.uuid4, editable=False),
         ),
     ]

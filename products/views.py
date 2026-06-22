@@ -1,25 +1,33 @@
 import json
-import os
-from datetime import date
-
-from django.contrib import messages
-from django.contrib.auth.decorators import (login_required,
-                                            permission_required,
-                                            user_passes_test)
-from django.core.paginator import Paginator
-from django.db.models import Count, Q
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_exempt
-
-from assets.models import Asset, AssignAsset
-from dashboard.models import CustomField
-
+from django.shortcuts import render, redirect
 from .forms import AddProductsForm, ProductImageForm
-from .models import Product, ProductImage
-from .utils import (added_product, deleted_product, export_product_pdf_utils,
-                    exports_product_csv_utils, get_product_details,
-                    product_list)
+from django.contrib import messages
+from .models import Product, ProductCategory, ProductType, ProductImage
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
+from vendors.utils import render_to_csv, render_to_pdf
+from django.shortcuts import get_object_or_404
+from django.db.models import Q, Count
+from dashboard.models import CustomField
+from assets.models import AssetImage
+from assets.models import Asset, AssignAsset
+from django.views.decorators.csrf import csrf_exempt
+from datetime import date
+from .utils import (
+    product_list,
+    search_utils,
+    get_product_details,
+    export_product_pdf_utils,
+    added_product,
+    deleted_product,
+    exports_product_csv_utils,
+)
+import os
+
+# from silk.profiling.profiler import silk_profile
 
 IS_DEMO = os.environ.get("IS_DEMO")
 today = date.today()
@@ -62,6 +70,7 @@ def details_product(request, id):
 
 @login_required
 @permission_required("authentication.add_product")
+# @silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
         form = AddProductsForm(
@@ -70,16 +79,20 @@ def add_product(request):
         image_form = ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
             added_product(request, form)
+            # print("Product added successfully")
             messages.success(request, "Product added successfully")
             return redirect("products:list")
     else:
         form = AddProductsForm(organization=request.user.organization)
         image_form = ProductImageForm()
 
-    context = {'form': form,
-               'title': 'Add New Product',
-               'image_form': image_form,}
-    return render(request, 'products/add.html', context)
+    context = {
+        "form": form,
+        "title": "Add New Product",
+        "image_form": image_form,
+    }
+    return render(request, "products/add.html", context)
+
 
 @login_required
 @permission_required("authentication.delete_product")
@@ -89,10 +102,12 @@ def delete_product(request, id):
         # First find if the product is already assigned to the asset or not
         if AssignAsset.objects.filter(asset=get_asset_by_product_id).exists():
             messages.error(request, "Error! Product is assigned to a Asset")
+            # return HttpResponse(status=400)
         else:
             deleted_product(request, id)
             messages.success(request, "Product deleted successfully")
     return redirect("products:list")
+    # return redirect(request.META.get('HTTP_REFERER'))
 
 
 @csrf_exempt

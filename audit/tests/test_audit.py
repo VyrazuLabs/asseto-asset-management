@@ -1,6 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from dashboard.models import Organization, Address, Location, ProductType, ProductCategory
+from dashboard.models import (
+    Organization,
+    Address,
+    Location,
+    ProductType,
+    ProductCategory,
+)
 from vendors.models import Vendor
 from products.models import Product
 from assets.models import Asset
@@ -18,7 +24,7 @@ class AuditTest(TestCase):
             phone="9433622983",
             username="auditor",
             email="auditor@test.com",
-            password="password123"
+            password="password123",
         )
 
         # Create Address
@@ -39,7 +45,7 @@ class AuditTest(TestCase):
             email="asseto@asseto.com",
             currency="INR",
             date_format="dd-mm-yyyy",
-            logo="logo.png"
+            logo="logo.png",
         )
 
         # Vendor
@@ -52,7 +58,7 @@ class AuditTest(TestCase):
             gstin_number="1234567890",
             description="Description 1",
             address=self.address,
-            organization=self.organization
+            organization=self.organization,
         )
 
         # Product Category & Type
@@ -74,7 +80,7 @@ class AuditTest(TestCase):
             description="Description 1",
             product_sub_category=self.category,
             product_type=self.type,
-            organization=self.organization
+            organization=self.organization,
         )
 
         # Location
@@ -110,7 +116,7 @@ class AuditTest(TestCase):
             organization=self.organization,
             condition=1,
             notes="Initial audit notes",
-            audited_by=self.user
+            audited_by=self.user,
         )
 
     # Test Create Audit

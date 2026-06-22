@@ -289,7 +289,7 @@
         {% for contact in client.contacts.all %}
         <div class="detail-contact-card">
           <div class="d-flex align-items-center mb-2">
-            <div class="client-assignee-avatar 
+            <div class="client-assignee-avatar
                         {% if forloop.counter|divisibleby:4 %}avatar-blue
                         {% elif forloop.counter|divisibleby:3 %}avatar-green
                         {% elif forloop.counter|divisibleby:2 %}avatar-orange

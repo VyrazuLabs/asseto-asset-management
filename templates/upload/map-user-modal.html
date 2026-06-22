@@ -28,7 +28,7 @@
 
                     <td>
                         <select name="mapping_{{ field }}" class="form-select mapping-select"
-                            data-error-id="error-{{ forloop.counter }}" 
+                            data-error-id="error-{{ forloop.counter }}"
                             {% if field in required_fields %}data-required="true" {% endif %}>
                             <option value="">{{ trans.select_option }}</option>
                             {% for header in headers %}

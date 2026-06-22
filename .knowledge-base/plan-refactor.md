@@ -1,6 +1,6 @@
 # Refactoring Plan
 
-This plan captures the high-level refactor steps for the Asset Management project. 
+This plan captures the high-level refactor steps for the Asset Management project.
 
 > **Important References:** Always adhere to the guidelines outlined in [`.github/django-best-practices.md`](../.github/django-best-practices.md) and [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) while implementing these changes.
 

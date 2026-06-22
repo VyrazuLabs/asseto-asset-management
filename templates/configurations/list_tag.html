@@ -29,8 +29,8 @@
     </div>
     {% if configurations %}
         <section class="section">
-            <form class="form row" 
-                method="POST" 
+            <form class="form row"
+                method="POST"
                 novalidate
                 action="{% if is_update %}{% url 'configurations:create_or_update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}">
                 {% csrf_token %}
@@ -69,7 +69,7 @@
                         </div>
                        <div class="row m-4">
                             <div class="col-md-6 col-12 form-check ">
-                                <input type="checkbox" 
+                                <input type="checkbox"
                                     id="use_default_settings_{{ configurations.id }}"
                                     name="use_default_settings"
                                     class="form-check-input"

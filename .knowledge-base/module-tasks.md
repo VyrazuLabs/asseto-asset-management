@@ -3,10 +3,10 @@
 Based on the overall refactoring plan, here is a detailed breakdown of the tasks for each module. This can be used as a checklist while executing the refactor.
 
 ## 1. `assets` Module
-- [ ] **`assets/views.py`**: 
+- [ ] **`assets/views.py`**:
   - Extract the heavy business logic from the `details` view (which involves `Audit.objects.filter`, `AssetImage.objects.filter`, barcode generation, and custom field handling) and move it to `assets/services.py` or model methods.
   - Refactor `assigned_list` and `unassigned_list` to utilize a shared pagination helper.
-- [ ] **`assets/api_views.py`**: 
+- [ ] **`assets/api_views.py`**:
   - Extract inline asset lookups and status updates into dedicated service functions.
   - Implement `select_related` and `prefetch_related` in API queries (e.g., `AssetList` fetching related `product` and `vendor` fields).
 - [ ] **`assets/api_utils.py`**:

@@ -13,7 +13,7 @@ def generate_otp():
 
 def send_otp_email(contact, otp):
     """Send OTP to the client contact's email address."""
-    subject = 'Asseto Client Portal — Your Login Code'
+    subject = "Asseto Client Portal — Your Login Code"
     message = (
         f"Hello {contact.name},\n\n"
         f"Your one-time login code is: {otp}\n\n"
@@ -33,9 +33,7 @@ def send_otp_email(contact, otp):
 def create_otp_for_contact(contact):
     """Invalidate old OTPs, generate a new one, save to DB, send it via email."""
     # Invalidate any existing unused OTPs
-    ClientPortalOTP.objects.filter(
-        contact=contact, is_used=False
-    ).update(is_used=True)
+    ClientPortalOTP.objects.filter(contact=contact, is_used=False).update(is_used=True)
 
     otp_code = generate_otp()
     ClientPortalOTP.objects.create(
@@ -52,10 +50,14 @@ def verify_otp_for_contact(contact, entered_otp):
     Check if 'entered_otp' matches the latest unused OTP for 'contact'.
     Returns True and marks OTP as used if valid, False otherwise.
     """
-    otp_record = ClientPortalOTP.objects.filter(
-        contact=contact,
-        is_used=False,
-    ).order_by('-created_at').first()
+    otp_record = (
+        ClientPortalOTP.objects.filter(
+            contact=contact,
+            is_used=False,
+        )
+        .order_by("-created_at")
+        .first()
+    )
 
     if not otp_record:
         return False, "No active verification code found."

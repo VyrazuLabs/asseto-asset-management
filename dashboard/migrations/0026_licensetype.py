@@ -6,24 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0025_alter_address_created_at_alter_address_status_and_more'),
+        ("dashboard", "0025_alter_address_created_at_alter_address_status_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LicenseType',
+            name="LicenseType",
             fields=[
-                ('status', models.BooleanField(default=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True, null=True)),
-                ('updated_at', models.DateTimeField(auto_now=True, null=True)),
-                ('created_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('updated_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('is_deleted', models.BooleanField(default=False)),
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=255)),
+                ("status", models.BooleanField(default=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, null=True)),
+                ("updated_at", models.DateTimeField(auto_now=True, null=True)),
+                ("created_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("updated_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("is_deleted", models.BooleanField(default=False)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=255)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

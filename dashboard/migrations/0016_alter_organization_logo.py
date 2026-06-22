@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_delete_employee'),
+        ("dashboard", "0015_delete_employee"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='organization',
-            name='logo',
-            field=models.ImageField(blank=True, null=True, upload_to=dashboard.models.path_and_rename),
+            model_name="organization",
+            name="logo",
+            field=models.ImageField(
+                blank=True, null=True, upload_to=dashboard.models.path_and_rename
+            ),
         ),
     ]

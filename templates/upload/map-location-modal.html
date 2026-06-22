@@ -17,7 +17,7 @@
                 <tr>
                     <td>
                         {{ field }}
-            
+
                         {% if field in required_fields %}
                             <span class="text-danger">*</span>
                             <div class="text-danger small mt-1 d-none" id="error-{{ forloop.counter }}">
@@ -25,10 +25,10 @@
                             </div>
                         {% endif %}
                     </td>
-            
+
                     <td>
                         <select name="mapping_{{ field }}" class="form-select mapping-select"
-                            data-error-id="error-{{ forloop.counter }}" 
+                            data-error-id="error-{{ forloop.counter }}"
                             {% if field in required_fields %}data-required="true" {% endif %}>
                             <option value="">{{ trans.select_option }}</option>
                             {% for header in headers %}

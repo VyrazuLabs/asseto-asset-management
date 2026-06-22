@@ -78,7 +78,7 @@
 function openEditAssetStatusModal(url) {
     var modalEl = document.getElementById('update-asset-status-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-asset-status-modal-content'
     }).then(function() {

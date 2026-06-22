@@ -7,18 +7,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('roles', '0004_alter_role_created_at_alter_role_status_and_more'),
-        ('upload', '0012_remove_importeduser_role_importeduser_roles'),
+        ("roles", "0004_alter_role_created_at_alter_role_status_and_more"),
+        ("upload", "0012_remove_importeduser_role_importeduser_roles"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='importeduser',
-            name='roles',
+            model_name="importeduser",
+            name="roles",
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='roles.role'),
+            model_name="importeduser",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="roles.role",
+            ),
         ),
     ]

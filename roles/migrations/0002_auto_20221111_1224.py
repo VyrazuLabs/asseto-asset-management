@@ -7,19 +7,24 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_delete_employee'),
-        ('roles', '0001_initial'),
+        ("dashboard", "0015_delete_employee"),
+        ("roles", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='role',
-            name='organization',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.organization'),
+            model_name="role",
+            name="organization",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.organization",
+            ),
         ),
         migrations.AddField(
-            model_name='role',
-            name='related_name',
+            model_name="role",
+            name="related_name",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

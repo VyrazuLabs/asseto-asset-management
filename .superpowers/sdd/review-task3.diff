@@ -1,0 +1,297 @@
+# Review package: working tree (uncommitted) — Task 3
+
+## New files
+--- common/services.py ---
+"""Shared service-layer base classes and helpers for the project.
+
+This module provides the multi-tenant org-scoping base that every later
+per-app ``Service`` class builds on (``BaseMultiTenantService``), plus a
+shared helper that consolidates duplicated asset-condition aggregation logic
+found across several apps' ``utils.py`` modules (``build_asset_conditions_map``).
+"""
+
+from collections import defaultdict
+
+
+class BaseMultiTenantService:
+    """Base class for per-app service classes that operate on org-scoped models.
+
+    Subclasses should call ``base_queryset`` to obtain a queryset that is
+    always filtered to the current user's organization, preventing
+    cross-tenant data leakage.
+    """
+
+    @staticmethod
+    def base_queryset(model, user):
+        """Return an org-scoped, non-deleted queryset for ``model``.
+
+        Args:
+            model: A Django model class that exposes an ``undeleted_objects``
+                manager (the project's ``SoftDeleteManager`` convention, see
+                ``dashboard/models.py``) and an ``organization`` foreign key.
+            user: The current ``User`` instance whose ``organization`` is used
+                to scope the queryset.
+
+        Returns:
+            QuerySet: ``model.undeleted_objects`` filtered to
+            ``organization=user.organization``. Never returns rows belonging
+            to a different organization.
+        """
+        return model.undeleted_objects.filter(organization=user.organization)
+
+
+def build_asset_conditions_map(audits_queryset):
+    """Build a mapping of asset id to the list of conditions from its audits.
+
+    Consolidates duplicated logic independently found in ``clients/utils.py``,
+    ``vendors/utils.py``, ``audit/utils.py``, and ``assets/utils.py``, all of
+    which iterate an ``Audit`` queryset and append ``audit.condition`` to a
+    list keyed by ``audit.asset_id``.
+
+    Args:
+        audits_queryset: An iterable/queryset of ``Audit`` instances, each
+            exposing ``asset_id`` and ``condition`` attributes.
+
+    Returns:
+        dict[Any, list]: A ``defaultdict(list)`` mapping each ``asset_id`` to
+        the ordered list of ``condition`` values from its audits, in the
+        order the queryset was iterated.
+    """
+    asset_conditions_map = defaultdict(list)
+    for audit in audits_queryset:
+        asset_conditions_map[audit.asset_id].append(audit.condition)
+    return asset_conditions_map
+
+--- common/factories.py ---
+"""Base factory_boy factories shared across the test suite.
+
+These are the foundational factories that later per-app factories will
+subclass or depend on, since every org-scoped model factory needs an
+org+user dependency chain. Defined here (in ``common``) so Phase 1+ work can
+import them without duplicating org/user setup in each app.
+"""
+
+import factory
+import factory.django
+
+from authentication.models import User
+from dashboard.models import Organization
+
+
+class OrganizationFactory(factory.django.DjangoModelFactory):
+    """Factory for ``dashboard.models.Organization``.
+
+    Produces a minimal, valid ``Organization`` instance with a unique name.
+    """
+
+    class Meta:
+        model = Organization
+
+    name = factory.Sequence(lambda n: f"Org {n}")
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    """Factory for ``authentication.models.User``.
+
+    Builds a ``User`` via the custom ``UserManager.create_user`` (rather than
+    plain ``Meta.model()`` construction) because ``User`` uses a custom
+    manager that hashes the password and sets manager-controlled flags
+    (``is_staff``/``is_superuser``) as part of user creation. Each generated
+    user belongs to its own ``OrganizationFactory``-created organization
+    unless an ``organization`` is passed explicitly.
+    """
+
+    class Meta:
+        model = User
+
+    organization = factory.SubFactory(OrganizationFactory)
+    password = "TestPass123!"
+    email = factory.Sequence(lambda n: f"user{n}@example.com")
+    username = factory.Sequence(lambda n: f"user{n}")
+    full_name = factory.Faker("name")
+    phone = factory.Sequence(lambda n: f"+1555000{n:04d}")
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        """Create a ``User`` via ``UserManager.create_user``.
+
+        Args:
+            model_class: The ``User`` model class (``cls._meta.model``).
+            *args: Unused positional args from factory_boy's call signature.
+            **kwargs: Field values collected by factory_boy, including
+                ``email``, ``full_name``, ``username``, ``phone``,
+                ``organization``, and ``password``.
+
+        Returns:
+            User: A saved, persisted ``User`` instance with a usable
+            hashed password and an assigned ``organization``.
+        """
+        password = kwargs.pop("password")
+        email = kwargs.pop("email")
+        full_name = kwargs.pop("full_name")
+        username = kwargs.pop("username")
+        phone = kwargs.pop("phone")
+        kwargs.setdefault("is_active", True)
+        manager = model_class.objects
+        return manager.create_user(
+            email=email,
+            full_name=full_name,
+            username=username,
+            phone=phone,
+            password=password,
+            **kwargs,
+        )
+
+--- common/tests/test_factories.py ---
+"""Tests for the shared base factories in ``common.factories``.
+
+Verifies that ``UserFactory`` produces a persisted, valid ``User`` with an
+``organization`` assigned and a usable hashed password, exercising the
+custom ``UserManager.create_user`` path used by the factory.
+"""
+
+import pytest
+
+from common.factories import OrganizationFactory, UserFactory
+
+
+@pytest.mark.django_db
+def test_user_factory_creates_valid_user():
+    """UserFactory() should create a persisted user with a valid organization.
+
+    Asserts the user has a primary key (was saved), is linked to an
+    ``Organization`` instance, and has a usable hashed password set via
+    ``UserManager.create_user``.
+    """
+    user = UserFactory()
+
+    assert user.pk is not None
+    assert user.organization is not None
+    assert user.organization.pk is not None
+    assert user.check_password("TestPass123!")
+
+
+@pytest.mark.django_db
+def test_organization_factory_creates_valid_organization():
+    """OrganizationFactory() should create a persisted organization with a name."""
+    organization = OrganizationFactory()
+
+    assert organization.pk is not None
+    assert organization.name
+
+## Referenced real models for verification
+--- Organization (dashboard/models.py) ---
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f'{self.office_name} - {self.address.address_line_one}'
+    
+class Organization(TimeStampModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    website = models.CharField(max_length=255, blank=True, null=True)
+    email = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    currency = models.CharField(max_length=255, blank=True, null=True)
+    date_format = models.CharField(max_length=255, blank=True, null=True)
+    logo = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
+    history = HistoricalRecords()
+
+    def get_currency_display_value(self):
+        currency_dict = dict(CURRENCY_CHOICES)
+        return currency_dict.get(int(self.currency), None)
+
+    def __str__(self):
+        return self.name
+    
+class ProductType(TimeStampModel, SoftDeleteModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    can_modify=models.BooleanField(default=True)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+
+--- User (authentication/models.py) ---
+    else:
+        filename = '{}.{}'.format(uuid4().hex, ext)
+    return os.path.join(upload_to, filename)
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, full_name, username, phone, password, **extra_fields):
+        if not email:
+            raise ValueError('Users must have an email address.')
+        user = self.model(email=self.normalize_email(email), full_name=full_name,username=username, phone=phone, **extra_fields)
+        user.set_password(password)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(using=self._db)
+
+        return user
+
+    def create_superuser(self, email, full_name, username, phone, password, **extra_fields):
+        user = self.create_user(email, full_name, username, phone, password, is_active = True, access_level=True, **extra_fields)
+        
+        # Create or get the Superuser default
+        organization = Organization.objects.filter(name='DjangoSuperUserOrganization').first()
+        if not organization:
+            organization = Organization.objects.create(name='DjangoSuperUserOrganization')
+        
+
+        role = Role.objects.filter(related_name='Superuser', organization=organization).first()
+        if not role:
+            role = Role.objects.create(
+                name = "all_permissions",
+                related_name='Superuser',
+                organization=organization
+            )
+
+        if role.permissions.count() == 0:
+            all_permisisons = Permission.objects.all()
+            for permission in all_permisisons:
+                role.permissions.add(permission)
+        role.save()
+
+
+        user.role = role
+        user.save(using=self._db)
+
+        return user
+
+BOOL_CHOICES = ((False, 'Only Assigned'), (True, 'All'))
+
+class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(max_length=255, unique=True)
+    username = models.CharField(max_length=255 , blank=True, null=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    profile_pic = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
+    employee_id = models.CharField(max_length=45, blank=True, null=True)
+    is_active = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    address = models.ForeignKey(Address, models.DO_NOTHING, blank=True, null=True)
+    location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
+    department = models.ForeignKey(Department, models.DO_NOTHING, blank=True, null=True)
+    access_level = models.BooleanField(choices=BOOL_CHOICES,default=False)
+    role = models.ForeignKey(Role, models.DO_NOTHING, related_name='role', blank=True, null=True)
+    email_notification=models.BooleanField(default=False)
+    browser_notification=models.BooleanField(default=False)
+    slack_notification=models.BooleanField(default=False)
+    inapp_notification=models.BooleanField(default=False)
+    two_factor_auth=models.BooleanField(default=False)
+    password_reset_token = models.CharField(max_length=255, blank=True, null=True)
+    password_reset_expires = models.DateTimeField(blank=True, null=True)
+    use_expired_assets = models.BooleanField(default=False)
+    objects = UserManager()
+    history = HistoricalRecords()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
+
+    # def __init__(self, *args, **kwargs):
+    #     self.full_name=kwargs.pop('full_name', None)
+    #     format_key= LocalizationConfiguration.objects.filter(organization=self.user.organization).first()
+    #     format_key=format_key.name_display_format if format_key else "0"

@@ -22,9 +22,9 @@
                     <span class="permission-tag add">{{ trans.perm_add }}</span>
                 {% elif 'view' in permission.codename %}
                     <span class="permission-tag view">{{ trans.view }}</span>
-                {% elif 'change' in permission.codename or 'edit' in permission.codename %}   
+                {% elif 'change' in permission.codename or 'edit' in permission.codename %}
                     <span class="permission-tag edit">{{ trans.edit }}</span>
-                {% elif 'delete' in permission.codename %}   
+                {% elif 'delete' in permission.codename %}
                     <span class="permission-tag delete">{{ trans.delete }}</span>
                 {% else %}
                     <span class="permission-tag other">{{ permission.name|truncatechars:10 }}</span>

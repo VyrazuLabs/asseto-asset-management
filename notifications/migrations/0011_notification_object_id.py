@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0010_alter_notification_entity_type_firebasetoken'),
+        ("notifications", "0010_alter_notification_entity_type_firebasetoken"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='object_id',
+            model_name="notification",
+            name="object_id",
             field=models.CharField(blank=True, default=None, max_length=225, null=True),
         ),
     ]

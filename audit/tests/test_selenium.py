@@ -13,6 +13,7 @@ import pytest
 
 pytestmark = pytest.mark.selenium
 
+
 class AuditTest(LiveServerTestCase):
 
     def setUp(self):
@@ -23,7 +24,7 @@ class AuditTest(LiveServerTestCase):
             username="testuser",
             full_name="Test User",
             phone="9808123456",
-            password="password123"
+            password="password123",
         )
         self.test_user.is_active = True
         self.test_user.save()
@@ -33,13 +34,12 @@ class AuditTest(LiveServerTestCase):
             name="Organization 1",
             website="www.example.com",
             email="organization@example.com",
-            phone="1234567890"
+            phone="1234567890",
         )
 
         # Create Asset (required for audit)
         self.asset = Asset.objects.create(
-            name="Laptop Asset",
-            organization=self.organization
+            name="Laptop Asset", organization=self.organization
         )
 
         # Existing audit (for update/delete tests)
@@ -49,7 +49,7 @@ class AuditTest(LiveServerTestCase):
             organization=self.organization,
             condition=1,
             notes="Initial audit",
-            audited_by=self.test_user
+            audited_by=self.test_user,
         )
 
         # Django client
@@ -59,7 +59,7 @@ class AuditTest(LiveServerTestCase):
         self.client.login(email="testuser@gmail.com", password="password123")
 
         # Get session cookie
-        self.session_cookie = self.client.cookies['sessionid']
+        self.session_cookie = self.client.cookies["sessionid"]
 
         # Start selenium driver
         self.driver = webdriver.Chrome()
@@ -69,12 +69,14 @@ class AuditTest(LiveServerTestCase):
         self.driver.get(self.live_server_url)
 
         # Inject session cookie
-        self.driver.add_cookie({
-            'name': 'sessionid',
-            'value': self.session_cookie.value,
-            'path': '/',
-            'secure': False
-        })
+        self.driver.add_cookie(
+            {
+                "name": "sessionid",
+                "value": self.session_cookie.value,
+                "path": "/",
+                "secure": False,
+            }
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -99,9 +101,7 @@ class AuditTest(LiveServerTestCase):
         assigned_to.send_keys("Jane Doe")
 
         # Click condition button
-        condition_button = self.driver.find_element(
-            By.XPATH, "//button[text()='Good']"
-        )
+        condition_button = self.driver.find_element(By.XPATH, "//button[text()='Good']")
         condition_button.click()
 
         notes.send_keys("Audit created via Selenium")

@@ -8,20 +8,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0004_localizationconfiguration_country_format_and_more'),
-        ('dashboard', '0025_alter_address_created_at_alter_address_status_and_more'),
+        ("configurations", "0004_localizationconfiguration_country_format_and_more"),
+        ("dashboard", "0025_alter_address_created_at_alter_address_status_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Extensions',
+            name="Extensions",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('entity_name', models.CharField(max_length=150)),
-                ('status', models.IntegerField()),
-                ('payment_date', models.DateTimeField(auto_now_add=True)),
-                ('validity', models.IntegerField()),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='integrations', to='dashboard.organization')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("entity_name", models.CharField(max_length=150)),
+                ("status", models.IntegerField()),
+                ("payment_date", models.DateTimeField(auto_now_add=True)),
+                ("validity", models.IntegerField()),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="integrations",
+                        to="dashboard.organization",
+                    ),
+                ),
             ],
         ),
     ]

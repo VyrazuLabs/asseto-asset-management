@@ -8,13 +8,23 @@ import products.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0011_alter_product_description'),
+        ("products", "0011_alter_product_description"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='product_picture',
-            field=django_resized.forms.ResizedImageField(blank=True, crop=None, force_format='JPEG', keep_meta=True, null=True, quality=75, scale=None, size=[1024, 768], upload_to=products.models.path_and_rename),
+            model_name="product",
+            name="product_picture",
+            field=django_resized.forms.ResizedImageField(
+                blank=True,
+                crop=None,
+                force_format="JPEG",
+                keep_meta=True,
+                null=True,
+                quality=75,
+                scale=None,
+                size=[1024, 768],
+                upload_to=products.models.path_and_rename,
+            ),
         ),
     ]

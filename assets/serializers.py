@@ -9,46 +9,55 @@ from datetime import timedelta
 from notifications.models import UserNotification
 from .api_utils import get_base_segment
 
+
 class NotificationSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(source='notification.notification_title')
-    body = serializers.CharField(source='notification.notification_text')
-    link = serializers.CharField(source='notification.link')
-    created_at = serializers.DateTimeField(source='notification.created_at')
-    object_id = serializers.CharField(source='notification.object_id')
+    title = serializers.CharField(source="notification.notification_title")
+    body = serializers.CharField(source="notification.notification_text")
+    link = serializers.CharField(source="notification.link")
+    created_at = serializers.DateTimeField(source="notification.created_at")
+    object_id = serializers.CharField(source="notification.object_id")
     object_type = serializers.SerializerMethodField()
 
     class Meta:
         model = UserNotification
         fields = [
-            'id',
-            'title',
-            'body',
-            'is_seen',
-            'link',
-            'object_type',
-            'created_at',
-            'object_id'
+            "id",
+            "title",
+            "body",
+            "is_seen",
+            "link",
+            "object_type",
+            "created_at",
+            "object_id",
         ]
 
     def get_object_type(self, obj):
         link = obj.notification.link
         return get_base_segment(link) if link else None
 
+
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
-        if isinstance(dictionary.get(self.field_name), list) and all(isinstance(item, dict) for item in dictionary[self.field_name]):
+        if isinstance(dictionary.get(self.field_name), list) and all(
+            isinstance(item, dict) for item in dictionary[self.field_name]
+        ):
             return dictionary[self.field_name]
         elif isinstance(dictionary.get(self.field_name), list):
             # There can be some cases where custom fields will be a list of list of dictionaries
             # The following remedies it
             dictionary_copy = dictionary.copy()
-            dictionary_copy[self.field_name] = next(iter(dictionary[self.field_name]), [])
+            dictionary_copy[self.field_name] = next(
+                iter(dictionary[self.field_name]), []
+            )
             return dictionary_copy[self.field_name]
         return super().get_value(dictionary)
-    
+
+
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
     field_value = serializers.CharField()
+
+
 class AssetSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     images = serializers.ListField(
@@ -59,15 +68,29 @@ class AssetSerializer(serializers.ModelSerializer):
         default=list,
     )
     custom_fields = DictionaryListField(child=serializers.DictField(), required=False)
-    purchase_date = serializers.DateTimeField(format='iso-8601', required=False, allow_null=True)
-    warranty_expiry_date = serializers.DateTimeField(format='iso-8601', required=False, allow_null=True)
+    purchase_date = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
+    warranty_expiry_date = serializers.DateTimeField(
+        format="iso-8601", required=False, allow_null=True
+    )
 
     class Meta:
         model = Asset
         fields = [
-            'tag', 'name', 'product', 'vendor', 'location', 'serial_no',
-            'price', 'purchase_type', 'purchase_date', 'warranty_expiry_date',
-            'images', 'custom_fields','description'
+            "tag",
+            "name",
+            "product",
+            "vendor",
+            "location",
+            "serial_no",
+            "price",
+            "purchase_type",
+            "purchase_date",
+            "warranty_expiry_date",
+            "images",
+            "custom_fields",
+            "description",
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
@@ -116,12 +139,12 @@ class AssetSerializer(serializers.ModelSerializer):
             try:
                 mutable_data["custom_fields"] = json.loads(custom_fields)
             except json.JSONDecodeError:
-                raise serializers.ValidationError({
-                    "custom_fields": "Invalid JSON format"
-                })
+                raise serializers.ValidationError(
+                    {"custom_fields": "Invalid JSON format"}
+                )
 
         return super().to_internal_value(mutable_data)
-    
+
     # def to_internal_value(self, data):
     # # Convert QueryDict safely → plain dict
     #     if hasattr(data, "lists"):
@@ -166,12 +189,12 @@ class AssetSerializer(serializers.ModelSerializer):
         if "product" in self.initial_data and not value:
             raise serializers.ValidationError("Product can not be blank")
         return value
-    
+
     def validate_price(self, value):
         if value is not None and value < 0:
             raise serializers.ValidationError("Price cannot be negative.")
         return value
-    
+
     def validate_purchase_date(self, value):
         if value:
             today = timezone.now()
@@ -188,7 +211,7 @@ class AssetSerializer(serializers.ModelSerializer):
         asset = Asset.objects.create(
             **validated_data,
             organization=self.context["request"].user.organization,
-            asset_status=AssetStatus.objects.get(name="Available")
+            asset_status=AssetStatus.objects.get(name="Available"),
         )
 
         for image in images:
@@ -204,15 +227,14 @@ class AssetSerializer(serializers.ModelSerializer):
                 CustomField.objects.create(
                     name=field_name,
                     object_id=asset.id,
-                    field_type='text',
+                    field_type="text",
                     field_name=field_name,
                     field_value=field_value,
-                    entity_type='asset',
-                    organization=self.context["request"].user.organization
+                    entity_type="asset",
+                    organization=self.context["request"].user.organization,
                 )
 
         return asset
-
 
     @transaction.atomic
     def update(self, instance, validated_data):
@@ -285,7 +307,7 @@ class AssetSerializer(serializers.ModelSerializer):
         # return instance
         custom_fields = validated_data.pop("custom_fields", None)
 
-    # Update normal fields
+        # Update normal fields
         for attribute, value in validated_data.items():
             if value is not None:
                 setattr(instance, attribute, value)
@@ -299,8 +321,7 @@ class AssetSerializer(serializers.ModelSerializer):
         if custom_fields is not None:
 
             existing_qs = CustomField.objects.filter(
-                object_id=instance.id,
-                entity_type="asset"
+                object_id=instance.id, entity_type="asset"
             )
             existing_field_names = {cf.field_name for cf in existing_qs}
 
@@ -316,7 +337,7 @@ class AssetSerializer(serializers.ModelSerializer):
                 CustomField.objects.filter(
                     object_id=instance.id,
                     field_name__in=deleted_field_names,
-                    entity_type="asset"
+                    entity_type="asset",
                 ).delete()
 
             for custom_field in custom_fields:
@@ -330,18 +351,14 @@ class AssetSerializer(serializers.ModelSerializer):
                     continue
 
                 qs = CustomField.objects.filter(
-                    object_id=instance.id,
-                    field_name=field_name,
-                    entity_type="asset"
+                    object_id=instance.id, field_name=field_name, entity_type="asset"
                 )
 
                 if field_value is None:
                     qs.delete()
                 elif qs.exists():
                     qs.update(
-                        field_value=field_value,
-                        field_type="text",
-                        name=field_name
+                        field_value=field_value, field_type="text", name=field_name
                     )
                 else:
                     CustomField.objects.create(
@@ -350,11 +367,11 @@ class AssetSerializer(serializers.ModelSerializer):
                         field_value=field_value,
                         entity_type="asset",
                         field_type="text",
-                        name=field_name
+                        name=field_name,
                     )
 
         return instance
-    
+
     # def validate(self, attrs):
     #     for field in ["purchase_date", "warranty_expiry_date"]:
     #         if attrs.get(field) in ["", None]:
@@ -371,9 +388,9 @@ class AssetSerializer(serializers.ModelSerializer):
     #                 )
     #             })
     #     return attrs
-    
+
     def validate_warranty_expiry_date(self, value):
-        user=self.context["request"].user
+        user = self.context["request"].user
         if user.use_expired_assets is True and value:
             return value
         else:
@@ -387,17 +404,18 @@ class AssetSerializer(serializers.ModelSerializer):
 
 class SearchAssetSerializer(serializers.Serializer):
     search_text = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        allow_null=True
+        required=False, allow_blank=True, allow_null=True
     )
+
     class Meta:
-        fields=['search_text']
-    
+        fields = ["search_text"]
+
     def validate(self, search_text):
         if not search_text:
             return []
         return search_text
+
+
 class AssignAssetSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
         child=serializers.ImageField(required=False, allow_null=True),
@@ -440,23 +458,24 @@ class AssignAssetSerializer(serializers.ModelSerializer):
 
         return super().to_internal_value(mutable_data)
 
-    def validate_user(self,user):
+    def validate_user(self, user):
         if not user:
             raise serializers.ValidationError("User must needed")
         return user
-        
+
     def create(self, validated_data):
-        asset=validated_data.pop('asset',None)
-        asset_images=validated_data.pop('images',[])
-        assign_asset=AssignAsset.objects.create(asset=asset,**validated_data)
-        asset.is_assigned=True
-        status="Assigned"
-        get_status=AssetStatus.objects.filter(name=status).first()
+        asset = validated_data.pop("asset", None)
+        asset_images = validated_data.pop("images", [])
+        assign_asset = AssignAsset.objects.create(asset=asset, **validated_data)
+        asset.is_assigned = True
+        status = "Assigned"
+        get_status = AssetStatus.objects.filter(name=status).first()
         asset.asset_status = get_status
         asset.save()
         for image in asset_images:
-            AssetImage.objects.create(asset=asset,image=image)
+            AssetImage.objects.create(asset=asset, image=image)
         return assign_asset
+
     class Meta:
-        model=AssignAsset
-        fields=['user','images']
+        model = AssignAsset
+        fields = ["user", "images"]

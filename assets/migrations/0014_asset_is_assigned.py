@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0013_alter_assetspecification_asset'),
+        ("assets", "0013_alter_assetspecification_asset"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='asset',
-            name='is_assigned',
+            model_name="asset",
+            name="is_assigned",
             field=models.BooleanField(default=False),
         ),
     ]

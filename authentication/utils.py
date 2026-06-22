@@ -9,23 +9,17 @@ from datetime import datetime, timedelta
 import jwt
 import pyotp
 import qrcode
-from django.conf import settings
-from django.contrib import messages
-from django.core.management import call_command
-from django.db import connections
-from django.db.models import Q
-from django.db.utils import ConnectionHandler
-from django.http import JsonResponse
-from django.shortcuts import redirect
-from dotenv import load_dotenv, set_key
+import io
+import base64
+import random, string
+from django.utils import timezone
+import jwt
+import datetime
+from .models import PhoneOtp, UserTotp, User
 from rest_framework.response import Response
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken
-
 from assets.models import Asset, AssignAsset
-from users.serializers import UserSerializer
-
-from .models import User, UserTotp
+from datetime import datetime, timedelta
+from django.db.models import Q
 
 
 def asset_data_util(request):
@@ -102,7 +96,7 @@ def generate_otl_session_id(user):
     return otl_session_id
 
 
-def generate_qr(request, user, secret):
+def generate_qr(request, user_totp):
     try:
         # user_totp.secret = secret
         request.session["user_totp"] = secret
@@ -121,13 +115,7 @@ def generate_qr(request, user, secret):
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
 
-        buffered = io.BytesIO()
-
-        # saving QR into bytes object
-        img.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
-
-        return img_str
+        return qr_image
 
     except Exception as e:
         print("QR generation error:", e)
@@ -149,6 +137,7 @@ def generate_access_token(user, otl_session_id=None):
     access_token = jwt.encode(
         access_token_payload, settings.SECRET_KEY, algorithm="HS256"
     )
+    # PhoneOtp.objects.create(user_id=user.id, otp=access_token, expires_at=timezone.now() + datetime.timedelta(minutes=15))
     return access_token
 
 
@@ -170,12 +159,14 @@ def generate_totp_secret():
 
 
 def generate_qrcode(secret, username):
+    # get_user=User.objects.filter(username=username).first()
     get_totp = UserTotp.objects.filter(secret=secret).first()
     if get_totp.status == 2:
         secret = get_totp.secret
     totp = pyotp.totp.TOTP(secret)
     # Generating provisioning URI for the QR code
     provisioning_uri = totp.provisioning_uri(name=f"Asseto: {username}")
+    # Generating QR code
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -191,87 +182,19 @@ def generate_qrcode(secret, username):
 
     # saving QR into bytes object
     img.save(buffered, format="PNG")
+    # Dont send in bytes
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
     return img_str
 
 
 def verify_totp(secret, entered_otp):
-
+    # print("Verifying OTP: secret=", secret)
     totp = pyotp.TOTP(secret)
     user_provided_otp = entered_otp
 
     if totp.verify(user_provided_otp):
         return True
     return False
-
-
-class TotpMixin:
-
-    def _is_ajax(self,request) -> bool:
-        return request.headers.get("X-Requested-With") == "XMLHttpRequest"
-
-    def totp_response(
-        self,
-        request,
-        *,
-        success: bool,
-        message: str,
-        redirect_name: str,
-        extra: dict = None,
-        level="error",
-    ):
-        if self._is_ajax(request):
-            payload = {"success": success, "message": message}
-            if extra:
-                payload.update(extra)
-            return JsonResponse(payload)
-
-        getattr(messages, level)(request, message)
-
-        return redirect(redirect_name)
-
-
-class TotpService:
-
-    @staticmethod
-    def get_or_create_otp(user):
-        user_totp, created = UserTotp.objects.get_or_create(
-            user=user, defaults={"secret": generate_totp_secret()}
-        )
-        return user_totp
-
-    @staticmethod
-    def reset_opt(user):
-        secret = generate_totp_secret()
-        old_totp = UserTotp.objects.get(user=user)
-        old_totp.delete()
-
-        return UserTotp.objects.create(user=user, secret=secret)
-
-    @staticmethod
-    def verify_and_mark(totp: UserTotp, otp):
-        verify_otp = verify_totp(totp.secret, otp)
-
-        if not verify_otp:
-            return False
-
-        totp.is_validate = True
-        totp.save()
-
-        return True
-
-    @staticmethod
-    def build_totp_payload(request, user: User, user_totp: UserTotp):
-        return {
-            "success": True,
-            "two_factor_auth": user.two_factor_auth,
-            "is_validate": user_totp.is_validate,
-            "qr_code": (
-                generate_qr(request, user, user_totp.secret)
-                if not user_totp.is_validate
-                else None
-            ),
-        }
 
 
 def get_tokens_for_user(user):

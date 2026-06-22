@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0025_historicaluser_password_reset_token_and_more'),
+        ("authentication", "0025_historicaluser_password_reset_token_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicaluser',
-            name='password_reset_expires',
+            model_name="historicaluser",
+            name="password_reset_expires",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='password_reset_expires',
+            model_name="user",
+            name="password_reset_expires",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

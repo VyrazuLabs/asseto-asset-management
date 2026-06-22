@@ -2,6 +2,7 @@ from django.test import TestCase
 from dashboard.models import LicenseType
 from license.models import License
 from vendors.models import Vendor
+
 # class TestLicense(TestCase):
 #     def setUp(self):
 #         create_license_type=LicenseType.objects.create(name='Test License type')
@@ -17,7 +18,7 @@ from vendors.models import Vendor
 #             notes="Test Description",
 #             is_assigned=True
 #         )
-    
+
 #     def test_license_list(self):
 #         get_license=License.objects.get(name='Test License')
 #         self.assertEqual(get_license.name,'Test License')
@@ -60,7 +61,7 @@ class LicenseTest(TestCase):
             phone="9433622983",
             username="testuser",
             email="testuser@test.com",
-            password="password123"
+            password="password123",
         )
 
         # Address
@@ -81,7 +82,7 @@ class LicenseTest(TestCase):
             email="asseto@asseto.com",
             currency="INR",
             date_format="dd-mm-yyyy",
-            logo="logo.png"
+            logo="logo.png",
         )
 
         # Vendor
@@ -94,13 +95,11 @@ class LicenseTest(TestCase):
             gstin_number="1234567890",
             description="Description 1",
             address=self.address,
-            organization=self.organization
+            organization=self.organization,
         )
 
         # License Type
-        self.license_type = LicenseType.objects.create(
-            name="Software License"
-        )
+        self.license_type = LicenseType.objects.create(name="Software License")
 
         # License
         self.license = License.objects.create(
@@ -112,14 +111,12 @@ class LicenseTest(TestCase):
             expiry_date="2024-01-01",
             key="ABC123XYZ",
             notes="Initial License Notes",
-            is_assigned=False
+            is_assigned=False,
         )
 
         # Assign License
         self.assign_license = AssignLicense.objects.create(
-            license=self.license,
-            user=self.user,
-            notes="Assigned to testuser"
+            license=self.license, user=self.user, notes="Assigned to testuser"
         )
 
     # ✅ Test Create License

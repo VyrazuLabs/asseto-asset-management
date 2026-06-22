@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0030_alter_asset_options_alter_assetimage_options_and_more'),
+        ("assets", "0030_alter_asset_options_alter_assetimage_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assignasset',
-            name='issue_date',
+            model_name="assignasset",
+            name="issue_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='assignasset',
-            name='notes',
+            model_name="assignasset",
+            name="notes",
             field=models.TextField(blank=True, null=True),
         ),
     ]

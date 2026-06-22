@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
         <a href="{% url 'client_portal:support_tickets' %}" class="text-decoration-none text-reset d-block h-100">
             <div class="card card-stats border-0 shadow-sm h-100">
@@ -94,7 +94,7 @@
             </div>
         </a>
     </div>
-    
+
 </div>
 
 <div class="row g-4">
@@ -184,7 +184,7 @@
             <div class="card-body p-4">
                 <h6 class="fw-bold text-uppercase mb-1" style="color: #25396f;">Asset Category Distribution</h6>
                 <p class="text-muted small mb-4">Distribution across product categories</p>
-                
+
                 <div class="chart-container mb-4">
                     <canvas id="categoryChart"></canvas>
                     <div class="chart-center-text">
@@ -217,14 +217,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('categoryChart').getContext('2d');
-        
+
         const catValues = [{% for v in cat_values %}{{ v }}{% if not forloop.last %}, {% endif %}{% endfor %}];
         const catColors = [{% for c in cat_colors %}'{{ c }}'{% if not forloop.last %}, {% endif %}{% endfor %}];
-        
+
         // Handle empty state: Use a single gray segment if no data
         const chartData = catValues.length > 0 ? catValues : [1];
         const chartColors = catValues.length > 0 ? catColors : ['#e9ecef'];
-        
+
         new Chart(ctx, {
             type: 'doughnut',
             data: {

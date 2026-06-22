@@ -278,5 +278,120 @@
 </div>
 
 <!-- Scripts -->
-<script src="{% static 'js/pages/user_profile.js' %}?v=2" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("twoFactorToggle");
+        const regenerateBtn = document.getElementById("regenerateQrBtn");
+        const verify2faBtn = document.getElementById("verify2faBtn");
+        const userOtp = document.getElementById("userOtp");
+        const qrSection = document.getElementById("qrContainer");
+
+        // 2FA Toggle Update
+        if (toggle) {
+            toggle.addEventListener("change", function () {
+                const isChecked = toggle.checked;
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch("{% url 'users:toggle_two_factor_auth' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: new URLSearchParams({
+                        two_factor_auth: isChecked ? "on" : ""
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (qrSection) {
+                            if (isChecked) {
+                                qrSection.classList.remove("d-none");
+                            } else {
+                                qrSection.classList.add("d-none");
+                            }
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        }
+
+        // Regenerate QR
+        if (regenerateBtn) {
+            regenerateBtn.addEventListener("click", function () {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+                regenerateBtn.disabled = true;
+                regenerateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> {{ trans.generating }}';
+
+                fetch("{% url 'authentication:regenerate_qr' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (qrSection) qrSection.classList.remove("d-none");
+                            if (verify2faBtn) verify2faBtn.classList.remove("d-none");
+                            if (userOtp) userOtp.classList.remove("d-none");
+                            const otpContainer = document.getElementById("otpInputContainer");
+                            if (otpContainer) otpContainer.classList.remove("d-none");
+
+                            const existingImg = document.getElementById("dynamicQrImage");
+                            if (existingImg) existingImg.remove();
+
+                            const imgContainer = document.getElementById("img-container");
+                            const img = document.createElement("img");
+                            img.id = "dynamicQrImage";
+                            img.src = "data:image/png;base64," + data.qr_code;
+                            img.className = "img-fluid mt-3";
+                            img.style.maxWidth = "200px";
+                            imgContainer.appendChild(img);
+                        } else {
+                            alert(data.message || "{{ trans.failed_regenerate_qr }}");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("{{ trans.something_went_wrong }}");
+                    })
+                    .finally(() => {
+                        regenerateBtn.disabled = false;
+                        regenerateBtn.innerHTML = '<i class="bi bi-qr-code"></i> {{ trans.regenerate_qr_code }}';
+                    });
+            });
+        }
+
+        // Verify 2FA
+        if (verify2faBtn) {
+            verify2faBtn.addEventListener("click", function () {
+                const otp = userOtp ? userOtp.value.trim() : "";
+                const email = "{{request.user.email}}";
+
+                if (!otp) {
+                    alert("{{ trans.please_enter_otp }}");
+                    return;
+                }
+
+                fetch(`/api/authentication/login-otp/?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`, {
+                    method: "POST",
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.access) {
+                            alert("{{ trans.verification_successful }}");
+                            window.location.reload();
+                        } else {
+                            alert(data.message || "{{ trans.invalid_otp }}");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("{{ trans.something_went_wrong }}");
+                    });
+            });
+        }
+    });
+</script>
 {% endblock content %}

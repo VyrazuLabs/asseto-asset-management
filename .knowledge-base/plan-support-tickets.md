@@ -31,7 +31,7 @@ Create a `Ticket` model inheriting from `TimeStampModel` and `SoftDeleteModel` (
 
 ### Views / API Views (`tickets/api_views.py` & `tickets/views.py`)
 Use Django REST Framework for API endpoints. Return responses using `common.API_custom_response.api_response`.
-- **List/Create API:** 
+- **List/Create API:**
   - `GET`: Filter tickets by `organization`. Support Staff see all tickets in their org, normal users see their own.
   - `POST`: Create a ticket. Auto-assign `created_by` and `organization`.
 - **Retrieve/Update API:**

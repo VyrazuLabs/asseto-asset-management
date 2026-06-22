@@ -6,7 +6,7 @@
     --dash-card-bg: #FFFFFF;
     --dash-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
     --dash-card-radius: 16px;
-    
+
     --metric-blue: #4F46E5;
     --metric-blue-soft: #EFF6FF;
     --metric-cyan: #0EA5E9;
@@ -23,7 +23,7 @@
     --metric-teal-soft: #F0FDFA;
     --metric-rose: #F43F5E;
     --metric-rose-soft: #FFF1F2;
-    
+
     --text-main: #1E293B;
     --text-muted: #64748B;
 }
@@ -221,9 +221,9 @@
 body.theme-dark {
     --dash-card-bg: #1E1E2D;
     --dash-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-    
+
     --dash-card-border: 1px solid #2D2D44;
-    
+
     --metric-blue-soft: #2D2D44;
     --metric-cyan-soft: #1E2D3D;
     --metric-orange-soft: #2D261E;
@@ -232,7 +232,7 @@ body.theme-dark {
     --metric-purple-soft: #261E2E;
     --metric-teal-soft: #1E2E2D;
     --metric-rose-soft: #2E1E22;
-    
+
     --text-main: #E2E8F0;
     --text-muted: #94A3B8;
 }

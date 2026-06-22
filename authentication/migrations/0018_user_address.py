@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_delete_employee'),
-        ('authentication', '0017_alter_user_access_level'),
+        ("dashboard", "0015_delete_employee"),
+        ("authentication", "0017_alter_user_access_level"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='address',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.address'),
+            model_name="user",
+            name="address",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.address",
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0008_slackconfiguration'),
+        ("configurations", "0008_slackconfiguration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='extensions',
-            name='description',
+            model_name="extensions",
+            name="description",
             field=models.TextField(blank=True, null=True),
         ),
     ]

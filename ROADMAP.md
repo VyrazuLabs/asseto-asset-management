@@ -25,7 +25,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Asset Configurations & Lifecycle Management
 
-> This milestone will be done when 
+> This milestone will be done when
 * Administrators can custom-define specifications and template fields per asset category.
 * Asset repair history, maintenance costs, and vendor relationships are logged.
 * Consumables and accessories stock levels can be managed and assigned to employees.
@@ -41,7 +41,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Security & Audit Systems
 
-> This milestone will be done when 
+> This milestone will be done when
 * User authentication can be strengthened with Two-Factor Verification.
 * Resources can be soft-deleted and recovered via Recycle Bin.
 * Every administrative data mutation creates an automated audit trail.
@@ -57,7 +57,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Localization & User Preferences
 
-> This milestone will be done when 
+> This milestone will be done when
 * The interface strings are internationalized and translation files exist.
 * The system detects browser locale and lets users change language options manually.
 
@@ -80,7 +80,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Third-Party API & Communication
 
-> This milestone will be done when 
+> This milestone will be done when
 * Authenticated REST APIs exist to let third-party services programmatically fetch or update assets.
 * Slack integration webhooks can send real-time alerts to external channels.
 
@@ -104,7 +104,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Client Portal & Ticket Management
 
-> This milestone will be done when 
+> This milestone will be done when
 * Rented assets can be viewed by tenant clients in a dedicated Portal view.
 * Ticket workflows enable clients to open and follow repairs or technical requests directly.
 
@@ -128,7 +128,7 @@ This document describes the current status and the upcoming milestones of the As
 
 #### Mobile Application Development
 
-> This milestone will be done when 
+> This milestone will be done when
 * Android & iOS applications support barcode auditing and remote requests.
 * The applications are successfully released to internal or public app stores.
 

@@ -1,8 +1,8 @@
 # 🔒 Security Policy
 
 ## 🧭 Overview
-The **Asset Management Project** team takes security very seriously.  
-We are committed to protecting the confidentiality, integrity, and availability of our systems and data.  
+The **Asset Management Project** team takes security very seriously.
+We are committed to protecting the confidentiality, integrity, and availability of our systems and data.
 This document outlines our **security best practices**, **vulnerability reporting process**, and **responsible disclosure policy**.
 
 ---
@@ -25,7 +25,7 @@ If you are using an unsupported version, please upgrade to the latest release to
 If you discover a security vulnerability in the project:
 
 1. **Do not disclose it publicly.**
-2. **Report it privately** to the maintainers via email:  
+2. **Report it privately** to the maintainers via email:
    📧 **info@vyrazu.com**
 3. Include the following details (if possible):
    - A clear description of the issue.
@@ -114,7 +114,7 @@ In case of a security incident (such as data breach, unauthorized access, or mal
 ---
 
 ## 🏁 Final Note
-We deeply appreciate the efforts of the security community in keeping this project safe.  
+We deeply appreciate the efforts of the security community in keeping this project safe.
 Your contributions help us ensure a secure and reliable platform for all users.
 
 If in doubt, please reach out — it’s always better to report than to ignore.

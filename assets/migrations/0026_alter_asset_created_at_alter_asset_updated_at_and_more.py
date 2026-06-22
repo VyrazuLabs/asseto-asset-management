@@ -6,73 +6,73 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0025_assignasset_assigned_date'),
+        ("assets", "0025_assignasset_assigned_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='created_at',
+            model_name="asset",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='asset',
-            name='updated_at',
+            model_name="asset",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='created_at',
+            model_name="assetspecification",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='status',
+            model_name="assetspecification",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='updated_at',
+            model_name="assetspecification",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetstatus',
-            name='created_at',
+            model_name="assetstatus",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetstatus',
-            name='status',
+            model_name="assetstatus",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='assetstatus',
-            name='updated_at',
+            model_name="assetstatus",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalasset',
-            name='created_at',
+            model_name="historicalasset",
+            name="created_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalasset',
-            name='updated_at',
+            model_name="historicalasset",
+            name="updated_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalassetstatus',
-            name='created_at',
+            model_name="historicalassetstatus",
+            name="created_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalassetstatus',
-            name='status',
+            model_name="historicalassetstatus",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalassetstatus',
-            name='updated_at',
+            model_name="historicalassetstatus",
+            name="updated_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
     ]

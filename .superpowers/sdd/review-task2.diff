@@ -1,0 +1,239 @@
+# Review package: working tree (uncommitted) — Task 2
+
+## Status (all uncommitted changes so far, Tasks 1+2 combined)
+R  assets/tests.py -> assets/tests/test_assets.py
+M  assets/tests/test_selenium.py
+R  audit/tests.py -> audit/tests/test_audit.py
+M  audit/tests/test_selenium.py
+R  dashboard/tests.py -> dashboard/tests/test_dashboard.py
+M  dashboard/tests/test_selenium.py
+R  license/tests.py -> license/tests/test_license.py
+M  license/tests/test_selenium.py
+R  products/tests.py -> products/tests/test_products.py
+M  products/tests/test_selenium.py
+ M requirements.txt
+D  users/tests.py
+M  users/tests/test_selenium.py
+D  vendors/tests/tempCodeRunnerFile.py
+M  vendors/tests/test_selenium.py
+R  vendors/tests.py -> vendors/tests/test_vendors.py
+?? .pre-commit-config.yaml
+?? .superpowers/
+?? pyproject.toml
+
+## Diff for Task 2 files (tests structure)
+
+=== NEW FILE: assets/tests/test_assets.py (first 30 lines) ===
+from django.test import TestCase
+from dashboard.models import Organization,Address,Location,ProductType,ProductCategory,Department
+from vendors.models import Vendor
+from products.models import Product
+from assets.models import Asset
+# Create your tests here.
+class Asseto_test(TestCase):
+    def setUp(self):
+        user_address=Address.objects.create(
+            address_line_one = "Address line 1",
+            address_line_two = "Address line 2",
+            country = "India",
+            state="West Bengal",
+            city = "Kolkata",
+            pin_code = "700018",
+        )
+        user_organization = Organization.objects.create(
+            name="Organization 1",
+            website="asseto.com",
+            phone="1234567890",
+            email="asseto@asseto.com",
+            currency="INR",
+            date_format="dd-mm-yyyy",
+            logo = "logo.png"
+        )
+        user_vendor=Vendor.objects.create(
+            name = "Vendor 1",
+            email = "vendor1@asseto.com",
+            phone = "7896321454",
+            contact_person = "Person 1",
+
+=== NEW FILE: audit/tests/test_audit.py (first 30 lines) ===
+from django.test import TestCase
+from django.contrib.auth import get_user_model
+from dashboard.models import Organization, Address, Location, ProductType, ProductCategory
+from vendors.models import Vendor
+from products.models import Product
+from assets.models import Asset
+from audit.models import Audit
+
+User = get_user_model()
+
+
+class AuditTest(TestCase):
+
+    def setUp(self):
+        # Create User
+        self.user = User.objects.create_user(
+            full_name="Auditor 1",
+            phone="9433622983",
+            username="auditor",
+            email="auditor@test.com",
+            password="password123"
+        )
+
+        # Create Address
+        self.address = Address.objects.create(
+            address_line_one="Address line 1",
+            address_line_two="Address line 2",
+            country="India",
+            state="West Bengal",
+            city="Kolkata",
+
+=== NEW FILE: dashboard/tests/test_dashboard.py (first 30 lines) ===
+from django.test import TestCase
+from dashboard.models import Address,Location,Organization,ProductType,ProductCategory,Department
+# Create your tests here.
+
+class Asseto_test_address(TestCase):
+    def setUp(self):
+        Address.objects.create(
+            country = "India",
+            state = "Rajasthan",
+            address_line_one = "testline 1",
+            address_line_two = "testline 2",
+            city = "Jaipur",
+            pin_code = "302001"
+        )
+
+    def test_product_category(self):
+        address = Address.objects.get(country="India")
+        self.assertEqual(address.state, "Rajasthan")
+class Asseto_test_location(TestCase):
+    def setUp(self):
+        self.user_organization = Organization.objects.create(
+            name="Organization 1",
+            website="asseto.com",
+            phone="1234567890",
+            email="asseto@asseto.com",
+            currency="INR",
+            date_format="dd-mm-yyyy",
+            logo = "logo.png"
+        )
+        self.user_address=Address.objects.create(
+
+=== NEW FILE: license/tests/test_license.py (first 30 lines) ===
+from django.test import TestCase
+from dashboard.models import LicenseType
+from license.models import License
+from vendors.models import Vendor
+# class TestLicense(TestCase):
+#     def setUp(self):
+#         create_license_type=LicenseType.objects.create(name='Test License type')
+#         create_vendor=Vendor.objects.create(name='TestVendor')
+#         License.objects.create(
+#             name='Test License',
+#             license_type=create_license_type,
+#             vendor=create_vendor,
+#             seats=12,
+#             start_date="01/01/2026",
+#             expiry_date="01/01/2027",
+#             key="98798qw7d9wddDWD7984",
+#             notes="Test Description",
+#             is_assigned=True
+#         )
+    
+#     def test_license_list(self):
+#         get_license=License.objects.get(name='Test License')
+#         self.assertEqual(get_license.name,'Test License')
+#         self.assertEqual(get_license.license_type.name,'Test License type')
+#         self.assertEqual(get_license.vendor.name,"TestVendor")
+#         self.assertEqual(get_license.seats,12)
+#         self.assertEqual(get_license.start_date,"01/01/2026")
+#         self.assertEqual(get_license.expiry_date,"01/01/2027")
+#         self.assertEqual(get_license.key,"98798qw7d9wddDWD7984")
+#         self.assertEqual(get_license.notes,"Test Description")
+
+=== NEW FILE: products/tests/test_products.py (first 30 lines) ===
+from django.test import TestCase
+from products.models import Product
+from dashboard.models import ProductCategory,ProductType,Organization
+# Create your tests here.
+
+class Asseto_test(TestCase):
+    def setUp(self):
+        self.user_organization = Organization.objects.create(
+            name="Organization 1",
+            website="asseto.com",
+            phone="1234567890",
+            email="asseto@asseto.com",
+            currency="INR",
+            date_format="dd-mm-yyyy",
+            logo = "logo.png"
+        )
+        self.product_sub_category=ProductCategory.objects.create(
+            name="Category 1",
+            organization=self.user_organization,
+        )
+        self.product_type=ProductType.objects.create(
+            name="Type 1",
+            organization=self.user_organization,
+        )
+        self.product=Product.objects.create(
+            name = "Product 1",
+            product_picture = "test.jpg",
+            manufacturer = "Manufacturer 1",
+            description = "Description 1",
+            product_sub_category = self.product_sub_category,
+
+=== NEW FILE: vendors/tests/test_vendors.py (first 30 lines) ===
+from django.test import TestCase
+from vendors.models import Vendor
+from dashboard.models import Address,Organization
+# Create your tests here.
+
+class Asseto_test(TestCase):
+    def setUp(self):
+        user_address=Address.objects.create(
+            address_line_one = "Address line 1",
+            address_line_two = "Address line 2",
+            country = "India",
+            state="West Bengal",
+            city = "Kolkata",
+            pin_code = "700018",
+        )
+        user_organization = Organization.objects.create(
+            name="Organization 1",
+            website="asseto.com",
+            phone="1234567890",
+            email="asseto@asseto.com",
+            currency="INR",
+            date_format="dd-mm-yyyy",
+            logo = "logo.png"
+        )
+        self.vendor=Vendor.objects.create(
+            name = "Vendor 1",
+            email = "vendor1@asseto.com",
+            phone = "7896321454",
+            contact_person = "Person 1",
+            designation = "Designation 1",
+
+=== test_selenium.py marker check (all 7 apps) ===
+--- assets ---
+142:import pytest
+144:pytestmark = pytest.mark.selenium
+--- audit ---
+12:import pytest
+14:pytestmark = pytest.mark.selenium
+--- dashboard ---
+12:import pytest
+14:pytestmark = pytest.mark.selenium
+--- license ---
+8:import pytest
+10:pytestmark = pytest.mark.selenium
+--- products ---
+114:import pytest
+116:pytestmark = pytest.mark.selenium
+--- users ---
+67:import pytest
+69:pytestmark = pytest.mark.selenium
+--- vendors ---
+398:import pytest
+400:pytestmark = pytest.mark.selenium

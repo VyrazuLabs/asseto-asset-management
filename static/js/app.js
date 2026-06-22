@@ -3372,7 +3372,7 @@ var Sidebar = /*#__PURE__*/function () {
       document.querySelectorAll('.sidebar-hide').forEach(function (el) {
         return el.addEventListener('click', _this.toggle.bind(_this));
       });
-      window.addEventListener('resize', this.onResize.bind(this)); // 
+      window.addEventListener('resize', this.onResize.bind(this)); //
 
       var sidebarItems = document.querySelectorAll('.sidebar-item.has-sub');
 
@@ -3436,7 +3436,7 @@ var Sidebar = /*#__PURE__*/function () {
         this.sidebarEL.classList.remove('active');
       } else {
         this.sidebarEL.classList.add('active');
-      } // reset 
+      } // reset
 
 
       this.deleteBackdrop();
@@ -11311,7 +11311,7 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -11325,17 +11325,17 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/chunk loaded */
 /******/ 	(() => {
@@ -11368,7 +11368,7 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			return result;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
@@ -11380,7 +11380,7 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -11392,12 +11392,12 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -11408,11 +11408,11 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/jsonp chunk loading */
 /******/ 	(() => {
 /******/ 		// no baseURI
-/******/ 		
+/******/
 /******/ 		// object to store loaded and loading chunks
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
@@ -11439,19 +11439,19 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			"assets/css/pages/toastify": 0,
 /******/ 			"assets/css/pages/chat": 0
 /******/ 		};
-/******/ 		
+/******/
 /******/ 		// no chunk on demand loading
-/******/ 		
+/******/
 /******/ 		// no prefetching
-/******/ 		
+/******/
 /******/ 		// no preloaded
-/******/ 		
+/******/
 /******/ 		// no HMR
-/******/ 		
+/******/
 /******/ 		// no HMR manifest
-/******/ 		
+/******/
 /******/ 		__webpack_require__.O.j = (chunkId) => (installedChunks[chunkId] === 0);
-/******/ 		
+/******/
 /******/ 		// install a JSONP callback for chunk loading
 /******/ 		var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
 /******/ 			var [chunkIds, moreModules, runtime] = data;
@@ -11476,14 +11476,14 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 			}
 /******/ 			return __webpack_require__.O(result);
 /******/ 		}
-/******/ 		
+/******/
 /******/ 		var chunkLoadingGlobal = self["webpackChunkmazer"] = self["webpackChunkmazer"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
@@ -11509,6 +11509,6 @@ this.event.unbindAll(),e(this.scrollbarX),e(this.scrollbarY),e(this.scrollbarXRa
 /******/ 	__webpack_require__.O(undefined, ["assets/css/main/app","assets/css/pages/filepond","assets/css/pages/quill","assets/css/widgets/todo","assets/css/pages/form-element-select","assets/css/pages/summernote","assets/css/pages/rater-js","assets/css/pages/simple-datatables","assets/css/pages/datatables","assets/css/pages/fontawesome","assets/css/pages/dripicons","assets/css/pages/email","assets/css/pages/error","assets/css/pages/auth","assets/css/main/app-dark","assets/css/shared/iconly","assets/css/widgets/chat","assets/css/pages/sweetalert2","assets/css/pages/toastify","assets/css/pages/chat"], () => (__webpack_require__("./src/assets/scss/widgets/todo.scss")))
 /******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["assets/css/main/app","assets/css/pages/filepond","assets/css/pages/quill","assets/css/widgets/todo","assets/css/pages/form-element-select","assets/css/pages/summernote","assets/css/pages/rater-js","assets/css/pages/simple-datatables","assets/css/pages/datatables","assets/css/pages/fontawesome","assets/css/pages/dripicons","assets/css/pages/email","assets/css/pages/error","assets/css/pages/auth","assets/css/main/app-dark","assets/css/shared/iconly","assets/css/widgets/chat","assets/css/pages/sweetalert2","assets/css/pages/toastify","assets/css/pages/chat"], () => (__webpack_require__("./src/assets/scss/iconly.scss")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
-/******/ 	
+/******/
 /******/ })()
 ;
