@@ -627,9 +627,19 @@
                     </div>
                     <div>
                         <div class="info-value-primary">
-                            {% if ticket.department %}{{ ticket.department.name }}{% else %}{{ trans.general_infrastructure }}{% endif %}
+                            {% if ticket.assigned_to and ticket.assigned_to.department %}
+                                {{ ticket.assigned_to.department.name }}
+                            {% elif ticket.department %}
+                                {{ ticket.department.name }}
+                            {% else %}
+                                {{ trans.unassigned }}
+                            {% endif %}
                         </div>
-                        <div class="info-value-secondary">{{ trans.operations_team }}</div>
+                        <div class="info-value-secondary">
+                            {% if ticket.assigned_to and ticket.assigned_to.role %}
+                                {{ ticket.assigned_to.role.related_name|default:ticket.assigned_to.role.name }}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -654,10 +664,20 @@
                     </div>
                     <div>
                         <div class="info-value-primary">
-                            {% if ticket.location %}{{ ticket.location.name }}{% else %}{{ trans.main_headquarters }}{% endif %}
+                            {% if ticket.assigned_to and ticket.assigned_to.location %}
+                                {{ ticket.assigned_to.location.office_name }}
+                            {% elif ticket.location %}
+                                {{ ticket.location.office_name }}
+                            {% else %}
+                                {{ trans.unassigned }}
+                            {% endif %}
                         </div>
                         <div class="info-value-secondary">
-                            {% if ticket.location.address %}{{ ticket.location.address.city }}{% else %}{{ trans.corporate_office }}{% endif %}
+                            {% if ticket.assigned_to and ticket.assigned_to.location and ticket.assigned_to.location.address %}
+                                {{ ticket.assigned_to.location.address.city }}{% if ticket.assigned_to.location.address.state %}, {{ ticket.assigned_to.location.address.state }}{% endif %}
+                            {% elif ticket.location and ticket.location.address %}
+                                {{ ticket.location.address.city }}{% if ticket.location.address.state %}, {{ ticket.location.address.state }}{% endif %}
+                            {% endif %}
                         </div>
                     </div>
                 </div>
