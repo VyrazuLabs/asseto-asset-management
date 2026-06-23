@@ -2,7 +2,7 @@
     <div class="modal-header-custom">
         <h5 class="modal-title"><i class="bi bi-journal-check"></i> {% if is_add_mode %}{{ trans.add_license_type }}{% else %}{{ trans.update_license_type }}{% endif %}</h5>
         <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
-            <i class="bi bi-x-lg"></i> 
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
     <form hx-post="{{request.path}}" novalidate>

@@ -99,7 +99,7 @@
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
-        <tr>         
+        <tr>
           <th>{{ trans.sl_no }}</th>
           <th>{{ trans.vendor_details }}</th>
           <th>{{ trans.contact_person }}</th>
@@ -172,7 +172,7 @@ htmx.on("htmx:afterSwap", (e) => {
         const uploadModalEl = document.getElementById("upload-vendors-modal");
         const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
         if (uploadModal) uploadModal.hide();
-        
+
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';

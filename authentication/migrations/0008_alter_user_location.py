@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0005_alter_organization_logo'),
-        ('authentication', '0007_alter_user_location'),
+        ("dashboard", "0005_alter_organization_logo"),
+        ("authentication", "0007_alter_user_location"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='location',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.location'),
+            model_name="user",
+            name="location",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.location",
+            ),
         ),
     ]

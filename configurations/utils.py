@@ -1,15 +1,13 @@
 import os
 import uuid
-
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from configurations.models import BrandingImages, LocalizationConfiguration
+from .constants import DATETIME_CHOICES, CURRENCY_CHOICES, NAME_FORMATS
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-
-from assets.models import Asset
-from configurations.models import BrandingImages, LocalizationConfiguration
-
-from .constants import CURRENCY_CHOICES, DATETIME_CHOICES, NAME_FORMATS
 
 
 def update_files_name(request, logo, favicon, login_page_logo):

@@ -6,19 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0001_initial'),
+        ("authentication", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Register',
+            name="Register",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=30)),
-                ('email', models.EmailField(max_length=50)),
-                ('username', models.CharField(max_length=30)),
-                ('pass1', models.CharField(max_length=30)),
-                ('pass2', models.CharField(max_length=30)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=30)),
+                ("email", models.EmailField(max_length=50)),
+                ("username", models.CharField(max_length=30)),
+                ("pass1", models.CharField(max_length=30)),
+                ("pass2", models.CharField(max_length=30)),
             ],
         ),
     ]

@@ -1,5 +1,5 @@
 from django.template.loader import get_template
-from django.http import HttpResponse,JsonResponse,HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.db.models import Q
 from django.core.paginator import Paginator
 import csv
@@ -12,16 +12,17 @@ from django.contrib import messages
 import os
 from datetime import date
 from django.utils import timezone
-from .models import File,ImportedUser
+from .models import File, ImportedUser
 import json
 from vendors.models import Vendor
-from dashboard.models import Department,Location,ProductCategory,ProductType
+from dashboard.models import Department, Location, ProductCategory, ProductType
+
 
 def render_to_csv(context_dict={}):
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type="text/csv")
     writer = csv.writer(response)
-    writer.writerow(context_dict['header_list'])
-    for row in context_dict['rows']:
+    writer.writerow(context_dict["header_list"])
+    for row in context_dict["rows"]:
         writer.writerow(row)
     return response
 
@@ -32,7 +33,7 @@ def render_to_pdf(template_src, context_dict={}):
     result = BytesIO()
     pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
     if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
+        return HttpResponse(result.getvalue(), content_type="application/pdf")
     return None
 
 
@@ -42,44 +43,49 @@ def csv_file_upload(request, file):
         split_tup = os.path.splitext(file_name)
         file_extension = split_tup[1]
 
-        if file_name.endswith('.csv'):
+        if file_name.endswith(".csv"):
             obj = File.objects.create(file=file)
-            df = pd.read_csv(obj.file, delimiter=',')
+            df = pd.read_csv(obj.file, delimiter=",")
             list_of_csv = [list(row) for row in df.values]
             length_of_csv = len(list_of_csv)
             if length_of_csv <= 100:
                 return obj.file.path
             else:
                 messages.error(
-                    request, f'Please upload less than 100 rows. Your list has {length_of_csv} rows.')
+                    request,
+                    f"Please upload less than 100 rows. Your list has {length_of_csv} rows.",
+                )
         else:
             messages.error(
-                request, f'Please upload CSV file. You have uploaded {file_extension} file.')
+                request,
+                f"Please upload CSV file. You have uploaded {file_extension} file.",
+            )
     else:
-        messages.error(request, 'Please choose a File.')
+        messages.error(request, "Please choose a File.")
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.META.get("HTTP_REFERER"))
+
 
 def create_matched_data_from_csv_generic(
-        request,
-        # create_model,           # Model class to create (e.g. ImportedUser or Vendor)
-        create_field_map,       # Dict: {'csv_key': 'model_field'}
-        match_model=None,       # Model class to match in DB (e.g. User), optional
-        match_field_map=None,   # Dict: {'csv_key': 'match_model_field'}, optional
-        link_field_in_match=None,  # str: The field in match model to be set to created obj
-        link_value_field='id'      # str: The field in created obj to link (default 'id')
-    ):
+    request,
+    # create_model,           # Model class to create (e.g. ImportedUser or Vendor)
+    create_field_map,  # Dict: {'csv_key': 'model_field'}
+    match_model=None,  # Model class to match in DB (e.g. User), optional
+    match_field_map=None,  # Dict: {'csv_key': 'match_model_field'}, optional
+    link_field_in_match=None,  # str: The field in match model to be set to created obj
+    link_value_field="id",  # str: The field in created obj to link (default 'id')
+):
     field_map_imported_user = {
-        'Entity_Type': 'entity_type',
-        'Email': 'email',
-        'Username': 'username',
-        'Full_Name': 'full_name',
-        'Phone': 'phone',
-        'Contact_Person_Name': 'contact_person_name',
-        'Contact_Person_Email': 'contact_person_email',
-        'Contact_Person_Phone': 'contact_person_phone',
-        'Address_ID': 'address',         # assuming CSV includes Address id or key to resolve FK
-        'Organization_ID': 'organization'  # assuming CSV includes Organization id or key
+        "Entity_Type": "entity_type",
+        "Email": "email",
+        "Username": "username",
+        "Full_Name": "full_name",
+        "Phone": "phone",
+        "Contact_Person_Name": "contact_person_name",
+        "Contact_Person_Email": "contact_person_email",
+        "Contact_Person_Phone": "contact_person_phone",
+        "Address_ID": "address",  # assuming CSV includes Address id or key to resolve FK
+        "Organization_ID": "organization",  # assuming CSV includes Organization id or key
     }
     """
     Generic CSV-to-model create and match flow
@@ -92,355 +98,394 @@ def create_matched_data_from_csv_generic(
     - link_field_in_match: Field name in match_model to set (e.g., 'imported_user')
     - link_value_field: Field on created object to link (default 'id')
     """
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             data = json.loads(request.body.decode())
             created_objs = []
             for it in data:
                 # Dynamic creation from mapping
-                #Create a custom create_field_map
-                create_kwargs = {model_field: it.get(csv_key) for csv_key, model_field in field_map_imported_user.items()}
+                # Create a custom create_field_map
+                create_kwargs = {
+                    model_field: it.get(csv_key)
+                    for csv_key, model_field in field_map_imported_user.items()
+                }
                 obj = ImportedUser.objects.create(**create_kwargs)
                 created_objs.append(obj)
 
                 # Optionally link to base/matching model
                 if match_model and match_field_map and link_field_in_match:
-                    filters = {match_field: it.get(csv_key) for csv_key, match_field in match_field_map.items()}
+                    filters = {
+                        match_field: it.get(csv_key)
+                        for csv_key, match_field in match_field_map.items()
+                    }
                     match_obj = match_model.objects.filter(**filters).first()
                     if match_obj:
-                        setattr(match_obj, link_field_in_match, getattr(obj, link_value_field))
+                        setattr(
+                            match_obj,
+                            link_field_in_match,
+                            getattr(obj, link_value_field),
+                        )
                         match_obj.save()
-            return JsonResponse({'status': 'success', 'created': len(created_objs)})
+            return JsonResponse({"status": "success", "created": len(created_objs)})
         except json.JSONDecodeError:
-            return HttpResponseBadRequest('Invalid JSON')
+            return HttpResponseBadRequest("Invalid JSON")
         except Exception as e:
-            return HttpResponseBadRequest(f'Error processing request: {str(e)}')
-    return HttpResponse('Only POST method allowed')
+            return HttpResponseBadRequest(f"Error processing request: {str(e)}")
+    return HttpResponse("Only POST method allowed")
+
 
 def function_to_get_matching_objects_vendors(arr):
-    array=[]    
+    array = []
     for it in arr:
-        filter_kwargs={
-            'email': it.get('email'),
+        filter_kwargs = {
+            "email": it.get("email"),
             # 'organization_id': it.get('organization_id') if hasattr(it.get('organization_id'), 'id') else it.get('organization_id')
-            'organization_id': it.get("organization_id"),
+            "organization_id": it.get("organization_id"),
         }
-        get_existing_vendors=Vendor.objects.filter(**filter_kwargs).select_related('address').first()
-        obj={}
+        get_existing_vendors = (
+            Vendor.objects.filter(**filter_kwargs).select_related("address").first()
+        )
+        obj = {}
         if get_existing_vendors is not None:
-            obj['email']=get_existing_vendors.email
-            username=None,
-            obj['name']=get_existing_vendors.name
-            obj['phone']=get_existing_vendors.phone
-            obj['contact_person']=get_existing_vendors.contact_person
-            obj['contact_person_email']=""
-            obj['contact_person_phone']=""
-            obj['gstin_number']=get_existing_vendors.gstin_number
-            obj['adress_line_one']=get_existing_vendors.address.address_line_one
-            obj['address_line_two']= get_existing_vendors.address.address_line_two
-            obj['city']= get_existing_vendors.address.city
-            obj['pin_code']= get_existing_vendors.address.pin_code
-            obj['state']= get_existing_vendors.address.state
-            obj['country']= get_existing_vendors.address.country
-            obj['description']=get_existing_vendors.description
-            obj['designation']=get_existing_vendors.designation
+            obj["email"] = get_existing_vendors.email
+            username = (None,)
+            obj["name"] = get_existing_vendors.name
+            obj["phone"] = get_existing_vendors.phone
+            obj["contact_person"] = get_existing_vendors.contact_person
+            obj["contact_person_email"] = ""
+            obj["contact_person_phone"] = ""
+            obj["gstin_number"] = get_existing_vendors.gstin_number
+            obj["adress_line_one"] = get_existing_vendors.address.address_line_one
+            obj["address_line_two"] = get_existing_vendors.address.address_line_two
+            obj["city"] = get_existing_vendors.address.city
+            obj["pin_code"] = get_existing_vendors.address.pin_code
+            obj["state"] = get_existing_vendors.address.state
+            obj["country"] = get_existing_vendors.address.country
+            obj["description"] = get_existing_vendors.description
+            obj["designation"] = get_existing_vendors.designation
             array.append(obj)
         else:
             print(f"No vendor found for email")
     return array
 
+
 def function_to_get_matching_objects_departments(arr):
-    array=[]    
+    array = []
     for it in arr:
-        get_existing_departments=Department.objects.filter(**it).first()
-        obj={}
+        get_existing_departments = Department.objects.filter(**it).first()
+        obj = {}
         # entity_type="Vendor",
-        obj['email']=""
-        obj['name']=get_existing_departments.name
-        obj['contact_person_name']=get_existing_departments.contact_person_name
-        obj['contact_person_email']=get_existing_departments.contact_person_email
-        obj['contact_person_phone']=get_existing_departments.contact_person_phone
+        obj["email"] = ""
+        obj["name"] = get_existing_departments.name
+        obj["contact_person_name"] = get_existing_departments.contact_person_name
+        obj["contact_person_email"] = get_existing_departments.contact_person_email
+        obj["contact_person_phone"] = get_existing_departments.contact_person_phone
         # address=address
         # organization=request.user.organization,
-        obj['gstin_number']=""
-        obj['description']=""
-        obj['designation']=""
+        obj["gstin_number"] = ""
+        obj["description"] = ""
+        obj["designation"] = ""
         array.append(obj)
     return array
+
 
 def function_to_get_matching_objects_locations(arr):
     array = []
 
     for it in arr:
-        org = it.get('organization')
-        org_id = org.id if hasattr(org, 'id') else org
+        org = it.get("organization")
+        org_id = org.id if hasattr(org, "id") else org
 
-        location = Location.objects.filter(
-            office_name=it.get('office_name'),
-            organization_id=org_id
-        ).select_related('address').first()
+        location = (
+            Location.objects.filter(
+                office_name=it.get("office_name"), organization_id=org_id
+            )
+            .select_related("address")
+            .first()
+        )
 
         if location:
             addr = location.address
-            array.append({
-                'name': location.office_name,
-                'contact_person_name': location.contact_person_name,
-                'contact_person_email': location.contact_person_email,
-                'contact_person_phone': location.contact_person_phone,
-                'address_line_one': addr.address_line_one if addr else "",
-                'address_line_two': addr.address_line_two if addr else "",
-                'city': addr.city if addr else "",
-                'pin_code': addr.pin_code if addr else "",
-                'state': addr.state if addr else "",
-                'country': addr.country if addr else "",
-            })
+            array.append(
+                {
+                    "name": location.office_name,
+                    "contact_person_name": location.contact_person_name,
+                    "contact_person_email": location.contact_person_email,
+                    "contact_person_phone": location.contact_person_phone,
+                    "address_line_one": addr.address_line_one if addr else "",
+                    "address_line_two": addr.address_line_two if addr else "",
+                    "city": addr.city if addr else "",
+                    "pin_code": addr.pin_code if addr else "",
+                    "state": addr.state if addr else "",
+                    "country": addr.country if addr else "",
+                }
+            )
         else:
-            it['exists'] = False
+            it["exists"] = False
             array.append(it)
 
     return array
 
 
 def function_to_get_matching_objects_product_category(arr):
-    array=[]
+    array = []
     for it in arr:
-        get_existing_product_category=ProductCategory.objects.filter(**it).first()
-        obj={}
+        get_existing_product_category = ProductCategory.objects.filter(**it).first()
+        obj = {}
         # entity_type="Vendor",
-        obj['email']=""
-        username=None
-        obj['name']=get_existing_product_category.name
-        obj['phone']=""
-        obj['office_name']=""
-        obj['contact_person_name']=""
-        obj['contact_person_email']=""
-        obj['contact_person_phone']=""
+        obj["email"] = ""
+        username = None
+        obj["name"] = get_existing_product_category.name
+        obj["phone"] = ""
+        obj["office_name"] = ""
+        obj["contact_person_name"] = ""
+        obj["contact_person_email"] = ""
+        obj["contact_person_phone"] = ""
         # address=address
         # organization=request.user.organization,
-        obj['gstin_number']=""
-        obj['description']=""
-        obj['designation']=""
+        obj["gstin_number"] = ""
+        obj["description"] = ""
+        obj["designation"] = ""
         array.append(obj)
     return array
+
 
 def function_to_get_matching_objects_product_types(arr):
-    array=[]
+    array = []
     for it in arr:
-        get_existing_product_type=ProductType.objects.filter(**it).first()
-        obj={}
+        get_existing_product_type = ProductType.objects.filter(**it).first()
+        obj = {}
         # entity_type="Vendor",
-        obj['email']=""
-        username=None
-        obj['name']=get_existing_product_type.name
-        obj['phone']=""
-        obj['office_name']=""
-        obj['contact_person_name']=""
-        obj['contact_person_email']=""
-        obj['contact_person_phone']=""
+        obj["email"] = ""
+        username = None
+        obj["name"] = get_existing_product_type.name
+        obj["phone"] = ""
+        obj["office_name"] = ""
+        obj["contact_person_name"] = ""
+        obj["contact_person_email"] = ""
+        obj["contact_person_phone"] = ""
         # address=address
         # organization=request.user.organization,
-        obj['gstin_number']=""
-        obj['description']=""
-        obj['designation']=""
+        obj["gstin_number"] = ""
+        obj["description"] = ""
+        obj["designation"] = ""
         array.append(obj)
     return array
 
+
 def get_vendor_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="Vendor", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="Vendor", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique vendors by email
-    unique_vendors = base_query.values('email').distinct().count()
-    
+    unique_vendors = base_query.values("email").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(
-            Q(name__icontains=search_text) |
-            Q(email__icontains=search_text) |
-            Q(contact_person_name__icontains=search_text) |
-            Q(phone__icontains=search_text) |
-            Q(gstin_number__icontains=search_text)
+            Q(name__icontains=search_text)
+            | Q(email__icontains=search_text)
+            | Q(contact_person_name__icontains=search_text)
+            | Q(phone__icontains=search_text)
+            | Q(gstin_number__icontains=search_text)
         )
-        
-    vendor_list = base_query.order_by('-created_at')
-    
+
+    vendor_list = base_query.order_by("-created_at")
+
     paginator = Paginator(vendor_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_vendors': unique_vendors,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_vendors": unique_vendors,
     }
-    
+
     return page_object, stats
 
+
 def get_department_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="Department", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="Department", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique departments by name
-    unique_departments = base_query.values('name').distinct().count()
-    
+    unique_departments = base_query.values("name").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(
-            Q(name__icontains=search_text) |
-            Q(contact_person_name__icontains=search_text) |
-            Q(contact_person_email__icontains=search_text)
+            Q(name__icontains=search_text)
+            | Q(contact_person_name__icontains=search_text)
+            | Q(contact_person_email__icontains=search_text)
         )
-        
-    department_list = base_query.order_by('-created_at')
-    
+
+    department_list = base_query.order_by("-created_at")
+
     paginator = Paginator(department_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_departments': unique_departments,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_departments": unique_departments,
     }
-    
+
     return page_object, stats
 
+
 def get_product_type_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="ProductType", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="ProductType", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique types by name
-    unique_types = base_query.values('name').distinct().count()
-    
+    unique_types = base_query.values("name").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(Q(name__icontains=search_text))
-        
-    product_type_list = base_query.order_by('-created_at')
-    
+
+    product_type_list = base_query.order_by("-created_at")
+
     paginator = Paginator(product_type_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_types': unique_types,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_types": unique_types,
     }
-    
+
     return page_object, stats
 
+
 def get_product_category_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="ProductCategory", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="ProductCategory", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique categories by name
-    unique_categories = base_query.values('name').distinct().count()
-    
+    unique_categories = base_query.values("name").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(Q(name__icontains=search_text))
-        
-    category_list = base_query.order_by('-created_at')
-    
+
+    category_list = base_query.order_by("-created_at")
+
     paginator = Paginator(category_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_categories': unique_categories,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_categories": unique_categories,
     }
-    
+
     return page_object, stats
 
+
 def get_user_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="User", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="User", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique users by email
-    unique_users = base_query.values('email').distinct().count()
-    
+    unique_users = base_query.values("email").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(
-            Q(full_name__icontains=search_text) |
-            Q(email__icontains=search_text) |
-            Q(username__icontains=search_text) |
-            Q(phone__icontains=search_text)
+            Q(full_name__icontains=search_text)
+            | Q(email__icontains=search_text)
+            | Q(username__icontains=search_text)
+            | Q(phone__icontains=search_text)
         )
-        
-    user_list = base_query.order_by('-created_at')
-    
+
+    user_list = base_query.order_by("-created_at")
+
     paginator = Paginator(user_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_users': unique_users,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_users": unique_users,
     }
-    
+
     return page_object, stats
 
+
 def get_location_upload_list(request, page_number=None):
-    search_text = request.GET.get('search_text', '')
-    
-    base_query = ImportedUser.objects.filter(entity_type="Location", organization=request.user.organization)
-    
+    search_text = request.GET.get("search_text", "")
+
+    base_query = ImportedUser.objects.filter(
+        entity_type="Location", organization=request.user.organization
+    )
+
     # Summary stats
     total_uploads = base_query.count()
     today_uploads = base_query.filter(created_at__date=timezone.now().date()).count()
     # Unique locations by name
-    unique_locations = base_query.values('name').distinct().count()
-    
+    unique_locations = base_query.values("name").distinct().count()
+
     # Filtering
     if search_text:
         base_query = base_query.filter(
-            Q(name__icontains=search_text) |
-            Q(contact_person_name__icontains=search_text) |
-            Q(contact_person_email__icontains=search_text) |
-            Q(contact_person_phone__icontains=search_text)
+            Q(name__icontains=search_text)
+            | Q(contact_person_name__icontains=search_text)
+            | Q(contact_person_email__icontains=search_text)
+            | Q(contact_person_phone__icontains=search_text)
         )
-        
-    location_list = base_query.order_by('-created_at')
-    
+
+    location_list = base_query.order_by("-created_at")
+
     paginator = Paginator(location_list, 10, orphans=1)
     if not page_number:
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
-    
+
     stats = {
-        'total_uploads': total_uploads,
-        'today_uploads': today_uploads,
-        'unique_locations': unique_locations,
+        "total_uploads": total_uploads,
+        "today_uploads": today_uploads,
+        "unique_locations": unique_locations,
     }
-    
+
     return page_object, stats

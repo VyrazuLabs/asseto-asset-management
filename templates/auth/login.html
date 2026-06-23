@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-            {% if not last_logins %}   
+            {% if not last_logins %}
                 {% include 'commons/progress-bar.html' with current_step=5 %}
             {% endif %}
 
@@ -19,7 +19,7 @@
                     <div class="alert alert-light-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
-                
+
                 {% csrf_token %}
                 <div class="form-group position-relative has-icon-left mb-3">
                     {{form.email}}

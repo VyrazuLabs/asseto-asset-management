@@ -140,7 +140,7 @@
         <th>{{ trans.type_name }}</th>
         <th>{{ trans.total_licenses }}</th>
         <th>{{ trans.status }}</th>
-        
+
           {% if perms.authentication.edit_license_type or perms.authentication.delete_license_type or request.user.is_superuser %}
           <th>{{ trans.actions }}</th>
           {% endif %}

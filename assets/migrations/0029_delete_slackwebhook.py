@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0028_slackwebhook'),
+        ("assets", "0028_slackwebhook"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='SlackWebhook',
+            name="SlackWebhook",
         ),
     ]

@@ -7,10 +7,11 @@ class ClientPortalMiddleware:
     Allows login, verify-otp, and logout without session.
     All other portal pages require 'client_contact_id' in session.
     """
+
     PUBLIC_PATHS = [
-        '/client-portal/login',
-        '/client-portal/verify-otp',
-        '/client-portal/logout/',
+        "/client-portal/login",
+        "/client-portal/verify-otp",
+        "/client-portal/logout/",
     ]
 
     def __init__(self, get_response):
@@ -20,7 +21,7 @@ class ClientPortalMiddleware:
         path = request.path
 
         # Only apply to client portal routes
-        if not path.startswith('/client-portal/'):
+        if not path.startswith("/client-portal/"):
             return self.get_response(request)
 
         # Allow public paths
@@ -28,7 +29,7 @@ class ClientPortalMiddleware:
             return self.get_response(request)
 
         # Check authenticated session
-        if not request.session.get('client_contact_id'):
-            return redirect('client_portal:login')
+        if not request.session.get("client_contact_id"):
+            return redirect("client_portal:login")
 
         return self.get_response(request)

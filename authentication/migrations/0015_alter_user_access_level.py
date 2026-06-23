@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0014_auto_20221018_1030'),
+        ("authentication", "0014_auto_20221018_1030"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='access_level',
-            field=models.BooleanField(choices=[(False, 'Only Assigned'), (True, 'All')]),
+            model_name="user",
+            name="access_level",
+            field=models.BooleanField(
+                choices=[(False, "Only Assigned"), (True, "All")]
+            ),
         ),
     ]

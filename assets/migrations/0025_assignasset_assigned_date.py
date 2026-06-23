@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0024_alter_asset_asset_status'),
+        ("assets", "0024_alter_asset_asset_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assignasset',
-            name='assigned_date',
+            model_name="assignasset",
+            name="assigned_date",
             field=models.DateField(auto_now_add=True, null=True),
         ),
     ]

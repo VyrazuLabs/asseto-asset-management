@@ -38,7 +38,7 @@
                 <i class="bi bi-clipboard-check"></i>
                 <h2><span>{{ trans.audit_information }}</span></h2>
             </div>
-            
+
             <div class="info-grid">
                 <div class="info-item">
                     <span class="label">{{ trans.asset_tag }}</span>
@@ -87,7 +87,7 @@
                 <i class="bi bi-images"></i>
                 <h2><span>{{ trans.audit_images_section }}</span></h2>
             </div>
-            
+
             <div class="image-gallery">
                 {% if images %}
                     {% for img in images %}
@@ -136,17 +136,17 @@ function showImageModal(imgSrc, index) {
     var modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
     var modalImg = document.getElementById('modalPreviewImage');
     var modalContainer = document.getElementById('modalImageContainer');
-    
+
     modalImg.onerror = function() {
         modalImg.style.display = 'none';
         modalContainer.innerHTML = '<div class="no-image-found"><i class="bi bi-image"></i><span>No image available</span></div>';
     };
-    
+
     modalImg.onload = function() {
         modalImg.style.display = 'block';
         modalContainer.innerHTML = '<img id="modalPreviewImage" src="' + imgSrc + '" class="img-fluid" alt="Preview">';
     };
-    
+
     modalImg.src = imgSrc;
     modal.show();
 }

@@ -6,36 +6,66 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0029_delete_slackwebhook'),
+        ("assets", "0029_delete_slackwebhook"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='asset',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Asset', 'verbose_name_plural': 'Assets'},
+            name="asset",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Asset",
+                "verbose_name_plural": "Assets",
+            },
         ),
         migrations.AlterModelOptions(
-            name='assetimage',
-            options={'ordering': ['-uploaded_at'], 'verbose_name': 'Asset Image', 'verbose_name_plural': 'Asset Images'},
+            name="assetimage",
+            options={
+                "ordering": ["-uploaded_at"],
+                "verbose_name": "Asset Image",
+                "verbose_name_plural": "Asset Images",
+            },
         ),
         migrations.AlterModelOptions(
-            name='assetspecification',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Asset Specification', 'verbose_name_plural': 'Asset Specifications'},
+            name="assetspecification",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Asset Specification",
+                "verbose_name_plural": "Asset Specifications",
+            },
         ),
         migrations.AlterModelOptions(
-            name='assetstatus',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Asset Status', 'verbose_name_plural': 'Asset Statuses'},
+            name="assetstatus",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Asset Status",
+                "verbose_name_plural": "Asset Statuses",
+            },
         ),
         migrations.AlterModelOptions(
-            name='assignasset',
-            options={'ordering': ['-assigned_date'], 'verbose_name': 'Assign Asset', 'verbose_name_plural': 'Assign Assets'},
+            name="assignasset",
+            options={
+                "ordering": ["-assigned_date"],
+                "verbose_name": "Assign Asset",
+                "verbose_name_plural": "Assign Assets",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalasset',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Asset', 'verbose_name_plural': 'historical Assets'},
+            name="historicalasset",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Asset",
+                "verbose_name_plural": "historical Assets",
+            },
         ),
         migrations.AlterModelOptions(
-            name='historicalassetstatus',
-            options={'get_latest_by': ('history_date', 'history_id'), 'ordering': ('-history_date', '-history_id'), 'verbose_name': 'historical Asset Status', 'verbose_name_plural': 'historical Asset Statuses'},
+            name="historicalassetstatus",
+            options={
+                "get_latest_by": ("history_date", "history_id"),
+                "ordering": ("-history_date", "-history_id"),
+                "verbose_name": "historical Asset Status",
+                "verbose_name_plural": "historical Asset Statuses",
+            },
         ),
     ]

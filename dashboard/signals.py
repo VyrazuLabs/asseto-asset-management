@@ -95,9 +95,14 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 
 from .models import (
-    Department, Location, Organization,
-    ProductType, ProductCategory,
-    Address, CustomField, LicenseType
+    Department,
+    Location,
+    Organization,
+    ProductType,
+    ProductCategory,
+    Address,
+    CustomField,
+    LicenseType,
 )
 from notifications.service import NotificationService
 from notifications.models import Notification
@@ -109,26 +114,33 @@ User = get_user_model()
 # -----------------------------
 
 TRACKED_MODELS = (
-    Department, Location, Organization,
-    ProductType, ProductCategory,
-    Address, CustomField, LicenseType
+    Department,
+    Location,
+    Organization,
+    ProductType,
+    ProductCategory,
+    Address,
+    CustomField,
+    LicenseType,
 )
 
 # -----------------------------
 # HELPER: GET ADMINS
 # -----------------------------
 
+
 def get_admins(instance):
     if hasattr(instance, "organization") and instance.organization:
         return User.objects.filter(
-            is_superuser=True,
-            organization=instance.organization
+            is_superuser=True, organization=instance.organization
         )
     return User.objects.filter(is_superuser=True)
+
 
 # -----------------------------
 # HELPER: CREATE NOTIFICATION
 # -----------------------------
+
 
 def notify(users, title, message, icon=None, link=None, instance=None):
     notifications = [
@@ -146,12 +158,14 @@ def notify(users, title, message, icon=None, link=None, instance=None):
     if notifications:
         Notification.objects.bulk_create(notifications)
 
+
 # -----------------------------
 # PRE SAVE (STORE OLD STATE)
 # -----------------------------
 
+
 def store_previous_state(sender, instance):
-    if not hasattr(instance, 'is_deleted'):
+    if not hasattr(instance, "is_deleted"):
         instance._old_is_deleted = None
         return
 
@@ -175,6 +189,7 @@ def register_pre_save(model):
 # POST SAVE HANDLER
 # -----------------------------
 
+
 def handle_post_save(sender, instance, created):
     admins = get_admins(instance)
     model_name = sender.__name__
@@ -189,7 +204,7 @@ def handle_post_save(sender, instance, created):
                 icon="bi-plus-circle",
                 link="#",
                 instance_id=instance.pk if instance.pk else instance.id,
-                object_id=str(instance.pk) if instance.pk else str(instance.id)
+                object_id=str(instance.pk) if instance.pk else str(instance.id),
                 # instance_id = instance.pk if instance.pk else None
                 # object_id = str(instance.pk) if instance.pk else ""
             )
@@ -206,7 +221,7 @@ def handle_post_save(sender, instance, created):
                     icon="bi-trash",
                     link="#",
                     instance_id=instance.id,
-                    object_id=str(instance.id)
+                    object_id=str(instance.id),
                 )
             return
 
@@ -220,7 +235,7 @@ def handle_post_save(sender, instance, created):
                     icon="bi-arrow-counterclockwise",
                     link="#",
                     instance_id=instance.id,
-                    object_id=str(instance.id)
+                    object_id=str(instance.id),
                 )
             return
 
@@ -233,7 +248,7 @@ def handle_post_save(sender, instance, created):
             icon="bi-pencil-square",
             link="#",
             instance_id=instance.pk if instance.pk else instance.id,
-            object_id=str(instance.pk) if instance.pk else str(instance.id)
+            object_id=str(instance.pk) if instance.pk else str(instance.id),
         )
 
 
@@ -247,6 +262,7 @@ def register_post_save(model):
 # POST DELETE (HARD DELETE)
 # -----------------------------
 
+
 def handle_post_delete(sender, instance):
     admins = get_admins(instance)
     model_name = sender.__name__
@@ -258,7 +274,7 @@ def handle_post_delete(sender, instance):
         icon="bi-x-circle",
         link="#",
         instance=instance,
-        object_id=str(instance.pk) if instance.pk else str(instance.id)
+        object_id=str(instance.pk) if instance.pk else str(instance.id),
     )
 
 

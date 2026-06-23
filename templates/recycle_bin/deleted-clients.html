@@ -62,7 +62,7 @@
                                         <form action="{% url 'recycle_bin:deleted_clients_permanently' client.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-danger btn-sm" title="{{ trans.permanently_delete }}"><i class="bi bi-trash3-fill"></i></button>
-                                        </form>                
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

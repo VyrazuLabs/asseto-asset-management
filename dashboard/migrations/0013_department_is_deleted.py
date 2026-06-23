@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0012_merge_20220929_1355'),
+        ("dashboard", "0012_merge_20220929_1355"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='department',
-            name='is_deleted',
+            model_name="department",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0022_customfield'),
+        ("dashboard", "0022_customfield"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='customfield',
-            name='organization',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dashboard.organization'),
+            model_name="customfield",
+            name="organization",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dashboard.organization",
+            ),
         ),
     ]

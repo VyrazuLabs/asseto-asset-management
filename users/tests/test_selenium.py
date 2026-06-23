@@ -64,6 +64,9 @@ from selenium.webdriver.common.by import By
 from authentication.models import User
 from dashboard.models import Organization
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class UserTest(LiveServerTestCase):
@@ -76,7 +79,7 @@ class UserTest(LiveServerTestCase):
             username="admin",
             full_name="Admin User",
             phone="9800000000",
-            password="password123"
+            password="password123",
         )
         self.test_user.is_active = True
         self.test_user.is_staff = True
@@ -87,7 +90,7 @@ class UserTest(LiveServerTestCase):
             name="Test Organization",
             website="www.test.com",
             email="org@test.com",
-            phone="1234567890"
+            phone="1234567890",
         )
 
         # User object for update/delete
@@ -97,7 +100,7 @@ class UserTest(LiveServerTestCase):
             full_name="Old User",
             phone="9811111111",
             password="password123",
-            organization=self.organization
+            organization=self.organization,
         )
         self.user.is_active = True
         self.user.save()
@@ -109,7 +112,7 @@ class UserTest(LiveServerTestCase):
         self.client.login(email="admin@test.com", password="password123")
 
         # Get session cookie
-        self.session_cookie = self.client.cookies['sessionid']
+        self.session_cookie = self.client.cookies["sessionid"]
 
         # Start selenium
         self.driver = webdriver.Chrome()
@@ -119,12 +122,14 @@ class UserTest(LiveServerTestCase):
         self.driver.get(self.live_server_url)
 
         # Inject login session
-        self.driver.add_cookie({
-            "name": "sessionid",
-            "value": self.session_cookie.value,
-            "path": "/",
-            "secure": False
-        })
+        self.driver.add_cookie(
+            {
+                "name": "sessionid",
+                "value": self.session_cookie.value,
+                "path": "/",
+                "secure": False,
+            }
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -180,7 +185,6 @@ class UserTest(LiveServerTestCase):
 
         time.sleep(2)
 
-
         self.assertIn("Updated User", self.driver.page_source)
 
     # -------------------------------
@@ -188,13 +192,9 @@ class UserTest(LiveServerTestCase):
     # -------------------------------
     def test_delete_user(self):
 
-        self.driver.get(
-            f"{self.live_server_url}/users/list"
-        )
+        self.driver.get(f"{self.live_server_url}/users/list")
 
-        delete_button = self.driver.find_element(
-            By.XPATH, "//button[@type='submit']"
-        )
+        delete_button = self.driver.find_element(By.XPATH, "//button[@type='submit']")
 
         delete_button.click()
 

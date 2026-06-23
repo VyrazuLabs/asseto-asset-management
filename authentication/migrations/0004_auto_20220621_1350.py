@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0003_auto_20220621_1344'),
+        ("authentication", "0003_auto_20220621_1344"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='role',
-            name='created_by',
+            model_name="role",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='role',
-            name='updated_by',
+            model_name="role",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='userrole',
-            name='created_by',
+            model_name="userrole",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='userrole',
-            name='updated_by',
+            model_name="userrole",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

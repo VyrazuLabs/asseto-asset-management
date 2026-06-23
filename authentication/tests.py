@@ -1,7 +1,9 @@
 from django.test import TestCase
-from dashboard.models import Organization,Address,Location,Department
+from dashboard.models import Organization, Address, Location, Department
 from roles.models import Role
 from authentication.models import User
+
+
 # Create your tests here.
 class User_Test(TestCase):
     def setUp(self):
@@ -12,50 +14,50 @@ class User_Test(TestCase):
             email="asseto@asseto.com",
             currency="INR",
             date_format="dd-mm-yyyy",
-            logo = "logo.png"
-    )
-        self.user_address=Address.objects.create(
-            country = "India",
-            state = "Rajasthan",
-            address_line_one = "testline 1",
-            address_line_two = "testline 2",
-            city = "Jaipur",
-            pin_code = "302001"
+            logo="logo.png",
         )
-        self.user_role=Role.objects.create(
-            related_name= "Role 1",
+        self.user_address = Address.objects.create(
+            country="India",
+            state="Rajasthan",
+            address_line_one="testline 1",
+            address_line_two="testline 2",
+            city="Jaipur",
+            pin_code="302001",
+        )
+        self.user_role = Role.objects.create(
+            related_name="Role 1",
             organization=self.user_organization,
         )
-        self.user_location=Location.objects.create(
-            office_name = "Office 1",
-            address = self.user_address,
-            contact_person_name = "Person 1",
-            contact_person_email = "person1@asseto.com",
-            contact_person_phone = "1234567890",
-            organization = self.user_organization
+        self.user_location = Location.objects.create(
+            office_name="Office 1",
+            address=self.user_address,
+            contact_person_name="Person 1",
+            contact_person_email="person1@asseto.com",
+            contact_person_phone="1234567890",
+            organization=self.user_organization,
         )
-        self.user_department=Department.objects.create(
+        self.user_department = Department.objects.create(
             name="Department 1",
             organization=self.user_organization,
-            contact_person_name = "Person 1",
-            contact_person_email = "person1@asseto.com",
-            contact_person_phone = "1234567890",
+            contact_person_name="Person 1",
+            contact_person_email="person1@asseto.com",
+            contact_person_phone="1234567890",
         )
-        self.user=User.objects.create(
-        email = "mail@gmail.com",
-        username = 'usertest',
-        full_name = 'test',
-        phone = '1234567890',
-        role = self.user_role,
-        organization = self.user_organization,
-        address= self.user_address,
-        location=self.user_location,
-        department=self.user_department,
-        profile_pic="test.jpg",
-        employee_id="1234",
-        is_active=True,
-        is_staff=True,
-        access_level=1
+        self.user = User.objects.create(
+            email="mail@gmail.com",
+            username="usertest",
+            full_name="test",
+            phone="1234567890",
+            role=self.user_role,
+            organization=self.user_organization,
+            address=self.user_address,
+            location=self.user_location,
+            department=self.user_department,
+            profile_pic="test.jpg",
+            employee_id="1234",
+            is_active=True,
+            is_staff=True,
+            access_level=1,
         )
         self.edit_user_organization = Organization.objects.create(
             name="Organization 2",
@@ -64,51 +66,50 @@ class User_Test(TestCase):
             email="asseto@asseto2.com",
             currency="INR2",
             date_format="dd-mm-yyyy",
-            logo = "logo2.png"
+            logo="logo2.png",
         )
-        self.edit_user_address=Address.objects.create(
-            country = "India",
-            state = "West Bengal",
-            address_line_one = "testline 11",
-            address_line_two = "testline 21",
-            city = "Kolkata",
-            pin_code = "700018"
+        self.edit_user_address = Address.objects.create(
+            country="India",
+            state="West Bengal",
+            address_line_one="testline 11",
+            address_line_two="testline 21",
+            city="Kolkata",
+            pin_code="700018",
         )
-        self.edit_user_location=Location.objects.create(
-            office_name = "Office 2",
-            address = self.edit_user_address,
-            contact_person_name = "Person 2",
-            contact_person_email = "person2@asseto.com",
-            contact_person_phone = "1234567899",
-            organization = self.edit_user_organization
+        self.edit_user_location = Location.objects.create(
+            office_name="Office 2",
+            address=self.edit_user_address,
+            contact_person_name="Person 2",
+            contact_person_email="person2@asseto.com",
+            contact_person_phone="1234567899",
+            organization=self.edit_user_organization,
         )
-        self.edit_user_department=Department.objects.create(
+        self.edit_user_department = Department.objects.create(
             name="Department 2",
             organization=self.edit_user_organization,
-            contact_person_name = "Person 2",
-            contact_person_email = "person2@asseto.com",
-            contact_person_phone = "1234567899",
+            contact_person_name="Person 2",
+            contact_person_email="person2@asseto.com",
+            contact_person_phone="1234567899",
         )
-        self.edit_user=User.objects.create(
-        email = "mail2@gmail.com",
-        username = 'usertest2',
-        full_name = 'test2',
-        phone = '1234567899',
-        role = self.user_role,
-        organization = self.edit_user_organization,
-        address= self.edit_user_address,
-        location= self.edit_user_location,
-        department= self.edit_user_department,
-        profile_pic="test2.jpg",
-        employee_id="12342",
-        is_active=True,
-        is_staff=True,
-        access_level=0
+        self.edit_user = User.objects.create(
+            email="mail2@gmail.com",
+            username="usertest2",
+            full_name="test2",
+            phone="1234567899",
+            role=self.user_role,
+            organization=self.edit_user_organization,
+            address=self.edit_user_address,
+            location=self.edit_user_location,
+            department=self.edit_user_department,
+            profile_pic="test2.jpg",
+            employee_id="12342",
+            is_active=True,
+            is_staff=True,
+            access_level=0,
         )
-
 
     def test_user(self):
-        self.user = User.objects.get(email = "mail@gmail.com")
+        self.user = User.objects.get(email="mail@gmail.com")
         self.assertEqual(self.user.full_name, "test")
         self.assertEqual(self.user.username, "usertest")
         self.assertEqual(self.user.profile_pic, "test.jpg")
@@ -127,7 +128,9 @@ class User_Test(TestCase):
         self.assertEqual(self.user.role.related_name, "Role 1")
         self.assertEqual(self.user.department.name, "Department 1")
         self.assertEqual(self.user.department.contact_person_name, "Person 1")
-        self.assertEqual(self.user.department.contact_person_email, "person1@asseto.com")
+        self.assertEqual(
+            self.user.department.contact_person_email, "person1@asseto.com"
+        )
         self.assertEqual(self.user.department.contact_person_phone, "1234567890")
         self.assertEqual(self.user.organization.name, "Organization 1")
         self.assertEqual(self.user.organization.website, "asseto.com")
@@ -136,7 +139,6 @@ class User_Test(TestCase):
         self.assertEqual(self.user.organization.currency, "INR")
         self.assertEqual(self.user.organization.date_format, "dd-mm-yyyy")
         self.assertEqual(self.user.organization.logo, "logo.png")
-
 
     def test_edit_user(self):
         self.user = User.objects.get(email="mail2@gmail.com")
@@ -197,9 +199,11 @@ class User_Test(TestCase):
         self.assertEqual(self.user.location.contact_person_phone, "1234567890")
         self.assertEqual(self.user.department.name, "Department 2")
         self.assertEqual(self.user.department.contact_person_name, "Person 2")
-        self.assertEqual(self.user.department.contact_person_email, "person2@asseto.com")
-        self.assertEqual(self.user.department.contact_person_phone, "1234567890")   
-        
+        self.assertEqual(
+            self.user.department.contact_person_email, "person2@asseto.com"
+        )
+        self.assertEqual(self.user.department.contact_person_phone, "1234567890")
+
     def delete_user(self):
         self.user.delete()
 
@@ -207,11 +211,11 @@ class User_Test(TestCase):
             User.objects.get(id=self.product.id)
 
         # Check if the address and organization objects are not affected
-        address=Address.objects.get(id=self.user.address.id)
-        location=Location.objects.get(id=self.user.location.id)
+        address = Address.objects.get(id=self.user.address.id)
+        location = Location.objects.get(id=self.user.location.id)
         organization = Organization.objects.get(name=self.user.organization.id)
-        department=Department.objects.get(id=self.user.department.id)
-        role=Role.objects.get(related_name=self.user.role.related_name)
+        department = Department.objects.get(id=self.user.department.id)
+        role = Role.objects.get(related_name=self.user.role.related_name)
         self.assertIsNotNone(location)
         self.assertIsNotNone(address)
         self.assertIsNotNone(department)

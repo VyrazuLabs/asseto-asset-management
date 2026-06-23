@@ -142,7 +142,7 @@
     {% for num in page_object.paginator.page_range %}
     {% if page_object.number == num %}
     <span class="page-btn active">{{ num }}</span>
-    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} 
+    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
       <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
       class="page-btn">{{ num }}</a>
       {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}

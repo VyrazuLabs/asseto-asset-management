@@ -37,7 +37,7 @@
         <tr>
             <td style="width: 50%">{{forloop.counter}}</td>
             <td>
-                {% if product.product_picture %} 
+                {% if product.product_picture %}
                     <img src="{{product.product_picture.path}}" width="100" height="80" />
                 {% else %} {{ trans.not_uploaded }} {% endif %}
             </td>

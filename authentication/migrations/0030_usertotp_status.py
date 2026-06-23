@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0029_usertotp_is_logged_in'),
+        ("authentication", "0029_usertotp_is_logged_in"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usertotp',
-            name='status',
+            model_name="usertotp",
+            name="status",
             field=models.IntegerField(default=0),
         ),
     ]

@@ -214,20 +214,20 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="chart-title m-0">{{ trans.recently_added }}</h5>
                     <div class="tab-nav-premium" id="recentTabs">
-                        <button class="tab-link-premium active" 
-                                hx-get="{% url 'authentication:recent_vendors_partial' %}" 
+                        <button class="tab-link-premium active"
+                                hx-get="{% url 'authentication:recent_vendors_partial' %}"
                                 hx-target="#recentContent"
                                 onclick="setActiveTab(this)">{{ trans.vendors }}</button>
-                        <button class="tab-link-premium" 
-                                hx-get="{% url 'authentication:recent_products_partial' %}" 
+                        <button class="tab-link-premium"
+                                hx-get="{% url 'authentication:recent_products_partial' %}"
                                 hx-target="#recentContent"
                                 onclick="setActiveTab(this)">{{ trans.products }}</button>
-                        <button class="tab-link-premium" 
-                                hx-get="{% url 'authentication:recent_locations_partial' %}" 
+                        <button class="tab-link-premium"
+                                hx-get="{% url 'authentication:recent_locations_partial' %}"
                                 hx-target="#recentContent"
                                 onclick="setActiveTab(this)">{{ trans.locations }}</button>
-                        <button class="tab-link-premium" 
-                                hx-get="{% url 'authentication:recent_users_partial' %}" 
+                        <button class="tab-link-premium"
+                                hx-get="{% url 'authentication:recent_users_partial' %}"
                                 hx-target="#recentContent"
                                 onclick="setActiveTab(this)">{{ trans.users }}</button>
                     </div>
@@ -254,8 +254,8 @@
     }
 
     function getThemeConfig() {
-        const isDark = document.body.classList.contains('theme-dark') || 
-                       document.body.classList.contains('dark') || 
+        const isDark = document.body.classList.contains('theme-dark') ||
+                       document.body.classList.contains('dark') ||
                        localStorage.getItem('theme') === 'theme-dark';
         return {
             isDark: isDark,
@@ -268,7 +268,7 @@
 
     function updateChartsTheme() {
         const config = getThemeConfig();
-        
+
         if (statusChart) {
             statusChart.updateOptions({
                 theme: { mode: config.mode },
@@ -314,8 +314,8 @@
 
             const options = {
                 series: series,
-                chart: { 
-                    type: 'donut', 
+                chart: {
+                    type: 'donut',
                     height: 350,
                     background: 'transparent'
                 },
@@ -372,8 +372,8 @@
 
         const utilOptions = {
             series: [utilization],
-            chart: { 
-                type: 'radialBar', 
+            chart: {
+                type: 'radialBar',
                 height: 350,
                 background: 'transparent'
             },
@@ -427,7 +427,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         initStatusChart();
         initUtilizationChart();
-        
+
         // Watch for theme changes
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {

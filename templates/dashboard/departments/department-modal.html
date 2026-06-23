@@ -271,8 +271,8 @@ function requestAndSendNotification() {
 function sendNotification() {
   const title = "{{ trans.department_updated_notification_title }}";
   const options = {
-    body: "{{ trans.department_updated_notification_body }}", 
-    icon: "/static/images/logo/favicon.png", 
+    body: "{{ trans.department_updated_notification_body }}",
+    icon: "/static/images/logo/favicon.png",
   };
   new Notification(title, options);
 }

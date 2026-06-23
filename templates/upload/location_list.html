@@ -170,7 +170,7 @@ htmx.on("htmx:afterSwap", (e) => {
         const uploadModalEl = document.getElementById("upload-locations-modal");
         const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
         if (uploadModal) uploadModal.hide();
-        
+
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';

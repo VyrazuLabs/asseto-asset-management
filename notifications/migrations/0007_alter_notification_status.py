@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0006_alter_usernotification_user'),
+        ("notifications", "0006_alter_usernotification_user"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='status',
+            model_name="notification",
+            name="status",
             field=models.BooleanField(default=True),
         ),
     ]

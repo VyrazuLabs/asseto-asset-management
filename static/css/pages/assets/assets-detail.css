@@ -70,7 +70,7 @@ body.theme-dark .detail-card-header {
   justify-content: space-between;
   padding: .85rem 1.25rem;
   border-bottom: 1.5px solid var(--color-border);
-}  
+}
 
 body.theme-dark .detail-card-header h2 {
   font-size: 1.05rem;
@@ -87,7 +87,7 @@ body.theme-dark .detail-card-header {
   justify-content: space-between;
   padding: .85rem 1.25rem;
   border-bottom: 1.5px solid var(--color-border);
-}  
+}
 
 body.theme-dark .detail-card-header h3 {
   font-size: 1.1rem;

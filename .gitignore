@@ -2,7 +2,7 @@
 **/__pycache__
 **/.env
 **/env
-# .pytest_cache
+.pytest_cache
 media
 db.sqlite3
 staticfiles
@@ -29,9 +29,15 @@ agents.md
 
 # Tool-specific AI config files
 .cursorrules
+.superpowers
+.superpowers/
 .windsurfrules
-.cursorignore
+.knowledge-base
+.knowledge-base/
 **/.knowledge-base
+**/.knowledge-base/
+.mypy_cache
+.cursorignore
 
 # macOS System Files
 .DS_Store

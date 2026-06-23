@@ -30,13 +30,13 @@
                               <strong>   #{{forloop.counter}} {{faq.question}} </strong>
                            </button>
                         </h2>
-                        
+
                         <div id="collapse-{{forloop.counter}}" class="accordion-collapse collapse" aria-labelledby="heading-{{forloop.counter}}" data-bs-parent="#accordionExample">
                            <div class="accordion-body">
                               <p style="text-indent: 40px">  {{faq.answer}}  </p>
                            </div>
                         </div>
-                        
+
                     </div>
 
                 {% endfor %}

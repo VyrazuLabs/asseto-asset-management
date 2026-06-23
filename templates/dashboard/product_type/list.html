@@ -199,7 +199,7 @@
               {% if perms.authentication.edit_product_type %}
               <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_product_type }}"
                 hx-get="{% url 'dashboard:update_product_type' pt.id %}" hx-target="#update-product-type-modal-content"
-                data-bs-toggle="modal" data-bs-target="#update-product-type-modal" 
+                data-bs-toggle="modal" data-bs-target="#update-product-type-modal"
                 {% if pt.can_modify is False or is_demo %}disabled{% endif %}>
                 <i class="bi bi-pencil"></i>
               </button>

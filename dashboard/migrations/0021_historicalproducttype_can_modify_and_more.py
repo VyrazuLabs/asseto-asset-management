@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0020_historicalproductcategory_parent_and_more'),
+        ("dashboard", "0020_historicalproductcategory_parent_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalproducttype',
-            name='can_modify',
+            model_name="historicalproducttype",
+            name="can_modify",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='producttype',
-            name='can_modify',
+            model_name="producttype",
+            name="can_modify",
             field=models.BooleanField(default=True),
         ),
     ]

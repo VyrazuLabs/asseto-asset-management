@@ -80,7 +80,7 @@
 function openEditProductCategoryModal(url) {
     var modalEl = document.getElementById('update-product-category-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-product-category-modal-content'
     }).then(function() {

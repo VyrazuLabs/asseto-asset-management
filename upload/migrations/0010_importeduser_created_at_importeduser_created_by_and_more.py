@@ -6,48 +6,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0009_alter_importeduser_email'),
+        ("upload", "0009_alter_importeduser_email"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='importeduser',
-            name='created_at',
+            model_name="importeduser",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='created_by',
+            model_name="importeduser",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='status',
+            model_name="importeduser",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='updated_at',
+            model_name="importeduser",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='updated_by',
+            model_name="importeduser",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='upload',
-            name='created_at',
+            model_name="upload",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='upload',
-            name='status',
+            model_name="upload",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='upload',
-            name='updated_at',
+            model_name="upload",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

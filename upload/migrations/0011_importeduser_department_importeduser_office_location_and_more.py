@@ -7,25 +7,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0025_alter_address_created_at_alter_address_status_and_more'),
-        ('roles', '0004_alter_role_created_at_alter_role_status_and_more'),
-        ('upload', '0010_importeduser_created_at_importeduser_created_by_and_more'),
+        ("dashboard", "0025_alter_address_created_at_alter_address_status_and_more"),
+        ("roles", "0004_alter_role_created_at_alter_role_status_and_more"),
+        ("upload", "0010_importeduser_created_at_importeduser_created_by_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='importeduser',
-            name='department',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.department'),
+            model_name="importeduser",
+            name="department",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.department",
+            ),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='office_location',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.location'),
+            model_name="importeduser",
+            name="office_location",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.location",
+            ),
         ),
         migrations.AddField(
-            model_name='importeduser',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='roles.role'),
+            model_name="importeduser",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="roles.role",
+            ),
         ),
     ]

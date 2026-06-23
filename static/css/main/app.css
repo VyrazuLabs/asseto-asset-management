@@ -18891,7 +18891,7 @@ body .bi::before,
 
 /*
 * Mazer, Technology Innovations Bootstrap HTML5 Landing Page
-* 
+*
 * File: app.scss
 *
 * If you want to edit the components, just go to _variables.scss
@@ -18900,7 +18900,7 @@ body .bi::before,
 
 ====== TABLE OF CONTENTS =======
 1. Mixins
-2. Bootstrap Components Override 
+2. Bootstrap Components Override
     2.1 Alert
     2.2 Avatar
     2.3 Badge
@@ -20144,7 +20144,7 @@ body .bi::before,
     padding: 1rem;
     display: none;
   }
-  
+
   .layout-horizontal .main-navbar.active {
     max-height: initial;
   }
@@ -20263,7 +20263,7 @@ body .bi::before,
   margin-left: 0.4rem;
 }
 
-/* 
+/*
   This is commented for fixed the view in Product section
 .table td, .dataTable-table td, .table thead th, .dataTable-table thead th {
   vertical-align: middle;

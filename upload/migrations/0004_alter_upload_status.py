@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0003_remove_file_organization'),
+        ("upload", "0003_remove_file_organization"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='upload',
-            name='status',
+            model_name="upload",
+            name="status",
             field=models.BooleanField(default=True),
         ),
     ]

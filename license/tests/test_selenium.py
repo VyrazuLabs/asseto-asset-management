@@ -5,6 +5,9 @@ from authentication.models import User
 from license.models import License, LicenseType
 from vendors.models import Vendor
 import time
+import pytest
+
+pytestmark = pytest.mark.selenium
 
 
 class LicenseTest(LiveServerTestCase):
@@ -17,21 +20,17 @@ class LicenseTest(LiveServerTestCase):
             username="testuser",
             full_name="Test User",
             phone="9808123456",
-            password="password123"
+            password="password123",
         )
         self.test_user.is_active = True
         self.test_user.save()
 
         # Create LicenseType
-        self.license_type = LicenseType.objects.create(
-            name="Software License"
-        )
+        self.license_type = LicenseType.objects.create(name="Software License")
 
         # Create Vendor
         self.vendor = Vendor.objects.create(
-            name="Microsoft",
-            email="microsoft@test.com",
-            phone="1234567890"
+            name="Microsoft", email="microsoft@test.com", phone="1234567890"
         )
 
         # Create License for update/delete
@@ -40,14 +39,14 @@ class LicenseTest(LiveServerTestCase):
             license_type=self.license_type,
             vendor=self.vendor,
             seats=10,
-            key="ABC123"
+            key="ABC123",
         )
 
         # Django client login
         self.client = Client()
         self.client.login(email="testuser@gmail.com", password="password123")
 
-        self.session_cookie = self.client.cookies['sessionid']
+        self.session_cookie = self.client.cookies["sessionid"]
 
         # Start selenium
         self.driver = webdriver.Chrome()
@@ -56,12 +55,14 @@ class LicenseTest(LiveServerTestCase):
         self.driver.get(self.live_server_url)
 
         # Inject login session
-        self.driver.add_cookie({
-            'name': 'sessionid',
-            'value': self.session_cookie.value,
-            'path': '/',
-            'secure': False
-        })
+        self.driver.add_cookie(
+            {
+                "name": "sessionid",
+                "value": self.session_cookie.value,
+                "path": "/",
+                "secure": False,
+            }
+        )
 
     def tearDown(self):
         self.driver.quit()
@@ -105,9 +106,7 @@ class LicenseTest(LiveServerTestCase):
     # --------------------------------
     def test_update_license(self):
 
-        self.driver.get(
-            f"{self.live_server_url}/license/update/{self.license.id}"
-        )
+        self.driver.get(f"{self.live_server_url}/license/update/{self.license.id}")
         name = self.driver.find_element(By.NAME, "name")
         name.clear()
         name.send_keys("Updated Windows License")
@@ -121,9 +120,7 @@ class LicenseTest(LiveServerTestCase):
     # DELETE LICENSE
     # --------------------------------
     def test_delete_license(self):
-        self.driver.get(
-            f"{self.live_server_url}/license/list"
-        )
+        self.driver.get(f"{self.live_server_url}/license/list")
 
         # delete_button = self.driver.find_element(
         #     By.XPATH, "//button[@type='submit']"

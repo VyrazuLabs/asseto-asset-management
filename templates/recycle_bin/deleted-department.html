@@ -47,16 +47,16 @@
                                 <td>{{department.contact_person_phone}}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                                        <form action="{% url 'recycle_bin:deleted_departments_restore' department.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">  
+                                        <form action="{% url 'recycle_bin:deleted_departments_restore' department.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
                                         </form>
-                                        <form action="{% url 'recycle_bin:deleted_departments_permanently' department.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">  
+                                        <form action="{% url 'recycle_bin:deleted_departments_permanently' department.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
                                         </form>
                                     </div>
-                                </td>   
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

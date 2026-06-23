@@ -32,12 +32,12 @@
             </td>
             <td>{{asset.tag}}</td>
             <td>{% if asset in list_of_audited_assets %}
-                    <div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;"> 
+                    <div class="d-flex"><div style="width: 10px; height: 10px;background-color: red;border: solid 1px black; ;margin-top: 7.5px;margin-right: 10px;">
                 {% endif %}
                 </div>{{asset.name}}</div>
             </td>
             <td>{{asset.product.product_type}}</td>
-            
+
             <td>
                 {{asset.product}}
                 {% if asset.product.is_deleted %}
@@ -45,7 +45,7 @@
                 {% endif %}
             </td>
             <td>
-                {{asset.vendor}} 
+                {{asset.vendor}}
                 {% if asset.vendor.is_deleted %}
                 <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted, please update or restore."></i>
                 {% endif %}
@@ -53,13 +53,13 @@
             <td>
                 {% if asset.is_assigned %}
                     <sup class="d-flex align-items-center">{% with map=asset_user_map|get_item:asset.id %}{% if map.image %}<img src='{{ map.image.url }}' class="rounded-circle" style="width: 20px; height: 20px "/> {% endif %} {{ map.full_name }}{% endwith %}</sup>
-                    <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">  
+                    <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">
                             {% csrf_token %}
                             <button type="submit" value="Delete" class="btn btn-sm btn-danger">Unassign</button>
                     </form>
                 {% else %}
                     <div class="input-group">
-                        <button type="button"  
+                        <button type="button"
                             class="btn btn-info btn-sm"
                             hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
                             hx-target="#assign-asset-modal-list-content"
@@ -92,7 +92,7 @@
                             Release
                         </button>
                     </div>
-                </div>                
+                </div>
             </td>
             <td>
                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
@@ -103,7 +103,7 @@
                         <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn  btn-info d-flex justify-content-center align-items-center p-1" type="button" class="btn  btn-info" style="width:35px; height:35px;"><i class="bi bi-pencil-square"></i></a>
                     {% endif %}
                     {% if perms.authentication.delete_asset %}
-                        <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">  
+                        <form action="{% url 'assets:delete' asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to delete this?')">
                             {% csrf_token %}
                             <button  class="btn  btn-danger d-flex justify-content-center align-items-center p-1" type="submit" value="Delete" class="btn  btn-danger" style="width:35px; height:35px;"><i class="bi bi-trash3-fill"></i></button>
                         </form>

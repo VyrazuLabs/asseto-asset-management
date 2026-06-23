@@ -750,7 +750,7 @@
             <div class="doc-info">
                 <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
                 <div class="doc-meta">
-                    {{ att.file_size|filesizeformat|default:"2.4 MB" }} • 
+                    {{ att.file_size|filesizeformat|default:"2.4 MB" }} •
                     {% if "pdf" in att.file_name|lower %}{{ trans.pdf_label }}
                     {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}{{ trans.image_label }}
                     {% else %}{{ trans.file_label }}{% endif %}

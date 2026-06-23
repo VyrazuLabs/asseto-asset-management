@@ -4,13 +4,22 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from drf_spectacular.utils import extend_schema,OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from django.utils.decorators import method_decorator
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@extend_schema(parameters=[OpenApiParameter(name='Firebase Token', type=str, description="Enter Firebase Token To Enable In-App Notifications")])
-def save_firebase_token(request,token):
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="Firebase Token",
+            type=str,
+            description="Enter Firebase Token To Enable In-App Notifications",
+        )
+    ]
+)
+def save_firebase_token(request, token):
     user = request.user
     # token = request.data.get('token')
     # If in-app notification is enabled, block FCM token storage
@@ -24,18 +33,8 @@ def save_firebase_token(request,token):
     #     )
     if not token:
         return Response(
-            {
-                "success": False,
-                "error": "Token not provided."
-            },
-            status=status.HTTP_400_BAD_REQUEST
+            {"success": False, "error": "Token not provided."},
+            status=status.HTTP_400_BAD_REQUEST,
         )
-    FirebaseToken.objects.update_or_create(
-        user=user,
-        defaults={'token': token}
-    )
-    return Response(
-        {"success": True},
-        status=status.HTTP_200_OK
-    )
-
+    FirebaseToken.objects.update_or_create(user=user, defaults={"token": token})
+    return Response({"success": True}, status=status.HTTP_200_OK)

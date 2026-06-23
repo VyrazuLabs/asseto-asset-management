@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0026_alter_asset_created_at_alter_asset_updated_at_and_more'),
+        ("assets", "0026_alter_asset_created_at_alter_asset_updated_at_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='tag',
+            model_name="asset",
+            name="tag",
             field=models.CharField(max_length=255, null=True, unique=True),
         ),
         migrations.AlterField(
-            model_name='historicalasset',
-            name='tag',
+            model_name="historicalasset",
+            name="tag",
             field=models.CharField(db_index=True, max_length=255, null=True),
         ),
     ]

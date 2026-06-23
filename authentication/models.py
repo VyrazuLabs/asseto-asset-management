@@ -1,8 +1,20 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Permission
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+    Permission,
+)
 from django.contrib.contenttypes.models import ContentType
-from dashboard.models import Organization, Location, Address, Department, TimeStampModel, SoftDeleteModel
+from dashboard.models import (
+    Organization,
+    Location,
+    Address,
+    Department,
+    TimeStampModel,
+    SoftDeleteModel,
+)
 from django.conf import settings
 from roles.models import Role
 import os
@@ -12,20 +24,28 @@ from simple_history.models import HistoricalRecords
 from configurations.constants import NAME_FORMATS
 from django.apps import apps
 
+
 def path_and_rename(instance, filename):
-    upload_to = 'profile/'
-    ext = filename.split('.')[-1]
+    upload_to = "profile/"
+    ext = filename.split(".")[-1]
     if instance.pk:
-        filename = '{}.{}'.format(instance.pk, ext)
+        filename = "{}.{}".format(instance.pk, ext)
     else:
-        filename = '{}.{}'.format(uuid4().hex, ext)
+        filename = "{}.{}".format(uuid4().hex, ext)
     return os.path.join(upload_to, filename)
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, full_name, username, phone, password, **extra_fields):
         if not email:
-            raise ValueError('Users must have an email address.')
-        user = self.model(email=self.normalize_email(email), full_name=full_name,username=username, phone=phone, **extra_fields)
+            raise ValueError("Users must have an email address.")
+        user = self.model(
+            email=self.normalize_email(email),
+            full_name=full_name,
+            username=username,
+            phone=phone,
+            **extra_fields,
+        )
         user.set_password(password)
         user.is_staff = True
         user.is_superuser = True
@@ -33,21 +53,37 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, full_name, username, phone, password, **extra_fields):
-        user = self.create_user(email, full_name, username, phone, password, is_active = True, access_level=True, **extra_fields)
-        
-        # Create or get the Superuser default
-        organization = Organization.objects.filter(name='DjangoSuperUserOrganization').first()
-        if not organization:
-            organization = Organization.objects.create(name='DjangoSuperUserOrganization')
-        
+    def create_superuser(
+        self, email, full_name, username, phone, password, **extra_fields
+    ):
+        user = self.create_user(
+            email,
+            full_name,
+            username,
+            phone,
+            password,
+            is_active=True,
+            access_level=True,
+            **extra_fields,
+        )
 
-        role = Role.objects.filter(related_name='Superuser', organization=organization).first()
+        # Create or get the Superuser default
+        organization = Organization.objects.filter(
+            name="DjangoSuperUserOrganization"
+        ).first()
+        if not organization:
+            organization = Organization.objects.create(
+                name="DjangoSuperUserOrganization"
+            )
+
+        role = Role.objects.filter(
+            related_name="Superuser", organization=organization
+        ).first()
         if not role:
             role = Role.objects.create(
-                name = "all_permissions",
-                related_name='Superuser',
-                organization=organization
+                name="all_permissions",
+                related_name="Superuser",
+                organization=organization,
             )
 
         if role.permissions.count() == 0:
@@ -56,43 +92,48 @@ class UserManager(BaseUserManager):
                 role.permissions.add(permission)
         role.save()
 
-
         user.role = role
         user.save(using=self._db)
 
         return user
 
-BOOL_CHOICES = ((False, 'Only Assigned'), (True, 'All'))
+
+BOOL_CHOICES = ((False, "Only Assigned"), (True, "All"))
+
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
-    username = models.CharField(max_length=255 , blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=255, blank=True, null=True)
     profile_pic = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     employee_id = models.CharField(max_length=45, blank=True, null=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    organization = models.ForeignKey(
+        Organization, models.DO_NOTHING, blank=True, null=True
+    )
     address = models.ForeignKey(Address, models.DO_NOTHING, blank=True, null=True)
     location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
     department = models.ForeignKey(Department, models.DO_NOTHING, blank=True, null=True)
-    access_level = models.BooleanField(choices=BOOL_CHOICES,default=False)
-    role = models.ForeignKey(Role, models.DO_NOTHING, related_name='role', blank=True, null=True)
-    email_notification=models.BooleanField(default=False)
-    browser_notification=models.BooleanField(default=False)
-    slack_notification=models.BooleanField(default=False)
-    inapp_notification=models.BooleanField(default=False)
-    two_factor_auth=models.BooleanField(default=False)
+    access_level = models.BooleanField(choices=BOOL_CHOICES, default=False)
+    role = models.ForeignKey(
+        Role, models.DO_NOTHING, related_name="role", blank=True, null=True
+    )
+    email_notification = models.BooleanField(default=False)
+    browser_notification = models.BooleanField(default=False)
+    slack_notification = models.BooleanField(default=False)
+    inapp_notification = models.BooleanField(default=False)
+    two_factor_auth = models.BooleanField(default=False)
     password_reset_token = models.CharField(max_length=255, blank=True, null=True)
     password_reset_expires = models.DateTimeField(blank=True, null=True)
     use_expired_assets = models.BooleanField(default=False)
     objects = UserManager()
     history = HistoricalRecords()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['full_name', 'phone', 'username']  
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["full_name", "phone", "username"]
 
     # def __init__(self, *args, **kwargs):
     #     self.full_name=kwargs.pop('full_name', None)
@@ -109,10 +150,14 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         # Get organization's configured format key (safe)
         format_key_value = None
         try:
-            LocalizationConfiguration = apps.get_model('configurations', 'LocalizationConfiguration')
-            config = LocalizationConfiguration.objects.filter(
-                organization=self.organization
-            ).values_list("name_display_format", flat=True).first()
+            LocalizationConfiguration = apps.get_model(
+                "configurations", "LocalizationConfiguration"
+            )
+            config = (
+                LocalizationConfiguration.objects.filter(organization=self.organization)
+                .values_list("name_display_format", flat=True)
+                .first()
+            )
             format_key_value = config
         except Exception:
             format_key_value = None
@@ -130,7 +175,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         parts = fullname.split()
         first = parts[0] if parts else ""
         last = parts[-1] if len(parts) > 1 else ""
-        first_initial = (first[0].upper() if first else "")
+        first_initial = first[0].upper() if first else ""
 
         context = {
             "first": first,
@@ -146,12 +191,12 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
             if first and last:
                 result = f"{first} {last}"
             else:
-                result = first or last or fullname    
+                result = first or last or fullname
         return result
 
     def __str__(self):
-        return self.full_name or f'Role {self.role}' or " "
-    
+        return self.full_name or f"Role {self.role}" or " "
+
     def get_full_name(self):
         return self.full_name or self.email
 
@@ -163,19 +208,25 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
         if self.full_name:
             return self.dynamic_display_name(self.full_name)
         return ""
+
+
 class UserTotp(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_totp", null=False)
     secret = models.CharField(max_length=255)
     is_validate = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_logged_in = models.BooleanField(default=False)
+
+
 class PhoneOtp(models.Model):
     user_id = models.CharField(max_length=255)
     otp = models.CharField(max_length=255)
     expires_at = models.DateTimeField()
 
+
 class SeedFlag(models.Model):
-    seeded=models.BooleanField(default=False)
+    seeded = models.BooleanField(default=False)
 
     def __str__(self):
         return "Seed already done" if self.seeded else "Seed not done yet"

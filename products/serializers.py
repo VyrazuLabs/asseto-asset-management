@@ -4,21 +4,28 @@ from dashboard.models import CustomField
 from products.models import Product, ProductImage
 from common.convert_base64_image import convert_image
 
+
 class CustomFieldSerializer(serializers.Serializer):
     field_name = serializers.CharField()
     field_value = serializers.CharField()
 
+
 class DictionaryListField(serializers.ListField):
     def get_value(self, dictionary):
-        if isinstance(dictionary.get(self.field_name), list) and all(isinstance(item, dict) for item in dictionary[self.field_name]):
+        if isinstance(dictionary.get(self.field_name), list) and all(
+            isinstance(item, dict) for item in dictionary[self.field_name]
+        ):
             return dictionary[self.field_name]
         elif isinstance(dictionary.get(self.field_name), list):
             # There can be some cases where custom fields will be a list of list of dictionaries
             # The following remedies it
             dictionary_copy = dictionary.copy()
-            dictionary_copy[self.field_name] = next(iter(dictionary[self.field_name]), [])
+            dictionary_copy[self.field_name] = next(
+                iter(dictionary[self.field_name]), []
+            )
             return dictionary_copy[self.field_name]
         return super().get_value(dictionary)
+
 
 class ProductSerializer(serializers.ModelSerializer):
     images = serializers.ListField(
@@ -51,7 +58,7 @@ class ProductSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("Product Category can not be blank")
         return value
-    
+
     def validate_custom_fields(self, value):
         if isinstance(value, list) and all(isinstance(item, dict) for item in value):
             return value
@@ -60,9 +67,13 @@ class ProductSerializer(serializers.ModelSerializer):
             # The following remedies it
             value = next(iter(value), [])
             if not all(isinstance(item, dict) for item in value):
-                raise serializers.ValidationError("Each custom field must be a dictionary")
+                raise serializers.ValidationError(
+                    "Each custom field must be a dictionary"
+                )
             return value
-        raise serializers.ValidationError("Custom fields must be a list of dictionaries")
+        raise serializers.ValidationError(
+            "Custom fields must be a list of dictionaries"
+        )
 
     def to_internal_value(self, data):
         data = data.copy()
@@ -91,14 +102,16 @@ class ProductSerializer(serializers.ModelSerializer):
         # data["custom_fields"] = custom_fields
 
     def create(self, validated_data):
-        images=validated_data.pop("images")
-        custom_fields = validated_data.pop("custom_fields",None)
-        product=Product.objects.create(**validated_data,organization=self.context['request'].user.organization)
+        images = validated_data.pop("images")
+        custom_fields = validated_data.pop("custom_fields", None)
+        product = Product.objects.create(
+            **validated_data, organization=self.context["request"].user.organization
+        )
 
-        product_image=None
+        product_image = None
         for image in images:
             # image=convert_image(image)
-            product_image=ProductImage.objects.create(image=image,product=product)
+            product_image = ProductImage.objects.create(image=image, product=product)
 
         if custom_fields is not None:
             for custom_field in custom_fields:
@@ -107,14 +120,14 @@ class ProductSerializer(serializers.ModelSerializer):
                 CustomField.objects.create(
                     name=field_name,
                     object_id=product.id,
-                    field_type='text',
+                    field_type="text",
                     field_name=field_name,
                     field_value=field_value,
-                    entity_type='product',
-                    organization=self.context["request"].user.organization
+                    entity_type="product",
+                    organization=self.context["request"].user.organization,
                 )
-        return product,product_image
-    
+        return product, product_image
+
     def update(self, instance, validated_data):
         image_data = validated_data.pop("images", [])
         custom_fields = validated_data.pop("custom_fields", [])
@@ -128,15 +141,12 @@ class ProductSerializer(serializers.ModelSerializer):
             ProductImage.objects.create(product=instance, image=image)
 
         existing_qs = CustomField.objects.filter(
-            object_id=instance.id,
-            entity_type="product"
+            object_id=instance.id, entity_type="product"
         )
         existing_field_names = {cf.field_name for cf in existing_qs}
 
         incoming_field_names = {
-            next(iter(cf.keys()))
-            for cf in custom_fields
-            if isinstance(cf, dict) and cf
+            next(iter(cf.keys())) for cf in custom_fields if isinstance(cf, dict) and cf
         }
 
         deleted_field_names = existing_field_names - incoming_field_names
@@ -144,7 +154,7 @@ class ProductSerializer(serializers.ModelSerializer):
             CustomField.objects.filter(
                 object_id=instance.id,
                 field_name__in=deleted_field_names,
-                entity_type="product"
+                entity_type="product",
             ).delete()
 
         # 🔹 Create / Update incoming fields
@@ -159,19 +169,13 @@ class ProductSerializer(serializers.ModelSerializer):
                 continue
 
             qs = CustomField.objects.filter(
-                object_id=instance.id,
-                field_name=field_name,
-                entity_type="product"
+                object_id=instance.id, field_name=field_name, entity_type="product"
             )
 
             if field_value is None:
                 qs.delete()
             elif qs.exists():
-                qs.update(
-                    field_value=field_value,
-                    field_type="text",
-                    name=field_name
-                )
+                qs.update(field_value=field_value, field_type="text", name=field_name)
             else:
                 CustomField.objects.create(
                     object_id=instance.id,
@@ -179,12 +183,21 @@ class ProductSerializer(serializers.ModelSerializer):
                     field_value=field_value,
                     entity_type="product",
                     field_type="text",
-                    name=field_name
+                    name=field_name,
                 )
 
         return instance
 
-            
     class Meta:
-        model=Product
-        fields=['name','manufacturer','model','eol','description','product_sub_category','product_type','images','custom_fields']
+        model = Product
+        fields = [
+            "name",
+            "manufacturer",
+            "model",
+            "eol",
+            "description",
+            "product_sub_category",
+            "product_type",
+            "images",
+            "custom_fields",
+        ]

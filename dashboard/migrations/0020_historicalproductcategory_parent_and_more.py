@@ -7,18 +7,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0019_historicaldepartment_historicallocation_historicalorganization_historicalproductcategory_historicalp'),
+        (
+            "dashboard",
+            "0019_historicaldepartment_historicallocation_historicalorganization_historicalproductcategory_historicalp",
+        ),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalproductcategory',
-            name='parent',
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='dashboard.productcategory'),
+            model_name="historicalproductcategory",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="+",
+                to="dashboard.productcategory",
+            ),
         ),
         migrations.AddField(
-            model_name='productcategory',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='subcategories', to='dashboard.productcategory'),
+            model_name="productcategory",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="subcategories",
+                to="dashboard.productcategory",
+            ),
         ),
     ]
