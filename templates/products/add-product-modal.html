@@ -3,35 +3,35 @@
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3 class="page-name">Add Product</h3>
+            <h3 class="page-name">{{ trans.add_product }}</h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Products</li>
-                    <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.products_breadcrumb }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ trans.add_product }}</li>
                 </ol>
             </nav>
-        </div>      
+        </div>
 
         <div>
-            <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">Back to Product List</a>
+            <a href="{% url 'products:list' %}" class="btn btn-sm btn-outline-info my-3">{{ trans.back_to_product_list }}</a>
         </div>
     </div>
- 
+
     <section class="section">
         <form class="form row" method="POST" action="{{ request.path }}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
             <div class="card">
                 <div class="card-header">
                     <button type="submit" class="btn btn-sm btn-info float-end"
-                        onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
-                    >Save</button>
+                        onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving|escapejs }}`;"
+                    >{{ trans.save }}</button>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Product Name</label>
+                                <label>{{ trans.product_name }}</label>
                                 <span class="text-danger">*</span>
                                 {{form.name}}
                                 {% for error in form.name.errors %}
@@ -41,7 +41,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Product Type</label>
+                                <label>{{ trans.product_type }}</label>
                                 <span class="text-danger">*</span>
                                 {{form.product_type}}
                                 {% for error in form.product_type.errors %}
@@ -51,7 +51,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Product Category</label>
+                                <label>{{ trans.product_category_label }}</label>
                                 <span class="text-danger">*</span>
                                 {{form.product_category}}
                                 {% for error in form.product_category.errors %}
@@ -61,7 +61,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Product Sub Category</label>
+                                <label>{{ trans.product_sub_category_label }}</label>
                                 {{form.product_sub_category}}
                                 {% for error in form.product_sub_category.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -70,7 +70,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Manufacturer</label>
+                                <label>{{ trans.manufacturer_label }}</label>
                                 {{form.manufacturer}}
                                 {% for error in form.manufacturer.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Model</label>
+                                <label>{{ trans.model_label }}</label>
                                 {{ form.model }}
                                 {% for error in form.model.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -88,7 +88,7 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Product EOL</label>
+                                <label>{{ trans.product_eol_label }}</label>
                                 {{ form.eol }}
                                 {% for error in form.eol.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -97,14 +97,14 @@
                         </div>
                         <div class="col-md-6 col-12">
                             <div class="form-group mb-2">
-                                <label>Audit Interval</label>
+                                <label>{{ trans.audit_interval_label }}</label>
                                 <select class="form-control" name="audit_interval">
-                                    <option value="1">Yearly</option>
-                                    <option value="2">Half Yearly</option>
-                                    <option value="3">Quarterly</option>
-                                    <option value="4">Bi-Monthly</option>
-                                    <option value="4">Monthly</option>
-                                    <option value="5">Not Applicable</option>
+                                    <option value="1">{{ trans.yearly }}</option>
+                                    <option value="2">{{ trans.half_yearly }}</option>
+                                    <option value="3">{{ trans.quarterly }}</option>
+                                    <option value="4">{{ trans.bi_monthly }}</option>
+                                    <option value="4">{{ trans.monthly }}</option>
+                                    <option value="5">{{ trans.not_applicable }}</option>
                                 </select>
                                 {% for error in form.eol.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -113,7 +113,7 @@
                         </div>
                         <div class="col-md-12 col-12">
                             <div class="form-group">
-                                <label>Description</label>
+                                <label>{{ trans.description_caps }}</label>
                                 {{form.description}}
                                 {% for error in form.description.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
@@ -123,33 +123,33 @@
                         <!-- Image upload -->
                         <div class="col-md-6 col-12">
                             <div class="form-group">
-                                <label>Add Product Image</label>
+                                <label>{{ trans.product_image_label }}</label>
                                 {{image_form.image}}
                                 {% for error in image_form.image.errors %}
                                     <small class="text-danger mb-3">{{ error }}</small>
                                 {% endfor %}
                             </div>
-                            <div class="form-group rounded ml-2" id="imagePreview"></div>                    
+                            <div class="form-group rounded ml-2" id="imagePreview"></div>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Custom Fields Section -->
             <div class="card mt-3">
-                <div class="card-header">Custom Fields</div>
+                <div class="card-header">{{ trans.custom_fields_section }}</div>
                 <div class="card-body" id="custom-field-container">
                     <div class="row">
                         <div class="col-5">
                             <div class="form-group">
                                 <input type="text" class="form-control"
-                                       placeholder="Custom Field Name"
+                                       placeholder="{{ trans.custom_field_name_placeholder }}"
                                        name="custom_field_name" autocomplete="off">
                             </div>
                         </div>
                         <div class="col-5">
                             <div class="form-group">
                                 <input type="text" class="form-control"
-                                       placeholder="Custom Field Value"
+                                       placeholder="{{ trans.custom_field_value_placeholder }}"
                                        name="custom_field_value" autocomplete="off">
                             </div>
                         </div>
@@ -167,14 +167,14 @@
                             <div class="col-5">
                                 <div class="form-group">
                                     <input type="text" class="form-control"
-                                        placeholder="Custom Field Name"
+                                        placeholder="{{ trans.custom_field_name_placeholder }}"
                                         name="custom_field_name" autocomplete="off">
                                 </div>
                             </div>
                             <div class="col-5">
                                 <div class="form-group">
                                     <input type="text" class="form-control"
-                                        placeholder="Custom Field Value"
+                                        placeholder="{{ trans.custom_field_value_placeholder }}"
                                         name="custom_field_value" autocomplete="off">
                                 </div>
                             </div>
@@ -184,7 +184,7 @@
                                         <i class="bi bi-dash-lg"></i>
                                     </button>
                                 </div>
-                            </div>   
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -197,18 +197,18 @@
     document.querySelector('#id_product_category')?.addEventListener('change', function () {
         const categoryId = this.value;
         const subCatSelect = document.querySelector('#id_product_sub_category');
-        subCatSelect.innerHTML = '<option value="">Loading...</option>';
+        subCatSelect.innerHTML = '<option value="">{{ trans.loading }}</option>';
         fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
             .then(response => response.json())
             .then(data => {
-                let options = '<option value="">--SELECT--</option>';
+                let options = '<option value="">{{ trans.select_option }}</option>';
                 data.forEach(function (item) {
                     options += `<option value="${item.id}">${item.name}</option>`;
                 });
                 subCatSelect.innerHTML = options;
             })
             .catch(() => {
-                subCatSelect.innerHTML = '<option value="">Error loading</option>';
+                subCatSelect.innerHTML = '<option value="">{{ trans.error_loading }}</option>';
             });
     });
 

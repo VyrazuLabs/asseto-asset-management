@@ -3,7 +3,7 @@
 {% load static %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% block title %}{{ asset.tag }} — Asset Details | Asseto{% endblock %}
+{% block title %}{{ asset.tag }} — {{ trans.asset_details }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -18,20 +18,20 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb mb-2">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
-        <li class="breadcrumb-item active">Asset Details</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">{{ trans.assets }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.asset_details }}</li>
       </ol>
     </nav>
-    <h1 class="page-title">Asset Details</h1>
-    <p class="page-subtitle">Detailed overview and history for <strong class="detail-tag-inline">{{ asset.tag }}</strong></p>
+    <h1 class="page-title">{{ trans.asset_details }}</h1>
+    <p class="page-subtitle">{{ trans.detailed_overview_history }} <strong class="detail-tag-inline">{{ asset.tag }}</strong></p>
   </div>
   <div class="header-actions">
     <a href="{% url 'assets:list' %}" class="btn-reset">
-      <i class="bi bi-arrow-left"></i> Back to List
+      <i class="bi bi-arrow-left"></i> {{ trans.back_to_list }}
     </a>
     <a href="{% url 'assets:update_in_detail' asset.id %}" class="btn-register ms-2">
-      <i class="bi bi-pencil-square"></i> Update Asset
+      <i class="bi bi-pencil-square"></i> {{ trans.update_asset }}
     </a>
   </div>
 </div>
@@ -47,10 +47,10 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-cpu"></i></div>
-          <h2>Asset Information</h2>
+          <h2>{{ trans.asset_information }}</h2>
         </div>
         {% if asset.is_assigned %}
-          <span class="detail-status-badge badge-in-use">IN USE</span>
+          <span class="detail-status-badge badge-in-use">{{ trans.in_use }}</span>
         {% elif asset.asset_status %}
           <span class="detail-status-badge badge-available">{{ asset.asset_status.name }}</span>
         {% endif %}
@@ -59,27 +59,27 @@
         <div class="detail-fields-grid">
 
           <div class="detail-field">
-            <span class="detail-field-label">Asset Tag</span>
+            <span class="detail-field-label">{{ trans.asset_tag }}</span>
             <span class="detail-field-value"><span class="asset-tag-pill">{{ asset.tag }}</span></span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Asset Name</span>
+            <span class="detail-field-label">{{ trans.asset_name }}</span>
             <span class="detail-field-value fw-semibold">{{ asset.name|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Product</span>
+            <span class="detail-field-label">{{ trans.product }}</span>
             <span class="detail-field-value">{{ asset.product|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Serial No.</span>
+            <span class="detail-field-label">{{ trans.serial_number }}</span>
             <span class="detail-field-value detail-mono">{{ asset.serial_no|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Purchase Price</span>
+            <span class="detail-field-label">{{ trans.purchase_price }}</span>
             <span class="detail-field-value detail-price">
               {% if asset.price %}
                 {% if get_currency %}{{ get_currency }} {% endif %}{{ asset.price }}
@@ -88,7 +88,7 @@
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Warranty Expiry</span>
+            <span class="detail-field-label">{{ trans.warranty_expiry }}</span>
             <span class="detail-field-value">
               {% if asset.warranty_expiry_date %}
                 <span class="detail-warranty-ok"><i class="bi bi-shield-check"></i> {{ asset.warranty_expiry_date }}</span>
@@ -97,46 +97,46 @@
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">End of Life</span>
+            <span class="detail-field-label">{{ trans.end_of_life }}</span>
             <span class="detail-field-value">{{ eol_date|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Assigned To</span>
+            <span class="detail-field-label">{{ trans.assigned_to }}</span>
             <span class="detail-field-value">
               {% if assigned_user %}
                 <span class="detail-assignee-chip">
                   <span class="detail-assignee-avatar">{{ assigned_user|slice:":2"|upper }}</span>
                   <span>{{ assigned_user }}</span>
                 </span>
-              {% else %}<span class="text-muted">Unassigned</span>{% endif %}
+              {% else %}<span class="text-muted">{{ trans.unassigned_label }}</span>{% endif %}
             </span>
           </div>
 
           {% if assigned_asset %}
           <div class="detail-field">
-            <span class="detail-field-label">Issue Date</span>
+            <span class="detail-field-label">{{ trans.issue_date }}</span>
             <span class="detail-field-value">{{ assigned_asset.issue_date|default:"—" }}</span>
           </div>
           {% endif %}
 
           <div class="detail-field">
-            <span class="detail-field-label">Location</span>
+            <span class="detail-field-label">{{ trans.location }}</span>
             <span class="detail-field-value">{{ asset.location.office_name|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Vendor</span>
+            <span class="detail-field-label">{{ trans.vendor }}</span>
             <span class="detail-field-value">{{ asset.vendor|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Purchase Date</span>
+            <span class="detail-field-label">{{ trans.purchase_date }}</span>
             <span class="detail-field-value">{{ asset.purchase_date|default:"—" }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Product Type</span>
+            <span class="detail-field-label">{{ trans.product_type }}</span>
             <span class="detail-field-value">{{ asset.product.product_type|default:"—" }}</span>
           </div>
 
@@ -144,14 +144,14 @@
 
         {% if asset.description %}
         <div class="detail-description-block">
-          <span class="detail-field-label">Asset Description &amp; Notes</span>
+          <span class="detail-field-label">{{ trans.asset_description_notes }}</span>
           <p class="detail-description-text">{{ asset.description|urlize }}</p>
         </div>
         {% endif %}
 
         {% if assigned_asset.notes %}
         <div class="detail-description-block">
-          <span class="detail-field-label">Assignment Notes</span>
+          <span class="detail-field-label">{{ trans.assignment_notes }}</span>
           <p class="detail-description-text">{{ assigned_asset.notes|urlize }}</p>
         </div>
         {% endif %}
@@ -164,7 +164,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-sliders"></i></div>
-          <h2>Custom Fields</h2>
+          <h2>{{ trans.custom_fields }}</h2>
         </div>
       </div>
       <div class="detail-card-body">
@@ -186,13 +186,13 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-list-check"></i></div>
-          <h2>Asset Specifications</h2>
+          <h2>{{ trans.asset_specifications }}</h2>
         </div>
       </div>
       <div class="detail-card-body p-0">
         <table class="detail-specs-table">
           <thead>
-            <tr><th>Specification</th><th>Value</th></tr>
+            <tr><th>{{ trans.specification }}</th><th>{{ trans.value }}</th></tr>
           </thead>
           <tbody>
             {% for spec in assetSpecifications %}
@@ -209,10 +209,10 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-clipboard-check"></i></div>
-          <h2>Audit History</h2>
+          <h2>{{ trans.audit_history }}</h2>
         </div>
         {% if get_audit_history %}
-          <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="detail-view-all">View All Records</a>
+          <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="detail-view-all">{{ trans.view_all_records }}</a>
         {% endif %}
       </div>
       <div class="detail-card-body p-0">
@@ -220,11 +220,11 @@
         <table class="detail-audit-table">
           <thead>
             <tr>
-              <th>Sl No.</th>
-              <th>Proof</th>
-              <th>Condition</th>
-              <th>Time</th>
-              <th>Actions</th>
+              <th>{{ trans.sl_no }}</th>
+              <th>{{ trans.proof }}</th>
+              <th>{{ trans.condition }}</th>
+              <th>{{ trans.time }}</th>
+              <th>{{ trans.actions }}</th>
             </tr>
           </thead>
           <tbody>
@@ -256,7 +256,7 @@
         {% else %}
         <div class="detail-empty-state">
           <i class="bi bi-clipboard-x"></i>
-          <p>No audit records found</p>
+          <p>{{ trans.no_audit_records }}</p>
         </div>
         {% endif %}
       </div>
@@ -272,7 +272,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-images"></i></div>
-          <h2>Asset Images</h2>
+          <h2>{{ trans.asset_images_title }}</h2>
         </div>
       </div>
       <div class="detail-card-body">
@@ -308,7 +308,7 @@
                         data-bs-toggle="modal"
                         data-bs-target="#imageCarouselModal"
                         data-bs-slide-to="{{ forloop.counter|add:'-1' }}">
-                  +{{ arr_size|add:"-3" }} More
+                  +{{ arr_size|add:"-3" }} {{ trans.more }}
                 </button>
               {% endif %}
             {% endif %}{% endfor %}
@@ -327,7 +327,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-upc-scan"></i></div>
-          <h2>Asset Identification</h2>
+          <h2>{{ trans.asset_identification }}</h2>
         </div>
       </div>
       <div class="detail-card-body">
@@ -335,7 +335,7 @@
         <div class="detail-barcode-tag-label">{{ asset.tag }}</div>
         <div class="text-center mt-3">
           <button id="download-btn" type="button" class="btn-download-label">
-            <i class="bi bi-download"></i> Download Label (PNG)
+            <i class="bi bi-download"></i> {{ trans.download_label_png }}
           </button>
         </div>
       </div>
@@ -347,7 +347,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon"><i class="bi bi-clock-history"></i></div>
-          <h2>Activity Log</h2>
+          <h2>{{ trans.activity_log }}</h2>
         </div>
       </div>
       <div class="detail-card-body p-0">
@@ -362,13 +362,13 @@
             <div class="activity-content">
               <div class="activity-title">
                 {% if h.history_type == '+' %}
-                  Asset created in system
+                  {{ trans.asset_created_in_system }}
                 {% elif h.history_type == '-' %}
-                  Asset deleted
+                  {{ trans.asset_deleted_activity }}
                 {% elif h.is_assigned != h.prev_record.is_assigned %}
-                  {% if h.is_assigned %}Asset assigned to user{% else %}Asset unassigned{% endif %}
+                  {% if h.is_assigned %}{{ trans.asset_assigned_to_user }}{% else %}{{ trans.asset_unassigned_activity }}{% endif %}
                 {% else %}
-                  Asset updated
+                  {{ trans.asset_updated_activity }}
                 {% endif %}
               </div>
               <div class="activity-meta">
@@ -395,8 +395,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Image 1 of {{ arr_size }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">{{ trans.image }} 1 {{ trans.of_label }} {{ arr_size }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}"></button>
         </div>
         <div class="modal-body text-center">
           <img src="{% get_media_prefix %}{{ it.image }}"
@@ -423,7 +423,7 @@
       </div>
       <div class="modal-body text-center">
         <div id="carouselExampleControls" class="carousel{{ forloop.counter }} slide" data-bs-ride="carousel">
-          
+
           <div class="carousel-inner">
             {% for it in get_asset_img %}
               {% if it.image %}
@@ -459,8 +459,8 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Image <span id="carouselImageCounter">1</span> of {{ arr_size }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title">{{ trans.image }} <span id="carouselImageCounter">1</span> {{ trans.of_label }} {{ arr_size }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}"></button>
       </div>
       <div class="modal-body">
         <div id="carouselMain" class="carousel slide" data-bs-ride="false">
@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (carouselEl) {
     var counterEl = document.getElementById('carouselImageCounter');
     var totalImages = {{ arr_size }};
-    
+
     carouselEl.addEventListener('slide.bs.carousel', function(e) {
       if (counterEl) {
         var currentIndex = e.to + 1;
@@ -515,4 +515,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock content %}
-

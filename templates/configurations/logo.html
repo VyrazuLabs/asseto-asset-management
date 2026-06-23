@@ -5,11 +5,11 @@
 <div class="page-heading">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="page-title">
-            <h3 class="page-name mb-1">Branding</h3>
+            <h3 class="page-name mb-1">{{ trans.branding }}</h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Branding</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ trans.branding }}</li>
                 </ol>
             </nav>
         </div>
@@ -24,7 +24,7 @@
                 <!-- Upload Logo -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card p-3 h-100">
-                        <h4 class="mb-3">Upload Logo</h4>
+                        <h4 class="mb-3">{{ trans.upload_logo }}</h4>
                         <div class="mb-3 text-center">
                             {% if add_path_context.logo %}
                                 <img src="/media/{{ add_path_context.logo }}" alt="logo_image" class="img-fluid" style="max-height: 90px;">
@@ -38,7 +38,7 @@
                         <input type="file" name="logo" class="form-control">
                         <div class="d-flex align-items-center mt-3">
                             <i class="bi bi-info-circle"></i>
-                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                            <span class="ms-2">{{ trans.image_size_limit }} <b>5 MB</b></span>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                 <!-- Upload Favicon -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card p-3 h-100">
-                        <h4 class="mb-3">Upload Favicon</h4>
+                        <h4 class="mb-3">{{ trans.upload_favicon }}</h4>
                         <div class="mb-3 text-center">
                             {% if add_path_context.favicon %}
                                 <img src="/media/{{ add_path_context.favicon }}" alt="favicon_image" class="img-fluid" style="max-height: 90px;">
@@ -60,7 +60,7 @@
                         <input type="file" name="favicon" class="form-control">
                         <div class="d-flex align-items-center mt-3">
                             <i class="bi bi-info-circle"></i>
-                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                            <span class="ms-2">{{ trans.image_size_limit }} <b>5 MB</b></span>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                 <!-- Upload Login Page Logo -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card p-3 h-100">
-                        <h4 class="mb-3">Upload Login Page Logo</h4>
+                        <h4 class="mb-3">{{ trans.upload_login_logo }}</h4>
                         <div class="mb-3 text-center">
                             {% if add_path_context.login_page_logo %}
                                 <img src="/media/{{ add_path_context.login_page_logo }}" alt="login_page_logo" class="img-fluid" style="max-height: 90px;">
@@ -82,7 +82,7 @@
                         <input type="file" name="login_page_logo" class="form-control">
                         <div class="d-flex align-items-center mt-3">
                             <i class="bi bi-info-circle"></i>
-                            <span class="ms-2">Image size should not exceed <b>5 MB</b></span>
+                            <span class="ms-2">{{ trans.image_size_limit }} <b>5 MB</b></span>
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
 
             <!-- Submit Button -->
             <div class="text-end mt-4">
-                <button class="btn text-white logo-upload-btn" type="submit">Upload</button>
+                <button class="btn text-white logo-upload-btn" type="submit">{{ trans.upload }}</button>
             </div>
         </form>
     </section>

@@ -1,5 +1,5 @@
 import sys
-from django.db.models.signals import post_save, post_init, post_delete,pre_save
+from django.db.models.signals import post_save, post_init, post_delete, pre_save
 from django.dispatch import receiver
 from django.conf import settings
 from notifications.models import Notification, UserNotification
@@ -9,9 +9,11 @@ from django.db.backends.signals import connection_created
 from assets.models import AssignAsset
 from django.db import connection
 from assets.models import Asset
-from notifications.utils import notifications_call,send_email
+from notifications.utils import notifications_call, send_email
 from assets.utils import slack_notification
 from notifications.service import NotificationService
+
+
 # User Notification
 # Implement this with the service to maintain a clean code.
 # print("IN NOTIFICATION SIGNALS")
@@ -20,28 +22,31 @@ def user_notification(sender, instance, created, **kwargs):
     if created:
         NotificationService.send(
             user=instance,
-            title='New User',
-            message=f'{instance.full_name} has been added to your team ({instance.role})',
-            icon='bi-person-fill',
+            title="New User",
+            message=f"{instance.full_name} has been added to your team ({instance.role})",
+            icon="bi-person-fill",
             instance_id=instance.id,
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
 
     elif instance.previous_role != instance.role:
         NotificationService.send(
             user=instance,
-            title='Role Updated',
-            message=f'{instance.full_name} role changed to {instance.role}',
-            icon='bi-person-fill',
+            title="Role Updated",
+            message=f"{instance.full_name} role changed to {instance.role}",
+            icon="bi-person-fill",
             instance_id=instance.id,
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
+
 
 @receiver(post_init, sender=settings.AUTH_USER_MODEL)
 def remember_state_user(sender, instance, **kwargs):
     instance.previous_role = instance.role
 
+
 # Asset Notification
+
 
 @receiver(pre_save, sender=Asset)
 def save_old_status(sender, instance, **kwargs):
@@ -54,9 +59,10 @@ def save_old_status(sender, instance, **kwargs):
     else:
         instance._old_status = None
 
+
 @receiver(post_save, sender=Asset)
 def notify_admin_on_status_change(sender, instance, created, **kwargs):
-    if not created and hasattr(instance, '_old_status'):
+    if not created and hasattr(instance, "_old_status"):
         old_status = instance._old_status
         new_status = instance.asset_status
 
@@ -68,7 +74,7 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
                 link=f"/assets/list",  # Update to actual admin URL
                 is_superuser=True,
                 updated_by=instance.updated_by,
-                object_id=str(instance.id) if instance else None
+                object_id=str(instance.id) if instance else None,
             )
             admins = User.objects.filter(is_superuser=True)
             for admin in admins:
@@ -89,6 +95,8 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             #             instance.id,
             #             instance.tag
             #         )
+
+
 @receiver(post_save, sender=Asset)
 def notify_admin_on_asset_created(sender, instance, created, **kwargs):
     if created:
@@ -99,21 +107,19 @@ def notify_admin_on_asset_created(sender, instance, created, **kwargs):
             link="/assets/list",
             is_superuser=True,
             updated_by=instance.updated_by,
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
 
         admins = User.objects.filter(is_superuser=True)
 
         for admin in admins:
-            UserNotification.objects.create(
-                user=admin,
-                notification=notification
-            )
+            UserNotification.objects.create(user=admin, notification=notification)
+
 
 @receiver(post_save, sender=Asset)
 def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
-    if not created and hasattr(instance, '_old_status'):
-        
+    if not created and hasattr(instance, "_old_status"):
+
         old_status = instance._old_status
         new_status = instance.asset_status
 
@@ -126,16 +132,13 @@ def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
                 link="/assets/list",
                 is_superuser=True,
                 updated_by=instance.updated_by,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
 
             admins = User.objects.filter(is_superuser=True)
             # print("hre")
             for admin in admins:
-                UserNotification.objects.create(
-                    user=admin,
-                    notification=notification
-                )
+                UserNotification.objects.create(user=admin, notification=notification)
 
 
 # @receiver(post_save, sender=AssignAsset)
@@ -170,11 +173,10 @@ def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
 #         )
 
 
-
-        # UserNotification.objects.create(
-        #     user=instance.previous_user,
-        #     notification=notification
-        # )
+# UserNotification.objects.create(
+#     user=instance.previous_user,
+#     notification=notification
+# )
 @receiver(post_save, sender=AssignAsset)
 def asset_notifications(sender, instance, created, **kwargs):
 
@@ -183,9 +185,7 @@ def asset_notifications(sender, instance, created, **kwargs):
     if created:
         for admin in admins:
             NotificationService.send(
-                user=admin,
-                title="Asset Created",
-                message=f"{instance} created"
+                user=admin, title="Asset Created", message=f"{instance} created"
             )
         return
 
@@ -196,28 +196,28 @@ def asset_notifications(sender, instance, created, **kwargs):
                 NotificationService.send(
                     user=admin,
                     title="Status Changed",
-                    message=f"{instance} status changed"
+                    message=f"{instance} status changed",
                 )
             return
 
     # general update
     for admin in admins:
         NotificationService.send(
-            user=admin,
-            title="Asset Updated",
-            message=f"{instance} updated"
+            user=admin, title="Asset Updated", message=f"{instance} updated"
         )
 
+
 @receiver(post_delete, sender=AssignAsset)
-def asset_delete_notification(sender, instance, *args,  **kwargs):
+def asset_delete_notification(sender, instance, *args, **kwargs):
     # send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
-        NotificationService.send(
-            user=instance.previous_user,
-            title='Asset Deleted',
-            message=f'{instance.asset.name} has been deleted.',
-            icon='bi-gear-fill',
-            instance_id=instance.id
-        )
+    NotificationService.send(
+        user=instance.previous_user,
+        title="Asset Deleted",
+        message=f"{instance.asset.name} has been deleted.",
+        icon="bi-gear-fill",
+        instance_id=instance.id,
+    )
+
 
 @receiver(post_init, sender=AssignAsset)
 def remember_state_asset(sender, instance, **kwargs):
@@ -229,18 +229,23 @@ def expiring_asset(days):
     all_tables = connection.introspection.table_names()
 
     # Asset Expires Notification
-    if 'assets_assignasset' in all_tables:
-    
+    if "assets_assignasset" in all_tables:
+
         time_threshold = datetime.now() + timedelta(days=days)
         expiring_assets = AssignAsset.objects.filter(
-            asset__warranty_expiry_date=time_threshold)
+            asset__warranty_expiry_date=time_threshold
+        )
 
         for expiring_asset in expiring_assets:
 
             super_user = User.objects.filter(
-                is_superuser=True, organization=expiring_asset.user.organization).first()
+                is_superuser=True, organization=expiring_asset.user.organization
+            ).first()
 
-            if not UserNotification.objects.filter(user=super_user, notification__notification_text=f'{expiring_asset.asset.name} warranty expires in {days} days.').exists():
+            if not UserNotification.objects.filter(
+                user=super_user,
+                notification__notification_text=f"{expiring_asset.asset.name} warranty expires in {days} days.",
+            ).exists():
 
                 # notification = Notification.objects.create(
                 #     instance_id=expiring_asset.id,
@@ -257,16 +262,17 @@ def expiring_asset(days):
                 # )
                 NotificationService.send(
                     user=expiring_asset.previous_user,
-                    title='Asset Deleted',
-                    message=f'{expiring_asset.asset.name} has been deleted.',
-                    icon='bi-gear-fill',
-                    instance_id=expiring_asset.id
+                    title="Asset Deleted",
+                    message=f"{expiring_asset.asset.name} has been deleted.",
+                    icon="bi-gear-fill",
+                    instance_id=expiring_asset.id,
                 )
+
 
 @receiver(connection_created)
 def conn_db(sender, connection, **kwargs):
     # avoid running during migrations
-    if any(cmd in sys.argv for cmd in ['makemigrations', 'migrate']):
+    if any(cmd in sys.argv for cmd in ["makemigrations", "migrate"]):
         return
     expiring_asset(15)
     expiring_asset(7)

@@ -1,5 +1,5 @@
 <div class="modal-header bg-dark text-white">
-    <h5 class="modal-title">Map CSV Fields to Product Category Fields</h5>
+    <h5 class="modal-title">{{ trans.map_product_category_fields_title }}</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 <form method="post" action="{% url 'upload:product_categories_compare_data' %}" id="mappingForm">
@@ -8,8 +8,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Product Category Field</th>
-                    <th>CSV Header</th>
+                    <th>{{ trans.product_category_field }}</th>
+                    <th>{{ trans.csv_header }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -21,16 +21,16 @@
                         {% if field in required_fields %}
                         <span class="text-danger">*</span>
                         <div class="text-danger small mt-1 d-none" id="error-{{ forloop.counter }}">
-                            This field is required
+                            {{ trans.this_field_is_required }}
                         </div>
                         {% endif %}
                     </td>
 
                     <td>
                         <select name="mapping_{{ field }}" class="form-select mapping-select"
-                            data-error-id="error-{{ forloop.counter }}" 
+                            data-error-id="error-{{ forloop.counter }}"
                             {% if field in required_fields %}data-required="true" {% endif %}>
-                            <option value="">-- Select --</option>
+                            <option value="">{{ trans.select_option }}</option>
                             {% for header in headers %}
                             <option value="{{ header }}">{{ header }}</option>
                             {% endfor %}
@@ -42,9 +42,9 @@
         </table>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.close }}</button>
         <button type="submit" class="btn btn-success" id="importBtn" disabled>
-            Import Product Categories
+            {{ trans.import_product_categories }}
         </button>
     </div>
 </form>

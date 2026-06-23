@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0030_usertotp_status'),
+        ("authentication", "0030_usertotp_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicaluser',
-            name='use_expired_assets',
+            model_name="historicaluser",
+            name="use_expired_assets",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='use_expired_assets',
+            model_name="user",
+            name="use_expired_assets",
             field=models.BooleanField(default=False),
         ),
     ]

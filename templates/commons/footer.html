@@ -19,7 +19,7 @@
             e.innerHTML = ""
         })
     });
-    
+
 </script>
 
 <script>
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function() {
         scannerBtn.addEventListener("click", async () => {
             const hasCamera = await cameraAvailable();
             if (!hasCamera) {
-                alert("⚠️ No camera device found.");
+                alert("No camera device found.");
                 return;
             }
 
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!barcodeArea) return;
             var svgElement = barcodeArea.querySelector("svg");
             if (!svgElement) return;
-            
+
             // Add necessary attributes
             if (!svgElement.hasAttribute('xmlns')) {
                 svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
@@ -228,13 +228,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!svgElement.hasAttribute('height')) {
                 svgElement.setAttribute('height', '150');
             }
-            
+
             var serializer = new XMLSerializer();
             var svgString = serializer.serializeToString(svgElement);
-            
+
             var blob = new Blob([svgString], {type: "image/svg+xml"});
             var url = URL.createObjectURL(blob);
-            
+
             var a = document.createElement('a');
             a.href = url;
             a.download = 'barcode.svg';
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function() {
             URL.revokeObjectURL(url);
         });
     }
-    
+
 </script>
 
 <script>

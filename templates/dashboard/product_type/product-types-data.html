@@ -45,9 +45,9 @@
         </div>
         {% else %}
         {% if products.status %}
-        <span class="status-badge status-active">Active</span>
+        <span class="status-badge status-active">{{ trans.active }}</span>
         {% else %}
-        <span class="status-badge status-inactive">Inactive</span>
+        <span class="status-badge status-inactive">{{ trans.inactive }}</span>
         {% endif %}
         {% endif %}
     </td>
@@ -72,7 +72,7 @@
 
             {% if perms.authentication.delete_product_type %}
             <form method="post" action="{% url 'dashboard:delete_product_type' products.id %}"
-                onsubmit="return confirm('Are you sure?')">
+                onsubmit="return confirm('{{ trans.delete_confirm_product_type }}')">
                 {% csrf_token %}
                 <button class="action-btn danger">
                     <i class="bi bi-trash3"></i>
@@ -90,7 +90,7 @@
 <tr>
     <td colspan="5">
         <div class="table-empty-state text-center">
-            <p>No product types found.</p>
+            <p>{{ trans.no_product_types_found }}</p>
         </div>
     </td>
 </tr>

@@ -16,21 +16,21 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Vendors</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.vendors }}</li>
       </ol>
     </nav>
-    <h1>Vendor Directory</h1>
-    <p class="page-subtitle">Manage your organization's vendor relationships and contacts.</p>
+    <h1>{{ trans.vendor_directory }}</h1>
+    <p class="page-subtitle">{{ trans.manage_vendors }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_vendors' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_vendors' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_vendor_count %}<span class="count-badge">{{ deleted_vendor_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_vendor %}
       <a href="{% url 'vendors:add' %}" class="btn-register">
-        <i class="bi bi-plus-lg"></i> Add Vendor
+        <i class="bi bi-plus-lg"></i> {{ trans.add_vendor }}
       </a>
     {% endif %}
   </div>
@@ -41,28 +41,28 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-building"></i></div>
     <div>
-      <div class="stat-label">Total Vendors</div>
+      <div class="stat-label">{{ trans.total_vendors }}</div>
       <div class="stat-value">{{ total_vendor_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Active</div>
+      <div class="stat-label">{{ trans.active }}</div>
       <div class="stat-value">{{ active_vendor_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-pause-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Inactive</div>
+      <div class="stat-label">{{ trans.inactive }}</div>
       <div class="stat-value">{{ inactive_vendor_count }}</div>
     </div>
   </div>
   <a href="{% url 'recycle_bin:deleted_vendors' %}" class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-label">{{ trans.recycle_bin }}</div>
       <div class="stat-value">{{ deleted_vendor_count }}</div>
     </div>
   </a>
@@ -76,23 +76,23 @@
     hx-trigger="change, keyup changed delay:400ms from:input">
     <div class="row g-2 align-items-end">
       <div class="col">
-        <div class="filter-label">Search Vendor</div>
+        <div class="filter-label">{{ trans.search_vendor }}</div>
         <input name="search_text" type="search"
-          autocomplete="off" placeholder="Name, email or contact…"
-          aria-label="Search vendors">
+          autocomplete="off" placeholder="{{ trans.search_placeholder }}"
+          aria-label="{{ trans.search_vendor }}">
       </div>
 
       <div class="col-auto">
-        <div class="filter-label">Status</div>
+        <div class="filter-label">{{ trans.status_label }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
-            All Status
+            {{ trans.all_status }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='active'; document.getElementById('status-btn').childNodes[0].textContent='Active '; htmx.trigger(form,'change');">Active</a></li>
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='inactive'; document.getElementById('status-btn').childNodes[0].textContent='Inactive '; htmx.trigger(form,'change');">Inactive</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; htmx.trigger(form,'change');">{{ trans.all_status }}</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='active'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} '; htmx.trigger(form,'change');">{{ trans.active }}</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='inactive'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} '; htmx.trigger(form,'change');">{{ trans.inactive }}</a></li>
           </ul>
           <input type="hidden" name="status">
         </div>
@@ -102,18 +102,18 @@
         <div class="col-auto">
           <div class="dropdown">
             <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-              <i class="bi bi-download"></i> Export
+              <i class="bi bi-download"></i> {{ trans.export }}
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
-              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
             </ul>
           </div>
         </div>
       {% endif %}
       <div class="col-auto">
         <a href="{% url 'vendors:list' %}" class="btn-reset" title="Reset">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
     </div>
@@ -129,16 +129,16 @@
     <table class="list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Vendor Name</th>
-          <th>Contact Person</th>
-          <th>Email</th>
-          <th>GSTIN No.</th>
-          <th>Phone No.</th>
-          <th>Status</th>
-          <th>Asset Count</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.vendor_name }}</th>
+          <th>{{ trans.contact_person }}</th>
+          <th>{{ trans.email_label }}</th>
+          <th>{{ trans.gstin_no }}</th>
+          <th>{{ trans.phone_no }}</th>
+          <th>{{ trans.status_label }}</th>
+          <th>{{ trans.asset_count }}</th>
           {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
-            <th>Actions</th>
+            <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -168,9 +168,9 @@
               </div>
             {% else %}
               {% if vendors.status %}
-                <span class="status-badge status-active">Active</span>
+                <span class="status-badge status-active">{{ trans.active }}</span>
               {% else %}
-                <span class="status-badge status-inactive">Inactive</span>
+                <span class="status-badge status-inactive">{{ trans.inactive }}</span>
               {% endif %}
             {% endif %}
           </td>
@@ -200,7 +200,7 @@
               {% endif %}
               {% if perms.authentication.delete_vendor %}
                 <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('Delete {{ vendors.name }}? It can be restored from Recycle Bin.')">
+                      onsubmit="return confirm('{{ trans.delete_confirm_vendor }}')">
                   {% csrf_token %}
                   <button type="submit"
                     class="action-btn danger {% if is_demo %}disabled{% endif %}"
@@ -223,8 +223,8 @@
           <td colspan="9">
             <div class="table-empty-state">
               <i class="bi bi-building d-block"></i>
-              <p>No vendors found.<br>
-                <a href="{% url 'vendors:add' %}" class="link-primary">Add your first vendor</a>
+              <p>{{ trans.no_vendors_found }}<br>
+                <a href="{% url 'vendors:add' %}" class="link-primary">{{ trans.add_first_vendor }}</a>
               </p>
             </div>
           </td>

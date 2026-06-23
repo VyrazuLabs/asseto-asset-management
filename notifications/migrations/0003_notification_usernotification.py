@@ -12,39 +12,85 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('roles', '0001_initial'),
-        ('notifications', '0002_auto_20221102_1212'),
+        ("roles", "0001_initial"),
+        ("notifications", "0002_auto_20221102_1212"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('status', models.IntegerField(default=1)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('updated_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('instance_id', models.UUIDField(default=uuid.uuid4, editable=False)),
-                ('notification_title', models.CharField(blank=True, max_length=255, null=True)),
-                ('notification_text', models.CharField(blank=True, max_length=255, null=True)),
-                ('icon', models.CharField(blank=True, max_length=225, null=True)),
-                ('is_view', models.BooleanField(default=False)),
-                ('is_superuser', models.BooleanField(default=False)),
-                ('role', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='roles.role')),
+                ("status", models.IntegerField(default=1)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("created_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("updated_by", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("instance_id", models.UUIDField(default=uuid.uuid4, editable=False)),
+                (
+                    "notification_title",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                (
+                    "notification_text",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("icon", models.CharField(blank=True, max_length=225, null=True)),
+                ("is_view", models.BooleanField(default=False)),
+                ("is_superuser", models.BooleanField(default=False)),
+                (
+                    "role",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="roles.role",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='UserNotification',
+            name="UserNotification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_seen', models.BooleanField(default=False)),
-                ('notification', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='notifications.notification')),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_seen", models.BooleanField(default=False)),
+                (
+                    "notification",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="notifications.notification",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

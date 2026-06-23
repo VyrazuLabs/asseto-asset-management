@@ -6,43 +6,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0003_localizationconfiguration'),
+        ("configurations", "0003_localizationconfiguration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='localizationconfiguration',
-            name='country_format',
+            model_name="localizationconfiguration",
+            name="country_format",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='localizationconfiguration',
-            name='default_language',
+            model_name="localizationconfiguration",
+            name="default_language",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='localizationconfiguration',
-            name='name_display_format',
+            model_name="localizationconfiguration",
+            name="name_display_format",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='localizationconfiguration',
-            name='currency',
+            model_name="localizationconfiguration",
+            name="currency",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='localizationconfiguration',
-            name='date_format',
+            model_name="localizationconfiguration",
+            name="date_format",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='localizationconfiguration',
-            name='time_format',
+            model_name="localizationconfiguration",
+            name="time_format",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='localizationconfiguration',
-            name='timezone',
+            model_name="localizationconfiguration",
+            name="timezone",
             field=models.IntegerField(blank=True, null=True),
         ),
     ]

@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0024_historicaluser_browser_notification_and_more'),
+        ("authentication", "0024_historicaluser_browser_notification_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicaluser',
-            name='password_reset_token',
+            model_name="historicaluser",
+            name="password_reset_token",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='password_reset_token',
+            model_name="user",
+            name="password_reset_token",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

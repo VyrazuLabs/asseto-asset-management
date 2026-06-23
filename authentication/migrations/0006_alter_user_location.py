@@ -8,14 +8,22 @@ import smart_selects.db_fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0005_alter_organization_logo'),
-        ('authentication', '0005_alter_user_is_active'),
+        ("dashboard", "0005_alter_organization_logo"),
+        ("authentication", "0005_alter_user_is_active"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='location',
-            field=smart_selects.db_fields.ChainedForeignKey(auto_choose=True, blank=True, chained_field='organization', chained_model_field='organization', null=True, on_delete=django.db.models.deletion.CASCADE, to='dashboard.location'),
+            model_name="user",
+            name="location",
+            field=smart_selects.db_fields.ChainedForeignKey(
+                auto_choose=True,
+                blank=True,
+                chained_field="organization",
+                chained_model_field="organization",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dashboard.location",
+            ),
         ),
     ]

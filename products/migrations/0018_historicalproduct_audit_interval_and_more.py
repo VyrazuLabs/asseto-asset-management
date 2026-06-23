@@ -6,18 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0017_alter_historicalproduct_created_at_and_more'),
+        ("products", "0017_alter_historicalproduct_created_at_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalproduct',
-            name='audit_interval',
-            field=models.IntegerField(choices=[(0, 0), (1, 365), (2, 182), (3, 91), (4, 60), (5, 30)], default=0),
+            model_name="historicalproduct",
+            name="audit_interval",
+            field=models.IntegerField(
+                choices=[(0, 0), (1, 365), (2, 182), (3, 91), (4, 60), (5, 30)],
+                default=0,
+            ),
         ),
         migrations.AddField(
-            model_name='product',
-            name='audit_interval',
-            field=models.IntegerField(choices=[(0, 0), (1, 365), (2, 182), (3, 91), (4, 60), (5, 30)], default=0),
+            model_name="product",
+            name="audit_interval",
+            field=models.IntegerField(
+                choices=[(0, 0), (1, 365), (2, 182), (3, 91), (4, 60), (5, 30)],
+                default=0,
+            ),
         ),
     ]

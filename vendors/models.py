@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from dashboard.models import TimeStampModel, Organization, SoftDeleteModel, Address
 from simple_history.models import HistoricalRecords
+
 # Create your models here
 
 
@@ -15,9 +16,11 @@ class Vendor(TimeStampModel, SoftDeleteModel):
     gstin_number = models.CharField(max_length=45, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     address = models.ForeignKey(
-        Address, on_delete=models.CASCADE, blank=True, null=True)
+        Address, on_delete=models.CASCADE, blank=True, null=True
+    )
     organization = models.ForeignKey(
-        Organization, models.DO_NOTHING, blank=True, null=True)
+        Organization, models.DO_NOTHING, blank=True, null=True
+    )
     history = HistoricalRecords()
 
     def __str__(self):

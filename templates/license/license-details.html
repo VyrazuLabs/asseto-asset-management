@@ -2,42 +2,45 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}License Details - {{ license.name }} | Asseto{% endblock %}
+{% block title %}{{ trans.license_details }} - {{ license.name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/license-details.css' %}?v=1.1">
+<link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 {% endblock css %}
 
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
-            <h3 class="page-name">License Details</h3>
 
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">License</li>
-                    <li class="breadcrumb-item active" aria-current="page">License Details</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.license }}</li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ trans.license_details }}</li>
                 </ol>
             </nav>
         </div>
     </div>
 
-    {# ── Header Row ────────────────────────────────────────────────────────── #}
-    <div class="header-row">
+    <div class="header-row d-flex justify-content-between align-items-start">
+    <div>
         <h1>{{ license.name }}</h1>
-        <p class="page-subtitle">View and manage license details and assigned seats.</p>
+        <p class="page-subtitle">{{ trans.view_manage_license }}</p>
     </div>
+
     <div class="d-flex align-items-center gap-2">
         <a href="{% url 'license:license_list' %}" class="btn-back-listing">
-            <i class="bi bi-arrow-left"></i> Back to Listing
+            <i class="bi bi-arrow-left"></i> {{ trans.back_to_list }}
         </a>
+
         <a href="{% url 'license:update_license' license.id %}" class="btn-save-asset">
-            <i class="bi bi-pencil"></i> Update License
+            <i class="bi bi-pencil"></i> {{ trans.update_license }}
         </a>
     </div>
+</div>
 </div>
 
 <section class="section">
@@ -45,73 +48,54 @@
         <div class="card-body">
             <h6 class="my-3">
                 <i class="bi bi-pc-display"></i>
-                <span>License Information</span>
+                <span>{{ trans.license_information }}</span>
             </h6>
             <div class="table-responsive">
                 <table class="table table-borderless">
                     <tbody>
                         <tr>
-                            <th scope="row">License Name</th>
-                            <td>{{license.name}}</td>
-
-                            <th scope="row">Key</th>
-                            {% if not license.key %} <td>Not Provided</td>
-                            {% else %}
-                            <td>{{license.key}}</td>
-                            {% endif %}
+                            <th scope="row">{{ trans.license_name }}</th>
+                            <td>{{ license.name }}</td>
+                            <th scope="row">{{ trans.key_label }}</th>
+                            <td>{% if license.key %}{{ license.key }}{% else %}{{ trans.not_provided }}{% endif %}</td>
                         </tr>
                         <tr>
-                            <th scope="row">License Type</th>
-                            <td>{{license.license_type.name}}</td>
-                            <th scope="row">Expiry Date</th>
-                            {% if license.expiry_date == None %} <td>Not Provided</td>
-                            {% else %}
-                            <td>{% format_datetime license.expiry_date %}</td>
-                            {% endif %}
-                        </tr>
-
-                        <tr>
-                            <th scope="row">Vendor</th>
-                            <td>{{license.vendor.name}}</td>
-                        </tr>
-
-                        <tr>
-                            <th scope="row">Seats</th>
-                            {% if not license.seats %} <td>Not Provided</td>
-                            {% else %}
-                            <td>{{license.seats}}</td>
-                            {% endif %}
+                            <th scope="row">{{ trans.license_type }}</th>
+                            <td>{{ license.license_type.name }}</td>
+                            <th scope="row">{{ trans.expiry_date }}</th>
+                            <td>{% if license.expiry_date %}{% format_datetime license.expiry_date %}{% else %}{{ trans.not_provided }}{% endif %}</td>
                         </tr>
                         <tr>
-                            <th scope="row">Start Date</th>
-                            {% if license.start_date == None %} <td>Not Provided</td>
-                            {% else %}
-                            <td>{% format_datetime license.start_date %}</td>
-                            {% endif %}
+                            <th scope="row">{{ trans.vendor }}</th>
+                            <td>{{ license.vendor.name }}</td>
+                            <th scope="row">{{ trans.seats }}</th>
+                            <td>{% if license.seats %}{{ license.seats }}{% else %}{{ trans.not_provided }}{% endif %}</td>
                         </tr>
                         <tr>
-                            <th scope="row">Notes</th>
-                            <td colspan="3">{{license.notes|urlize}}</td>
+                            <th scope="row">{{ trans.start_date }}</th>
+                            <td>{% if license.start_date %}{% format_datetime license.start_date %}{% else %}{{ trans.not_provided }}{% endif %}</td>
+                            <th scope="row">{{ trans.notes_label }}</th>
+                            <td colspan="3">{{ license.notes|urlize }}</td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-    </div>
 
-    {# ── History Section ───────────────────────────────────────────────────── #}
+    {# ── History / Activity Log ──────────────────────────────────────────── #}
     <div class="mt-4">
+        {% with hide_activity_pagination=True %}
         {% include 'commons/history.html' %}
+        {% endwith %}
     </div>
-    </div>
+</section>
 
-    <script>
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('hidden.bs.modal', () => {
-                window.location.reload();
-            });
+<script>
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', () => {
+            window.location.reload();
         });
-    </script>
-    {% endblock content %}
+    });
+</script>
+{% endblock content %}

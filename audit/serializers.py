@@ -3,6 +3,8 @@ from rest_framework import serializers
 from audit.models import Audit, AuditImage
 from common.convert_base64_image import convert_image
 from assets.models import Asset
+
+
 # from dashboard.models import CustomField
 # class CustomFieldSerializer(serializers.Serializer):
 #     field_name = serializers.CharField()
@@ -15,10 +17,18 @@ class AuditSerializer(serializers.ModelSerializer):
         allow_null=True,
         default=list,
     )
+
     class Meta:
         model = Audit
         fields = [
-            'images','audited_by', 'created_at', 'assigned_to', 'asset', 'organization', 'condition', 'notes'
+            "images",
+            "audited_by",
+            "created_at",
+            "assigned_to",
+            "asset",
+            "organization",
+            "condition",
+            "notes",
         ]
 
     # Fix: Only decode, never remove or pop keys in to_internal_value
@@ -30,7 +40,7 @@ class AuditSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)
 
     def validate_tag(self, tag):
-        get_tag=Asset.objects.filter(tag=tag).exists()
+        get_tag = Asset.objects.filter(tag=tag).exists()
         if not tag:
             raise serializers.ValidationError("Tag can not be empty")
         return tag
@@ -54,12 +64,12 @@ class AuditSerializer(serializers.ModelSerializer):
         )
         asset_images = None
         for image in images:
-            image=convert_image(image)
+            image = convert_image(image)
             AuditImage.objects.create(image=image, audit=audit)
         return audit
 
     def update(self, instance, validated_data):
-        image_data = validated_data.pop('images', None)
+        image_data = validated_data.pop("images", None)
         for attribute, value in validated_data.items():
             if value is None:
                 continue
@@ -68,5 +78,5 @@ class AuditSerializer(serializers.ModelSerializer):
         if image_data is not None:
             for image in image_data:
                 AuditImage.objects.create(audit=instance, image=image)
-        
+
         return instance

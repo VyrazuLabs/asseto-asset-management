@@ -5,14 +5,14 @@
     <table class="assets-table list-table" id="assetsTable">
         <thead>
             <tr>
-                <th>Sl No.</th>
-                <th>Image</th>
-                <th>Asset Tag</th>
-                <th>Asset Name</th>
-                <th>Product Type</th>
-                <th>Assigned To</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{{ trans.sl_no }}</th>
+                <th>{{ trans.image_label_col }}</th>
+                <th>{{ trans.asset_tag_col }}</th>
+                <th>{{ trans.asset_name_col }}</th>
+                <th>{{ trans.product_type }}</th>
+                <th>{{ trans.assigned_to_col }}</th>
+                <th>{{ trans.status_col }}</th>
+                <th>{{ trans.actions_col }}</th>
             </tr>
         </thead>
         <tbody>
@@ -45,11 +45,11 @@
                         <div class="asset-name-sub">
                           {% if asset.product %}{{ asset.product.name }}{% endif %}
                           {% if condition == 0 or condition == 1 %}
-                            &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+                            &nbsp;·&nbsp;<span class="state-excellent">● {{ trans.excellent }}</span>
                           {% elif condition == 2 %}
-                            &nbsp;·&nbsp;<span class="state-good">● Good</span>
+                            &nbsp;·&nbsp;<span class="state-good">● {{ trans.good }}</span>
                           {% elif condition == 3 or condition == 4 %}
-                            &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+                            &nbsp;·&nbsp;<span class="state-poor">● {{ trans.needs_repair }}</span>
                           {% endif %}
                         </div>
                       {% endwith %}
@@ -71,11 +71,11 @@
                               {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
                             </span>
                           {% endif %}
-                          <span>{{ map.full_name|default:"Unknown User" }}</span>
+                          <span>{{ map.full_name|default:trans.unknown_user }}</span>
                         </div>
                       {% endwith %}
                     {% else %}
-                      <span class="unassigned-label">Unassigned</span>
+                      <span class="unassigned-label">{{ trans.unassigned_label }}</span>
                     {% endif %}
                 </td>
 
@@ -83,13 +83,13 @@
                     {% if not asset.is_assigned %}
                       <span class="status-badge" style="background:var(--color-bg-secondary); color:var(--color-text);">{{ asset.asset_status.name }}</span>
                     {% else %}
-                      <span class="status-badge status-allocated">Allocated</span>
+                      <span class="status-badge status-allocated">{{ trans.allocated_label }}</span>
                     {% endif %}
                 </td>
 
                 <td>
                     <div class="row-actions">
-                        <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View details">
+                        <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="{{ trans.view_details }}">
                           <i class="bi bi-eye"></i>
                         </a>
                     </div>
@@ -97,7 +97,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="8"><div class="text-center py-4 text-muted">No assets assigned.</div></td>
+                <td colspan="8"><div class="text-center py-4 text-muted">{{ trans.no_assets_assigned }}</div></td>
             </tr>
             {% endfor %}
         </tbody>

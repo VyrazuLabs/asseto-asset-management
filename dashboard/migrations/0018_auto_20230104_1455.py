@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0017_alter_organization_logo'),
+        ("dashboard", "0017_alter_organization_logo"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='address',
-            name='status',
+            model_name="address",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='department',
-            name='status',
+            model_name="department",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='location',
-            name='status',
+            model_name="location",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='organization',
-            name='status',
+            model_name="organization",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='productcategory',
-            name='status',
+            model_name="productcategory",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='producttype',
-            name='status',
+            model_name="producttype",
+            name="status",
             field=models.BooleanField(default=True),
         ),
     ]

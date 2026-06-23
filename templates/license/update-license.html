@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Update License - {{ title }} | Asseto{% endblock %}
+{% block title %}{{ trans.update_license }} - {{ title }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,20 +15,20 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'license:license_list' %}" class="breadcrumb-link">Licenses</a></li>
-            <li class="breadcrumb-item active">Update License</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'license:license_list' %}" class="breadcrumb-link">{{ trans.licenses_breadcrumb }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.update_license_breadcrumb }}</li>
           </ol>
         </nav>
-        <h1>Update License</h1>
-        <p class="subtitle">Update the license details below to modify the license information.</p>
+        <h1>{{ trans.update_license }}</h1>
+        <p class="subtitle">{{ trans.update_license_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'license:license_list' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         <button type="submit" form="license-form" class="btn-save-asset">
-          <i class="bi bi-floppy2"></i> Update
+          <i class="bi bi-floppy2"></i> {{ trans.update }}
         </button>
       </div>
     </div>
@@ -41,32 +41,32 @@
             {# ── Section 1: Basic Information ────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-key"></i> <span>Basic Information</span>
+                    <i class="bi bi-key"></i> <span>{{ trans.basic_information }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="{{ form.name.id_for_label }}">LICENSE NAME <span class="required">*</span></label>
+                        <label for="{{ form.name.id_for_label }}">{{ trans.license_name_label }} <span class="required">*</span></label>
                         {{ form.name }}
                         {% if form.name.errors %}
                         <div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.license_type.id_for_label }}">LICENSE TYPE <span class="required">*</span></label>
+                        <label for="{{ form.license_type.id_for_label }}">{{ trans.license_type_label }} <span class="required">*</span></label>
                         {{ form.license_type }}
                         {% if form.license_type.errors %}
                         <div class="text-danger small mt-1">{{ form.license_type.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.seats.id_for_label }}">SEATS <span class="required">*</span></label>
+                        <label for="{{ form.seats.id_for_label }}">{{ trans.seats_label }} <span class="required">*</span></label>
                         {{ form.seats }}
                         {% if form.seats.errors %}
                         <div class="text-danger small mt-1">{{ form.seats.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.vendor.id_for_label }}">VENDOR</label>
+                        <label for="{{ form.vendor.id_for_label }}">{{ trans.vendor_label }}</label>
                         {{ form.vendor }}
                         {% if form.vendor.errors %}
                         <div class="text-danger small mt-1">{{ form.vendor.errors.0 }}</div>
@@ -78,25 +78,25 @@
             {# ── Section 2: License Details ─────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-info-circle"></i> <span>License Details</span>
+                    <i class="bi bi-info-circle"></i> <span>{{ trans.license_details_section }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="{{ form.key.id_for_label }}">LICENSE KEY</label>
+                        <label for="{{ form.key.id_for_label }}">{{ trans.license_key_label }}</label>
                         {{ form.key }}
                         {% if form.key.errors %}
                         <div class="text-danger small mt-1">{{ form.key.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.start_date.id_for_label }}">START DATE</label>
+                        <label for="{{ form.start_date.id_for_label }}">{{ trans.start_date_label }}</label>
                         {{ form.start_date }}
                         {% if form.start_date.errors %}
                         <div class="text-danger small mt-1">{{ form.start_date.errors.0 }}</div>
                         {% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.expiry_date.id_for_label }}">EXPIRY DATE</label>
+                        <label for="{{ form.expiry_date.id_for_label }}">{{ trans.expiry_date_label }}</label>
                         {{ form.expiry_date }}
                         {% if form.expiry_date.errors %}
                         <div class="text-danger small mt-1">{{ form.expiry_date.errors.0 }}</div>
@@ -108,11 +108,11 @@
             {# ── Section 3: Additional Details ──────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-file-earmark-text"></i> <span>Additional Details</span>
+                    <i class="bi bi-file-earmark-text"></i> <span>{{ trans.additional_details }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="{{ form.notes.id_for_label }}">DESCRIPTION / NOTES</label>
+                        <label for="{{ form.notes.id_for_label }}">{{ trans.description_notes_label }}</label>
                         {{ form.notes }}
                         {% if form.notes.errors %}
                         <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>

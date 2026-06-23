@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Completed Audits | Asseto{% endblock %}
+{% block title %}{{ trans.completed_audits }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -17,17 +17,17 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">Audit</a></li>
-        <li class="breadcrumb-item active">Completed</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">{{ trans.audit }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.completed }}</li>
       </ol>
     </nav>
-    <h1>Asset Audits</h1>
-    <p class="page-subtitle">Track and manage asset audit history and compliance.</p>
+    <h1>{{ trans.asset_audits }}</h1>
+    <p class="page-subtitle">{{ trans.audit_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
     <a href="{% url 'audit:add_audit' %}" class="btn-register">
-      <i class="bi bi-plus-lg"></i> New Audit
+      <i class="bi bi-plus-lg"></i> {{ trans.new_audit }}
     </a>
   </div>
 </div>
@@ -37,28 +37,28 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-clipboard2-check"></i></div>
     <div>
-      <div class="stat-label">Total Audits</div>
+      <div class="stat-label">{{ trans.total_audits }}</div>
       <div class="stat-value">{{ total_audit_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Completed (30d)</div>
+      <div class="stat-label">{{ trans.completed_30d }}</div>
       <div class="stat-value">{{ completed_count }}</div>
     </div>
   </div>
   <a href="{% url 'audit:pending_audits' %}" class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-clock-fill"></i></div>
     <div>
-      <div class="stat-label">Pending</div>
+      <div class="stat-label">{{ trans.pending }}</div>
       <div class="stat-value">{{ pending_count }}</div>
     </div>
   </a>
   <div class="stat-card">
     <div class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></div>
     <div>
-      <div class="stat-label">Overdue</div>
+      <div class="stat-label">{{ trans.overdue }}</div>
       <div class="stat-value">{{ pending_count }}</div>
     </div>
   </div>
@@ -68,8 +68,8 @@
 <div class="filter-card">
   <div class="d-flex align-items-center justify-content-between">
     <div class="tab-pills">
-      <a href="{% url 'audit:pending_audits' %}" class="tab-pill">Pending</a>
-      <a href="{% url 'audit:completed_audits' %}" class="tab-pill active">Completed</a>
+      <a href="{% url 'audit:pending_audits' %}" class="tab-pill">{{ trans.pending }}</a>
+      <a href="{% url 'audit:completed_audits' %}" class="tab-pill active">{{ trans.completed }}</a>
     </div>
   </div>
 </div>
@@ -80,14 +80,14 @@
     <table class="assets-table list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Image</th>
-          <th>Asset Tag</th>
-          <th>Asset Name</th>
-          <th>Product Type</th>
-          <th>Assigned To</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.image }}</th>
+          <th>{{ trans.asset_tag }}</th>
+          <th>{{ trans.asset_name }}</th>
+          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.assigned_to }}</th>
+          <th>{{ trans.status_label }}</th>
+          <th>{{ trans.actions }}</th>
         </tr>
       </thead>
 
@@ -163,10 +163,10 @@
 
             <td>
               <div class="row-actions">
-                <a href="{% url 'audit:details' audit.id %}" class="action-btn" title="View details">
+                <a href="{% url 'audit:details' audit.id %}" class="action-btn" title="{{ trans.view_details }}">
                   <i class="bi bi-eye"></i>
                 </a>
-                <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="action-btn" title="Audit history">
+                <a href="{% url 'audit:get_audits_by_id' audit.asset.id %}" class="action-btn" title="{{ trans.audit_history }}">
                   <i class="bi bi-archive"></i>
                 </a>
               </div>
@@ -179,8 +179,8 @@
             <td colspan="8">
               <div class="table-empty-state">
                 <i class="bi bi-clipboard2-check d-block"></i>
-                <p>No completed audits found.<br>
-                  <a href="{% url 'audit:add_audit' %}" class="link-primary">Start a new audit</a>
+                <p>{{ trans.no_completed_audits }}<br>
+                  <a href="{% url 'audit:add_audit' %}" class="link-primary">{{ trans.start_new_audit }}</a>
                 </p>
               </div>
             </td>
@@ -209,9 +209,9 @@ function requestAndSendNotification() {
 }
 
 function sendNotification() {
-  const title = "Successfully Audited Asset";
+  const title = "{{ trans.successfully_audited }}";
   const options = {
-    body: "Successfully Audited Asset.",
+    body: "{{ trans.successfully_audited }}.",
     icon: "/static/images/logo/favicon.png",
   };
   new Notification(title, options);

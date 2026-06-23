@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Product Category Details - {{ product_category.name }} | Asseto{% endblock %}
+{% block title %}{{ trans.product_category_details }} - {{ product_category.name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,21 +15,21 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:product_category_list' %}" class="breadcrumb-link">Product Categories</a></li>
-            <li class="breadcrumb-item active">Product Category Details</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:product_category_list' %}" class="breadcrumb-link">{{ trans.product_categories }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.product_category_details }}</li>
           </ol>
         </nav>
         <h1>{{ product_category.name }}</h1>
-        <p class="page-subtitle">View and manage product category details and associated assets.</p>
+        <p class="page-subtitle">{{ trans.product_category_detail_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'dashboard:product_category_list' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         {% if perms.authentication.edit_product_category %}
         <button type="button" class="btn-save-asset" onclick="openEditProductCategoryModal('{% url 'dashboard:update_product_category' product_category.id %}')" {% if is_demo %}disabled{% endif %}>
-          <i class="bi bi-pencil"></i> Update Category
+          <i class="bi bi-pencil"></i> {{ trans.update_category }}
         </button>
         {% endif %}
       </div>
@@ -39,24 +39,24 @@
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-folder2-open"></i>
-            <h2><span>Product Category Information</span></h2>
+            <h2><span>{{ trans.product_category_information }}</span></h2>
         </div>
         <div class="info-grid">
             <div class="info-item">
-                <span class="label">Category Name</span>
+                <span class="label">{{ trans.category_name }}</span>
                 <span class="value">{{ product_category.name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Parent Category</span>
+                <span class="label">{{ trans.parent_category }}</span>
                 <span class="value">{{ product_category.parent.name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Status</span>
+                <span class="label">{{ trans.status_label }}</span>
                 <span class="value">
                     {% if product_category.status %}
-                    <span class="status-badge status-active">Active</span>
+                    <span class="status-badge status-active">{{ trans.active }}</span>
                     {% else %}
-                    <span class="status-badge status-inactive">Inactive</span>
+                    <span class="status-badge status-inactive">{{ trans.inactive }}</span>
                     {% endif %}
                 </span>
             </div>
@@ -80,7 +80,7 @@
 function openEditProductCategoryModal(url) {
     var modalEl = document.getElementById('update-product-category-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-product-category-modal-content'
     }).then(function() {

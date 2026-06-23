@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Product Category Management | Asseto{% endblock %}
+{% block title %}{{ trans.product_category_management }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,18 +15,18 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb page-breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                <li class="breadcrumb-item active">Product Categories</li>
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                <li class="breadcrumb-item active">{{ trans.product_categories }}</li>
             </ol>
         </nav>
-        <h1>Product Category Management</h1>
-        <p class="page-subtitle">Organize product categories and subcategories efficiently.</p>
+        <h1>{{ trans.product_category_management }}</h1>
+        <p class="page-subtitle">{{ trans.product_category_management_subtitle }}</p>
     </div>
 
     <div class="d-flex align-items-center gap-2 mt-1">
 
         <a href="{% url 'recycle_bin:deleted_product_categories' %}" class="btn-trash">
-            <i class="bi bi-trash3"></i> Trash
+            <i class="bi bi-trash3"></i> {{ trans.trash }}
             {% if deleted_product_categories_count %}
             <span class="count-badge">{{ deleted_product_categories_count }}</span>
             {% endif %}
@@ -36,7 +36,7 @@
         <button type="button" class="btn-register" hx-get="{% url 'dashboard:add_product_category' %}"
             hx-target="#add-product-category-modal-content" data-bs-toggle="modal"
             data-bs-target="#add-product-category-modal">
-            <i class="bi bi-plus-lg"></i> Add Category
+            <i class="bi bi-plus-lg"></i> {{ trans.add_category }}
         </button>
         {% endif %}
 
@@ -48,28 +48,28 @@
     <div class="stat-card">
         <div class="stat-icon blue"><i class="bi bi-folder2-open"></i></div>
         <div>
-            <div class="stat-label">Total Categories</div>
+            <div class="stat-label">{{ trans.total_categories }}</div>
             <div class="stat-value">{{ total_categories }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
         <div>
-            <div class="stat-label">Active</div>
+            <div class="stat-label">{{ trans.active }}</div>
             <div class="stat-value">{{ active_categories }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
         <div>
-            <div class="stat-label">Inactive</div>
+            <div class="stat-label">{{ trans.inactive }}</div>
             <div class="stat-value">{{ inactive_categories }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
         <div>
-            <div class="stat-label">Deleted</div>
+            <div class="stat-label">{{ trans.deleted }}</div>
             <div class="stat-value">{{ deleted_product_categories_count }}</div>
         </div>
     </div>
@@ -84,30 +84,29 @@
         <div class="row g-2 align-items-end">
 
             <div class="col-12 col-md-6 col-lg">
-                <div class="filter-label">Search Category</div>
-                <input name="search_text" type="search" placeholder="Search category..."
+                <div class="filter-label">{{ trans.search_category }}</div>
+                <input name="search_text" type="search" placeholder="{{ trans.search_category_placeholder }}"
                     hx-get="{% url 'dashboard:search_product_category' page_object.number %}"
                     hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result">
             </div>
 
             <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
-                <div class="filter-label">Status</div>
+                <div class="filter-label">{{ trans.status_label }}</div>
                 <div class="dropdown">
                     <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
-                        All Status
+                        {{ trans.all_status }}
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#product-category-filter-form','change');">All
-                                Status</a></li>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} ';htmx.trigger('#product-category-filter-form','change');">{{ trans.all_status }}</a></li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#product-category-filter-form','change');">Active</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} ';htmx.trigger('#product-category-filter-form','change');">{{ trans.active }}</a>
                         </li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#product-category-filter-form','change');">Inactive</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} ';htmx.trigger('#product-category-filter-form','change');">{{ trans.inactive }}</a>
                         </li>
                     </ul>
                     <input type="hidden" name="status">
@@ -116,7 +115,7 @@
 
             <div class="col-auto">
                 <a href="{% url 'dashboard:product_category_list' %}" class="btn-reset">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
                 </a>
             </div>
 
@@ -144,12 +143,12 @@
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Sl No.</th>
-                    <th>Name</th>
-                    <th>Total Assets</th>
-                    <th>Parent</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <th>{{ trans.sl_no }}</th>
+                    <th>{{ trans.name_label }}</th>
+                    <th>{{ trans.total_assets }}</th>
+                    <th>{{ trans.parent }}</th>
+                    <th>{{ trans.status_label }}</th>
+                    <th>{{ trans.actions }}</th>
                 </tr>
             </thead>
 
@@ -163,8 +162,8 @@
     <!-- PAGINATION -->
     <div class="pagination-wrap">
         <span>
-            Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-            of <strong>{{ page_object.paginator.count|default:0 }}</strong> categories
+            {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+            {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.categories_lower }}
         </span>
 
         <div class="pagination-nav">

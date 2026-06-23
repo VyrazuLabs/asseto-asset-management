@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0015_alter_user_access_level'),
+        ("authentication", "0015_alter_user_access_level"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='is_deleted',
+            model_name="user",
+            name="is_deleted",
             field=models.BooleanField(default=False),
         ),
     ]

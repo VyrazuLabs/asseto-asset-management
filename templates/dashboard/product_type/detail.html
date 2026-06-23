@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Product Type Details - {{ product_type.name }} | Asseto{% endblock %}
+{% block title %}{{ trans.product_type_details }} - {{ product_type.name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,21 +15,21 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:product_type_list' %}" class="breadcrumb-link">Product Types</a></li>
-            <li class="breadcrumb-item active">Product Type Details</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:product_type_list' %}" class="breadcrumb-link">{{ trans.product_types }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.product_type_details }}</li>
           </ol>
         </nav>
         <h1>{{ product_type.name }}</h1>
-        <p class="page-subtitle">View and manage product type details and associated assets.</p>
+        <p class="page-subtitle">{{ trans.product_type_detail_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'dashboard:product_type_list' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         {% if perms.authentication.edit_product_type %}
         <button type="button" class="btn-save-asset" onclick="openEditProductTypeModal('{% url 'dashboard:update_product_type' product_type.id %}')" {% if is_demo %}disabled{% endif %}>
-          <i class="bi bi-pencil"></i> Update Product Type
+          <i class="bi bi-pencil"></i> {{ trans.update_product_type }}
         </button>
         {% endif %}
       </div>
@@ -39,20 +39,20 @@
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-box-seam-fill"></i>
-            <h2><span>Product Type Information</span></h2>
+            <h2><span>{{ trans.product_type_information }}</span></h2>
         </div>
         <div class="info-grid">
             <div class="info-item">
-                <span class="label">Product Type Name</span>
+                <span class="label">{{ trans.product_type_name_label }}</span>
                 <span class="value">{{ product_type.name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Status</span>
+                <span class="label">{{ trans.status }}</span>
                 <span class="value">
                     {% if product_type.status %}
-                    <span class="status-badge status-active">Active</span>
+                    <span class="status-badge status-active">{{ trans.active }}</span>
                     {% else %}
-                    <span class="status-badge status-inactive">Inactive</span>
+                    <span class="status-badge status-inactive">{{ trans.inactive }}</span>
                     {% endif %}
                 </span>
             </div>
@@ -78,7 +78,7 @@
 function openEditProductTypeModal(url) {
     var modalEl = document.getElementById('update-product-type-modal');
     if (!modalEl) return;
-    
+
     htmx.ajax('GET', url, {
         target: '#update-product-type-modal-content'
     }).then(function() {

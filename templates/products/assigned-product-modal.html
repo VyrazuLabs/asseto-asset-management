@@ -6,7 +6,7 @@
 
 .modal-header, .modal-footer {
   display: flex;
-  justify-content: space-between; /* spreads buttons/title */
+  justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
 }
@@ -14,7 +14,7 @@
 .modal-body {
   padding: 1.5rem;
   flex-grow: 1;
-  overflow-y: auto; /* scroll if content too tall */
+  overflow-y: auto;
 }
 
 .modal-title {
@@ -28,7 +28,7 @@
     <div >
         <div id="add-product-modal-content" class="modal-content" hx-target="this">
         <div class="modal-header bg-dark text-center">
-        <h5 class="modal-title white" id="myModalLabel160">Assigned Assets
+        <h5 class="modal-title white" id="myModalLabel160">{{ trans.assigned_assets_modal }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"
             aria-label="Close">
@@ -41,13 +41,13 @@
               <table class="table" style="align-items: center;">
                 <thead>
                   <tr>
-                    <th>Sr No</th>
-                    <th>Asset Name</th>
-                    <th>Vendor</th>
-                    <th>Asset Serial Number</th>
-                    <th>Product Type</th>
-                    <th>Asset Status</th>
-                    <th>Assigned Status</th>
+                    <th>{{ trans.sr_no }}</th>
+                    <th>{{ trans.asset_name }}</th>
+                    <th>{{ trans.vendor }}</th>
+                    <th>{{ trans.asset_serial_number }}</th>
+                    <th>{{ trans.product_type }}</th>
+                    <th>{{ trans.asset_status }}</th>
+                    <th>{{ trans.assigned_status }}</th>
                   </tr>
                 </thead>
                 <tbody>

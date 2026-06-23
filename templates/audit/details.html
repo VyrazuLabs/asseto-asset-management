@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}Audit Details - {{ audit.asset.tag }} | Asseto{% endblock %}
+{% block title %}{{ trans.audit_details }} - {{ audit.asset.tag }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -16,17 +16,17 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">Audit</a></li>
-            <li class="breadcrumb-item active">Audit Details</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'audit:completed_audits' %}" class="breadcrumb-link">{{ trans.audit }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.audit_details }}</li>
           </ol>
         </nav>
-        <h1>Audit Details</h1>
-        <p class="page-subtitle">View detailed information about the asset audit.</p>
+        <h1>{{ trans.audit_details }}</h1>
+        <p class="page-subtitle">{{ trans.audit_details_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'audit:completed_audits' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Audit List
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_audit_list }}
         </a>
       </div>
     </div>
@@ -36,34 +36,34 @@
         <div class="detail-card">
             <div class="card-header-custom">
                 <i class="bi bi-clipboard-check"></i>
-                <h2><span>Audit Information</span></h2>
+                <h2><span>{{ trans.audit_information }}</span></h2>
             </div>
-            
+
             <div class="info-grid">
                 <div class="info-item">
-                    <span class="label">Asset Tag</span>
+                    <span class="label">{{ trans.asset_tag }}</span>
                     <span class="value">{{ audit.asset.tag }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">Asset Name</span>
+                    <span class="label">{{ trans.asset_name }}</span>
                     <span class="value">{{ audit.asset.name }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">Audited At</span>
+                    <span class="label">{{ trans.audited_at }}</span>
                     <span class="value">{% format_datetime audit.created_at %}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">Audited By</span>
+                    <span class="label">{{ trans.audited_by }}</span>
                     <span class="value">{{ audit.audited_by.get_full_name|default:audit.audited_by.username }}</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">Asset Audit Interval</span>
+                    <span class="label">{{ trans.asset_audit_interval }}</span>
                     <div class="value">
                         <span class="badge-interval">{{ audit.asset.product.get_audit_duration|default:"N/A" }}</span>
                     </div>
                 </div>
                 <div class="info-item">
-                    <span class="label">Condition</span>
+                    <span class="label">{{ trans.condition }}</span>
                     <div class="value">
                         <div class="condition-status">
                             <span class="status-dot {% if audit.condition == 0 %}excellent{% elif audit.condition == 1 %}good{% elif audit.condition == 2 %}fair{% else %}poor{% endif %}"></span>
@@ -74,9 +74,9 @@
             </div>
 
             <div class="notes-section">
-                <span class="label">Notes</span>
+                <span class="label">{{ trans.notes }}</span>
                 <div class="notes-box">
-                    {{ audit.notes|default:"No additional notes provided for this audit." }}
+                    {{ audit.notes|default:trans.no_notes_provided }}
                 </div>
             </div>
         </div>
@@ -85,9 +85,9 @@
         <div class="detail-card">
             <div class="card-header-custom">
                 <i class="bi bi-images"></i>
-                <h2><span>Audit Images</span></h2>
+                <h2><span>{{ trans.audit_images_section }}</span></h2>
             </div>
-            
+
             <div class="image-gallery">
                 {% if images %}
                     {% for img in images %}
@@ -96,11 +96,11 @@
                             <img src="{% get_media_prefix %}{{ img.image }}" alt="Audit Image {{ forloop.counter }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="image-fallback" style="display:none;">
                                 <i class="bi bi-image"></i>
-                                <span>No image available</span>
+                                <span>{{ trans.no_image_available }}</span>
                             </div>
                             <div class="image-caption">
                                 <i class="bi bi-calendar3"></i>
-                                Captured: {% format_datetime img.uploaded_at %}
+                                {{ trans.captured_label }} {% format_datetime img.uploaded_at %}
                             </div>
                         </div>
                         {% endwith %}
@@ -108,7 +108,7 @@
                 {% else %}
                     <div class="no-image-found">
                         <i class="bi bi-image"></i>
-                        <span>No image found</span>
+                        <span>{{ trans.no_image_found }}</span>
                     </div>
                 {% endif %}
             </div>
@@ -121,7 +121,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Image Preview</h5>
+                <h5 class="modal-title">{{ trans.image_preview }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center p-0" id="modalImageContainer">
@@ -136,17 +136,17 @@ function showImageModal(imgSrc, index) {
     var modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
     var modalImg = document.getElementById('modalPreviewImage');
     var modalContainer = document.getElementById('modalImageContainer');
-    
+
     modalImg.onerror = function() {
         modalImg.style.display = 'none';
         modalContainer.innerHTML = '<div class="no-image-found"><i class="bi bi-image"></i><span>No image available</span></div>';
     };
-    
+
     modalImg.onload = function() {
         modalImg.style.display = 'block';
         modalContainer.innerHTML = '<img id="modalPreviewImage" src="' + imgSrc + '" class="img-fluid" alt="Preview">';
     };
-    
+
     modalImg.src = imgSrc;
     modal.show();
 }

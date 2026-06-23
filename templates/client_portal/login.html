@@ -30,7 +30,7 @@
 
                 <form method="POST" action="{% url 'client_portal:login' %}">
                     {% csrf_token %}
-                    
+
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} small py-2">

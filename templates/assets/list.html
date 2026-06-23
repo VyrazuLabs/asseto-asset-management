@@ -18,21 +18,21 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Assets</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.assets }}</li>
       </ol>
     </nav>
-    <h1>Asset Inventory</h1>
-    <p class="page-subtitle">Manage and track your organization's high-value physical assets.</p>
+    <h1>{{ trans.asset_inventory }}</h1>
+    <p class="page-subtitle">{{ trans.asset_inventory_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_asset_count %}<span class="count-badge">{{ deleted_asset_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_asset %}
       <a href="{% url 'assets:add' %}" class="btn-register">
-        <i class="bi bi-plus-lg"></i> Register New Asset
+        <i class="bi bi-plus-lg"></i> {{ trans.register_new_asset }}
       </a>
     {% endif %}
   </div>
@@ -43,28 +43,28 @@
   <a href="{% url 'assets:list' %}" class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
     <div>
-      <div class="stat-label">Total Value</div>
+      <div class="stat-label">{{ trans.total_value }}</div>
       <div class="stat-value">{{ total_value|floatformat:0 }}</div>
     </div>
   </a>
   <a href="{% url 'assets:list' %}" class="stat-card">
     <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
     <div>
-      <div class="stat-label">Active Units</div>
+      <div class="stat-label">{{ trans.active_units }}</div>
       <div class="stat-value">{{ active_count }}</div>
     </div>
   </a>
   <a href="{% url 'assets:list' %}?status=assigned" class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-tools"></i></div>
     <div>
-      <div class="stat-label">In Service</div>
+      <div class="stat-label">{{ trans.in_service }}</div>
       <div class="stat-value">{{ assigned_count }}</div>
     </div>
   </a>
   <a href="{% url 'recycle_bin:deleted_assets' %}" class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-label">{{ trans.recycle_bin }}</div>
       <div class="stat-value">{{ deleted_asset_count }}</div>
     </div>
   </a>
@@ -80,9 +80,9 @@
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-sm-6 col-lg">
-        <div class="filter-label">Search Asset</div>
+        <div class="filter-label">{{ trans.search_asset_label }}</div>
         <input name="search_text" type="search"
-          autocomplete="off" placeholder="Tag or Name…"
+          autocomplete="off" placeholder="{{ trans.tag_or_name }}"
           hx-get="{% url 'assets:search' page_object.number %}"
           hx-trigger="keyup changed delay:400ms, search"
           hx-target="#search_result"
@@ -90,14 +90,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Status</div>
+        <div class="filter-label">{{ trans.status_label }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
             All Status
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; htmx.trigger(form,'change');">All Status</a></li>
             {% for status in asset_status_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value='{{ status.id }}'; document.getElementById('status-btn').childNodes[0].textContent='{{ status.name }} '; htmx.trigger(form,'change');">
@@ -110,14 +110,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Vendor</div>
+        <div class="filter-label">{{ trans.vendors }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
             All Vendors
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors '; htmx.trigger(form,'change');">All Vendors</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; document.getElementById('vendor-btn').childNodes[0].textContent='{{ trans.all_vendors }} '; htmx.trigger(form,'change');">All Vendors</a></li>
             {% for vendor in vendor_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value='{{ vendor.id }}'; document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.name }} '; htmx.trigger(form,'change');">
@@ -130,14 +130,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Product Type</div>
+        <div class="filter-label">{{ trans.product_types }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
             All Types
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
             {% for type in product_type_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
@@ -150,14 +150,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Category</div>
+        <div class="filter-label">{{ trans.product_categories }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="category-btn" aria-label="Filter by category">
             All Categories
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value=''; document.getElementById('category-btn').childNodes[0].textContent='All Categories '; htmx.trigger(form,'change');">All Categories</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value=''; document.getElementById('category-btn').childNodes[0].textContent='{{ trans.all_categories }} '; htmx.trigger(form,'change');">All Categories</a></li>
             {% for category in product_category_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value='{{ category.id }}'; document.getElementById('category-btn').childNodes[0].textContent='{{ category.name }} '; htmx.trigger(form,'change');">
@@ -170,14 +170,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Location</div>
+        <div class="filter-label">{{ trans.locations }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn" aria-label="Filter by location">
             All Locations
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value=''; document.getElementById('location-btn').childNodes[0].textContent='All Locations '; htmx.trigger(form,'change');">All Locations</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value=''; document.getElementById('location-btn').childNodes[0].textContent='{{ trans.all_locations }} '; htmx.trigger(form,'change');">All Locations</a></li>
             {% for loc in location_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value='{{ loc.id }}'; document.getElementById('location-btn').childNodes[0].textContent='{{ loc.office_name }} '; htmx.trigger(form,'change');">
@@ -190,14 +190,14 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Department</div>
+        <div class="filter-label">{{ trans.departments }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn" aria-label="Filter by department">
             All Dept
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=department]').value=''; document.getElementById('dept-btn').childNodes[0].textContent='All Dept '; htmx.trigger(form,'change');">All Dept</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=department]').value=''; document.getElementById('dept-btn').childNodes[0].textContent='{{ trans.all_dept }} '; htmx.trigger(form,'change');">All Dept</a></li>
             {% for dept in department_list %}
             <li><a href="#" class="dropdown-item"
               onclick="event.preventDefault();document.querySelector('[name=department]').value='{{ dept.id }}';document.getElementById('dept-btn').childNodes[0].textContent='{{ dept.name }} ';htmx.trigger('#asset-filter-form','change');">
@@ -210,8 +210,8 @@
       </div>
 
       <div class="col-auto">
-        <a href="{% url 'assets:list' %}" class="btn-reset" title="Reset all filters">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        <a href="{% url 'assets:list' %}" class="btn-reset" title="{{ trans.reset }} all filters">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
 
@@ -228,16 +228,16 @@
     <table class="assets-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Image</th>
-          <th>Asset Tag</th>
-          <th>Asset Name</th>
-          <th>Product Type</th>
-          <th>Vendor</th>
-          <th>Assigned To</th>
-          <th>Status</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.image_label_col }}</th>
+          <th>{{ trans.asset_tag_col }}</th>
+          <th>{{ trans.asset_name_col }}</th>
+          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.vendor }}</th>
+          <th>{{ trans.assigned_to_col }}</th>
+          <th>{{ trans.status_col }}</th>
           {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
-            <th>Actions</th>
+            <th>{{ trans.actions_col }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -397,8 +397,8 @@
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
   <div class="pagination-wrap">
     <span>
-      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-      of <strong>{{ page_object.paginator.count }}</strong> assets
+      {{ trans.showing_label }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+      {{ trans.of_label }} <strong>{{ page_object.paginator.count }}</strong> {{ trans.assets_lower }}
     </span>
     <div class="pagination-nav">
       {% if page_object.has_previous %}

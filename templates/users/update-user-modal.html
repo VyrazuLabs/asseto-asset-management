@@ -2,28 +2,28 @@
 <div class="modal-content modal-premium">
     <div class="modal-header border-0 pb-0">
         <div class="d-flex flex-column">
-            <h5 class="modal-title fw-bold" id="myModalLabel160">Update User</h5>
-            <p class="modal-subtitle mb-0">Modify the architectural curator profile details.</p>
+            <h5 class="modal-title fw-bold" id="myModalLabel160">{{ trans.update_user }}</h5>
+            <p class="modal-subtitle mb-0">{{ trans.update_user_subtitle }}</p>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    
+
     <form hx-encoding='multipart/form-data' hx-post='{{request.path}}' novalidate>
         {% csrf_token %}
         <div class="modal-body">
-            
+
             <!-- Section: Personal Information -->
             <div class="section-header">
                 <div class="icon-box">
                     <i class="bi bi-person-fill"></i>
                 </div>
-                <h6 class="section-title">Personal Information</h6>
+                <h6 class="section-title">{{ trans.personal_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="premium-input-group">
-                        <label>Full Name <span class="text-danger">*</span></label>
+                        <label>{{ trans.full_name }} <span class="text-danger">*</span></label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-person"></i>
                             {{form.full_name}}
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Email Address <span class="text-danger">*</span></label>
+                        <label>{{ trans.email_address }} <span class="text-danger">*</span></label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-envelope"></i>
                             {{form.email}}
@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Phone Number <span class="text-danger">*</span></label>
+                        <label>{{ trans.phone_number }} <span class="text-danger">*</span></label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-phone"></i>
                             {{form.phone}}
@@ -64,13 +64,13 @@
                 <div class="icon-box">
                     <i class="bi bi-briefcase-fill"></i>
                 </div>
-                <h6 class="section-title">Office Information</h6>
+                <h6 class="section-title">{{ trans.office_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Department</label>
+                        <label>{{ trans.department_label }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-collection"></i>
                             {{form.department}}
@@ -82,7 +82,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Job Title / Role</label>
+                        <label>{{ trans.job_title_role }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-person-badge"></i>
                             {{form.role}}
@@ -94,7 +94,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Office Location</label>
+                        <label>{{ trans.office_location_label }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-geo-alt"></i>
                             {{form.location}}
@@ -106,7 +106,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="premium-input-group">
-                        <label>Access Level</label>
+                        <label>{{ trans.access_level_label }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-shield"></i>
                             {{form.access_level}}
@@ -118,7 +118,7 @@
                 </div>
                 <div class="col-md-12">
                     <div class="premium-input-group">
-                        <label>Profile Picture</label>
+                        <label>{{ trans.profile_picture }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-image"></i>
                             {{form.profile_pic}}
@@ -133,7 +133,7 @@
                         {% else %}
                             <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
                         {% endif %}
-                    </div>                    
+                    </div>
                 </div>
             </div>
 
@@ -142,13 +142,13 @@
                 <div class="icon-box">
                     <i class="bi bi-geo-alt-fill"></i>
                 </div>
-                <h6 class="section-title">Address Information</h6>
+                <h6 class="section-title">{{ trans.address_information }}</h6>
             </div>
-            
+
             <div class="row g-3">
                 <div class="col-md-12">
                     <div class="premium-input-group">
-                        <label>Street Address</label>
+                        <label>{{ trans.street_address }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-house"></i>
                             {{address_form.address_line_one}}
@@ -160,7 +160,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="premium-input-group">
-                        <label>City</label>
+                        <label>{{ trans.city }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-building"></i>
                             {{address_form.city}}
@@ -172,7 +172,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="premium-input-group">
-                        <label>State/Province</label>
+                        <label>{{ trans.state_province }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-map"></i>
                             {{address_form.state}}
@@ -184,7 +184,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="premium-input-group">
-                        <label>Zip Code</label>
+                        <label>{{ trans.zip_code }}</label>
                         <div class="premium-input-with-icon">
                             <i class="bi bi-hash"></i>
                             {{address_form.pin_code}}
@@ -199,10 +199,10 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn-discard" data-bs-dismiss="modal">Discard</button>
-            <button type="submit" class="btn-save-user" 
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"> 
-                Save Changes
+            <button type="button" class="btn-discard" data-bs-dismiss="modal">{{ trans.discard }}</button>
+            <button type="submit" class="btn-save-user"
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving }}`;">
+                {{ trans.save_changes }}
             </button>
         </div>
     </form>

@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}User Management | Asseto{% endblock %}
+{% block title %}{{ trans.user_management }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -17,23 +17,23 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">Users</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.users }}</li>
       </ol>
     </nav>
-    <h1>User Management</h1>
-    <p class="page-subtitle">Manage team members, roles and access levels.</p>
+    <h1>{{ trans.user_management }}</h1>
+    <p class="page-subtitle">{{ trans.user_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'recycle_bin:deleted_users' %}" class="btn-trash" title="Recycle Bin">
-      <i class="bi bi-trash3"></i> Trash
+    <a href="{% url 'recycle_bin:deleted_users' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+      <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_user_count %}<span class="count-badge">{{ deleted_user_count }}</span>{% endif %}
     </a>
     {% if perms.authentication.add_users %}
       <button type="button" class="btn-register"
         hx-get="{% url 'users:add' %}" hx-target="#add-user-modal-content"
         data-bs-toggle="modal" data-bs-target="#add-user-modal">
-        <i class="bi bi-plus-lg"></i> Add User
+        <i class="bi bi-plus-lg"></i> {{ trans.add_user }}
       </button>
     {% endif %}
   </div>
@@ -44,28 +44,28 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
     <div>
-      <div class="stat-label">Total Users</div>
+      <div class="stat-label">{{ trans.total_users }}</div>
       <div class="stat-value">{{ total_user_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-person-check-fill"></i></div>
     <div>
-      <div class="stat-label">Active</div>
+      <div class="stat-label">{{ trans.active }}</div>
       <div class="stat-value">{{ active_user_count }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-laptop"></i></div>
     <div>
-      <div class="stat-label">Assigned Assets</div>
+      <div class="stat-label">{{ trans.assigned_assets }}</div>
       <div class="stat-value">{{ total_assigned_assets }}</div>
     </div>
   </div>
-  <a href="{% url 'recycle_bin:deleted_users' %}" class="stat-card">
+  <a href="{% url 'recycle_bin:deleted_users' %}" class="stat-card" title="{{ trans.recycle_bin }}">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Recycle Bin</div>
+      <div class="stat-label">{{ trans.recycle_bin }}</div>
       <div class="stat-value">{{ deleted_user_count }}</div>
     </div>
   </a>
@@ -75,35 +75,35 @@
 <div class="filter-card">
   <div class="row g-2 align-items-end">
     <div class="col">
-      <div class="filter-label">Search User</div>
+      <div class="filter-label">{{ trans.search_user }}</div>
       <input name="search_text" type="search"
-        autocomplete="off" placeholder="Name or email…"
+        autocomplete="off" placeholder="{{ trans.search_user_placeholder }}"
         hx-get="{% url 'users:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search"
         hx-target="#search_result"
-        aria-label="Search users">
+        aria-label="{{ trans.search_user }}">
     </div>
     {% if request.user.is_superuser %}
       <div class="col-auto">
         <div class="dropdown">
-          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-            <i class="bi bi-download"></i> Export
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="{{ trans.export }}">
+            <i class="bi bi-download"></i> {{ trans.export }}
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'users:export_users_csv' %}"><i class="bi bi-filetype-csv"></i> CSV Format</a></li>
-            <li><a class="dropdown-item" href="{% url 'users:export_users_pdf' %}"><i class="bi bi-filetype-pdf"></i> PDF Format</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:export_users_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:export_users_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
           </ul>
         </div>
       </div>
     {% endif %}
     <div class="col-auto">
-      <a href="{% url 'users:list' %}" class="btn-reset" title="Reset">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      <a href="{% url 'users:list' %}" class="btn-reset" title="{{ trans.reset }}">
+        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
       </a>
     </div>
   </div>
   {% if is_demo is True %}
-    <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
+    <p class="demo-note">{{ trans.demo_mode_disabled }}</p>
   {% endif %}
 </div>
 
@@ -113,19 +113,19 @@
     <table class="list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Image</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Assigned Assets</th>
-          <th>Designation</th>
-          <th>Access Level</th>
-          <th>Last Login</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.image }}</th>
+          <th>{{ trans.name_label }}</th>
+          <th>{{ trans.email_label }}</th>
+          <th>{{ trans.assigned_assets }}</th>
+          <th>{{ trans.designation }}</th>
+          <th>{{ trans.access_level }}</th>
+          <th>{{ trans.last_login }}</th>
           {% if request.user.is_superuser %}
-            <th>Status</th>
+            <th>{{ trans.status_label }}</th>
           {% endif %}
           {% if perms.authentication.delete_users or perms.authentication.view_users or perms.authentication.edit_users %}
-            <th>Actions</th>
+            <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
       </thead>
@@ -147,7 +147,7 @@
             {% else %}
               <img class="user-thumb"
                 src="{% static 'images/faces/1.jpg' %}"
-                alt="Default user">
+                alt="{{ trans.default_avatar }}">
             {% endif %}
           </td>
 
@@ -201,7 +201,7 @@
           <td>
             <div class="row-actions">
               {% if perms.authentication.view_users %}
-                <a href="{% url 'users:details' user.id %}" class="action-btn" title="View {{ user.full_name }}">
+                <a href="{% url 'users:details' user.id %}" class="action-btn" title="{{ trans.view }}">
                   <i class="bi bi-eye"></i>
                 </a>
               {% endif %}
@@ -210,18 +210,18 @@
                   class="action-btn {% if is_demo %}disabled{% endif %}"
                   hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
                   data-bs-toggle="modal" data-bs-target="#update-user-modal"
-                  title="Edit {{ user.full_name }}"
+                  title="{{ trans.edit }}"
                   {% if is_demo %}disabled{% endif %}>
                   <i class="bi bi-pencil"></i>
                 </button>
               {% endif %}
               {% if perms.authentication.delete_users %}
                 <form action="{% url 'users:delete' user.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('Delete {{ user.full_name }}? It can be restored from Recycle Bin.')">
+                      onsubmit="return confirm('{{ trans.delete_confirm_user|escapejs }}')">
                   {% csrf_token %}
                   <button type="submit"
                     class="action-btn danger {% if is_demo %}disabled{% endif %}"
-                    title="Delete {{ user.full_name }}"
+                    title="{{ trans.delete }}"
                     {% if is_demo %}disabled{% endif %}>
                     <i class="bi bi-trash3"></i>
                   </button>
@@ -240,9 +240,9 @@
           <td colspan="10">
             <div class="table-empty-state">
               <i class="bi bi-people"></i>
-              <p>No users found.<br>
+              <p>{{ trans.no_users_found }}<br>
                 <a href="#" class="link-primary" hx-get="{% url 'users:add' %}" hx-target="#add-user-modal-content"
-                  data-bs-toggle="modal" data-bs-target="#add-user-modal">Add your first user</a>
+                  data-bs-toggle="modal" data-bs-target="#add-user-modal">{{ trans.add_first_user }}</a>
               </p>
             </div>
           </td>

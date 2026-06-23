@@ -4,14 +4,14 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Frequently Ask Questions</h3>
+                <h3>{{ trans.frequently_ask_questions }}</h3>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                        <li class="breadcrumb-item" aria-current="page">Support</li>
-                        <li class="breadcrumb-item active" aria-current="page">FAQs</li>
+                        <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                        <li class="breadcrumb-item" aria-current="page">{{ trans.support_breadcrumb }}</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ trans.faqs }}</li>
                     </ol>
                 </nav>
             </div>
@@ -30,13 +30,13 @@
                               <strong>   #{{forloop.counter}} {{faq.question}} </strong>
                            </button>
                         </h2>
-                        
+
                         <div id="collapse-{{forloop.counter}}" class="accordion-collapse collapse" aria-labelledby="heading-{{forloop.counter}}" data-bs-parent="#accordionExample">
                            <div class="accordion-body">
                               <p style="text-indent: 40px">  {{faq.answer}}  </p>
                            </div>
                         </div>
-                        
+
                     </div>
 
                 {% endfor %}

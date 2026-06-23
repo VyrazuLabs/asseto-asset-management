@@ -6,5 +6,12 @@ from .models import User
 
 @admin.register(User)
 class SupportAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'email', 'role',
-                    'organization', 'is_active', 'is_deleted', 'created_at']
+    list_display = [
+        "full_name",
+        "email",
+        "role",
+        "organization",
+        "is_active",
+        "is_deleted",
+        "created_at",
+    ]

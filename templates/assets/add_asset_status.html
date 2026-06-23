@@ -1,7 +1,7 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-activity"></i> {{modal_title}}</h5>
-        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+        <h5 class="modal-title"><i class="bi bi-activity"></i> {% if is_add_mode %}{{ trans.add_asset_status }}{% else %}{{ trans.edit_asset_status }}{% endif %}</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
             <i class="bi bi-x-lg"></i>
         </button>
     </div>
@@ -9,7 +9,7 @@
         {% csrf_token %}
         <div class="modal-body-custom">
             <div class="form-group">
-                <label>ASSET STATUS <span class="required">*</span></label>
+                <label>{{ trans.asset_status }} <span class="required">*</span></label>
                 {{ form.name }}
                 {% for error in form.name.errors %}
                 <small class="text-danger">{{ error }}</small>
@@ -18,10 +18,10 @@
         </div>
         <div class="modal-footer-custom">
             <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                <i class="bi bi-x-lg"></i> Cancel
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save">
-                <i class="bi bi-check-lg"></i> {% if 'Add' in modal_title %}Save{% else %}Update{% endif %}
+                <i class="bi bi-check-lg"></i> {% if is_add_mode %}{{ trans.save }}{% else %}{{ trans.update }}{% endif %}
             </button>
         </div>
     </form>

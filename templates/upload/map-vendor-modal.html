@@ -17,7 +17,7 @@
                 <tr>
                     <td>
                         {{ field }}
-            
+
                         {% if field in required_fields %}
                         <span class="text-danger">*</span>
                         <div class="text-danger small mt-1 d-none" id="error-{{ field }}">
@@ -26,7 +26,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <select name="mapping_{{ field }}" class="form-select mapping-select" 
+                        <select name="mapping_{{ field }}" class="form-select mapping-select"
                         {% if field in required_fields %}data-required="true" {% endif %}>
                             <option value="">-- Select --</option>
                             {% for header in headers %}

@@ -3,15 +3,15 @@
   <table class="list-table" id="table1">
     <thead>
       <tr>
-        <th>Sl No.</th>
-        <th>Office Name</th>
-        <th>Total Assets</th>
-        <th>Contact Person</th>
-        <th>State / City</th>
-        <th>Zip Code</th>
-        <th>Status</th>
+        <th>{{ trans.sl_no }}</th>
+        <th>{{ trans.office_name_label }}</th>
+        <th>{{ trans.total_assets }}</th>
+        <th>{{ trans.contact_person }}</th>
+        <th>{{ trans.state_city }}</th>
+        <th>{{ trans.zip_code_label }}</th>
+        <th>{{ trans.status_label }}</th>
         {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
-        <th>Actions</th>
+        <th>{{ trans.actions }}</th>
         {% endif %}
       </tr>
     </thead>
@@ -67,9 +67,9 @@
           </div>
           {% else %}
           {% if location.status %}
-          <span class="status-badge status-active">Active</span>
+          <span class="status-badge status-active">{{ trans.active }}</span>
           {% else %}
-          <span class="status-badge status-inactive">Inactive</span>
+          <span class="status-badge status-inactive">{{ trans.inactive }}</span>
           {% endif %}
           {% endif %}
         </td>
@@ -78,22 +78,22 @@
         <td>
           <div class="row-actions">
             {% if perms.authentication.view_location %}
-            <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="View Details">
+            <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="{{ trans.view_details }}">
               <i class="bi bi-eye"></i>
             </a>
             {% endif %}
             {% if perms.authentication.edit_location %}
             <a href="{% url 'dashboard:update_location' location.id %}"
-              class="action-btn {% if is_demo %}disabled{% endif %}" title="Edit Location">
+              class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_location }}">
               <i class="bi bi-pencil"></i>
             </a>
             {% endif %}
             {% if perms.authentication.delete_location %}
             <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
-              onsubmit="return confirm('Are you sure you want to delete this location?')">
+              onsubmit="return confirm('{{ trans.delete_confirm_location }}')">
               {% csrf_token %}
               <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}"
-                title="Delete Location" {% if is_demo %}disabled{% endif %}>
+                title="{{ trans.delete_location }}" {% if is_demo %}disabled{% endif %}>
                 <i class="bi bi-trash3"></i>
               </button>
             </form>
@@ -110,11 +110,11 @@
         <td colspan="8">
           <div class="table-empty-state">
             <i class="bi bi-building d-block"></i>
-            <p>No locations found related to your search.<br>
+            <p>{{ trans.no_locations_search }}<br>
               {% if perms.authentication.add_location %}
               <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                 hx-get="{% url 'dashboard:add_location' %}" hx-target="#add-location-modal-content"
-                data-bs-toggle="modal" data-bs-target="#add-location-modal">Register a new location</button>
+                data-bs-toggle="modal" data-bs-target="#add-location-modal">{{ trans.register_new_location }}</button>
               {% endif %}
             </p>
           </div>
@@ -128,8 +128,8 @@
 {# ── Pagination ─────────────────────────────────────────────────────────── #}
 <div class="pagination-wrap">
   <span>
-    Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-    of <strong>{{ page_object.paginator.count|default:0 }}</strong> locations
+    {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+    {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.locations_lower }}
   </span>
   <div class="pagination-nav">
     {% if page_object.has_previous %}
@@ -142,7 +142,7 @@
     {% for num in page_object.paginator.page_range %}
     {% if page_object.number == num %}
     <span class="page-btn active">{{ num }}</span>
-    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} 
+    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
       <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
       class="page-btn">{{ num }}</a>
       {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}

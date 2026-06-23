@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0017_alter_asset_description'),
+        ("assets", "0017_alter_asset_description"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='status',
+            model_name="asset",
+            name="status",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='assetspecification',
-            name='status',
+            model_name="assetspecification",
+            name="status",
             field=models.BooleanField(default=True),
         ),
     ]

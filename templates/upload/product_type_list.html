@@ -15,22 +15,22 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item">Upload</li>
-        <li class="breadcrumb-item active">Product Types</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item">{{ trans.upload }}</li>
+        <li class="breadcrumb-item active">{{ trans.product_types }}</li>
       </ol>
     </nav>
-    <h1>Product Type Upload History</h1>
-    <p class="page-subtitle">View and manage history of imported product type records.</p>
+    <h1>{{ trans.product_type_upload_history }}</h1>
+    <p class="page-subtitle">{{ trans.product_type_upload_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'upload:export_product_types_csv' %}" class="btn-trash" title="Download Sample CSV">
-      <i class="bi bi-download"></i> Sample File
+    <a href="{% url 'upload:export_product_types_csv' %}" class="btn-trash" title="{{ trans.download_sample_csv }}">
+      <i class="bi bi-download"></i> {{ trans.sample_file }}
     </a>
     <button type="button" class="btn-register" id="upload-modal-btn"
       hx-get="{% url 'upload:import_product_types_csv' %}"
       hx-target="#upload-product-types-modal-content" data-bs-toggle="modal" data-bs-target="#upload-product-types-modal">
-      <i class="bi bi-upload"></i> Upload CSV
+      <i class="bi bi-upload"></i> {{ trans.upload_csv }}
     </button>
   </div>
 </div>
@@ -40,21 +40,21 @@
   <div class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-cloud-upload"></i></div>
     <div>
-      <div class="stat-label">Total Uploaded</div>
+      <div class="stat-label">{{ trans.total_uploaded }}</div>
       <div class="stat-value">{{ total_uploads }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon green"><i class="bi bi-calendar-check"></i></div>
     <div>
-      <div class="stat-label">Uploaded Today</div>
+      <div class="stat-label">{{ trans.uploaded_today }}</div>
       <div class="stat-value">{{ today_uploads }}</div>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-box"></i></div>
     <div>
-      <div class="stat-label">Unique Types</div>
+      <div class="stat-label">{{ trans.unique_types }}</div>
       <div class="stat-value">{{ unique_types }}</div>
     </div>
   </div>
@@ -67,14 +67,14 @@
     hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
     <div class="row g-2 align-items-end">
       <div class="col-12 col-md-8 col-lg">
-        <div class="filter-label">Search Uploads</div>
-        <input name="search_text" type="search" autocomplete="off" placeholder="Product type name..."
+        <div class="filter-label">{{ trans.search_uploads }}</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_product_type_uploads_placeholder }}"
           hx-get="{% url 'upload:search_product_type_upload' page_object.number %}"
           hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result" aria-label="Search uploads">
       </div>
       <div class="col-auto">
-        <a href="{% url 'upload:product_type_list' %}" class="btn-reset" title="Reset all filters">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        <a href="{% url 'upload:product_type_list' %}" class="btn-reset" title="{{ trans.reset_filters }}">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
     </div>
@@ -100,9 +100,9 @@
     <table class="list-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>Product Type Name</th>
-          <th class="text-end pe-4">Upload Date</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.product_type_name }}</th>
+          <th class="text-end pe-4">{{ trans.upload_date }}</th>
         </tr>
       </thead>
       {% if page_object %}
@@ -115,10 +115,10 @@
           <td colspan="3">
             <div class="table-empty-state">
               <i class="bi bi-cloud-upload d-block"></i>
-              <p>No product type upload history found.<br>
+              <p>{{ trans.no_product_type_upload_history }}<br>
                 <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                   hx-get="{% url 'upload:import_product_types_csv' %}" hx-target="#upload-product-types-modal-content"
-                  data-bs-toggle="modal" data-bs-target="#upload-product-types-modal">Upload your first CSV</button>
+                  data-bs-toggle="modal" data-bs-target="#upload-product-types-modal">{{ trans.upload_first_csv }}</button>
               </p>
             </div>
           </td>
@@ -131,8 +131,8 @@
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
   <div class="pagination-wrap">
     <span>
-      Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-      of <strong>{{ page_object.paginator.count|default:0 }}</strong> records
+      {{ trans.showing }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+      {{ trans.of }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.records }}
     </span>
     <div class="pagination-nav">
       {% if page_object.has_previous %}
@@ -168,7 +168,7 @@ htmx.on("htmx:afterSwap", (e) => {
         const uploadModalEl = document.getElementById("upload-product-types-modal");
         const uploadModal = bootstrap.Modal.getOrCreateInstance(uploadModalEl);
         if (uploadModal) uploadModal.hide();
-        
+
         document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';

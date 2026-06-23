@@ -9,18 +9,26 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('dashboard', '0025_alter_address_created_at_alter_address_status_and_more'),
+        ("dashboard", "0025_alter_address_created_at_alter_address_status_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BrandingImages',
+            name="BrandingImages",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('logo', models.TextField(max_length=255, null=True)),
-                ('favicon', models.TextField(max_length=255, null=True)),
-                ('login_page_logo', models.TextField(max_length=255, null=True)),
-                ('organization', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='organization_logo', to='dashboard.organization')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("logo", models.TextField(max_length=255, null=True)),
+                ("favicon", models.TextField(max_length=255, null=True)),
+                ("login_page_logo", models.TextField(max_length=255, null=True)),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="organization_logo",
+                        to="dashboard.organization",
+                    ),
+                ),
             ],
         ),
     ]

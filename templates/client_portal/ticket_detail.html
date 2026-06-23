@@ -1,0 +1,236 @@
+{% extends 'client_portal/layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Ticket #{{ ticket.ticket_id }}: {{ ticket.subject }} | Asseto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+
+<link rel="stylesheet" href="{% static 'css/pages/product-details.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/client-ticket-detail.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="pb-5 mt-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'client_portal:dashboard' %}" class="breadcrumb-link">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'client_portal:support_tickets' %}" class="breadcrumb-link">Support Tickets</a></li>
+                    <li class="breadcrumb-item active">View Details</li>
+                </ol>
+            </nav>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="t-badge t-badge-id">#{{ ticket.ticket_id }}</span>
+                <span class="t-badge t-badge-status-{{ ticket.status }}">
+                    <i class="bi bi-circle-fill small me-1" style="font-size:0.5rem;"></i>
+                    {{ ticket.get_status_display|upper }}
+                </span>
+            </div>
+            <h4 class="mb-0 fw-bold">{{ ticket.subject }}</h4>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'client_portal:support_tickets' %}" class="btn-back-list">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    {# Top Cards - Simplified (No Assignment/Dept) #}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Date Opened</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper">
+                        <i class="bi bi-calendar3 fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.created_at|date:"M j, Y" }}</div>
+                        <div class="info-value-secondary">{{ ticket.created_at|date:"h:i A" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Last Update</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper">
+                        <i class="bi bi-clock-history fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.updated_at|timesince }} ago</div>
+                        <div class="info-value-secondary">{{ ticket.updated_at|date:"M j, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="detail-card h-100 mb-0 d-flex flex-column justify-content-center">
+                <div class="info-card-title">Impact Level</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="info-icon-wrapper">
+                        <i class="bi bi-lightning-charge fs-5"></i>
+                    </div>
+                    <div>
+                        <div class="info-value-primary">{{ ticket.get_impact_level_display }}</div>
+                        <div class="info-value-secondary">Priority: {{ ticket.get_priority_display }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Description #}
+    <div class="detail-card mb-4">
+        <div class="section-title">
+            <i class="bi bi-file-text text-primary fs-5"></i> Description
+        </div>
+        <div class="desc-text mt-3">
+            {{ ticket.description|default:"No description provided."|linebreaksbr }}
+        </div>
+    </div>
+
+    {# Asset & Details #}
+    <div class="detail-card mb-4">
+        <h6 class="fw-bold mb-4">Ticket Details</h6>
+        <div class="impact-grid">
+            <div class="impact-item">
+                <div class="info-card-title">Target Asset</div>
+                <div class="impact-value">
+                    {% if ticket.asset %}
+                    {{ ticket.asset.name }} <br>
+                    <span class="asset-tag-pill">{{ ticket.asset.tag }}</span>
+                    {% else %}
+                    General / No Asset
+                    {% endif %}
+                </div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Ticket Type</div>
+                <div class="impact-value">{{ ticket.get_ticket_type_display }}</div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Estimated ETA</div>
+                <div class="impact-value">
+                    {% if ticket.estimated_eta %}
+                    {{ ticket.estimated_eta|date:"M j, Y h:i A" }}
+                    {% else %}
+                    --
+                    {% endif %}
+                </div>
+            </div>
+            <div class="impact-item">
+                <div class="info-card-title">Hours Logged</div>
+                <div class="impact-value">{{ ticket.hours_worked }} hrs</div>
+            </div>
+        </div>
+    </div>
+
+    {# Supporting Documents #}
+    <div class="docs-header mt-5">
+        <h6 class="fw-bold mb-0">Attachments</h6>
+        {% if attachments %}
+        <span class="docs-count">{{ attachments|length }} Files</span>
+        {% endif %}
+    </div>
+    <div class="docs-container mb-5">
+        {% for att in attachments %}
+        <a href="{{ att.file.url }}" target="_blank" class="doc-card">
+            <div class="doc-icon">
+                {% if "pdf" in att.file_name|lower %}
+                <i class="bi bi-file-earmark-pdf text-danger fs-4"></i>
+                {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
+                <img src="{{ att.file.url }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                {% else %}
+                <i class="bi bi-file-earmark text-primary fs-4"></i>
+                {% endif %}
+            </div>
+            <div class="doc-info">
+                <div class="doc-name">{{ att.file_name }}</div>
+                <div class="doc-meta">{{ att.file_size|filesizeformat }}</div>
+            </div>
+            <div class="doc-download">
+                <i class="bi bi-download"></i>
+            </div>
+        </a>
+        {% empty %}
+        <div class="doc-empty-state">
+            <div class="empty-icon-wrap">
+                <i class="bi bi-cloud-slash"></i>
+            </div>
+            <h6>No attachments</h6>
+            <p>No documents or images were uploaded with this ticket.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# Activity Log #}
+    <div class="pd-history-wrap mt-4">
+        <div class="timeline-card">
+            <div class="timeline-header">
+                <div class="timeline-header-left">
+                    <i class="bi bi-clock-history"></i>
+                    <h3>Activity Log</h3>
+                </div>
+            </div>
+            <div class="timeline-body">
+                {% for activity in activities %}
+                <div class="timeline-item">
+                    {% if activity.activity_type == 'created' %}
+                        <div class="timeline-icon bg-blue"><i class="bi bi-plus-circle"></i></div>
+                    {% elif activity.activity_type == 'status_changed' %}
+                        <div class="timeline-icon bg-green"><i class="bi bi-check-circle"></i></div>
+                    {% elif activity.activity_type == 'attachment_added' %}
+                        <div class="timeline-icon bg-blue"><i class="bi bi-paperclip"></i></div>
+                    {% elif activity.activity_type == 'assigned' or activity.activity_type == 'reassigned' %}
+                        <div class="timeline-icon bg-orange"><i class="bi bi-person-check"></i></div>
+                    {% else %}
+                        <div class="timeline-icon bg-gray"><i class="bi bi-info-circle"></i></div>
+                    {% endif %}
+
+                    <div class="timeline-content">
+                        <div class="timeline-content-header">
+                            <h4 class="timeline-title">{{ activity.get_activity_type_display }}</h4>
+                            <span class="timeline-time">{{ activity.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="timeline-desc">{{ activity.description }}</p>
+                        <div class="timeline-footer">
+                            <div class="timeline-avatar">
+                                {% if activity.performed_by %}
+                                    {{ activity.performed_by.get_full_name|slice:":1"|upper }}
+                                {% else %}
+                                    S
+                                {% endif %}
+                            </div>
+                            <span class="timeline-user">
+                                {% if activity.performed_by %}
+                                    {{ activity.performed_by.get_full_name }}
+                                {% else %}
+                                    System Notification
+                                {% endif %}
+                            </span>
+                            {% if activity.performed_by %}
+                            {% if activity.performed_by.role %}
+                            <span class="timeline-role">{{ activity.performed_by.role.related_name|default:"Member" }}</span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+                    <p>No activity log found for this ticket yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

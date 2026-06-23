@@ -9,32 +9,43 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('dashboard', '0026_licensetype'),
-        ('vendors', '0009_alter_historicalvendor_created_at_and_more'),
+        ("dashboard", "0026_licensetype"),
+        ("vendors", "0009_alter_historicalvendor_created_at_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='License',
+            name="License",
             fields=[
-                ('status', models.BooleanField(default=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True, null=True)),
-                ('updated_at', models.DateTimeField(auto_now=True, null=True)),
-                ('created_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('updated_by', models.CharField(blank=True, max_length=255, null=True)),
-                ('is_deleted', models.BooleanField(default=False)),
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=255)),
-                ('seats', models.IntegerField()),
-                ('start_date', models.DateField()),
-                ('expiry_date', models.DateField()),
-                ('key', models.CharField(blank=True, max_length=255, null=True)),
-                ('notes', models.CharField(blank=True, max_length=500, null=True)),
-                ('license_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dashboard.licensetype')),
-                ('vendor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='vendors.vendor')),
+                ("status", models.BooleanField(default=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, null=True)),
+                ("updated_at", models.DateTimeField(auto_now=True, null=True)),
+                ("created_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("updated_by", models.CharField(blank=True, max_length=255, null=True)),
+                ("is_deleted", models.BooleanField(default=False)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=255)),
+                ("seats", models.IntegerField()),
+                ("start_date", models.DateField()),
+                ("expiry_date", models.DateField()),
+                ("key", models.CharField(blank=True, max_length=255, null=True)),
+                ("notes", models.CharField(blank=True, max_length=500, null=True)),
+                (
+                    "license_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dashboard.licensetype",
+                    ),
+                ),
+                (
+                    "vendor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="vendors.vendor"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

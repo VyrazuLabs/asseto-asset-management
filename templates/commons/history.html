@@ -5,9 +5,9 @@
     <div class="timeline-header">
         <div class="timeline-header-left">
             <i class="bi bi-clock-history"></i>
-            <h3>Activity Log</h3>
+            <h3>{{ trans.activity_log }}</h3>
         </div>
-        <a href="#" class="view-all-link">View All History</a>
+        <a href="#" class="view-all-link">{{ trans.view_all_history }}</a>
     </div>
     <div class="timeline-body">
         {% for history in page_object %}
@@ -42,18 +42,18 @@
                 <div class="timeline-content-header">
                     <h4 class="timeline-title">
                         {% if history.history_type == "+" %}
-                            Record Created
+                            {{ trans.record_created }}
                         {% elif history.history_type == "-" %}
-                            Record Deleted
+                            {{ trans.record_deleted }}
                         {% elif history.history_type == "^" %}
-                            Record Restored
+                            {{ trans.record_restored }}
                         {% else %}
                             {% if history.prev_record and history.status != history.prev_record.status %}
-                                Status Changed
+                                {{ trans.status_changed }}
                             {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
-                                Assignment Changed
+                                {{ trans.assignment_changed }}
                             {% else %}
-                                Information Updated
+                                {{ trans.information_updated }}
                             {% endif %}
                         {% endif %}
                     </h4>
@@ -61,21 +61,21 @@
                         {% format_datetime history.history_date %}
                     </span>
                 </div>
-                
+
                 <p class="timeline-desc">
                     {% if history.history_type == "+" %}
-                        The record was successfully created and added to the system.
+                        {{ trans.record_created_desc }}
                     {% elif history.history_type == "-" %}
-                        The record was removed and moved to the recycle bin.
+                        {{ trans.record_deleted_desc }}
                     {% elif history.history_type == "^" %}
-                        The record was restored from the recycle bin.
+                        {{ trans.record_restored_desc }}
                     {% else %}
                         {% if history.prev_record and history.status != history.prev_record.status %}
-                            Status was {% if history.status %}Enabled{% else %}Disabled{% endif %} by the administrator.
+                            {{ trans.status_was }} {% if history.status %}{{ trans.enabled_status }}{% else %}{{ trans.disabled_status }}{% endif %} {{ trans.by_administrator }}
                         {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
-                             Record was {% if history.is_assigned %}Assigned{% else %}Unassigned{% endif %}.
+                            {{ trans.record_was }} {% if history.is_assigned %}{{ trans.assigned_status }}{% else %}{{ trans.unassigned_status }}{% endif %}.
                         {% else %}
-                            Information was updated with new details.
+                            {{ trans.information_updated_desc }}
                         {% endif %}
                     {% endif %}
                 </p>
@@ -84,19 +84,19 @@
                     <div class="timeline-avatar">
                         {{ history.history_user.full_name|slice:":1"|upper|default:"?" }}
                     </div>
-                    <span class="timeline-user">{{ history.history_user.full_name|default:"System" }}</span>
-                    <span class="timeline-role">{{ history.history_user.role.related_name|default:"Administrator" }}</span>
+                    <span class="timeline-user">{{ history.history_user.full_name|default:trans.system_user }}</span>
+                    <span class="timeline-role">{{ history.history_user.role.related_name|default:trans.administrator_role }}</span>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="text-center py-5 text-muted">
             <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
-            <p>No activity log found for this record.</p>
+            <p>{{ trans.no_activity_log }}</p>
         </div>
         {% endfor %}
     </div>
-    {% if page_object.has_other_pages %}
+    {% if not hide_activity_pagination and page_object.has_other_pages %}
     <div class="px-4 pb-3">
         {% include 'commons/pagination.html' %}
     </div>

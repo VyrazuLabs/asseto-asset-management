@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Location Details - {{ location.office_name }} | Asseto{% endblock %}
+{% block title %}{{ trans.location_details }} - {{ location.office_name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,20 +15,20 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:locations' %}" class="breadcrumb-link">Locations</a></li>
-            <li class="breadcrumb-item active">Location Details</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:locations' %}" class="breadcrumb-link">{{ trans.locations }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.location_details }}</li>
           </ol>
         </nav>
         <h1>{{ location.office_name }}</h1>
-        <p class="page-subtitle">View and manage location details and associated assets.</p>
+        <p class="page-subtitle">{{ trans.location_detail_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'dashboard:locations' %}" class="btn-back-listing">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         <a href="{% url 'dashboard:update_location' location.id %}?modal=1" class="btn-save-asset" data-bs-toggle="modal" data-bs-target="#edit-location-modal">
-          <i class="bi bi-pencil"></i> Update Location
+          <i class="bi bi-pencil"></i> {{ trans.update_location }}
         </a>
       </div>
     </div>
@@ -37,47 +37,47 @@
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-geo-alt-fill"></i>
-            <h2><span>Location Information</span></h2>
+            <h2><span>{{ trans.location_information }}</span></h2>
         </div>
         <div class="info-grid">
             <div class="info-item">
-                <span class="label">Office Name</span>
+                <span class="label">{{ trans.office_name_label }}</span>
                 <span class="value">{{ location.office_name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Contact Person Name</span>
+                <span class="label">{{ trans.contact_person_name_label }}</span>
                 <span class="value">{{ location.contact_person_name|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Contact Person Email</span>
+                <span class="label">{{ trans.contact_person_email_label }}</span>
                 <span class="value">{{ location.contact_person_email|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Contact Person Phone</span>
+                <span class="label">{{ trans.contact_person_phone_label }}</span>
                 <span class="value">{{ location.contact_person_phone|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Country</span>
+                <span class="label">{{ trans.country_label }}</span>
                 <span class="value">{{ location.address.country|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">State</span>
+                <span class="label">{{ trans.state_label }}</span>
                 <span class="value">{{ location.address.state|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">City</span>
+                <span class="label">{{ trans.city_label }}</span>
                 <span class="value">{{ location.address.city|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Zip Code</span>
+                <span class="label">{{ trans.zip_code_label }}</span>
                 <span class="value">{{ location.address.pin_code|default:"-" }}</span>
             </div>
             <div class="info-item full-width">
-                <span class="label">Address Line 1</span>
+                <span class="label">{{ trans.address_line_1_label }}</span>
                 <span class="value">{{ location.address.address_line_one|default:"-" }}</span>
             </div>
             <div class="info-item full-width">
-                <span class="label">Address Line 2</span>
+                <span class="label">{{ trans.address_line_2_label }}</span>
                 <span class="value">{{ location.address.address_line_two|default:"-" }}</span>
             </div>
         </div>

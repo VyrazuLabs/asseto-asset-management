@@ -342,9 +342,9 @@ body.theme-dark .section-body select,
 
 /* ── Form Footer / Modal Footer ───────────────────────────────────────────── */
 .update-form-footer,
-.assign-modal-footer { 
-  padding: 1.25rem 1.75rem; 
-  border-top: 1px solid var(--color-border); 
+.assign-modal-footer {
+  padding: 1.25rem 1.75rem;
+  border-top: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -513,9 +513,9 @@ body.theme-dark .modal-body .form-control,
   cursor: pointer;
 }
 
-.assign-modal-footer { 
-  padding: 1.5rem 2rem 2rem; 
-  border-top: 1px solid #F1F5F9; 
+.assign-modal-footer {
+  padding: 1.5rem 2rem 2rem;
+  border-top: 1px solid #F1F5F9;
   display: flex;
   align-items: center;
   justify-content: flex-end;

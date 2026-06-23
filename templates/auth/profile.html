@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/profile-details.css' %}">
@@ -9,8 +10,8 @@
 {% block content %}
 <div class="profile-details-container">
     <div class="pd-page-header">
-        <h1 class="pd-page-title">My Profile</h1>
-        <p class="pd-page-subtitle">Manage your profile information, notification preferences, and account security.</p>
+        <h1 class="pd-page-title">{{ trans.my_profile }}</h1>
+        <p class="pd-page-subtitle">{{ trans.profile_subtitle }}</p>
     </div>
 
     <div class="row">
@@ -30,19 +31,19 @@
                 </div>
                 <h2 class="pd-profile-name">{{request.user.reverse_full_name}}</h2>
                 <p class="pd-profile-role">
-                    {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role}} {% endif %}
+                    {% if request.user.is_superuser %} {{ trans.administrator_role }} {% else %} {{request.user.role}} {% endif %}
                 </p>
                 <p class="pd-profile-username">{{request.user.username}}</p>
 
                 <div class="pd-contact-info">
-                    <div class="pd-contact-section-title mb-4">Contact Information</div>
+                    <div class="pd-contact-section-title mb-4">{{ trans.contact_info_label }}</div>
 
                     <div class="pd-contact-item">
                         <div class="pd-contact-icon">
                             <i class="bi bi-envelope-at"></i>
                         </div>
                         <div class="pd-contact-details">
-                            <span class="pd-contact-label">Email</span>
+                            <span class="pd-contact-label">{{ trans.email_label }}</span>
                             <span class="pd-contact-value text-break">{{request.user.email}}</span>
                         </div>
                     </div>
@@ -52,7 +53,7 @@
                             <i class="bi bi-telephone"></i>
                         </div>
                         <div class="pd-contact-details">
-                            <span class="pd-contact-label">Phone</span>
+                            <span class="pd-contact-label">{{ trans.phone }}</span>
                             <span class="pd-contact-value">{{request.user.phone|default:"N/A"}}</span>
                         </div>
                     </div>
@@ -65,37 +66,37 @@
             <!-- Basic Information Card -->
             <div class="pd-card">
                 <div class="pd-section-title">
-                    <h3>Basic Information</h3>
+                    <h3>{{ trans.basic_information }}</h3>
                     <button type="button" class="pd-btn-edit" id="update-basic-btn"
                         hx-get="{% url 'authentication:profile_basic_info_update' %}"
                         hx-target="#update-basic-modal-content" data-bs-toggle="modal"
                         data-bs-target="#update-basic-modal">
-                        <i class="bi bi-pencil-square"></i> Edit Changes
+                        <i class="bi bi-pencil-square"></i> {{ trans.edit_changes }}
                     </button>
                 </div>
 
                 <div class="pd-info-grid">
                     <div class="pd-info-item">
-                        <span class="pd-info-label">Full Name</span>
+                        <span class="pd-info-label">{{ trans.full_name }}</span>
                         <div class="pd-info-value-box">{{request.user.full_name|default:"--"}}</div>
                     </div>
                     <div class="pd-info-item">
-                        <span class="pd-info-label">Designation</span>
+                        <span class="pd-info-label">{{ trans.designation }}</span>
                         <div class="pd-info-value-box">
-                            {% if request.user.is_superuser %} Administrator {% else %} {{request.user.role|default:"--"}} {% endif %}
+                            {% if request.user.is_superuser %} {{ trans.administrator_role }} {% else %} {{request.user.role|default:"--"}} {% endif %}
                         </div>
                     </div>
                     <div class="pd-info-item full-width">
-                        <span class="pd-info-label">Email Address</span>
+                        <span class="pd-info-label">{{ trans.email_address }}</span>
                         <div class="pd-info-value-box">{{request.user.email}}</div>
                     </div>
                     {% if request.user.department %}
                     <div class="pd-info-item">
-                        <span class="pd-info-label">Department</span>
+                        <span class="pd-info-label">{{ trans.department_label }}</span>
                         <div class="pd-info-value-box">{{request.user.department}}</div>
                     </div>
                     <div class="pd-info-item">
-                        <span class="pd-info-label">Contact Person</span>
+                        <span class="pd-info-label">{{ trans.contact_person }}</span>
                         <div class="pd-info-value-box">{{request.user.department.contact_person_name}}</div>
                     </div>
                     {% endif %}
@@ -105,8 +106,8 @@
             <!-- Notification Settings Card -->
             <div class="pd-notif-card">
                 <div class="pd-notif-header">
-                    <h3>Notification Settings</h3>
-                    <p>Configure how you want to be alerted about system changes.</p>
+                    <h3>{{ trans.notification_settings }}</h3>
+                    <p>{{ trans.notification_settings_desc }}</p>
                 </div>
 
                 <form hx-post="{% url 'users:create_user_notification_type' %}" hx-trigger="change" hx-include="this"
@@ -119,8 +120,8 @@
                                 <i class="bi bi-envelope-check"></i>
                             </div>
                             <div class="pd-notif-text">
-                                <span class="pd-notif-title">Email Notifications</span>
-                                <span class="pd-notif-desc">Daily digest and critical alerts</span>
+                                <span class="pd-notif-title">{{ trans.email_notifications }}</span>
+                                <span class="pd-notif-desc">{{ trans.email_notifications_desc }}</span>
                             </div>
                         </div>
                         <div class="form-check form-switch">
@@ -135,8 +136,8 @@
                                 <i class="bi bi-bell"></i>
                             </div>
                             <div class="pd-notif-text">
-                                <span class="pd-notif-title">In-App Notifications</span>
-                                <span class="pd-notif-desc">Real-time alerts within the portal</span>
+                                <span class="pd-notif-title">{{ trans.in_app_notifications }}</span>
+                                <span class="pd-notif-desc">{{ trans.in_app_notifications_desc }}</span>
                             </div>
                         </div>
                         <div class="form-check form-switch">
@@ -151,8 +152,8 @@
                                 <i class="bi bi-window"></i>
                             </div>
                             <div class="pd-notif-text">
-                                <span class="pd-notif-title">Browser Notifications</span>
-                                <span class="pd-notif-desc">Desktop push notifications</span>
+                                <span class="pd-notif-title">{{ trans.browser_notifications }}</span>
+                                <span class="pd-notif-desc">{{ trans.browser_notifications_desc }}</span>
                             </div>
                         </div>
                         <div class="form-check form-switch">
@@ -167,13 +168,13 @@
                                 <i class="bi bi-slack"></i>
                             </div>
                             <div class="pd-notif-text">
-                                <span class="pd-notif-title">Slack Integration</span>
-                                <span class="pd-notif-desc">Send alerts to connected workspaces</span>
+                                <span class="pd-notif-title">{{ trans.slack_integration }}</span>
+                                <span class="pd-notif-desc">{{ trans.slack_integration_desc }}</span>
                             </div>
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="slack_notification" {% if slack_notification is True %} checked {% endif %} disabled
-                                title="Integration coming soon">
+                                title="{{ trans.integration_coming_soon }}">
                         </div>
                     </div>
 
@@ -184,8 +185,8 @@
                                 <i class="bi bi-clock-history"></i>
                             </div>
                             <div class="pd-notif-text">
-                                <span class="pd-notif-title">Expired Assets</span>
-                                <span class="pd-notif-desc">Weekly summary of deprecated items</span>
+                                <span class="pd-notif-title">{{ trans.expired_assets_notif }}</span>
+                                <span class="pd-notif-desc">{{ trans.expired_assets_desc }}</span>
                             </div>
                         </div>
                         <div class="form-check form-switch">
@@ -206,38 +207,55 @@
                         <i class="bi bi-shield-lock"></i>
                     </div>
                     <div class="pd-2fa-text">
-                        <h3 class="pd-2fa-title">2FA Implementation</h3>
-                        <p class="pd-2fa-desc">Two-factor authentication adds an additional layer of security to your
-                            account by requiring more than just a password to log in. We recommend using a hardware key
-                            or a trusted authenticator app.</p>
+                        <h3 class="pd-2fa-title">{{ trans.two_factor_implementation }}</h3>
+                        <p class="pd-2fa-desc">{{ trans.two_factor_description }}</p>
                     </div>
                     <div class="pd-2fa-actions shadow-sm">
                         <div class="pd-2fa-status">
-                            <span class="pd-2fa-status-label">Active Status</span>
+                            <span class="pd-2fa-status-label">Active 2FA</span>
                             <div class="form-check form-switch p-0 m-0">
                                 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                                 <input class="form-check-input" type="checkbox" id="twoFactorToggle"
-                                    name="two_factor_auth" {% if two_factor_auth %} checked {% endif %}>
+                                    name="two_factor_auth" {% if two_factor_auth %}checked{% endif %}
+                                    data-toggle-url="{% url 'authentication:toggle_2fa' %}"
+                                    data-qr-url="{% url 'authentication:regenerate_qr' %}"
+                                    data-is-validate="{{ get_user_totp.is_validate|lower }}">
                             </div>
                         </div>
-                        <button type="button" id="regenerateQrBtn" class="pd-btn-qr mt-3">
-                            <i class="bi bi-qr-code"></i> Regenerate QR Code
+                        <button type="button" id="regenerateQrBtn"
+                            class="pd-btn-qr mt-3 {% if not two_factor_auth %}d-none{% endif %}"
+                            data-regenerate-url="{% url 'authentication:regenerate_qr' %}">
+                            <i class="bi bi-qr-code"></i> {{ trans.regenerate_qr_code }}
                         </button>
                     </div>
                 </div>
 
-                <!-- QR Code Container (Hidden by default based on JS) -->
-                <div id="qrContainer" class="text-center mt-4 {% if not two_factor_auth %}d-none{% endif %}">
+                <div id="qrContainer" class="text-center mt-4 {% if not two_factor_auth or get_user_totp.is_validate %}d-none{% endif %}" data-qr-data="{{ qr_code_data|default:'' }}">
                     <hr class="my-4 opacity-25">
-                    <h5 class="mb-3">Scan this QR Code in your Authenticator App</h5>
-
-                    <div id="otpInputContainer" class="mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">
-                        <input type="text" placeholder="Enter 6-digit OTP to verify" id="userOtp"
-                            class="form-control w-25 mx-auto text-center font-monospace" maxlength="6">
-                    </div>
-                    <button type="button" id="verify2faBtn" class="btn btn-success px-4 mb-3 {% if get_user_totp.status != 1 and get_user_totp.status != 2 %}d-none{% endif %}">Verify & Enable</button>
-
+                    <h5 class="mb-3">{{ trans.scan_qr_instruction }}</h5>
                     <div id="img-container"></div>
+                    <form method="POST" action="{% url 'authentication:verify_and_enable' %}" id="verifyOtpForm">
+                        {% csrf_token %}
+                        <div class="mt-3">
+                            <input type="text" placeholder="{{ trans.enter_otp_placeholder }}" id="userOtp"
+                            class="form-control w-25 mx-auto text-center font-monospace" maxlength="6", name="otp">
+                        </div>
+                        <button type="submit" class="otp-verify-btn px-4 mt-3">Verify & Enable</button>
+                    </form>
+                </div>
+                
+                
+                <div id="verifiedSuccess" class="text-center mt-4 {% if not two_factor_auth or not get_user_totp.is_validate %}d-none{% endif %}">
+                    <hr class="my-4 opacity-25">
+                    <div class="verified-tick-wrap">
+                        <div class="verified-tick-circle">
+                            <svg class="verified-tick-svg" viewBox="0 0 52 52">
+                                <circle class="verified-tick-circle-bg" cx="26" cy="26" r="25" fill="none"/>
+                                <path class="verified-tick-check" d="M14 27l7 7 16-16" fill="none"/>
+                            </svg>
+                        </div>
+                        <h5 class="verified-text mt-3">OTP Verified!</h5>
+                    </div>
                 </div>
             </div>
         </div>
@@ -303,7 +321,7 @@
             regenerateBtn.addEventListener("click", function () {
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
                 regenerateBtn.disabled = true;
-                regenerateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+                regenerateBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> {{ trans.generating }}';
 
                 fetch("{% url 'authentication:regenerate_qr' %}", {
                     method: "POST",
@@ -331,16 +349,16 @@
                             img.style.maxWidth = "200px";
                             imgContainer.appendChild(img);
                         } else {
-                            alert(data.message || "Failed to regenerate QR");
+                            alert(data.message || "{{ trans.failed_regenerate_qr }}");
                         }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        alert("Something went wrong");
+                        alert("{{ trans.something_went_wrong }}");
                     })
                     .finally(() => {
                         regenerateBtn.disabled = false;
-                        regenerateBtn.innerHTML = '<i class="bi bi-qr-code"></i> Regenerate QR Code';
+                        regenerateBtn.innerHTML = '<i class="bi bi-qr-code"></i> {{ trans.regenerate_qr_code }}';
                     });
             });
         }
@@ -352,7 +370,7 @@
                 const email = "{{request.user.email}}";
 
                 if (!otp) {
-                    alert("Please enter OTP");
+                    alert("{{ trans.please_enter_otp }}");
                     return;
                 }
 
@@ -362,15 +380,15 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.access) {
-                            alert("Verification successful!");
+                            alert("{{ trans.verification_successful }}");
                             window.location.reload();
                         } else {
-                            alert(data.message || "Invalid OTP");
+                            alert(data.message || "{{ trans.invalid_otp }}");
                         }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        alert("Something went wrong");
+                        alert("{{ trans.something_went_wrong }}");
                     });
             });
         }

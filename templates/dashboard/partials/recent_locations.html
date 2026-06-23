@@ -3,9 +3,9 @@
         <thead>
             <tr>
                 <th style="width: 60px;"></th>
-                <th>Location</th>
-                <th>City</th>
-                <th>Date Added</th>
+                <th>{{ trans.location }}</th>
+                <th>{{ trans.city_label }}</th>
+                <th>{{ trans.date_added }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center py-4 text-muted">No recent locations found</td>
+                <td colspan="4" class="text-center py-4 text-muted">{{ trans.no_recent_locations }}</td>
             </tr>
             {% endfor %}
         </tbody>

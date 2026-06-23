@@ -8,19 +8,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('configurations', '0001_initial'),
-        ('dashboard', '0025_alter_address_created_at_alter_address_status_and_more'),
+        ("configurations", "0001_initial"),
+        ("dashboard", "0025_alter_address_created_at_alter_address_status_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TagConfiguration',
+            name="TagConfiguration",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('prefix', models.CharField(blank=True, max_length=50, null=True)),
-                ('number_suffix', models.CharField(blank=True, max_length=50, null=True)),
-                ('use_default_settings', models.BooleanField(default=False)),
-                ('organization', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.organization')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("prefix", models.CharField(blank=True, max_length=50, null=True)),
+                (
+                    "number_suffix",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                ("use_default_settings", models.BooleanField(default=False)),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        to="dashboard.organization",
+                    ),
+                ),
             ],
         ),
     ]

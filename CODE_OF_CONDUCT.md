@@ -1,8 +1,8 @@
 # 🧭 Code of Conduct
 
 ## Overview
-Welcome to the **Asset Management Project**!  
-We are committed to creating a collaborative, respectful, and inclusive environment for everyone contributing to the project.  
+Welcome to the **Asset Management Project**!
+We are committed to creating a collaborative, respectful, and inclusive environment for everyone contributing to the project.
 This Code of Conduct outlines our expectations for behavior and the steps for addressing unacceptable conduct.
 
 ---
@@ -62,7 +62,7 @@ The following are examples of behavior that will not be tolerated:
 ## 🧱 Project Standards
 
 ### Commit & Branching Guidelines
-- Follow the branch naming convention:  
+- Follow the branch naming convention:
   `feature/<name>` | `fix/<issue>` | `hotfix/<name>` | `chore/<task>`
 - Use meaningful commit messages (e.g., `fix: resolve asset image upload issue`).
 - Avoid committing large binaries unless necessary.
@@ -81,7 +81,7 @@ The following are examples of behavior that will not be tolerated:
 ## 🧠 Enforcement
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project maintainers at:
 
-**Email:** [maintainers@assetmanagement.dev]  
+**Email:** [maintainers@assetmanagement.dev]
 All complaints will be reviewed and investigated promptly and fairly.
 
 Maintainers are obligated to respect the privacy and security of the reporter of any incident.
@@ -102,7 +102,7 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 ---
 
 ## 💬 Final Note
-We believe in **respect, transparency, and collaboration**.  
+We believe in **respect, transparency, and collaboration**.
 By participating in this project, you agree to uphold this Code of Conduct and help maintain a positive environment for everyone.
 
 **— The Asset Management Project Team**

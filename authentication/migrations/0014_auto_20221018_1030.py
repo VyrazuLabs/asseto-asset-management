@@ -7,34 +7,36 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0013_alter_user_profile_pic'),
+        ("authentication", "0013_alter_user_profile_pic"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="user",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='created_by',
+            model_name="user",
+            name="created_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='status',
+            model_name="user",
+            name="status",
             field=models.IntegerField(default=1),
         ),
         migrations.AddField(
-            model_name='user',
-            name='updated_at',
+            model_name="user",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='updated_by',
+            model_name="user",
+            name="updated_by",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

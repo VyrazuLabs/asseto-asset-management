@@ -5,6 +5,7 @@ Contains multi-model operations that span across Asset, AssignAsset,
 AssetStatus, and notifications. Views should delegate to these functions
 rather than containing inline business logic.
 """
+
 import structlog
 from django.db import transaction
 from django.db.models import Q
@@ -38,7 +39,7 @@ def change_asset_status(asset_id, new_status_name, organization, updated_by):
 
     get_status = AssetStatus.objects.filter(
         Q(organization=organization) | Q(organization__isnull=True),
-        name=new_status_name
+        name=new_status_name,
     ).first()
 
     asset.asset_status = get_status
@@ -68,16 +69,12 @@ def unassign_asset_from_list(asset_id, organization):
 
     asset.is_assigned = False
     available_status = AssetStatus.objects.filter(
-        Q(organization=organization) | Q(organization__isnull=True),
-        name='Available'
+        Q(organization=organization) | Q(organization__isnull=True), name="Available"
     ).first()
     asset.asset_status = available_status
     asset.save()
 
-    AssignAsset.objects.filter(
-        asset=asset,
-        asset__organization=organization
-    ).delete()
+    AssignAsset.objects.filter(asset=asset, asset__organization=organization).delete()
 
     log.info("asset_unassigned", asset_id=str(asset_id))
 
@@ -97,12 +94,11 @@ def assign_asset_to_user(asset, user, organization):
     """
     assign_obj, created = AssignAsset.objects.update_or_create(
         asset=asset,
-        defaults={'user': user},
+        defaults={"user": user},
     )
     asset.is_assigned = True
     assigned_status = AssetStatus.objects.filter(
-        Q(organization=organization) | Q(organization__isnull=True),
-        name='Assigned'
+        Q(organization=organization) | Q(organization__isnull=True), name="Assigned"
     ).first()
     asset.asset_status = assigned_status
     asset.save()

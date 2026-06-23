@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Asset Status Management | Asseto{% endblock %}
+{% block title %}{{ trans.asset_status_management }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,17 +15,17 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb page-breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                <li class="breadcrumb-item active">Asset Statuses</li>
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                <li class="breadcrumb-item active">{{ trans.asset_statuses }}</li>
             </ol>
         </nav>
-        <h1>Asset Status Management</h1>
-        <p class="page-subtitle">Manage asset lifecycle states and availability statuses.</p>
+        <h1>{{ trans.asset_status_management }}</h1>
+        <p class="page-subtitle">{{ trans.asset_status_subtitle }}</p>
     </div>
 
     <div class="d-flex align-items-center gap-2 mt-1">
-        <a href="{% url 'recycle_bin:deleted_asset_status' %}" class="btn-trash" title="Recycle Bin">
-            <i class="bi bi-trash3"></i> Trash
+        <a href="{% url 'recycle_bin:deleted_asset_status' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
+            <i class="bi bi-trash3"></i> {{ trans.deleted }}
             {% if deleted_asset_status_count %}
             <span class="count-badge">{{ deleted_asset_status_count }}</span>
             {% endif %}
@@ -35,7 +35,7 @@
         <button type="button" class="btn-register" hx-get="{% url 'assets:add_asset_status' %}"
             hx-target="#add-asset-status-modal-content" data-bs-toggle="modal"
             data-bs-target="#add-asset-status-modal">
-            <i class="bi bi-plus-lg"></i> Add Status
+            <i class="bi bi-plus-lg"></i> {{ trans.add_status }}
         </button>
         {% endif %}
     </div>
@@ -46,28 +46,28 @@
     <div class="stat-card">
         <div class="stat-icon blue"><i class="bi bi-activity"></i></div>
         <div>
-            <div class="stat-label">Total Statuses</div>
+            <div class="stat-label">{{ trans.total_statuses }}</div>
             <div class="stat-value">{{ total_statuses }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
         <div>
-            <div class="stat-label">Active</div>
+            <div class="stat-label">{{ trans.active }}</div>
             <div class="stat-value">{{ active_statuses }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon orange"><i class="bi bi-dash-circle-fill"></i></div>
         <div>
-            <div class="stat-label">Inactive</div>
+            <div class="stat-label">{{ trans.inactive }}</div>
             <div class="stat-value">{{ inactive_statuses }}</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
         <div>
-            <div class="stat-label">Deleted</div>
+            <div class="stat-label">{{ trans.deleted }}</div>
             <div class="stat-value">{{ deleted_asset_status_count }}</div>
         </div>
     </div>
@@ -82,30 +82,29 @@
         <div class="row g-2 align-items-end">
 
             <div class="col-12 col-md-6 col-lg">
-                <div class="filter-label">Search Status</div>
-                <input name="search_text" type="search" placeholder="Search status name..."
+                <div class="filter-label">{{ trans.search_status }}</div>
+                <input name="search_text" type="search" placeholder="{{ trans.search_status_placeholder }}"
                     hx-get="{% url 'assets:asset_status_search' page_object.number %}"
                     hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result">
             </div>
 
             <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
-                <div class="filter-label">Status</div>
+                <div class="filter-label">{{ trans.all_status }}</div>
                 <div class="dropdown">
                     <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
-                        All Status
+                        {{ trans.all_status }}
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='All Status ';htmx.trigger('#asset-status-filter-form','change');">All
-                                Status</a></li>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.all_status }}</a></li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='Active ';htmx.trigger('#asset-status-filter-form','change');">Active</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='active';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.active }}</a>
                         </li>
                         <li><a href="#" class="dropdown-item"
-                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='Inactive ';htmx.trigger('#asset-status-filter-form','change');">Inactive</a>
+                                onclick="event.preventDefault();document.querySelector('[name=status]').value='inactive';document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} ';htmx.trigger('#asset-status-filter-form','change');">{{ trans.inactive }}</a>
                         </li>
                     </ul>
                     <input type="hidden" name="status">
@@ -114,13 +113,13 @@
 
             <div class="col-auto">
                 <a href="{% url 'assets:asset_status_list' %}" class="btn-reset">
-                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
                 </a>
             </div>
 
         </div>
     </form>
-    {% if is_demo %}<p class="demo-note mt-2">* Demo mode: some features are disabled.</p>{% endif %}
+    {% if is_demo %}<p class="demo-note mt-2">* {{ trans.demo_mode_note }}.</p>{% endif %}
 </div>
 
 <!-- TABLE -->
@@ -143,11 +142,12 @@
         <table class="list-table">
             <thead>
                 <tr>
-                    <th>Sl No.</th>
-                    <th>Status Name</th>
-                    <th>Status</th>
-                    <th>Total Assets</th>
-                    <th>Actions</th>
+                    <th>{{ trans.sl_no }}</th>
+                    <th>{{ trans.status_name }}</th>
+                    <th>{{ trans.status }}</th>
+                    <th>{{ trans.total_assets }}</th>
+                    <th>{{ trans.actions }}</th>
+
                 </tr>
             </thead>
 
@@ -161,8 +161,8 @@
     <!-- PAGINATION -->
     <div class="pagination-wrap">
         <span>
-            Showing <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-            of <strong>{{ page_object.paginator.count|default:0 }}</strong> statuses
+            {{ trans.showing }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
+          {{ trans.of }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.statuses }}
         </span>
 
         <div class="pagination-nav">
@@ -204,8 +204,8 @@
         }
     }
     function sendNotification() {
-        new Notification("Asset Status Updated", {
-            body: "The asset status record has been successfully modified.",
+        new Notification("{{ trans.asset_status_updated }}", {
+            body: "{{ trans.asset_status_updated_message }}",
             icon: "{% static 'images/logo/favicon.png' %}",
         });
     }
@@ -221,4 +221,3 @@
 </script>
 
 {% endblock %}
-

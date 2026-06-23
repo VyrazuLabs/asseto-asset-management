@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0028_historicaluser_two_factor_auth_user_two_factor_auth'),
+        ("authentication", "0028_historicaluser_two_factor_auth_user_two_factor_auth"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usertotp',
-            name='is_logged_in',
+            model_name="usertotp",
+            name="is_logged_in",
             field=models.BooleanField(default=False),
         ),
     ]

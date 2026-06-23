@@ -36,18 +36,18 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item active">Gate Pass</li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item active">{{ trans.gate_pass }}</li>
           </ol>
         </nav>
-        <h1>Movement Authorisations</h1>
-        <p class="page-subtitle">Manage and track all inward and outward asset logistical passes.</p>
+        <h1>{{ trans.gate_pass_movement_auth }}</h1>
+        <p class="page-subtitle">{{ trans.gate_pass_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2 mt-1">
-        
+
         {% if perms.authentication.add_asset %}
           <a href="{% url 'gate-pass:add' %}" class="btn-register">
-            <i class="bi bi-plus-lg"></i> Register New Gate Pass
+            <i class="bi bi-plus-lg"></i> {{ trans.gate_pass_register_new }}
           </a>
         {% endif %}
       </div>
@@ -58,7 +58,7 @@
     <!-- Card 1 -->
     <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
     <div>
-      <div class="stat-label">Pending Authorisations</div>
+      <div class="stat-label">{{ trans.gate_pass_pending_auth }}</div>
       <div class="stat-value">{{ pending_authorization_count }}</div>
     </div>
   </a>
@@ -66,7 +66,7 @@
     <!-- Card 2 -->
     <div class="stat-icon green"><i class="bi bi-clipboard2-data"></i></div>
     <div>
-      <div class="stat-label">Active Inward Passes</div>
+      <div class="stat-label">{{ trans.gate_pass_active_inward }}</div>
       <div class="stat-value">{{ inward_pass_count }}</div>
     </div>
   </a>
@@ -74,7 +74,7 @@
     <!-- Card 3 -->
     <div class="stat-icon orange"><i class="bi bi-clipboard2-data"></i></div>
     <div>
-      <div class="stat-label">Total Passes Today</div>
+      <div class="stat-label">{{ trans.gate_pass_total_today }}</div>
       <div class="stat-value">{{ passes_created_today_count }}</div>
     </div>
   </a>
@@ -86,18 +86,18 @@
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-sm-6 col-lg">
-        <div class="filter-label">Search Pass</div>
-        <input name="search_text" type="search" autocomplete="off" placeholder="Tag or Name…"
+        <div class="filter-label">{{ trans.gate_pass_search }}</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.tag_or_name }}"
           hx-get="{% url 'gate-pass:search' %}" hx-trigger="keyup changed delay:400ms, search"
           hx-target="#search_result" aria-label="Search assets" />
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Status</div>
+        <div class="filter-label">{{ trans.status_label }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn"
             aria-label="Filter by status">
-            All Status
+            {{ trans.all_status }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -105,7 +105,7 @@
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='All Status '; htmx.trigger(form,'change');">All Status</a></li>
+                onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; htmx.trigger(form,'change');">{{ trans.all_status }}</a></li>
             <li><a href="#" class="dropdown-item"
                 onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value='0'; document.getElementById('status-btn').childNodes[0].textContent='Pending '; htmx.trigger(form,'change');">Pending</a>
             </li>
@@ -125,11 +125,11 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">To Vendor</div>
+        <div class="filter-label">{{ trans.gate_pass_to_vendor }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn"
             aria-label="Filter by vendor">
-            All Vendors
+            {{ trans.all_vendors }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -151,11 +151,11 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Type</div>
+        <div class="filter-label">{{ trans.gate_pass_type_col}}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn"
             aria-label="Filter by product type">
-            All Types
+            {{ trans.all_types }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -201,12 +201,12 @@
         </div>
       </div>
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Raised By</div>
+        <div class="filter-label">{{ trans.gate_pass_raised_by }}</div>
 
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="raised-by-btn"
             aria-label="Filter by raised by">
-            All Raisers
+            {{ trans.gate_pass_all_raisers }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -247,12 +247,12 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Authorised By</div>
+        <div class="filter-label">{{ trans.gate_pass_authorised_by }}</div>
 
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="authorised-btn"
             aria-label="Filter by authorised by">
-            All Authorised
+            {{ trans.gate_pass_all_authorised }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -291,12 +291,12 @@
         </div>
       </div>
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Asset</div>
+        <div class="filter-label">{{ trans.gate_pass_all_assets }}</div>
 
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="asset-btn"
             aria-label="Filter by asset">
-            All Assets
+            {{ trans.gate_pass_all_assets }}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               aria-hidden="true">
               <polyline points="6 9 12 15 18 9" />
@@ -335,8 +335,8 @@
         </div>
       </div>
       <div class="col-auto">
-        <a href="{% url 'gate_pass:list' %}" class="btn-reset p-2" title="Reset all filters">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        <a href="{% url 'gate_pass:list' %}" class="btn-reset p-2" title="{{ trans.reset }}">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
     </div>
@@ -350,15 +350,15 @@
     <table class="assets-table" id="table1">
       <thead>
         <tr>
-          <th>SL.No</th>
-          <th>Pass #</th>
-          <th>Asset</th>
-          <th>Raised By</th>
-          <th>Authorised By</th>
-          <th>To Vendor</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{{ trans.gate_pass_sl_no }}</th>
+          <th>{{ trans.gate_pass_pass_no }}</th>
+          <th>{{ trans.gate_pass_asset_col }}</th>
+          <th>{{ trans.gate_pass_raised_by_col }}</th>
+          <th>{{ trans.gate_pass_authorised_by_col }}</th>
+          <th>{{ trans.gate_pass_to_vendor_col }}</th>
+          <th>{{ trans.gate_pass_type_col }}</th>
+          <th>{{ trans.gate_pass_status_col }}</th>
+          <th>{{ trans.gate_pass_actions_col }}</th>
         </tr>
       </thead>
       {% if filtered is None %}
@@ -512,31 +512,8 @@
   </div>
   <div class="pagination-wrap">
     <span>
-      Showing <strong>{{ page_object.start_index }}1 –{{ page_object.end_index }}1</strong>
-      of <strong>{{ page_object.paginator.count }}</strong>1 assets
+      Showing all <strong>{{ items.count }}</strong> entries
     </span>
-    <div class="pagination-nav">
-      {% if page_object.has_previous %}
-      <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
-      {% else %}
-      <span class="page-btn disabled" aria-disabled="true">‹</span>
-      {% endif %}
-      {% for num in page_object.paginator.page_range %}
-      {% if page_object.number == num %}
-      <span class="page-btn active" aria-current="page">{{ num }}</span>
-      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <=
-        page_object.number|add:"2" %} <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
-        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-        <span class="page-ellipsis">…</span>
-        {% endif %}
-        {% endfor %}
-
-        {% if page_object.has_next %}
-        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
-        {% else %}
-        <span class="page-btn disabled" aria-disabled="true">›</span>
-        {% endif %}
-    </div>
   </div>
 </div>
 {% endblock content %}

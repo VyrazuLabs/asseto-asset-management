@@ -2,8 +2,12 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from license.models import License
-from notifications.models import Notification, UserNotification  # adjust import if needed
+from notifications.models import (
+    Notification,
+    UserNotification,
+)  # adjust import if needed
 from notifications.service import NotificationService
+
 User = get_user_model()
 
 
@@ -18,6 +22,7 @@ def store_old_license(sender, instance, **kwargs):
     else:
         instance._old_instance = None
 
+
 @receiver(post_save, sender=License)
 def notify_license_create_update(sender, instance, created, **kwargs):
     if created:
@@ -28,9 +33,8 @@ def notify_license_create_update(sender, instance, created, **kwargs):
             link="/license/list",
             is_superuser=True,
             updated_by=getattr(instance, "updated_by", None),
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
-
 
     else:
         NotificationService.send(
@@ -40,7 +44,7 @@ def notify_license_create_update(sender, instance, created, **kwargs):
             link="/license/list",
             is_superuser=True,
             updated_by=getattr(instance, "updated_by", None),
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
 
     admins = User.objects.filter(is_superuser=True)
@@ -58,7 +62,7 @@ def notify_license_create_update(sender, instance, created, **kwargs):
             link="/license/list",
             is_superuser=True,
             updated_by=getattr(instance, "updated_by", None),
-            object_id=str(instance.id)
+            object_id=str(instance.id),
         )
 
         # admins = User.objects.filter(is_superuser=True)

@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('vendors', '0008_auto_20230104_1455'),
+        ("vendors", "0008_auto_20230104_1455"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='historicalvendor',
-            name='created_at',
+            model_name="historicalvendor",
+            name="created_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalvendor',
-            name='status',
+            model_name="historicalvendor",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalvendor',
-            name='updated_at',
+            model_name="historicalvendor",
+            name="updated_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='vendor',
-            name='created_at',
+            model_name="vendor",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='vendor',
-            name='status',
+            model_name="vendor",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='vendor',
-            name='updated_at',
+            model_name="vendor",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

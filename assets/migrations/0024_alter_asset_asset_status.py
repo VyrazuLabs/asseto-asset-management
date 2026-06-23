@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assets', '0023_asset_asset_status_historicalasset_asset_status'),
+        ("assets", "0023_asset_asset_status_historicalasset_asset_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='asset',
-            name='asset_status',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='assets.assetstatus'),
+            model_name="asset",
+            name="asset_status",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="assets.assetstatus",
+            ),
         ),
     ]

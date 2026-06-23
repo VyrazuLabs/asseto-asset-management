@@ -39,11 +39,11 @@
         <div class="dropdown-item d-flex p-2 alert alert-dismissible show fade xyz" style="cursor: pointer; position: relative;">
 
             <i class="bi {{user_notification.notification.icon}} fs-3 ps-2 pe-4"></i>
-            <div 
-                 
+            <div
+
                 class="justify-content-between px-3"
                 {% if user_notification.notification.link is not None %}
-                    onclick="location.href='{{user_notification.notification.link}}';" 
+                    onclick="location.href='{{user_notification.notification.link}}';"
                     hx-post="{% url 'notifications:seen' user_notification.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                     hx-trigger="click"
@@ -57,18 +57,18 @@
 
                     <small>{{ user_notification.notification.created_at|date:"F j, Y, g:i A" }}</small>
                 </div>
-                <small style="text-wrap: wrap;">{{user_notification.notification.notification_text}}</small> 
+                <small style="text-wrap: wrap;">{{user_notification.notification.notification_text}}</small>
             </div>
         </div>
     </li>
 {% endfor %}
-    
+
 {% if notifications  %}
     <li>
         <div class="p-3 d-flex flex-column">
             {% with notifications|length as notification_count %}
                 {% if notification_count >= 2 %}
-                    <a 
+                    <a
                         class="btn btn-sm align-items-center justify-content-center text-white mb-2 mark-all-as-read-notification"
                         hx-post="{% url 'notifications:mark_all_as_read' %}"
                         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
@@ -81,18 +81,18 @@
                 {% endif %}
             {% endwith %}
 
-            
-            <a 
-                href="{% url 'notifications:list' %}" 
+
+            <a
+                href="{% url 'notifications:list' %}"
                 class="btn text-center see-all-notifications btn-sm" >
                 <span>See all Notifications</span>
             </a>
-            
+
 
         </div>
     </li>
     {% else %}
-     <div class="p-3 d-flex flex-column align-items-center">No notifications are available</div>     
+     <div class="p-3 d-flex flex-column align-items-center">No notifications are available</div>
 {% endif %}
 
 <script>

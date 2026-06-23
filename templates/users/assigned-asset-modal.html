@@ -28,7 +28,7 @@
     <div>
         <div id="add-product-modal-content" style="width: 100%;" class="modal-content" hx-target="this">
             <div class="modal-header bg-dark text-center">
-        <h5 class="modal-title white w-100" id="myModalLabel140">Assigned Assets
+        <h5 class="modal-title white w-100" id="myModalLabel140">{{ trans.assigned_assets }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"
             aria-label="Close">
@@ -41,12 +41,12 @@
               <table class="table" style="align-items:center; padding:40px;">
                 <thead>
                   <tr>
-                    <th>Sr No</th>
-                    <th>User Assigned Asset Name</th>
-                    <th>Vendor</th>
-                    <th>Serial Number</th>
-                    <th>Product Type</th>
-                    <th>Product Category</th>
+                    <th>{{ trans.sr_no }}</th>
+                    <th>{{ trans.user_assigned_asset_name }}</th>
+                    <th>{{ trans.vendor }}</th>
+                    <th>{{ trans.serial_number }}</th>
+                    <th>{{ trans.product_type }}</th>
+                    <th>{{ trans.category }}</th>
                   </tr>
                 </thead>
                 <tbody>

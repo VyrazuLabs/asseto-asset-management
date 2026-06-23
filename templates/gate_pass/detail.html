@@ -32,13 +32,13 @@
     <div class="">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb page-breadcrumb">
-          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'gate-pass:list' %}" class="breadcrumb-link">Gate-Pass</a></li>
-          <li class="breadcrumb-item active">Detail</li>
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'gate-pass:list' %}" class="breadcrumb-link">{{ trans.gate_pass }}</a></li>
+          <li class="breadcrumb-item active">{{ trans.gate_pass_detail }}</li>
         </ol>
       </nav>
       <p class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-1">
-        Authorization Details
+        {{ trans.gate_pass_auth_details }}
       </p>
       <h1 class="text-lg md:text-xl font-semibold text-on-surface">
         Gate Pass #{{ items.gate_pass_no }}
@@ -46,26 +46,27 @@
       <div class="flex items-center gap-2 mt-2">
         {% if items.status == 1 or items.status == 0 %}
         <span
-          class="px-3 py-1 bg-success-container/30 text-success text-xs font-bold rounded-full bg-green-100 text-green-700">ACTIVE
-          AUTHORIZATION</span>
+          class="px-3 py-1 bg-success-container/30 text-success text-xs font-bold rounded-full bg-green-100 text-green-700">{{ trans.gate_pass_active_auth }}</span>
         {% endif %}
       </div>
     </div>
     <div class="flex gap-3">
       <a href="{% url 'gate_pass:print_doc' items.id  %}">
         <button type="submit" class="btn-register">
-          <i class="bi bi-floppy2"></i> Print Document
+          <i class="bi bi-floppy2"></i> {{ trans.gate_pass_print_doc }}
         </button>
       </a>
       {% if items.status == 1 %}
       <button type="button" class="btn-trash" data-bs-toggle="modal" data-bs-target="#confirmModal" data-action="revoke"
-        data-url="{% url 'gate_pass:authorise' items.id items.status %}">
-        <i class="bi bi-x-circle"></i> Revoke Authorisation
+        data-url="{% url 'gate_pass:authorise' items.id items.status %}"
+        data-title="{{ trans.gate_pass_revoke_title }}" data-body="{{ trans.gate_pass_revoke_body }}">
+        <i class="bi bi-x-circle"></i> {{ trans.gate_pass_revoke }}
       </button>
       {% else %}
       <button type="button" class="btn-trash btn-approve" data-bs-toggle="modal" data-bs-target="#confirmModal"
-        data-action="approve" data-url="{% url 'gate_pass:authorise' items.id items.status %}">
-        <i class="bi bi-check-circle"></i> Approve Authorisation
+        data-action="approve" data-url="{% url 'gate_pass:authorise' items.id items.status %}"
+        data-title="{{ trans.gate_pass_approve_title }}" data-body="{{ trans.gate_pass_approve_body }}">
+        <i class="bi bi-check-circle"></i> {{ trans.gate_pass_approve }}
       </button>
       {% endif %}
     </div>
@@ -77,27 +78,27 @@
     <div class="form-section">
       <div class="section-header">
         <div class="section-icon"><i class="bi bi-info-circle-fill"></i></div>
-        <h2>Asset Specifications</h2>
+        <h2>{{ trans.gate_pass_asset_specs }}</h2>
       </div>
       <div class="section-body">
         <div class="row g-4">
           <div class="col-md-6">
-            <label class="field-label">Asset Name</label>
+            <label class="field-label">{{ trans.gate_pass_asset_name_label }}</label>
               <p class="stat-value">{{ items.asset.name }}</p>
           </div>
 
           <div class="col-md-6">
-            <label class="field-label">Asset Tag/ Serial<span class="required">*</span></label>
+            <label class="field-label">{{ trans.gate_pass_asset_tag_label }}<span class="required">*</span></label>
             <p class="stat-value">{{ items.asset.tag }}</p>
           </div>
 
           <div class="col-md-6">
-            <label class="field-label">Category</label>
+            <label class="field-label">{{ trans.gate_pass_category_label }}</label>
             <p class="stat-value">{% if items.asset.product.product_sub_category %}{{ items.asset.product.product_sub_category }}{% else %}UnCategorised{% endif %}</p>
           </div>
 
           <div class="col-md-6">
-            <label class="field-label">Declared Value</label>
+            <label class="field-label">{{ trans.gate_pass_declared_value }}</label>
             <p class="stat-value">{% if items.asset.price %}{{ currency }} {{ items.asset.price }}{% else %}Not
               Declared{% endif %}</p>
           </div>
@@ -113,13 +114,13 @@
         <div class="section-icon"><span class="material-symbols-outlined text-primary"
             data-icon="swap_horiz">swap_horiz</span>
         </div>
-        <h3 class="font-bold text-sm dark:text-gray-100">Movement Context</h3>
+        <h3 class="font-bold text-sm dark:text-gray-100">{{ trans.gate_pass_movement_context }}</h3>
       </div>
     </div>
     <div class="detail-card-body p-5">
       <div class="space-y-6">
         <div class="flex items-center gap-3">
-          <span class="field-label shrink-0 dark:text-gray-400">Movement Type:</span>
+          <span class="field-label shrink-0 dark:text-gray-400">{{ trans.gate_pass_movement_type_label }}</span>
           {% if items.movement_type == 0 %}
           <span
             class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-error-container text-error flex items-center gap-1 w-fit">
@@ -135,11 +136,11 @@
           {% endif %}
         </div>
         <div class="flex items-center gap-3">
-          <span class="field-label shrink-0 dark:text-gray-400">Expected Return:</span>
+          <span class="field-label shrink-0 dark:text-gray-400">{{ trans.gate_pass_expected_return_label }}</span>
           <span class="text-sm dark:text-gray-200">{{ items.expected_return_date }}</span>
         </div>
         <div class="pt-4 border-t border-surface-container">
-          <label class="field-label block mb-3 dark:text-gray-400">Destination Vendor</label>
+          <label class="field-label block mb-3 dark:text-gray-400">{{ trans.gate_pass_destination_vendor_label }}</label>
           <div class="flex items-center gap-3">
             <div
               class="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden shrink-0">
@@ -162,15 +163,15 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="confirmModalLabel">Confirm Action</h5>
+        <h5 class="modal-title" id="confirmModalLabel">{{ trans.gate_pass_confirm_action }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="confirmModalBody">
-        Are you sure?
+        {{ trans.gate_pass_are_you_sure }}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a href="#" id="confirmActionBtn" class="btn btn-danger">Confirm</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.cancel }}</button>
+        <a href="#" id="confirmActionBtn" class="btn btn-danger">{{ trans.gate_pass_confirm_btn }}</a>
       </div>
     </div>
   </div>
@@ -185,15 +186,9 @@
       var modalTitle = confirmModal.querySelector('.modal-title');
       var modalBody = confirmModal.querySelector('.modal-body');
       var confirmBtn = document.getElementById('confirmActionBtn');
-      if (action === 'revoke') {
-        modalTitle.textContent = 'Revoke Authorisation';
-        modalBody.textContent = 'Are you sure you want to revoke this authorisation?';
-        confirmBtn.className = 'btn btn-danger';
-      } else {
-        modalTitle.textContent = 'Approve Authorisation';
-        modalBody.textContent = 'Are you sure you want to approve this authorisation?';
-        confirmBtn.className = 'btn btn-success';
-      }
+      modalTitle.textContent = button.getAttribute('data-title');
+      modalBody.textContent = button.getAttribute('data-body');
+      confirmBtn.className = action === 'revoke' ? 'btn btn-danger' : 'btn btn-success';
       confirmBtn.href = url;
     });
   });

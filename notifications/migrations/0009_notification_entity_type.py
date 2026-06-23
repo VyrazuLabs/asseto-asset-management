@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0008_alter_notification_created_at_and_more'),
+        ("notifications", "0008_alter_notification_created_at_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='entity_type',
-            field=models.IntegerField(choices=[(0, 'browser'), (1, 'email'), (2, 'slack'), (3, 'slack')], default=0),
+            model_name="notification",
+            name="entity_type",
+            field=models.IntegerField(
+                choices=[(0, "browser"), (1, "email"), (2, "slack"), (3, "slack")],
+                default=0,
+            ),
         ),
     ]

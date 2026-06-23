@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}Vendor Details - {{ vendor.name }} | Asseto{% endblock %}
+{% block title %}{{ trans.vendor_details }} - {{ vendor.name }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.2">
@@ -30,20 +30,20 @@
       <div>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb page-breadcrumb">
-            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'vendors:list' %}" class="breadcrumb-link">Vendors</a></li>
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'vendors:list' %}" class="breadcrumb-link">{{ trans.vendors }}</a></li>
             <li class="breadcrumb-item active">{{ vendor.name }}</li>
           </ol>
         </nav>
         <h1>{{ vendor.name }}</h1>
-        <p class="page-subtitle">View and manage vendor details and associated assets.</p>
+        <p class="page-subtitle">{{ trans.vendor_detail_subtitle }}</p>
       </div>
       <div class="d-flex align-items-center gap-2">
         <a href="{% url 'vendors:list' %}" class="btn-back">
-          <i class="bi bi-arrow-left"></i> Back to Listing
+          <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
         </a>
         <a href="{% url 'vendors:update_vendor' vendor.id %}" class="btn-update">
-          <i class="bi bi-pencil"></i> Update Vendor
+          <i class="bi bi-pencil"></i> {{ trans.update_vendor }}
         </a>
       </div>
     </div>
@@ -52,62 +52,62 @@
     <div class="info-card">
         <div class="card-header-custom">
             <i class="bi bi-person-badge"></i>
-            <h2><span>Vendor Information</span></h2>
+            <h2><span>{{ trans.vendor_information }}</span></h2>
         </div>
         <div class="info-grid">
             {# Row 1 #}
             <div class="info-item">
-                <span class="label">Phone</span>
+                <span class="label">{{ trans.phone_label }}</span>
                 <span class="value">{{ vendor.phone|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Email</span>
+                <span class="label">{{ trans.email_label }}</span>
                 <span class="value">{{ vendor.email|default:"-" }}</span>
             </div>
 
             {# Row 2 #}
             <div class="info-item">
-                <span class="label">Designation</span>
+                <span class="label">{{ trans.designation_label }}</span>
                 <span class="value">{{ vendor.designation|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Contact Person</span>
+                <span class="label">{{ trans.contact_person }}</span>
                 <span class="value">{% if vendor.contact_person %}{{ vendor.contact_person }}{% else %}-{% endif %}</span>
             </div>
 
             {# Row 3 #}
             <div class="info-item">
-                <span class="label">Address</span>
+                <span class="label">{{ trans.address_label }}</span>
                 <span class="value">{{ vendor.address.address_line_one|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">GSTIN Number</span>
+                <span class="label">{{ trans.gstin_number_label }}</span>
                 <span class="value">{{ vendor.gstin_number|default:"-" }}</span>
             </div>
 
             {# Row 4 #}
             <div class="info-item">
-                <span class="label">State</span>
+                <span class="label">{{ trans.vendor_state_label }}</span>
                 <span class="value">{{ vendor.address.state|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Country</span>
+                <span class="label">{{ trans.country_label }}</span>
                 <span class="value">{{ vendor.address.country|default:"-" }}</span>
             </div>
 
             {# Description - Full Width #}
             <div class="info-item full-width">
-                <span class="label">Description</span>
-                <div class="value">{{ vendor.description|default:"No description available."|urlize }}</div>
+                <span class="label">{{ trans.description_label }}</span>
+                <div class="value">{{ vendor.description|default:trans.no_description_available|urlize }}</div>
             </div>
 
             {# Row 5 #}
             <div class="info-item">
-                <span class="label">City</span>
+                <span class="label">{{ trans.city_label }}</span>
                 <span class="value">{{ vendor.address.city|default:"-" }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Pincode</span>
+                <span class="label">{{ trans.zip_code_label }}</span>
                 <span class="value">{{ vendor.address.pin_code|default:"-" }}</span>
             </div>
         </div>
@@ -118,14 +118,14 @@
     <div class="table-card mb-4">
         <div class="card-header-custom">
             <i class="bi bi-list-stars"></i>
-            <h2><span>Custom Fields</span></h2>
+            <h2><span>{{ trans.custom_fields }}</span></h2>
         </div>
         <div class="table-responsive">
             <table class="list-table">
                 <thead>
                     <tr>
-                        <th>Field Name</th>
-                        <th>Field Value</th>
+                        <th>{{ trans.field_name }}</th>
+                        <th>{{ trans.field_value }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,7 +146,7 @@
     <div class="table-card mb-4">
         <div class="card-header-custom">
             <i class="bi bi-box-seam"></i>
-            <h2><span>Asset List</span></h2>
+            <h2><span>{{ trans.asset_list }}</span></h2>
         </div>
         {% include 'commons/assets-table.html' %}
         {% include 'commons/list-pagination.html' with page_object=assets_page_object page_var='asset_page' %}

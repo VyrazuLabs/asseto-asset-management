@@ -52,9 +52,9 @@
         </div>
         {% else %}
         {% if products.status %}
-        <span class="status-badge status-active">Active</span>
+        <span class="status-badge status-active">{{ trans.active }}</span>
         {% else %}
-        <span class="status-badge status-inactive">Inactive</span>
+        <span class="status-badge status-inactive">{{ trans.inactive }}</span>
         {% endif %}
         {% endif %}
     </td>
@@ -80,7 +80,7 @@
             {% if perms.authentication.delete_product_category %}
             <form method="post" action="{% url 'dashboard:delete_product_category' products.id %}"
                 class="form-row-action"
-                onsubmit="return confirm('Are you sure you want to delete this product category?')">
+                   onsubmit="return confirm('{{ trans.delete_confirm_product_category }}')">
                 {% csrf_token %}
                 <button class="action-btn danger">
                     <i class="bi bi-trash3"></i>
@@ -97,7 +97,7 @@
 <tr>
     <td colspan="6">
         <div class="table-empty-state text-center">
-            <p>No product categories found.</p>
+            <p>{{ trans.no_product_categories_found }}</p>
         </div>
     </td>
 </tr>

@@ -8,44 +8,57 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0015_delete_employee'),
-        ('roles', '0001_initial'),
-        ('authentication', '0010_rename_profile_picture_user_profile_pic'),
+        ("dashboard", "0015_delete_employee"),
+        ("roles", "0001_initial"),
+        ("authentication", "0010_rename_profile_picture_user_profile_pic"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='userrole',
-            name='role',
+            model_name="userrole",
+            name="role",
         ),
         migrations.RemoveField(
-            model_name='userrole',
-            name='user',
+            model_name="userrole",
+            name="user",
         ),
         migrations.AddField(
-            model_name='user',
-            name='access_level',
+            model_name="user",
+            name="access_level",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='department',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='dashboard.department'),
+            model_name="user",
+            name="department",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="dashboard.department",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='role', to='roles.role'),
+            model_name="user",
+            name="role",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="role",
+                to="roles.role",
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='profile_pic',
-            field=models.ImageField(blank=True, null=True, upload_to=authentication.models.path_and_rename),
+            model_name="user",
+            name="profile_pic",
+            field=models.ImageField(
+                blank=True, null=True, upload_to=authentication.models.path_and_rename
+            ),
         ),
         migrations.DeleteModel(
-            name='Role',
+            name="Role",
         ),
         migrations.DeleteModel(
-            name='UserRole',
+            name="UserRole",
         ),
     ]

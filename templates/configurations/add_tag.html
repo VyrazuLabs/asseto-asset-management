@@ -1,28 +1,33 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{% if not configurations %}{{ trans.add_tag_configuration }}{% else %}{{ trans.update_tag_configuration }}{% endif %} | Asseto{% endblock %}
+
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
             <h3 class="page-name">
-                {% if not configurations %}Add Tag Configuration{% else %}Update Tag Configuration{% endif %}
+                {% if not configurations %}{{ trans.add_tag_configuration }}{% else %}{{ trans.update_tag_configuration }}{% endif %}
             </h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item" aria-current="page">{{ trans.configurations }}</li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        {% if not configurations %}Add Tag Configurations{% else %}Update Tag Configurations{% endif %}
+                        {% if not configurations %}{{ trans.tag_configurations }}{% else %}{{ trans.update_tag_configuration }}{% endif %}
                     </li>
                 </ol>
             </nav>
             <div>
-                {% if configurations %}<a href="{% url 'configurations:list_tag' %}" class="btn btn-sm btn-outline-info my-3">Back to Configuration List</a>{% endif %}
+                {% if configurations %}<a href="{% url 'configurations:list_tag' %}" class="btn btn-sm btn-outline-info my-3">{{ trans.back_to_configuration_list }}</a>{% endif %}
             </div>
         </div>
     </div>
     <section class="section d-flex justify-content-center">
-        <form class="form col" 
-              action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}" 
+        <form class="form col"
+              action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}"
               method="POST" novalidate>
             {% csrf_token %}
             <div class="d-flex gap-2">
@@ -39,7 +44,7 @@
                         {% endif %}
                         <div class="row">
                             <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
-                                <label for="id_prefix" class="mt-1">Tag Prefix</label>
+                                <label for="id_prefix" class="mt-1">{{ trans.tag_prefix }}</label>
                                 {{ form.prefix }}
                                 {% for error in form.prefix.errors %}
                                     <small class="text-danger">{{ error }}</small>
@@ -52,7 +57,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
-                                <label for="id_number_suffix" class="mt-1">Tag Suffix</label>
+                                <label for="id_number_suffix" class="mt-1">{{ trans.tag_suffix }}</label>
                                 {{ form.number_suffix }}
                                 {% for error in form.number_suffix.errors %}
                                     <small class="text-danger">{{ error }}</small>
@@ -66,7 +71,7 @@
                 <div class="col mt-3">
                             <div class="col-md-6 col-12 form-check">
                                 {{ form.use_default_settings }}
-                                <label for="id_use_default_settings" class="form-check-label">Use This As Default Settings</label>
+                                <label for="id_use_default_settings" class="form-check-label">{{ trans.use_default_settings }}</label>
                                 {% for error in form.use_default_settings.errors %}
                                     <small class="text-danger">{{ error }}</small>
                                 {% endfor %}
@@ -74,7 +79,7 @@
                         </div>
                 <div class="col mt-3">
                     <button type="submit" class="btn btn-sm btn-info float-end">
-                        {% if is_update %}Update{% else %}Create{% endif %}
+                        {% if is_update %}{{ trans.update }}{% else %}{{ trans.create }}{% endif %}
                     </button>
                 </div>
             </div>
@@ -82,4 +87,3 @@
     </section>
 </div>
 {% endblock %}
-

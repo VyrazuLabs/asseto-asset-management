@@ -23,11 +23,11 @@
         {% if perms.authentication.add_assign_asset %}
             <div>
                 <!-- assign btn -->
-                <button type="button"  
+                <button type="button"
                     class="btn btn-sm btn-outline-info my-3 "
-                    hx-get="{% url 'assets:assign_asset' %}" 
+                    hx-get="{% url 'assets:assign_asset' %}"
                     hx-target="#assign-asset-modal-content"
-                    data-bs-toggle="modal" 
+                    data-bs-toggle="modal"
                     data-bs-target="#assign-asset-modal"
                 >Assign Asset</button>
             </div>
@@ -40,7 +40,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div id="assign-asset-modal-content" class="modal-content" hx-target="this"></div>
             </div>
-        </div>        
+        </div>
         <!-- reassign modal -->
         <div class="modal fade text-left" id="reassign-asset-modal" tabindex="-1" role="dialog"
             aria-labelledby="myModalLabel160" aria-hidden="true">
@@ -79,7 +79,7 @@
                             <td>
                                 <a href="{% url 'assets:details' assign_asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                                 {% if perms.authentication.reassign_assign_asset %}
-                                <button type="button"  
+                                <button type="button"
                                     class="btn btn-info"
                                     hx-get="{% url 'assets:assign_asset_in_asset_list' assign_asset.id %}"
                                     hx-target="#assign-asset-modal-list-content"

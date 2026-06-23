@@ -88,7 +88,7 @@ body.theme-dark {
   @import "~@fontsource/nunito/800.css";
   /*
   * Mazer, Technology Innovations Bootstrap HTML5 Landing Page
-  * 
+  *
   * File: app.scss
   *
   * If you want to edit the components, just go to _variables.scss
@@ -97,7 +97,7 @@ body.theme-dark {
 
   ====== TABLE OF CONTENTS =======
   1. Mixins
-  2. Bootstrap Components Override 
+  2. Bootstrap Components Override
       2.1 Alert
       2.2 Avatar
       2.3 Badge
@@ -8099,7 +8099,7 @@ body[data-theme="dark"] {
   background-color: red!important;
   padding: 2px!important;
   line-height: 0!important;
- 
+
 }
 
 .asst-prd-img-div:hover .asst-prd-img{
@@ -8222,10 +8222,10 @@ body[data-theme="dark"] {
 }
 
 .notification-count-div{
-  top:-7px; 
-  right:10px; 
-  height:1.2rem; 
-  width:1.2rem; 
+  top:-7px;
+  right:10px;
+  height:1.2rem;
+  width:1.2rem;
   background-color: #6f42c1 !important;
 }
 .notification-count-div p{
@@ -8235,6 +8235,10 @@ body[data-theme="dark"] {
 
 .barcode-scanner{
   color: #435ebe !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 #camera-preview {
@@ -8270,13 +8274,13 @@ body[data-theme="dark"] {
     .asset-barcode {
         display: block;
         overflow-x: auto;
-        white-space: nowrap; 
+        white-space: nowrap;
         max-width: 100%;
         padding: 5px 0;
     }
 
     .asset-barcode span {
-        display: inline-block; 
+        display: inline-block;
     }
 } */
 
@@ -8293,9 +8297,9 @@ body[data-theme="dark"] {
   .asset-barcode svg{
     width: 100%;
   }
- 
+
 }
- 
+
 .bell-icon-div{
   margin-right: 20px;
 }
@@ -8339,8 +8343,8 @@ body.theme-dark:root {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   background: var(--bg-card);
 }
-.search-modal .modal-body { 
-  padding: 0; 
+.search-modal .modal-body {
+  padding: 0;
 }
 
 .search-header {
@@ -8427,9 +8431,9 @@ body.theme-dark .search-header input {
 .icon-product { background: #e8f5e9; color: #2e7d32; }
 .icon-user { background: #fff3e0; color: #ef6c00; }
 
-.result-content { 
-  flex: 1; 
-  min-width: 0; 
+.result-content {
+  flex: 1;
+  min-width: 0;
 }
 body.theme-dark .result-title{
   flex: 1;
@@ -8439,85 +8443,85 @@ body.theme-dark .result-title{
 }
 
 
-.result-title { 
-  font-weight: 500; 
-  font-size: 1rem; 
-  color: var(--text-primary); 
-  margin: 0; 
+.result-title {
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.result-meta { 
-  font-size: 0.85rem; 
-  color: var(--text-muted); 
-  margin: 0; 
+.result-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 
-.result-badge { 
-  font-size: 0.8rem; 
-  padding: 4px 10px; 
-  border-radius: 6px; 
-  font-weight: 500; 
+.result-badge {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
 }
-.result-badge.bg-success-subtle { 
-  background: color-mix(in srgb, #198754 15%, transparent); 
-  color: #198754; 
-}
-
-.result-badge.bg-primary-subtle { 
-  background: color-mix(in srgb, var(--accent) 15%, transparent); 
-  color: var(--accent); 
+.result-badge.bg-success-subtle {
+  background: color-mix(in srgb, #198754 15%, transparent);
+  color: #198754;
 }
 
-.result-badge.bg-dark-subtle { 
-  background: color-mix(in srgb, var(--text-muted) 15%, transparent); 
-  color: var(--text-muted); 
+.result-badge.bg-primary-subtle {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
 }
 
-.result-badge.bg-danger-subtle { 
-  background: color-mix(in srgb, #dc3545 15%, transparent); 
-  color: #dc3545; 
+.result-badge.bg-dark-subtle {
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+  color: var(--text-muted);
 }
 
-.result-badge.bg-warning-subtle { 
-  background: color-mix(in srgb, #ffc107 15%, transparent); 
-  color: #856404; 
+.result-badge.bg-danger-subtle {
+  background: color-mix(in srgb, #dc3545 15%, transparent);
+  color: #dc3545;
 }
 
-.result-badge.bg-secondary-subtle { 
-  background: color-mix(in srgb, var(--text-muted) 15%, transparent); 
-  color: var(--text-muted); 
-}
-.result-badge.bg-purple-subtle { 
-  background: color-mix(in srgb, #6f42c1 15%, transparent); 
-  color: #6f42c1; 
+.result-badge.bg-warning-subtle {
+  background: color-mix(in srgb, #ffc107 15%, transparent);
+  color: #856404;
 }
 
-.result-badge.bg-navy-subtle { 
-  background: color-mix(in srgb, #57caeb 45%, transparent); 
-  color: white; 
+.result-badge.bg-secondary-subtle {
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+  color: var(--text-muted);
+}
+.result-badge.bg-purple-subtle {
+  background: color-mix(in srgb, #6f42c1 15%, transparent);
+  color: #6f42c1;
 }
 
-body.theme-dark.result-badge.bg-purple-subtle { 
-  background: color-mix(in srgb, #8b5cf6 15%, transparent); 
-  color: #8b5cf6; 
+.result-badge.bg-navy-subtle {
+  background: color-mix(in srgb, #57caeb 45%, transparent);
+  color: white;
 }
 
-body.theme-dark.result-badge.bg-navy-subtle { 
-  background: color-mix(in srgb, #57caeb 15%, transparent); 
-  color: white; 
+body.theme-dark.result-badge.bg-purple-subtle {
+  background: color-mix(in srgb, #8b5cf6 15%, transparent);
+  color: #8b5cf6;
 }
 
-.empty-state { 
-  text-align: center; 
-  padding: 50px 24px; 
-  color: var(--text-muted); 
+body.theme-dark.result-badge.bg-navy-subtle {
+  background: color-mix(in srgb, #57caeb 15%, transparent);
+  color: white;
 }
 
-.empty-state i { 
-  font-size: 3rem; 
-  margin-bottom: 16px; 
-  opacity: 0.5; 
+.empty-state {
+  text-align: center;
+  padding: 50px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 
 /* custom scrollbar for global search*/

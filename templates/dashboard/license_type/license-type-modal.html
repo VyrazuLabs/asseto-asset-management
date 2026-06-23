@@ -1,7 +1,7 @@
 <div class="modal-content">
     <div class="modal-header-custom">
-        <h5 class="modal-title"><i class="bi bi-journal-check"></i> {{modal_title}}</h5>
-        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">
+        <h5 class="modal-title"><i class="bi bi-journal-check"></i> {% if is_add_mode %}{{ trans.add_license_type }}{% else %}{{ trans.update_license_type }}{% endif %}</h5>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
             <i class="bi bi-x-lg"></i>
         </button>
     </div>
@@ -9,7 +9,7 @@
         {% csrf_token %}
         <div class="modal-body-custom">
             <div class="form-group">
-                <label>TYPE NAME <span class="required">*</span></label>
+                <label>{{ trans.type_name_required }} <span class="required">*</span></label>
                 {{form.name}}
                 {% for error in form.name.errors %}
                 <small class="text-danger">{{ error }}</small>
@@ -18,10 +18,10 @@
         </div>
         <div class="modal-footer-custom">
             <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                <i class="bi bi-x-lg"></i> Cancel
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
             <button type="submit" class="btn-save">
-                <i class="bi bi-check-lg"></i> {% if 'Add' in modal_title %}Save{% else %}Update{% endif %}
+                <i class="bi bi-check-lg"></i> {% if 'Add' in modal_title %}{{ trans.save }}{% else %}{{ trans.update }}{% endif %}
             </button>
         </div>
     </form>
@@ -226,7 +226,7 @@ body.theme-dark .modal-footer-custom .btn-cancel:hover {
 document.querySelector('form').addEventListener('submit', function(e) {
     const form = this;
     const submitBtn = form.querySelector('.btn-save');
-    submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Saving...';
+    submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> {{ trans.saving }}';
     submitBtn.disabled = true;
 });
 </script>
@@ -244,9 +244,9 @@ function requestAndSendNotification() {
 }
 
 function sendNotification() {
-  const title = "Successfully Added License Type";
+  const title = "{{ trans.license_type_added_notification_title }}";
   const options = {
-    body: "Successfully Added License Type.",
+    body: "{{ trans.license_type_added_notification_body }}",
     icon: "/static/images/logo/favicon.png",
   };
 

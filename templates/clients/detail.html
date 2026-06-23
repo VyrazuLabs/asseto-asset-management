@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}{{ client.name }} | Client Details | Asseto{% endblock %}
+{% block title %}{{ client.name }} | {{ trans.client_details }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -147,20 +147,20 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb mb-2">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">Clients</a></li>
-        <li class="breadcrumb-item active">Client Details</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'clients:list' %}" class="breadcrumb-link">{{ trans.clients }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.client_details }}</li>
       </ol>
     </nav>
-    <h1 class="page-title">Client Details</h1>
-    <p class="page-subtitle">Detailed overview for <strong class="detail-tag-inline">{{ client.name }}</strong></p>
+    <h1 class="page-title">{{ trans.client_details }}</h1>
+    <p class="page-subtitle">{{ trans.overview_for }} <strong class="detail-tag-inline">{{ client.name }}</strong></p>
   </div>
   <div class="header-actions">
     <a href="{% url 'clients:list' %}" class="btn-reset">
-      <i class="bi bi-arrow-left"></i> Back to List
+      <i class="bi bi-arrow-left"></i> {{ trans.back_to_list }}
     </a>
     <a href="{% url 'clients:update' client.id %}" class="btn-register ms-2">
-      <i class="bi bi-pencil-square"></i> Update Client
+      <i class="bi bi-pencil-square"></i> {{ trans.update_client }}
     </a>
   </div>
 </div>
@@ -176,11 +176,11 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon bg-blue"><i class="bi bi-building"></i></div>
-          <h2>Client Information</h2>
+          <h2>{{ trans.client_information }}</h2>
         </div>
         <span class="detail-status-badge {% if client.status == '1' %}badge-available{% else %}badge-in-use{% endif %}">
-          {% if client.status == '1' %}ACTIVE{% elif client.status == '2' %}IN REVIEW{%
-          elif client.status == '3' %}DORMANT{% else %}INACTIVE{% endif %}
+          {% if client.status == '1' %}{{ trans.active_caps_client }}{% elif client.status == '2' %}{{ trans.review_caps_client }}{%
+          elif client.status == '3' %}{{ trans.dormant_caps_client }}{% else %}{{ trans.inactive_caps_client }}{% endif %}
         </span>
       </div>
       <div class="detail-card-body">
@@ -188,22 +188,22 @@
         <div class="detail-fields-grid">
 
           <div class="detail-field">
-            <span class="detail-field-label">Company Name</span>
+            <span class="detail-field-label">{{ trans.company_name }}</span>
             <span class="detail-field-value fw-semibold">{{ client.name }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Client ID</span>
+            <span class="detail-field-label">{{ trans.id_label }}</span>
             <span class="detail-field-value"><span class="asset-tag-pill">{{ client.client_id }}</span></span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Industry</span>
+            <span class="detail-field-label">{{ trans.industry }}</span>
             <span class="detail-field-value">{{ client.industry_name }}</span>
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">Corporate Website</span>
+            <span class="detail-field-label">{{ trans.corporate_website }}</span>
             <span class="detail-field-value">
               {% if client.corporate_website %}
               <a href="{{ client.corporate_website }}" target="_blank" class="text-decoration-none"
@@ -219,19 +219,19 @@
 
 
           <div class="detail-field">
-            <span class="detail-field-label">Street Address</span>
+            <span class="detail-field-label">{{ trans.street_address_label }}</span>
             <span class="detail-field-value">{{ client.street_address|default:"—" }}</span>
           </div>
           <div class="detail-field">
-            <span class="detail-field-label">City</span>
+            <span class="detail-field-label">{{ trans.city_label }}</span>
             <span class="detail-field-value">{{ client.city|default:"—" }}</span>
           </div>
           <div class="detail-field">
-            <span class="detail-field-label">State / Province</span>
+            <span class="detail-field-label">{{ trans.state_label }}</span>
             <span class="detail-field-value">{{ client.state|default:"—" }}</span>
           </div>
           <div class="detail-field">
-            <span class="detail-field-label">Zip Code</span>
+            <span class="detail-field-label">{{ trans.zip_label }}</span>
             <span class="detail-field-value">{{ client.zip_code|default:"—" }}</span>
           </div>
         </div>
@@ -244,15 +244,15 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon bg-green"><i class="bi bi-laptop"></i></div>
-          <h2>Asset Inventory Ledger</h2>
+          <h2>{{ trans.asset_inventory_ledger }}</h2>
         </div>
         <form method="GET" class="d-flex align-items-center gap-2" style="margin-left: auto;">
           <input type="hidden" name="asset_page" value="1">
           <input type="search" name="asset_search" class="form-control form-control-sm"
-            placeholder="Search by tag or name…" value="{{ asset_search|default:'' }}"
+            placeholder="{{ trans.search_asset_placeholder }}" value="{{ asset_search|default:'' }}"
             style="width: 320px;" id="assetSearchInput">
           {% if assets_page_object %}
-          <button type="button" class="btn-export" id="exportAssetsBtn"><i class="bi bi-download"></i> Export</button>
+          <button type="button" class="btn-export" id="exportAssetsBtn"><i class="bi bi-download"></i> {{ trans.export }}</button>
           {% endif %}
         </form>
       </div>
@@ -265,7 +265,7 @@
         {% else %}
         <div class="detail-empty-state">
           <i class="bi bi-inbox"></i> <br>
-          <p>No assets assigned to this client yet</p>
+          <p>{{ trans.no_assets_client }}</p>
         </div>
         {% endif %}
       </div>
@@ -281,7 +281,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon bg-purple"><i class="bi bi-person-lines-fill"></i></div>
-          <h2>Key Contacts</h2>
+          <h2>{{ trans.key_contacts }}</h2>
         </div>
       </div>
       <div class="detail-card-body">
@@ -289,7 +289,7 @@
         {% for contact in client.contacts.all %}
         <div class="detail-contact-card">
           <div class="d-flex align-items-center mb-2">
-            <div class="client-assignee-avatar 
+            <div class="client-assignee-avatar
                         {% if forloop.counter|divisibleby:4 %}avatar-blue
                         {% elif forloop.counter|divisibleby:3 %}avatar-green
                         {% elif forloop.counter|divisibleby:2 %}avatar-orange
@@ -300,10 +300,10 @@
               <div class="d-flex align-items-center gap-2">
                 <div class="fw-bold" style="font-size: 15px;">{{ contact.name }}</div>
                 {% if contact.is_portal_active %}
-                <span class="badge bg-success-light text-success" style="font-size: 10px; padding: 2px 6px; border-radius: 4px;">Access Granted</span>
+                <span class="badge bg-success-light text-success" style="font-size: 10px; padding: 2px 6px; border-radius: 4px;">{{ trans.access_granted }}</span>
                 {% endif %}
               </div>
-              <div class="small text-muted" style="font-size: 12px;">{{ contact.role.related_name|default:"Primary Contact" }}</div>
+              <div class="small text-muted" style="font-size: 12px;">{{ contact.role.related_name|default:trans.primary_contact_fallback }}</div>
               {% if contact.email %}
               <div><a href="mailto:{{ contact.email }}" class="detail-contact-link"><i class="bi bi-envelope"></i> {{ contact.email }}</a></div>
               {% endif %}
@@ -316,7 +316,7 @@
         {% endfor %}
         {% else %}
         <div class="detail-empty-state py-3">
-          <p>No contacts listed</p>
+          <p>{{ trans.no_contacts_listed }}</p>
         </div>
         {% endif %}
       </div>
@@ -327,7 +327,7 @@
       <div class="detail-card-header">
         <div class="d-flex align-items-center gap-2">
           <div class="section-icon bg-orange"><i class="bi bi-clock-history"></i></div>
-          <h2>Activity Log</h2>
+          <h2>{{ trans.activity_log }}</h2>
         </div>
       </div>
       <div class="detail-card-body p-0">
@@ -352,7 +352,7 @@
           <li class="activity-log-item">
             <div class="activity-dot" style="border-color: #cbd5e1; border-width: 2px;"></div>
             <div class="activity-content">
-              <div class="activity-title">No activity recorded</div>
+              <div class="activity-title">{{ trans.no_activity_recorded }}</div>
             </div>
           </li>
           {% endif %}

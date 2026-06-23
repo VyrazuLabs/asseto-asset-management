@@ -1,11 +1,5 @@
-# from notifications.models import Notification, UserNotification
-# from notifications.utils import send_email
-# from assets.utils import slack_notification
-# from notifications.models import FirebaseToken
-# from firebase_admin import messaging
-# from .utils import send_data_message
-# from django.http import JsonResponse
 from kombu.exceptions import OperationalError
+
 # class NotificationService:
 
 #     @staticmethod
@@ -71,6 +65,7 @@ from kombu.exceptions import OperationalError
 
 from notifications.tasks import send_notification_task
 
+
 class NotificationService:
 
     @staticmethod
@@ -78,14 +73,13 @@ class NotificationService:
         user_obj = kwargs.get("user")
         if hasattr(user_obj, "id"):
             user_id = user_obj.id
-        elif hasattr(user_obj, "first"):  # QuerySet
+        elif hasattr(user_obj, "first"):
             user_instance = user_obj.first()
             user_id = user_instance.id if user_instance else None
         else:
             user_id = user_obj  # assume it's already an ID
         payload = {
             "user": user_id,
-            # "user": kwargs["user"],
             "title": kwargs["title"],
             "message": kwargs["message"],
             "icon": kwargs.get("icon"),
@@ -93,13 +87,15 @@ class NotificationService:
             "object_id": kwargs.get("object_id"),
             "instance_id": kwargs.get("instance_id"),
             "is_superuser": kwargs.get("is_superuser", False),
-            "updated_by": kwargs.get("updated_by").id if kwargs.get("updated_by") else None,
+            "updated_by": (
+                kwargs.get("updated_by").id if kwargs.get("updated_by") else None
+            ),
         }
 
         # async call
         try:
             send_notification_task.delay(payload)
         except OperationalError as e:
-            print("????",e)
+            print("????", e)
             print("⚠️ Celery broker unavailable, skipping async task")
             send_notification_task(payload)

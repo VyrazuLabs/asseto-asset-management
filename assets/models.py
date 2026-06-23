@@ -10,18 +10,20 @@ from simple_history.models import HistoricalRecords
 
 from clients.models import Client
 
+
 def path_and_rename(instance, filename):
-    upload_to = 'asset_images/'
-    ext = filename.split('.')[-1]
+    upload_to = "asset_images/"
+    ext = filename.split(".")[-1]
     if instance.pk:
-        filename = '{}.{}'.format(instance.pk, ext)
+        filename = "{}.{}".format(instance.pk, ext)
     else:
-        filename = '{}.{}'.format(uuid.uuid4().hex, ext)
+        filename = "{}.{}".format(uuid.uuid4().hex, ext)
     return os.path.join(upload_to, filename)
+
 
 class AssetSpecification(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    asset = models.ForeignKey('Asset', models.CASCADE, blank=True, null=True)
+    asset = models.ForeignKey("Asset", models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     value = models.CharField(max_length=255, blank=True, null=True)
 
@@ -30,11 +32,14 @@ class AssetSpecification(TimeStampModel):
         verbose_name_plural = "Asset Specifications"
         ordering = ["-created_at"]
 
+
 class AssetStatus(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, blank=True, null=True)
-    can_modify=models.BooleanField(default=True)
-    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    can_modify = models.BooleanField(default=True)
+    organization = models.ForeignKey(
+        Organization, models.DO_NOTHING, blank=True, null=True
+    )
     history = HistoricalRecords()
 
     class Meta:
@@ -58,12 +63,16 @@ class AssetStatusChoice(models.IntegerChoices):
 
 class Asset(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    status = models.IntegerField(choices=AssetStatusChoice.choices, default=AssetStatusChoice.AVAILABLE)
+    status = models.IntegerField(
+        choices=AssetStatusChoice.choices, default=AssetStatusChoice.AVAILABLE
+    )
     tag = models.CharField(max_length=255, blank=False, null=True, unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     serial_no = models.CharField(max_length=45, blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
-    asset_status=models.ForeignKey(AssetStatus, models.DO_NOTHING, null=True, blank=True)
+    asset_status = models.ForeignKey(
+        AssetStatus, models.DO_NOTHING, null=True, blank=True
+    )
     purchase_date = models.DateField(blank=True, null=True)
     warranty_expiry_date = models.DateField(blank=True, null=True)
     purchase_type = models.CharField(max_length=45, blank=True, null=True)
@@ -71,9 +80,17 @@ class Asset(TimeStampModel, SoftDeleteModel):
     is_assigned = models.BooleanField(default=False)
     product = models.ForeignKey(Product, models.PROTECT, blank=True, null=True)
     vendor = models.ForeignKey(Vendor, models.PROTECT, blank=True, null=True)
-    client = models.ForeignKey('clients.Client', models.DO_NOTHING, blank=True, null=True, related_name='assets')
+    client = models.ForeignKey(
+        "clients.Client",
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+        related_name="assets",
+    )
     location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
-    organization = models.ForeignKey(Organization, models.DO_NOTHING, blank=True, null=True)
+    organization = models.ForeignKey(
+        Organization, models.DO_NOTHING, blank=True, null=True
+    )
     history = HistoricalRecords()
 
     class Meta:
@@ -87,8 +104,9 @@ class Asset(TimeStampModel, SoftDeleteModel):
     def __str__(self):
         return self.name
 
+
 class AssetImage(models.Model):
-    asset = models.ForeignKey('Asset', on_delete=models.CASCADE, related_name='images')
+    asset = models.ForeignKey("Asset", on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to=path_and_rename, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
@@ -101,6 +119,7 @@ class AssetImage(models.Model):
         if self.image and hasattr(self.image, "url"):
             return str(self.image.url)
         return "No Image"
+
 
 class AssignAsset(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

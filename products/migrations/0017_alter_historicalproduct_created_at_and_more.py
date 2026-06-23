@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('products', '0016_historicalproduct_eol_historicalproduct_model_and_more'),
+        ("products", "0016_historicalproduct_eol_historicalproduct_model_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='historicalproduct',
-            name='created_at',
+            model_name="historicalproduct",
+            name="created_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalproduct',
-            name='status',
+            model_name="historicalproduct",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='historicalproduct',
-            name='updated_at',
+            model_name="historicalproduct",
+            name="updated_at",
             field=models.DateTimeField(blank=True, editable=False, null=True),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='created_at',
+            model_name="product",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, null=True),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='status',
+            model_name="product",
+            name="status",
             field=models.BooleanField(default=True, null=True),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='updated_at',
+            model_name="product",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True, null=True),
         ),
     ]

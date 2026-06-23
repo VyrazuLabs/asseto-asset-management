@@ -2,7 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
-{% block title %}License Inventory | Asseto{% endblock %}
+{% block title %}{{ trans.license_inventory }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -17,17 +17,17 @@
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
-        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-        <li class="breadcrumb-item active">License</li>
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+        <li class="breadcrumb-item active">{{ trans.license }}</li>
       </ol>
     </nav>
-    <h1>License Inventory</h1>
-    <p class="page-subtitle">Manage and track your organization's software licenses and subscriptions.</p>
+    <h1>{{ trans.license_inventory }}</h1>
+    <p class="page-subtitle">{{ trans.license_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
     {% if perms.authentication.add_license %}
     <a href="{% url 'license:add_license' %}" class="btn-register">
-      <i class="bi bi-plus-lg"></i> Register New License
+      <i class="bi bi-plus-lg"></i> {{ trans.register_new_license }}
     </a>
     {% endif %}
   </div>
@@ -38,28 +38,28 @@
   <a href="{% url 'license:license_list' %}" class="stat-card">
     <div class="stat-icon blue"><i class="bi bi-clipboard2-data"></i></div>
     <div>
-      <div class="stat-label">Total Licenses</div>
+      <div class="stat-label">{{ trans.total_licenses }}</div>
       <div class="stat-value">{{ total_licenses }}</div>
     </div>
   </a>
   <a href="{% url 'license:license_list' %}" class="stat-card">
     <div class="stat-icon green"><i class="bi bi-person-check-fill"></i></div>
     <div>
-      <div class="stat-label">Total Seats</div>
+      <div class="stat-label">{{ trans.total_seats }}</div>
       <div class="stat-value">{{ total_seats }}</div>
     </div>
   </a>
   <a href="{% url 'license:license_list' %}" class="stat-card">
     <div class="stat-icon orange"><i class="bi bi-shield-check"></i></div>
     <div>
-      <div class="stat-label">Assigned</div>
+      <div class="stat-label">{{ trans.assigned }}</div>
       <div class="stat-value">{{ assigned_count }}</div>
     </div>
   </a>
   <a href="javascript:void(0)" class="stat-card">
     <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
     <div>
-      <div class="stat-label">Trash</div>
+      <div class="stat-label">{{ trans.trash }}</div>
       <div class="stat-value">{{ deleted_count }}</div>
     </div>
   </a>
@@ -73,14 +73,14 @@
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-sm-6 col-lg">
-        <div class="filter-label">Search License</div>
-        <input name="search_text" type="search" autocomplete="off" placeholder="Name, Vendor or Type…"
+        <div class="filter-label">{{ trans.search_license }}</div>
+        <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_license_placeholder }}"
           hx-get="{% url 'license:search_license' %}" hx-trigger="keyup changed delay:400ms, search"
           hx-target="#search_result" aria-label="Search licenses">
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">License Type</div>
+        <div class="filter-label">{{ trans.license_types }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn"
             aria-label="Filter by type">
@@ -92,8 +92,7 @@
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=license_type]').value='';document.getElementById('type-btn').childNodes[0].textContent='All Types ';htmx.trigger('#license-filter-form','change');">All
-                Types</a></li>
+                onclick="event.preventDefault();document.querySelector('[name=license_type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#license-filter-form','change');">{{ trans.all_types }}</a></li>
             {% for type in license_type_list %}
             <li><a href="#" class="dropdown-item"
                 onclick="event.preventDefault();document.querySelector('[name=license_type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#license-filter-form','change');">
@@ -106,7 +105,7 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">Vendor</div>
+        <div class="filter-label">{{ trans.vendor }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn"
             aria-label="Filter by vendor">
@@ -118,8 +117,7 @@
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"
-                onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='All Vendors ';htmx.trigger('#license-filter-form','change');">All
-                Vendors</a></li>
+                onclick="event.preventDefault();document.querySelector('[name=vendor]').value='';document.getElementById('vendor-btn').childNodes[0].textContent='{{ trans.all_vendors }} ';htmx.trigger('#license-filter-form','change');">{{ trans.all_vendors }}</a></li>
             {% for vendor in vendor_list %}
             <li><a href="#" class="dropdown-item"
                 onclick="event.preventDefault();document.querySelector('[name=vendor]').value='{{ vendor.id }}';document.getElementById('vendor-btn').childNodes[0].textContent='{{ vendor.name }} ';htmx.trigger('#license-filter-form','change');">
@@ -133,7 +131,7 @@
 
       <div class="col-auto">
         <a href="{% url 'license:license_list' %}" class="btn-reset" title="Reset all filters">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
       </div>
 
@@ -147,15 +145,15 @@
     <table class="assets-table" id="table1">
       <thead>
         <tr>
-          <th>Sl No.</th>
-          <th>License Name</th>
-          <th>Type</th>
-          <th>Seats</th>
-          <th>Vendor</th>
-          <th>Assigned To</th>
-          <th>Start Date</th>
-          <th>Expiry Date</th>
-          <th>Actions</th>
+          <th>{{ trans.sl_no }}</th>
+          <th>{{ trans.license_name }}</th>
+          <th>{{ trans.type }}</th>
+          <th>{{ trans.seats }}</th>
+          <th>{{ trans.vendor }}</th>
+          <th>{{ trans.assigned_to }}</th>
+          <th>{{ trans.start_date }}</th>
+          <th>{{ trans.expiry_date }}</th>
+          <th>{{ trans.actions }}</th>
         </tr>
       </thead>
 
@@ -178,7 +176,7 @@
           <td>
             {{ license.vendor.name|default:"-" }}
             {% if license.vendor.is_deleted %}
-            <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.vendor_deleted_warning }}"></i>
             {% endif %}
           </td>
 
@@ -194,20 +192,20 @@
                 {% if map.name %}{{ map.name|slice:":2"|upper }}{% else %}??{% endif %}
               </span>
               {% endif %}
-              <span>{{ map.name|default:"Unknown User" }}</span>
+              <span>{{ map.name|default:trans.unknown_user }}</span>
             </div>
             {% endwith %}
             <form action="{% url 'license:unassign_license' license.id %}" method="post" class="form-row-action"
-              onsubmit="return confirm('Unassign this license?')">
+              onsubmit="return confirm('{{ trans.unassign_confirm }}')">
               {% csrf_token %}
-              <button type="submit" class="btn-unassign">Unassign</button>
+              <button type="submit" class="btn-unassign">{{ trans.unassign }}</button>
             </form>
             {% else %}
-            <span class="unassigned-label">Unassigned</span>
+            <span class="unassigned-label">{{ trans.unassigned }}</span>
             <button type="button" class="btn-assign mt-1" hx-get="{% url 'license:assign_license' license.id %}"
               hx-target="#assign-license-modal-content" hx-trigger="click" data-bs-toggle="modal"
               data-bs-target="#assign-license-list-modal" aria-label="Assign {{ license.name }}">
-              + Assign
+              {{ trans.assign_label }}
             </button>
             {% endif %}
           </td>
@@ -219,13 +217,13 @@
             <div class="row-actions">
               {% if perms.authentication.view_license %}
               <a href="{% url 'license:license_details' license.id %}" class="action-btn"
-                title="View {{ license.name }}">
+                title="{{ trans.view }} {{ license.name }}">
                 <i class="bi bi-eye"></i>
               </a>
               {% endif %}
               {% if perms.authentication.edit_license %}
               <a href="{% url 'license:update_license' license.id %}" class="action-btn"
-                title="Edit {{ license.name }}">
+                title="{{ trans.edit }} {{ license.name }}">
                 <i class="bi bi-pencil"></i>
               </a>
               {% endif %}
@@ -233,7 +231,7 @@
               <form action="{% url 'license:delete_license' license.id %}" method="post" class="form-row-action"
                 onsubmit="return confirm('Delete {{ license.name }}?')">
                 {% csrf_token %}
-                <button type="submit" class="action-btn danger" title="Delete {{ license.name }}">
+                <button type="submit" class="action-btn danger" title="{{ trans.delete }} {{ license.name }}">
                   <i class="bi bi-trash3"></i>
                 </button>
               </form>
@@ -248,8 +246,8 @@
           <td colspan="9">
             <div class="table-empty-state">
               <i class="bi bi-inbox d-block"></i>
-              <p>No licenses found.<br>
-                <a href="{% url 'license:add_license' %}" class="link-primary">Register your first license</a>
+              <p>{{ trans.no_licenses_found }}<br>
+                <a href="{% url 'license:add_license' %}" class="link-primary">{{ trans.register_first_license }}</a>
               </p>
             </div>
           </td>
@@ -263,8 +261,8 @@
   {% if page_object %}
   <div class="pagination-wrap">
     <span>
-      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-      of <strong>{{ page_object.paginator.count }}</strong> licenses
+      {{ trans.showing_label }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+      {{ trans.of_label }} <strong>{{ page_object.paginator.count }}</strong> {{ trans.licenses_lower }}
     </span>
     <div class="pagination-nav">
       {% if page_object.has_previous %}

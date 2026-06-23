@@ -25,7 +25,7 @@
 
                 <form method="POST" action="{% url 'client_portal:verify_otp' %}">
                     {% csrf_token %}
-                    
+
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} small py-2">
@@ -43,7 +43,7 @@
                     <button type="submit" class="portal-btn">
                         Verify & Access Portal <i class="bi bi-arrow-right"></i>
                     </button>
-                    
+
                     <div class="text-center mt-3">
                         <p class="small text-muted">Didn't receive the code? <a href="#" class="text-decoration-none fw-bold">Resend</a></p>
                         <a href="{% url 'client_portal:login' %}" class="small text-decoration-none fw-bold"><i class="bi bi-arrow-left"></i> Back to Login</a>

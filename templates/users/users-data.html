@@ -20,7 +20,7 @@
         {% else %}
           <img class="user-thumb"
             src="{% static 'images/faces/1.jpg' %}"
-            alt="Default user">
+            alt="{{ trans.default_avatar }}">
         {% endif %}
       </td>
 
@@ -74,7 +74,7 @@
       <td>
         <div class="row-actions">
           {% if perms.authentication.view_users %}
-            <a href="{% url 'users:details' user.id %}" class="action-btn" title="View {{ user.full_name }}">
+            <a href="{% url 'users:details' user.id %}" class="action-btn" title="{{ trans.view }}">
               <i class="bi bi-eye"></i>
             </a>
           {% endif %}
@@ -82,15 +82,15 @@
             <button type="button" class="action-btn"
               hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
               data-bs-toggle="modal" data-bs-target="#update-user-modal"
-              title="Edit {{ user.full_name }}">
+              title="{{ trans.edit }}">
               <i class="bi bi-pencil"></i>
             </button>
           {% endif %}
           {% if perms.authentication.delete_users %}
             <form action="{% url 'users:delete' user.id %}" method="post" class="form-row-action"
-                  onsubmit="return confirm('Delete {{ user.full_name }}? It can be restored from Recycle Bin.')">
+                  onsubmit="return confirm('{{ trans.delete_confirm_user|escapejs }}')">
               {% csrf_token %}
-              <button type="submit" class="action-btn danger" title="Delete {{ user.full_name }}">
+              <button type="submit" class="action-btn danger" title="{{ trans.delete }}">
                 <i class="bi bi-trash3"></i>
               </button>
             </form>
@@ -105,7 +105,7 @@
       <td colspan="10">
         <div class="table-empty-state">
           <i class="bi bi-search d-block"></i>
-          <p>No users found matching your search.</p>
+          <p>{{ trans.no_users_search }}</p>
         </div>
       </td>
     </tr>

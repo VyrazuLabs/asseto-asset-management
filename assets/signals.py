@@ -3,24 +3,24 @@ from django.apps import AppConfig
 from authentication.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from.seeders import seed_asset_statuses
+from .seeders import seed_asset_statuses
 from authentication.models import SeedFlag
 from django.contrib.auth import get_user_model
 from assets.models import Asset
 from notifications.service import NotificationService
+
 User = get_user_model()
 
 log = structlog.get_logger(__name__)
 log.info("asset_signals_loaded")
+
+
 @receiver(post_save, sender=Asset)
 def asset_notification(sender, instance, created, **kwargs):
     if getattr(instance, "_skip_notification", False):
         return
     # Get organization admins
-    admins = User.objects.filter(
-        is_superuser=True,
-        organization=instance.organization
-    )
+    admins = User.objects.filter(is_superuser=True, organization=instance.organization)
     if created:
         for admin in admins:
             instance._skip_notification = True  # ✅ block re-entry
@@ -58,8 +58,6 @@ def asset_notification(sender, instance, created, **kwargs):
 
     if not changed_fields:
         return
-
-
 
     for admin in admins:
 
@@ -122,9 +120,10 @@ def asset_notification(sender, instance, created, **kwargs):
         )
         log.info("asset_updated_notification_sent", asset_id=str(instance.id))
 
+
 @receiver(post_save, sender=User)
-def trigger_seed_on_first_superuser(sender,instance,created,**kwargs):
-        if created and instance.is_superuser:
-            
-            if not SeedFlag.objects.exists():  # Only seed once
-                seed_asset_statuses()
+def trigger_seed_on_first_superuser(sender, instance, created, **kwargs):
+    if created and instance.is_superuser:
+
+        if not SeedFlag.objects.exists():  # Only seed once
+            seed_asset_statuses()

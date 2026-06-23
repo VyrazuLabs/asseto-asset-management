@@ -3,9 +3,9 @@
         <thead>
             <tr>
                 <th style="width: 60px;"></th>
-                <th>Product Name</th>
-                <th>Model</th>
-                <th>Date Added</th>
+                <th>{{ trans.product_name }}</th>
+                <th>{{ trans.model }}</th>
+                <th>{{ trans.date_added }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center py-4 text-muted">No recent products found</td>
+                <td colspan="4" class="text-center py-4 text-muted">{{ trans.no_recent_products }}</td>
             </tr>
             {% endfor %}
         </tbody>

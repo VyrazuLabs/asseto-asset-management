@@ -3,7 +3,9 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from notifications.models import Notification, UserNotification  # adjust if needed
 from notifications.service import NotificationService
+
 User = get_user_model()
+
 
 @receiver(pre_save, sender=User)
 def store_old_user_instance(sender, instance, **kwargs):
@@ -13,17 +15,14 @@ def store_old_user_instance(sender, instance, **kwargs):
         except sender.DoesNotExist:
             instance._old_instance = None
 
+
 @receiver(post_save, sender=User)
 def notify_user_changes(sender, instance, created, **kwargs):
 
     if instance.is_superuser:
         return
 
-    admins = User.objects.filter(
-        is_superuser=True,
-        organization=instance.organization
-    )
-
+    admins = User.objects.filter(is_superuser=True, organization=instance.organization)
 
     if created:
         for admin in admins:
@@ -34,7 +33,7 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 icon="bi-person-plus-fill",
                 link="/users/list",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
         return
 
@@ -72,7 +71,7 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 icon="bi-person-dash-fill",
                 link="/users/list",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
             break
 
@@ -85,10 +84,12 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 user=admin,
                 title=f"User {status_text}",
                 message=f"User '{instance.full_name}' has been {status_text.lower()}.",
-                icon="bi-person-check-fill" if instance.is_active else "bi-person-x-fill",
+                icon=(
+                    "bi-person-check-fill" if instance.is_active else "bi-person-x-fill"
+                ),
                 link="/users/list",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
             continue
 
@@ -105,6 +106,6 @@ def notify_user_changes(sender, instance, created, **kwargs):
                 icon="bi-pencil-square",
                 link="/users/list",
                 instance_id=instance.id,
-                object_id=str(instance.id)
+                object_id=str(instance.id),
             )
             break
