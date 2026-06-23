@@ -12,6 +12,28 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.3] — 2026-06-23
+
+### Added
+- **`is_logged_in` field on `UserTotp`** — Restored the `is_logged_in` boolean field to the `UserTotp` model (migration `0033`) to track active 2FA sessions correctly after the earlier rename migration.
+- **Client Portal ticket creation and detail views** — Added `client_portal_add_ticket` and `client_portal_ticket_detail` views with corresponding URL patterns so portal users can open and view support tickets.
+- **Global search API** — Extracted `GlobalSearch` API view into a dedicated `dashboard/api_views/` package with a clean module boundary.
+
+### Changed
+- **Code refactor — large-scale codebase cleanup** (`feature/code-refactor-1`) — PEP 8 formatting, DRY improvements, extracted shared logic to managers/mixins/utils, consolidated duplicate imports across 700+ files.
+- **Dashboard URL structure** — `api_view` module re-mapped from `dashboard/views/` to `dashboard/api_views/` for clearer separation of HTML and API concerns.
+- **Test organisation** — Moved app-level test files from flat `tests.py` to structured `tests/` packages (`test_assets.py`, `test_audit.py`, `test_products.py`, `test_vendors.py`, `test_dashboard.py`, `test_license.py`).
+- **Pre-commit configuration** — Added `.pre-commit-config.yaml` to enforce linting and formatting on every commit.
+- **`pyproject.toml`** — Added project-level tooling configuration.
+
+### Fixed
+- **`NameError: user_passes_test`** — Added missing import for `user_passes_test`, `logout`, `render`, `redirect`, and `get_object_or_404` in `authentication/views.py`.
+- **Merge conflict syntax errors** — Resolved leftover git conflict markers in `products/api_utils.py` and `client_portal/views.py` that prevented the server from starting.
+- **`ImportError: cannot import name 'api_view'`** — Fixed incorrect import path for the global search API view in `dashboard/urls.py`.
+- **Relative import paths** — Fixed `from .serializers` and `from .api_utils` imports inside `dashboard/api_views/global_search_api_views.py` to use correct parent-package references.
+
+---
+
 ## [1.6.2] — 2026-06-06
 
 ### Changed
