@@ -134,10 +134,8 @@ def add_ticket(request):
 def ticket_detail(request, id):
     ticket = get_object_or_404(
         SupportTicket.undeleted_objects.select_related(
-            "asset", "assigned_to", "department", "location"
-        ),
-        pk=id,
-        organization=request.user.organization,
+            'asset', 'assigned_to', 'department', 'location',
+        ), pk=id, organization=request.user.organization
     )
 
     from django.core.paginator import Paginator
