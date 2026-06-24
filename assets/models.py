@@ -133,3 +133,23 @@ class AssignAsset(models.Model):
         verbose_name = "Assign Asset"
         verbose_name_plural = "Assign Assets"
         ordering = ["-assigned_date"]
+
+class MaintenanceRecord(TimeStampModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='maintenance_records')
+    service_id = models.CharField(max_length=20, unique=True)
+    date = models.DateField()
+    maintenance_type = models.CharField(max_length=100) # Calibration, Breakdown, etc.
+    cost = models.DecimalField(max_digits=12, decimal_places=2)
+    technician = models.CharField(max_length=255)
+    status = models.CharField(max_length=50) # Completed, Scheduled, etc.
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name = "Maintenance Record"
+        verbose_name_plural = "Maintenance Records"
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.service_id} - {self.asset.name}"
