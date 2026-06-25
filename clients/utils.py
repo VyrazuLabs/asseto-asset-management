@@ -34,14 +34,8 @@ def export_clients_csv_utils(request):
         today = date.today()
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
-            .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
-                open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
-                ),
-            )
-            .order_by('-created_at')
+            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
+            .order_by("-created_at")
         )
 
         search_term = request.GET.get("search", "").strip()
@@ -75,17 +69,19 @@ def export_clients_csv_utils(request):
 
         for client in client_queryset:
             first_contact = client.contacts.first()
-            writer.writerow([
-                client.client_id,
-                client.name,
-                client.industry_name,
-                first_contact.name if first_contact else '',
-                first_contact.email if first_contact else '',
-                first_contact.phone if first_contact else '',
-                client.asset_count,
-                client.open_tickets_count,
-                client.get_status_display()
-            ])
+            writer.writerow(
+                [
+                    client.client_id,
+                    client.name,
+                    client.industry_name,
+                    first_contact.name if first_contact else "",
+                    first_contact.email if first_contact else "",
+                    first_contact.phone if first_contact else "",
+                    client.asset_count,
+                    client.open_tickets,
+                    client.get_status_display(),
+                ]
+            )
         return response
     except Exception:
         logger.exception("Error exporting clients CSV")
@@ -102,14 +98,8 @@ def export_clients_pdf_utils(request):
         today = date.today()
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
-            .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
-                open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
-                ),
-            )
-            .order_by('-created_at')
+            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
+            .order_by("-created_at")
         )
 
         search_term = request.GET.get("search", "").strip()
@@ -150,14 +140,8 @@ class ClientService:
         """Return the base queryset for the current user's organization."""
         return (
             Client.undeleted_objects.filter(organization=user.organization)
-            .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
-                open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
-                ),
-            )
-            .order_by('-created_at')
+            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
+            .order_by("-created_at")
         )
 
     @staticmethod

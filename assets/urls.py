@@ -76,11 +76,11 @@ urlpatterns = [
         name="delete_asset_status",
     ),
     # url for generate barcodes
-    path('scan-barcode/<str:tag_id>',Scan_barcode.as_view(), name='barcode'),
-    path('slack-authorize/', views.slack_authorize, name='slack_authorize'),
-    path('slack/oauth/callback/', views.slack_oauth_callback, name='slack_oauth_callback'),
-    path('record-repair/<uuid:id>/', views.record_repair, name='record_repair'),
-    path('edit-maintenance/<uuid:record_id>/', views.edit_maintenance, name='edit_maintenance'),
+    path("scan-barcode/<str:tag_id>", Scan_barcode.as_view(), name="barcode"),
+    path("slack-authorize/", views.slack_authorize, name="slack_authorize"),
+    path(
+        "slack/oauth/callback/", views.slack_oauth_callback, name="slack_oauth_callback"
+    ),
 ]
 
 api_url_patterns = [

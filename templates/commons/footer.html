@@ -15,8 +15,9 @@
 </div>
 <script>
     $(".modal").on("hidden.bs.modal", function () {
-        if ($(this).is("[data-preserve-content]")) return;
-        this.querySelector(".modal-content").innerHTML = "";
+        document.querySelectorAll(".modal-content").forEach((e)=>{
+            e.innerHTML = ""
+        })
     });
 
 </script>
