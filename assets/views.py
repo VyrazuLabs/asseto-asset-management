@@ -595,5 +595,3 @@ def edit_maintenance(request, record_id):
         record.save()
         messages.success(request, f"Maintenance record {record.service_id} updated.")
     return redirect('assets:details', id=record.asset.id)
-
-    return redirect('assets:details', id=id)

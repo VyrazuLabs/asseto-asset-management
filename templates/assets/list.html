@@ -134,7 +134,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
             All Types
-            
+          </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
             {% for type in product_type_list %}
