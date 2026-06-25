@@ -483,6 +483,7 @@ body.theme-dark .assets-page-header .page-subtitle {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 200px);
+    min-height: 0;
 }
 
 .kanban-column-header {
@@ -572,8 +573,10 @@ body.theme-dark .assets-page-header .page-subtitle {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     text-decoration: none !important;
+    display: block;
+    color: inherit;
 }
 
 .kanban-card:hover {
@@ -652,7 +655,7 @@ body.theme-dark .assets-page-header .page-subtitle {
 }
 
 .kanban-empty-state {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
