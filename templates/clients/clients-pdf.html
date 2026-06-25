@@ -44,7 +44,7 @@
             <td>{% with contact=client.contacts.first %}{{ contact.email|default:"" }}{% endwith %}</td>
             <td>{% with contact=client.contacts.first %}{{ contact.phone|default:"" }}{% endwith %}</td>
             <td>{{ client.asset_count }}</td>
-            <td>{{ client.open_tickets_count }}</td>
+            <td>{{ client.open_tickets }}</td>
             <td>{{ client.get_status_display }}</td>
         </tr>
         {% endfor %}

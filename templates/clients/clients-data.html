@@ -47,11 +47,15 @@
       <span class="count-pill zero">0</span>
     {% endif %}
   </td>
-  <td class="text-center">
-    {% if client.open_tickets_count %}
-      <span class="count-pill">{{ client.open_tickets_count }}</span>
+  <td class="text-center c-col-opentickets">
+    {% if client.open_tickets == 0 %}
+      <div class="c-ticket-count text-muted">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% elif client.open_tickets > 10 %}
+      <div class="c-ticket-count text-danger">{{ client.open_tickets|stringformat:"02d" }}</div>
+    {% elif client.open_tickets > 5 %}
+      <div class="c-ticket-count text-warning">{{ client.open_tickets|stringformat:"02d" }}</div>
     {% else %}
-      <span class="count-pill zero">0</span>
+      <div class="c-ticket-count text-success">{{ client.open_tickets|stringformat:"02d" }}</div>
     {% endif %}
   </td>
   <td>

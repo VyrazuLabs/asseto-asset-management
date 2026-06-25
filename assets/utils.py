@@ -4,10 +4,23 @@ from django.http import JsonResponse
 from django.utils import timezone
 from audit.models import Audit, AuditImage
 from configurations.models import TagConfiguration
-from configurations.utils import dynamic_display_name, format_datetime, generate_asset_tag, get_currency_and_datetime_format
-from .models import Asset,AssignAsset,AssetImage,AssetStatus,AssetStatusChoice,Location,Vendor,MaintenanceRecord
-from dashboard.models import CustomField, Department,ProductType,ProductCategory
-from .forms import AssetForm, AssignedAssetForm,ReassignedAssetForm,MaintenanceRecordForm
+from configurations.utils import (
+    dynamic_display_name,
+    format_datetime,
+    generate_asset_tag,
+    get_currency_and_datetime_format,
+)
+from .models import (
+    Asset,
+    AssignAsset,
+    AssetImage,
+    AssetStatus,
+    AssetStatusChoice,
+    Location,
+    Vendor,
+)
+from dashboard.models import CustomField, Department, ProductType, ProductCategory
+from .forms import AssetForm, AssignedAssetForm, ReassignedAssetForm
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
 from .models import Asset
@@ -170,7 +183,7 @@ def filtered_asset(request):
     product = request.POST.get("product")  # gets the id of the product
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
-    status_name = request.GET.get("status")
+    status_id = request.GET.get("status")
     department_id = request.GET.get("department")
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
@@ -195,8 +208,8 @@ def filtered_asset(request):
 
     if vendor_id:
         filters &= Q(vendor_id=vendor_id)
-    if status_name:
-        filters &= Q(asset_status__name__icontains=status_name)
+    if status_id:
+        filters &= Q(asset_status_id=status_id)
     if category_id:
         filters &= Q(product__product_sub_category_id=category_id)
     if type_id:
@@ -418,12 +431,29 @@ def details_of_asset(request, id):
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     get_asset_img = get_asset_images(asset)
     asset_barcode = generate_barcode(asset.tag)
-    maintenance_records = MaintenanceRecord.objects.filter(asset=asset).order_by('-created_at')
-    maintenance_form = MaintenanceRecordForm(organization=request.user.organization)
-    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form)
+    context = asset_details(
+        request,
+        get_audit_history,
+        get_audit_image,
+        asset,
+        assigned_asset,
+        assetSpecifications,
+        get_asset_img,
+        asset_barcode,
+    )
     return context
 
-def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None):
+
+def asset_details(
+    request,
+    get_audit_history,
+    get_audit_image,
+    asset,
+    assigned_asset,
+    assetSpecifications,
+    get_asset_img,
+    asset_barcode,
+):
     audit_data = []
     if get_audit_history:
         for audit in get_audit_history:
@@ -496,68 +526,25 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         obj["field_value"] = it.field_value
         get_custom_data.append(obj)
 
-    from authentication.models import User
-    
-    maintenance_type_labels = {
-        '1': 'Calibration',
-        '2': 'Breakdown',
-        '3': 'Preventive',
-        '4': 'Repair',
-        '5': 'Other',
+    context = {
+        "sidebar": "assets",
+        "assigned_user": assigned_user,
+        "assigned_asset": assigned_asset,
+        "asset_barcode": asset_barcode,
+        "asset": asset,
+        "submenu": "list",
+        "page_object": page_object,
+        "arr_size": arr_size,
+        "assetSpecifications": assetSpecifications,
+        "title": f"Details-{asset.tag}-{asset.name}",
+        "get_asset_img": img_array,
+        "eol_date": eol_date,
+        "get_custom_data": get_custom_data,
+        "get_currency": get_currency,
+        "is_demo": is_demo,
+        "get_audit_history": audit_data,
+        "get_audit_image": get_audit_image,
     }
-    
-    status_labels = {
-        '1': 'New',
-        '2': 'In Progress',
-        '3': 'Completed',
-    }
-    
-    technician_map = {}
-    tech_users = User.undeleted_objects.filter(
-        organization=request.user.organization, is_active=True
-    )
-    for u in tech_users:
-        technician_map[str(u.id)] = u.full_name
-
-    maintenance_history_entries = []
-    if maintenance_records:
-        for record in maintenance_records:
-            maintenance_history_entries.append({
-                'type': 'created',
-                'timestamp': record.created_at,
-                'user_id': record.created_by,
-                'details': maintenance_type_labels.get(record.maintenance_type, record.maintenance_type),
-            })
-            if record.updated_by:
-                try:
-                    history = list(record.history.all().order_by('history_date'))
-                    prev = None
-                    for h in history:
-                        if h.history_type == '~' and prev:
-                            changes = []
-                            if h.technician != prev.technician:
-                                changes.append('Technician')
-                            if h.status != prev.status:
-                                changes.append('Status')
-                            if changes:
-                                maintenance_history_entries.append({
-                                    'type': 'updated',
-                                    'timestamp': h.history_date,
-                                    'user_id': h.updated_by,
-                                    'details': ', '.join(changes),
-                                })
-                        prev = h
-                except Exception:
-                    maintenance_history_entries.append({
-                        'type': 'updated',
-                        'timestamp': record.updated_at,
-                        'user_id': record.updated_by,
-                        'details': 'Maintenance',
-                    })
-
-    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'assetSpecifications': assetSpecifications, 'title': f'Details-{asset.tag}-{asset.name}','get_asset_img':img_array,'eol_date':eol_date,'get_custom_data':get_custom_data,'get_currency':get_currency,'is_demo':is_demo,'get_audit_history':audit_data,'get_audit_image':get_audit_image,
-               'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries}
 
     return context
 
