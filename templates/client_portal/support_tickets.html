@@ -145,15 +145,14 @@
                 <table class="table table-hover align-middle mb-0 ticket-table">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">{{ trans.sl_no }}</th>
-                            <th>{{ trans.ticket_id }}</th>
-                            <th>{{ trans.asset_name }}</th>
-                            <th>{{ trans.subject_label }}</th>
-                            <th>{{ trans.issue_priority }}</th>
-                            <th>{{ trans.status_label }}</th>
-                            <th>{{ trans.assigned_to }}</th>
-                            <th>{{ trans.last_activity }}</th>
-
+                            <th class="ps-4">SL</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Activity</th>
+                            <th class="pe-4 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ticket-table-body">
@@ -199,7 +198,11 @@
                                     {{ ticket.updated_at|timesince }} ago
                                 </div>
                             </td>
-
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="action-btn" title="View Ticket">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>

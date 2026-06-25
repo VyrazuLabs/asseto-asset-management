@@ -44,8 +44,6 @@ DEFAULT_LANGUAGE = [
 # To add or remove a supported language, update LANGUAGE_MAP above —
 # this list will follow automatically.
 def _build_active_languages():
-    from configurations.translations import LANGUAGE_MAP
-
     _label_map = dict(DEFAULT_LANGUAGE)
     return [
         (lang_id, _label_map.get(lang_id, lang_code.upper()))
