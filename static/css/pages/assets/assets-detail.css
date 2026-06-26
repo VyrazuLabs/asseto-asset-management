@@ -586,4 +586,5 @@ body.theme-dark .status-completed { background: #15302a; color: #6ee7b7; border-
 .table-cost-cell {
   font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
 }

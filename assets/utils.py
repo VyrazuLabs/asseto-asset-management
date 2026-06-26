@@ -514,8 +514,9 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
     }
     
     technician_map = {}
+    # Fetch all users for name resolution, regardless of active status
     tech_users = User.undeleted_objects.filter(
-        organization=request.user.organization, is_active=True
+        organization=request.user.organization
     )
     for u in tech_users:
         technician_map[str(u.id)] = u.full_name
