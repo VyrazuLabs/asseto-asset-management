@@ -88,25 +88,40 @@ def verify_and_enable(request):
 
 
 def verify_otp(request):
-    user = request.user
     if request.method == "POST":
         otp = request.POST.get("otp")
         user_email = request.session.get("user_email")
-        get_user = User.objects.get(email=user_email)
+        if not user_email:
+            messages.error(request, "Session expired. Please log in again.")
+            return redirect("authentication:login")
 
-        get_totp = UserTotp.objects.get(user=get_user)
+        try:
+            get_user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            messages.error(request, "User not found. Please log in again.")
+            return redirect("authentication:login")
 
-        verify_otp = verify_totp(get_totp.secret, otp)
+        try:
+            get_totp = UserTotp.objects.get(user=get_user)
+        except UserTotp.DoesNotExist:
+            messages.error(request, "2FA not set up for this user. Please contact administrator.")
+            return redirect("authentication:login")
 
-        if verify_otp:
+        is_valid_otp = verify_totp(get_totp.secret, otp)
+
+        if is_valid_otp:
             login(request, get_user)
-            messages.success(request, f"Welcome, {user.full_name}")
+            messages.success(request, f"Welcome, {get_user.full_name}")
             return redirect("authentication:index")
         else:
+            messages.error(request, "Invalid OTP. Please try again.")
             return redirect("authentication:verify_otp")
 
     elif request.method == "GET":
-        return render(request, "auth/verify-otp.html")
+        user_email = request.session.get("user_email")
+        if not user_email:
+            return redirect("authentication:login")
+        return render(request, "auth/verify-otp.html", context={"email": user_email})
 
 
 @login_required

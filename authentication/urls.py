@@ -3,7 +3,7 @@ from authentication import views
 from django.contrib.auth import views as auth_views
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView,TokenBlacklistView
 from . import index_api_views
-from . two_factor_authentication_views import *;
+from .two_factor_authentication_views import toggle_2fa, verify_and_enable, regenerate_qr, verify_otp
 app_name = 'authentication'
 
 urlpatterns = [
