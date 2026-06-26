@@ -66,15 +66,6 @@
       <div class="stat-value">{{ open_tickets_count|default:"0" }}</div>
     </div>
   </div>
-
-  <!-- Card 4 -->
-  <a href="{% url 'recycle_bin:deleted_clients' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_client_count|default:"0" }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
