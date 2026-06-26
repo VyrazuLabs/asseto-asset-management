@@ -59,13 +59,6 @@
       <div class="stat-value">{{ with_assets_count }}</div>
     </div>
   </div>
-  <a href="{% url 'recycle_bin:deleted_products' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_product_count }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}

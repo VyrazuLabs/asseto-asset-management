@@ -29,6 +29,7 @@
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_client_count %}<span class="count-badge">{{ deleted_client_count }}</span>{% endif %}
     </a>
+
     {% if perms.authentication.add_client %}
     <a href="{% url 'clients:add' %}" class="btn-register">
       <i class="bi bi-plus-lg"></i> {{ trans.register_client }}
@@ -62,18 +63,9 @@
     <div class="stat-icon orange"><i class="bi bi-headset"></i></div>
     <div>
       <div class="stat-label">{{ trans.open_tickets_client }}</div>
-      <div class="stat-value">{{ review_client_count|default:"0" }}</div>
+      <div class="stat-value">{{ open_tickets_count|default:"0" }}</div>
     </div>
   </div>
-
-  <!-- Card 4 -->
-  <a href="{% url 'recycle_bin:deleted_clients' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_client_count|default:"0" }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}

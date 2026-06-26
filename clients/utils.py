@@ -34,8 +34,15 @@ def export_clients_csv_utils(request):
         today = date.today()
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
-            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
-            .order_by("-created_at")
+            .annotate(
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                open_tickets_count=Count(
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
+                ),
+            )
+            .order_by('-created_at')
         )
 
         search_term = request.GET.get("search", "").strip()
@@ -69,19 +76,17 @@ def export_clients_csv_utils(request):
 
         for client in client_queryset:
             first_contact = client.contacts.first()
-            writer.writerow(
-                [
-                    client.client_id,
-                    client.name,
-                    client.industry_name,
-                    first_contact.name if first_contact else "",
-                    first_contact.email if first_contact else "",
-                    first_contact.phone if first_contact else "",
-                    client.asset_count,
-                    client.open_tickets,
-                    client.get_status_display(),
-                ]
-            )
+            writer.writerow([
+                client.client_id,
+                client.name,
+                client.industry_name,
+                first_contact.name if first_contact else '',
+                first_contact.email if first_contact else '',
+                first_contact.phone if first_contact else '',
+                client.asset_count,
+                client.open_tickets_count,
+                client.get_status_display()
+            ])
         return response
     except Exception:
         logger.exception("Error exporting clients CSV")
@@ -98,8 +103,15 @@ def export_clients_pdf_utils(request):
         today = date.today()
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
-            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
-            .order_by("-created_at")
+            .annotate(
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                open_tickets_count=Count(
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
+                ),
+            )
+            .order_by('-created_at')
         )
 
         search_term = request.GET.get("search", "").strip()
@@ -140,8 +152,15 @@ class ClientService:
         """Return the base queryset for the current user's organization."""
         return (
             Client.undeleted_objects.filter(organization=user.organization)
-            .annotate(asset_count=Count("assets", filter=Q(assets__is_deleted=False)))
-            .order_by("-created_at")
+            .annotate(
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                open_tickets_count=Count(
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
+                ),
+            )
+            .order_by('-created_at')
         )
 
     @staticmethod
@@ -151,6 +170,9 @@ class ClientService:
         total_active_rentals = (
             client_queryset.aggregate(total=Sum("asset_count"))["total"] or 0
         )
+        open_tickets_total = (
+            client_queryset.aggregate(total=Sum("open_tickets_count"))["total"] or 0
+        )
         return {
             "total_client_count": client_queryset.count(),
             "active_client_count": client_queryset.filter(status="1").count(),
@@ -158,6 +180,7 @@ class ClientService:
             "dormant_client_count": client_queryset.filter(status="3").count(),
             "inactive_client_count": client_queryset.filter(status="0").count(),
             "active_rentals_count": total_active_rentals,
+            "open_tickets_count": open_tickets_total,
             "deleted_client_count": Client.deleted_objects.filter(
                 organization=user.organization
             ).count(),
