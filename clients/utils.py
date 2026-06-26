@@ -37,8 +37,9 @@ def export_clients_csv_utils(request):
             .annotate(
                 asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
                 open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
                 ),
             )
             .order_by('-created_at')
@@ -105,8 +106,9 @@ def export_clients_pdf_utils(request):
             .annotate(
                 asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
                 open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
                 ),
             )
             .order_by('-created_at')
@@ -153,8 +155,9 @@ class ClientService:
             .annotate(
                 asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
                 open_tickets_count=Count(
-                    'support_tickets',
-                    filter=Q(support_tickets__is_deleted=False) & ~Q(support_tickets__status__in=['3', '4'])
+                    'assets__tickets',
+                    filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
+                    distinct=True,
                 ),
             )
             .order_by('-created_at')
@@ -167,6 +170,9 @@ class ClientService:
         total_active_rentals = (
             client_queryset.aggregate(total=Sum("asset_count"))["total"] or 0
         )
+        open_tickets_total = (
+            client_queryset.aggregate(total=Sum("open_tickets_count"))["total"] or 0
+        )
         return {
             "total_client_count": client_queryset.count(),
             "active_client_count": client_queryset.filter(status="1").count(),
@@ -174,6 +180,7 @@ class ClientService:
             "dormant_client_count": client_queryset.filter(status="3").count(),
             "inactive_client_count": client_queryset.filter(status="0").count(),
             "active_rentals_count": total_active_rentals,
+            "open_tickets_count": open_tickets_total,
             "deleted_client_count": Client.deleted_objects.filter(
                 organization=user.organization
             ).count(),

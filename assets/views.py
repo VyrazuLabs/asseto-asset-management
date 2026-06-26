@@ -51,6 +51,8 @@ from .utils import (
     assign_asset_in_form,
     details_of_asset,
     slack_notification,
+    add_maintenance_record,
+    update_maintenance_record,
 )
 from .services import (
     change_asset_status,
@@ -568,32 +570,20 @@ def slack_authorize(request):
 @login_required
 def record_repair(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
-    if request.method == 'POST':
-        form = MaintenanceRecordForm(request.POST, organization=request.user.organization)
+    if request.method == "POST":
+        form = MaintenanceRecordForm(
+            request.POST, organization=request.user.organization
+        )
         if form.is_valid():
-            record = form.save(commit=False)
-            record.asset = asset
-            record.organization = request.user.organization
-            
-            record.service_id = f"MN-{random.randint(10000, 99999)}"
-            record.created_by = str(request.user.id)
-            record.save()
-            messages.success(request, f"Maintenance record {record.service_id} added successfully.")
-    return redirect('assets:details', id=id)
+            add_maintenance_record(request, form, asset)
+    return redirect("assets:details", id=id)
+
 
 @login_required
 def edit_maintenance(request, record_id):
-    record = get_object_or_404(MaintenanceRecord, pk=record_id, organization=request.user.organization)
-    if request.method == 'POST':
-        technician = request.POST.get('technician')
-        status = request.POST.get('status')
-        if technician and technician != record.technician:
-            record.technician = technician
-        if status and status != record.status:
-            record.status = status
-        record.updated_by = str(request.user.id)
-        record.save()
-        messages.success(request, f"Maintenance record {record.service_id} updated.")
-    return redirect('assets:details', id=record.asset.id)
-
-    return redirect('assets:details', id=id)
+    record = get_object_or_404(
+        MaintenanceRecord, pk=record_id, organization=request.user.organization
+    )
+    if request.method == "POST":
+        update_maintenance_record(request, record)
+    return redirect("assets:details", id=record.asset.id)

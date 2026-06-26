@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from django.http import JsonResponse
 from django.utils import timezone
 from audit.models import Audit, AuditImage
@@ -1025,3 +1026,27 @@ def get_asset_status_list_utils(request, page_number=None):
     }
 
     return page_object, asset_status_asset_count, stats
+@transaction.atomic
+def add_maintenance_record(request, form, asset):
+    record = form.save(commit=False)
+    record.asset = asset
+    record.organization = request.user.organization
+    record.service_id = f"MN-{random.randint(10000, 99999)}"
+    record.created_by = str(request.user.id)
+    record.save()
+    messages.success(request, f"Maintenance record {record.service_id} added successfully.")
+    return record
+
+
+@transaction.atomic
+def update_maintenance_record(request, record):
+    technician = request.POST.get("technician")
+    status = request.POST.get("status")
+    if technician and technician != record.technician:
+        record.technician = technician
+    if status and status != record.status:
+        record.status = status
+    record.updated_by = str(request.user.id)
+    record.save()
+    messages.success(request, f"Maintenance record {record.service_id} updated.")
+    return record
