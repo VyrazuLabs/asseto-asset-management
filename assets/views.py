@@ -576,6 +576,10 @@ def record_repair(request, id):
         )
         if form.is_valid():
             add_maintenance_record(request, form, asset)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     return redirect("assets:details", id=id)
 
 

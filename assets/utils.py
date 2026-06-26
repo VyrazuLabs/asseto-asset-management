@@ -515,7 +515,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
     
     technician_map = {}
     tech_users = User.undeleted_objects.filter(
-        organization=request.user.organization, is_active=True
+        organization=request.user.organization
     )
     for u in tech_users:
         technician_map[str(u.id)] = u.full_name
@@ -1031,7 +1031,11 @@ def add_maintenance_record(request, form, asset):
     record = form.save(commit=False)
     record.asset = asset
     record.organization = request.user.organization
-    record.service_id = f"MN-{random.randint(10000, 99999)}"
+    while True:
+        service_id = f"MN-{random.randint(10000, 99999)}"
+        if not MaintenanceRecord.objects.filter(service_id=service_id).exists():
+            break
+    record.service_id = service_id
     record.created_by = str(request.user.id)
     record.save()
     messages.success(request, f"Maintenance record {record.service_id} added successfully.")

@@ -325,7 +325,7 @@ class MaintenanceRecordForm(forms.ModelForm):
         if organization:
             from authentication.models import User
             users = User.undeleted_objects.filter(
-                organization=organization
+                organization=organization, is_active=True
             ).exclude(full_name__isnull=True).exclude(full_name=''
             ).order_by('full_name')
             
