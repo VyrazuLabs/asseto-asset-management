@@ -580,8 +580,7 @@ def organization_info_update(request):
 @never_cache
 @login_required
 def logout_view(request):
-    get_totp_status = UserTotp.objects.filter(user_id=request.user.id).first()
-    
+  
     logout(request)
     return redirect("/")
     

@@ -202,7 +202,7 @@ class ClientService:
         page_object = paginator.get_page(request.GET.get("page", 1))
         return {
             "sidebar": "clients",
-            "title": "Client Directory | Asseto",
+            "title": "Client Directory",
             "page_object": page_object,
             "status_choices": [s for s in STATUS_CHOICES if s[0] in ("1", "0")],
             "search_query": search_term,
@@ -325,6 +325,9 @@ class ClientService:
                 | Q(contacts__email__icontains=search_text)
                 | Q(rental_type__icontains=search_text)
             ).distinct()
+        status_filter = request.GET.get("status", "")
+        if status_filter and status_filter != "All Statuses":
+            client_queryset = client_queryset.filter(status=status_filter)
         paginator = Paginator(client_queryset, 10, orphans=1)
         page_object = paginator.get_page(page)
         return {"sidebar": "clients", "page_object": page_object}

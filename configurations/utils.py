@@ -8,6 +8,7 @@ from dateutil.parser import parse
 from django.conf import settings
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from assets.models import Asset
 
 
 def update_files_name(request, logo, favicon, login_page_logo):
