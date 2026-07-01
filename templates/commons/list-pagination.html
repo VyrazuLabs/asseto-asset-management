@@ -1,12 +1,13 @@
+{% firstof page_param page_var "page" as page_param %}
 {% if page_object.paginator.count > 0 %}
 <div class="pagination-wrap">
   <span>
-    Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-    of <strong>{{ page_object.paginator.count }}</strong> {{ item_label|default:"records" }}
+    {{ trans.showing|default:"Showing" }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+    {{ trans.of_label|default:"of" }} <strong>{{ page_object.paginator.count }}</strong> {{ item_label|default:"records" }}
   </span>
   <div class="pagination-nav">
     {% if page_object.has_previous %}
-      <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
+      <a href="?{{ page_param }}={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
     {% else %}
       <span class="page-btn disabled" aria-disabled="true">‹</span>
     {% endif %}
@@ -15,14 +16,14 @@
       {% if page_object.number == num %}
         <span class="page-btn active" aria-current="page">{{ num }}</span>
       {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-        <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        <a href="?{{ page_param }}={{ num }}" class="page-btn">{{ num }}</a>
       {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
         <span class="page-ellipsis">…</span>
       {% endif %}
     {% endfor %}
 
     {% if page_object.has_next %}
-      <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
+      <a href="?{{ page_param }}={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
     {% else %}
       <span class="page-btn disabled" aria-disabled="true">›</span>
     {% endif %}

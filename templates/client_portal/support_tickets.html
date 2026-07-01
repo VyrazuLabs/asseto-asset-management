@@ -219,38 +219,10 @@
             </div>
 
             {# ── Pagination ─────────────────────────────────────────────────────── #}
-            {% if page_object.paginator.num_pages > 1 %}
-            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center border-top">
-                <div class="text-muted small">
-                    Showing {{ page_object.start_index }} to {{ page_object.end_index }} of {{ page_object.paginator.count }} tickets
-                </div>
-                <nav aria-label="Table navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        {% if page_object.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_object.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
-                                    class="bi bi-chevron-left"></i></a>
-                        </li>
-                        {% endif %}
-
-                        {% for num in page_object.paginator.page_range %}
-                        {% if page_object.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% elif num > page_object.number|add:'-3' and num < page_object.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
-                        {% endif %}
-                        {% endfor %}
-
-                        {% if page_object.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_object.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
-                                    class="bi bi-chevron-right"></i></a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
+            {% if page_object %}
+                {% include 'commons/list-pagination.html' with item_label="tickets" %}
             {% endif %}
+
         </div>
     </div>
 

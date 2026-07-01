@@ -10,85 +10,133 @@
         <a href="#" class="view-all-link">{{ trans.view_all_history }}</a>
     </div>
     <div class="timeline-body">
-        {% for history in page_object %}
-        <div class="timeline-item">
-            {# Dynamic Icon and Color logic #}
-            {% if history.history_type == "+" %}
+        {% for entry in page_object %}
+            {% if entry.activity_type %}
+            <div class="timeline-item">
+                {% if entry.activity_type == "comment" %}
                 <div class="timeline-icon bg-blue">
-                    <i class="bi bi-plus-circle"></i>
+                    <i class="bi bi-chat-dots"></i>
                 </div>
-            {% elif history.history_type == "-" %}
-                <div class="timeline-icon bg-orange">
-                    <i class="bi bi-trash"></i>
-                </div>
-            {% elif history.history_type == "^" %}
-                <div class="timeline-icon bg-green">
-                    <i class="bi bi-arrow-counterclockwise"></i>
-                </div>
-            {% else %}
-                {# Check for specific status changes if applicable #}
-                {% if history.prev_record and history.status != history.prev_record.status %}
-                    <div class="timeline-icon bg-green">
-                        <i class="bi bi-check-circle"></i>
-                    </div>
                 {% else %}
-                    <div class="timeline-icon bg-blue">
-                        <i class="bi bi-pencil-square"></i>
-                    </div>
+                <div class="timeline-icon bg-blue">
+                    <i class="bi bi-info-circle"></i>
+                </div>
                 {% endif %}
-            {% endif %}
-
-            <div class="timeline-content">
-                <div class="timeline-content-header">
-                    <h4 class="timeline-title">
-                        {% if history.history_type == "+" %}
-                            {{ trans.record_created }}
-                        {% elif history.history_type == "-" %}
-                            {{ trans.record_deleted }}
-                        {% elif history.history_type == "^" %}
-                            {{ trans.record_restored }}
-                        {% else %}
-                            {% if history.prev_record and history.status != history.prev_record.status %}
+                <div class="timeline-content">
+                    <div class="timeline-content-header">
+                        <h4 class="timeline-title">
+                            {% if entry.activity_type == "comment" %}
+                                {{ trans.comment_added }}
+                            {% elif entry.activity_type == "created" %}
+                                {{ trans.record_created }}
+                            {% elif entry.activity_type == "status_changed" %}
                                 {{ trans.status_changed }}
-                            {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
+                            {% elif entry.activity_type == "reassigned" %}
                                 {{ trans.assignment_changed }}
                             {% else %}
                                 {{ trans.information_updated }}
                             {% endif %}
-                        {% endif %}
-                    </h4>
-                    <span class="timeline-time">
-                        {% format_datetime history.history_date %}
-                    </span>
-                </div>
-
-                <p class="timeline-desc">
-                    {% if history.history_type == "+" %}
-                        {{ trans.record_created_desc }}
-                    {% elif history.history_type == "-" %}
-                        {{ trans.record_deleted_desc }}
-                    {% elif history.history_type == "^" %}
-                        {{ trans.record_restored_desc }}
-                    {% else %}
-                        {% if history.prev_record and history.status != history.prev_record.status %}
-                            {{ trans.status_was }} {% if history.status %}{{ trans.enabled_status }}{% else %}{{ trans.disabled_status }}{% endif %} {{ trans.by_administrator }}
-                        {% elif history.prev_record and history.is_assigned != history.prev_record.is_assigned %}
-                            {{ trans.record_was }} {% if history.is_assigned %}{{ trans.assigned_status }}{% else %}{{ trans.unassigned_status }}{% endif %}.
-                        {% else %}
-                            {{ trans.information_updated_desc }}
-                        {% endif %}
-                    {% endif %}
-                </p>
-
-                <div class="timeline-footer">
-                    <div class="timeline-avatar">
-                        {{ history.history_user.full_name|slice:":1"|upper|default:"?" }}
+                        </h4>
+                        <span class="timeline-time">
+                            {% format_datetime entry.created_at %}
+                        </span>
                     </div>
-                    <span class="timeline-user">{{ history.history_user.full_name|default:trans.system_user }}</span>
-                    <span class="timeline-role">{{ history.history_user.role.related_name|default:trans.administrator_role }}</span>
+                    <p class="timeline-desc">{{ entry.description|linebreaksbr }}</p>
+                    <div class="timeline-footer">
+                        {% if entry.performed_by %}
+                        <div class="timeline-avatar">{{ entry.performed_by.get_full_name|slice:":1"|upper }}</div>
+                        <span class="timeline-user staff">{{ entry.performed_by.get_full_name }}</span>
+                        <span class="timeline-role">{{ trans.administrator_role }}</span>
+                        {% elif entry.contact %}
+                        <div class="timeline-avatar client-avatar"><i class="bi bi-person"></i></div>
+                        <span class="timeline-user client">{{ entry.contact.name }}</span>
+                        <span class="timeline-role">Client</span>
+                        {% else %}
+                        <div class="timeline-avatar">?</div>
+                        <span class="timeline-user">Client</span>
+                        <span class="timeline-role">{{ trans.comment_label }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
+            {% else %}
+            <div class="timeline-item">
+                {% if entry.history_type == "+" %}
+                    <div class="timeline-icon bg-blue">
+                        <i class="bi bi-plus-circle"></i>
+                    </div>
+                {% elif entry.history_type == "-" %}
+                    <div class="timeline-icon bg-orange">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                {% elif entry.history_type == "^" %}
+                    <div class="timeline-icon bg-green">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </div>
+                {% else %}
+                    {% if entry.prev_record and entry.status != entry.prev_record.status %}
+                        <div class="timeline-icon bg-green">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    {% else %}
+                        <div class="timeline-icon bg-blue">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <div class="timeline-content">
+                    <div class="timeline-content-header">
+                        <h4 class="timeline-title">
+                            {% if entry.history_type == "+" %}
+                                {{ trans.record_created }}
+                            {% elif entry.history_type == "-" %}
+                                {{ trans.record_deleted }}
+                            {% elif entry.history_type == "^" %}
+                                {{ trans.record_restored }}
+                            {% else %}
+                                {% if entry.prev_record and entry.status != entry.prev_record.status %}
+                                    {{ trans.status_changed }}
+                                {% elif entry.prev_record and entry.is_assigned != entry.prev_record.is_assigned %}
+                                    {{ trans.assignment_changed }}
+                                {% else %}
+                                    {{ trans.information_updated }}
+                                {% endif %}
+                            {% endif %}
+                        </h4>
+                        <span class="timeline-time">
+                            {% format_datetime entry.history_date %}
+                        </span>
+                    </div>
+
+                    <p class="timeline-desc">
+                        {% if entry.history_type == "+" %}
+                            {{ trans.record_created_desc }}
+                        {% elif entry.history_type == "-" %}
+                            {{ trans.record_deleted_desc }}
+                        {% elif entry.history_type == "^" %}
+                            {{ trans.record_restored_desc }}
+                        {% else %}
+                            {% if entry.prev_record and entry.status != entry.prev_record.status %}
+                                {{ trans.status_was }} {% if entry.status %}{{ trans.enabled_status }}{% else %}{{ trans.disabled_status }}{% endif %} {{ trans.by_administrator }}
+                            {% elif entry.prev_record and entry.is_assigned != entry.prev_record.is_assigned %}
+                                {{ trans.record_was }} {% if entry.is_assigned %}{{ trans.assigned_status }}{% else %}{{ trans.unassigned_status }}{% endif %}.
+                            {% else %}
+                                {{ trans.information_updated_desc }}
+                            {% endif %}
+                        {% endif %}
+                    </p>
+
+                    <div class="timeline-footer">
+                        <div class="timeline-avatar">
+                            {{ entry.history_user.full_name|slice:":1"|upper|default:"?" }}
+                        </div>
+                        <span class="timeline-user">{{ entry.history_user.full_name|default:trans.system_user }}</span>
+                        <span class="timeline-role">{{ entry.history_user.role.related_name|default:trans.administrator_role }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% empty %}
         <div class="text-center py-5 text-muted">
             <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
@@ -97,9 +145,7 @@
         {% endfor %}
     </div>
     {% if not hide_activity_pagination and page_object.has_other_pages %}
-    <div class="px-4 pb-3">
-        {% include 'commons/pagination.html' %}
-    </div>
+        {% include 'commons/list-pagination.html' %}
     {% endif %}
 </div>
 {% endif %}

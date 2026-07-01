@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 
 <link rel="stylesheet" href="{% static 'css/pages/product-details.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/client-ticket-detail.css' %}">
 {% endblock extra_css %}
 
@@ -169,6 +170,62 @@
         {% endfor %}
     </div>
 
+    {# Comments Section #}
+    <div class="detail-card mb-4">
+        <div class="section-title">
+            <i class="bi bi-chat-left-text text-primary fs-5"></i> {{ trans.comments_section_title|default:"Comments" }}
+            <span class="badge bg-primary rounded-pill">{{ comments|length }}</span>
+        </div>
+
+        <div class="comments-container" id="comments-container">
+            <div class="comments-list">
+            {% for comment in comments %}
+                <div class="comment-wrapper">
+                    {% include 'support/includes/comment_item.html' %}
+                </div>
+            {% empty %}
+                <div class="text-center py-4 text-muted" id="comment-empty-state">
+                    <div class="d-flex justify-content-center mb-3">
+                        <i class="bi bi-chat-dots fs-3"></i>
+                    </div>
+                    <p class="small mb-0">{{ trans.no_comments_yet|default:"No comments posted yet." }}</p>
+                </div>
+            {% endfor %}
+        </div>
+            {% if comments|length > 10 %}
+            <div class="load-more-comments-wrapper" id="load-more-wrapper">
+                <button type="button" class="btn-load-more" id="btn-load-more">
+                    {{ trans.load_more_comments|default:"Load More Comments" }}
+                </button>
+            </div>
+            {% endif %}
+        </div>
+
+        <form action="{% url 'client_portal:support_tickets_detail' ticket.id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="new-comment-box">
+                <div class="comment-upload-preview-container" id="comment-preview-container"></div>
+                <textarea name="comment_content" id="comment-textarea" class="new-comment-textarea" placeholder="{{ trans.type_message_placeholder|default:'Type your message here...' }}" required></textarea>
+                <div class="new-comment-toolbar">
+                    <div class="toolbar-buttons-left">
+                        <input type="file" name="comment_attachments" id="comment-attachments-input" multiple class="d-none">
+                        <button type="button" class="toolbar-btn" id="comment-attach-btn" title="{{ trans.attach_file_title|default:'Attach file' }}">
+                            <i class="bi bi-paperclip"></i>
+                        </button>
+                        <button type="button" class="toolbar-btn" id="comment-emoji-btn" title="{{ trans.insert_emoji_title|default:'Insert emoji' }}">
+                            <i class="bi bi-emoji-smile"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn-post-comment">
+                            {{ trans.post_comment_btn|default:'Post Comment' }} <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     {# Activity Log #}
     <div class="pd-history-wrap mt-4">
         <div class="timeline-card">
@@ -178,10 +235,12 @@
                     <h3>Activity Log</h3>
                 </div>
             </div>
-            <div class="timeline-body">
+                <div class="timeline-body">
                 {% for activity in activities %}
                 <div class="timeline-item">
-                    {% if activity.activity_type == 'created' %}
+                    {% if activity.activity_type == 'comment' %}
+                        <div class="timeline-icon bg-blue"><i class="bi bi-chat-dots"></i></div>
+                    {% elif activity.activity_type == 'created' %}
                         <div class="timeline-icon bg-blue"><i class="bi bi-plus-circle"></i></div>
                     {% elif activity.activity_type == 'status_changed' %}
                         <div class="timeline-icon bg-green"><i class="bi bi-check-circle"></i></div>
@@ -195,42 +254,52 @@
 
                     <div class="timeline-content">
                         <div class="timeline-content-header">
-                            <h4 class="timeline-title">{{ activity.get_activity_type_display }}</h4>
+                            <h4 class="timeline-title">
+                                {% if activity.activity_type == 'comment' %}
+                                    Comment Created
+                                {% else %}
+                                    {{ activity.get_activity_type_display }}
+                                {% endif %}
+                            </h4>
                             <span class="timeline-time">{{ activity.created_at|timesince }} ago</span>
                         </div>
                         <p class="timeline-desc">{{ activity.description }}</p>
                         <div class="timeline-footer">
-                            <div class="timeline-avatar">
-                                {% if activity.performed_by %}
-                                    {{ activity.performed_by.get_full_name|slice:":1"|upper }}
-                                {% else %}
-                                    S
-                                {% endif %}
-                            </div>
-                            <span class="timeline-user">
-                                {% if activity.performed_by %}
-                                    {{ activity.performed_by.get_full_name }}
-                                {% else %}
-                                    System Notification
-                                {% endif %}
-                            </span>
                             {% if activity.performed_by %}
+                            <div class="timeline-avatar">{{ activity.performed_by.get_full_name|slice:":1"|upper }}</div>
+                            <span class="timeline-user staff">{{ activity.performed_by.get_full_name }}</span>
                             {% if activity.performed_by.role %}
                             <span class="timeline-role">{{ activity.performed_by.role.related_name|default:"Member" }}</span>
                             {% endif %}
+                            {% elif activity.contact %}
+                            <div class="timeline-avatar client-avatar"><i class="bi bi-person"></i></div>
+                            <span class="timeline-user client">{{ activity.contact.name }}</span>
+                            <span class="timeline-role">Client</span>
+                            {% else %}
+                            <div class="timeline-avatar">?</div>
+                            <span class="timeline-user">Client</span>
                             {% endif %}
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="text-center py-5 text-muted">
-                    <i class="bi bi-journal-x fs-1 d-block mb-3"></i>
+                    <i class="bi bi-journal-x fs-1 d-block mx-auto mb-3"></i>
                     <p>No activity log found for this ticket yet.</p>
                 </div>
                 {% endfor %}
             </div>
+            {% if activities %}
+                {% with page_object=activities %}
+                    {% include 'commons/list-pagination.html' with page_param="activities_page" %}
+                {% endwith %}
+            {% endif %}
         </div>
     </div>
 
 </div>
 {% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/support_ticket_detail.js' %}" defer></script>
+{% endblock extra_js %}
