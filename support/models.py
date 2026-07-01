@@ -1,6 +1,7 @@
 import uuid
 import random
 from django.db import models
+from django.conf import settings
 from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
@@ -163,6 +164,56 @@ class TicketActivity(TimeStampModel):
     performed_by = models.ForeignKey(
         "authentication.User", on_delete=models.SET_NULL, null=True
     )
+    contact = models.ForeignKey(
+        "clients.ClientContact", on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def __str__(self):
         return f"{self.activity_type} on {self.ticket.ticket_id}"
+
+
+class TicketComment(TimeStampModel):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    ticket = models.ForeignKey(
+        SupportTicket, on_delete=models.CASCADE, related_name="comments"
+    )
+    content = models.TextField()
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
+        related_name="ticket_comments",
+    )
+    contact = models.ForeignKey(
+        "clients.ClientContact", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="ticket_comments",
+    )
+    client = models.ForeignKey(
+        "clients.Client", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="ticket_comments",
+    )
+
+    class Meta:
+        ordering = ["created_at"]
+
+    @property
+    def display_name(self):
+        if self.author:
+            return self.author.get_full_name()
+        if self.contact:
+            return self.contact.name
+        return "Client"
+
+    def __str__(self):
+        return f"Comment on {self.ticket.ticket_id} by {self.display_name}"
+
+
+class TicketCommentAttachment(TimeStampModel):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    comment = models.ForeignKey(
+        TicketComment, on_delete=models.CASCADE, related_name="attachments"
+    )
+    file = models.FileField(upload_to="support/comment_attachments/")
+    file_name = models.CharField(max_length=255)
+    file_size = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.file_name

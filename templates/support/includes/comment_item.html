@@ -1,0 +1,73 @@
+{% load static %}
+{% if comment.author and comment.author.is_staff or comment.author.is_superuser %}
+    <div class="comment-item agent-comment">
+        <div class="comment-bubble">
+            <div class="comment-meta">
+                <span class="comment-timestamp">{{ comment.created_at|date:"d/m/Y, h:i A" }}</span>
+                <div class="comment-meta-left">
+                    <span class="comment-badge-support">{{ trans.support_badge }}</span>
+                    <span class="comment-author-name">{{ comment.display_name }}</span>
+                </div>
+            </div>
+            <div class="comment-text-content">
+                {{ comment.content|linebreaksbr }}
+            </div>
+            {% if comment.attachments.all %}
+            <div class="comment-attached-files justify-content-end">
+                {% for att in comment.attachments.all %}
+                <a href="{{ att.file.url }}" target="_blank" class="comment-file-card">
+                    <div class="comment-file-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <div class="comment-file-info">
+                        <span class="comment-file-name" title="{{ att.file_name }}">{{ att.file_name }}</span>
+                        <span class="comment-file-size">{{ att.file_size|filesizeformat }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% if comment.author %}
+        <div class="comment-avatar">
+            {% if comment.author.profile_pic %}
+                <img src="{{ comment.author.profile_pic.url }}" alt="{{ comment.display_name }}">
+            {% else %}
+                <img src="{% static 'images/faces/1.jpg' %}" alt="{{ comment.display_name }}">
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+{% else %}
+    {% with initial=comment.display_name|slice:":1"|upper %}
+    <div class="comment-item client-comment">
+        <div class="comment-avatar">
+            <div class="comment-initials">{{ initial }}</div>
+        </div>
+        <div class="comment-bubble">
+            <div class="comment-meta">
+                <span class="comment-author-name">{{ comment.display_name }}</span>
+                <span class="comment-timestamp">{{ comment.created_at|date:"d/m/Y, h:i A" }}</span>
+            </div>
+            <div class="comment-text-content">
+                {{ comment.content|linebreaksbr }}
+            </div>
+            {% if comment.attachments.all %}
+            <div class="comment-attached-files">
+                {% for att in comment.attachments.all %}
+                <a href="{{ att.file.url }}" target="_blank" class="comment-file-card">
+                    <div class="comment-file-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <div class="comment-file-info">
+                        <span class="comment-file-name" title="{{ att.file_name }}">{{ att.file_name }}</span>
+                        <span class="comment-file-size">{{ att.file_size|filesizeformat }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endwith %}
+{% endif %}

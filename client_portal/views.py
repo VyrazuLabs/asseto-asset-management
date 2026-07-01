@@ -13,6 +13,8 @@ from support.models import (
     SupportTicket,
     TicketAttachment,
     TicketActivity,
+    TicketComment,
+    TicketCommentAttachment,
     STATUS_CHOICES,
     PRIORITY_CHOICES,
     TICKET_TYPE_CHOICES,
@@ -547,12 +549,52 @@ def client_portal_ticket_detail(request, pk):
         pk=pk
     )
 
+    if request.method == "POST":
+        comment_content = request.POST.get("comment_content", "").strip()
+        if comment_content:
+            comment = TicketComment.objects.create(
+                ticket=ticket,
+                content=comment_content,
+                author=None,
+                contact=contact,
+                client=contact.client,
+            )
+            for f in request.FILES.getlist("comment_attachments"):
+                TicketCommentAttachment.objects.create(
+                    comment=comment,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                )
+            TicketActivity.objects.create(
+                ticket=ticket,
+                activity_type="comment",
+                description=comment_content,
+                is_internal=False,
+                performed_by=None,
+                contact=contact,
+            )
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                from django.template.loader import render_to_string
+                html = render_to_string("support/includes/comment_item.html", {"comment": comment}, request=request)
+                return JsonResponse({"success": True, "html": html, "comment_id": str(comment.id)})
+            messages.success(request, "Comment posted successfully.")
+            return redirect("client_portal:support_tickets_detail", pk=pk)
+
+    comments = ticket.comments.select_related("author", "contact", "client").prefetch_related("attachments")
+
+    from django.core.paginator import Paginator
+    activities_qs = ticket.activities.filter(is_internal=False).order_by('-created_at')
+    activities_paginator = Paginator(activities_qs, 10, orphans=1)
+    activities_page = activities_paginator.get_page(request.GET.get('activities_page', 1))
+
     context = {
         'cp_sidebar': 'support',
         'contact': contact,
         'client': client,
         'ticket': ticket,
         'attachments': ticket.attachments.order_by('-created_at'),
-        'activities': ticket.activities.filter(is_internal=False).order_by('-created_at'),
+        'comments': comments,
+        'activities': activities_page,
     }
     return render(request, 'client_portal/ticket_detail.html', context)
