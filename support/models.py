@@ -191,6 +191,8 @@ class TicketComment(TimeStampModel):
         related_name="ticket_comments",
     )
 
+    is_staff_comment = models.BooleanField(default=False)
+
     class Meta:
         ordering = ["created_at"]
 
@@ -198,6 +200,8 @@ class TicketComment(TimeStampModel):
     def display_name(self):
         if self.author:
             return self.author.get_full_name()
+        if self.is_staff_comment:
+            return "Deleted Staff"
         if self.contact:
             return self.contact.name
         return "Client"

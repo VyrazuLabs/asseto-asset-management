@@ -2,8 +2,8 @@
 {% if page_object.paginator.count > 0 %}
 <div class="pagination-wrap">
   <span>
-    Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-    of <strong>{{ page_object.paginator.count }}</strong> {{ item_label|default:"records" }}
+    {{ trans.showing|default:"Showing" }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+    {{ trans.of_label|default:"of" }} <strong>{{ page_object.paginator.count }}</strong> {{ item_label|default:"records" }}
   </span>
   <div class="pagination-nav">
     {% if page_object.has_previous %}

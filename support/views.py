@@ -40,14 +40,22 @@ def ticket_detail(request, id):
     ticket = context["ticket"]
 
     if request.method == "POST":
-        comment, created = SupportTicketService.add_comment(request, ticket)
-        if created:
+        from django.core.exceptions import ValidationError
+        try:
+            comment, created = SupportTicketService.add_comment(request, ticket)
+            if created:
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    html = SupportTicketService.render_comment_html(comment, request)
+                    return JsonResponse(
+                        {"success": True, "html": html, "comment_id": str(comment.id)}
+                    )
+                messages.success(request, "Comment posted successfully.")
+                return redirect("support:ticket_detail", id=id)
+        except ValidationError as e:
+            err_msg = e.message if hasattr(e, 'message') else ", ".join(e.messages)
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                html = SupportTicketService.render_comment_html(comment, request)
-                return JsonResponse(
-                    {"success": True, "html": html, "comment_id": str(comment.id)}
-                )
-            messages.success(request, "Comment posted successfully.")
+                return JsonResponse({"success": False, "error": err_msg})
+            messages.error(request, err_msg)
             return redirect("support:ticket_detail", id=id)
 
     return render(request, "support/ticket_detail.html", context)

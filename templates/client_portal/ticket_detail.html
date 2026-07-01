@@ -173,7 +173,7 @@
     {# Comments Section #}
     <div class="detail-card mb-4">
         <div class="section-title">
-            <i class="bi bi-chat-left-text text-primary fs-5"></i> Comments
+            <i class="bi bi-chat-left-text text-primary fs-5"></i> {{ trans.comments_section_title|default:"Comments" }}
             <span class="badge bg-primary rounded-pill">{{ comments|length }}</span>
         </div>
 
@@ -181,92 +181,21 @@
             <div class="comments-list">
             {% for comment in comments %}
                 <div class="comment-wrapper">
-                {% if comment.author and comment.author.is_staff or comment.author.is_superuser %}
-                    <div class="comment-item agent-comment">
-                        <div class="comment-bubble">
-                            <div class="comment-meta">
-                                <span class="comment-timestamp">{{ comment.created_at|date:"d/m/Y, h:i A" }}</span>
-                                <div class="comment-meta-left">
-                                    <span class="comment-badge-support">SUPPORT</span>
-                                    <span class="comment-author-name">{{ comment.display_name }}</span>
-                                </div>
-                            </div>
-                            <div class="comment-text-content">
-                                {{ comment.content|linebreaksbr }}
-                            </div>
-                            {% if comment.attachments.all %}
-                            <div class="comment-attached-files justify-content-end">
-                                {% for att in comment.attachments.all %}
-                                <a href="{{ att.file.url }}" target="_blank" class="comment-file-card">
-                                    <div class="comment-file-icon">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                    </div>
-                                    <div class="comment-file-info">
-                                        <span class="comment-file-name" title="{{ att.file_name }}">{{ att.file_name }}</span>
-                                        <span class="comment-file-size">{{ att.file_size|filesizeformat }}</span>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% if comment.author %}
-                        <div class="comment-avatar">
-                            {% if comment.author.profile_pic %}
-                                <img src="{{ comment.author.profile_pic.url }}" alt="{{ comment.display_name }}">
-                            {% else %}
-                                <img src="{% static 'images/faces/1.jpg' %}" alt="{{ comment.display_name }}">
-                            {% endif %}
-                        </div>
-                        {% endif %}
-                    </div>
-                {% else %}
-                    {% with initial=comment.display_name|slice:":1"|upper %}
-                    <div class="comment-item client-comment">
-                        <div class="comment-avatar">
-                            <div class="comment-initials">{{ initial }}</div>
-                        </div>
-                        <div class="comment-bubble">
-                            <div class="comment-meta">
-                                <span class="comment-author-name">{{ comment.display_name }}</span>
-                                <span class="comment-timestamp">{{ comment.created_at|date:"d/m/Y, h:i A" }}</span>
-                            </div>
-                            <div class="comment-text-content">
-                                {{ comment.content|linebreaksbr }}
-                            </div>
-                            {% if comment.attachments.all %}
-                            <div class="comment-attached-files">
-                                {% for att in comment.attachments.all %}
-                                <a href="{{ att.file.url }}" target="_blank" class="comment-file-card">
-                                    <div class="comment-file-icon">
-                                        <i class="bi bi-file-earmark-text"></i>
-                                    </div>
-                                    <div class="comment-file-info">
-                                        <span class="comment-file-name" title="{{ att.file_name }}">{{ att.file_name }}</span>
-                                        <span class="comment-file-size">{{ att.file_size|filesizeformat }}</span>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endwith %}
-                {% endif %}
+                    {% include 'support/includes/comment_item.html' %}
                 </div>
             {% empty %}
-                <div class="text-center py-4 text-muted">
+                <div class="text-center py-4 text-muted" id="comment-empty-state">
                     <div class="d-flex justify-content-center mb-3">
                         <i class="bi bi-chat-dots fs-3"></i>
                     </div>
-                    <p class="small mb-0">No comments posted yet.</p>
+                    <p class="small mb-0">{{ trans.no_comments_yet|default:"No comments posted yet." }}</p>
                 </div>
             {% endfor %}
         </div>
             {% if comments|length > 10 %}
             <div class="load-more-comments-wrapper" id="load-more-wrapper">
                 <button type="button" class="btn-load-more" id="btn-load-more">
-                    Load More Comments
+                    {{ trans.load_more_comments|default:"Load More Comments" }}
                 </button>
             </div>
             {% endif %}
@@ -276,20 +205,20 @@
             {% csrf_token %}
             <div class="new-comment-box">
                 <div class="comment-upload-preview-container" id="comment-preview-container"></div>
-                <textarea name="comment_content" id="comment-textarea" class="new-comment-textarea" placeholder="Type your message here..." required></textarea>
+                <textarea name="comment_content" id="comment-textarea" class="new-comment-textarea" placeholder="{{ trans.type_message_placeholder|default:'Type your message here...' }}" required></textarea>
                 <div class="new-comment-toolbar">
                     <div class="toolbar-buttons-left">
                         <input type="file" name="comment_attachments" id="comment-attachments-input" multiple class="d-none">
-                        <button type="button" class="toolbar-btn" id="comment-attach-btn" title="Attach file">
+                        <button type="button" class="toolbar-btn" id="comment-attach-btn" title="{{ trans.attach_file_title|default:'Attach file' }}">
                             <i class="bi bi-paperclip"></i>
                         </button>
-                        <button type="button" class="toolbar-btn" id="comment-emoji-btn" title="Insert emoji">
+                        <button type="button" class="toolbar-btn" id="comment-emoji-btn" title="{{ trans.insert_emoji_title|default:'Insert emoji' }}">
                             <i class="bi bi-emoji-smile"></i>
                         </button>
                     </div>
                     <div>
                         <button type="submit" class="btn-post-comment">
-                            Post Comment <i class="bi bi-send-fill"></i>
+                            {{ trans.post_comment_btn|default:'Post Comment' }} <i class="bi bi-send-fill"></i>
                         </button>
                     </div>
                 </div>

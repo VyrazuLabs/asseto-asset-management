@@ -20,6 +20,8 @@ from support.models import (
     TICKET_TYPE_CHOICES,
 )
 from .forms import ClientSupportTicketForm
+from support.utils import SupportTicketService
+from django.core.exceptions import ValidationError
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location
 from vendors.models import Vendor
@@ -550,35 +552,20 @@ def client_portal_ticket_detail(request, pk):
     )
 
     if request.method == "POST":
-        comment_content = request.POST.get("comment_content", "").strip()
-        if comment_content:
-            comment = TicketComment.objects.create(
-                ticket=ticket,
-                content=comment_content,
-                author=None,
-                contact=contact,
-                client=contact.client,
-            )
-            for f in request.FILES.getlist("comment_attachments"):
-                TicketCommentAttachment.objects.create(
-                    comment=comment,
-                    file=f,
-                    file_name=f.name,
-                    file_size=f.size,
-                )
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="comment",
-                description=comment_content,
-                is_internal=False,
-                performed_by=None,
-                contact=contact,
-            )
+        try:
+            comment, created = SupportTicketService.add_client_comment(request, ticket, contact)
+            if created:
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    from django.template.loader import render_to_string
+                    html = render_to_string("support/includes/comment_item.html", {"comment": comment}, request=request)
+                    return JsonResponse({"success": True, "html": html, "comment_id": str(comment.id)})
+                messages.success(request, "Comment posted successfully.")
+                return redirect("client_portal:support_tickets_detail", pk=pk)
+        except ValidationError as e:
+            err_msg = e.message if hasattr(e, 'message') else ", ".join(e.messages)
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                from django.template.loader import render_to_string
-                html = render_to_string("support/includes/comment_item.html", {"comment": comment}, request=request)
-                return JsonResponse({"success": True, "html": html, "comment_id": str(comment.id)})
-            messages.success(request, "Comment posted successfully.")
+                return JsonResponse({"success": False, "error": err_msg})
+            messages.error(request, err_msg)
             return redirect("client_portal:support_tickets_detail", pk=pk)
 
     comments = ticket.comments.select_related("author", "contact", "client").prefetch_related("attachments")

@@ -11,6 +11,8 @@ import logging
 from itertools import chain
 
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -238,6 +240,28 @@ class SupportTicketService:
     # Add comment (from detail page)
     # ------------------------------------------------------------------
 
+    ALLOWED_EXTENSIONS = {
+        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf',
+        'zip', 'rar', 'tar', 'gz', '7z',
+    }
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+    @staticmethod
+    def validate_attachments(files):
+        """Validate files for size and safe extensions."""
+        for f in files:
+            if f.size > SupportTicketService.MAX_FILE_SIZE:
+                raise ValidationError(f"File '{f.name}' exceeds the 10MB size limit.")
+            
+            ext = f.name.split('.')[-1].lower() if '.' in f.name else ''
+            if ext not in SupportTicketService.ALLOWED_EXTENSIONS:
+                raise ValidationError(f"File type '.{ext}' is not allowed.")
+
+    # ------------------------------------------------------------------
+    # Add comment (from detail page)
+    # ------------------------------------------------------------------
+
     @staticmethod
     def add_comment(request, ticket):
         """Create a comment with optional attachments and log activity.
@@ -248,27 +272,77 @@ class SupportTicketService:
         if not comment_content:
             return None, False
 
-        comment = TicketComment.objects.create(
-            ticket=ticket,
-            content=comment_content,
-            author=request.user,
-        )
+        files = request.FILES.getlist("comment_attachments")
+        SupportTicketService.validate_attachments(files)
 
-        for f in request.FILES.getlist("comment_attachments"):
-            TicketCommentAttachment.objects.create(
-                comment=comment,
-                file=f,
-                file_name=f.name,
-                file_size=f.size,
+        is_staff = request.user.is_staff or request.user.is_superuser
+
+        with transaction.atomic():
+            comment = TicketComment.objects.create(
+                ticket=ticket,
+                content=comment_content,
+                author=request.user,
+                is_staff_comment=is_staff,
             )
 
-        TicketActivity.objects.create(
-            ticket=ticket,
-            activity_type="comment",
-            description=comment_content,
-            is_internal=False,
-            performed_by=request.user,
-        )
+            for f in files:
+                TicketCommentAttachment.objects.create(
+                    comment=comment,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                )
+
+            TicketActivity.objects.create(
+                ticket=ticket,
+                activity_type="comment",
+                description=comment_content,
+                is_internal=False,
+                performed_by=request.user,
+            )
+
+        return comment, True
+
+    @staticmethod
+    def add_client_comment(request, ticket, contact):
+        """Create a comment from the Client Portal with optional attachments and log activity.
+
+        Returns ``(comment, True)`` on success, ``(None, False)`` if blank.
+        """
+        comment_content = request.POST.get("comment_content", "").strip()
+        if not comment_content:
+            return None, False
+
+        files = request.FILES.getlist("comment_attachments")
+        SupportTicketService.validate_attachments(files)
+
+        with transaction.atomic():
+            comment = TicketComment.objects.create(
+                ticket=ticket,
+                content=comment_content,
+                author=None,
+                contact=contact,
+                client=contact.client,
+                is_staff_comment=False,
+            )
+
+            for f in files:
+                TicketCommentAttachment.objects.create(
+                    comment=comment,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                )
+
+            TicketActivity.objects.create(
+                ticket=ticket,
+                activity_type="comment",
+                description=comment_content,
+                is_internal=False,
+                performed_by=None,
+                contact=contact,
+            )
+
         return comment, True
 
     @staticmethod

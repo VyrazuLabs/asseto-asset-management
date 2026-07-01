@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
 
       const submitBtn = commentForm.querySelector('.btn-post-comment');
+      const originalHTML = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.innerHTML = 'Posting...';
 
@@ -213,12 +214,17 @@ document.addEventListener('DOMContentLoaded', function () {
           commentTextarea.value = '';
           selectedFiles = [];
           updateInputAndPreview();
+        } else {
+          alert(data.error || 'An error occurred while posting your comment.');
         }
       })
-      .catch(error => console.error('Error posting comment:', error))
+      .catch(error => {
+        console.error('Error posting comment:', error);
+        alert('An unexpected error occurred. Please try again.');
+      })
       .finally(() => {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Post Comment <i class="bi bi-send-fill"></i>';
+        submitBtn.innerHTML = originalHTML;
       });
     });
   }

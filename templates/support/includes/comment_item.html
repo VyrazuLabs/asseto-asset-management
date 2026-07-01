@@ -1,5 +1,5 @@
 {% load static %}
-{% if comment.author and comment.author.is_staff or comment.author.is_superuser %}
+{% if comment.is_staff_comment %}
     <div class="comment-item agent-comment">
         <div class="comment-bubble">
             <div class="comment-meta">
