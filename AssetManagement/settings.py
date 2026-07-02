@@ -37,7 +37,6 @@ cipher_suite = Fernet(b"NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=")
 file_name = os.getenv(
     "FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY", "firebase-credentials.json"
 )
-cred_path = BASE_DIR / file_name
 firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
 
 if firebase_credentials:
@@ -48,9 +47,11 @@ if firebase_credentials:
     cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred)
 
-elif cred_path.exists():
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+elif file_name and file_name.strip().strip("'\""):
+    cred_path = BASE_DIR / file_name.strip().strip("'\"")
+    if cred_path.is_file():
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
 LOGIN_REDIRECT_URL = "/"
 
 DEBUG = True
