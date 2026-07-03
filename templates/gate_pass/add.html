@@ -88,7 +88,7 @@
 
             <div class="col-md-6">
               <label class="field-label">{{ trans.gate_pass_movement_type }} <span class="required">*</span></label>
-              <select name="movement-type" class="field-input {% if errors.movement_type %}is-invalid{% endif %}">
+              <select name="movement_type" class="field-input {% if errors.movement_type %}is-invalid{% endif %}">
                 <option value="">{{ trans.gate_pass_select_type }}</option>
                 <option value="0" {% if old.movement_type|stringformat:"s" == "0" %}selected{% endif %}>Outward</option>
                 <option value="1" {% if old.movement_type|stringformat:"s" == "1" %}selected{% endif %}>Inward</option>

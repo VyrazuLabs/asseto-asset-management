@@ -1,5 +1,6 @@
 from zoneinfo import ZoneInfo
 
+from django.contrib import messages
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -14,6 +15,7 @@ from vendors.models import Vendor
 from .models import GatePass
 
 FIELDS = {
+    "search": {"required": True},
     "movement_type": {"required": True},
     "destination_vendor": {"required": True},
     "expected_return_date": {"required": True},
@@ -102,6 +104,7 @@ def add(request):
             raised_by=request.user,
             authorised_by=None,
         )
+        messages.success(request, "Gate pass created successfully")
         return redirect("gate_pass:list")
 
     vendors = Vendor.undeleted_objects.all()
@@ -197,13 +200,12 @@ def vendor_search(request):
     return JsonResponse({"vendors": data})
 
 
-def authorisation(request, id):
+def authorisation(request, id, status):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
         return redirect("gate_pass:list")
 
-    # [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
-    if gate_pass.status == 1:
+    if status == 1:
         gate_pass.authorised_by = None
         gate_pass.status = 3
     else:

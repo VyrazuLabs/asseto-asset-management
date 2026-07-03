@@ -28,7 +28,7 @@ SEARCH_FIELDS = [
 
 
 def get_gate_pass_list():
-    get_items = GatePass.objects.all()
+    get_items = GatePass.objects.all().order_by("-created_at")
     get_inward_pass_count = get_items.filter(movement_type=1, status=1).count()
     get_pending_authorization_count = get_items.filter(status=0).count()
     now = timezone.localtime(timezone.now())
@@ -233,17 +233,17 @@ class GatePassService:
         paginated_data = add_pagination(data, page=page)
         return {**paginated_data, **stats}
 
-    def approved_or_reject(self, request, gate_pass: GatePass):
-        # [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
+    # def approved_or_reject(self, request, gate_pass: GatePass):
+    #     # [(0, 'Pending'), (1, 'Approved'), (2, 'Draft'), (3, 'Rejected'), (4, 'Checked Out')]
 
-        if gate_pass.status == 1:
-            gate_pass.authorised_by = None
-            gate_pass.status = 3
+    #     if gate_pass.status == 1:
+    #         gate_pass.authorised_by = None
+    #         gate_pass.status = 3
 
-            self.repository.save(gate_pass)
-            return "GatePass Rejected"
-        gate_pass.authorised_by = request.user
-        gate_pass.status = 1
+    #         self.repository.save(gate_pass)
+    #         return "GatePass Rejected"
+    #     gate_pass.authorised_by = request.user
+    #     gate_pass.status = 1
 
-        self.repository.save(gate_pass)
-        return "GatePass Approved"
+    #     self.repository.save(gate_pass)
+    #     return "GatePass Approved"

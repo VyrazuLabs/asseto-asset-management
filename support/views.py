@@ -28,7 +28,7 @@ def add_ticket(request):
 
     context = {
         "sidebar": "support",
-        "title": "New Support Request | Asseto",
+        "title": "New Support Request",
         "form": form,
     }
     return render(request, "support/ticket_add.html", context)
@@ -82,7 +82,7 @@ def update_ticket(request, id):
 
     context = {
         "sidebar": "support",
-        "title": f"Edit {ticket.subject} | Asseto",
+        "title": f"Edit {ticket.subject}",
         "form": form,
         "ticket": ticket,
         "activities": ticket.activities.order_by("-created_at")[:20],

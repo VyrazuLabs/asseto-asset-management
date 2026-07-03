@@ -23,6 +23,12 @@ from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
 from configurations.constants import NAME_FORMATS
 from django.apps import apps
+from django.core.validators import RegexValidator
+
+phone_validator = RegexValidator(
+    regex=r'^\+[1-9]\d{9,14}$',
+    message="Phone number must be in standard format with + followed by country code and number (10-15 digits total, e.g., +919876543210).",
+)
 
 
 def path_and_rename(instance, filename):
@@ -106,7 +112,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True, validators=[phone_validator])
     profile_pic = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     employee_id = models.CharField(max_length=45, blank=True, null=True)
     is_active = models.BooleanField(default=False)
