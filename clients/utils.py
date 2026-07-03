@@ -8,6 +8,7 @@ logic into a single module as dictated by the project rules.
 
 import csv
 import logging
+import re
 from datetime import date
 from io import BytesIO
 
@@ -211,6 +212,21 @@ class ClientService:
         }
 
     @staticmethod
+    def _validate_contact(email, phone):
+        """Validate email and phone format for a contact.
+        
+        Raises ValueError if validation fails.
+        """
+        email_pattern = r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$'
+        phone_pattern = r'^\+[1-9]\d{9,14}$'
+
+        if email and not re.match(email_pattern, email.strip()):
+            raise ValueError(f"Invalid email format: {email}")
+
+        if phone and not re.match(phone_pattern, phone.strip()):
+            raise ValueError(f"Invalid phone number format: {phone}")
+
+    @staticmethod
     def create(request):
         """Create a new client and its contacts."""
         form = request.form
@@ -224,27 +240,26 @@ class ClientService:
         contact_phones = request.POST.getlist("contact_phone[]")
         contact_roles = request.POST.getlist("contact_role[]")
         contact_notes = request.POST.getlist("contact_notes[]")
+        contact_portal_access = request.POST.getlist("is_portal_active[]")
+        logger.info(f"CREATE contact_names={contact_names} contact_emails={contact_emails} contact_phones={contact_phones}")
         for index, raw_name in enumerate(contact_names):
             contact_name = raw_name.strip()
             if not contact_name:
                 continue
+            email = contact_emails[index].strip() if index < len(contact_emails) else ""
+            phone = contact_phones[index].strip() if index < len(contact_phones) else ""
+            role_id = contact_roles[index] if index < len(contact_roles) and contact_roles[index] else None
+            notes = contact_notes[index].strip() if index < len(contact_notes) else ""
+            is_portal_active = contact_portal_access[index] == "1" if index < len(contact_portal_access) else False
+            ClientService._validate_contact(email, phone)
             ClientContact.objects.create(
                 client=client,
                 name=contact_name,
-                email=(
-                    contact_emails[index].strip() if index < len(contact_emails) else ""
-                ),
-                phone=(
-                    contact_phones[index].strip() if index < len(contact_phones) else ""
-                ),
-                role_id=(
-                    contact_roles[index]
-                    if index < len(contact_roles) and contact_roles[index]
-                    else None
-                ),
-                notes=(
-                    contact_notes[index].strip() if index < len(contact_notes) else ""
-                ),
+                email=email,
+                phone=phone,
+                role_id=role_id,
+                notes=notes,
+                is_portal_active=is_portal_active,
             )
         return client
 
@@ -267,27 +282,26 @@ class ClientService:
         contact_phones = request.POST.getlist("contact_phone[]")
         contact_roles = request.POST.getlist("contact_role[]")
         contact_notes = request.POST.getlist("contact_notes[]")
+        contact_portal_access = request.POST.getlist("is_portal_active[]")
+        logger.info(f"UPDATE contact_names={contact_names} contact_emails={contact_emails} contact_phones={contact_phones}")
         for index, raw_name in enumerate(contact_names):
             contact_name = raw_name.strip()
             if not contact_name:
                 continue
+            email = contact_emails[index].strip() if index < len(contact_emails) else ""
+            phone = contact_phones[index].strip() if index < len(contact_phones) else ""
+            role_id = contact_roles[index] if index < len(contact_roles) and contact_roles[index] else None
+            notes = contact_notes[index].strip() if index < len(contact_notes) else ""
+            is_portal_active = contact_portal_access[index] == "1" if index < len(contact_portal_access) else False
+            ClientService._validate_contact(email, phone)
             ClientContact.objects.create(
                 client=client,
                 name=contact_name,
-                email=(
-                    contact_emails[index].strip() if index < len(contact_emails) else ""
-                ),
-                phone=(
-                    contact_phones[index].strip() if index < len(contact_phones) else ""
-                ),
-                role_id=(
-                    contact_roles[index]
-                    if index < len(contact_roles) and contact_roles[index]
-                    else None
-                ),
-                notes=(
-                    contact_notes[index].strip() if index < len(contact_notes) else ""
-                ),
+                email=email,
+                phone=phone,
+                role_id=role_id,
+                notes=notes,
+                is_portal_active=is_portal_active,
             )
         return client
 

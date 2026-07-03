@@ -113,8 +113,9 @@ class UserForm(forms.ModelForm):
 
     def clean_phone(self):
         phone = self.cleaned_data["phone"]
-        if not phone.isdigit():
-            raise forms.ValidationError("Phone number must contain only digits")
+        import re
+        if not re.match(r'^\+[1-9]\d{9,14}$', phone):
+            raise forms.ValidationError("Enter a valid phone number in standard format (+ followed by country code and number, e.g., +919876543210)")
         return phone
 
     class Meta:
@@ -219,8 +220,9 @@ class UserUpdateForm(UserChangeForm):
 
     def clean_phone(self):
         phone = self.cleaned_data["phone"]
-        if not phone.isdigit():
-            raise forms.ValidationError("Phone number must contain only digits")
+        import re
+        if not re.match(r'^\+[1-9]\d{9,14}$', phone):
+            raise forms.ValidationError("Enter a valid phone number in standard format (+ followed by country code and number, e.g., +919876543210)")
         return phone
 
     def clean_full_name(self):
