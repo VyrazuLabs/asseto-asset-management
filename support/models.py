@@ -1,5 +1,6 @@
 import uuid
 import random
+import string
 from django.db import models
 from django.conf import settings
 from uuid import uuid4
@@ -55,6 +56,10 @@ def generate_ticket_id():
     return f"TK-{random.randint(10000, 99999)}"
 
 
+def generate_happy_code():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+
 class SupportTicket(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     ticket_id = models.CharField(max_length=20, unique=True, blank=True)
@@ -62,6 +67,7 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
     # Core fields
     subject = models.CharField(max_length=500)
     description = models.TextField(blank=True, null=True)
+    happy_code = models.CharField(max_length=10, blank=True, null=True)
 
     # Linked asset (FK to assets.Asset)
     asset = models.ForeignKey(
@@ -85,7 +91,6 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
     estimated_eta = models.DateTimeField(blank=True, null=True)
     hours_worked = models.DecimalField(max_digits=8, decimal_places=1, default=0.0)
     impact_level = models.CharField(max_length=20, choices=IMPACT_CHOICES, default="1")
-    service_level = models.CharField(max_length=100, blank=True, null=True)
 
     # Assignment
     assigned_to = models.ForeignKey(
@@ -110,13 +115,6 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
         blank=True,
         related_name="support_tickets",
     )
-    created_by_contact = models.ForeignKey(
-        "clients.ClientContact",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="created_tickets",
-    )
 
     # Organization
     organization = models.ForeignKey(
@@ -131,6 +129,8 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
             self.ticket_id = generate_ticket_id()
             while SupportTicket.objects.filter(ticket_id=self.ticket_id).exists():
                 self.ticket_id = generate_ticket_id()
+        if not self.happy_code:
+            self.happy_code = generate_happy_code()
         super().save(*args, **kwargs)
 
     def __str__(self):

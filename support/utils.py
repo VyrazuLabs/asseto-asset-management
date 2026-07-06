@@ -372,6 +372,26 @@ class SupportTicketService:
         old_status = ticket.status
         old_assigned = ticket.assigned_to
 
+        # Validate happy code when closing a ticket (status = 4)
+        new_status = request.POST.get("status", old_status)
+        if new_status == "4" and old_status != "4":
+            if not ticket.happy_code:
+                raise ValidationError(
+                    "This ticket does not have a happy code. "
+                    "Please ask the client to provide one."
+                )
+            submitted_code = request.POST.get("happy_code", "").strip().upper()
+            if not submitted_code:
+                raise ValidationError(
+                    "Happy code is required to close this ticket. "
+                    "Please enter the code provided by the client."
+                )
+            expected_code = ticket.happy_code.upper()
+            if submitted_code != expected_code and f"HC-{submitted_code}" != expected_code:
+                raise ValidationError(
+                    "Invalid happy code. Please check with the client for the correct code."
+                )
+
         ticket = form.save(commit=False)
         ticket.updated_by = str(request.user.id)
         ticket.save()

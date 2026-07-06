@@ -88,8 +88,6 @@ STRINGS = {
     "asset_work_impact": "Asset & Work Impact",
     "asset_name_id": "Asset Name/ID",
     "no_asset_linked": "No Asset Linked",
-    "service_level": "Service Level",
-    "sla_gold_tier": "SLA Gold Tier",
     "supporting_documents": "Supporting Documents",
     "files_label": "FILES",
     "no_supporting_documents": "No Supporting Documents",
