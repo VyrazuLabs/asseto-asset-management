@@ -43,15 +43,15 @@ class CheckSize:
     def video_size(request, file_size):
         if file_size > MAX_VIDEO_FILE_SIZE:
             messages.error(request, "Video size is more than 10 MB")
-            return None
+            return False
+        return True
 
     @staticmethod
     def document_size(request, file_size):
         if file_size > MAX_DOCUMENT_FILE_SIZE:
             messages.error(request, "Document size is more than 5 MB")
-            return None
-
-
+            return False
+        return True
 class Upload:
     @staticmethod
     def image_upload(request, file_object, folder_name):
@@ -83,10 +83,10 @@ class Upload:
         ext = os.path.splitext(file_object.name)[1].lower()
 
         if ext not in video_extentions:
-            messages.error(request, f"'{ext}' file type not allowed")
+            messages.error(request, f" {ext} file type not resloveallowed")
             return None
 
-        if not CheckSize.image_size(request, file_object.size):
+        if not CheckSize.video_size(request, file_object.size):
             return None
 
         unique_name = CreateName.unique_name(file_object.name)
@@ -105,10 +105,10 @@ class Upload:
         ext = os.path.splitext(file_object.name)[1].lower()
 
         if ext not in document_extentions:
-            messages.error(request, f"'{ext}' file type not allowed")
+            messages.error(request, f" {ext} file type not allowed")
             return None
 
-        if not CheckSize.image_size(request, file_object.size):
+        if not CheckSize.document_size(request, file_object.size):
             return None
 
         unique_name = CreateName.unique_name(file_object.name)
