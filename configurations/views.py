@@ -1,15 +1,14 @@
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.models import BrandingImages, LocalizationConfiguration
 from configurations.utils import (
     add_path,
     create_or_update_image,
-    update_files_name,
     hide_last_digits,
+    process_uploaded_logos,
 )
 from django.contrib import messages
 from configurations.models import BrandingImages, LocalizationConfiguration
-from configurations.utils import add_path, update_files_name
+from configurations.utils import add_path
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .forms import TagConfigurationForm, ClientCredentialsForm
@@ -27,7 +26,6 @@ from .constants import (
     ACTIVE_LANGUAGES,
     DATETIME_CHOICES,
     INTEGRATION_CHOICES,
-    DEFAULT_CURRENCY,
 )
 
 
@@ -38,7 +36,9 @@ def logo_upload(request):
         favicon = request.FILES.get("favicon")
         login_page_logo = request.FILES.get("login_page_logo")
 
-        file_dist = update_files_name(request, logo, favicon, login_page_logo)
+        file_dist = process_uploaded_logos(
+            request, logo=logo, favicon=favicon, login_page_logo=login_page_logo
+        )
         create_or_update_image(
             request,
             logo,
@@ -277,9 +277,9 @@ def create_localization_configuration(request):
                 default_language=default_language,
                 time_format=time_format,
             )
-        if 'org_lang_id' in request.session:
-            del request.session['org_lang_id']
-        return redirect('configurations:list_localization')
+        if "org_lang_id" in request.session:
+            del request.session["org_lang_id"]
+        return redirect("configurations:list_localization")
 
 
 @login_required

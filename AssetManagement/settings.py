@@ -13,27 +13,21 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
-
-# import pysqlite3 as sqlite3
 import pymysql
 from decouple import config
 from dotenv import load_dotenv
 
 pymysql.install_as_MySQLdb()
-import base64
 import json
 
 import firebase_admin
 from cryptography.fernet import Fernet
-from django.db.utils import OperationalError
 from firebase_admin import credentials
-
-# from firebase_admin import initialize_app
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env", override=True)
 cipher_suite = Fernet(b"NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=")
-# print("FERNET_KEY:", cipher_suite)
+
 file_name = os.getenv(
     "FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY", "firebase-credentials.json"
 )
@@ -52,6 +46,7 @@ elif file_name and file_name.strip().strip("'\""):
     if cred_path.is_file():
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
+
 LOGIN_REDIRECT_URL = "/"
 
 DEBUG = True
@@ -67,6 +62,7 @@ CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -137,25 +133,17 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    # "authentication.middleware.DynamicCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "client_portal.middleware.ClientPortalMiddleware",
-    # 'silk.middleware.SilkyMiddleware'
 ]
 
 ROOT_URLCONF = "AssetManagement.urls"
 
 WSGI_APPLICATION = "AssetManagement.wsgi.application"
-
-# SILKY_PYTHON_PROFILER = True
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -205,7 +193,6 @@ WSGI_APPLICATION = "AssetManagement.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 
 DATABASES = {
     "default": {
