@@ -478,6 +478,7 @@
     const happyCodeError = document.getElementById('happyCodeError');
     const confirmBtn = document.getElementById('happyCodeConfirmBtn');
     let pendingSubmit = false;
+    const initialStatus = statusInput ? statusInput.value : '';
 
     // Clear modal state on close
     document.getElementById('happyCodeModal').addEventListener('hidden.bs.modal', function () {
@@ -490,7 +491,7 @@
 
     form.addEventListener('submit', function (e) {
       // Only intercept if status is being changed to "Closed" (4)
-      if (statusInput && statusInput.value === '4') {
+      if (statusInput && statusInput.value === '4' && initialStatus !== '4') {
         // Check if happy code is already submitted
         if (happyCodeHidden.value) {
           return; // Already have code, let it submit

@@ -387,7 +387,7 @@ class SupportTicketService:
                     "Please enter the code provided by the client."
                 )
             expected_code = ticket.happy_code.upper()
-            if submitted_code != expected_code and f"HC-{submitted_code}" != expected_code:
+            if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
                 raise ValidationError(
                     "Invalid happy code. Please check with the client for the correct code."
                 )

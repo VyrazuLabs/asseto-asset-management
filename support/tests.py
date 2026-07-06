@@ -131,3 +131,75 @@ class SupportTicketCommentsTests(TestCase):
         )
 
         self.assertEqual(comment.display_name, "Deleted Staff")
+
+
+class SupportTicketHappyCodeTests(TestCase):
+    def setUp(self):
+        self.organization = OrganizationFactory()
+        self.staff_user = UserFactory(organization=self.organization)
+        self.ticket = SupportTicket.objects.create(
+            subject="Test Difficulties",
+            description="Testing details...",
+            organization=self.organization,
+            created_by=str(self.staff_user.id),
+            status="0", # Open
+        )
+        self.happy_code = self.ticket.happy_code
+        self.assertTrue(self.happy_code)
+
+    def test_close_ticket_with_exact_happy_code(self):
+        """Verify that a ticket can be closed if the exact happy code is provided."""
+        post_data = {"status": "4", "happy_code": self.happy_code}
+        request = MockRequest(user=self.staff_user, post_data=post_data)
+
+        class MockForm:
+            def __init__(self, ticket):
+                self.ticket = ticket
+            def save(self, commit=False):
+                self.ticket.status = "4"
+                return self.ticket
+
+        form = MockForm(self.ticket)
+        # Should not raise ValidationError
+        SupportTicketService.update(request, self.ticket.id, form)
+
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.status, "4")
+
+    def test_close_ticket_with_prefixed_happy_code(self):
+        """Verify that a ticket can be closed if the happy code is prefixed with HC-."""
+        post_data = {"status": "4", "happy_code": f"HC-{self.happy_code}"}
+        request = MockRequest(user=self.staff_user, post_data=post_data)
+
+        class MockForm:
+            def __init__(self, ticket):
+                self.ticket = ticket
+            def save(self, commit=False):
+                self.ticket.status = "4"
+                return self.ticket
+
+        form = MockForm(self.ticket)
+        # Should not raise ValidationError
+        SupportTicketService.update(request, self.ticket.id, form)
+
+        self.ticket.refresh_from_db()
+        self.assertEqual(self.ticket.status, "4")
+
+    def test_close_ticket_with_invalid_happy_code(self):
+        """Verify that closing is rejected if the happy code is incorrect."""
+        post_data = {"status": "4", "happy_code": "WRONG1"}
+        request = MockRequest(user=self.staff_user, post_data=post_data)
+
+        class MockForm:
+            def __init__(self, ticket):
+                self.ticket = ticket
+            def save(self, commit=False):
+                self.ticket.status = "4"
+                return self.ticket
+
+        form = MockForm(self.ticket)
+        with self.assertRaises(ValidationError) as context:
+            SupportTicketService.update(request, self.ticket.id, form)
+
+        self.assertIn("Invalid happy code", str(context.exception))
+

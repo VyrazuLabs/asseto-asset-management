@@ -18,7 +18,6 @@ from support.models import (
     STATUS_CHOICES,
     PRIORITY_CHOICES,
     TICKET_TYPE_CHOICES,
-    generate_happy_code,
 )
 from .forms import ClientSupportTicketForm
 from support.utils import SupportTicketService
