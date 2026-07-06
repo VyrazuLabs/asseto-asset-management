@@ -88,8 +88,6 @@ STRINGS = {
     "asset_work_impact": "অ্যাসেট ও কাজের প্রভাব",
     "asset_name_id": "অ্যাসেট নাম/আইডি",
     "no_asset_linked": "কোনো অ্যাসেট সংযুক্ত নেই",
-    "service_level": "সেবা স্তর",
-    "sla_gold_tier": "SLA গোল্ড টিয়ার",
     "supporting_documents": "সহায়ক দলিল",
     "files_label": "ফাইল",
     "no_supporting_documents": "কোনো সহায়ক দলিল নেই",

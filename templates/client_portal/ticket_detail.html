@@ -10,6 +10,35 @@
 <link rel="stylesheet" href="{% static 'css/pages/product-details.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/support-tickets.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/client-ticket-detail.css' %}">
+<style>
+.happy-code-box {
+    font-family: monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #1e293b;
+    min-width: 220px;
+    background-color: #fafbfc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+body.theme-dark .happy-code-box {
+    background-color: #151521;
+    border-color: #2D2D3F;
+    color: #ffffff;
+}
+#happyCodeText {
+    font-weight: 700;
+}
+body.theme-dark #happyCodeText {
+    color: #ffffff !important;
+}
+</style>
 {% endblock extra_css %}
 
 {% block content %}
@@ -129,6 +158,31 @@
                 <div class="info-card-title">Hours Logged</div>
                 <div class="impact-value">{{ ticket.hours_worked }} hrs</div>
             </div>
+        </div>
+    </div>
+
+    {# Happy Code Section #}
+    <div class="detail-card mb-4">
+        <div class="section-title text-success d-flex align-items-center gap-2" style="color: #10b981 !important;">
+            <i class="bi bi-shield-check fs-5"></i> Happy Code
+        </div>
+        <p class="desc-text mt-2 text-muted" style="font-size: 0.88rem;">
+            This unique authorization code must be provided by the client to verify successful resolution and close the ticket.
+        </p>
+        <div class="d-flex align-items-center gap-3 mt-3 flex-wrap">
+            <div class="happy-code-box">
+                <span id="happyCodeText">{{ ticket.happy_code|default:"—" }}</span>
+                {% if ticket.happy_code %}
+                <button class="btn btn-sm btn-link p-0 text-muted d-flex align-items-center justify-content-center" onclick="copyHappyCode()" id="copyBtn" title="Copy code" style="color: #64748b; border: none; background: none; outline: none; cursor: pointer; width: 24px; height: 24px;">
+                    <i class="bi bi-clipboard fs-5" id="copyIcon"></i>
+                </button>
+                {% endif %}
+            </div>
+            {% if ticket.status == '4' %}
+            <span class="badge bg-secondary px-3 py-2 rounded-3 text-uppercase" style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px;">CLOSED</span>
+            {% else %}
+            <span class="badge px-3 py-2 rounded-3 text-uppercase" style="background-color: #ecfdf5; color: #059669; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; border: 1px solid #a7f3d0;">ACTIVE</span>
+            {% endif %}
         </div>
     </div>
 
@@ -302,4 +356,19 @@
 
 {% block extra_js %}
 <script src="{% static 'js/pages/support_ticket_detail.js' %}" defer></script>
+<script>
+function copyHappyCode() {
+    const codeText = document.getElementById("happyCodeText").innerText;
+    navigator.clipboard.writeText(codeText).then(() => {
+        const copyIcon = document.getElementById("copyIcon");
+        // Change icon to checkmark on success
+        copyIcon.className = "bi bi-check2 text-success fs-5";
+        setTimeout(() => {
+            copyIcon.className = "bi bi-clipboard fs-5";
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
+}
+</script>
 {% endblock extra_js %}

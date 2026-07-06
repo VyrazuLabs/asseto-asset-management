@@ -88,8 +88,6 @@ STRINGS = {
     "asset_work_impact": "Impact sur l'actif et le travail",
     "asset_name_id": "Nom/ID de l'actif",
     "no_asset_linked": "Aucun actif lié",
-    "service_level": "Niveau de service",
-    "sla_gold_tier": "SLA Gold Tier",
     "supporting_documents": "Documents justificatifs",
     "files_label": "FICHIERS",
     "no_supporting_documents": "Aucun document justificatif",

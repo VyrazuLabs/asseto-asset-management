@@ -64,6 +64,7 @@ def ticket_detail(request, id):
 @login_required
 def update_ticket(request, id):
     from django.shortcuts import get_object_or_404
+    from django.core.exceptions import ValidationError
     from .models import SupportTicket
 
     ticket = get_object_or_404(
@@ -76,9 +77,12 @@ def update_ticket(request, id):
             request.POST, instance=ticket, organization=request.user.organization
         )
         if form.is_valid():
-            SupportTicketService.update(request, id, form)
-            messages.success(request, "Ticket updated successfully.")
-            return redirect("support:ticket_list")
+            try:
+                SupportTicketService.update(request, id, form)
+                messages.success(request, "Ticket updated successfully.")
+                return redirect("support:ticket_list")
+            except ValidationError as e:
+                messages.error(request, e.message if hasattr(e, 'message') else ", ".join(e.messages))
 
     context = {
         "sidebar": "support",

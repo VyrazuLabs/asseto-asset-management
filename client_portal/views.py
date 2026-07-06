@@ -413,8 +413,7 @@ def client_portal_add_ticket(request):
             ticket = form.save(commit=False)
             ticket.organization = client.organization
             ticket.client = client
-            ticket.created_by_contact = contact
-            ticket.created_by = f"Client Contact: {contact.name}"
+            ticket.created_by = str(contact.id)
             ticket.save()
 
             # Handle file uploads
