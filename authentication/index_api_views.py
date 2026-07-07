@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 from authentication.models import User
 from authentication.utils import (
     asset_datas,
+    product_datas,
     user_information,
     asset_data_util,
     totp_and_qrcode_generation,
