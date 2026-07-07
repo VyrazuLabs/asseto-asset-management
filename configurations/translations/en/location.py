@@ -58,4 +58,6 @@ STRINGS = {
     "csv_header": "CSV Header",
     "this_field_is_required": "This field is required",
     "import_locations": "Import Locations",
+    "client_locations": "Client Locations",
+    "no_locations_for_client": "No locations registered for this client.",
 }

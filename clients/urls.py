@@ -13,4 +13,7 @@ urlpatterns = [
     path("search/<str:page>", views.search_clients, name="search"),
     path("export-csv", views.export_clients_csv, name="export_csv"),
     path("export-pdf", views.export_clients_pdf, name="export_pdf"),
+    path("details/<uuid:id>/locations/add", views.add_client_location, name="add_location"),
+    path("locations/update/<uuid:id>", views.update_client_location, name="update_location"),
+    path("locations/delete/<uuid:id>", views.delete_client_location, name="delete_location"),
 ]

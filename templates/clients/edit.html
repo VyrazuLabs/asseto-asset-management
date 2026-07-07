@@ -175,9 +175,9 @@
                                 <label>{{ trans.phone_number_label }}</label>
                                 <input type="tel" name="contact_phone[]" class="form-control"
                                     placeholder="{{ trans.phone_placeholder }}" value="{{ contact.phone|default:'' }}"
-                                    pattern="\+[1-9]\d{9,14}"
-                                    title="Enter a valid phone number in standard format (+ followed by country code and number, e.g., +919876543210)"
-                                    maxlength="16">
+                                    pattern="[\d\s\+\-\(\)]{7,20}"
+                                    title="Enter a valid phone number (e.g., +1-555-123-4567 or +919876543210)"
+                                    maxlength="20">
                             </div>
                             <div class="form-group full-width">
                                 <label>{{ trans.role_label }}</label>
@@ -230,9 +230,9 @@
                                 <label>{{ trans.phone_number_label }}</label>
                                 <input type="tel" name="contact_phone[]" class="form-control"
                                     placeholder="{{ trans.phone_placeholder }}"
-                                    pattern="\+[1-9]\d{9,14}"
-                                    title="Enter a valid phone number in standard format (+ followed by country code and number, e.g., +919876543210)"
-                                    maxlength="16">
+                                    pattern="[\d\s\+\-\(\)]{7,20}"
+                                    title="Enter a valid phone number (e.g., +1-555-123-4567 or +919876543210)"
+                                    maxlength="20">
                             </div>
                             <div class="form-group full-width">
                                 <label>{{ trans.role_label }}</label>

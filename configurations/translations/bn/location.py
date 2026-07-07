@@ -58,4 +58,6 @@ STRINGS = {
     "csv_header": "CSV হেডার",
     "this_field_is_required": "এই ফিল্ডটি প্রয়োজনীয়",
     "import_locations": "অবস্থান আমদানি করুন",
+    "client_locations": "ক্লায়েন্ট অবস্থান",
+    "no_locations_for_client": "এই ক্লায়েন্টের জন্য কোন অবস্থান নিবন্ধিত নেই।",
 }
