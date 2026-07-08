@@ -405,7 +405,7 @@ def user_login(request):
                 get_user = User.objects.filter(email=email).first()
                 get_totp = UserTotp.objects.filter(user_id=get_user.id).first()
 
-                if get_totp and get_totp.is_validate:
+                if get_user.two_factor_auth and get_totp.is_validate:
                     return redirect("authentication:verify_otp")
 
                 login(request, user)
