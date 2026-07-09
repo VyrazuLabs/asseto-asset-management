@@ -86,10 +86,19 @@ class Location(TimeStampModel, SoftDeleteModel):
     address = models.ForeignKey(
         "Address", on_delete=models.CASCADE, blank=True, null=True
     )
+    client = models.ForeignKey(
+        "clients.Client",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="locations",
+    )
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"{self.office_name} - {self.address.address_line_one}"
+        if self.address:
+            return f"{self.office_name} - {self.address.address_line_one}"
+        return self.office_name or "Location"
 
 
 class Organization(TimeStampModel):

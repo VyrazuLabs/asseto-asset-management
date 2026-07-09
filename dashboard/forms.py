@@ -27,7 +27,7 @@ class LocationForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "autocomplete": "off",
+                "autocomplete": "nope",
                 "class": "form-control",
                 "placeholder": "Contact Person Name",
             }
@@ -37,7 +37,7 @@ class LocationForm(forms.ModelForm):
         required=False,
         widget=forms.EmailInput(
             attrs={
-                "autocomplete": "off",
+                "autocomplete": "nope",
                 "class": "form-control",
                 "placeholder": "Contact Person Email",
             }
@@ -47,7 +47,7 @@ class LocationForm(forms.ModelForm):
         required=False,
         widget=forms.NumberInput(
             attrs={
-                "autocomplete": "off",
+                "autocomplete": "nope",
                 "class": "form-control",
                 "placeholder": "Contact Person Phone",
             }

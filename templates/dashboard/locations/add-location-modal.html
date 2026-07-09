@@ -5,7 +5,7 @@
             <i class="bi bi-x-lg"></i>
         </button>
     </div>
-    <form hx-post="{{request.path}}" novalidate>
+    <form hx-post="{{request.path}}" novalidate autocomplete="off">
         {% csrf_token %}
         <div class="modal-body-custom">
             <div class="form-grid">
