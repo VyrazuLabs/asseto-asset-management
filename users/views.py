@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from assets.models import AssignAsset
-from authentication.models import User
+from authentication.models import Technician, User
 from configurations.constants import NAME_FORMATS
 from configurations.utils import dynamic_display_name
 from dashboard.models import Address
@@ -175,11 +175,14 @@ def add(request):
 
             if password1 == password2:
                 user.set_password(password1)
-                
+
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
             user.save()
+            is_technician = request.POST.get("is_technician",None)
+            if is_technician=="on":
+                Technician.objects.create(user=user)
             messages.success(request, "User added successfully")
 
             all_perms, created = Group.objects.get_or_create(name="all_perms")

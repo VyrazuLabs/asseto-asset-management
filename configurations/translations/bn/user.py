@@ -110,6 +110,7 @@ STRINGS = {
     "access_level_label": "অ্যাক্সেস স্তর",
     "profile_picture": "প্রোফাইল ছবি",
     "enable_user_login": "ব্যবহারকারী লগইন সক্ষম করবেন?",
+    "is_technician": "টেকনিশিয়ান?",
     "password_label": "পাসওয়ার্ড",
     "repeat_password": "পাসওয়ার্ড পুনরায় লিখুন",
     "address_information": "ঠিকানার তথ্য",

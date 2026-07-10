@@ -4,7 +4,7 @@ from products.models import Product
 from vendors.models import Vendor
 from clients.models import Client
 from dashboard.models import Location
-from authentication.models import User
+from authentication.models import Technician, User
 from django.forms import ModelForm
 
 
@@ -328,14 +328,16 @@ class MaintenanceRecordForm(forms.ModelForm):
                 organization=organization,
                 is_active=True
             ).exclude(full_name__isnull=True).exclude(full_name='').order_by('full_name')
+
+            technicians=Technician.objects.filter(status=True).all()
             
             choices = [('', 'Select Technician')]
-            for u in users:
-                display_name = u.full_name
+            for technician in technicians:
+                display_name = technician.user.full_name
                 # Use reverse_full_name if available for better display
-                if hasattr(u, 'reverse_full_name') and u.reverse_full_name:
-                    display_name = u.reverse_full_name
-                choices.append((str(u.id), display_name))
+                if hasattr(technician.user.full_name, 'reverse_full_name') and technician.user.reverse_full_name:
+                    display_name = technician.user.full_name
+                choices.append((str(technician.id), display_name))
             
             self.fields['technician'].choices = choices
 

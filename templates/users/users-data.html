@@ -1,112 +1,111 @@
 {% load custom_filters %}
 {% load static %}
 {% if page_object %}
-    {% for user in page_object %}
-    <tr>
-      <td class="table-index-cell">
-        {% if page_object.start_index %}
-          {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-        {% else %}
-          {{ forloop.counter|stringformat:"02d" }}
-        {% endif %}
-      </td>
+{% for user in page_object %}
+<tr>
+  <td class="table-index-cell">
+    {% if page_object.start_index %}
+    {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+    {% else %}
+    {{ forloop.counter|stringformat:"02d" }}
+    {% endif %}
+  </td>
 
-      <td>
-        {% if user.profile_pic %}
-          <img class="user-thumb"
-            src="{{ user.profile_pic.url }}"
-            alt="{{ user.get_full_name|default:user.username }}"
-            onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';">
-        {% else %}
-          <img class="user-thumb"
-            src="{% static 'images/faces/1.jpg' %}"
-            alt="{{ trans.default_avatar }}">
-        {% endif %}
-      </td>
+  <td>
+    {% if user.profile_pic %}
+    <img class="user-thumb" src="{{ user.profile_pic.url }}" alt="{{ user.get_full_name|default:user.username }}"
+      onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';">
+    {% else %}
+    <img class="user-thumb" src="{% static 'images/faces/1.jpg' %}" alt="{{ trans.default_avatar }}">
+    {% endif %}
+  </td>
 
-      <td>
-        <div class="cell-name-main">{{ user.full_name }}</div>
-      </td>
-
-      <td>{{ user.email }}</td>
-
-      <td>
-        {% if user.id in user_asset_map_count %}
-          <form method="post" action="{% url 'assets:list' %}">
-            {% csrf_token %}
-            <input type="hidden" name="user-data" value="{{ user.id }}">
-            <button type="submit" class="count-pill">
-              {{ user_asset_map_count_count|get_item:user.id }}
-            </button>
-          </form>
-        {% else %}
-          <span class="count-pill zero">0</span>
-        {% endif %}
-      </td>
-
-      <td>{{ user.role }}</td>
-
-      <td>
-        {% if user.access_level %}
-          <span class="access-badge access-all">All</span>
-        {% else %}
-          <span class="access-badge access-limited">Only Assigned</span>
-        {% endif %}
-      </td>
-
-      <td>
-        <span class="login-date">{{ user.last_login|default:"Never" }}</span>
-      </td>
-
-      {% if request.user.is_superuser %}
-      <td>
-        <div class="form-check form-switch status-toggle">
-          <input
-            class="form-check-input"
-            hx-post="{% url 'users:status' user.id %}"
-            hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-            type="checkbox" {% if user.is_active %} checked {% endif %}>
-        </div>
-      </td>
+  <td>
+    <div class="d-flex align-items-center gap-2">
+      <div class="cell-name-main">{{ user.full_name }}</div>
+      {% if user.technician %}
+      <span class="tech-badge" title="Technician">
+        <i class="bi bi-tools"></i> 
+      </span>
       {% endif %}
+    </div>
+  </td>
 
-      {% if perms.authentication.delete_users or perms.authentication.view_users or perms.authentication.edit_users %}
-      <td>
-        <div class="row-actions">
-          {% if perms.authentication.view_users %}
-            <a href="{% url 'users:details' user.id %}" class="action-btn" title="{{ trans.view }}">
-              <i class="bi bi-eye"></i>
-            </a>
-          {% endif %}
-          {% if perms.authentication.edit_users %}
-            <button type="button" class="action-btn"
-              hx-get="{% url 'users:update' user.id %}" hx-target="#update-user-modal-content"
-              data-bs-toggle="modal" data-bs-target="#update-user-modal"
-              title="{{ trans.edit }}">
-              <i class="bi bi-pencil"></i>
-            </button>
-          {% endif %}
-          {% if perms.authentication.delete_users %}
-            <form action="{% url 'users:delete' user.id %}" method="post" class="form-row-action"
-                  onsubmit="return confirm('{{ trans.delete_confirm_user|escapejs }}')">
-              {% csrf_token %}
-              <button type="submit" class="action-btn danger" title="{{ trans.delete }}">
-                <i class="bi bi-trash3"></i>
-              </button>
-            </form>
-          {% endif %}
-        </div>
-      </td>
+  <td>{{ user.email }}</td>
+
+  <td>
+    {% if user.id in user_asset_map_count %}
+    <form method="post" action="{% url 'assets:list' %}">
+      {% csrf_token %}
+      <input type="hidden" name="user-data" value="{{ user.id }}">
+      <button type="submit" class="count-pill">
+        {{ user_asset_map_count_count|get_item:user.id }}
+      </button>
+    </form>
+    {% else %}
+    <span class="count-pill zero">0</span>
+    {% endif %}
+  </td>
+
+  <td>{{ user.role }}</td>
+
+  <td>
+    {% if user.access_level %}
+    <span class="access-badge access-all">All</span>
+    {% else %}
+    <span class="access-badge access-limited">Only Assigned</span>
+    {% endif %}
+  </td>
+
+  <td>
+    <span class="login-date">{{ user.last_login|default:"Never" }}</span>
+  </td>
+
+  {% if request.user.is_superuser %}
+  <td>
+    <div class="form-check form-switch status-toggle">
+      <input class="form-check-input" hx-post="{% url 'users:status' user.id %}"
+        hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' type="checkbox" {% if user.is_active %} checked {% endif %}>
+    </div>
+  </td>
+  {% endif %}
+
+  {% if perms.authentication.delete_users or perms.authentication.view_users or perms.authentication.edit_users %}
+  <td>
+    <div class="row-actions">
+      {% if perms.authentication.view_users %}
+      <a href="{% url 'users:details' user.id %}" class="action-btn" title="{{ trans.view }}">
+        <i class="bi bi-eye"></i>
+      </a>
       {% endif %}
-    </tr>
-    {% endfor %}
+      {% if perms.authentication.edit_users %}
+      <button type="button" class="action-btn" hx-get="{% url 'users:update' user.id %}"
+        hx-target="#update-user-modal-content" data-bs-toggle="modal" data-bs-target="#update-user-modal"
+        title="{{ trans.edit }}">
+        <i class="bi bi-pencil"></i>
+      </button>
+      {% endif %}
+      {% if perms.authentication.delete_users %}
+      <form action="{% url 'users:delete' user.id %}" method="post" class="form-row-action"
+        onsubmit="return confirm('{{ trans.delete_confirm_user|escapejs }}')">
+        {% csrf_token %}
+        <button type="submit" class="action-btn danger" title="{{ trans.delete }}">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </td>
+  {% endif %}
+</tr>
+{% endfor %}
 {% else %}
-    <tr>
-      <td colspan="10">
-        <div class="table-empty-state">
-          <i class="bi bi-search d-block"></i>
-          <p>{{ trans.no_users_search }}</p>
-        </div>
-      </td>
-    </tr>
+<tr>
+  <td colspan="10">
+    <div class="table-empty-state">
+      <i class="bi bi-search d-block"></i>
+      <p>{{ trans.no_users_search }}</p>
+    </div>
+  </td>
+</tr>
 {% endif %}

@@ -110,6 +110,7 @@ STRINGS = {
     "access_level_label": "Access Level",
     "profile_picture": "Profile Picture",
     "enable_user_login": "Enable User Login?",
+    "is_technician": "Technician?",
     "password_label": "Password",
     "repeat_password": "Repeat Password",
     "address_information": "Address Information",
