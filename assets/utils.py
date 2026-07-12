@@ -497,7 +497,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         obj["field_value"] = it.field_value
         get_custom_data.append(obj)
 
-    from authentication.models import User
+    from authentication.models import User, Technician
     
     maintenance_type_labels = {
         '1': 'Calibration',
@@ -519,7 +519,13 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         organization=request.user.organization
     )
     for u in tech_users:
-        technician_map[str(u.id)] = u.full_name
+        display_name = u.reverse_full_name or u.full_name or u.email
+        technician_map[str(u.id)] = display_name
+
+    # Also map Technician IDs to name resolution
+    for tech in Technician.objects.select_related('user').filter(user__organization=request.user.organization):
+        display_name = tech.user.reverse_full_name or tech.user.full_name or tech.user.email
+        technician_map[str(tech.id)] = display_name
 
     maintenance_history_entries = []
     if maintenance_records:

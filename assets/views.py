@@ -189,27 +189,6 @@ def assigned_list(request):
 
     return render(request, "assets/assigned-list.html", context=context)
 
-
-# @login_required
-# @user_passes_test(manage_access_for_assign_assets)
-# def unassigned_list(request):
-
-#     assign_asset_list = Asset.objects.filter(
-#         organization=request.user.organization or None,is_assigned=False).order_by('-created_at')
-#     paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
-#     page_number = request.GET.get('page')
-#     page_object = paginator.get_page(page_number)
-
-#     context = {
-#         'sidebar': 'assets',
-#         'submenu': 'assigned-assets',
-#         'page_object': page_object,
-#         'title': 'Assigned Assets'
-#     }
-
-#     return render(request, 'assets/unassigned-list.html', context=context)
-
-
 @login_required
 @permission_required("authentication.add_assign_asset")
 def assign_asset(request):

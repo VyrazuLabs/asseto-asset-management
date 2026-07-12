@@ -21,15 +21,43 @@
   border-radius: 5px;
   letter-spacing: .03em;
 }
+
 .access-all {
   background: #EEF2FF;
   color: #4F46E5;
   border: 1px solid #C7D2FE;
 }
+
 .access-limited {
   background: #FFF7ED;
   color: #EA580C;
   border: 1px solid #FED7AA;
+}
+
+/* ── Technician badge ────────────────────────────────────────────────────── */
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .68rem;
+  font-weight: 600;
+  padding: .22rem .55rem;
+  border-radius: 5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: #ECFDF5;
+  color: #059669;
+  border: 1px solid #A7F3D0;
+}
+.tech-badge i {
+  font-size: .75rem;
+  line-height: 1;
+}
+body.theme-dark .tech-badge {
+  background: #15302a;
+  color: #6ee7b7;
+  border-color: #1c4a3a;
 }
 
 /* ── Last login muted ────────────────────────────────────────────────────── */

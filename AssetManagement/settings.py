@@ -10,18 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import json
 import os
 from datetime import timedelta
 from pathlib import Path
-import pymysql
-from decouple import config
-from dotenv import load_dotenv
-
-pymysql.install_as_MySQLdb()
-import json
 
 import firebase_admin
 from cryptography.fernet import Fernet
+from decouple import config
+from dotenv import load_dotenv
 from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
