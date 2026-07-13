@@ -1,24 +1,30 @@
 {% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/configurations.css' %}">
+{% endblock css %}
+
 {% block content %}
 <div class="page-heading">
     <div class="d-flex justify-content-between">
         <div class="page-title">
             <h3 class="page-name">
-               {{ trans.add_organization }}
+                Add Organization
             </h3>
             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"> <a href="/">{{ trans.dashboard }}</a></li>
-                    <li class="breadcrumb-item" aria-current="page">{{ trans.configurations }}</li>
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item" aria-current="page">Configurations</li>
                     <li class="breadcrumb-item active" aria-current="page">
-                        {{ trans.organization }}
+                        Organization
                     </li>
                 </ol>
             </nav>
         </div>
     </div>
     <section class="section">
-        <form class="form row"
+        <form class="form" 
               action="{% url 'configurations:add_organization' %}"
               method="POST" novalidate>
             {% csrf_token %}
@@ -33,49 +39,85 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <div class="row p-2">
-                        <div class="btn-group mt-1">
-                            <p style="margin-right: 150px;"> <b>{{ trans.organization_name }}</b></p>
-                            {% if org_data is not None %}
-                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_name }}" value="{{ org_data.name }}">
-                            {% else %}
-                                <input type="text" name="organization_name" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_name }}">
-                            {% endif %}
+                    
+                    <div class="row">
+                        <!-- Left Field: Name -->
+                        <div class="col-md-6">
+                            <div class="config-form-group">
+                                <label class="config-label">Organization Name</label>
+                                {% if org_data is not None %}
+                                    <input type="text" name="organization_name" class="form-control config-input" placeholder="Organization Name" value="{{ org_data.name }}">
+                                {% else %}
+                                    <input type="text" name="organization_name" class="form-control config-input" placeholder="Organization Name">
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="btn-group mt-4">
-                            <p style="margin-right: 135px;"><b>{{ trans.organization_website }}</b></p>
-                            {% if org_data is not None %}
-                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_website }}" value="{{ org_data.website }}">
-                            {% else %}
-                                <input type="text" name="organization_website" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_website }}">
-                            {% endif %}
+
+                        <!-- Right Field: Website -->
+                        <div class="col-md-6">
+                            <div class="config-form-group">
+                                <label class="config-label">Organization Website</label>
+                                {% if org_data is not None %}
+                                    <input type="text" name="organization_website" class="form-control config-input" placeholder="Organization Website" value="{{ org_data.website }}">
+                                {% else %}
+                                    <input type="text" name="organization_website" class="form-control config-input" placeholder="Organization Website">
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="btn-group mt-4">
-                            <p style="margin-right: 150px;"><b>{{ trans.organization_email }}</b></p>
-                            {% if org_data is not None %}
-                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_email }}" value="{{ org_data.email }}">
-                            {% else %}
-                                <input type="text" name="organization_email" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_email }}">
-                            {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <!-- Left Field: Email -->
+                        <div class="col-md-6">
+                            <div class="config-form-group">
+                                <label class="config-label">Organization Email</label>
+                                {% if org_data is not None %}
+                                    <input type="email" name="organization_email" class="form-control config-input" placeholder="Organization Email" value="{{ org_data.email }}">
+                                {% else %}
+                                    <input type="email" name="organization_email" class="form-control config-input" placeholder="Organization Email">
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="btn-group  mt-4">
-                            <p style="margin-right: 145px;"><b>{{ trans.organization_phone }}</b></p>
-                            {% if org_data is not None %}
-                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_phone }}" value="{{ org_data.phone }}">
-                            {% else %}
-                                <input type="text" name="organization_phone" class="form-control w-100" style="margin-right: 20px;" placeholder="{{ trans.organization_phone }}">
-                            {% endif %}
+
+                        <!-- Right Field: Phone -->
+                        <div class="col-md-6">
+                            <div class="config-form-group">
+                                <label class="config-label">Organization Phone</label>
+                                {% if org_data is not None %}
+                                    <input type="text" name="organization_phone" class="form-control config-input" placeholder="Organization Phone" value="{{ org_data.phone }}">
+                                {% else %}
+                                    <input type="text" name="organization_phone" class="form-control config-input" placeholder="Organization Phone">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Currency Selection -->
+                        <div class="col-md-6">
+                            <div class="config-form-group">
+                                <label class="config-label">Organization Currency</label>
+                                <select name="currency-format" class="form-control config-input">
+                                    {% for code, name in currency_choices %}
+                                        <option value="{{ code }}"
+                                            {% if org_data and org_data.currency == code|stringformat:'s' %}selected{% endif %}>
+                                            {{ name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-12">
-                            <div class="d-flex justify-content-end gap-3 p-4" style="padding-right: 20px;">
-                                <button type="button" class="btn btn-sm btn-danger" style="width: 100px"> {{ trans.cancel }}</button>
-                                <button type="submit" class="btn btn-sm btn-info" style="width: 100px;"> {{ trans.save }}</button>
+                            <div class="config-actions">
+                                <button type="button" class="btn btn-sm btn-danger config-btn-width">Cancel</button>
+                                <button type="submit" class="btn btn-sm btn-info config-btn-width">Save</button>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </form>
