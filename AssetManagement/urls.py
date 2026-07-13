@@ -35,7 +35,6 @@ from authentication.forms import (
     UserPasswordResetRequestForm,
 )
 from authentication.urls import authentication_url_patterns
-from configurations.models import Extensions
 from configurations.urls import configuration_api_url_patterns
 from dashboard.urls import dashboard_api_urlpatterns
 from gate_pass.urls import gate_pass_api_url_patterns
