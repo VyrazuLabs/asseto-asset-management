@@ -6,7 +6,6 @@ from django.contrib.auth.models import (
     PermissionsMixin,
     Permission,
 )
-from django.contrib.contenttypes.models import ContentType
 from dashboard.models import (
     Organization,
     Location,
@@ -23,6 +22,12 @@ from django_resized import ResizedImageField
 from simple_history.models import HistoricalRecords
 from configurations.constants import NAME_FORMATS
 from django.apps import apps
+from django.core.validators import RegexValidator
+
+phone_validator = RegexValidator(
+    regex=r'^\+[1-9]\d{9,14}$',
+    message="Phone number must be in standard format with + followed by country code and number (10-15 digits total, e.g., +919876543210).",
+)
 
 
 def path_and_rename(instance, filename):
@@ -106,7 +111,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
     email = models.EmailField(max_length=255, unique=True)
     username = models.CharField(max_length=255, blank=True, null=True)
     full_name = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True, validators=[phone_validator])
     profile_pic = ResizedImageField(upload_to=path_and_rename, blank=True, null=True)
     employee_id = models.CharField(max_length=45, blank=True, null=True)
     is_active = models.BooleanField(default=False)
@@ -134,12 +139,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name", "phone", "username"]
-
-    # def __init__(self, *args, **kwargs):
-    #     self.full_name=kwargs.pop('full_name', None)
-    #     format_key= LocalizationConfiguration.objects.filter(organization=self.user.organization).first()
-    #     format_key=format_key.name_display_format if format_key else "0"
-    #     super().__init__(*args, **kwargs)
 
     def dynamic_display_name(self, fullname):
         # Normalize fullname
@@ -230,3 +229,10 @@ class SeedFlag(models.Model):
 
     def __str__(self):
         return "Seed already done" if self.seeded else "Seed not done yet"
+    
+class Technician(TimeStampModel):
+    id= models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user=models.OneToOneField(User, on_delete=models.CASCADE, related_name="technician", null=False)
+
+    class Meta:
+        db_table = "technicians"

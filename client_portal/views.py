@@ -13,11 +13,15 @@ from support.models import (
     SupportTicket,
     TicketAttachment,
     TicketActivity,
+    TicketComment,
+    TicketCommentAttachment,
     STATUS_CHOICES,
     PRIORITY_CHOICES,
     TICKET_TYPE_CHOICES,
 )
 from .forms import ClientSupportTicketForm
+from support.utils import SupportTicketService
+from django.core.exceptions import ValidationError
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location
 from vendors.models import Vendor
@@ -409,8 +413,7 @@ def client_portal_add_ticket(request):
             ticket = form.save(commit=False)
             ticket.organization = client.organization
             ticket.client = client
-            ticket.created_by_contact = contact
-            ticket.created_by = f"Client Contact: {contact.name}"
+            ticket.created_by = str(contact.id)
             ticket.save()
 
             # Handle file uploads
@@ -547,12 +550,37 @@ def client_portal_ticket_detail(request, pk):
         pk=pk
     )
 
+    if request.method == "POST":
+        try:
+            comment, created = SupportTicketService.add_client_comment(request, ticket, contact)
+            if created:
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    from django.template.loader import render_to_string
+                    html = render_to_string("support/includes/comment_item.html", {"comment": comment}, request=request)
+                    return JsonResponse({"success": True, "html": html, "comment_id": str(comment.id)})
+                messages.success(request, "Comment posted successfully.")
+                return redirect("client_portal:support_tickets_detail", pk=pk)
+        except ValidationError as e:
+            err_msg = e.message if hasattr(e, 'message') else ", ".join(e.messages)
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "error": err_msg})
+            messages.error(request, err_msg)
+            return redirect("client_portal:support_tickets_detail", pk=pk)
+
+    comments = ticket.comments.select_related("author", "contact", "client").prefetch_related("attachments")
+
+    from django.core.paginator import Paginator
+    activities_qs = ticket.activities.filter(is_internal=False).order_by('-created_at')
+    activities_paginator = Paginator(activities_qs, 10, orphans=1)
+    activities_page = activities_paginator.get_page(request.GET.get('activities_page', 1))
+
     context = {
         'cp_sidebar': 'support',
         'contact': contact,
         'client': client,
         'ticket': ticket,
         'attachments': ticket.attachments.order_by('-created_at'),
-        'activities': ticket.activities.filter(is_internal=False).order_by('-created_at'),
+        'comments': comments,
+        'activities': activities_page,
     }
     return render(request, 'client_portal/ticket_detail.html', context)

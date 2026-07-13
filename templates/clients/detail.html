@@ -193,7 +193,7 @@
           </div>
 
           <div class="detail-field">
-            <span class="detail-field-label">{{ trans.id_label }}</span>
+            <span class="detail-field-label">{{ trans.client_id }}</span>
             <span class="detail-field-value"><span class="asset-tag-pill">{{ client.client_id }}</span></span>
           </div>
 
@@ -213,10 +213,6 @@
               {% else %}—{% endif %}
             </span>
           </div>
-
-
-
-
 
           <div class="detail-field">
             <span class="detail-field-label">{{ trans.street_address_label }}</span>
@@ -266,6 +262,89 @@
         <div class="detail-empty-state">
           <i class="bi bi-inbox"></i> <br>
           <p>{{ trans.no_assets_client }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Locations Table #}
+    <div class="detail-card mt-4">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-blue"><i class="bi bi-geo-alt"></i></div>
+          <h2>{{ trans.client_locations }}</h2>
+        </div>
+        <button type="button" class="btn-register ms-auto" id="add-client-location-button"
+          hx-get="{% url 'clients:add_location' client.id %}"
+          hx-target="#add-location-modal-content" data-bs-toggle="modal" data-bs-target="#add-location-modal">
+          <i class="bi bi-plus-lg"></i> {{ trans.add_location }}
+        </button>
+      </div>
+      <div class="detail-card-body p-0">
+        {% if client.locations.all %}
+          <div class="table-responsive">
+            <table class="list-table">
+              <thead>
+                <tr>
+                  <th>{{ trans.sl_no }}</th>
+                  <th>{{ trans.office_name_label }}</th>
+                  <th>{{ trans.contact_person_label }}</th>
+                  <th>{{ trans.state_city }}</th>
+                  <th>{{ trans.zip_code_label }}</th>
+                  <th>{{ trans.status_label }}</th>
+                  <th>{{ trans.actions }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for location in client.locations.all %}
+                {% if not location.is_deleted %}
+                <tr>
+                  <td class="table-index-cell">{{ forloop.counter|stringformat:"02d" }}</td>
+                  <td>
+                    <div class="cell-name-main">{{ location.office_name }}</div>
+                    <div class="cell-name-sub">{{ location.address.address_line_one|default:"" }}</div>
+                  </td>
+                  <td>
+                    <div class="cell-name-main">{{ location.contact_person_name|default:"—" }}</div>
+                    <div class="cell-name-sub">{{ location.contact_person_email|default:"" }}</div>
+                  </td>
+                  <td>{{ location.address.state|default:"—" }} / {{ location.address.city|default:"—" }}</td>
+                  <td>{{ location.address.pin_code|default:"—" }}</td>
+                  <td>
+                    {% if location.status %}
+                    <span class="status-badge status-active">{{ trans.active }}</span>
+                    {% else %}
+                    <span class="status-badge status-inactive">{{ trans.inactive }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button type="button" class="action-btn" title="{{ trans.edit_location }}"
+                        hx-get="{% url 'clients:update_location' location.id %}"
+                        hx-target="#edit-location-modal-content"
+                        data-bs-toggle="modal" data-bs-target="#edit-location-modal">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      
+                      <form action="{% url 'clients:delete_location' location.id %}" method="post" class="form-row-action"
+                        onsubmit="return confirm('{{ trans.delete_confirm_location|escapejs }}')">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn danger" title="{{ trans.delete_location }}">
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+        <div class="detail-empty-state">
+          <i class="bi bi-geo-alt"></i> <br>
+          <p>{{ trans.no_locations_for_client }}</p>
         </div>
         {% endif %}
       </div>
@@ -364,7 +443,26 @@
 
 </div>{# /detail-layout #}
 
+{# ── Add modal ───────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="add-location-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div id="add-location-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
+
+{# ── Edit modal ───────────────────────────────────────────────────────────── #}
+<div class="modal fade" id="edit-location-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div id="edit-location-modal-content" class="modal-content" hx-target="this"></div>
+  </div>
+</div>
+
 <script>
+  // Reload page when a location is added
+  document.body.addEventListener("clientLocationAdded", function () {
+    location.reload();
+  });
+
   const assetSearchForm = document.querySelector('#assetSearchInput')?.closest('form');
   const assetSearchInput = document.getElementById('assetSearchInput');
   if (assetSearchInput && assetSearchForm) {

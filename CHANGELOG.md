@@ -12,6 +12,31 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.4] — 2026-07-13
+
+### Added
+- **Technician role for users** — Implemented the technician role for users, showing only active and enabled users in technician lists, and added a Maintenance and repairs log section in asset details.
+- **Client location feature** — Integrated client location details into the client portal module.
+- **Two-way support comments** — Implemented two-way support ticket comment workflows in both the client portal and admin, including file upload validation, staff comment flags, and UI text localization.
+- **Support ticket happy codes** — Implemented Happy Code validation, migration, and UI submission flows for support tickets on both admin and client portals.
+
+### Changed
+- **Asset details view** — Restored and redesigned the Maintenance and repairs section as well as the Maintenance log in the asset details view.
+- **Client portal notifications** — Replaced success alert views with Toastify notifications for ticket actions.
+- **Cleaned localization setup** — Moved translation code from `__init__.py` to utility and constant modules.
+- **General UI improvements** — Removed the recycle bin statistics card from listing pages, improved the ticket Kanban view UI, and deduplicated views in the client portal.
+
+### Fixed
+- **2FA login API bug** — Fixed 2FA verification issues inside the login API.
+- **Phone number validations** — Added phone number validation in user and client models.
+- **Filtering & searching** — Fixed filtering and searching bugs in the vendor list and client list.
+- **Gate pass & authorization** — Fixed issues related to saving gate passes and authorization settings.
+- **Environment config** — Sanitized Firebase credential path and corrected environment example comments.
+- **OTP verification page** — Fixed OTP verification HTML code layout and alignment issues.
+- **Session cache invalidation** — Invalidated session cache correctly after updating user language settings.
+
+---
+
 ## [1.6.3] — 2026-06-23
 
 ### Added

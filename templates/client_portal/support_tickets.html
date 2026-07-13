@@ -145,15 +145,14 @@
                 <table class="table table-hover align-middle mb-0 ticket-table">
                     <thead class="bg-light">
                         <tr>
-                            <th class="ps-4">{{ trans.sl_no }}</th>
-                            <th>{{ trans.ticket_id }}</th>
-                            <th>{{ trans.asset_name }}</th>
-                            <th>{{ trans.subject_label }}</th>
-                            <th>{{ trans.issue_priority }}</th>
-                            <th>{{ trans.status_label }}</th>
-                            <th>{{ trans.assigned_to }}</th>
-                            <th>{{ trans.last_activity }}</th>
-
+                            <th class="ps-4">SL</th>
+                            <th>Ticket ID</th>
+                            <th>Asset Name</th>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Last Activity</th>
+                            <th class="pe-4 text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ticket-table-body">
@@ -199,7 +198,11 @@
                                     {{ ticket.updated_at|timesince }} ago
                                 </div>
                             </td>
-
+                            <td class="pe-4 text-end">
+                                <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="action-btn" title="View Ticket">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -216,38 +219,10 @@
             </div>
 
             {# ── Pagination ─────────────────────────────────────────────────────── #}
-            {% if page_object.paginator.num_pages > 1 %}
-            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center border-top">
-                <div class="text-muted small">
-                    Showing {{ page_object.start_index }} to {{ page_object.end_index }} of {{ page_object.paginator.count }} tickets
-                </div>
-                <nav aria-label="Table navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        {% if page_object.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_object.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
-                                    class="bi bi-chevron-left"></i></a>
-                        </li>
-                        {% endif %}
-
-                        {% for num in page_object.paginator.page_range %}
-                        {% if page_object.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% elif num > page_object.number|add:'-3' and num < page_object.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a></li>
-                        {% endif %}
-                        {% endfor %}
-
-                        {% if page_object.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_object.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"><i
-                                    class="bi bi-chevron-right"></i></a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
+            {% if page_object %}
+                {% include 'commons/list-pagination.html' with item_label="tickets" %}
             {% endif %}
+
         </div>
     </div>
 

@@ -59,65 +59,57 @@
       <div class="stat-value">{{ inactive_vendor_count }}</div>
     </div>
   </div>
-  <a href="{% url 'recycle_bin:deleted_vendors' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_vendor_count }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
-  <form id="vendor-filter-form"
-    hx-get="{% url 'vendors:search' page_object.number %}"
-    hx-target="#search_result"
-    hx-trigger="change, keyup changed delay:400ms from:input">
-    <div class="row g-2 align-items-end">
-      <div class="col">
-        <div class="filter-label">{{ trans.search_vendor }}</div>
-        <input name="search_text" type="search"
-          autocomplete="off" placeholder="{{ trans.search_placeholder }}"
-          aria-label="{{ trans.search_vendor }}">
-      </div>
+  <div id="vendor-filter-form" class="row g-2 align-items-end">
+    <div class="col">
+      <div class="filter-label">{{ trans.search_vendor }}</div>
+      <input name="search_text" type="search"
+        autocomplete="off" placeholder="{{ trans.search_placeholder }}"
+        hx-get="{% url 'vendors:search' page_object.number %}"
+        hx-trigger="keyup changed delay:400ms, search, change from:[name='status']"
+        hx-target="#search_result"
+        hx-include="[name='status']"
+        aria-label="{{ trans.search_vendor }}">
+    </div>
 
-      <div class="col-auto">
-        <div class="filter-label">{{ trans.status_label }}</div>
-        <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
-            {{ trans.all_status }}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; htmx.trigger(form,'change');">{{ trans.all_status }}</a></li>
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='active'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} '; htmx.trigger(form,'change');">{{ trans.active }}</a></li>
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); form.querySelector('[name=status]').value='inactive'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} '; htmx.trigger(form,'change');">{{ trans.inactive }}</a></li>
-          </ul>
-          <input type="hidden" name="status">
-        </div>
-      </div>
-
-      {% if request.user.is_superuser %}
-        <div class="col-auto">
-          <div class="dropdown">
-            <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-              <i class="bi bi-download"></i> {{ trans.export }}
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
-              <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
-            </ul>
-          </div>
-        </div>
-      {% endif %}
-      <div class="col-auto">
-        <a href="{% url 'vendors:list' %}" class="btn-reset" title="Reset">
-          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
-        </a>
+    <div class="col-auto">
+      <div class="filter-label">{{ trans.status_label }}</div>
+      <div class="dropdown">
+        <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
+          {{ trans.all_status }}
+         
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); var statusInput=form.querySelector('[name=status]'); statusInput.value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; statusInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ trans.all_status }}</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); var statusInput=form.querySelector('[name=status]'); statusInput.value='active'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.active }} '; statusInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ trans.active }}</a></li>
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('vendor-filter-form'); var statusInput=form.querySelector('[name=status]'); statusInput.value='inactive'; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.inactive }} '; statusInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ trans.inactive }}</a></li>
+        </ul>
+        <input type="hidden" name="status">
       </div>
     </div>
-  </form>
+
+    {% if request.user.is_superuser %}
+      <div class="col-auto">
+        <div class="dropdown">
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
+            <i class="bi bi-download"></i> {{ trans.export }}
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'vendors:export_vendors_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+    <div class="col-auto">
+      <a href="{% url 'vendors:list' %}" class="btn-reset" title="Reset">
+        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
+      </a>
+    </div>
+  </div>
   {% if is_demo is True %}
     <p class="demo-note">* Demo mode: Update &amp; Delete are disabled.</p>
   {% endif %}

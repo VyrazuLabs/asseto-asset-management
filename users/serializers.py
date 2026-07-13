@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 
 from authentication.models import User
@@ -58,6 +59,11 @@ class UserSerializer(serializers.ModelSerializer):
     #     if role:
     #         return role.id
     #     return None
+
+    def validate_phone(self, phone):
+        if not re.match(r'^\+[1-9]\d{9,14}$', phone):
+            raise serializers.ValidationError("Enter a valid phone number in standard format (+ followed by country code and number, e.g., +919876543210)")
+        return phone
 
     def validate_email(self, email):
         domain = "@"

@@ -131,10 +131,16 @@
                 </div>
 
                 <div class="col-md-12">
-                    <div class="form-check form-switch mb-2">
+
+                    <div class="form-check form-switch mb-0">
                         <input type="checkbox" class="form-check-input" id="toggle_password">
                         <label class="form-check-label fw-bold" for="toggle_password">{{ trans.enable_user_login }}</label>
                     </div>
+                    <div class="form-check form-switch mt-2">
+                        <input type="checkbox" class="form-check-input" id="is_technician" name="is_technician">
+                        <label class="form-check-label fw-bold" for="is_technician">{{ trans.is_technician }}</label>
+                    </div>
+
                 </div>
 
                 <div id="password_fields" class="row g-3 d-none">

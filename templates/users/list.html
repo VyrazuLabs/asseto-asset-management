@@ -62,46 +62,88 @@
       <div class="stat-value">{{ total_assigned_assets }}</div>
     </div>
   </div>
-  <a href="{% url 'recycle_bin:deleted_users' %}" class="stat-card" title="{{ trans.recycle_bin }}">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_user_count }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
-  <div class="row g-2 align-items-end">
-    <div class="col">
-      <div class="filter-label">{{ trans.search_user }}</div>
-      <input name="search_text" type="search"
-        autocomplete="off" placeholder="{{ trans.search_user_placeholder }}"
+  <form id="user-filter-form"
         hx-get="{% url 'users:search' page_object.number %}"
-        hx-trigger="keyup changed delay:400ms, search"
         hx-target="#search_result"
-        aria-label="{{ trans.search_user }}">
-    </div>
-    {% if request.user.is_superuser %}
-      <div class="col-auto">
+        hx-trigger="change, keyup changed delay:400ms from:input">
+    <div class="row g-2 align-items-end">
+
+      <div class="col">
+        <div class="filter-label">{{ trans.search_user }}</div>
+        <input name="search_text" type="search"
+          autocomplete="off"
+          placeholder="{{ trans.search_user_placeholder }}"
+          aria-label="{{ trans.search_user }}">
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">Role</div>
         <div class="dropdown">
-          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="{{ trans.export }}">
-            <i class="bi bi-download"></i> {{ trans.export }}
+          <button class="filter-select-btn dropdown-toggle" type="button"
+                  data-bs-toggle="dropdown"
+                  id="technician-btn"
+                  aria-label="Filter by role">
+            All Users
           </button>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'users:export_users_csv' %}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
-            <li><a class="dropdown-item" href="{% url 'users:export_users_pdf' %}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
+            <li>
+              <a href="#" class="dropdown-item"
+                 data-technician-value=""
+                 data-technician-label="All Users">All Users</a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-item"
+                 data-technician-value="1"
+                 data-technician-label="Technicians">
+                <i class="bi bi-tools me-1"></i> Technicians
+              </a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-item"
+                 data-technician-value="0"
+                 data-technician-label="Non-Technicians">Non-Technicians</a>
+            </li>
           </ul>
+          <input type="hidden" name="technician">
         </div>
       </div>
-    {% endif %}
-    <div class="col-auto">
-      <a href="{% url 'users:list' %}" class="btn-reset" title="{{ trans.reset }}">
-        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
-      </a>
+
+      {% if request.user.is_superuser %}
+        <div class="col-auto">
+          <div class="dropdown">
+            <button class="btn-export dropdown-toggle" type="button"
+                    data-bs-toggle="dropdown"
+                    aria-label="{{ trans.export }}">
+              <i class="bi bi-download"></i> {{ trans.export }}
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item" href="{% url 'users:export_users_csv' %}">
+                  <i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'users:export_users_pdf' %}">
+                  <i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="col-auto">
+        <a href="{% url 'users:list' %}" class="btn-reset" title="{{ trans.reset }}">
+          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
+        </a>
+      </div>
+
     </div>
-  </div>
+  </form>
   {% if is_demo is True %}
     <p class="demo-note">{{ trans.demo_mode_disabled }}</p>
   {% endif %}
@@ -152,7 +194,14 @@
           </td>
 
           <td>
-            <div class="cell-name-main">{{ user.full_name }}</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="cell-name-main">{{ user.full_name }}</div>
+              {% if user.technician %}
+                <span class="tech-badge" title="Technician">
+                  <i class="bi bi-tools"></i>
+                </span>
+              {% endif %}
+            </div>
           </td>
 
           <td>{{ user.email }}</td>
@@ -192,7 +241,9 @@
                 class="form-check-input"
                 hx-post="{% url 'users:status' user.id %}"
                 hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-                type="checkbox" {% if user.is_active %} checked {% endif %}>
+                type="checkbox"
+                aria-label="{{ trans.status_label }} {{ user.full_name }}"
+                {% if user.is_active %} checked {% endif %}>
             </div>
           </td>
           {% endif %}
@@ -216,8 +267,9 @@
                 </button>
               {% endif %}
               {% if perms.authentication.delete_users %}
-                <form action="{% url 'users:delete' user.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('{{ trans.delete_confirm_user|escapejs }}')">
+                <form action="{% url 'users:delete' user.id %}" method="post"
+                      class="form-row-action user-delete-form"
+                      data-confirm-message="{{ trans.delete_confirm_user|escapejs }}">
                   {% csrf_token %}
                   <button type="submit"
                     class="action-btn danger {% if is_demo %}disabled{% endif %}"
@@ -241,8 +293,11 @@
             <div class="table-empty-state">
               <i class="bi bi-people"></i>
               <p>{{ trans.no_users_found }}<br>
-                <a href="#" class="link-primary" hx-get="{% url 'users:add' %}" hx-target="#add-user-modal-content"
-                  data-bs-toggle="modal" data-bs-target="#add-user-modal">{{ trans.add_first_user }}</a>
+                <a href="#" class="link-primary"
+                   role="button"
+                   aria-label="{{ trans.add_first_user }}"
+                   hx-get="{% url 'users:add' %}" hx-target="#add-user-modal-content"
+                   data-bs-toggle="modal" data-bs-target="#add-user-modal">{{ trans.add_first_user }}</a>
               </p>
             </div>
           </td>
@@ -268,3 +323,7 @@
 </div>
 
 {% endblock content %}
+
+{% block script %}
+<script src="{% static 'js/pages/user_list.js' %}" defer></script>
+{% endblock script %}

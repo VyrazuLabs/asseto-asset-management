@@ -1,7 +1,28 @@
-/* =============================================================================
-   assets-detail.css — Styles specific to the Asset Detail page
-   Relies on: assets-common.css
-   ============================================================================= */
+/* ── Select2 Premium Styling ──────────────────────────────────────────────── */
+.select2-container--default .select2-selection--single {
+  height: 38px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__rendered {
+  color: var(--color-text);
+  padding-left: 12px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 36px;
+}
+.select2-dropdown {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+}
+.select2-search__field {
+  border-radius: 4px !important;
+}
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
 .detail-page-header {
@@ -268,9 +289,13 @@ body.theme-dark .detail-card-header h3 {
   padding: 2.5rem 1.5rem;
   text-align: center;
   color: var(--color-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
 }
-.detail-empty-state i  { font-size: 2.5rem; opacity: .3; display: block; margin-bottom: .75rem; }
-.detail-empty-state p  { font-size: .875rem; margin: 0; }
+.detail-empty-state i  { font-size: 2.5rem; opacity: .3; display: block; }
+.detail-empty-state p  { font-size: .875rem; margin: 15px; }
 
 /* ── Asset images (sidebar) ───────────────────────────────────────────────── */
 .detail-main-image-wrap {
@@ -406,3 +431,160 @@ body.theme-dark .activity-log-item { border-color: var(--color-border); }
 body.theme-dark .badge-in-use  { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
 body.theme-dark .badge-available { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
 body.theme-dark .detail-assignee-chip { background: var(--color-primary-light); border-color: #3d3780; }
+
+/* ── Modal dark mode overrides ─────────────────────────────────────────── */
+body.theme-dark .modal-content {
+  background: var(--color-card);
+  border-color: var(--color-border);
+}
+body.theme-dark .modal-header,
+body.theme-dark .modal-footer {
+  background: var(--color-card) !important;
+  border-color: var(--color-border);
+}
+body.theme-dark .modal-header .btn-close {
+  filter: invert(1);
+}
+body.theme-dark .modal-body .form-label {
+  color: var(--color-text) !important;
+}
+body.theme-dark .modal-body .form-control,
+body.theme-dark .modal-body .form-select {
+  background: var(--color-card) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.theme-dark .modal-body .form-control:focus,
+body.theme-dark .modal-body .form-select:focus {
+  background: var(--color-card) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+body.theme-dark .modal-body .form-select option {
+  background: var(--color-card);
+  color: var(--color-text);
+}
+body.theme-dark .modal-body .input-group-text {
+  background: var(--color-card) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.theme-dark .modal .btn-link {
+  color: var(--color-muted) !important;
+}
+
+/* ── Select2 dark mode overrides ──────────────────────────────────────── */
+body.theme-dark .select2-container--default .select2-selection--single {
+  background: var(--color-card) !important;
+  border-color: var(--color-border) !important;
+}
+body.theme-dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--color-text) !important;
+  background: var(--color-card) !important;
+}
+body.theme-dark .select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: var(--color-muted) !important;
+}
+body.theme-dark .select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: var(--color-muted) transparent transparent transparent !important;
+}
+body.theme-dark .select2-dropdown {
+  background: var(--color-card) !important;
+  border-color: var(--color-border) !important;
+}
+body.theme-dark .select2-results__option {
+  background: var(--color-card) !important;
+  color: var(--color-text) !important;
+}
+body.theme-dark .select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: var(--color-primary-light) !important;
+  color: var(--color-primary) !important;
+}
+body.theme-dark .select2-container--default .select2-results__option[aria-selected="true"] {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+}
+body.theme-dark .select2-search__field {
+  background: var(--color-card) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+body.theme-dark .select2-container--default .select2-selection--single .select2-selection__clear {
+  color: var(--color-muted) !important;
+}
+
+/* ── Maintenance Section Styles ────────────────────────────────────────── */
+.btn-record-repair {
+  font-size: .85rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  padding: .4rem 1rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  transition: all 0.2s;
+}
+
+.btn-record-repair:hover {
+  background-color: #4338CA;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.maintenance-status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-new { background-color: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+.status-in-progress { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.status-completed { background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+
+/* ── Maintenance Type Badges ────────────────────────────────────────── */
+.maintenance-type-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.type-repair { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.type-maintenance, .type-preventive { background-color: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+.type-calibration { background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+.type-breakdown { background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+.type-other { background-color: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+
+body.theme-dark .type-repair { background: #451a1a; color: #f87171; border-color: #7f1d1d; }
+body.theme-dark .type-maintenance, body.theme-dark .type-preventive { background: #2e1065; color: #c084fc; border-color: #4c1d95; }
+body.theme-dark .type-calibration { background: #082f49; color: #38bdf8; border-color: #0c4a6e; }
+body.theme-dark .type-breakdown { background: #431407; color: #fb923c; border-color: #7c2d12; }
+body.theme-dark .type-other { background: #1f2937; color: #9ca3af; border-color: #374151; }
+
+body.theme-dark .status-new { background: #3d3015; color: #fbbf24; border-color: #4a3a1c; }
+body.theme-dark .status-in-progress { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
+body.theme-dark .status-completed { background: #15302a; color: #6ee7b7; border-color: #1c4a3a; }
+
+.service-id-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.service-id-link:hover {
+  text-decoration: underline;
+}
+
+.table-cost-cell {
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}

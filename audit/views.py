@@ -1,20 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Audit
-from assets.models import AssetImage
-from .forms import AuditForm
-from django.core.paginator import Paginator
-from assets.models import AssignAsset, Asset
-from authentication.models import User
-from audit.utils import next_audit_due, next_audit_due_for_asset, get_tag_list
-from datetime import datetime, timedelta, timezone
-from django.http import JsonResponse
-from audit.models import AuditImage
-from django.db.models import OuterRef, Subquery
-from django.core.paginator import Paginator
-from datetime import datetime, timedelta
-from django.contrib.auth.decorators import login_required
+from datetime import datetime
+
 from django.contrib import messages
-from .utils import get_completed_audit, get_pending_audits, get_audit_stats
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from assets.models import Asset, AssignAsset
+from audit.models import AuditImage
+from audit.utils import get_tag_list
+from authentication.models import User
+
+from .forms import AuditForm
+from .models import Audit
+from .utils import get_audit_stats, get_completed_audit, get_pending_audits
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -56,8 +55,6 @@ def add_audit(request):
         form = AuditForm(
             request.POST, request.FILES, organization=request.user.organization
         )
-        # image_form = AssetImageForm(request.POST, request.FILES)
-        image_instance = None
         files = request.FILES.getlist("image")
         if not files:
             file = request.FILES.get("image")

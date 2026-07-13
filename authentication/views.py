@@ -2,17 +2,12 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect, get_object_or_404
-from authentication.forms import (
-    UserRegisterForm,
-    OrganizationForm,
-    UserLoginForm,
-    UserUpdateForm,
-    OrganizationUpdateForm,
-)
-from authentication.decorators import unauthenticated_user
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
@@ -41,60 +36,15 @@ from configurations.constants import NAME_FORMATS
 from configurations.models import LocalizationConfiguration
 from configurations.utils import format_datetime, get_currency_and_datetime_format
 from dashboard.forms import AddressForm
-from dashboard.models import Location, Address, ProductType, ProductCategory
-from django.contrib.auth import get_user_model
+from dashboard.models import Address, Location, ProductCategory, ProductType
+from dashboard.views.seeders import seed_parent_category
+from license.models import License
 from products.models import Product
 from vendors.models import Vendor
-from assets.models import *
-from django.db.models.signals import post_save
-from assets.seeders import seed_asset_statuses
-from assets.models import AssignAsset
-from django.views.decorators.cache import never_cache
-from dashboard.views.seeders import seed_parent_category
-from django.db.models import Q
-from configurations.utils import get_currency_and_datetime_format
-from configurations.utils import format_datetime
 
 from .constant import db_engines
-from configurations.models import LocalizationConfiguration
-from configurations.constants import NAME_FORMATS
-from dotenv import load_dotenv, set_key
-from django.conf import settings
-from license.models import License
-from .utils import get_tokens_for_user, generate_totp_secret, verify_totp
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
-from rest_framework.response import Response
-from rest_framework.decorators import (
-    api_view,
-    permission_classes,
-    authentication_classes,
-)
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.conf import settings
-from .utils import generate_qr
-from django.template.loader import render_to_string
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.http import require_POST
 
 User = get_user_model()
-
-
-@login_required
-def toggle_2fa(request):
-    user = request.user
-
-    if request.method == "POST":
-        user.two_factor_auth = not user.two_factor_auth
-        user.save()
-
-    context = {
-        "two_factor_auth": user.two_factor_auth,
-        "get_qr_for_2fa": generate_qr(user),  # your QR generator
-    }
-
-    html = render_to_string("users/partials/qr_section.html", context, request=request)
-    return HttpResponse(html)
 
 
 @api_view(["POST"])
@@ -278,7 +228,7 @@ def index(request):
             it.warranty_expiry_date = format_datetime(
                 x=it.warranty_expiry_date, output_format=obj["date_format"]
             )
-        # it.warranty_expiry_date=format_datetime(x=it.warranty_expiry_date,output_format=obj['date_format'])
+
     for it in latest_vendor_list:
         if not obj["date_format"]:
             it.created_at = it.created_at.date
@@ -293,7 +243,6 @@ def index(request):
             it.created_at = format_datetime(
                 x=it.created_at, output_format=obj["date_format"]
             )
-        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
 
     for it in all_location_list:
         if not obj["date_format"]:
@@ -302,7 +251,6 @@ def index(request):
             it.created_at = format_datetime(
                 x=it.created_at, output_format=obj["date_format"]
             )
-        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
 
     for it in latest_users_list:
         if not obj["date_format"]:
@@ -311,7 +259,7 @@ def index(request):
             it.created_at = format_datetime(
                 x=it.created_at, output_format=obj["date_format"]
             )
-        # it.created_at=format_datetime(x=it.created_at,output_format=obj['date_format'])
+
     context = {
         "currency": obj["currency"] if obj["currency"] else "INR",
         "date_format": obj["date_format"],
@@ -428,7 +376,6 @@ def recent_users_partial(request):
         {"latest_users_list": latest_users_list},
     )
 
-
 @unauthenticated_user
 def user_login(request):
     form = UserLoginForm()
@@ -436,7 +383,7 @@ def user_login(request):
         form = UserLoginForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
-            password = form.cleaned_data["password"]
+            password = form.cleaned_data["password"]            
             user = authenticate(email=email, password=password)
 
             if user is not None:
@@ -453,19 +400,15 @@ def user_login(request):
                     seed_parent_category(category=True)
                 else:
                     print("seed fail for category")
+
+                request.session["user_email"] = email
                 get_user = User.objects.filter(email=email).first()
                 get_totp = UserTotp.objects.filter(user_id=get_user.id).first()
-                if get_totp:
-                    if user.two_factor_auth and get_totp.status == 1:
-                        # request.session['pre_2fa_user_id'] = str(user.id)
-                        request.session["email"] = email
-                        return redirect("authentication:verify_otp")
-                    if user.two_factor_auth and get_totp.status == 2:
-                        # request.session['pre_2fa_user_id'] = str(user.id)
-                        request.session["email"] = email
-                        return redirect("authentication:verify_otp")
+
+                if get_user.two_factor_auth and get_totp.is_validate:
+                    return redirect("authentication:verify_otp")
+
                 login(request, user)
-                # full_name=dynamic_display_name(fullname=user.full_name, format_key)
                 messages.success(request, f"Welcome, {user.full_name}")
 
                 # redirecting to the requested url
@@ -474,46 +417,13 @@ def user_login(request):
                 return redirect("/")
             else:
                 messages.error(request, "Invalid credentials!")
+
     last_logins = User.objects.values_list("last_login", flat=True)
     return render(
         request,
         "auth/login.html",
         context={"form": form, "current_step": 5, "last_logins": last_logins},
     )
-
-
-def verify_otp(request):
-    user = request.user
-    get_email = request.session.get("email")
-    user = User.objects.filter(email=get_email).first()
-    get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
-    if request.method == "POST":
-        otp = request.POST.get("otp")
-        if settings.DEBUG == True:
-            otp = "123456"
-        # This rus when we have generated the QR but not scanned it the secret reamins the same
-        if user and get_user_totp.status == 1:
-            verify_otp = verify_totp(get_user_totp.secret, otp)
-            if verify_otp:
-                get_user_totp.status = 2
-                # get_user_totp.secret=
-                get_user_totp.save()
-                login(request, user)
-                messages.success(request, f"Welcome, {user.full_name}")
-                return redirect("/profile")
-        if user and get_user_totp.secret:
-            verify_otp = verify_totp(get_user_totp.secret, otp)
-            if verify_otp:
-                get_user_totp.status = 2
-                get_user_totp.save()
-                login(request, user)
-                messages.success(request, f"Welcome, {user.full_name}")
-                return redirect("/profile")
-            else:
-                messages.error(request, "Invalid OTP. Please try again.")
-                return redirect("authentication:verify_otp")
-    elif request.method == "GET":
-        return render(request, "auth/verify-otp.html", context={"email": get_email})
 
 
 @unauthenticated_user
@@ -583,12 +493,10 @@ def profile(request):
         .values("use_expired_assets")
         .first()
     )
-    # print("FLAG",get_expired_asset_use_flag)
-    # get_expired_asset_use_flag=Asset.undeleted_objects.filter(Q(organization=None) | Q(organization=request.user.organization),warranty_expiry_date__lt=datetime.now(),use_expired_assets=True).count()
     assigned_assets = AssignAsset.objects.filter(user=request.user).first()
     get_user_full_name = user.dynamic_display_name(user.full_name)
     get_user_totp = UserTotp.objects.filter(user_id=user.id).first()
-    # get_qr_for_2fa = generate_qr(request)
+    qr_code_data = generate_qr(request, user, get_user_totp.secret) if user.two_factor_auth and get_user_totp and not get_user_totp.is_validate else ''
     context = {
         "profile": True,
         "title": "Profile",
@@ -600,36 +508,9 @@ def profile(request):
         "inapp_notification": user.inapp_notification,
         "two_factor_auth": user.two_factor_auth,
         "get_user_totp": get_user_totp,
-        "get_expired_asset_use_flag": get_expired_asset_use_flag,
+        "qr_code_data": qr_code_data,
     }
     return render(request, "auth/profile.html", context=context)
-
-
-@login_required
-@require_POST
-def regenerate_qr(request):
-    user = request.user
-    secret = generate_totp_secret()
-    user_totp = UserTotp.objects.filter(user_id=user.id).first()
-
-    if not user_totp:
-        user_totp = UserTotp.objects.create(user_id=user.id, secret=secret, status=0)
-
-    if user_totp.status in [0, 1, 2]:
-        qr_code_base64 = generate_qr(request, user_totp)
-
-        return JsonResponse(
-            {"success": True, "qr_code": qr_code_base64, "status": user_totp.status}
-        )
-
-    return JsonResponse(
-        {
-            "success": False,
-            "message": "QR regeneration not allowed.",
-            "status": user_totp.status,
-        },
-        status=400,
-    )
 
 
 @login_required
@@ -699,24 +580,7 @@ def organization_info_update(request):
 @never_cache
 @login_required
 def logout_view(request):
-    get_totp_status = UserTotp.objects.filter(user_id=request.user.id).first()
-    if (
-        get_totp_status is not None
-        and request.user.two_factor_auth is False
-        and get_totp_status.status == 2
-    ):
-        get_totp_status.status = 0
-        get_totp_status.save()
-    elif get_totp_status is None:
-        pass
+  
     logout(request)
     return redirect("/")
-
-
-# def toggle_2fa(request):
-#     user = request.user
-#     if user.is_authenticated:
-#         user.two_factor_auth = not user.two_factor_auth
-#         user.save()
-#         messages.success(request, 'Two-factor authentication has been toggled.')
-#     return redirect('authentication:profile')
+    

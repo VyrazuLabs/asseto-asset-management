@@ -7,7 +7,7 @@ STRINGS = {
     "open_tickets_client": "Open Support Tickets",
     "search_client": "Search Client",
     "search_client_placeholder": "Search Client Name or ID...",
-    "all_statuses": "All Statuses",
+    "all_statuses": "All Status",
     "industry_type": "Industry Type",
     "no_clients_found": "No clients found.",
     "add_first_client": "Add your first client",

@@ -46,9 +46,12 @@ def add_client(request):
                 client = ClientService.create(request)
                 messages.success(request, "Client registered successfully.")
                 return redirect("clients:list")
+            except ValueError as e:
+                logger.warning(f"Validation error creating client: {e}")
+                messages.error(request, str(e))
             except Exception as e:
                 logger.exception("Error creating client")
-                messages.error(request, "Failed to create client. Please try again.")
+                messages.error(request, f"Failed to create client: {type(e).__name__}: {e}")
     else:
         form = ClientForm(organization=request.user.organization)
     from roles.models import Role
@@ -77,9 +80,12 @@ def update_client(request, id):
                 ClientService.update(request, client_id=id)
                 messages.success(request, "Client updated successfully.")
                 return redirect("clients:list")
+            except ValueError as e:
+                logger.warning(f"Validation error updating client: {e}")
+                messages.error(request, str(e))
             except Exception as e:
                 logger.exception("Error updating client")
-                messages.error(request, "Failed to update client. Please try again.")
+                messages.error(request, f"Failed to update client: {type(e).__name__}: {e}")
     else:
         form = ClientForm(instance=client, organization=request.user.organization)
     from roles.models import Role
@@ -163,3 +169,113 @@ def export_clients_pdf(request):
         logger.exception("Error exporting PDF")
         messages.error(request, "Failed to export PDF.")
         return redirect("clients:list")
+
+
+@login_required
+def add_client_location(request, id):
+    """Add a new location for a client."""
+    from dashboard.models import Location
+    from dashboard.forms import LocationForm, AddressForm
+    from .models import Client
+
+    client = get_object_or_404(
+        Client.undeleted_objects, pk=id, organization=request.user.organization
+    )
+    address_form = AddressForm(request.POST or None)
+    location_form = LocationForm(request.POST or None)
+
+    if request.method == "POST":
+        if address_form.is_valid() and location_form.is_valid():
+            address = address_form.save()
+            location = location_form.save(commit=False)
+            location.address = address
+            location.organization = request.user.organization
+            location.client = client
+            location.save()
+            messages.success(request, "Location added successfully")
+            response = HttpResponse(status=204)
+            response["HX-Trigger"] = "clientLocationAdded"
+            return response
+
+    context = {
+        "address_form": address_form,
+        "location_form": location_form,
+        "client": client,
+    }
+    return render(
+        request, "dashboard/locations/add-location-modal.html", context=context
+    )
+
+
+@login_required
+def update_client_location(request, id):
+    """Update an existing client location."""
+    from dashboard.models import Location, Address
+    from dashboard.forms import LocationForm, AddressForm
+
+    location = get_object_or_404(
+        Location.undeleted_objects, pk=id, organization=request.user.organization
+    )
+    address = get_object_or_404(Address, pk=location.address.id)
+
+    location_form = LocationForm(request.POST or None, instance=location)
+    address_form = AddressForm(request.POST or None, instance=address)
+
+    if request.method == "POST":
+        if location_form.is_valid() and address_form.is_valid():
+            location_form.save()
+            address_form.save()
+            messages.success(request, "Location updated successfully")
+            if request.htmx:
+                return HttpResponse(status=200, headers={"HX-Refresh": "true"})
+            if location.client:
+                return redirect("clients:details", id=location.client.id)
+            return redirect("clients:list")
+
+    context = {
+        "sidebar": "clients",
+        "location_form": location_form,
+        "address_form": address_form,
+        "location": location,
+        "title": f"Update-{location.office_name}",
+    }
+
+    if request.headers.get("HX-Request", "false").lower() == "true":
+        return render(
+            request, "dashboard/locations/edit-location-modal.html", context=context
+        )
+
+    return redirect("clients:list")
+
+
+@login_required
+def delete_client_location(request, id):
+    """Delete a client location (soft delete)."""
+    from dashboard.models import Location
+    from assets.models import AssignAsset
+
+    if request.method == "POST":
+        location = get_object_or_404(
+            Location.undeleted_objects, pk=id, organization=request.user.organization
+        )
+        client_id = location.client.id if location.client else None
+
+        # Check if the deleted location is assigned to any asset
+        assigned_assets = AssignAsset.objects.filter(asset__location=location).first()
+        if assigned_assets is not None:
+            messages.error(
+                request,
+                "Location cannot be deleted as it is assigned to an asset. Please unassign the asset before deleting the location.",
+            )
+            if client_id:
+                return redirect("clients:details", id=client_id)
+            return redirect("clients:list")
+
+        location.status = False
+        location.soft_delete()
+        history_id = location.history.first().history_id
+        location.history.filter(pk=history_id).update(history_type="-")
+        messages.success(request, "Location deleted successfully")
+        if client_id:
+            return redirect("clients:details", id=client_id)
+    return redirect("clients:list")

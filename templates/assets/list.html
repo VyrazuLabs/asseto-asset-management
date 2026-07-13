@@ -61,13 +61,6 @@
       <div class="stat-value">{{ assigned_count }}</div>
     </div>
   </a>
-  <a href="{% url 'recycle_bin:deleted_assets' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_asset_count }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
@@ -94,7 +87,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn" aria-label="Filter by status">
             All Status
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=status]').value=''; document.getElementById('status-btn').childNodes[0].textContent='{{ trans.all_status }} '; htmx.trigger(form,'change');">All Status</a></li>
@@ -114,7 +107,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
             All Vendors
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+           
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; document.getElementById('vendor-btn').childNodes[0].textContent='{{ trans.all_vendors }} '; htmx.trigger(form,'change');">All Vendors</a></li>
@@ -134,8 +127,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
             All Types
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
+            
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
             {% for type in product_type_list %}
@@ -154,7 +146,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="category-btn" aria-label="Filter by category">
             All Categories
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=category]').value=''; document.getElementById('category-btn').childNodes[0].textContent='{{ trans.all_categories }} '; htmx.trigger(form,'change');">All Categories</a></li>
@@ -174,7 +166,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="location-btn" aria-label="Filter by location">
             All Locations
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=location]').value=''; document.getElementById('location-btn').childNodes[0].textContent='{{ trans.all_locations }} '; htmx.trigger(form,'change');">All Locations</a></li>
@@ -194,7 +186,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="dept-btn" aria-label="Filter by department">
             All Dept
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=department]').value=''; document.getElementById('dept-btn').childNodes[0].textContent='{{ trans.all_dept }} '; htmx.trigger(form,'change');">All Dept</a></li>

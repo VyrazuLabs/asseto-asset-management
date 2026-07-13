@@ -161,37 +161,8 @@
             </div>
 
             {# ── Pagination ─────────────────────────────────────────────────────── #}
-            {% if page_object.paginator.num_pages > 1 %}
-            <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                <div class="text-muted small">
-                    {{ trans.showing }} {{ page_object.start_index }} {{ trans.to_pagination }} {{ page_object.end_index }} {{ trans.of_label }} {{ page_object.paginator.count }} {{ trans.tickets_breadcrumb|lower }}
-                </div>
-                <nav aria-label="Table navigation">
-                    <ul class="pagination pagination-sm mb-0">
-                        {% if page_object.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_object.previous_page_number }}"><i
-                                    class="bi bi-chevron-left"></i></a>
-                        </li>
-                        {% endif %}
-
-                        {% for num in page_object.paginator.page_range %}
-                        {% if page_object.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% elif num > page_object.number|add:'-3' and num < page_object.number|add:'3' %} <li
-                            class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                            {% endif %}
-                            {% endfor %}
-
-                            {% if page_object.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_object.next_page_number }}"><i
-                                        class="bi bi-chevron-right"></i></a>
-                            </li>
-                            {% endif %}
-                    </ul>
-                </nav>
-            </div>
+            {% if page_object %}
+                {% include 'commons/list-pagination.html' with item_label="tickets" %}
             {% endif %}
         </div>
     </div>

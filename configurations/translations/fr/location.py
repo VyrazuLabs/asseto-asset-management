@@ -58,4 +58,6 @@ STRINGS = {
     "csv_header": "En-tête CSV",
     "this_field_is_required": "Ce champ est obligatoire",
     "import_locations": "Importer les emplacements",
+    "client_locations": "Emplacements du client",
+    "no_locations_for_client": "Aucun emplacement enregistré pour ce client.",
 }

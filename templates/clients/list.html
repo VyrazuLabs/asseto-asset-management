@@ -29,7 +29,6 @@
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_client_count %}<span class="count-badge">{{ deleted_client_count }}</span>{% endif %}
     </a>
-    {% endif %}
 
     {% if perms.authentication.add_client %}
     <a href="{% url 'clients:add' %}" class="btn-register">
@@ -64,59 +63,51 @@
     <div class="stat-icon orange"><i class="bi bi-headset"></i></div>
     <div>
       <div class="stat-label">{{ trans.open_tickets_client }}</div>
-      <div class="stat-value">{{ review_client_count|default:"0" }}</div>
+      <div class="stat-value">{{ open_tickets_count|default:"0" }}</div>
     </div>
   </div>
-
-  <!-- Card 4 -->
-  <a href="{% url 'recycle_bin:deleted_clients' %}" class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.recycle_bin }}</div>
-      <div class="stat-value">{{ deleted_client_count|default:"0" }}</div>
-    </div>
-  </a>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
-  <form method="GET" id="filterForm">
-    <div class="row g-2 align-items-end">
-      <div class="col">
-        <div class="filter-label">{{ trans.search_client }}</div>
-        <input name="search" type="search" autocomplete="off" placeholder="{{ trans.search_client_placeholder }}"
-          value="{{ search_query|default:'' }}">
-      </div>
-      <div class="col-auto">
-        <div class="filter-label">{{ trans.status_label }}</div>
-        <select name="status" class="filter-select-btn" style="min-width: 150px;" onchange="this.form.submit()">
-          <option value="All Statuses">{{ trans.all_statuses }}</option>
-          {% for val, label in status_choices %}
-          <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
-            {{ label }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-auto">
-        <div class="dropdown">
-          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
-            <i class="bi bi-download"></i> {{ trans.export }}
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'clients:export_csv' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
-            <li><a class="dropdown-item" href="{% url 'clients:export_pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="col-auto">
-        <a href="{% url 'clients:list' %}" class="btn-reset" title="{{ trans.reset }}">
-          <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
-        </a>
-      </div>
-      <button type="submit" style="display: none;"></button>
+  <div id="client-filter-form" class="row g-2 align-items-end">
+    <div class="col">
+      <div class="filter-label">{{ trans.search_client }}</div>
+      <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_client_placeholder }}"
+        hx-get="{% url 'clients:search' page_object.number %}"
+        hx-trigger="keyup changed delay:400ms, search, change from:[name='status']"
+        hx-target="#client_search_result"
+        hx-include="[name='status']"
+        aria-label="{{ trans.search_client }}">
     </div>
-  </form>
+    <div class="col-auto">
+      <div class="filter-label">{{ trans.status_label }}</div>
+      <select name="status" class="filter-select-btn" style="min-width: 150px;">
+        <option value="All Statuses">{{ trans.all_statuses }}</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
+          {{ label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <div class="dropdown">
+        <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="Export">
+          <i class="bi bi-download"></i> {{ trans.export }}
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{% url 'clients:export_csv' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}</a></li>
+          <li><a class="dropdown-item" href="{% url 'clients:export_pdf' %}?search={{ search_query|urlencode }}&status={{ selected_status|urlencode }}"><i class="bi bi-filetype-pdf"></i> {{ trans.pdf_format }}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-auto">
+      <a href="{% url 'clients:list' %}" class="btn-reset" title="{{ trans.reset }}">
+        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
+      </a>
+    </div>
+  </div>
 
 </div>
 
@@ -165,22 +156,4 @@
 
 {% endblock content %}
 
-{% block script %}
-<script>
-  window.addEventListener('load', function () {
-    const filterForm = document.getElementById('filterForm');
-    const searchInput = document.querySelector('input[name="search"]');
 
-    // Auto-submit search after typing (with debounce)
-    let timeout = null;
-    if (searchInput && filterForm) {
-      searchInput.addEventListener('input', function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          filterForm.submit();
-        }, 800);
-      });
-    }
-  });
-</script>
-{% endblock %}

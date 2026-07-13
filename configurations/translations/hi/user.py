@@ -110,6 +110,7 @@ STRINGS = {
     "access_level_label": "पहुंच स्तर",
     "profile_picture": "प्रोफ़ाइल चित्र",
     "enable_user_login": "उपयोगकर्ता लॉगिन सक्षम करें?",
+    "is_technician": "तकनीशियन?",
     "password_label": "पासवर्ड",
     "repeat_password": "पासवर्ड दोहराएं",
     "address_information": "पता जानकारी",

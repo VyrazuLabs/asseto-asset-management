@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
-
+from django.shortcuts import get_object_or_404
 from authentication.models import User, UserTotp
 
 from .utils import TotpMixin, TotpService, verify_totp
@@ -92,9 +92,9 @@ def verify_otp(request):
     if request.method == "POST":
         otp = request.POST.get("otp")
         user_email = request.session.get("user_email")
-        get_user = User.objects.get(email=user_email)
+        get_user = get_object_or_404(User,email=user_email)
 
-        get_totp = UserTotp.objects.get(user=get_user)
+        get_totp = get_object_or_404(UserTotp,user=get_user)
 
         verify_otp = verify_totp(get_totp.secret, otp)
 

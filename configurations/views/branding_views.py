@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from configurations.models import BrandingImages
 from configurations.utils import (add_path, create_or_update_image,
-                                  update_files_name)
+                                  process_uploaded_logos)
 
 
 @login_required
@@ -13,7 +13,9 @@ def logo_upload(request):
         favicon = request.FILES.get("favicon")
         login_page_logo = request.FILES.get("login_page_logo")
 
-        file_dist = update_files_name(request, logo, favicon, login_page_logo)
+        file_dist = process_uploaded_logos(
+            request, logo=logo, favicon=favicon, login_page_logo=login_page_logo
+        )
         create_or_update_image(
             request,
             logo,

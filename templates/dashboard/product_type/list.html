@@ -59,13 +59,6 @@
       <div class="stat-value">{{ inactive_product_types }}</div>
     </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-icon red"><i class="bi bi-trash3-fill"></i></div>
-    <div>
-      <div class="stat-label">{{ trans.deleted }}</div>
-      <div class="stat-value">{{ deleted_product_types_count }}</div>
-    </div>
-  </div>
 </div>
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
@@ -87,9 +80,7 @@
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn">
             {{ trans.all_status }}
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
+           
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item"

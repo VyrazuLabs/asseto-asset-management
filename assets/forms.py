@@ -1,10 +1,10 @@
 from django import forms
-from assets.models import Asset, AssignAsset, AssetImage, AssetStatus
+from assets.models import Asset, AssignAsset, AssetImage, AssetStatus, MaintenanceRecord
 from products.models import Product
 from vendors.models import Vendor
 from clients.models import Client
 from dashboard.models import Location
-from authentication.models import User
+from authentication.models import Technician, User
 from django.forms import ModelForm
 
 
@@ -309,5 +309,55 @@ class AssetStatusForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
     class Meta:
-        model = AssetStatus
-        fields = ["name"]
+        model=AssetStatus
+        fields=['name']
+
+class MaintenanceRecordForm(forms.ModelForm):
+    technician = forms.ChoiceField(
+        choices=[('', 'Select Technician')],
+        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_technician'}),
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        organization = kwargs.pop('organization', None)
+        super().__init__(*args, **kwargs)
+        if organization:
+            from authentication.models import User
+            users = User.undeleted_objects.filter(
+                organization=organization,
+                is_active=True
+            ).exclude(full_name__isnull=True).exclude(full_name='').order_by('full_name')
+
+            technicians=Technician.objects.filter(status=True).all()
+            
+            choices = [('', 'Select Technician')]
+            for technician in technicians:
+                display_name = technician.user.full_name
+                # Use reverse_full_name if available for better display
+                if hasattr(technician.user.full_name, 'reverse_full_name') and technician.user.reverse_full_name:
+                    display_name = technician.user.full_name
+                choices.append((str(technician.id), display_name))
+            
+            self.fields['technician'].choices = choices
+
+    class Meta:
+        model = MaintenanceRecord
+        fields = ['date', 'maintenance_type', 'cost', 'technician', 'status']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'maintenance_type': forms.Select(attrs={'class': 'form-select'}, choices=[
+                ('1', 'Calibration'),
+                ('2', 'Breakdown'),
+                ('3', 'Preventive'),
+                ('4', 'Repair'),
+                ('5', 'Other'),
+            ]),
+            'cost': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00'}),
+            'status': forms.Select(attrs={'class': 'form-select'}, choices=[
+                ('1', 'New'),
+                ('2', 'In Progress'),
+                ('3', 'Completed'),
+            ]),
+        }
+
