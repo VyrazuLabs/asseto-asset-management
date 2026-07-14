@@ -170,11 +170,14 @@ def add(request):
 
         if form.is_valid() and address_form.is_valid():
             user = form.save(commit=False)
-            password1 = form.cleaned_data.get("password1", "")
-            password2 = form.cleaned_data.get("password2", "")
-
-            if password1 == password2:
-                user.set_password(password1)
+            enable_login = request.POST.get("toggle_password") == "on"
+            if enable_login:
+                password1 = form.cleaned_data.get("password1", "")
+                password2 = form.cleaned_data.get("password2", "")
+                if password1 == password2:
+                    user.set_password(password1)
+            else:
+                user.set_unusable_password()
 
             address = address_form.save()
             user.organization = request.user.organization
@@ -227,9 +230,14 @@ def update(request, id):
         address_form = AddressForm(request.POST, instance=address)
 
         if form.is_valid() and address_form.is_valid():
-            form.instance.access_level
-            form.instance.groups.clear()
-            form.instance.role.user_set.add(form.instance)
+            if form.instance.access_level:
+                form.instance.access_level
+            else:
+                form.instance.groups.clear()
+            
+            if form.instance.role:
+                form.instance.role.user_set.add(form.instance)
+                
             new_email = form.cleaned_data["email"]
             if (old_email) != (new_email):
                 messages.success(
@@ -238,8 +246,16 @@ def update(request, id):
                 )
             else:
                 messages.success(request, "User updated successfully")
+
             form.save()
             address_form.save()
+
+            # Handle technician update dynamically
+            is_technician = request.POST.get("is_technician", None)
+            if is_technician == "on":
+                Technician.objects.get_or_create(user=user)
+            else:
+                Technician.objects.filter(user=user).delete()
 
             all_perms, created = Group.objects.get_or_create(name="all_perms")
 
@@ -250,7 +266,14 @@ def update(request, id):
 
             return HttpResponse(status=204)
 
-    context = {"user": user, "form": form, "address_form": address_form}
+    is_technician = Technician.objects.filter(user=user).exists()
+
+    context = {
+        "user": user,
+        "form": form,
+        "address_form": address_form,
+        "is_technician": is_technician,
+    }
     return render(request, "users/update-user-modal.html", context)
 
 

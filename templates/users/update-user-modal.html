@@ -116,23 +116,11 @@
                         {% endfor %}
                     </div>
                 </div>
+
                 <div class="col-md-12">
-                    <div class="premium-input-group">
-                        <label>{{ trans.profile_picture }}</label>
-                        <div class="premium-input-with-icon">
-                            <i class="bi bi-image"></i>
-                            {{form.profile_pic}}
-                        </div>
-                        {% for error in form.profile_pic.errors %}
-                            <small class="text-danger">{{ error }}</small>
-                        {% endfor %}
-                    </div>
-                    <div id="imagePreview" class="mt-2 text-center">
-                        {% if user.profile_pic %}
-                            <img src="{{user.profile_pic.url}}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
-                        {% else %}
-                            <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
-                        {% endif %}
+                    <div class="form-check form-switch mt-2">
+                        <input type="checkbox" class="form-check-input" id="is_technician" name="is_technician" {% if is_technician %}checked{% endif %}>
+                        <label class="form-check-label fw-bold" for="is_technician">{{ trans.is_technician }}</label>
                     </div>
                 </div>
             </div>
@@ -200,35 +188,9 @@
 
         <div class="modal-footer">
             <button type="button" class="btn-discard" data-bs-dismiss="modal">{{ trans.discard }}</button>
-            <button type="submit" class="btn-save-user"
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving }}`;">
+            <button type="submit" class="btn-save-user" data-saving-text="{{ trans.saving }}">
                 {{ trans.save_changes }}
             </button>
         </div>
     </form>
 </div>
-
-<script>
-    // Image preview enhancement
-    const profilePicInput = document.querySelector('input[type="file"]');
-    if (profilePicInput) {
-        profilePicInput.classList.add('form-control');
-        profilePicInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.innerHTML = `<img src="${e.target.result}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    htmx.on("htmx:beforeSwap", (e) => {
-        if (e.detail.target.id == "update-user-modal-content" && !e.detail.xhr.response) {
-            location.reload()
-        }
-    })
-</script>

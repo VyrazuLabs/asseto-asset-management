@@ -56,9 +56,110 @@ function initDeleteConfirmation() {
   });
 }
 
+/* ─── User Add/Update Modals Interactive Logic ────────────────────────────── */
+
+/**
+ * Handles the "Enable User Login" switch and password fields toggle.
+ */
+function initPasswordToggle() {
+  const handleToggle = (checkbox) => {
+    const modal = checkbox.closest(".modal-content");
+    if (!modal) return;
+    const fields = modal.querySelector("#password_fields");
+    if (!fields) return;
+    if (checkbox.checked) {
+      fields.classList.remove("d-none");
+    } else {
+      fields.classList.add("d-none");
+    }
+  };
+
+  document.addEventListener("change", function (event) {
+    const checkbox = event.target.closest("#toggle_password");
+    if (checkbox) {
+      handleToggle(checkbox);
+    }
+  });
+
+  document.addEventListener("htmx:load", function () {
+    const checkbox = document.getElementById("toggle_password");
+    if (checkbox) {
+      handleToggle(checkbox);
+    }
+  });
+}
+
+/**
+ * Handles the image file input preview and dynamic adding of form-control class.
+ */
+function initImagePreview() {
+  document.addEventListener("change", function (event) {
+    const fileInput = event.target.closest('input[type="file"]');
+    if (!fileInput) return;
+
+    const modal = fileInput.closest(".modal-content");
+    if (!modal) return;
+
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const preview = modal.querySelector("#imagePreview");
+        if (preview) {
+          preview.innerHTML = `<img src="${e.target.result}" class="rounded-circle border shadow-sm preview-avatar">`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.addEventListener("htmx:load", function () {
+    const fileInput = document.querySelector('.modal-content input[type="file"]');
+    if (fileInput) {
+      fileInput.classList.add("form-control");
+    }
+  });
+}
+
+/**
+ * Handles showing a loading spinner on form submit button.
+ */
+function initFormSavingSpinner() {
+  document.addEventListener("submit", function (event) {
+    const form = event.target.closest(".modal-premium form");
+    if (!form) return;
+
+    const saveBtn = form.querySelector(".btn-save-user");
+    if (saveBtn) {
+      const savingText = saveBtn.dataset.savingText || "Saving...";
+      saveBtn.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> ${savingText}`;
+    }
+  });
+}
+
+/**
+ * Reloads the page when HTMX receives an empty response (indicating a successful action).
+ */
+function initHtmxBeforeSwapReload() {
+  document.addEventListener("htmx:beforeSwap", function (event) {
+    const targetId = event.detail.target.id;
+    if (
+      (targetId === "add-user-modal-content" || targetId === "update-user-modal-content") &&
+      !event.detail.xhr.response
+    ) {
+      location.reload();
+    }
+  });
+}
+
 /* ─── Bootstrap ───────────────────────────────────────────────────────────── */
 
 document.addEventListener("DOMContentLoaded", function () {
   initTechnicianFilter();
   initDeleteConfirmation();
+  initPasswordToggle();
+  initImagePreview();
+  initFormSavingSpinner();
+  initHtmxBeforeSwapReload();
 });
+

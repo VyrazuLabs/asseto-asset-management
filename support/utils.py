@@ -557,12 +557,11 @@ class SupportTicketService:
         """
         if not query:
             users = User.objects.filter(
-                organization=user.organization,
+                technician__isnull=False
             ).order_by("full_name")[:10]
         else:
             users = User.objects.filter(
-                Q(organization=user.organization),
-                Q(full_name__icontains=query) | Q(email__icontains=query),
+                technician__isnull=False & Q(full_name__icontains=query) | Q(email__icontains=query),
             )[:10]
 
         return [

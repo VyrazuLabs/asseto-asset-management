@@ -135,7 +135,7 @@ class UserForm(forms.ModelForm):
 class UserUpdateForm(UserChangeForm):
 
     full_name = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
@@ -145,7 +145,7 @@ class UserUpdateForm(UserChangeForm):
         ),
     )
     email = forms.EmailField(
-        required=True,
+        required=False,
         widget=forms.EmailInput(
             attrs={
                 "class": "form-control",
@@ -155,7 +155,7 @@ class UserUpdateForm(UserChangeForm):
         ),
     )
     phone = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
@@ -166,7 +166,7 @@ class UserUpdateForm(UserChangeForm):
     )
 
     access_level = forms.ChoiceField(
-        # required=True,
+        required=False,
         choices=(
             ("False", "Only Assigned"),
             ("True", "All"),
@@ -175,21 +175,21 @@ class UserUpdateForm(UserChangeForm):
     )
 
     role = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     location = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     department = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
