@@ -101,6 +101,8 @@ class AddProductsForm(forms.ModelForm):
                     self.fields["product_sub_category"].initial = sub_category.pk
                 else:
                     self.fields["product_category"].initial = sub_category.pk
+                    self.fields["product_sub_category"].initial = None
+                    self.initial['product_sub_category'] = None
 
     class Meta:
         model = Product
@@ -118,14 +120,20 @@ class AddProductsForm(forms.ModelForm):
         ]
 
     def save(self, commit=True):
+        original_sub_category = self.instance.product_sub_category if self.instance.pk else None
+
         instance = super().save(commit=False)
 
         if self.cleaned_data.get("product_sub_category"):
             instance.product_sub_category = self.cleaned_data["product_sub_category"]
-        elif self.instance._state.adding:
-            instance.product_sub_category = self.cleaned_data["product_category"]
-        else:
+        elif (
+            original_sub_category
+            and original_sub_category.parent
+            and original_sub_category.parent.name != "Root"
+        ):
             instance.product_sub_category = None
+        else:
+            instance.product_sub_category = self.cleaned_data["product_category"]
 
         if commit:
             instance.save()
