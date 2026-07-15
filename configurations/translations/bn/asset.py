@@ -37,7 +37,7 @@ STRINGS = {
     'save_asset': 'সম্পদ সংরক্ষণ করুন',
     'update_asset': 'সম্পদ আপডেট করুন',
     'tag_id_auto': 'ট্যাগ আইডি (স্বয়ংক্রিয়ভাবে তৈরি)',
-    'product_category': 'পণ্যের বিভাগ',
+    'product_category': 'পণ্য',
     'client': 'ক্লায়েন্ট',
     'finance_purchase': 'অর্থ ও ক্রয়',
     'price': 'মূল্য',

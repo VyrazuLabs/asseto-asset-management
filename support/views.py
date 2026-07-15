@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from .forms import SupportTicketForm
+from .models import SupportTicket
 from .utils import SupportTicketService
 
 
@@ -40,7 +43,6 @@ def ticket_detail(request, id):
     ticket = context["ticket"]
 
     if request.method == "POST":
-        from django.core.exceptions import ValidationError
         try:
             comment, created = SupportTicketService.add_comment(request, ticket)
             if created:
@@ -63,10 +65,6 @@ def ticket_detail(request, id):
 
 @login_required
 def update_ticket(request, id):
-    from django.shortcuts import get_object_or_404
-    from django.core.exceptions import ValidationError
-    from .models import SupportTicket
-
     ticket = get_object_or_404(
         SupportTicket.undeleted_objects, pk=id, organization=request.user.organization
     )
@@ -132,3 +130,20 @@ def technician_search(request):
     query = request.GET.get("q", "").strip()
     results = SupportTicketService.search_technicians(request.user, query)
     return JsonResponse({"results": results})
+
+
+@login_required
+@require_POST
+def update_ticket_status(request, id):
+    """Update ticket status from Kanban drag-and-drop."""
+    try:
+        result = SupportTicketService.update_status(request, id)
+        return JsonResponse(result)
+    except ValidationError as e:
+        extra = {}
+        if hasattr(e, "params") and e.params:
+            extra = e.params
+        return JsonResponse(
+            {"success": False, "error": e.message if hasattr(e, "message") else ", ".join(e.messages), **extra},
+            status=400,
+        )
