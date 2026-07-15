@@ -326,7 +326,7 @@ This project is licensed under the **Vyrazu License** (based on GPL v3). Commerc
 
 - **Discussions**: [GitHub Discussions](https://github.com/VyrazuLabs/asseto-asset-management/discussions)
 - **Email**: [info@vyrazu.com](mailto:info@vyrazu.com)
-- **Project Maintainer**: [Vyrazu Labs Ltd](https://vyrazu.com/)
+- **Project Maintainer**: [Vyrazu Labs Pvt Ltd](https://vyrazu.com/)
 
 <div align="center">
 
