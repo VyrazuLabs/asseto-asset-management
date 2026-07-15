@@ -259,7 +259,15 @@
                             <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
+                            {% if ticket.assigned_to %}
+                                <img src="{% if ticket.assigned_to.profile_pic %}{{ ticket.assigned_to.profile_pic.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                    alt="{{ ticket.assigned_to.get_full_name }}" class="kanban-user-avatar"
+                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <span class="assigned-name">{{ ticket.assigned_to.get_full_name }}</span>
+                            {% else %}
+                                <img src="{% static 'images/No_Image.jpg' %}" alt="No image" class="kanban-user-avatar">
+                                <span class="assigned-name">Unassigned</span>
+                            {% endif %}
                         </div>
                     </a>
                     {% endif %}
@@ -302,7 +310,15 @@
                             <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
+                            {% if ticket.assigned_to %}
+                                <img src="{% if ticket.assigned_to.profile_pic %}{{ ticket.assigned_to.profile_pic.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                    alt="{{ ticket.assigned_to.get_full_name }}" class="kanban-user-avatar"
+                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <span class="assigned-name">{{ ticket.assigned_to.get_full_name }}</span>
+                            {% else %}
+                                <img src="{% static 'images/No_Image.jpg' %}" alt="No image" class="kanban-user-avatar">
+                                <span class="assigned-name">Unassigned</span>
+                            {% endif %}
                         </div>
                     </a>
                     {% endif %}
@@ -345,7 +361,15 @@
                             <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
+                            {% if ticket.assigned_to %}
+                                <img src="{% if ticket.assigned_to.profile_pic %}{{ ticket.assigned_to.profile_pic.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                    alt="{{ ticket.assigned_to.get_full_name }}" class="kanban-user-avatar"
+                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <span class="assigned-name">{{ ticket.assigned_to.get_full_name }}</span>
+                            {% else %}
+                                <img src="{% static 'images/No_Image.jpg' %}" alt="No image" class="kanban-user-avatar">
+                                <span class="assigned-name">Unassigned</span>
+                            {% endif %}
                         </div>
                     </a>
                     {% endif %}
@@ -368,7 +392,7 @@
                 </div>
                 <div class="kanban-cards-container">
                     {% for ticket in all_tickets %}
-                    {% if ticket.status == '3' or ticket.status == '4' %}
+                    {% if ticket.status == '3' %}
                     <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
                         <div class="card-top-meta">
                             <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
@@ -388,7 +412,15 @@
                             <span>{{ ticket.asset.name|default:'General' }}</span>
                         </div>
                         <div class="card-footer-meta">
-                            <span class="assigned-name">{{ ticket.assigned_to.get_full_name|default:'Unassigned' }}</span>
+                            {% if ticket.assigned_to %}
+                                <img src="{% if ticket.assigned_to.profile_pic %}{{ ticket.assigned_to.profile_pic.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                    alt="{{ ticket.assigned_to.get_full_name }}" class="kanban-user-avatar"
+                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <span class="assigned-name">{{ ticket.assigned_to.get_full_name }}</span>
+                            {% else %}
+                                <img src="{% static 'images/No_Image.jpg' %}" alt="No image" class="kanban-user-avatar">
+                                <span class="assigned-name">Unassigned</span>
+                            {% endif %}
                         </div>
                     </a>
                     {% endif %}
@@ -396,6 +428,57 @@
                     <div class="kanban-empty-state">
                         <i class="bi bi-inbox"></i>
                         <span>No resolved tickets found</span>
+                    </div>
+                </div>
+            </div>
+
+            {# Column: Closed #}
+            <div class="kanban-column" id="col-closed">
+                <div class="kanban-column-header">
+                    <div class="column-title-wrap">
+                        <span class="status-dot dot-closed"></span>
+                        <span class="column-title">Closed</span>
+                    </div>
+                    <span class="column-count" id="count-closed">0</span>
+                </div>
+                <div class="kanban-cards-container">
+                    {% for ticket in all_tickets %}
+                    {% if ticket.status == '4' %}
+                    <a href="{% url 'client_portal:support_tickets_detail' ticket.id %}" class="kanban-card">
+                        <div class="card-top-meta">
+                            <span class="ticket-id-badge">#{{ ticket.ticket_id }}</span>
+                            <span class="priority-badge-sm prio-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+                        </div>
+                        <h3 class="kanban-card-title">{{ ticket.subject }}</h3>
+                        <div class="card-info-item">
+                            {% if ticket.asset %}
+                            {% with img=asset_images|get_item:ticket.asset.id %}
+                            <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                alt="{{ ticket.asset.name }}" class="kanban-asset-thumb"
+                                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                            {% endwith %}
+                            {% else %}
+                            <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="kanban-asset-thumb">
+                            {% endif %}
+                            <span>{{ ticket.asset.name|default:'General' }}</span>
+                        </div>
+                        <div class="card-footer-meta">
+                            {% if ticket.assigned_to %}
+                                <img src="{% if ticket.assigned_to.profile_pic %}{{ ticket.assigned_to.profile_pic.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+                                    alt="{{ ticket.assigned_to.get_full_name }}" class="kanban-user-avatar"
+                                    onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+                                <span class="assigned-name">{{ ticket.assigned_to.get_full_name }}</span>
+                            {% else %}
+                                <img src="{% static 'images/No_Image.jpg' %}" alt="No image" class="kanban-user-avatar">
+                                <span class="assigned-name">Unassigned</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                    <div class="kanban-empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <span>No closed tickets found</span>
                     </div>
                 </div>
             </div>
@@ -456,7 +539,7 @@
         }
 
         function updateKanbanCounts() {
-            ['open', 'in_progress', 'in_testing', 'resolved'].forEach(status => {
+            ['open', 'in_progress', 'in_testing', 'resolved', 'closed'].forEach(status => {
                 const container = document.querySelector(`#col-${status} .kanban-cards-container`);
                 if (container) {
                     const cards = container.querySelectorAll('.kanban-card');
