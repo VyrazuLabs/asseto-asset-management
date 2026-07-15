@@ -120,11 +120,12 @@ class AddProductsForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
 
-        # Map either sub_category or category to the model field
         if self.cleaned_data.get("product_sub_category"):
             instance.product_sub_category = self.cleaned_data["product_sub_category"]
-        else:
+        elif self.instance._state.adding:
             instance.product_sub_category = self.cleaned_data["product_category"]
+        else:
+            instance.product_sub_category = None
 
         if commit:
             instance.save()
