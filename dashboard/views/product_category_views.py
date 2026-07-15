@@ -197,7 +197,11 @@ def search_product_category(request, page):
 def get_subcategories(request):
     category_id = request.GET.get("category_id")
     if category_id:
-        subcategories = ProductCategory.objects.filter(parent_id=category_id)
+        subcategories = ProductCategory.undeleted_objects.filter(
+            parent_id=category_id, status=True
+        ).filter(
+            Q(organization=None) | Q(organization=request.user.organization)
+        )
         data = [{"id": sub.id, "name": sub.name} for sub in subcategories]
     else:
         data = []

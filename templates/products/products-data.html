@@ -33,9 +33,10 @@
       </td>
 
       <td>
-        {{ products.product_sub_category.name }}
-        {% if products.product_category.parent.is_deleted %}
-          <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.category_deleted_warning }}"></i>
+        {% if products.product_sub_category %}
+          {{ products.product_sub_category.name }}
+        {% else %}
+          -
         {% endif %}
       </td>
 
