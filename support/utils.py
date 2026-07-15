@@ -53,7 +53,7 @@ class SupportTicketService:
         """Return the base queryset for the current user's organization."""
         return (
             SupportTicket.undeleted_objects.filter(organization=user.organization)
-            .select_related("asset", "assigned_to")
+            .select_related("asset", "assigned_to", "client")
             .order_by("-created_at")
         )
 
@@ -372,9 +372,12 @@ class SupportTicketService:
         old_status = ticket.status
         old_assigned = ticket.assigned_to
 
-        # Validate happy code when closing a ticket (status = 4)
+        # Validate happy code when closing a ticket (status = 4) and ticket has a client
         new_status = request.POST.get("status", old_status)
-        if new_status == "4" and old_status != "4":
+        has_client = ticket.client is not None or (
+            ticket.asset is not None and ticket.asset.client is not None
+        )
+        if new_status == "4" and old_status != "4" and has_client:
             if not ticket.happy_code:
                 raise ValidationError(
                     "This ticket does not have a happy code. "
@@ -472,6 +475,69 @@ class SupportTicketService:
         ticket_id = attachment.ticket.id
         attachment.delete()
         return ticket_id
+
+    # ------------------------------------------------------------------
+    # Status update (Kanban drag-and-drop)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def update_status(request, ticket_id):
+        """Update ticket status from Kanban drag-and-drop.
+
+        Validates the status, checks happy code when moving to Closed,
+        saves the change, and logs a status-changed activity.
+
+        Returns a ``dict`` with ``{"success": True}`` on success, or
+        raises ``ValidationError`` on failure.
+        """
+        ticket = get_object_or_404(
+            SupportTicket.undeleted_objects,
+            pk=ticket_id,
+            organization=request.user.organization,
+        )
+
+        new_status = request.POST.get("status")
+        if new_status not in dict(STATUS_CHOICES):
+            raise ValidationError("Invalid status.")
+
+        old_status = ticket.status
+
+        # Happy code validation when moving to Closed
+        if new_status == "4" and old_status != "4":
+            has_client = ticket.client is not None or (
+                ticket.asset is not None and ticket.asset.client is not None
+            )
+            if has_client:
+                if not ticket.happy_code:
+                    raise ValidationError(
+                        "This ticket does not have a happy code. "
+                        "Please ask the client to provide one."
+                    )
+                submitted_code = request.POST.get("happy_code", "").strip().upper()
+                if not submitted_code:
+                    raise ValidationError(
+                        "Happy code is required to close this ticket.",
+                        params={"happy_code_required": True, "ticket_id": str(ticket.id)},
+                    )
+                expected_code = ticket.happy_code.upper()
+                if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
+                    raise ValidationError(
+                        "Invalid happy code. Please check with the client for the correct code."
+                    )
+
+        ticket.status = new_status
+        ticket.updated_by = str(request.user.id)
+        ticket.save(update_fields=["status", "updated_by"])
+
+        status_map = dict(STATUS_CHOICES)
+        TicketActivity.objects.create(
+            ticket=ticket,
+            activity_type="status_changed",
+            description=f"Status changed from {status_map.get(old_status, old_status)} to {status_map.get(new_status, new_status)}.",
+            performed_by=request.user,
+        )
+
+        return {"success": True}
 
     # ------------------------------------------------------------------
     # Export CSV

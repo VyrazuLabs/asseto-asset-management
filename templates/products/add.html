@@ -187,10 +187,10 @@
             const categoryId = $(this).val();
             const $subCatSelect = $('#id_product_sub_category');
             if (!categoryId) {
-                $subCatSelect.prop('disabled', true).html('<option value="">--SELECT--</option>');
+                $subCatSelect.html('<option value="">--SELECT--</option>');
                 return;
             }
-            $subCatSelect.prop('disabled', false).html('<option value="">Loading...</option>');
+            $subCatSelect.html('<option value="">Loading...</option>');
             fetch(`/admin/get-subcategories/?category_id=${categoryId}`)
                 .then(response => response.json())
                 .then(data => {
