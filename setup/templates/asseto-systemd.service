@@ -1,0 +1,15 @@
+[Unit]
+Description=Asseto Asset Management (Gunicorn)
+After=network.target mysql.service mariadb.service
+
+[Service]
+User=asseto
+Group=asseto
+WorkingDirectory=__ASSETO_HOME__
+EnvironmentFile=__ASSETO_HOME__/.env
+ExecStart=__ASSETO_HOME__/env/bin/gunicorn AssetManagement.wsgi:application --bind 127.0.0.1:__DJANGO_PORT__ --workers 3
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

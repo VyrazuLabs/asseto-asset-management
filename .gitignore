@@ -51,3 +51,6 @@ Icon
 
 docs
 CLAUDE.md
+
+# Local port overrides for the installer — machine-specific, never shared
+setup/ports/custom.conf

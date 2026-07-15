@@ -173,13 +173,19 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ## Quick Start
 
-### Prerequisites
+### One-Command Install (Ubuntu, Debian, RHEL, CentOS, AlmaLinux, Rocky Linux)
 
-- [Python 3.11+](https://www.python.org/)
-- [MySQL](https://www.mysql.com/) (can be replaced by your preferred database)
-- [Docker](https://www.docker.com/) (optional, for containerized deployment)
+```bash
+git clone https://github.com/VyrazuLabs/asseto-asset-management.git
+cd asseto-asset-management
+sudo bash setup/install.sh
+```
 
-### Steps
+The installer detects your OS, installs all dependencies (Python, MySQL, Nginx), sets up the database, configures a systemd service with auto-restart, and opens the required firewall ports — no manual steps required. See [`setup/INSTALL.md`](setup/INSTALL.md) for full details, optional HTTPS/Celery setup, and troubleshooting.
+
+### Manual Setup (for local development)
+
+**Prerequisites:** [Python 3.11+](https://www.python.org/), [MySQL](https://www.mysql.com/) (can be replaced by your preferred database)
 
 1. Clone the repository:
 
