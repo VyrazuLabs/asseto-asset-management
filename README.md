@@ -1,250 +1,306 @@
-# Asseto - Asset Management Project
+<div align="center">
 
-## Overview
+<img src="static/images/asseto-logo.svg" alt="Asseto" width="220" />
 
-**Asseto** is a comprehensive, enterprise-grade asset management solution designed to help organizations efficiently track, maintain, and allocate assets. It offers robust feature sets for asset lifecycle tracking, role-based user access controls, multi-factor authentication, administrative soft-deletes with a recycle bin, and customizable notification systems.
+**Open-source asset management for IT, facility, and operations teams — track custody, audit every change, and manage the full lifecycle of your hardware, equipment, and rentals from one dashboard.**
 
-The system is built on Django with a clean, responsive web dashboard and supports a companion Flutter mobile application.
+[![License: Vyrazu](https://img.shields.io/badge/License-Vyrazu%20(GPLv3--based)-orange)](LICENSE.md)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![Django 5.2](https://img.shields.io/badge/Django-5.2-092E20)](https://www.djangoproject.com/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.MD)
+[![GitHub stars](https://img.shields.io/github/stars/VyrazuLabs/asseto-asset-management)](https://github.com/VyrazuLabs/asseto-asset-management/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/VyrazuLabs/asseto-asset-management)](https://github.com/VyrazuLabs/asseto-asset-management/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/VyrazuLabs/asseto-asset-management)](https://github.com/VyrazuLabs/asseto-asset-management/issues)
+
+[🚀 Live Demo](https://asset-management-hg2x.onrender.com/login?next=/) · [📖 Roadmap](ROADMAP.md) · [🐛 Report Bug](https://github.com/VyrazuLabs/asseto-asset-management/issues) · [✨ Request Feature](https://github.com/VyrazuLabs/asseto-asset-management/issues)
+
+<img src="static/images/011-Dasboard_large.png" alt="Asseto dashboard" width="90%" />
+
+</div>
+
+## Try the Demo
+
+> [!TIP]
+> Explore a live instance before installing anything — no signup required.
+> **[Open the demo →](https://asset-management-hg2x.onrender.com/login?next=/)**
+
+| | Shared demo account |
+|---|---|
+| **Email** | `asset-management@demo.com` |
+| **Password** | `DM4g476ZmQ$U` |
+
+*This is a shared, resettable demo account — please don't store anything sensitive in it.*
+
+## Why Asseto?
+
+Most teams still track laptops, equipment, and rented assets in spreadsheets — no custody trail, no audit history, and no way to prove who had what when it matters. Asseto replaces that with a single system of record: every assignment, repair, and modification is logged automatically, deleted records land in a recoverable Recycle Bin, and access is governed by custom roles and two-factor authentication. It ships with a REST API, Slack and Firebase push notifications, and a companion Flutter mobile app for physical audits in the field.
+
+**Built on Django 5.2**, actively developed with frequent releases. Self-hostable, and free for commercial use under the [Vyrazu License](LICENSE.md).
+
+---
+
+### 🔒 Security
+
+To report a security vulnerability, please email **[security@vyrazu.com](mailto:security@vyrazu.com)** instead of using the issue tracker. See [SECURITY.md](SECURITY.md) for details.
+
+### 📋 Latest Releases
+
+Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/releases) for version history and [CHANGELOG.md](CHANGELOG.md) for recent updates.
 
 ## Table of Contents
 
 - [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Unit Testing](#unit-testing)
+- [Screenshots](#screenshots)
+- [Quick Start](#quick-start)
+- [Security](#-security)
+- [Two-Factor Authentication](#two-factor-authentication-2fa)
+- [Notifications & Firebase](#notifications--firebase-integration)
+- [Testing](#testing)
 - [Configuration](#configuration)
+- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [Releasing](#releasing)
-- [Changelog](CHANGELOG.md)
-- [Roadmap](#roadmap)
 - [License](#license)
 - [Contact](#contact)
 
 ## Features
 
-### Core Asset Lifecycle & Inventory
-- **Admin Dashboard**: Maintain detailed records of all Assigned Users, Locations, Departments, Product Types, Product Categories, and Roles.
-- **Asset Assignment & Custody**: Assign assets to users, track reassignments, and manage active custody logs.
-- **Asset Configuration Management**: Define custom specification fields and category-based templates for diverse asset classes.
-- **Asset Repair Logs**: Track asset repair histories, maintenance costs, status changes, and servicing vendors.
-- **Consumables Management**: Inventory tracking, stock level alerts, and distribution management for office accessories.
-- **Bulk Uploads**: Import lists of Vendors, Locations, Departments, Categories, and Products via standard templates.
-
 ### Security, Auditing & Administration
-- **Two-Factor Authentication (2FA)**: Strengthen user accounts using dynamic TOTP authenticator code verification.
-- **Audit Logs & Soft Delete**: Auto-log administrative data modifications and recover records via a central Recycle Bin.
-- **Role-Based Access Control**: Restrict interface access and action permissions using custom workspace roles.
 
-### Portals & Customer Support
-- **Client Portal**: Let external rental clients log in to view rented assets and manage active support requests.
-- **Support Ticket Management**: Issue reporting, tracking, and resolution workflows for asset and client support queries.
+- **Audit Logs & Soft Delete**: Every administrative change is logged automatically; deleted records are recoverable from a central Recycle Bin.
+- **Two-Factor Authentication (2FA)**: TOTP authenticator-app verification on top of password login.
+- **Role-Based Access Control**: Custom workspace roles restrict both interface access and per-action permissions.
+
+### Core Asset Lifecycle & Inventory
+
+- **Admin Dashboard**: Central records for Assigned Users, Locations, Departments, Product Types, Product Categories, and Roles.
+- **Asset Assignment & Custody**: Assign assets to users, track reassignments, and keep active custody logs.
+- **Asset Configuration Management**: Custom specification fields and category-based templates for diverse asset classes.
+- **Asset Repair Logs**: Repair histories, maintenance costs, status changes, and servicing vendors.
+- **Consumables Management**: Inventory tracking, stock-level alerts, and distribution management for office accessories.
+- **Bulk Uploads**: Import Vendors, Locations, Departments, Categories, and Products via CSV templates.
 
 ### Integration & Multi-Channel Sync
-- **Mobile Application**: Flutter-based mobile companion app for remote management and physical audits.
-- **API for Third-Party Integrations**: Secure REST API endpoints to read and synchronize asset data with external systems.
-- **Slack Integrations**: Push immediate alerts and updates to Slack workspace channels.
-- **Flexible Notifications**: Coordinate multi-channel notifications across Email and Firebase (FCM) push alerts.
+
+- **REST API**: Secure endpoints to read and synchronize asset data with external systems.
+- **Slack Integration**: Push immediate alerts and updates to Slack workspace channels.
+- **Flexible Notifications**: Multi-channel notifications across Email and Firebase (FCM) push alerts.
+- **Mobile Application**: Flutter-based companion app for remote management and physical audits.
 - **Multi-Language Support**: Complete interface internationalization (i18n) for global teams.
 
-## Installation
+### Portals & Customer Support
+
+- **Client Portal**: External rental clients log in to view rented assets and manage support requests.
+- **Support Ticket Management**: Issue reporting, tracking, and resolution workflows.
+
+## Screenshots
+
+<details>
+<summary><b>Admin Section</b> — manage Locations, Departments, Product Types, Categories, and Roles</summary>
+
+![Admin Section](static/images/014-New%20Location.png)
+
+- Navigate to the **Admin** section in the side menu.
+- Manage Locations, Departments, Product Types, Product Categories, and Roles.
+- Perform standard CRUD actions (Add, Edit, View, Delete) on configurations.
+
+</details>
+
+<details>
+<summary><b>Vendors</b> — add, search, and export vendor records</summary>
+
+![Vendors Section](static/images/015-New%20Vendor.png)
+
+- Navigate to the **Vendors** section.
+- Click actions to Add, Edit, View, or Delete vendors.
+- Use search filters or download vendor lists as needed.
+
+</details>
+
+<details>
+<summary><b>Products</b> — product lines, specifications, and inventory counts</summary>
+
+![Products Section](static/images/016-New%20Product.png)
+
+- Navigate to the **Products** section.
+- Add new product lines or view product specifications.
+- Manage categories and inventory counts.
+
+</details>
+
+<details>
+<summary><b>Users</b> — accounts, roles, and permissions</summary>
+
+![Users Section](static/images/017-New%20Users.png)
+
+- Navigate to the **Users** section to view registered accounts.
+- Grant permissions, assign roles, or register new users.
+
+</details>
+
+<details>
+<summary><b>Assets</b> — profiles, assignment, and state transitions</summary>
+
+![Assets Section](static/images/018-New%20Assets.png)
+
+- Navigate to the **Assets** section.
+- Create/edit asset profiles and assign them to users.
+- Manage state transitions (e.g., Reassign, Unassign).
+
+</details>
+
+<details>
+<summary><b>Upload</b> — CSV templates for bulk data insertion</summary>
+
+![Upload Section](static/images/019-%20New%20Upload.png)
+
+- Navigate to the **Upload** section.
+- Download sample CSV templates for Locations, Departments, Product Types, Categories, and Vendors.
+- Upload completed sheets for fast bulk data insertion.
+
+</details>
+
+<details>
+<summary><b>Recycle Bin</b> — restore or purge soft-deleted records</summary>
+
+![Recycle Bin Section](static/images/013-recycle_bin.png)
+
+- Access the **Recycle Bin** from the settings panel.
+- View soft-deleted records grouped by category.
+- Restore items back to active tables or permanently purge them.
+
+</details>
+
+## Quick Start
 
 ### Prerequisites
 
-- [Python 3.9+](https://www.python.org/)
-- [MySQL](https://www.mysql.com/) (Can be replaced by your preferred database)
+- [Python 3.11+](https://www.python.org/)
+- [MySQL](https://www.mysql.com/) (can be replaced by your preferred database)
 - [Docker](https://www.docker.com/) (optional, for containerized deployment)
 
 ### Steps
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/VyrazuLabs/asseto-asset-management.git
-    cd asseto-asset-management
-    ```
+
+   ```bash
+   git clone https://github.com/VyrazuLabs/asseto-asset-management.git
+   cd asseto-asset-management
+   ```
 
 2. Create and activate a virtual environment:
-    ```sh
-    python -m venv env
-    source env/bin/activate  # On Windows use `env\Scripts\activate`
-    ```
+
+   ```bash
+   python -m venv env
+   source env/bin/activate  # On Windows use `env\Scripts\activate`
+   ```
 
 3. Install dependencies:
-    ```sh
-    pip install -r requirements.txt
-    ```
+
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 4. Set up environment variables:
-    ```sh
-    cp .env.example .env
-    ```
-    Edit the `.env` file with your preferred settings.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit the `.env` file with your preferred settings.
 
 5. Apply migrations:
-    ```sh
-    python manage.py migrate
-    ```
+
+   ```bash
+   python manage.py migrate
+   ```
 
 6. Start the development server:
-    ```sh
-    python manage.py runserver
-    ```
 
-7. Open your browser and navigate to `http://localhost:8000`.
+   ```bash
+   python manage.py runserver
+   ```
 
-8. Create a superuser if necessary:
-    ```sh
-    python manage.py createsuperuser
-    ```
+7. Open your browser at `http://localhost:8000`, and create a superuser if necessary:
 
-## Usage
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-#### Try This Project with a Demo Account
-You can try a live demo before downloading the project code.
-The demo instance is hosted [here](https://asset-management-hg2x.onrender.com/login?next=/).
+## Security & Advanced Features
 
-**Credentials:**
-- **Email:** `asset-management@demo.com`
-- **Password:** `DM4g476ZmQ$U`
+### Two-Factor Authentication (2FA)
 
----
-
-### Admin Section
-<img src="static/images/014-New Location.png" alt="Admin Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Admin** section in the side menu.
-2. Manage Locations, Departments, Product Types, Product Categories, and Roles.
-3. Perform standard CRUD actions (Add, Edit, View, Delete) on configurations.
-
-### Vendors
-<img src="static/images/015-New Vendor.png" alt="Vendors Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Vendors** section.
-2. Click actions to Add, Edit, View, or Delete vendors.
-3. Use search filters or download vendor lists as needed.
-
-### Products
-<img src="static/images/016-New Product.png" alt="Products Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Products** section.
-2. Add new product lines or view product specifications.
-3. Manage categories and inventory counts.
-
-### Users
-<img src="static/images/017-New Users.png" alt="Users Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Users** section to view registered accounts.
-2. Grant permissions, assign roles, or register new users.
-
-### Assets
-<img src="static/images/018-New Assets.png" alt="Assets Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Assets** section.
-2. Create/edit asset profiles and assign them to users.
-3. Manage state transitions (e.g., Reassign, Unassign).
-
-### Upload
-<img src="static/images/019- New Upload.png" alt="Upload Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Navigate to the **Upload** section.
-2. Download sample CSV templates for Locations, Departments, Product Types, Categories, and Vendors.
-3. Upload completed sheets for fast bulk data insertion.
-
-### Recycle Bin
-<img src="static/images/013-recycle_bin.png" alt="Recycle Bin Section" style="border-radius: 15px;" width="900" height="450"/>
-
-1. Access the **Recycle Bin** from the settings panel.
-2. View soft-deleted records grouped by category.
-3. Restore items back to active tables or permanently purge them.
-
----
-
-### Security & Advanced Features
-
-#### Two-Factor Authentication (2FA)
 2FA can be toggled on/off in the User Profile section.
-- **When Enabled**: Scan the provided QR code with any standard Authenticator App (Google Authenticator, Authy, etc.) to link the account. Subsequent logins will require a dynamic OTP code.
+
+- **When Enabled**: Scan the provided QR code with any standard Authenticator App (Google Authenticator, Authy, etc.) to link the account. Subsequent logins require a dynamic OTP code.
 - **When Disabled**: Falls back to password-only validation.
 
-#### Notifications & Firebase Integration
+### Notifications & Firebase Integration
+
 Custom notification channels can be enabled or disabled in the Profile settings.
+
 - **In-App & Mobile Push Alerts**: Require Firebase integration.
 - Place your `firebase-credentials.json` in the project root, or encrypt its contents using a Fernet key, placing the output data and the Fernet key in your `.env` file.
 
----
+## Testing
 
-## Unit Testing
+Unit tests cover core backend functionality. Activate your virtual environment first, then:
 
-To ensure the quality and reliability of the system, unit tests are written to cover core backend functionality.
-
-### Running Unit Tests
-
-1. **Activate your virtual environment**:
-    ```sh
-    source env/bin/activate  # On Windows use `env\Scripts\activate`
-    ```
-
-2. **Run all tests**:
-    ```sh
-    python manage.py test
-    ```
-
-3. **Run tests for a specific app**:
-    ```sh
-    python manage.py test assets
-    ```
-
-4. **Run with Verbose Output**:
-    ```sh
-    python manage.py test -v 2
-    ```
-
-5. **Run without recreating the test database**:
-    ```sh
-    python manage.py test --keepdb
-    ```
-
----
+```bash
+python manage.py test              # run all tests
+python manage.py test assets      # run tests for a specific app
+python manage.py test -v 2        # verbose output
+python manage.py test --keepdb    # skip test-database recreation
+```
 
 ## Configuration
 
-Configuration options are managed via the `.env` file. Key settings include:
+Configuration options are managed via the `.env` file. Copy the template from `.env.example` to `.env` for your local setup. Key settings include:
 
 - Database credentials (MySQL/PostgreSQL)
 - SMTP server credentials for email dispatch
 - Firebase settings & Fernet keys
 - Django CSRF & Allowed Hosts lists
 
-Copy the template settings from `.env.example` to `.env` to configure your local setup.
-
----
-
 ## Roadmap
 
-The current status and planned milestones of the project are outlined below. For the detailed list of individual milestone goals, open pull requests, and tracking issues, please refer to the full [ROADMAP.md](ROADMAP.md).
+Current status and planned milestones are summarized below. For individual milestone goals, open pull requests, and tracking issues, see the full [ROADMAP.md](ROADMAP.md).
 
-### Core Web Application Milestones
+### Core Web Application
+
+The web platform is deepening its lifecycle, security, and localization capabilities — details in [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management), [Security & Audit Systems](ROADMAP.md#security--audit-systems), and [Localization & User Preferences](ROADMAP.md#localization--user-preferences).
+
 | Status | Milestone | Goals Completed |
-| :---: | :--- | :---: |
-| 🟡 | **[Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management)** | 1 / 3 |
-| 🟡 | **[Security & Audit Systems](ROADMAP.md#security--audit-systems)** | 2 / 3 |
-| 🔵 | **[Localization & User Preferences](ROADMAP.md#localization--user-preferences)** | 0 / 1 |
+|---|---|---|
+| 🟡 | [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management) | 1 / 3 |
+| 🟡 | [Security & Audit Systems](ROADMAP.md#security--audit-systems) | 2 / 3 |
+| 🔵 | [Localization & User Preferences](ROADMAP.md#localization--user-preferences) | 0 / 1 |
 
-### Integrations & APIs Milestones
+### Integrations & APIs
+
+Third-party connectivity is next up — see [Third-Party API & Communication](ROADMAP.md#third-party-api--communication). Looking further ahead, IoT compatibility is planned: GPS/BLE asset tags and sensor feeds for real-time location, usage, and condition monitoring.
+
 | Status | Milestone | Goals Completed |
-| :---: | :--- | :---: |
-| 🔵 | **[Third-Party API & Communication](ROADMAP.md#third-party-api--communication)** | 0 / 2 |
+|---|---|---|
+| 🔵 | [Third-Party API & Communication](ROADMAP.md#third-party-api--communication) | 0 / 2 |
+| 🔵 | IoT Compatibility (future) — asset tags & sensor-based tracking | 0 / 1 |
 
-### Client Portal & Support Milestones
+### Client Portal & Support
+
+External-facing portal and ticketing improvements are planned — see [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management).
+
 | Status | Milestone | Goals Completed |
-| :---: | :--- | :---: |
-| 🔵 | **[Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management)** | 0 / 2 |
+|---|---|---|
+| 🔵 | [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management) | 0 / 2 |
 
-### Mobile Application Milestones
+### Mobile Application
+
+The Flutter companion app is under active development — see [Mobile Application Development](ROADMAP.md#mobile-application-development).
+
 | Status | Milestone | Goals Completed |
-| :---: | :--- | :---: |
-| 🔵 | **[Mobile Application Development](ROADMAP.md#mobile-application-development)** | 0 / 1 |
-
----
+|---|---|---|
+| 🔵 | [Mobile Application Development](ROADMAP.md#mobile-application-development) | 0 / 1 |
 
 ## Contributing
 
@@ -258,29 +314,22 @@ We welcome contributions from the community! To contribute:
 
 Please ensure your code conforms to the specifications in [CONTRIBUTING.MD](CONTRIBUTING.MD).
 
----
-
 ## Releasing
 
-To publish a new version of Asseto to GitHub, follow the step-by-step instructions in [RELEASING.md](RELEASING.md).
-
-It covers:
-- Versioning conventions (SemVer)
-- Pre-release checklists (tests, security audit, changelog updating)
-- Branch workflows and tagging
-- Creating official GitHub Releases
-
----
+To publish a new version of Asseto, follow the step-by-step instructions in [RELEASING.md](RELEASING.md). It covers versioning conventions (SemVer), pre-release checklists (tests, security audit, changelog updating), branch workflows and tagging, and creating official GitHub Releases.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for more details.
-
----
+This project is licensed under the **Vyrazu License** (based on GPL v3). Commercial use is permitted; selling, redistributing, or re-uploading original or modified copies is not, and shared modifications require attribution to the original repository. See [LICENSE.md](LICENSE.md) for full terms.
 
 ## Contact
 
-For any inquiries or support, please contact:
-
-- **Email**: info@vyrazu.com
+- **Discussions**: [GitHub Discussions](https://github.com/VyrazuLabs/asseto-asset-management/discussions)
+- **Email**: [info@vyrazu.com](mailto:info@vyrazu.com)
 - **Project Maintainer**: [Vyrazu Labs Ltd](https://vyrazu.com/)
+
+<div align="center">
+
+**If Asseto helps your team, [give it a ⭐](https://github.com/VyrazuLabs/asseto-asset-management/stargazers) — it helps others find the project.**
+
+</div>
