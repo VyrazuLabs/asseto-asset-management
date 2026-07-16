@@ -135,7 +135,7 @@ class UserForm(forms.ModelForm):
 class UserUpdateForm(UserChangeForm):
 
     full_name = forms.CharField(
-        required=False,
+        required=True,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
@@ -145,7 +145,7 @@ class UserUpdateForm(UserChangeForm):
         ),
     )
     email = forms.EmailField(
-        required=False,
+        required=True,
         widget=forms.EmailInput(
             attrs={
                 "class": "form-control",
@@ -155,7 +155,7 @@ class UserUpdateForm(UserChangeForm):
         ),
     )
     phone = forms.CharField(
-        required=False,
+        required=True,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",

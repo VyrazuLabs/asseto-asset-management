@@ -67,9 +67,7 @@ class SupportTicketService:
                 status="0", ticket_type="hardware_repair"
             ).count(),
             "overdue_count": qs.filter(status="0", estimated_eta__lt=now()).count(),
-            "critical_count": qs.filter(
-                priority__in=["3", "2"], status="0"
-            ).count(),
+            "critical_count": qs.filter(priority__in=["3", "2"], status="0").count(),
         }
 
     # ------------------------------------------------------------------
@@ -181,9 +179,7 @@ class SupportTicketService:
             TicketActivity.objects.create(
                 ticket=ticket,
                 activity_type="created",
-                description=(
-                    f"Ticket initiated by {request.user.get_full_name()}."
-                ),
+                description=(f"Ticket initiated by {request.user.get_full_name()}."),
                 performed_by=request.user,
             )
             return ticket
@@ -204,7 +200,10 @@ class SupportTicketService:
         """
         ticket = get_object_or_404(
             SupportTicket.undeleted_objects.select_related(
-                "asset", "assigned_to", "department", "location",
+                "asset",
+                "assigned_to",
+                "department",
+                "location",
             ),
             pk=ticket_id,
             organization=request.user.organization,
@@ -214,14 +213,15 @@ class SupportTicketService:
         comments = ticket.comments.select_related("author").prefetch_related(
             "attachments"
         )
-        activities_qs = (
-            ticket.activities.filter(is_internal=False)
-            .exclude(activity_type="created")
+        activities_qs = ticket.activities.filter(is_internal=False).exclude(
+            activity_type="created"
         )
 
         combined = sorted(
             chain(activities_qs, history_qs),
-            key=lambda x: x.created_at if hasattr(x, "activity_type") else x.history_date,
+            key=lambda x: (
+                x.created_at if hasattr(x, "activity_type") else x.history_date
+            ),
             reverse=True,
         )
         paginator = Paginator(combined, 10, orphans=1)
@@ -241,9 +241,28 @@ class SupportTicketService:
     # ------------------------------------------------------------------
 
     ALLOWED_EXTENSIONS = {
-        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg',
-        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf',
-        'zip', 'rar', 'tar', 'gz', '7z',
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "bmp",
+        "webp",
+        "svg",
+        "pdf",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",
+        "txt",
+        "csv",
+        "rtf",
+        "zip",
+        "rar",
+        "tar",
+        "gz",
+        "7z",
     }
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
@@ -253,8 +272,8 @@ class SupportTicketService:
         for f in files:
             if f.size > SupportTicketService.MAX_FILE_SIZE:
                 raise ValidationError(f"File '{f.name}' exceeds the 10MB size limit.")
-            
-            ext = f.name.split('.')[-1].lower() if '.' in f.name else ''
+
+            ext = f.name.split(".")[-1].lower() if "." in f.name else ""
             if ext not in SupportTicketService.ALLOWED_EXTENSIONS:
                 raise ValidationError(f"File type '.{ext}' is not allowed.")
 
@@ -390,7 +409,10 @@ class SupportTicketService:
                     "Please enter the code provided by the client."
                 )
             expected_code = ticket.happy_code.upper()
-            if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
+            if (
+                submitted_code != expected_code
+                and submitted_code != f"HC-{expected_code}"
+            ):
                 raise ValidationError(
                     "Invalid happy code. Please check with the client for the correct code."
                 )
@@ -407,9 +429,7 @@ class SupportTicketService:
             TicketActivity.objects.create(
                 ticket=ticket,
                 activity_type="status_changed",
-                description=(
-                    f"Status changed from {old_label} to {new_label}."
-                ),
+                description=(f"Status changed from {old_label} to {new_label}."),
                 performed_by=request.user,
             )
 
@@ -517,10 +537,16 @@ class SupportTicketService:
                 if not submitted_code:
                     raise ValidationError(
                         "Happy code is required to close this ticket.",
-                        params={"happy_code_required": True, "ticket_id": str(ticket.id)},
+                        params={
+                            "happy_code_required": True,
+                            "ticket_id": str(ticket.id),
+                        },
                     )
                 expected_code = ticket.happy_code.upper()
-                if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
+                if (
+                    submitted_code != expected_code
+                    and submitted_code != f"HC-{expected_code}"
+                ):
                     raise ValidationError(
                         "Invalid happy code. Please check with the client for the correct code."
                     )
@@ -554,30 +580,34 @@ class SupportTicketService:
             response["Content-Disposition"] = 'attachment; filename="tickets.csv"'
 
             writer = csv.writer(response)
-            writer.writerow([
-                "Ticket ID",
-                "Subject",
-                "Asset",
-                "Priority",
-                "Status",
-                "Assigned To",
-                "Created At",
-            ])
+            writer.writerow(
+                [
+                    "Ticket ID",
+                    "Subject",
+                    "Asset",
+                    "Priority",
+                    "Status",
+                    "Assigned To",
+                    "Created At",
+                ]
+            )
 
             for ticket in qs:
-                writer.writerow([
-                    ticket.ticket_id,
-                    ticket.subject,
-                    ticket.asset.name if ticket.asset else "",
-                    ticket.priority,
-                    ticket.status,
-                    (
-                        ticket.assigned_to.get_full_name()
-                        if ticket.assigned_to
-                        else "Unassigned"
-                    ),
-                    ticket.created_at,
-                ])
+                writer.writerow(
+                    [
+                        ticket.ticket_id,
+                        ticket.subject,
+                        ticket.asset.name if ticket.asset else "",
+                        ticket.priority,
+                        ticket.status,
+                        (
+                            ticket.assigned_to.get_full_name()
+                            if ticket.assigned_to
+                            else "Unassigned"
+                        ),
+                        ticket.created_at,
+                    ]
+                )
 
             return response
         except Exception:
@@ -622,12 +652,13 @@ class SupportTicketService:
         Returns a list of dicts suitable for ``JsonResponse``.
         """
         if not query:
-            users = User.objects.filter(
-                technician__isnull=False
-            ).order_by("full_name")[:10]
+            users = User.objects.filter(technician__isnull=False).order_by("full_name")[
+                :10
+            ]
         else:
             users = User.objects.filter(
-                technician__isnull=False & Q(full_name__icontains=query) | Q(email__icontains=query),
+                Q(full_name__icontains=query) | Q(email__icontains=query),
+                technician__isnull=False
             )[:10]
 
         return [

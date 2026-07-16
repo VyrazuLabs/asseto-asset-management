@@ -230,9 +230,7 @@ def update(request, id):
         address_form = AddressForm(request.POST, instance=address)
 
         if form.is_valid() and address_form.is_valid():
-            if form.instance.access_level:
-                form.instance.access_level
-            else:
+            if not form.instance.access_level:
                 form.instance.groups.clear()
             
             if form.instance.role:

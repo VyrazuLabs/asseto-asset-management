@@ -118,6 +118,26 @@
                 </div>
 
                 <div class="col-md-12">
+                    <div class="premium-input-group">
+                        <label>{{ trans.profile_picture }}</label>
+                        <div class="premium-input-with-icon">
+                            <i class="bi bi-image"></i>
+                            {{form.profile_pic}}
+                        </div>
+                        {% for error in form.profile_pic.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    <div id="imagePreview" class="mt-2 text-center">
+                        {% if user.profile_pic %}
+                            <img src="{{user.profile_pic.url}}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
+                        {% else %}
+                            <img src="{% static 'images/faces/1.jpg' %}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;"/>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-12">
                     <div class="form-check form-switch mt-2">
                         <input type="checkbox" class="form-check-input" id="is_technician" name="is_technician" {% if is_technician %}checked{% endif %}>
                         <label class="form-check-label fw-bold" for="is_technician">{{ trans.is_technician }}</label>
