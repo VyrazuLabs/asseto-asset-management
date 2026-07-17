@@ -3,6 +3,8 @@
 **/.env
 **/env
 .pytest_cache
+htmlcov
+htmlcov/
 media
 db.sqlite3
 staticfiles
