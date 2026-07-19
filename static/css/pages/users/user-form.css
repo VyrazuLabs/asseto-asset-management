@@ -282,3 +282,11 @@ body.theme-dark .modal-premium .premium-input-with-icon i {
     width: 1em !important;
     color: #64748B;
 }
+
+/* Profile picture preview avatar size/styling */
+.preview-avatar {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+

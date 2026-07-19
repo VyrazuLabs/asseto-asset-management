@@ -22,13 +22,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = get_object_or_404(User, id=self.user.id)
         user_totp = UserTotp.objects.filter(user_id=self.user.id).first()
 
-        if user.two_factor_auth and user_totp.is_validate:
+        if user.two_factor_auth and user_totp and user_totp.is_validate:
 
             return {"two_factor_auth": True}
 
         data["two_factor_auth"] = False
         return data
-
 
 class LoginOTPSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
