@@ -16,10 +16,13 @@ setup_nginx() {
         "$template" > "$dest"
 
     mkdir -p /etc/nginx/sites-enabled
+    rm -f /etc/nginx/sites-enabled/default
     ln -sf "$dest" /etc/nginx/sites-enabled/asseto
 
     nginx -t >>"$LOG_FILE" 2>&1 || die "Nginx config test failed — check $LOG_FILE"
-    systemctl reload nginx || systemctl restart nginx
+    if ! (systemctl reload nginx || systemctl restart nginx) >>"$LOG_FILE" 2>&1; then
+        die "Nginx service failed to start. Port ${NGINX_HTTP_PORT} is likely in use by another service (e.g., Apache). Check 'sudo lsof -i :${NGINX_HTTP_PORT}' or stop the conflicting service, or set a custom port in setup/ports/custom.conf."
+    fi
 
     log_success "Nginx configured and reloaded"
 }
