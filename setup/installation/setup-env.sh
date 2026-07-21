@@ -32,7 +32,14 @@ generate_secret() {
 setup_env() {
     log_info "Configuring environment (press Enter to accept the suggested value)..."
 
-    local suggested_domain="${DOMAIN_NAME:-localhost}"
+    local existing_db_pass="" existing_secret_key="" existing_domain=""
+    if [ -f "$ASSETO_HOME/.env" ]; then
+        existing_db_pass="$(grep '^DB_PASSWORD=' "$ASSETO_HOME/.env" | cut -d= -f2-)"
+        existing_secret_key="$(grep '^SECRET_KEY=' "$ASSETO_HOME/.env" | cut -d= -f2-)"
+        existing_domain="$(grep '^ALLOWED_HOSTS=' "$ASSETO_HOME/.env" | cut -d= -f2-)"
+    fi
+
+    local suggested_domain="${existing_domain:-${DOMAIN_NAME:-localhost}}"
     prompt_value DOMAIN_NAME "Domain name" "$suggested_domain"
 
     local suggested_email="admin@${DOMAIN_NAME}"
@@ -40,12 +47,10 @@ setup_env() {
 
     DB_NAME="asseto"
     DB_USERNAME="asseto"
-    local suggested_db_password
-    suggested_db_password="$(generate_secret)"
+    local suggested_db_password="${existing_db_pass:-$(generate_secret)}"
     prompt_value DB_PASSWORD "Database password" "$suggested_db_password" secret
 
-    local suggested_secret_key
-    suggested_secret_key="$(generate_secret)"
+    local suggested_secret_key="${existing_secret_key:-$(generate_secret)}"
     SECRET_KEY="$suggested_secret_key"
 
     # shellcheck source=/dev/null
