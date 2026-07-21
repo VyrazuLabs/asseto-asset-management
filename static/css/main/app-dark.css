@@ -7164,7 +7164,8 @@ body.theme-dark .sidebar-wrapper .sidebar-header {
   font-weight: bold;
 }
 body.theme-dark .sidebar-wrapper .sidebar-header img {
-  height: 1.2rem;
+  width: 125px;
+  height: auto;
 }
 body.theme-dark .sidebar-wrapper .sidebar-toggler.x {
   position: absolute;
