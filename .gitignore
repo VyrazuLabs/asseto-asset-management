@@ -8,6 +8,7 @@ db.sqlite3
 staticfiles
 firebase-credentials.json
 *.log
+backups/
 .superpowers
 .superpowers/
 **/.superpowers

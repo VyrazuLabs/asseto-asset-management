@@ -1,0 +1,8 @@
+# Copy to custom.conf and uncomment/edit values to override setup/ports/default.conf
+# custom.conf is git-ignored — safe to keep local overrides here.
+
+# DJANGO_PORT=8001
+# MYSQL_PORT=3307
+# NGINX_HTTP_PORT=8080
+# NGINX_HTTPS_PORT=8443
+# CELERY_FLOWER_PORT=5556
