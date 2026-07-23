@@ -1,0 +1,154 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Assets Upload History - Step 3 | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<style>
+.card-rounded {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.btn-purple {
+    background-color: #553af2;
+    border-color: #553af2;
+    color: #fff;
+    border-radius: 20px;
+    padding: 6px 20px;
+}
+.btn-purple:hover {
+    background-color: #4a33d1;
+    color: #fff;
+}
+.btn-outline-purple {
+    background-color: transparent;
+    border: 1px solid #553af2;
+    color: #553af2;
+    border-radius: 20px;
+    padding: 6px 20px;
+}
+.btn-outline-purple:hover {
+    background-color: #f4f2ff;
+    color: #4a33d1;
+}
+.badge-matched {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 12px;
+}
+.badge-missing {
+    background-color: #f8d7da;
+    color: #842029;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 12px;
+}
+.asset-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+}
+.asset-card.matched {
+    border-color: #a3cfbb;
+}
+.asset-card.missing {
+    border-color: #f5c2c7;
+}
+.asset-img-area {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background-color: #f8f9fa;
+}
+.asset-img-placeholder {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fffafb;
+    color: #dc3545;
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="list-page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
+                <li class="breadcrumb-item active">Assets Upload History</li>
+            </ol>
+        </nav>
+        <h1>Assets Upload History</h1>
+    </div>
+</div>
+
+{% include 'commons/bulk-step-indicator.html' with current_step=3 %}
+
+<div class="card card-rounded mb-4 p-2">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center mb-2 mt-2">
+        <div>
+            <h5 class="mb-1" style="font-weight: 700; color: #553af2;"><i class="bi bi-person-bounding-box me-1"></i> Image Recognition Diagnostics</h5>
+            <div class="text-muted small">Asseto automatically maps filenames listed in CSV to files discovered inside the uploaded ZIP folder.</div>
+        </div>
+        <div class="d-flex gap-3 align-items-center fw-bold" style="font-size: 0.85rem;">
+            <div class="text-success"><i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i> Matches: {{ session.matched_images }}</div>
+            <div class="text-danger"><i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i> Missing: {{ session.unmatched_images }}</div>
+        </div>
+    </div>
+    
+    <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for i, row in staged_data %}
+            <div class="col">
+                <div class="asset-card {% if row.image_status == 'matched' %}matched{% else %}missing{% endif %}">
+                    <div class="p-3 d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ row.name }}</h6>
+                            <small class="text-muted" style="font-size: 0.7rem; text-transform: uppercase;">S/N: {{ row.serial_no|default:"N/A" }}</small>
+                        </div>
+                        {% if row.image_status == 'matched' %}
+                            <span class="badge-matched"><i class="bi bi-check-circle-fill me-1"></i> MATCHED</span>
+                        {% else %}
+                            <span class="badge-missing"><i class="bi bi-exclamation-triangle-fill me-1"></i> MISSING</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if row.image_status == 'matched' %}
+                        <img src="/{{ row.matched_image_path }}" class="asset-img-area" alt="{{ row.name }}">
+                    {% else %}
+                        <div class="asset-img-placeholder">
+                            <i class="bi bi-exclamation-circle-fill text-danger fs-3 mb-2"></i>
+                            <span class="text-muted small px-3 text-center">Asset will import with a generic fallback photo</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-3 bg-light text-muted d-flex justify-content-between align-items-center" style="font-size: 0.75rem;">
+                        <span><i class="bi bi-person me-1"></i> Unassigned</span>
+                        <span><i class="bi bi-geo-alt me-1"></i> Unassigned</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'upload:bulk_import_step2' %}" class="btn btn-purple shadow-sm fw-bold px-4"><i class="bi bi-arrow-left"></i> Back to Mapping</a>
+    <a href="{% url 'upload:bulk_import_step4' %}" class="btn btn-purple shadow-sm fw-bold px-4">
+        Proceed to Validation <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+</div>
+{% endblock content %}

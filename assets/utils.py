@@ -453,7 +453,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
 
     for it in get_asset_img:
         img_array.append(it)
-    months_int = asset.product.eol
+    months_int = asset.product.eol if asset.product else None
     today = timezone.now().date()
     if months_int:
         eol_date = today + relativedelta(months=months_int)

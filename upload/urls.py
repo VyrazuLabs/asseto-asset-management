@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import user_views
+from .views import asset_bulk_upload_views
 
 app_name = "upload"
 
@@ -123,5 +124,35 @@ urlpatterns = [
         user_views.user_render_to_mapper_model,
         name="users_compare_data",
     ),
-    # path('create-obj-department/',views.create_matched_data_from_csv_department, name='create_data'),
+    path(
+        "assets/bulk-import/",
+        asset_bulk_upload_views.bulk_import_step1,
+        name="bulk_import_step1",
+    ),
+    path(
+        "assets/bulk-import/map/",
+        asset_bulk_upload_views.bulk_import_step2,
+        name="bulk_import_step2",
+    ),
+
+    path(
+        "assets/bulk-import/finalize/",
+        asset_bulk_upload_views.bulk_import_step4,
+        name="bulk_import_step4",
+    ),
+    path(
+        "assets/bulk-import/template/csv/",
+        asset_bulk_upload_views.download_asset_template_csv,
+        name="bulk_import_template_csv",
+    ),
+    path(
+        "assets/bulk-import/template/zip/",
+        asset_bulk_upload_views.download_asset_template_zip,
+        name="bulk_import_template_zip",
+    ),
+    path(
+        "assets/bulk-import/cancel/",
+        asset_bulk_upload_views.bulk_import_cancel,
+        name="bulk_import_cancel",
+    ),
 ]

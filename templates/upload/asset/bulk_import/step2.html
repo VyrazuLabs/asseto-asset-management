@@ -1,0 +1,688 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Assets Upload History - Step 2 | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<style>
+.text-uppercase-small {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #888;
+}
+.btn-purple {
+    background-color: #553af2;
+    border-color: #553af2;
+    color: #fff;
+    border-radius: 20px;
+    padding: 6px 20px;
+}
+.btn-purple:hover {
+    background-color: #4a33d1;
+    color: #fff;
+}
+.btn-outline-purple {
+    background-color: transparent;
+    border: 1px solid #553af2;
+    color: #553af2;
+    border-radius: 20px;
+    padding: 6px 20px;
+}
+.btn-outline-purple:hover {
+    background-color: #f4f2ff;
+    color: #4a33d1;
+}
+.table-rounded {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.table-rounded th {
+    border-bottom: 1px solid #dee2e6;
+}
+.card-rounded {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.img-thumb-cell {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+.img-thumb-cell:hover {
+    border-color: #553af2;
+}
+.img-placeholder-cell {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: #fff0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px dashed #e0e0e0;
+    transition: border-color 0.2s;
+}
+.img-placeholder-cell:hover {
+    border-color: #dc3545;
+}
+.modal-img-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.modal-img-item {
+    border: 3px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 4px;
+    transition: border-color 0.2s;
+    text-align: center;
+}
+.modal-img-item:hover {
+    border-color: #553af2;
+}
+.modal-img-item.selected {
+    border-color: #553af2;
+    background: #f4f2ff;
+}
+.modal-img-item img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.modal-img-item .filename {
+    font-size: 0.65rem;
+    color: #666;
+    margin-top: 4px;
+    word-break: break-all;
+}
+
+body.theme-dark .text-uppercase-small {
+    color: #9899ac;
+}
+
+body.theme-dark .table-rounded th {
+    border-bottom-color: #3a3a4a;
+}
+
+body.theme-dark .img-placeholder-cell {
+    background: #2a1a1a;
+    border-color: #4a2a2a;
+}
+
+body.theme-dark .modal-img-item.selected {
+    background: #2a1a3a;
+}
+
+body.theme-dark .modal-img-item .filename {
+    color: #9899ac;
+}
+
+body.theme-dark .btn-outline-purple:hover {
+    background-color: #2a1a3a;
+}
+
+body.theme-dark .card-rounded {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.theme-dark #bulk-product,
+body.theme-dark #bulk-vendor,
+body.theme-dark #bulk-client,
+body.theme-dark #bulk-location,
+body.theme-dark #bulk-status,
+body.theme-dark #bulk-type,
+body.theme-dark select[class*="form-select"] {
+    background-color: #2a2a3d !important;
+    color: #e0e0e0 !important;
+}
+
+body.theme-dark select[class*="form-select"] option {
+    background-color: #2a2a3d;
+    color: #e0e0e0;
+}
+
+body.theme-dark tbody tr {
+    border-bottom-color: #2a2a3a !important;
+}
+
+body.theme-dark .card-footer .text-muted,
+body.theme-dark .card-footer small {
+    color: #9899ac !important;
+}
+
+body.theme-dark .table-responsive .text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark .card-header.bg-white {
+    background-color: transparent !important;
+}
+
+body.theme-dark .card-footer.bg-white {
+    background-color: transparent !important;
+}
+
+body.theme-dark div.bg-light.rounded.p-3.border {
+    background-color: #2a2a3d !important;
+    border-color: #3a3a4a !important;
+}
+
+body.theme-dark strong.text-dark {
+    color: #e0e0e0 !important;
+}
+
+body.theme-dark td.fw-bold.text-dark {
+    color: #e0e0e0 !important;
+}
+
+body.theme-dark .page-link {
+    background-color: #2a2a3d;
+    border-color: #3a3a4a;
+    color: #e0e0e0;
+}
+
+body.theme-dark .page-link:hover {
+    background-color: #3a3a4d;
+    border-color: #4a4a5a;
+    color: #fff;
+}
+
+body.theme-dark .page-item.active .page-link {
+    background-color: #553af2;
+    border-color: #553af2;
+    color: #fff;
+}
+
+body.theme-dark .page-item.disabled .page-link {
+    background-color: #1e1e2d;
+    border-color: #2a2a3a;
+    color: #5a5a6a;
+}
+
+body.theme-dark .btn-outline-danger {
+    color: #ff6b6b;
+    border-color: #4a2a2a;
+}
+
+body.theme-dark .btn-outline-danger:hover {
+    background-color: #3a1a1a;
+    color: #ff8a8a;
+    border-color: #6a2a2a;
+}
+
+body.theme-dark #imageModal .modal-content {
+    background-color: #1e1e2d;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+body.theme-dark #imageModal .modal-content h5 {
+    color: #e0e0e0;
+}
+
+body.theme-dark #imageModal .modal-img-item .filename {
+    color: #9899ac;
+}
+
+body.theme-dark #imageModal .btn-outline-secondary {
+    color: #9899ac;
+    border-color: #3a3a4a;
+}
+
+body.theme-dark #imageModal .btn-outline-secondary:hover {
+    background-color: #2a2a3d;
+    color: #e0e0e0;
+    border-color: #5a5a6a;
+}
+
+body.theme-dark #imageModal .modal-body .text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark .card {
+    background-color: #1e1e2d;
+}
+
+body.theme-dark .card .text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark td.text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark .batch-update-label {
+    color: #c0c0d0;
+}
+
+body.theme-dark .btn-purple {
+    background-color: #6b52f5;
+    border-color: #6b52f5;
+    box-shadow: 0 2px 8px rgba(107, 82, 245, 0.3);
+}
+
+body.theme-dark .btn-purple:hover {
+    background-color: #7b62ff;
+    border-color: #7b62ff;
+    box-shadow: 0 4px 12px rgba(107, 82, 245, 0.4);
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="list-page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
+                <li class="breadcrumb-item active">Assets Upload History</li>
+            </ol>
+        </nav>
+        <h1>Assets Upload History</h1>
+    </div>
+</div>
+
+{% include 'commons/bulk-step-indicator.html' with current_step=2 %}
+
+<div class="card card-rounded mb-4 p-2">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center mb-2 mt-2">
+        <div>
+            <h5 class="mb-1" style="font-weight: 700;">Metadata Staging Grid</h5>
+            <div class="text-muted small">Assign mapping relationships and manage images before committing.</div>
+        </div>
+    </div>
+
+    <div class="px-3 pb-3">
+        <div class="bg-light rounded p-3 border">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-magic text-primary" style="color: #553af2 !important;"></i>
+                <span class="fw-bold" style="font-size: 0.85rem;">Batch Update</span>
+                <span class="text-muted" style="font-size: 0.75rem;">— Apply a value to all rows at once</span>
+                <button id="apply-bulk" class="btn btn-purple btn-sm shadow-sm ms-auto" style="border-radius: 8px;">Apply All</button>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Product</label>
+                    <select id="bulk-product" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Select Product</option>
+                        {% for prod in products %}
+                        <option value="{{ prod.id }}">{{ prod.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Vendor</label>
+                    <select id="bulk-vendor" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Select Vendor</option>
+                        {% for v in vendors %}
+                        <option value="{{ v.id }}">{{ v.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Client</label>
+                    <select id="bulk-client" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Select Client</option>
+                        {% for c in clients %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Location</label>
+                    <select id="bulk-location" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Select Location</option>
+                        {% for loc in locations %}
+                        <option value="{{ loc.id }}">{{ loc.office_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Status</label>
+                    <select id="bulk-status" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Select Status</option>
+                        {% for st in statuses %}
+                        <option value="{{ st.id }}">{{ st.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg">
+                    <label class="d-block text-muted mb-1" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Purchase Type</label>
+                    <select id="bulk-type" class="form-select form-select-sm border-0 shadow-sm bg-white" style="font-size: 0.85rem;">
+                        <option value="">Purchase Type</option>
+                        <option value="1">Owned</option>
+                        <option value="2">Rented</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive px-3 pb-3" id="staging-table-wrapper" data-per-page="{{ per_page|default:15 }}">
+        <table class="table table-borderless table-rounded align-middle mb-0" style="font-size: 0.85rem;">
+            <thead>
+                <tr class="text-uppercase-small">
+                    <th class="py-3 text-center" style="width: 80px;">Image</th>
+                    {% for key, display in csv_headers %}
+                    <th class="py-3">{{ display }}</th>
+                    {% endfor %}
+                    <th class="py-3 text-center">Product</th>
+                    <th class="py-3 text-center">Vendor</th>
+                    <th class="py-3 text-center">Client</th>
+                    <th class="py-3 text-center">Location</th>
+                    <th class="py-3 text-center">Status</th>
+                    <th class="py-3 text-center">Purchase Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in staged_data_for_template %}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td class="py-3 text-center">
+                        {% if item.row.image_status == 'matched' and item.row.matched_image_path %}
+                        <img src="/{{ item.row.matched_image_path }}" class="img-thumb-cell" data-row="{{ item.index }}" data-image-path="{{ item.row.matched_image_path }}" alt="Asset Image" onclick="openImageModal('{{ item.index }}')">
+                        {% else %}
+                        <div class="img-placeholder-cell" data-row="{{ item.index }}" onclick="openImageModal('{{ item.index }}')">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.3rem;"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    {% for val in item.csv_values %}
+                    <td class="py-3 {% if forloop.first %}fw-bold text-dark{% else %}text-muted{% endif %}" style="min-width: 100px;">
+                        {{ val|default:"-" }}
+                    </td>
+                    {% endfor %}
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm prod-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 120px;">
+                            <option value="">-- Product --</option>
+                            {% for prod in products %}
+                            <option value="{{ prod.id }}" {% if item.row.product_target_id == prod.id|stringformat:"s" %}selected{% endif %}>{{ prod.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm ven-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 120px;">
+                            <option value="">-- Vendor --</option>
+                            {% for ven in vendors %}
+                            <option value="{{ ven.id }}" {% if item.row.vendor_target_id == ven.id|stringformat:"s" %}selected{% endif %}>{{ ven.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm cli-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 120px;">
+                            <option value="">-- Client --</option>
+                            {% for cli in clients %}
+                            <option value="{{ cli.id }}" {% if item.row.client_target_id == cli.id|stringformat:"s" %}selected{% endif %}>{{ cli.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm loc-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 120px;">
+                            <option value="">-- Location --</option>
+                            {% for loc in locations %}
+                            <option value="{{ loc.id }}" {% if item.row.location_target_id == loc.id|stringformat:"s" %}selected{% endif %}>{{ loc.office_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm st-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 120px;">
+                            <option value="">-- Status --</option>
+                            {% for st in statuses %}
+                            <option value="{{ st.id }}" {% if item.row.status_target_id == st.id|stringformat:"s" %}selected{% endif %}>{{ st.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td class="py-3 text-center">
+                        <select class="form-select form-select-sm type-select mx-auto border-0 shadow-sm bg-light" data-row="{{ item.index }}" style="min-width: 100px;">
+                            <option value="">-- Type --</option>
+                            <option value="1" {% if item.row.purchase_type == '1' %}selected{% endif %}>Owned</option>
+                            <option value="2" {% if item.row.purchase_type == '2' %}selected{% endif %}>Rented</option>
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center px-3 pt-3">
+        <div class="text-muted small">
+            <i class="bi bi-menu-button-wide text-secondary me-1"></i> Ready mapping fields: <strong class="text-dark">0 of {{ session.total_rows }} rows complete</strong>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <nav aria-label="Staged rows pagination">
+                <ul class="pagination pagination-sm mb-0" id="staging-pagination"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mt-4">
+    <form method="POST" action="{% url 'upload:bulk_import_cancel' %}" id="cancel-form"
+          onsubmit="return confirm('Are you sure you want to cancel? All staged data and uploaded images will be deleted.');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger shadow-sm fw-bold px-4" style="border-radius: 8px;">
+            <i class="bi bi-x-circle me-1"></i> Cancel &amp; Discard
+        </button>
+    </form>
+    <form method="POST" id="mapping-form" action="{% url 'upload:bulk_import_step2' %}">
+        {% csrf_token %}
+        <input type="hidden" name="mapping_data" id="mapping-data-input">
+        <button type="submit" class="btn btn-purple shadow-sm fw-bold px-4" id="continue-btn">
+            Review Final Package <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+    </form>
+</div>
+
+{% include 'upload/asset/bulk_import/image_modal.html' %}
+
+{% endblock content %}
+
+{% block script %}
+<script>
+var imageModalEl = document.getElementById('imageModal');
+
+function cleanupModalBackdrop() {
+    document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('padding-right');
+}
+
+function openImageModal(rowIndex) {
+    cleanupModalBackdrop();
+    document.getElementById('imageModalRowIndex').value = rowIndex;
+    document.querySelectorAll('.modal-img-item').forEach(function(el) { el.classList.remove('selected'); });
+
+    var cell = document.querySelector('.img-thumb-cell[data-row="' + rowIndex + '"], .img-placeholder-cell[data-row="' + rowIndex + '"]');
+    var hasImage = false;
+    if (cell && cell.dataset.imagePath) {
+        document.querySelectorAll('.modal-img-item').forEach(function(el) {
+            if (el.dataset.imagePath === cell.dataset.imagePath) {
+                el.classList.add('selected');
+            }
+        });
+        hasImage = true;
+    }
+    document.getElementById('imageModalStatus').textContent = hasImage ? 'Image currently assigned' : 'No image assigned';
+
+    imageModalEl.classList.add('show');
+    imageModalEl.style.display = 'block';
+    document.body.classList.add('modal-open');
+    var backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    document.body.appendChild(backdrop);
+}
+
+function closeModal() {
+    imageModalEl.classList.remove('show');
+    imageModalEl.style.display = 'none';
+    cleanupModalBackdrop();
+}
+
+function toggleImage(element) {
+    if (element.classList.contains('selected')) {
+        element.classList.remove('selected');
+        clearCellImage(document.getElementById('imageModalRowIndex').value);
+        document.getElementById('imageModalStatus').textContent = 'No image assigned';
+    } else {
+        document.querySelectorAll('.modal-img-item').forEach(function(el) { el.classList.remove('selected'); });
+        element.classList.add('selected');
+        updateCellImage(document.getElementById('imageModalRowIndex').value, element.dataset.imagePath);
+        document.getElementById('imageModalStatus').textContent = 'Image selected';
+    }
+}
+
+function clearImageSelection() {
+    var rowIndex = document.getElementById('imageModalRowIndex').value;
+    clearCellImage(rowIndex);
+    document.querySelectorAll('.modal-img-item').forEach(function(el) { el.classList.remove('selected'); });
+    document.getElementById('imageModalStatus').textContent = 'Image removed';
+}
+
+function updateCellImage(rowIndex, imagePath) {
+    var cell = document.querySelector('.img-thumb-cell[data-row="' + rowIndex + '"], .img-placeholder-cell[data-row="' + rowIndex + '"]');
+    if (cell) {
+        cell.outerHTML = '<img src="/' + imagePath + '" class="img-thumb-cell" data-row="' + rowIndex + '" data-image-path="' + imagePath + '" alt="Asset Image" onclick="openImageModal(\'' + rowIndex + '\')">';
+    }
+}
+
+function clearCellImage(rowIndex) {
+    var cell = document.querySelector('.img-thumb-cell[data-row="' + rowIndex + '"], .img-placeholder-cell[data-row="' + rowIndex + '"]');
+    if (cell) {
+        cell.outerHTML = '<div class="img-placeholder-cell" data-row="' + rowIndex + '" onclick="openImageModal(\'' + rowIndex + '\')">'
+            + '<i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.3rem;"></i>'
+            + '</div>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('apply-bulk').addEventListener('click', function() {
+        var prodVal = document.getElementById('bulk-product').value;
+        var venVal = document.getElementById('bulk-vendor').value;
+        var cliVal = document.getElementById('bulk-client').value;
+        var locVal = document.getElementById('bulk-location').value;
+        var stVal = document.getElementById('bulk-status').value;
+        var typeVal = document.getElementById('bulk-type').value;
+
+        if(prodVal) document.querySelectorAll('.prod-select').forEach(function(sel) { sel.value = prodVal; });
+        if(venVal) document.querySelectorAll('.ven-select').forEach(function(sel) { sel.value = venVal; });
+        if(cliVal) document.querySelectorAll('.cli-select').forEach(function(sel) { sel.value = cliVal; });
+        if(locVal) document.querySelectorAll('.loc-select').forEach(function(sel) { sel.value = locVal; });
+        if(stVal) document.querySelectorAll('.st-select').forEach(function(sel) { sel.value = stVal; });
+        if(typeVal) document.querySelectorAll('.type-select').forEach(function(sel) { sel.value = typeVal; });
+    });
+
+    document.getElementById('continue-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var mapping = {};
+
+        var rows = document.querySelectorAll('tbody tr');
+        rows.forEach(function(row) {
+            var rowIdx = row.querySelector('.prod-select').dataset.row;
+            var prodId = row.querySelector('.prod-select').value;
+            var venId = row.querySelector('.ven-select').value;
+            var cliId = row.querySelector('.cli-select').value;
+            var locId = row.querySelector('.loc-select').value;
+            var stId = row.querySelector('.st-select').value;
+            var typeId = row.querySelector('.type-select').value;
+
+            mapping[rowIdx] = {
+                'product_id': prodId || null,
+                'vendor_id': venId || null,
+                'client_id': cliId || null,
+                'location_id': locId || null,
+                'status_id': stId || null,
+                'purchase_type': typeId || null
+            };
+        });
+
+        document.querySelectorAll('.img-thumb-cell, .img-placeholder-cell').forEach(function(el) {
+            var rowIdx = el.dataset.row;
+            if (mapping[rowIdx]) {
+                mapping[rowIdx]['image_path'] = el.dataset.imagePath || '';
+            }
+        });
+
+        document.getElementById('mapping-data-input').value = JSON.stringify(mapping);
+        document.getElementById('mapping-form').submit();
+    });
+
+    // Client-side pagination for staging table
+    (function() {
+        var wrapper = document.getElementById('staging-table-wrapper');
+        var perPage = parseInt(wrapper.dataset.perPage) || 15;
+        var rows = document.querySelectorAll('#staging-table-wrapper tbody tr');
+        var totalRows = rows.length;
+        var totalPages = Math.ceil(totalRows / perPage);
+        var currentPage = 1;
+
+        function showPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            rows.forEach(function(row, idx) {
+                var pageNum = Math.floor(idx / perPage) + 1;
+                row.style.display = pageNum === page ? '' : 'none';
+            });
+            updatePagination();
+        }
+
+        function updatePagination() {
+            var ul = document.getElementById('staging-pagination');
+            ul.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            // Prev
+            var prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + (currentPage === 1 ? ' disabled' : '');
+            prevLi.innerHTML = '<a class="page-link" href="#" aria-label="Previous">&laquo;</a>';
+            prevLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) showPage(currentPage - 1);
+            });
+            ul.appendChild(prevLi);
+
+            for (var i = 1; i <= totalPages; i++) {
+                var li = document.createElement('li');
+                li.className = 'page-item' + (i === currentPage ? ' active' : '');
+                li.innerHTML = '<a class="page-link" href="#">' + i + '</a>';
+                li.addEventListener('click', (function(pageNum) {
+                    return function(e) {
+                        e.preventDefault();
+                        showPage(pageNum);
+                    };
+                })(i));
+                ul.appendChild(li);
+            }
+
+            // Next
+            var nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + (currentPage === totalPages ? ' disabled' : '');
+            nextLi.innerHTML = '<a class="page-link" href="#" aria-label="Next">&raquo;</a>';
+            nextLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage < totalPages) showPage(currentPage + 1);
+            });
+            ul.appendChild(nextLi);
+        }
+
+        if (totalPages > 1) showPage(1);
+        else {
+            var ul = document.getElementById('staging-pagination');
+            ul.innerHTML = '<li class="page-item disabled"><span class="page-link">1</span></li>';
+        }
+    })();
+});
+</script>
+{% endblock %}
