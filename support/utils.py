@@ -217,8 +217,18 @@ class SupportTicketService:
             activity_type="created"
         )
 
+        history_list = list(history_qs)
+        status_change_ids = set()
+        prev_status = None
+        for record in reversed(history_list):
+            if prev_status is not None and record.status != prev_status:
+                status_change_ids.add(record.pk)
+            prev_status = record.status
+
+        filtered_history = [h for h in history_list if h.pk not in status_change_ids]
+
         combined = sorted(
-            chain(activities_qs, history_qs),
+            chain(activities_qs, filtered_history),
             key=lambda x: (
                 x.created_at if hasattr(x, "activity_type") else x.history_date
             ),

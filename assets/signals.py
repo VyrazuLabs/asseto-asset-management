@@ -22,17 +22,6 @@ def asset_notification(sender, instance, created, **kwargs):
     # Get organization admins
     admins = User.objects.filter(is_superuser=True, organization=instance.organization)
     if created:
-        for admin in admins:
-            instance._skip_notification = True  # ✅ block re-entry
-            NotificationService.send(
-                user=admin,
-                title="Asset Created",
-                message=f"Asset '{instance.name}' ({instance.tag}) has been created.",
-                icon="bi-box-seam",
-                link=f"/assets/details/{instance.id}",
-                instance_id=instance.id,
-                object_id=str(instance.id),
-            )
         return
 
     history = instance.history.all()[:2]
