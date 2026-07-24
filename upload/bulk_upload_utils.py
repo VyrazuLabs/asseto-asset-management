@@ -97,7 +97,7 @@ def cleanup_bulk_import_files(session_id):
 def extract_zip_images(zip_file, session_id):
     image_map = {}
     allowed_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
-    extract_dir = os.path.join('media', 'bulk_import', str(session_id))
+    extract_dir = os.path.abspath(os.path.join('media', 'bulk_import', str(session_id)))
     os.makedirs(extract_dir, exist_ok=True)
     
     with zipfile.ZipFile(zip_file, 'r') as z:
@@ -106,11 +106,17 @@ def extract_zip_images(zip_file, session_id):
                 continue
             
             filename = os.path.basename(info.filename)
+            if not filename:
+                continue
             ext = os.path.splitext(filename)[1].lower()
             
             if ext in allowed_exts:
-                extracted_path = z.extract(info, extract_dir)
-                image_map[filename.lower()] = extracted_path
+                target_path = os.path.abspath(os.path.join(extract_dir, filename))
+                if not target_path.startswith(extract_dir):
+                    continue
+                with z.open(info) as source, open(target_path, 'wb') as target:
+                    shutil.copyfileobj(source, target)
+                image_map[filename.lower()] = target_path
                 
     return image_map
 
@@ -199,6 +205,7 @@ def commit_bulk_session(session, request):
         return None
 
     for idx, row in enumerate(staged):
+        sid = transaction.savepoint()
         try:
             prod_id = row.get('product_target_id')
             product = products_by_id.get(prod_id) if prod_id else None
@@ -281,8 +288,10 @@ def commit_bulk_session(session, request):
                     )
 
             created_count += 1
+            transaction.savepoint_commit(sid)
 
         except Exception as e:
+            transaction.savepoint_rollback(sid)
             errors.append(f"Row {idx + 1} ({row.get('name')}): {str(e)}")
 
     if not errors:
