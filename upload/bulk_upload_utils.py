@@ -97,8 +97,9 @@ def cleanup_bulk_import_files(session_id):
 def extract_zip_images(zip_file, session_id):
     image_map = {}
     allowed_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
-    extract_dir = os.path.abspath(os.path.join('media', 'bulk_import', str(session_id)))
-    os.makedirs(extract_dir, exist_ok=True)
+    relative_dir = os.path.join('media', 'bulk_import', str(session_id))
+    abs_extract_dir = os.path.abspath(relative_dir)
+    os.makedirs(abs_extract_dir, exist_ok=True)
     
     with zipfile.ZipFile(zip_file, 'r') as z:
         for info in z.infolist():
@@ -111,12 +112,12 @@ def extract_zip_images(zip_file, session_id):
             ext = os.path.splitext(filename)[1].lower()
             
             if ext in allowed_exts:
-                target_path = os.path.abspath(os.path.join(extract_dir, filename))
-                if not target_path.startswith(extract_dir):
+                target_abs_path = os.path.abspath(os.path.join(abs_extract_dir, filename))
+                if not target_abs_path.startswith(abs_extract_dir):
                     continue
-                with z.open(info) as source, open(target_path, 'wb') as target:
+                with z.open(info) as source, open(target_abs_path, 'wb') as target:
                     shutil.copyfileobj(source, target)
-                image_map[filename.lower()] = target_path
+                image_map[filename.lower()] = os.path.join(relative_dir, filename)
                 
     return image_map
 
@@ -197,57 +198,25 @@ def commit_bulk_session(session, request):
         organization=organization, use_default_settings=True
     ).first()
 
-    def _get_val(row_dict, key_options):
-        for k in key_options:
-            for rk, rv in row_dict.items():
-                if rk and isinstance(rk, str) and rk.lower() == k.lower():
-                    return rv
-        return None
-
     for idx, row in enumerate(staged):
         sid = transaction.savepoint()
         try:
             prod_id = row.get('product_target_id')
             product = products_by_id.get(prod_id) if prod_id else None
-            if not product:
-                prod_name = _get_val(row, ['product', 'product name', 'product_name'])
-                if prod_name:
-                    product = next((p for p in products_by_id.values() if p.name and p.name.lower() == str(prod_name).lower()), None)
 
             vend_id = row.get('vendor_target_id')
             vendor = vendors_by_id.get(vend_id) if vend_id else None
-            if not vendor:
-                vend_name = _get_val(row, ['vendor', 'vendor name', 'vendor_name'])
-                if vend_name:
-                    vendor = next((v for v in vendors_by_id.values() if v.name and v.name.lower() == str(vend_name).lower()), None)
 
             cli_id = row.get('client_target_id')
             client = clients_by_id.get(cli_id) if cli_id else None
-            if not client:
-                cli_name = _get_val(row, ['client', 'client name', 'client_name'])
-                if cli_name:
-                    client = next((c for c in clients_by_id.values() if c.name and c.name.lower() == str(cli_name).lower()), None)
 
             loc_id = row.get('location_target_id')
             location = locations_by_id.get(loc_id) if loc_id else None
-            if not location:
-                loc_name = _get_val(row, ['location', 'location name', 'location_name', 'office', 'office name'])
-                if loc_name:
-                    location = next((l for l in locations_by_id.values() if l.office_name and l.office_name.lower() == str(loc_name).lower()), None)
 
             status_val = available_status
             status_id = row.get('status_target_id')
             if status_id:
                 status_val = statuses_by_id.get(status_id) or available_status
-            if not status_id:
-                status_name = row.get('status')
-                if status_name:
-                    custom_status = AssetStatus.objects.filter(
-                        Q(organization=organization) | Q(organization__isnull=True),
-                        name__iexact=status_name
-                    ).first()
-                    if custom_status:
-                        status_val = custom_status
 
             tag = row.get('tag')
             if not tag:
@@ -276,16 +245,19 @@ def commit_bulk_session(session, request):
                 vendor=vendor,
                 client=client,
                 location=location,
-                asset_status=status_val
+                asset_status=status_val,
+                created_by=str(request.user.id)
             )
 
             img_path = row.get('matched_image_path')
-            if img_path and os.path.exists(img_path):
-                with open(img_path, 'rb') as f:
-                    AssetImage.objects.create(
-                        asset=asset,
-                        image=ContentFile(f.read(), name=os.path.basename(img_path))
-                    )
+            if img_path:
+                abs_img_path = os.path.abspath(img_path)
+                if os.path.exists(abs_img_path):
+                    with open(abs_img_path, 'rb') as f:
+                        AssetImage.objects.create(
+                            asset=asset,
+                            image=ContentFile(f.read(), name=os.path.basename(abs_img_path))
+                        )
 
             created_count += 1
             transaction.savepoint_commit(sid)

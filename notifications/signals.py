@@ -100,20 +100,7 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Asset)
 def notify_admin_on_asset_created(sender, instance, created, **kwargs):
     if created:
-        notification = Notification.objects.create(
-            notification_title="Asset Created",
-            notification_text=f"A new asset '{instance}' has been created.",
-            icon="bi-plus-circle-fill",
-            link="/assets/list",
-            is_superuser=True,
-            updated_by=instance.updated_by,
-            object_id=str(instance.id),
-        )
-
-        admins = User.objects.filter(is_superuser=True)
-
-        for admin in admins:
-            UserNotification.objects.create(user=admin, notification=notification)
+        return
 
 
 @receiver(post_save, sender=Asset)

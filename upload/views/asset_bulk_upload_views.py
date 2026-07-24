@@ -64,55 +64,10 @@ def bulk_import_step1(request):
             staged_data=rows
         )
 
-        # Auto-match FK fields from CSV column names
-        org = request.user.organization
-        products_map = {p.name.lower(): str(p.id) for p in Product.undeleted_objects.filter(organization=org) if p.name}
-        vendors_map = {v.name.lower(): str(v.id) for v in Vendor.undeleted_objects.filter(organization=org) if v.name}
-        clients_map = {c.name.lower(): str(c.id) for c in Client.undeleted_objects.filter(organization=org) if c.name}
-        locations_map = {l.office_name.lower(): str(l.id) for l in Location.undeleted_objects.filter(organization=org) if l.office_name}
-        statuses_map = {s.name.lower(): str(s.id) for s in AssetStatus.undeleted_objects.filter(Q(organization=org) | Q(organization__isnull=True)) if s.name}
-        
-        updated = False
-        for row in session.staged_data:
-            def get_val(keys):
-                for k in keys:
-                    for rk, rv in row.items():
-                        if rk and isinstance(rk, str) and rk.lower() == k.lower():
-                            return rv
-                return None
-                
-            prod_val = get_val(['product', 'product name', 'product_name'])
-            if prod_val and str(prod_val).lower() in products_map:
-                row['product_target_id'] = products_map[str(prod_val).lower()]
-                updated = True
-                
-            ven_val = get_val(['vendor', 'vendor name', 'vendor_name'])
-            if ven_val and str(ven_val).lower() in vendors_map:
-                row['vendor_target_id'] = vendors_map[str(ven_val).lower()]
-                updated = True
-                
-            cli_val = get_val(['client', 'client name', 'client_name'])
-            if cli_val and str(cli_val).lower() in clients_map:
-                row['client_target_id'] = clients_map[str(cli_val).lower()]
-                updated = True
-                
-            loc_val = get_val(['location', 'location name', 'location_name', 'office', 'office name'])
-            if loc_val and str(loc_val).lower() in locations_map:
-                row['location_target_id'] = locations_map[str(loc_val).lower()]
-                updated = True
-                
-            st_val = get_val(['status', 'asset status'])
-            if st_val and str(st_val).lower() in statuses_map:
-                row['status_target_id'] = statuses_map[str(st_val).lower()]
-                updated = True
-                
-        if updated:
-            session.save()
-
         request.session[SESSION_KEY] = str(session.id)
         
         # Extract images if ZIP provided
-        if zip_file and zip_file.name.endswith('.zip'):
+        if zip_file and zip_file.name.lower().endswith('.zip'):
             try:
                 image_map = extract_zip_images(zip_file, session.id)
                 session.zip_filename = zip_file.name
