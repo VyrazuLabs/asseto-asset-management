@@ -12,6 +12,21 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.5] — 2026-07-25
+
+### Added
+- **Asset Bulk Import Feature** — Implemented comprehensive asset bulk import workflows with Excel and ZIP upload support, transaction integrity, and progress indicators.
+
+### Changed
+- **Support Ticket Kanban View** — Redesigned ticket Kanban view, updated closed ticket handling logic, and enhanced overall ticket management workflows.
+- **Documentation & UI Branding** — Updated README documentation, refreshed maintainer details, and tuned sidebar logo dimensions.
+
+### Fixed
+- **Product Categories & Subcategories** — Fixed update errors in product category and subcategory selection within the products module.
+- **Asset Details & Notifications** — Resolved asset details view display issues and removed blocking notifications during bulk asset insertion for smoother processing.
+
+---
+
 ## [1.6.4] — 2026-07-13
 
 ### Added

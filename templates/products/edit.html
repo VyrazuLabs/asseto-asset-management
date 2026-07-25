@@ -329,6 +329,8 @@
                 .catch(() => alert('{{ trans.network_error }}'));
         });
 
+        const initialSubCategoryValue = $('#id_product_sub_category').val();
+
         $('#id_product_category').on('change', function () {
             const categoryId = $(this).val();
             const $subCatSelect = $('#id_product_sub_category');
@@ -347,6 +349,9 @@
                         options += `<option value="${item.id}">${item.name}</option>`;
                     });
                     $subCatSelect.html(options);
+                    if (initialSubCategoryValue) {
+                        $subCatSelect.val(initialSubCategoryValue);
+                    }
                 })
                 .catch(() => $subCatSelect.html('<option value="">Error loading</option>'));
         });

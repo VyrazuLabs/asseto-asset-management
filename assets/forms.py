@@ -333,10 +333,7 @@ class MaintenanceRecordForm(forms.ModelForm):
             
             choices = [('', 'Select Technician')]
             for technician in technicians:
-                display_name = technician.user.full_name
-                # Use reverse_full_name if available for better display
-                if hasattr(technician.user.full_name, 'reverse_full_name') and technician.user.reverse_full_name:
-                    display_name = technician.user.full_name
+                display_name = technician.user.full_name or technician.user.reverse_full_name
                 choices.append((str(technician.id), display_name))
             
             self.fields['technician'].choices = choices

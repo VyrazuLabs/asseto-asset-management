@@ -93,18 +93,16 @@ class AddProductsForm(forms.ModelForm):
             )
         )
 
-        if self.instance.pk and self.instance.product_sub_category:
-            if self.instance.product_sub_category.parent:
-                # It's a sub-category — show parent and child
-                self.initial["product_category"] = (
-                    self.instance.product_sub_category.parent
-                )
-                self.initial["product_sub_category"] = (
-                    self.instance.product_sub_category
-                )
-            else:
-                # It's a top-level category — only show it in product_category
-                self.initial["product_category"] = self.instance.product_sub_category
+        if self.instance.pk:
+            sub_category = self.instance.product_sub_category
+            if sub_category:
+                if sub_category.parent and sub_category.parent.name != "Root":
+                    self.fields["product_category"].initial = sub_category.parent.pk
+                    self.fields["product_sub_category"].initial = sub_category.pk
+                else:
+                    self.fields["product_category"].initial = sub_category.pk
+                    self.fields["product_sub_category"].initial = None
+                    self.initial['product_sub_category'] = None
 
     class Meta:
         model = Product
@@ -122,11 +120,18 @@ class AddProductsForm(forms.ModelForm):
         ]
 
     def save(self, commit=True):
+        original_sub_category = self.instance.product_sub_category if self.instance.pk else None
+
         instance = super().save(commit=False)
 
-        # Map either sub_category or category to the model field
         if self.cleaned_data.get("product_sub_category"):
             instance.product_sub_category = self.cleaned_data["product_sub_category"]
+        elif (
+            original_sub_category
+            and original_sub_category.parent
+            and original_sub_category.parent.name != "Root"
+        ):
+            instance.product_sub_category = None
         else:
             instance.product_sub_category = self.cleaned_data["product_category"]
 

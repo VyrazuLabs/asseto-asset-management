@@ -133,7 +133,7 @@
                 <div class="col-md-12">
 
                     <div class="form-check form-switch mb-0">
-                        <input type="checkbox" class="form-check-input" id="toggle_password">
+                        <input type="checkbox" class="form-check-input" id="toggle_password" name="toggle_password">
                         <label class="form-check-label fw-bold" for="toggle_password">{{ trans.enable_user_login }}</label>
                     </div>
                     <div class="form-check form-switch mt-2">
@@ -234,64 +234,9 @@
 
         <div class="modal-footer">
             <button type="button" class="btn-discard" data-bs-dismiss="modal">{{ trans.discard }}</button>
-            <button type="submit" class="btn-save-user"
-                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> {{ trans.saving }}`;">
+            <button type="submit" class="btn-save-user" data-saving-text="{{ trans.saving }}">
                 {{ trans.save_user }}
             </button>
         </div>
     </form>
 </div>
-
-<script>
-    function initializePasswordToggle() {
-        const togglePasswordCheckbox = document.getElementById('toggle_password');
-        const passwordFields = document.getElementById('password_fields');
-
-        if (!togglePasswordCheckbox || !passwordFields || togglePasswordCheckbox.classList.contains('toggle-bind')) {
-            return;
-        }
-
-        togglePasswordCheckbox.classList.add('toggle-bind');
-
-        const toggleFields = () => {
-            if (togglePasswordCheckbox.checked) {
-                passwordFields.classList.remove('d-none');
-            } else {
-                passwordFields.classList.add('d-none');
-            }
-        };
-
-        togglePasswordCheckbox.addEventListener('change', toggleFields);
-        toggleFields();
-    }
-
-    document.addEventListener('htmx:load', initializePasswordToggle);
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePasswordToggle);
-    } else {
-        initializePasswordToggle();
-    }
-
-    // Image preview enhancement
-    const profilePicInput = document.querySelector('input[type="file"]');
-    if (profilePicInput) {
-        profilePicInput.classList.add('form-control');
-        profilePicInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.innerHTML = `<img src="${e.target.result}" class="rounded-circle border shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-
-    htmx.on("htmx:beforeSwap", (e) => {
-        if (e.detail.target.id == "add-user-modal-content" && !e.detail.xhr.response) {
-            location.reload()
-        }
-    })
-</script>

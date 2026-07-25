@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}{{ trans.edit_ticket_title|format_str:ticket.ticket_id }} | Asseto{% endblock %}
+{% block title %}Update Ticket - #{{ ticket.ticket_id }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -48,13 +48,11 @@
         <ol class="breadcrumb page-breadcrumb">
           <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
           <li class="breadcrumb-item"><a href="{% url 'support:ticket_list' %}" class="breadcrumb-link">{{ trans.tickets_breadcrumb }}</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'support:ticket_detail' ticket.id %}" class="breadcrumb-link">#{{
-              ticket.ticket_id }}</a></li>
-          <li class="breadcrumb-item active">{{ trans.edit }}</li>
+          <li class="breadcrumb-item active">Update Ticket</li>
         </ol>
       </nav>
-      <h1>{{ trans.edit_ticket_title|format_str:ticket.ticket_id }}</h1>
-      <p class="subtitle">{{ trans.edit_ticket_subtitle }}</p>
+      <h1>Update Ticket - #{{ ticket.ticket_id }}</h1>
+      <p class="subtitle">Update the details of this support ticket</p>
     </div>
 
     <div class="d-flex align-items-center gap-2">
@@ -204,7 +202,7 @@
       </div>
 
       {# Resolution Routing #}
-      <div class="sidebar-section">
+      <div class="sidebar-section" style="overflow: visible;">
         <div class="sidebar-section-header"><span>{{ trans.resolution_routing }}</span></div>
         <div class="sidebar-body">
           <label class="field-label small">{{ trans.assign_technician }}</label>
@@ -602,6 +600,32 @@
   .suggestion-email {
     font-size: 12px;
     color: #64748b;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Suggestions Dropdown Dark Mode overrides */
+  body.theme-dark .audit-suggestions {
+    background: #1e1e2d !important;
+    border: 1px solid #2e2e42 !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.45) !important;
+  }
+
+  body.theme-dark .audit-suggestion-item {
+    border-bottom: 1px solid #2e2e42;
+  }
+
+  body.theme-dark .audit-suggestion-item:hover {
+    background-color: #2a2650;
+    border-left: 3px solid #4F46E5;
+  }
+
+  body.theme-dark .suggestion-name {
+    color: #e0e0f0;
+  }
+
+  body.theme-dark .suggestion-tag,
+  body.theme-dark .suggestion-email {
+    color: #8b8ba4;
     font-family: 'Inter', system-ui, sans-serif;
   }
 </style>

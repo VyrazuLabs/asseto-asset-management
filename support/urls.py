@@ -19,4 +19,5 @@ urlpatterns = [
     ),
     path("asset-search/", views.asset_search, name="asset_search"),
     path("technician-search/", views.technician_search, name="technician_search"),
+    path("tickets/<uuid:id>/update-status/", views.update_ticket_status, name="ticket_update_status"),
 ]

@@ -26,6 +26,10 @@
     .sidebar-wrapper .menu .sidebar-link span {
         margin-left: 12px !important;
     }
+    .sidebar-wrapper .sidebar-header img {
+        width: 125px !important;
+        height: auto !important;
+    }
 </style>
 
 <div id="sidebar" class="active">
@@ -265,6 +269,9 @@
                                     <a href="{% url 'upload:user_list' %}">{{ trans.users }}</a>
                                 </li>
                             {% endif %}
+                            <li class="submenu-item {% if submenu == 'bulk_import' %}active{% endif %}">
+                                <a href="{% url 'upload:bulk_import_step1' %}">Assets</a>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}

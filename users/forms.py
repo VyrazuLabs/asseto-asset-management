@@ -166,7 +166,7 @@ class UserUpdateForm(UserChangeForm):
     )
 
     access_level = forms.ChoiceField(
-        # required=True,
+        required=False,
         choices=(
             ("False", "Only Assigned"),
             ("True", "All"),
@@ -175,21 +175,21 @@ class UserUpdateForm(UserChangeForm):
     )
 
     role = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     location = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
 
     department = forms.ModelChoiceField(
-        # required=True,
+        required=False,
         queryset=None,
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),

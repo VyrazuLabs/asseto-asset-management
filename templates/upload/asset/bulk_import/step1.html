@@ -1,0 +1,263 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Assets Upload History - Step 1 | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<style>
+.upload-card {
+    border: 2px dashed var(--border-color, #dee2e6);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    background: var(--bg-color-alt, #f8f9fa);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.upload-card:hover {
+    border-color: var(--primary-color, #0d6efd);
+    background: var(--bg-color-hover, #e9ecef);
+}
+
+body.theme-dark .upload-card {
+    --border-color: #3a3a4a;
+    --bg-color-alt: #2a2a3d;
+    --bg-color-hover: #33334a;
+}
+
+body.theme-dark .card-title {
+    color: #e0e0e0 !important;
+}
+
+body.theme-dark [id="csvEmptyState"],
+body.theme-dark [id="zipEmptyState"] {
+    border-color: #3a3a4a !important;
+    background-color: #2a2a3d !important;
+}
+
+body.theme-dark [id="csvFilledState"],
+body.theme-dark [id="zipFilledState"] {
+    border-color: #2d6a4f !important;
+    background-color: #1a2e24 !important;
+}
+
+body.theme-dark [id="csvFileName"],
+body.theme-dark [id="zipFileName"] {
+    color: #eaeaea !important;
+}
+
+body.theme-dark a[href*="template_csv"] {
+    background-color: #1a2a1a !important;
+    border-color: #2a4a2a !important;
+}
+
+body.theme-dark a[href*="template_zip"] {
+    background-color: #2a2a1a !important;
+    border-color: #4a4a2a !important;
+}
+
+body.theme-dark [style*="background-color: #f5f3ff"] {
+    background-color: #2a1a3a !important;
+    color: #c4a0ff !important;
+}
+
+body.theme-dark code {
+    background-color: #3a2a4a;
+    color: #e0d0ff;
+}
+
+body.theme-dark [id="csvEmptyState"] .fw-bold,
+body.theme-dark [id="zipEmptyState"] .fw-bold {
+    color: #c0c0d0 !important;
+}
+
+body.theme-dark .upload-card .text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark .card {
+    background-color: #1e1e2d;
+}
+
+body.theme-dark a.template-btn,
+body.theme-dark a[href*="template_csv"],
+body.theme-dark a[href*="template.zip"] {
+    color: #e0e0e0 !important;
+}
+
+body.theme-dark a[href*="template_csv"] .text-muted,
+body.theme-dark a[href*="template.zip"] .text-muted {
+    color: #9899ac !important;
+}
+
+body.theme-dark a[href*="template_csv"] i.bi-arrow-down,
+body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
+    color: #9899ac !important;
+}
+
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="list-page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
+                <li class="breadcrumb-item active">Assets Upload History</li>
+            </ol>
+        </nav>
+        <h1>Assets Upload History</h1>
+        <p class="text-muted small">View and manage history of imported asset records.</p>
+    </div>
+</div>
+
+{% include 'commons/bulk-step-indicator.html' with current_step=1 %}
+
+<div class="row">
+    <!-- Left panel: Templates -->
+    <div class="col-md-4 mb-4">
+        <div class="card card-rounded shadow-sm h-100 p-2">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-down text-primary" style="color: #553af2 !important;"></i> Download Sample Templates</h5>
+                <p class="text-muted small mb-4" style="line-height: 1.6;">To guarantee perfect mapping, formulate your bulk assets spreadsheet and asset photos according to the standards defined inside our reference schemas.</p>
+                <div class="d-grid gap-3">
+                    <a href="{% url 'upload:bulk_import_template_csv' %}" class="btn text-start p-3 d-flex align-items-center justify-content-between" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; text-decoration: none; color: inherit;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-success text-white rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.8;">
+                                <i class="bi bi-file-earmark-spreadsheet"></i>
+                            </div>
+                            <div style="line-height:1.2;">
+                                <div class="fw-bold" style="font-size: 0.8rem;">assets_template.csv</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">Preformatted schema file</div>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-down text-muted"></i>
+                    </a>
+                    <a href="{% url 'upload:bulk_import_template_zip' %}" class="btn text-start p-3 d-flex align-items-center justify-content-between" style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; text-decoration: none; color: inherit;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning text-dark rounded d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.8;">
+                                <i class="bi bi-file-earmark-zip"></i>
+                            </div>
+                            <div style="line-height:1.2;">
+                                <div class="fw-bold" style="font-size: 0.8rem;">asset_photos.zip</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">Sample asset images directory</div>
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-down text-muted"></i>
+                    </a>
+                </div>
+                <div class="mt-4 p-3 rounded" style="background-color: #f5f3ff; color: #6b21a8; font-size: 0.75rem;">
+                    <i class="bi bi-info-circle-fill me-1" style="color: #553af2;"></i> <strong style="color: #553af2;">Pro-Tip:</strong> Name the column containing your photo files <code>image_filename</code> in your CSV sheet!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right panel: Upload Form -->
+    <div class="col-md-8 mb-4">
+        <div class="card card-rounded shadow-sm h-100 p-2">
+            <div class="card-body">
+                                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-up text-primary" style="color: #553af2 !important;"></i> Upload Files</h5>
+                <p class="text-muted small mb-4">Attach your metadata worksheet and compressed ZIP containing the referenced pictures.</p>
+                
+                <form method="POST" enctype="multipart/form-data" action="{% url 'upload:bulk_import_step1' %}" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <!-- Empty State CSV -->
+                            <div id="csvEmptyState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center align-items-center" style="border: 2px dashed #cbd5e1; background-color: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('csvFiles').click()">
+                                <i class="bi bi-cloud-arrow-up text-muted mb-2" style="font-size: 2rem;"></i>
+                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">Click to upload CSV File</div>
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">Support for .csv format</div>
+                            </div>
+                            
+                            <!-- Filled State CSV -->
+                            <div id="csvFilledState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center d-none" style="border: 2px dashed #4ade80; background-color: #f0fdf4; cursor: pointer;">
+                                <div class="mx-auto mb-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.2;"><i class="bi bi-check-lg" style="opacity: 1; color: #166534;"></i></div>
+                                <div id="csvFileName" class="fw-bold fs-6" style="color: #1f2937;">asseto_hardware_list.csv</div>
+                                <div class="small" style="color: #166534; font-weight: 500;">Successfully attached</div>
+                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'csvFiles', 'csvEmptyState', 'csvFilledState')">Click here to re-upload</div>
+                            </div>
+                            <input type="file" id="csvFiles" name="csv_file" accept=".csv" style="display: none;" onchange="handleFileSelect(this, 'csvEmptyState', 'csvFilledState', 'csvFileName'); hideError()">
+                            <div id="csvError" class="d-none text-danger small mt-2" style="font-size: 0.75rem;">
+                                <i class="bi bi-exclamation-circle-fill me-1"></i> Please select a CSV file before proceeding.
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Empty State ZIP -->
+                            <div id="zipEmptyState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center align-items-center" style="border: 2px dashed #cbd5e1; background-color: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('zipFiles').click()">
+                                <i class="bi bi-file-earmark-zip text-muted mb-2" style="font-size: 2rem;"></i>
+                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">Click to upload ZIP File (Optional)</div>
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">Support for .zip containing images</div>
+                            </div>
+                            
+                            <!-- Filled State ZIP -->
+                            <div id="zipFilledState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center d-none" style="border: 2px dashed #4ade80; background-color: #f0fdf4; cursor: pointer;">
+                                <div class="mx-auto mb-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.2;"><i class="bi bi-check-lg" style="opacity: 1; color: #166534;"></i></div>
+                                <div id="zipFileName" class="fw-bold fs-6" style="color: #1f2937;">asset_photos.zip</div>
+                                <div class="small" style="color: #166534; font-weight: 500;">Successfully attached</div>
+                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'zipFiles', 'zipEmptyState', 'zipFilledState')">Click here to re-upload</div>
+                            </div>
+                            <input type="file" id="zipFiles" name="zip_file" accept=".zip" style="display: none;" onchange="handleFileSelect(this, 'zipEmptyState', 'zipFilledState', 'zipFileName')">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+                        <button type="submit" class="btn fw-bold px-4 pt-2 pb-2" style="background-color: #553af2; color: #fff; border-radius: 8px;">
+                            Process & View List <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+function handleFileSelect(input, emptyId, filledId, nameId) {
+    if (input.files && input.files[0]) {
+        document.getElementById(emptyId).classList.add('d-none');
+        document.getElementById(filledId).classList.remove('d-none');
+        document.getElementById(nameId).innerText = input.files[0].name;
+    } else {
+        document.getElementById(emptyId).classList.remove('d-none');
+        document.getElementById(filledId).classList.add('d-none');
+    }
+}
+function clearFile(event, inputId, emptyId, filledId) {
+    event.stopPropagation();
+    document.getElementById(inputId).value = '';
+    document.getElementById(emptyId).classList.remove('d-none');
+    document.getElementById(filledId).classList.add('d-none');
+}
+function showError() {
+    document.getElementById('csvError').classList.remove('d-none');
+    document.getElementById('csvEmptyState').style.borderColor = '#dc3545';
+    document.getElementById('csvEmptyState').style.backgroundColor = '#fff5f5';
+}
+function hideError() {
+    document.getElementById('csvError').classList.add('d-none');
+    document.getElementById('csvEmptyState').style.borderColor = '#cbd5e1';
+    document.getElementById('csvEmptyState').style.backgroundColor = '#f8fafc';
+}
+(function() {
+    var form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var fileInput = document.getElementById('csvFiles');
+            if (!fileInput.files || !fileInput.files[0]) {
+                e.preventDefault();
+                showError();
+                document.getElementById('csvEmptyState').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    }
+})();
+</script>
+{% endblock %}

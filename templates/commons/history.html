@@ -45,7 +45,7 @@
                     <div class="timeline-footer">
                         {% if entry.performed_by %}
                         <div class="timeline-avatar">{{ entry.performed_by.get_full_name|slice:":1"|upper }}</div>
-                        <span class="timeline-user staff">{{ entry.performed_by.get_full_name }}</span>
+                        <span class="timeline-user">{{ entry.performed_by.get_full_name }}</span>
                         <span class="timeline-role">{{ trans.administrator_role }}</span>
                         {% elif entry.contact %}
                         <div class="timeline-avatar client-avatar"><i class="bi bi-person"></i></div>

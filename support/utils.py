@@ -53,7 +53,7 @@ class SupportTicketService:
         """Return the base queryset for the current user's organization."""
         return (
             SupportTicket.undeleted_objects.filter(organization=user.organization)
-            .select_related("asset", "assigned_to")
+            .select_related("asset", "assigned_to", "client")
             .order_by("-created_at")
         )
 
@@ -67,9 +67,7 @@ class SupportTicketService:
                 status="0", ticket_type="hardware_repair"
             ).count(),
             "overdue_count": qs.filter(status="0", estimated_eta__lt=now()).count(),
-            "critical_count": qs.filter(
-                priority__in=["3", "2"], status="0"
-            ).count(),
+            "critical_count": qs.filter(priority__in=["3", "2"], status="0").count(),
         }
 
     # ------------------------------------------------------------------
@@ -181,9 +179,7 @@ class SupportTicketService:
             TicketActivity.objects.create(
                 ticket=ticket,
                 activity_type="created",
-                description=(
-                    f"Ticket initiated by {request.user.get_full_name()}."
-                ),
+                description=(f"Ticket initiated by {request.user.get_full_name()}."),
                 performed_by=request.user,
             )
             return ticket
@@ -204,7 +200,10 @@ class SupportTicketService:
         """
         ticket = get_object_or_404(
             SupportTicket.undeleted_objects.select_related(
-                "asset", "assigned_to", "department", "location",
+                "asset",
+                "assigned_to",
+                "department",
+                "location",
             ),
             pk=ticket_id,
             organization=request.user.organization,
@@ -214,14 +213,25 @@ class SupportTicketService:
         comments = ticket.comments.select_related("author").prefetch_related(
             "attachments"
         )
-        activities_qs = (
-            ticket.activities.filter(is_internal=False)
-            .exclude(activity_type="created")
+        activities_qs = ticket.activities.filter(is_internal=False).exclude(
+            activity_type="created"
         )
 
+        history_list = list(history_qs)
+        status_change_ids = set()
+        prev_status = None
+        for record in reversed(history_list):
+            if prev_status is not None and record.status != prev_status:
+                status_change_ids.add(record.pk)
+            prev_status = record.status
+
+        filtered_history = [h for h in history_list if h.pk not in status_change_ids]
+
         combined = sorted(
-            chain(activities_qs, history_qs),
-            key=lambda x: x.created_at if hasattr(x, "activity_type") else x.history_date,
+            chain(activities_qs, filtered_history),
+            key=lambda x: (
+                x.created_at if hasattr(x, "activity_type") else x.history_date
+            ),
             reverse=True,
         )
         paginator = Paginator(combined, 10, orphans=1)
@@ -241,9 +251,28 @@ class SupportTicketService:
     # ------------------------------------------------------------------
 
     ALLOWED_EXTENSIONS = {
-        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg',
-        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf',
-        'zip', 'rar', 'tar', 'gz', '7z',
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "bmp",
+        "webp",
+        "svg",
+        "pdf",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",
+        "txt",
+        "csv",
+        "rtf",
+        "zip",
+        "rar",
+        "tar",
+        "gz",
+        "7z",
     }
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
@@ -253,8 +282,8 @@ class SupportTicketService:
         for f in files:
             if f.size > SupportTicketService.MAX_FILE_SIZE:
                 raise ValidationError(f"File '{f.name}' exceeds the 10MB size limit.")
-            
-            ext = f.name.split('.')[-1].lower() if '.' in f.name else ''
+
+            ext = f.name.split(".")[-1].lower() if "." in f.name else ""
             if ext not in SupportTicketService.ALLOWED_EXTENSIONS:
                 raise ValidationError(f"File type '.{ext}' is not allowed.")
 
@@ -372,9 +401,12 @@ class SupportTicketService:
         old_status = ticket.status
         old_assigned = ticket.assigned_to
 
-        # Validate happy code when closing a ticket (status = 4)
+        # Validate happy code when closing a ticket (status = 4) and ticket has a client
         new_status = request.POST.get("status", old_status)
-        if new_status == "4" and old_status != "4":
+        has_client = ticket.client is not None or (
+            ticket.asset is not None and ticket.asset.client is not None
+        )
+        if new_status == "4" and old_status != "4" and has_client:
             if not ticket.happy_code:
                 raise ValidationError(
                     "This ticket does not have a happy code. "
@@ -387,7 +419,10 @@ class SupportTicketService:
                     "Please enter the code provided by the client."
                 )
             expected_code = ticket.happy_code.upper()
-            if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
+            if (
+                submitted_code != expected_code
+                and submitted_code != f"HC-{expected_code}"
+            ):
                 raise ValidationError(
                     "Invalid happy code. Please check with the client for the correct code."
                 )
@@ -404,9 +439,7 @@ class SupportTicketService:
             TicketActivity.objects.create(
                 ticket=ticket,
                 activity_type="status_changed",
-                description=(
-                    f"Status changed from {old_label} to {new_label}."
-                ),
+                description=(f"Status changed from {old_label} to {new_label}."),
                 performed_by=request.user,
             )
 
@@ -474,6 +507,75 @@ class SupportTicketService:
         return ticket_id
 
     # ------------------------------------------------------------------
+    # Status update (Kanban drag-and-drop)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def update_status(request, ticket_id):
+        """Update ticket status from Kanban drag-and-drop.
+
+        Validates the status, checks happy code when moving to Closed,
+        saves the change, and logs a status-changed activity.
+
+        Returns a ``dict`` with ``{"success": True}`` on success, or
+        raises ``ValidationError`` on failure.
+        """
+        ticket = get_object_or_404(
+            SupportTicket.undeleted_objects,
+            pk=ticket_id,
+            organization=request.user.organization,
+        )
+
+        new_status = request.POST.get("status")
+        if new_status not in dict(STATUS_CHOICES):
+            raise ValidationError("Invalid status.")
+
+        old_status = ticket.status
+
+        # Happy code validation when moving to Closed
+        if new_status == "4" and old_status != "4":
+            has_client = ticket.client is not None or (
+                ticket.asset is not None and ticket.asset.client is not None
+            )
+            if has_client:
+                if not ticket.happy_code:
+                    raise ValidationError(
+                        "This ticket does not have a happy code. "
+                        "Please ask the client to provide one."
+                    )
+                submitted_code = request.POST.get("happy_code", "").strip().upper()
+                if not submitted_code:
+                    raise ValidationError(
+                        "Happy code is required to close this ticket.",
+                        params={
+                            "happy_code_required": True,
+                            "ticket_id": str(ticket.id),
+                        },
+                    )
+                expected_code = ticket.happy_code.upper()
+                if (
+                    submitted_code != expected_code
+                    and submitted_code != f"HC-{expected_code}"
+                ):
+                    raise ValidationError(
+                        "Invalid happy code. Please check with the client for the correct code."
+                    )
+
+        ticket.status = new_status
+        ticket.updated_by = str(request.user.id)
+        ticket.save(update_fields=["status", "updated_by"])
+
+        status_map = dict(STATUS_CHOICES)
+        TicketActivity.objects.create(
+            ticket=ticket,
+            activity_type="status_changed",
+            description=f"Status changed from {status_map.get(old_status, old_status)} to {status_map.get(new_status, new_status)}.",
+            performed_by=request.user,
+        )
+
+        return {"success": True}
+
+    # ------------------------------------------------------------------
     # Export CSV
     # ------------------------------------------------------------------
 
@@ -488,30 +590,34 @@ class SupportTicketService:
             response["Content-Disposition"] = 'attachment; filename="tickets.csv"'
 
             writer = csv.writer(response)
-            writer.writerow([
-                "Ticket ID",
-                "Subject",
-                "Asset",
-                "Priority",
-                "Status",
-                "Assigned To",
-                "Created At",
-            ])
+            writer.writerow(
+                [
+                    "Ticket ID",
+                    "Subject",
+                    "Asset",
+                    "Priority",
+                    "Status",
+                    "Assigned To",
+                    "Created At",
+                ]
+            )
 
             for ticket in qs:
-                writer.writerow([
-                    ticket.ticket_id,
-                    ticket.subject,
-                    ticket.asset.name if ticket.asset else "",
-                    ticket.priority,
-                    ticket.status,
-                    (
-                        ticket.assigned_to.get_full_name()
-                        if ticket.assigned_to
-                        else "Unassigned"
-                    ),
-                    ticket.created_at,
-                ])
+                writer.writerow(
+                    [
+                        ticket.ticket_id,
+                        ticket.subject,
+                        ticket.asset.name if ticket.asset else "",
+                        ticket.priority,
+                        ticket.status,
+                        (
+                            ticket.assigned_to.get_full_name()
+                            if ticket.assigned_to
+                            else "Unassigned"
+                        ),
+                        ticket.created_at,
+                    ]
+                )
 
             return response
         except Exception:
@@ -556,13 +662,13 @@ class SupportTicketService:
         Returns a list of dicts suitable for ``JsonResponse``.
         """
         if not query:
-            users = User.objects.filter(
-                organization=user.organization,
-            ).order_by("full_name")[:10]
+            users = User.objects.filter(technician__isnull=False).order_by("full_name")[
+                :10
+            ]
         else:
             users = User.objects.filter(
-                Q(organization=user.organization),
                 Q(full_name__icontains=query) | Q(email__icontains=query),
+                technician__isnull=False
             )[:10]
 
         return [

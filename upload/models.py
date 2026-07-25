@@ -62,3 +62,21 @@ class ImportedUser(TimeStampModel):
 
     def __str__(self):
         return f"{self.full_name}"
+
+class BulkUploadSession(TimeStampModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(Organization, models.DO_NOTHING, null=True)
+    created_by = models.ForeignKey('authentication.User', on_delete=models.CASCADE, null=True)
+    csv_filename = models.CharField(max_length=255, blank=True, null=True)
+    zip_filename = models.CharField(max_length=255, blank=True, null=True)
+    staged_data = models.JSONField(default=list)   # parsed CSV rows
+    image_map = models.JSONField(default=dict)     # {filename: saved_path}
+    total_rows = models.IntegerField(default=0)
+    matched_images = models.IntegerField(default=0)
+    unmatched_images = models.IntegerField(default=0)
+    status = models.CharField(max_length=50, default='pending',
+        choices=[('pending','Pending'),('mapped','Mapped'),
+                 ('committed','Committed'),('failed','Failed')])
+    class Meta:
+        verbose_name = "Bulk Upload Session"
+        ordering = ['-created_at']

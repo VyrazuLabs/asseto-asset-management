@@ -37,7 +37,7 @@ STRINGS = {
     'add_asset_subtitle': 'Log a new physical or digital asset into the ledger. Ensure serial numbers and purchase details match your invoice for accurate auditing.',
     'save_asset': 'Save Asset',
     'tag_id_auto': 'Tag ID (Auto-Generated)',
-    'product_category': 'Product Category',
+    'product_category': 'Product',
     'client': 'Client',
     'finance_purchase': 'Finance & Purchase',
     'price': 'Price',
