@@ -17,6 +17,8 @@ class TagConfigurationForm(forms.ModelForm):
     def clean_prefix(self):
         prefix = self.cleaned_data.get("prefix")
 
+        if not prefix:  # field is empty or None
+            raise forms.ValidationError("Prefix is required.")
         if not prefix.isalpha():  # checks only letters
             raise forms.ValidationError("Prefix must contain only alphabets (A-Z).")
         return prefix
@@ -24,6 +26,8 @@ class TagConfigurationForm(forms.ModelForm):
     def clean_number_suffix(self):
         suffix = self.cleaned_data.get("number_suffix")
 
+        if not suffix:  # field is empty or None
+            raise forms.ValidationError("Number suffix is required.")
         if not suffix.isdigit():  # checks only numbers
             raise forms.ValidationError("Suffix must contain only numbers (0-9).")
         return suffix
