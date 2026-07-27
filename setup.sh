@@ -56,6 +56,38 @@ fi
 echo -e "----------------------------------------------------------------------"
 sleep 1
 
+# Check Docker installation
+echo -e "${BOLD}Checking Docker installation...${NC}"
+if ! command -v docker &> /dev/null; then
+    echo -e "${YELLOW}Docker is not installed. Attempting to install the latest Docker...${NC}"
+    if command -v curl &> /dev/null; then
+        echo -e "Using official Docker installation script..."
+        curl -fsSL https://get.docker.com | sh
+    elif command -v wget &> /dev/null; then
+        echo -e "Using official Docker installation script via wget..."
+        wget -qO- https://get.docker.com | sh
+    elif command -v apt-get &> /dev/null; then
+        echo -e "Using apt-get to install docker.io..."
+        sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
+    else
+        echo -e "${RED}Error: Neither curl, wget, nor apt-get is available. Please install Docker manually.${NC}"
+        exit 1
+    fi
+
+    # Re-verify installation
+    if ! command -v docker &> /dev/null; then
+        echo -e "${RED}Error: Failed to install Docker automatically. Please install Docker manually.${NC}"
+        exit 1
+    fi
+    
+    # Start docker service if not running
+    sudo systemctl start docker &>/dev/null || sudo service docker start &>/dev/null
+else
+    echo -e "${GREEN}✓ Docker is already installed.${NC}"
+fi
+echo -e "----------------------------------------------------------------------"
+sleep 1
+
 # Check Port 80 configuration
 echo -e "${BOLD}Checking if port 80 is occupied...${NC}"
 PORT_80_PID=""
@@ -184,12 +216,27 @@ echo ""
 DB_PASSWORD=${USER_DB_PASS:-$RANDOM_PASS}
 
 # Optional SMTP configuration
-echo -e "\n${YELLOW}${BOLD}Give SMTP credentials now or give inside .env later${NC}"
+echo -e "\n${YELLOW}${BOLD}Provide the SMTP credentials now, or configure them later in the .env file.${NC}"
 read -p "EMAIL_HOST: " EMAIL_HOST
 read -p "EMAIL_HOST_USER: " EMAIL_HOST_USER
 read -s -p "EMAIL_HOST_PASSWORD: " EMAIL_HOST_PASSWORD
 echo ""
 read -p "EMAIL_PORT: " EMAIL_PORT
+
+# Configure Server Domain / Host
+echo -e "\n${BOLD}Configure Server Domain / Host:${NC}"
+echo -e "Enter the domain name or IP address where this application will be accessed."
+echo -e "If running locally, just press [Enter] to use 'localhost'."
+read -p "Server Domain / IP [localhost]: " USER_SERVER_NAME
+SERVER_NAME=${USER_SERVER_NAME:-localhost}
+
+if [ "$SERVER_NAME" = "localhost" ]; then
+    ALLOWED_HOSTS="*"
+    CSRF_TRUSTED_ORIGINS="http://localhost,http://127.0.0.1"
+else
+    ALLOWED_HOSTS="$SERVER_NAME,localhost,127.0.0.1"
+    CSRF_TRUSTED_ORIGINS="http://$SERVER_NAME,https://$SERVER_NAME,http://localhost,http://127.0.0.1"
+fi
 
 # Django SECRET_KEY generation
 SECRET_KEY_GEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))" 2>/dev/null || tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 50 2>/dev/null || echo "unsafe-secret-key-for-asseto-asset-management")
@@ -212,11 +259,52 @@ DB_PASSWORD="$DB_PASSWORD"
 DB_HOST="db"
 DB_PORT="$DB_PORT"
 
-ALLOWED_HOSTS="*"
-CSRF_TRUSTED_ORIGINS="http://localhost,http://127.0.0.1"
+ALLOWED_HOSTS="$ALLOWED_HOSTS"
+CSRF_TRUSTED_ORIGINS="$CSRF_TRUSTED_ORIGINS"
 EOF
 
 echo -e "${GREEN}✓ .env file generated successfully.${NC}"
+
+# Generate nginx.conf file
+echo -e "Generating nginx.conf configuration..."
+cat << EOF > nginx.conf
+server {
+    listen 80;
+    server_name $SERVER_NAME;
+
+    client_max_body_size 100M;
+
+    # Gzip settings
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Static files routing
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # Media files routing
+    location /media/ {
+        alias /app/media/;
+        expires 30d;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # Proxy requests to Gunicorn application server
+    location / {
+        proxy_pass http://web:8000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_redirect off;
+    }
+}
+EOF
+
+echo -e "${GREEN}✓ nginx.conf file generated successfully.${NC}"
 
 # Generate corresponding docker-compose.yml file
 echo -e "Generating docker-compose.yml configuration..."
@@ -304,7 +392,7 @@ services:
       retries: 5
 
   nginx:
-    image: nginx:alpine
+    image: nginx:alpine:1.31.3
     ports:
       - "80:80"
     volumes:

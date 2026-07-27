@@ -43,10 +43,10 @@ Before setting up Asseto, ensure your system meets the following requirements:
 Asseto features an interactive setup wizard script (`setup.sh`) that automates container configuration, database selection, local web proxy installation, firewall adjustments, database migrations, and static asset collection.
 
 ### What the Setup Script Does
-1. **Verifies Python on Host**: Generates the Django `SECRET_KEY`. If Python is missing, the script attempts to install `python3.11` using the system's package manager (`apt-get`, `dnf`, `yum`, or `pacman`).
+1. **Verifies Python & Docker on Host**: Verifies if Python and Docker are installed at the very beginning of the setup script. If Python is missing, the script attempts to install `python3.11` using the system's package manager. If Docker is missing, it automatically attempts to download and install the latest Docker engine via the official installation script.
 2. **Checks Port 80**: Checks if the default port `80` (used by Nginx) is occupied. If another application (like a local Nginx, Apache, or custom server) is using it, the script attempts to stop or terminate that application first.
 3. **Database Selection**: Guides you through choosing between **PostgreSQL** (recommended) or **MySQL**.
-4. **Environment & SMTP Generation**: Automatically populates a `.env` file and creates a corresponding `docker-compose.yml` tailored to your choices. Optionally prompts for SMTP credentials (`EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`), or allows you to skip and configure them in `.env` later.
+4. **Environment, SMTP & Nginx Configuration**: Automatically populates a `.env` file, creates a corresponding `docker-compose.yml`, and dynamically generates `nginx.conf` tailored to your configuration. Optionally prompts for the Server Domain or IP address (defaults to `localhost`), and SMTP credentials (`EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`).
 5. **Verifies Docker**: Assures the Docker daemon and Docker Compose are installed and running.
 6. **Builds & Launches Containers**: Downloads required base images (Nginx, database) and builds the Django web app container.
 7. **Runs Migrations & Asset Collection**: Automatically executes Django migrations and collects static assets.
@@ -73,10 +73,11 @@ Asseto features an interactive setup wizard script (`setup.sh`) that automates c
    * Select your preferred database (PostgreSQL or MySQL).
    * Input custom database credentials or press `Enter` to use secure defaults.
    * Provide SMTP details optional step (or press `Enter` to skip and configure in `.env` later).
+   * Provide a Server Domain or IP address (e.g. `example.com` or `123.45.67.89`) to configure allowed hosts and the Nginx server name, or press `Enter` to default to `localhost`.
    * If prompted, opt to configure your UFW firewall rules to allow incoming HTTP traffic.
    * Enter your account and company details for initial administrator registration (Password entered twice with verification).
 
-5. Open your browser and navigate to `http://localhost` to view the Asseto dashboard.
+5. Open your browser and navigate to the configured Server Domain or IP address (or `http://localhost`) to view the Asseto dashboard.
 
 ---
 
