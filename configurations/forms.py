@@ -17,16 +17,16 @@ class TagConfigurationForm(forms.ModelForm):
     def clean_prefix(self):
         prefix = self.cleaned_data.get("prefix")
 
-        if not prefix.isalpha():  # checks only letters
+        if prefix and not prefix.isalpha():  # checks only letters (if provided)
             raise forms.ValidationError("Prefix must contain only alphabets (A-Z).")
-        return prefix
+        return prefix or None
 
     def clean_number_suffix(self):
         suffix = self.cleaned_data.get("number_suffix")
 
-        if not suffix.isdigit():  # checks only numbers
+        if suffix and not suffix.isdigit():  # checks only numbers (if provided)
             raise forms.ValidationError("Suffix must contain only numbers (0-9).")
-        return suffix
+        return suffix or None
 
 
 class ClientCredentialsForm(forms.Form):
