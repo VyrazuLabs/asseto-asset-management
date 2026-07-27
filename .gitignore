@@ -4,6 +4,7 @@
 **/env
 .pytest_cache
 media
+backups
 db.sqlite3
 staticfiles
 firebase-credentials.json

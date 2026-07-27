@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn AssetManagement.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - django-static:/app/staticfiles
+      - django-media:/app/media
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: assetto2
+      POSTGRES_USER: rajdeep291
+      POSTGRES_PASSWORD: rajdeep@291
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rajdeep291 -d assetto2"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - django-static:/app/staticfiles:ro
+      - django-media:/app/media:ro
+    depends_on:
+      - web
+
+volumes:
+  django-static:
+  django-media:
+  pg-data:
