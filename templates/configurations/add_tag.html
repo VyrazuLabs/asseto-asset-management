@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block title %}{% if not configurations %}{{ trans.add_tag_configuration }}{% else %}{{ trans.update_tag_configuration }}{% endif %} | Asseto{% endblock %}
+{% block title %}{% if not configurations %}Add Tag Configuration{% else %}Update Tag Configuration{% endif %} | Asseto{% endblock %}
 
 {% block content %}
 <div class="page-heading">
@@ -32,6 +32,9 @@
             {% csrf_token %}
             <div class="d-flex gap-2">
                 <div class="card w-50">
+                    <div class="card-header">
+                        <h5 class="card-title">Tag Configuration</h5>
+                    </div>
                     <div class="card-body">
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
