@@ -7,6 +7,7 @@ media
 backups
 db.sqlite3
 staticfiles
+docker-compose.yml
 firebase-credentials.json
 *.log
 .superpowers

@@ -46,10 +46,11 @@ Asseto features an interactive setup wizard script (`setup.sh`) that automates c
 1. **Verifies Python on Host**: Generates the Django `SECRET_KEY`. If Python is missing, the script attempts to install `python3.11` using the system's package manager (`apt-get`, `dnf`, `yum`, or `pacman`).
 2. **Checks Port 80**: Checks if the default port `80` (used by Nginx) is occupied. If another application (like a local Nginx, Apache, or custom server) is using it, the script attempts to stop or terminate that application first.
 3. **Database Selection**: Guides you through choosing between **PostgreSQL** (recommended) or **MySQL**.
-4. **Environment Generation**: Automatically populates a `.env` file and creates a corresponding `docker-compose.yml` tailored to your choices.
+4. **Environment & SMTP Generation**: Automatically populates a `.env` file and creates a corresponding `docker-compose.yml` tailored to your choices. Optionally prompts for SMTP credentials (`EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`), or allows you to skip and configure them in `.env` later.
 5. **Verifies Docker**: Assures the Docker daemon and Docker Compose are installed and running.
 6. **Builds & Launches Containers**: Downloads required base images (Nginx, database) and builds the Django web app container.
 7. **Runs Migrations & Asset Collection**: Automatically executes Django migrations and collects static assets.
+8. **Initial User & Organization Registration**: Prompts for administrator and company details (Full Name, Email, Username, Phone, Password asked twice with hidden inputs, Company Name, and Company Website). Executes `python manage.py user_register`. If the specified username or email already exists, the setup wizard automatically prompts you to re-enter valid details.
 
 ### Steps to Run
 1. Clone the repository and navigate to the project directory:
@@ -70,8 +71,10 @@ Asseto features an interactive setup wizard script (`setup.sh`) that automates c
 
 4. Follow the interactive prompts:
    * Select your preferred database (PostgreSQL or MySQL).
-   * Input custom database name, username, and password, or press `Enter` to use the secure defaults.
+   * Input custom database credentials or press `Enter` to use secure defaults.
+   * Provide SMTP details optional step (or press `Enter` to skip and configure in `.env` later).
    * If prompted, opt to configure your UFW firewall rules to allow incoming HTTP traffic.
+   * Enter your account and company details for initial administrator registration (Password entered twice with verification).
 
 5. Open your browser and navigate to `http://localhost` to view the Asseto dashboard.
 
@@ -107,6 +110,7 @@ If you prefer to run Asseto directly on your local system without containerizati
    ```
    Open the newly created `.env` file and edit it to input:
    * Your database connection details (PostgreSQL/MySQL `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`).
+   * Optional SMTP details (`EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_PORT`).
    * A secure Django `SECRET_KEY`.
 
 5. Apply the database migrations:
@@ -114,7 +118,12 @@ If you prefer to run Asseto directly on your local system without containerizati
    python manage.py migrate
    ```
 
-6. Start the local development server:
+6. Register initial administrator and organization:
+   ```bash
+   python manage.py user_register --fullname "John Doe" --email john.doe@example.com --username john --phone "+919876543210" --password "YourSecret123" --company_name "Acme Corp" --company_website "acme.com"
+   ```
+
+7. Start the local development server:
    ```bash
    python manage.py runserver
    ```
@@ -124,19 +133,31 @@ If you prefer to run Asseto directly on your local system without containerizati
 
 ## Post-Setup Configurations
 
-### Creating an Administrator Account
-To access administrative sections and customize settings, create a superuser:
+### Registering Administrator Accounts via CLI
+You can register new administrator user accounts and organizations at any time using the Django management command:
 
 * **For Docker Setup**:
   ```bash
-  docker compose exec -it web python manage.py createsuperuser
+  docker compose exec -it web python manage.py user_register \
+    --fullname "John Doe" \
+    --email john.doe@example.com \
+    --username john \
+    --phone "+919876543210" \
+    --password "YourSecret123" \
+    --company_name "Acme Corp" \
+    --company_website "acme.com"
   ```
 * **For Manual Setup**:
   ```bash
-  python manage.py createsuperuser
+  python manage.py user_register \
+    --fullname "John Doe" \
+    --email john.doe@example.com \
+    --username john \
+    --phone "+919876543210" \
+    --password "YourSecret123" \
+    --company_name "Acme Corp" \
+    --company_website "acme.com"
   ```
-
-Follow the prompts to enter a username, email address, and a secure password.
 
 ### Managing the Application
 For Docker deployments, use these standard commands to control the server:

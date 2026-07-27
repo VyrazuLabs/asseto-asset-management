@@ -183,6 +183,14 @@ read -s -p "Database Password [$RANDOM_PASS]: " USER_DB_PASS
 echo ""
 DB_PASSWORD=${USER_DB_PASS:-$RANDOM_PASS}
 
+# Optional SMTP configuration
+echo -e "\n${YELLOW}${BOLD}Give SMTP credentials now or give inside .env later${NC}"
+read -p "EMAIL_HOST: " EMAIL_HOST
+read -p "EMAIL_HOST_USER: " EMAIL_HOST_USER
+read -s -p "EMAIL_HOST_PASSWORD: " EMAIL_HOST_PASSWORD
+echo ""
+read -p "EMAIL_PORT: " EMAIL_PORT
+
 # Django SECRET_KEY generation
 SECRET_KEY_GEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))" 2>/dev/null || tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 50 2>/dev/null || echo "unsafe-secret-key-for-asseto-asset-management")
 
@@ -192,10 +200,10 @@ cat << EOF > .env
 SECRET_KEY="$SECRET_KEY_GEN"
 FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY=
 
-EMAIL_HOST=
-EMAIL_HOST_USER=
-EMAIL_HOST_PASSWORD=
-EMAIL_PORT=
+EMAIL_HOST="$EMAIL_HOST"
+EMAIL_HOST_USER="$EMAIL_HOST_USER"
+EMAIL_HOST_PASSWORD="$EMAIL_HOST_PASSWORD"
+EMAIL_PORT="$EMAIL_PORT"
 
 DB_ENGINE="$DB_ENGINE"
 DB_NAME="$DB_NAME"
@@ -444,17 +452,84 @@ echo -e "${GREEN}✓ Static files collected successfully.${NC}"
 echo -e "----------------------------------------------------------------------"
 sleep 1
 
-# Step 10: Setup Complete
+# Step 10: Register User Account
+echo -e "${BOLD}[Step 10] Register Administrator Account...${NC}"
+echo -e "Please provide user and company details. All fields are required."
+echo
+
+prompt_required() {
+    local prompt_text="$1"
+    local var_name="$2"
+    local is_secret="${3:-false}"
+    local val=""
+
+    while true; do
+        if [ "$is_secret" = "true" ]; then
+            read -s -p "$prompt_text" val
+            echo ""
+        else
+            read -p "$prompt_text" val
+        fi
+
+        val=$(echo "$val" | xargs)
+
+        if [ -n "$val" ]; then
+            eval "$var_name=\"\$val\""
+            break
+        else
+            echo -e "${RED}Error: This field is required. Please enter a value.${NC}"
+        fi
+    done
+}
+
+while true; do
+    echo -e "${CYAN}--- Enter User Details ---${NC}"
+    prompt_required "Full Name: " REG_FULLNAME
+    prompt_required "Email Address: " REG_EMAIL
+    prompt_required "Username: " REG_USERNAME
+    prompt_required "Phone Number: " REG_PHONE
+
+    while true; do
+        prompt_required "Password: " REG_PASSWORD "true"
+        prompt_required "Confirm Password: " REG_PASSWORD_CONFIRM "true"
+
+        if [ "$REG_PASSWORD" = "$REG_PASSWORD_CONFIRM" ]; then
+            break
+        else
+            echo -e "${RED}Error: Passwords do not match. Please try again.${NC}\n"
+        fi
+    done
+
+    prompt_required "Company Name: " REG_COMPANY_NAME
+    prompt_required "Company Website: " REG_COMPANY_WEBSITE
+
+    echo -e "\nRegistering user..."
+    if $DOCKER_COMPOSE_CMD exec -T web python manage.py user_register \
+        --fullname "$REG_FULLNAME" \
+        --email "$REG_EMAIL" \
+        --username "$REG_USERNAME" \
+        --phone "$REG_PHONE" \
+        --password "$REG_PASSWORD" \
+        --company_name "$REG_COMPANY_NAME" \
+        --company_website "$REG_COMPANY_WEBSITE"; then
+        break
+    else
+        echo -e "\n${RED}User already exists or registration failed. Please re-enter user details.${NC}\n"
+    fi
+done
+
+echo
+echo -e "${GREEN}✓ User account registered successfully.${NC}"
+echo -e "----------------------------------------------------------------------"
+sleep 1
+
+# Step 11: Setup Complete
 echo -e "${BLUE}${BOLD}======================================================================${NC}"
-echo -e "${GREEN}${BOLD}             [Step 10] Application is ready for use!                 ${NC}"
+echo -e "${GREEN}${BOLD}             [Step 11] Application is ready for use!                 ${NC}"
 echo -e "${BLUE}${BOLD}======================================================================${NC}"
 echo
 echo -e "Asseto Asset Management has been successfully configured and started."
-echo -e "Access the web portal in your browser at:"
 echo -e "  Link: ${CYAN}${BOLD}http://localhost${NC}"
-echo
-echo -e "Create your administrator account by running:"
-echo -e "  Command: ${YELLOW}${BOLD}$DOCKER_COMPOSE_CMD exec -it web python manage.py createsuperuser${NC}"
 echo
 echo -e "To manage your Asseto server, use the following commands:"
 echo -e "  - View live logs: ${BOLD}$DOCKER_COMPOSE_CMD logs -f${NC}"
@@ -462,3 +537,5 @@ echo -e "  - Shut down server: ${BOLD}$DOCKER_COMPOSE_CMD down${NC}"
 echo -e "  - Spin up server:  ${BOLD}$DOCKER_COMPOSE_CMD up -d${NC}"
 echo -e "======================================================================"
 echo
+
+
