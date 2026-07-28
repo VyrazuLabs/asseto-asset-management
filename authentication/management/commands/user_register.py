@@ -1,3 +1,5 @@
+import os
+
 from django.core.management.base import BaseCommand, CommandError
 from authentication.models import User
 from dashboard.models import Organization
@@ -11,11 +13,21 @@ class Command(BaseCommand):
         parser.add_argument('--email', required=True, help="Email address")
         parser.add_argument('--username', required=True, help="Username")
         parser.add_argument('--phone', required=True, help="Phone number")
-        parser.add_argument('--password', required=True, help="Password")
+        parser.add_argument(
+            '--password',
+            required=False,
+            help="Password (falls back to ASSETO_ADMIN_PASSWORD env var to avoid exposing it via `ps`)",
+        )
         parser.add_argument('--company_name', required=True, help="Company/Organization name")
         parser.add_argument('--company_website', required=True, help="Company website")
 
     def handle(self, *args, **options):
+        password = options.get('password') or os.environ.get('ASSETO_ADMIN_PASSWORD')
+        if not password:
+            raise CommandError(
+                "Password required: pass --password or set the ASSETO_ADMIN_PASSWORD environment variable."
+            )
+
         if User.objects.filter(username=options['username']).exists():
             raise CommandError(f"User with username '{options['username']}' already exists.")
 
@@ -32,7 +44,7 @@ class Command(BaseCommand):
             full_name=options["fullname"],
             username=options["username"],
             phone=options["phone"],
-            password=options["password"],
+            password=password,
         )
 
         user.organization = organization

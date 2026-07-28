@@ -210,7 +210,11 @@ read -p "Database Username [asseto_user]: " USER_DB_USER
 DB_USER=${USER_DB_USER:-asseto_user}
 
 # Generate a random password for security if none is specified
-RANDOM_PASS=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 16 2>/dev/null || echo "AssetoSecurePass123")
+RANDOM_PASS=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 16)
+if [ -z "$RANDOM_PASS" ]; then
+    echo -e "${RED}Error: could not generate a secure random password.${NC}"
+    exit 1
+fi
 read -s -p "Database Password [$RANDOM_PASS]: " USER_DB_PASS
 echo ""
 DB_PASSWORD=${USER_DB_PASS:-$RANDOM_PASS}
@@ -392,7 +396,7 @@ services:
       retries: 5
 
   nginx:
-    image: nginx:alpine:1.31.3
+    image: nginx:alpine
     ports:
       - "80:80"
     volumes:
@@ -592,16 +596,18 @@ while true; do
     prompt_required "Company Website: " REG_COMPANY_WEBSITE
 
     echo -e "\nRegistering user..."
-    if $DOCKER_COMPOSE_CMD exec -T web python manage.py user_register \
+    export ASSETO_ADMIN_PASSWORD="$REG_PASSWORD"
+    if $DOCKER_COMPOSE_CMD exec -T -e ASSETO_ADMIN_PASSWORD web python manage.py user_register \
         --fullname "$REG_FULLNAME" \
         --email "$REG_EMAIL" \
         --username "$REG_USERNAME" \
         --phone "$REG_PHONE" \
-        --password "$REG_PASSWORD" \
         --company_name "$REG_COMPANY_NAME" \
         --company_website "$REG_COMPANY_WEBSITE"; then
+        unset ASSETO_ADMIN_PASSWORD
         break
     else
+        unset ASSETO_ADMIN_PASSWORD
         echo -e "\n${RED}User already exists or registration failed. Please re-enter user details.${NC}\n"
     fi
 done

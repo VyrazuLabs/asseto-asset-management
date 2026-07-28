@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+db.sqlite3
+media/
+staticfiles/
+.git/
+.superpowers/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+backups/
+docker-compose.yml
