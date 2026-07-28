@@ -155,4 +155,9 @@ urlpatterns = [
         asset_bulk_upload_views.bulk_import_cancel,
         name="bulk_import_cancel",
     ),
+    path(
+        "assets/bulk-import/status/",
+        asset_bulk_upload_views.bulk_import_status,
+        name="bulk_import_status",
+    ),
 ]

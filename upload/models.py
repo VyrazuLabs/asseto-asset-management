@@ -75,8 +75,20 @@ class BulkUploadSession(TimeStampModel):
     matched_images = models.IntegerField(default=0)
     unmatched_images = models.IntegerField(default=0)
     status = models.CharField(max_length=50, default='pending',
-        choices=[('pending','Pending'),('mapped','Mapped'),
-                 ('committed','Committed'),('failed','Failed')])
+        choices=[
+            ('pending', 'Pending'),
+            ('mapped', 'Mapped'),
+            ('processing', 'Processing'),   # Celery task is running
+            ('done', 'Done'),               # Celery task finished (with or without partial errors)
+            ('failed', 'Failed'),           # Celery task crashed entirely
+            ('committed', 'Committed'),     # Legacy: synchronous commit (small datasets)
+        ])
+    # --- Async / Celery tracking ---
+    celery_task_id = models.CharField(max_length=255, null=True, blank=True)
+    processed_rows = models.IntegerField(default=0)   # rows attempted so far (for progress)
+    created_count  = models.IntegerField(default=0)   # successfully created assets
+    import_errors  = models.JSONField(default=list)   # list of per-row error strings
+
     class Meta:
         verbose_name = "Bulk Upload Session"
         ordering = ['-created_at']

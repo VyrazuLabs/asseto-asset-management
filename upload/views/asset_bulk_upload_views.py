@@ -11,6 +11,7 @@ from upload.bulk_upload_utils import (
     parse_csv_file, extract_zip_images, match_images_to_rows,
     apply_dept_location_mapping, commit_bulk_session, cleanup_bulk_import_files
 )
+from upload.tasks import run_bulk_import
 from dashboard.models import Location, Department
 from assets.models import Product, Vendor, AssetStatus
 from clients.models import Client
@@ -170,30 +171,37 @@ def bulk_import_step4(request):
     session_id = request.session.get(SESSION_KEY)
     if not session_id:
         return redirect('upload:bulk_import_step1')
-        
+
     session = get_object_or_404(BulkUploadSession, id=session_id, organization=request.user.organization)
-    
+
     if session.status != 'mapped':
         messages.warning(request, "Please complete the mapping step before finalizing.")
         return redirect('upload:bulk_import_step2')
-    
+
     if request.method == 'POST':
         if not request.POST.get('confirm_import'):
             messages.error(request, "Please check the confirmation box.")
             return redirect('upload:bulk_import_step4')
-            
-        created_count, errors = commit_bulk_session(session, request)
-        if errors:
-            for err in errors[:10]:
-                messages.error(request, err)
-            if len(errors) > 10:
-                messages.error(request, f"...and {len(errors)-10} more import errors.")
-            return redirect('upload:bulk_import_step4')
-            
-        messages.success(request, f"Successfully imported {created_count} assets!")
+
+        # ── Fire Celery task (non-blocking) ───────────────────────────────
+        task = run_bulk_import.delay(str(session.id), str(request.user.id))
+
+        session.celery_task_id = task.id
+        session.status = 'processing'
+        session.save(update_fields=['celery_task_id', 'status'])
+
+        # Store session ID for the progress banner on the assets list page.
+        # Clear the wizard key so the user can start a fresh import later.
+        request.session['bulk_import_job'] = str(session.id)
         del request.session[SESSION_KEY]
+
+        messages.info(
+            request,
+            f"Importing {session.total_rows} assets in the background. "
+            "You can track progress below."
+        )
         return redirect('assets:list')
-        
+
     return render(request, 'upload/asset/bulk_import/step4.html', {
         'title': 'Bulk Asset Upload - Step 3 (Finalize)',
         'session': session,
@@ -209,6 +217,53 @@ def bulk_import_cancel(request):
         del request.session[SESSION_KEY]
     messages.info(request, "Bulk import cancelled.")
     return redirect('upload:bulk_import_step1')
+
+
+@login_required
+def bulk_import_status(request):
+    """
+    JSON endpoint polled by the progress banner on the assets list page.
+    Returns the current state of the active bulk import job stored in the
+    user's Django session under 'bulk_import_job'.
+    """
+    session_id = request.session.get('bulk_import_job')
+    if not session_id:
+        return JsonResponse({'status': 'none'})
+
+    try:
+        session = BulkUploadSession.objects.get(
+            id=session_id,
+            organization=request.user.organization,
+        )
+    except BulkUploadSession.DoesNotExist:
+        # Session was cleaned up — tell the frontend it's done
+        request.session.pop('bulk_import_job', None)
+        return JsonResponse({'status': 'none'})
+
+    total     = session.total_rows or 1   # avoid division by zero
+    processed = session.processed_rows
+    percent   = min(int((processed / total) * 100), 100)
+
+    response_data = {
+        'status':    session.status,           # processing | done | failed | none
+        'processed': processed,
+        'total':     session.total_rows,
+        'created':   session.created_count,
+        'percent':   percent,
+        'error_count': len(session.import_errors),
+        'errors':    session.import_errors[:10],  # send first 10 for display
+    }
+
+    # Once done/failed, clean up the session key so the banner doesn't reappear
+    if session.status in ('done', 'failed'):
+        request.session.pop('bulk_import_job', None)
+        # Clean up staged files if there were no errors (partial-error sessions
+        # keep their staged files so errors can be inspected)
+        if session.status == 'done' and not session.import_errors:
+            cleanup_bulk_import_files(session.id)
+
+    return JsonResponse(response_data)
+
 
 @login_required
 def download_asset_template_csv(request):
@@ -227,6 +282,7 @@ def download_asset_template_csv(request):
         'macbook_pro.jpg'
     ])
     return response
+
 
 @login_required
 def download_asset_template_zip(request):

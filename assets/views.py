@@ -102,8 +102,37 @@ def manage_access_for_assign_assets(user):
 # @login_required
 # @user_passes_test(manage_access_for_assets)
 def listed(request):
+    from upload.models import BulkUploadSession
+
     assets_qs = filtered_asset(request)
     context = create_asset_list(request, assets_qs)
+
+    # ── Bulk import progress banner ────────────────────────────────────────
+    bulk_session_id = request.session.get('bulk_import_job')
+    bulk_import_active = False
+    bulk_import_session = None
+
+    if bulk_session_id:
+        try:
+            s = BulkUploadSession.objects.get(
+                id=bulk_session_id,
+                organization=request.user.organization,
+            )
+            if s.status in ('processing', 'mapped'):
+                bulk_import_active = True
+                bulk_import_session = s
+            elif s.status in ('done', 'failed'):
+                # Task finished — pass it once so the template shows the final state,
+                # then the JS will clean up the session key via the status endpoint.
+                bulk_import_active = True
+                bulk_import_session = s
+        except BulkUploadSession.DoesNotExist:
+            request.session.pop('bulk_import_job', None)
+
+    context.update({
+        'bulk_import_active':  bulk_import_active,
+        'bulk_import_session': bulk_import_session,
+    })
     return render(request, "assets/list.html", context=context)
 
 

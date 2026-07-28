@@ -52,8 +52,8 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6380/0"
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6380/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
-CELERY_TASK_TIME_LIMIT = 30  # hard kill
-CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
+CELERY_TASK_TIME_LIMIT = 3600        # hard kill — 1 hour (supports large bulk imports)
+CELERY_TASK_SOFT_TIME_LIMIT = 3300   # graceful timeout — 55 minutes
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     "gate_pass",
     "clients",
     "client_portal",
+    "django_celery_results",
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK = True
