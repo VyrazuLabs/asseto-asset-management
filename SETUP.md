@@ -121,8 +121,9 @@ If you prefer to run Asseto directly on your local system without containerizati
 
 6. Register initial administrator and organization:
    ```bash
-   python manage.py user_register --fullname "John Doe" --email john.doe@example.com --username john --phone "+919876543210" --password "YourSecret123" --company_name "Acme Corp" --company_website "acme.com"
+   ASSETO_ADMIN_PASSWORD="YourSecret123" python manage.py user_register --fullname "John Doe" --email john.doe@example.com --username john --phone "+919876543210" --company_name "Acme Corp" --company_website "acme.com"
    ```
+   The password is read from the `ASSETO_ADMIN_PASSWORD` environment variable (or `--password`, not recommended since it's visible in the process list).
 
 7. Start the local development server:
    ```bash
@@ -139,23 +140,21 @@ You can register new administrator user accounts and organizations at any time u
 
 * **For Docker Setup**:
   ```bash
-  docker compose exec -it web python manage.py user_register \
+  docker compose exec -T -e ASSETO_ADMIN_PASSWORD="YourSecret123" web python manage.py user_register \
     --fullname "John Doe" \
     --email john.doe@example.com \
     --username john \
     --phone "+919876543210" \
-    --password "YourSecret123" \
     --company_name "Acme Corp" \
     --company_website "acme.com"
   ```
 * **For Manual Setup**:
   ```bash
-  python manage.py user_register \
+  ASSETO_ADMIN_PASSWORD="YourSecret123" python manage.py user_register \
     --fullname "John Doe" \
     --email john.doe@example.com \
     --username john \
     --phone "+919876543210" \
-    --password "YourSecret123" \
     --company_name "Acme Corp" \
     --company_website "acme.com"
   ```

@@ -23,10 +23,8 @@ from assets.models import AssignAsset
 from assets.seeders import seed_asset_statuses
 from authentication.decorators import unauthenticated_user
 from authentication.forms import (
-    OrganizationForm,
     OrganizationUpdateForm,
     UserLoginForm,
-    UserRegisterForm,
     UserUpdateForm,
 )
 from authentication.models import UserTotp
@@ -363,39 +361,6 @@ def user_login(request):
         "auth/login.html",
         context={"form": form, "current_step": 3, "last_logins": last_logins},
     )
-
-
-# @unauthenticated_user
-# def user_register(request):
-#     u_form = UserRegisterForm()
-#     o_form = OrganizationForm()
-#     if request.method == "POST":
-#         if User.objects.filter(is_superuser=True).first():
-#             messages.error(request, "You are already registered")
-#         else:
-#             o_form = OrganizationForm(request.POST)
-#             u_form = UserRegisterForm(request.POST)
-#             if o_form.is_valid() and u_form.is_valid():
-#                 organization = o_form.save()
-#                 user = u_form.save(commit=False)
-#                 user.organization = organization
-#                 user.is_active = True
-#                 user.is_superuser = True
-#                 user.access_level = True
-#                 user.is_active = True
-#                 user.save()
-
-#                 messages.success(
-#                     request, f"Account for {user.full_name} created successfully."
-#                 )
-#                 return redirect("authentication:login")
-#             else:
-#                 messages.error(request, "Please correct the below errors.")
-#     return render(
-#         request,
-#         "auth/register.html",
-#         context={"u_form": u_form, "o_form": o_form, "current_step": 2},
-#     )
 
 
 @unauthenticated_user
