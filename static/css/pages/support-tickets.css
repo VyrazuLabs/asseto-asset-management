@@ -1379,8 +1379,8 @@ body.theme-dark .emoji-btn-item:hover {
 }
 
 .t-badge-status-1 {
-    background-color: #FFF0E0;
-    color: #C26300;
+    background: #1E3A8A;
+    color: #fff;
 }
 
 .t-badge-status-0 {
@@ -1401,6 +1401,20 @@ body.theme-dark .emoji-btn-item:hover {
 .t-badge-status-2 {
     background-color: #FEF3C7;
     color: #D97706;
+}
+
+.modal-body .form-control {
+  border-radius: 12px !important;
+  padding: .85rem 1.1rem !important;
+  border: 1.5px solid #E2E8F0 !important;
+  font-size: .95rem !important;
+  font-weight: 500 !important;
+}
+
+body.theme-dark .modal-body .form-control {
+  background: #161625 !important;
+  border-color: #2D2D3F !important;
+  color: #F1F5F9 !important;
 }
 
 .info-card-title {

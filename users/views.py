@@ -182,6 +182,7 @@ def add(request):
             address = address_form.save()
             user.organization = request.user.organization
             user.address = address
+            user.is_active = True
             user.save()
             is_technician = request.POST.get("is_technician",None)
             if is_technician=="on":

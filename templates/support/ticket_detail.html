@@ -25,14 +25,14 @@
             </nav>
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="t-badge t-badge-id">#{{ ticket.ticket_id }}</span>
-                <span class="t-badge t-badge-status-{{ ticket.status }}">
-                    {% if ticket.status == '1' %}
-                    <i class="bi bi-clock-history small me-1" style="font-size:0.7rem;"></i>
-                    {% else %}
-                    <i class="bi bi-circle-fill small me-1" style="font-size:0.5rem;"></i>
-                    {% endif %}
-                    {{ ticket.get_status_display|upper }}
-                </span>
+                <div class="status-dropdown-wrapper" style="position:relative;">
+                    <select id="statusSelect" class="t-badge t-badge-status-{{ ticket.status }}" style="width:auto;padding:0.25rem 1.75rem 0.25rem 0.75rem;border:1.5px solid rgba(0,0,0,0.15);border-radius:6px;cursor:pointer;appearance:auto;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">
+                        {% for key, label in status_choices %}
+                        <option value="{{ key }}" {% if ticket.status == key %}selected{% endif %}
+                            style="{% if key == '0' %}background-color:#E0F7FA;color:#00838F;{% elif key == '1' %}background-color:#1E3A8A;color:#fff;{% elif key == '2' %}background-color:#FEF3C7;color:#D97706;{% elif key == '3' %}background-color:#E8F5E9;color:#2E7D32;{% elif key == '4' %}background-color:#F1F3F5;color:#495057;{% endif %}padding:4px 8px;font-weight:600;">{{ label|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <h4 class="mb-0 fw-bold">{{ ticket.subject }}</h4>
         </div>
@@ -313,8 +313,147 @@
     </div>
 
 </div>
+<input type="hidden" id="happyCodeHiddenInput" value="">
+
+<!-- Happy Code Modal -->
+<div class="modal fade" id="happyCodeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px;">
+      <div class="modal-header border-0">
+        <h5 class="fw-bold"><i class="bi bi-shield-check me-2"></i> Happy Code Required</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <div class="mb-3" style="width: 64px; height: 64px; background: #e8f4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+            <i class="bi bi-lock-fill fs-3 text-primary"></i>
+          </div>
+          <p class="text-muted mb-0">This ticket has a happy code that must be entered to close it.</p>
+          <p class="text-muted small">Ask the client to share the happy code shown on their portal.</p>
+        </div>
+        <div class="form-group mb-3">
+          <label class="fw-bold small mb-2">Client Happy Code</label>
+          <input type="text" id="happyCodeInput" class="form-control form-control-lg text-center"
+                 placeholder="Enter 6-character code"
+                 style="font-family: monospace; letter-spacing: 6px; font-size: 1.5rem;"
+                 maxlength="10" autocomplete="off">
+          <div id="happyCodeError" class="text-danger small mt-2 d-none">
+            <i class="bi bi-exclamation-circle me-1"></i> Please enter the happy code provided by the client.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary px-4" id="happyCodeConfirmBtn">
+          <i class="bi bi-check-all me-1"></i> Confirm & Close Ticket
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
 
 {% block script %}
 <script src="{% static 'js/pages/support_tickets.js' %}" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('statusSelect');
+    if (!select) return;
+
+    const oldStatus = '{{ ticket.status }}';
+    const happyCodeModal = new bootstrap.Modal(document.getElementById('happyCodeModal'));
+    const happyCodeInput = document.getElementById('happyCodeInput');
+    const happyCodeHidden = document.getElementById('happyCodeHiddenInput');
+    const happyCodeError = document.getElementById('happyCodeError');
+    const confirmBtn = document.getElementById('happyCodeConfirmBtn');
+    let pendingCode = null;
+
+    // Reset modal state on close
+    document.getElementById('happyCodeModal').addEventListener('hidden.bs.modal', function () {
+        if (!pendingCode) {
+            happyCodeInput.value = '';
+            happyCodeHidden.value = '';
+            happyCodeError.classList.add('d-none');
+            select.value = oldStatus;
+        }
+    });
+
+    const statusClasses = ['t-badge-status-0','t-badge-status-1','t-badge-status-2','t-badge-status-3','t-badge-status-4'];
+
+    function updateBadgeColor(status) {
+        statusClasses.forEach(cls => select.classList.remove(cls));
+        select.classList.add('t-badge-status-' + status);
+    }
+
+    function doUpdate(happyCode) {
+        const formData = new FormData();
+        formData.append('status', select.value);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        if (happyCode) formData.append('happy_code', happyCode);
+
+        fetch('{% url "support:ticket_update_status" ticket.id %}', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                happyCodeInput.value = '';
+                happyCodeHidden.value = '';
+                pendingCode = null;
+                updateBadgeColor(select.value);
+            } else {
+                if (data.happy_code_required) {
+                    happyCodeInput.value = '';
+                    happyCodeHidden.value = '';
+                    happyCodeError.classList.add('d-none');
+                    happyCodeModal.show();
+                    return;
+                }
+                alert(data.error || 'Failed to update status.');
+                select.value = oldStatus;
+            }
+        })
+        .catch(() => {
+            alert('Network error. Please try again.');
+            select.value = oldStatus;
+        });
+    }
+
+    select.addEventListener('change', function () {
+        const newStatus = this.value;
+
+        // If moving to Closed, show happy code modal
+        if (newStatus === '4' && oldStatus !== '4') {
+            pendingCode = null;
+            happyCodeInput.value = '';
+            happyCodeHidden.value = '';
+            happyCodeError.classList.add('d-none');
+            happyCodeModal.show();
+        } else {
+            doUpdate();
+        }
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        const code = happyCodeInput.value.trim();
+        if (!code) {
+            happyCodeError.classList.remove('d-none');
+            return;
+        }
+        happyCodeError.classList.add('d-none');
+        happyCodeHidden.value = code;
+        pendingCode = code;
+        happyCodeModal.hide();
+        doUpdate(code);
+    });
+
+    happyCodeInput.addEventListener('input', function () {
+        happyCodeError.classList.add('d-none');
+        this.value = this.value.toUpperCase();
+    });
+});
+</script>
 {% endblock script %}
