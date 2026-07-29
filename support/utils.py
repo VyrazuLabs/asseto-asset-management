@@ -244,11 +244,8 @@ class SupportTicketService:
             "attachments": ticket.attachments.order_by("-created_at"),
             "comments": comments,
             "page_object": page_object,
+            "status_choices": STATUS_CHOICES,
         }
-
-    # ------------------------------------------------------------------
-    # Add comment (from detail page)
-    # ------------------------------------------------------------------
 
     ALLOWED_EXTENSIONS = {
         "png",
