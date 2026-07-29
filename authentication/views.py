@@ -23,10 +23,8 @@ from assets.models import AssignAsset
 from assets.seeders import seed_asset_statuses
 from authentication.decorators import unauthenticated_user
 from authentication.forms import (
-    OrganizationForm,
     OrganizationUpdateForm,
     UserLoginForm,
-    UserRegisterForm,
     UserUpdateForm,
 )
 from authentication.models import UserTotp
@@ -66,72 +64,11 @@ def get_refresh_token(request):
 
 
 def introduce(request):
-    env_path = settings.BASE_DIR / ".env"
-    request_host = request.get_host()  # e.g. "127.0.0.1:9001"
-    host_only = request_host.split(":")[0]  # e.g. "127.0.0.1"
-
-    # If you want to save this to your env:
-    set_key(env_path, "ORIGIN_HOST", host_only)
-    load_dotenv(env_path, override=True)
     return render(
         request,
         "auth/first_time_installation/introduce.html",
         context={"current_step": 1},
     )
-
-
-def db_configure(request):
-    if request.method == "POST":
-        db_type = request.POST.get("database")
-        db_engine = db_engines.get(db_type)
-
-        db_data = {
-            "DB_ENGINE": db_engine,
-            "DB_NAME": request.POST.get("db_name"),
-            "DB_USERNAME": request.POST.get("user_name"),
-            "DB_PASSWORD": request.POST.get("password"),
-            "DB_HOST": request.POST.get("host_name"),
-            "DB_PORT": request.POST.get("port"),
-        }
-
-        if create_db_connection(request, db_data):
-            messages.success(request, "Database configured successfully!")
-            return redirect("authentication:email_configure")
-        else:
-            messages.error(
-                request, "Database connection failed. Please check your credentials."
-            )
-            return render(request, "auth/first_time_installation/db_configure.html")
-
-    return render(
-        request,
-        "auth/first_time_installation/db_configure.html",
-        context={"current_step": 2},
-    )
-
-
-def smtp_email_configure(request):
-    env_path = settings.BASE_DIR / ".env"
-
-    if request.method == "POST":
-        email_data = {
-            "EMAIL_HOST": request.POST.get("email_host"),
-            "EMAIL_HOST_USER": request.POST.get("email_host_user"),
-            "EMAIL_HOST_PASSWORD": request.POST.get("email_host_password"),
-            "EMAIL_PORT": request.POST.get("email_port"),
-        }
-        for key, value in email_data.items():
-            set_key(env_path, key, value)
-        messages.success(request, "Email Configuration Successfully")
-        load_dotenv(env_path, override=True)
-        return redirect("authentication:register")
-
-    return render(
-        request,
-        "auth/first_time_installation/email_configure.html",
-        context={"current_step": 3},
-    )
-
 
 @login_required
 def index(request):
@@ -422,40 +359,7 @@ def user_login(request):
     return render(
         request,
         "auth/login.html",
-        context={"form": form, "current_step": 5, "last_logins": last_logins},
-    )
-
-
-@unauthenticated_user
-def user_register(request):
-    u_form = UserRegisterForm()
-    o_form = OrganizationForm()
-    if request.method == "POST":
-        if User.objects.filter(is_superuser=True).first():
-            messages.error(request, "You are already registered")
-        else:
-            o_form = OrganizationForm(request.POST)
-            u_form = UserRegisterForm(request.POST)
-            if o_form.is_valid() and u_form.is_valid():
-                organization = o_form.save()
-                user = u_form.save(commit=False)
-                user.organization = organization
-                user.is_active = True
-                user.is_superuser = True
-                user.access_level = True
-                user.is_active = True
-                user.save()
-
-                messages.success(
-                    request, f"Account for {user.full_name} created successfully."
-                )
-                return redirect("authentication:login")
-            else:
-                messages.error(request, "Please correct the below errors.")
-    return render(
-        request,
-        "auth/register.html",
-        context={"u_form": u_form, "o_form": o_form, "current_step": 4},
+        context={"form": form, "current_step": 3, "last_logins": last_logins},
     )
 
 
