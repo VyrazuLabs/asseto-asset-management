@@ -114,12 +114,12 @@ User = get_user_model()
 # -----------------------------
 
 TRACKED_MODELS = (
-    Department,
-    Location,
+    # Department,
+    # Location,
     Organization,
     ProductType,
     ProductCategory,
-    Address,
+    # Address,
     CustomField,
     LicenseType,
 )

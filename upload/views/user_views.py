@@ -1,19 +1,21 @@
 import csv
-from django.contrib.auth.decorators import login_required
-from AssetManagement import settings
-from upload.models import *
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from dashboard.models import Location, ProductType
-from authentication.models import User
-from django.core.paginator import Paginator
-from upload.utils import render_to_csv, csv_file_upload, get_user_upload_list
+
 import pandas as pd
-from django.contrib.auth.decorators import permission_required
-from ..utils import function_to_get_matching_objects_product_types
-import json
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.files.storage import default_storage
+from django.db import transaction
+from django.db.models.signals import post_save
+from django.shortcuts import redirect, render
+
+from AssetManagement import settings
+from authentication.models import User
+from dashboard.models import Address, Department
+from dashboard.signals import register_post_save
+from notifications.signals import user_notification
+from upload.models import *
+from upload.utils import get_user_upload_list, render_to_csv
+from users.signals import notify_user_changes
 
 
 @login_required
@@ -101,10 +103,10 @@ def import_user_csv(request):
             "upload/upload-csv-modal.html",
             {"page": "Users", "hx_target": "#mapping-users-modal-content"},
         )
-
-
+    
 @login_required
 @permission_required("authentication.add_user")
+@transaction.atomic
 def user_render_to_mapper_model(request):
     if request.method == "POST":
         file_path = request.session.get("uploaded_csv")
@@ -132,45 +134,74 @@ def user_render_to_mapper_model(request):
                 mapping[field] = selected
         created_users = []
         created_imported_user = []
-        for _, row in df.iterrows():
-            user_data = {f: row[c] for f, c in mapping.items() if c in row}
 
-            if User.objects.filter(email=user_data.get("Email")).exists():
-                messages.error(request, f'{user_data.get("Email")} is already exists')
-                continue
+        post_save.disconnect(user_notification, sender=User)
+        post_save.disconnect(notify_user_changes, sender=User)
+        post_save.disconnect(sender=Address)
+        post_save.disconnect(sender=Department)
 
-            user_address = Address.objects.create(
-                address_line_one=user_data.get("Address"),
-                city=user_data.get("City"),
-                state=user_data.get("State"),
-                country=user_data.get("Country"),
-                pin_code=user_data.get("Zip Code"),
-            )
+        try:
+            for _, row in df.iterrows():
+                user_data = {f: row[c] for f, c in mapping.items() if c in row}
 
-            department = Department.objects.create(
-                name=user_data.get("Department"), organization=request.user.organization
-            )
-            user = User.objects.create(
-                employee_id=user_data.get("Employee ID"),
-                username=user_data.get("User Name"),
-                email=user_data.get("Email"),
-                full_name=user_data.get("Name"),
-                address=user_address,
-                department=department,
-                organization=request.user.organization,
-            )
-            created_users.append(user)
-            import_user = ImportedUser.objects.create(
-                username=user_data.get("User Name"),
-                full_name=user_data.get("Name"),
-                email=user_data.get("Email"),
-                phone=user_data.get("Phone"),
-                entity_type="User",
-                department=department,
-                address=user_address,
-                organization=request.user.organization,
-            )
-            created_imported_user.append(import_user)
+                if User.undeleted_objects.filter(email=user_data.get("Email")).exists():
+                    messages.error(
+                        request, f'{user_data.get("Email")} is already exists'
+                    )
+                    continue
+
+                phone = (
+                    str(val) if isinstance(val := user_data.get("Phone"), int) else val
+                )
+
+                if len(phone) > 12:
+                    messages.error(
+                        request,
+                        f"{user_data.get('Phone')} this is not a valid phone number",
+                    )
+                    return redirect("upload:user_list")
+
+                user_address = Address.objects.create(
+                    address_line_one=user_data.get("Address"),
+                    city=user_data.get("City"),
+                    state=user_data.get("State"),
+                    country=user_data.get("Country"),
+                    pin_code=user_data.get("Zip Code"),
+                )
+
+                department = Department.objects.create(
+                    name=user_data.get("Department"),
+                    organization=request.user.organization,
+                )
+
+                user = User.objects.create(
+                    employee_id=user_data.get("Employee ID"),
+                    username=user_data.get("User Name"),
+                    email=user_data.get("Email"),
+                    full_name=user_data.get("Name"),
+                    phone=phone,
+                    address=user_address,
+                    department=department,
+                    organization=request.user.organization,
+                )
+                
+                created_users.append(user)
+                import_user = ImportedUser.objects.create(
+                    username=user_data.get("User Name"),
+                    full_name=user_data.get("Name"),
+                    email=user_data.get("Email"),
+                    phone=str(user_data.get("Phone")),
+                    entity_type="User",
+                    department=department,
+                    address=user_address,
+                    organization=request.user.organization,
+                )
+                created_imported_user.append(import_user)
+        finally:
+            post_save.connect(user_notification, sender=User)
+            post_save.connect(notify_user_changes, sender=User)
+            register_post_save(Address)
+            register_post_save(Department)
 
         messages.success(request, f"{len(created_users)} users imported successfully.")
         return redirect("upload:user_list")
