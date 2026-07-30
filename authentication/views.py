@@ -62,17 +62,8 @@ def get_refresh_token(request):
         status=200,
     )
 
-
-def introduce(request):
-    return render(
-        request,
-        "auth/first_time_installation/introduce.html",
-        context={"current_step": 1},
-    )
-
 @login_required
 def index(request):
-
     all_asset_cost = 0
     today = datetime.now()
     time_threshold = datetime.now() + timedelta(days=30)
