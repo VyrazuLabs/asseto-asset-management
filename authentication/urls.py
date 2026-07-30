@@ -8,7 +8,6 @@ app_name = 'authentication'
 
 urlpatterns = [
     # Template urls
-    path('introduce/', views.introduce, name = 'introduce'),
     path('', views.index, name = 'index'),
     path('login', views.user_login, name = 'login'),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
