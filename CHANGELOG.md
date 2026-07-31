@@ -10,6 +10,15 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 > Changes staged on `develop` that have not yet been released.
 
+### Security
+- **Pillow** — Bumped `12.2.0 → 12.3.0` to patch 13 HIGH/MODERATE CVEs including JPEG2000 DoS, heap out-of-bounds reads/writes, decompression bomb bypasses, and OS command injection.
+- **pypdf** — Bumped `6.10.2 → 6.14.2` to patch 10 HIGH/MODERATE CVEs including infinite loops for unterminated inline images, excessive memory usage, and long runtime attacks.
+- **cryptography** — Bumped `46.0.7 → 49.0.0` to resolve HIGH CVE for vulnerable OpenSSL included in wheels.
+- **pyasn1** — Bumped `0.6.3 → 0.6.4` to patch 2 HIGH CVEs: uncontrolled resource consumption and quadratic complexity DoS in OID processing.
+- **msgpack** — Bumped `1.1.2 → 1.2.1` to patch HIGH CVE for out-of-bounds read/crash on Unpacker reuse after a caught error.
+- **Django** — Bumped `5.2.14 → 5.2.16` to patch LOW CVE for STARTTLS partially-initialized connection reuse.
+- **setuptools** — Relaxed constraint from `<82.0.0` to `>=83.0.0` to patch CVE for Unicode normalization bypass in `MANIFEST.in` exclusions.
+
 ---
 
 ## [1.6.5] — 2026-07-25
