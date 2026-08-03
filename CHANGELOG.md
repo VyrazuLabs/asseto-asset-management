@@ -10,6 +10,22 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 > Changes staged on `develop` that have not yet been released.
 
+---
+
+## [1.6.6] — 2026-08-03
+
+### Added
+- **Docker & Shell Script Deployment Setup** — Introduced single-command installation (`setup.sh`), `Dockerfile`, `nginx.conf`, and `SETUP.md` for containerized application setup, Nginx reverse proxy, domain binding, and database connectivity.
+- **Admin Registration CLI Command** — Implemented custom Django management command `user_register` for secure initial administrator creation using environment variable credentials.
+
+### Changed
+- **Tag Configuration** — Refactored Tag Configuration forms and templates to make prefix and suffix fields optional.
+- **Support Ticket Layout** — Added ticket status dropdown and updated support ticket details view layout.
+
+### Fixed
+- **User Bulk Upload** — Resolved data processing, error handling, and session bugs during bulk user upload.
+- **Asset Import & User Default Handling** — Fixed step indicator UI layout in asset bulk import workflow and default active user filtering.
+
 ### Security
 - **Pillow** — Bumped `12.2.0 → 12.3.0` to patch 13 HIGH/MODERATE CVEs including JPEG2000 DoS, heap out-of-bounds reads/writes, decompression bomb bypasses, and OS command injection.
 - **pypdf** — Bumped `6.10.2 → 6.14.2` to patch 10 HIGH/MODERATE CVEs including infinite loops for unterminated inline images, excessive memory usage, and long runtime attacks.
