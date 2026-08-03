@@ -1,6 +1,6 @@
 Vyrazu License (Based on GPL v3)
 
-Copyright (c) [2024] [Vyrazu Labs Pvt. Ltd.]
+Copyright (c) [2026] [Vyrazu Labs Pvt. Ltd.]
 
 Permission is hereby granted to any person obtaining a copy of this software and associated documentation files (the "Software"), to use the Software for commercial purposes, subject to the following conditions:
 

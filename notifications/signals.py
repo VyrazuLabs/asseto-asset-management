@@ -1,22 +1,19 @@
 import sys
-from django.db.models.signals import post_save, post_init, post_delete, pre_save
-from django.dispatch import receiver
-from django.conf import settings
-from notifications.models import Notification, UserNotification
-from authentication.models import User
 from datetime import datetime, timedelta
-from django.db.backends.signals import connection_created
-from assets.models import AssignAsset
+
+from django.conf import settings
 from django.db import connection
-from assets.models import Asset
-from notifications.utils import notifications_call, send_email
-from assets.utils import slack_notification
+from django.db.backends.signals import connection_created
+from django.db.models.signals import (post_delete, post_init, post_save,
+                                      pre_save)
+from django.dispatch import receiver
+
+from assets.models import Asset, AssignAsset
+from authentication.models import User
+from notifications.models import Notification, UserNotification
 from notifications.service import NotificationService
 
 
-# User Notification
-# Implement this with the service to maintain a clean code.
-# print("IN NOTIFICATION SIGNALS")
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def user_notification(sender, instance, created, **kwargs):
     if created:
@@ -80,27 +77,11 @@ def notify_admin_on_status_change(sender, instance, created, **kwargs):
             for admin in admins:
                 UserNotification.objects.create(user=admin, notification=notification)
             user = instance.updated_by
-            # if user:
-            #     if user.email_notification:
-            #         send_email(
-            #             user.email,
-            #             notification_title="Updated asset",
-            #             notification_text=f"{instance.name} status changed to {new_status}."
-            #         )
-
-            #     if user.slack_notification:
-            #         slack_notification(
-            #             user,
-            #             f"{instance.name} status updated to {new_status}.",
-            #             instance.id,
-            #             instance.tag
-            #         )
 
 
 @receiver(post_save, sender=Asset)
 def notify_admin_on_asset_created(sender, instance, created, **kwargs):
-    if created:
-        return
+    pass
 
 
 @receiver(post_save, sender=Asset)
@@ -128,42 +109,6 @@ def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
                 UserNotification.objects.create(user=admin, notification=notification)
 
 
-# @receiver(post_save, sender=AssignAsset)
-# def asset_notification(sender, instance, created,  **kwargs):
-#     if instance.previous_user != instance.user:
-#         # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
-#         NotificationService.send(
-#             user=instance.user,
-#             title='Assigned Asset',
-#             message=f'{instance.asset.name} is assigned to you.',
-#             icon='bi-laptop',
-#             link=f'/assets/details/{instance.asset.id}',
-#             instance_id=instance.id,
-#             object_id=str(instance.asset.id)
-#         )
-
-#         # UserNotification.objects.create(
-#         #     user=instance.user,
-#         #     notification=notification
-#         # )
-
-#     if instance.previous_user != instance.user and not created:
-#         # send_email(instance.user.email,notifications_title='Assigned asset',notification_text=f'{instance.asset.name} is assigned to you.')
-#         NotificationService.send(
-#             user=instance.user,
-#             title='Assigned Asset',
-#             message=f'{instance.asset.name} is assigned to you.',
-#             icon='bi-laptop',
-#             link=f'/assets/details/{instance.asset.id}',
-#             instance_id=instance.id,
-#             object_id=str(instance.asset.id)
-#         )
-
-
-# UserNotification.objects.create(
-#     user=instance.previous_user,
-#     notification=notification
-# )
 @receiver(post_save, sender=AssignAsset)
 def asset_notifications(sender, instance, created, **kwargs):
 
@@ -233,20 +178,6 @@ def expiring_asset(days):
                 user=super_user,
                 notification__notification_text=f"{expiring_asset.asset.name} warranty expires in {days} days.",
             ).exists():
-
-                # notification = Notification.objects.create(
-                #     instance_id=expiring_asset.id,
-                #     notification_title='Warranty Expires',
-                #     notification_text=f'{expiringAssetManagement_asset.asset.name} warranty expires in {days} days.',
-                #     icon='bi-person-workspace',
-                #     link=f'/assets/details/{expiring_asset.asset.id}',
-                #     object_id=str(expiring_asset.asset.id)
-                # )
-
-                # UserNotification.objects.create(
-                #     user=super_user,
-                #     notification=notification
-                # )
                 NotificationService.send(
                     user=expiring_asset.previous_user,
                     title="Asset Deleted",

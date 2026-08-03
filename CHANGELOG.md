@@ -12,6 +12,31 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.6] — 2026-08-03
+
+### Added
+- **Docker & Shell Script Deployment Setup** — Introduced single-command installation (`setup.sh`), `Dockerfile`, `nginx.conf`, and `SETUP.md` for containerized application setup, Nginx reverse proxy, domain binding, and database connectivity.
+- **Admin Registration CLI Command** — Implemented custom Django management command `user_register` for secure initial administrator creation using environment variable credentials.
+
+### Changed
+- **Tag Configuration** — Refactored Tag Configuration forms and templates to make prefix and suffix fields optional.
+- **Support Ticket Layout** — Added ticket status dropdown and updated support ticket details view layout.
+
+### Fixed
+- **User Bulk Upload** — Resolved data processing, error handling, and session bugs during bulk user upload.
+- **Asset Import & User Default Handling** — Fixed step indicator UI layout in asset bulk import workflow and default active user filtering.
+
+### Security
+- **Pillow** — Bumped `12.2.0 → 12.3.0` to patch 13 HIGH/MODERATE CVEs including JPEG2000 DoS, heap out-of-bounds reads/writes, decompression bomb bypasses, and OS command injection.
+- **pypdf** — Bumped `6.10.2 → 6.14.2` to patch 10 HIGH/MODERATE CVEs including infinite loops for unterminated inline images, excessive memory usage, and long runtime attacks.
+- **cryptography** — Bumped `46.0.7 → 49.0.0` to resolve HIGH CVE for vulnerable OpenSSL included in wheels.
+- **pyasn1** — Bumped `0.6.3 → 0.6.4` to patch 2 HIGH CVEs: uncontrolled resource consumption and quadratic complexity DoS in OID processing.
+- **msgpack** — Bumped `1.1.2 → 1.2.1` to patch HIGH CVE for out-of-bounds read/crash on Unpacker reuse after a caught error.
+- **Django** — Bumped `5.2.14 → 5.2.16` to patch LOW CVE for STARTTLS partially-initialized connection reuse.
+- **setuptools** — Relaxed constraint from `<82.0.0` to `>=83.0.0` to patch CVE for Unicode normalization bypass in `MANIFEST.in` exclusions.
+
+---
+
 ## [1.6.5] — 2026-07-25
 
 ### Added

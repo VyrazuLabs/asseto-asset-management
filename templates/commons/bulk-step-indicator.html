@@ -1,60 +1,98 @@
 {% load static %}
 
 <style>
-.bulk-step-indicator {
-    display: flex;
-    justify-content: space-between;
-}
-.bulk-step {
-    flex: 1;
-    padding: 10px;
-    border-bottom: 2px solid var(--border-color, #dee2e6);
-    color: var(--text-muted, #6c757d);
-    background: transparent;
-    border-radius: 0;
-}
-.bulk-step.active {
-    border-bottom-color: var(--primary-color, #553af2);
-    color: var(--primary-color, #553af2);
-}
-.bulk-step.completed {
-    border-bottom-color: var(--primary-color, #553af2);
-}
-.bulk-step-number {
-    display: block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-    letter-spacing: 0.5px;
-    color: var(--primary-color, #553af2);
-}
-.bulk-step-title {
-    color: var(--text-color, #212529);
-    font-weight: 600;
-}
+    .bulk-step-indicator {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
 
-body.theme-dark .bulk-step-indicator .card-body {
-    background-color: #1e1e2d;
-}
+    .bulk-step {
+        flex: 1;
+        padding: 10px 20px;
+        border-bottom: 2px solid var(--border-color, #dee2e6);
+        color: var(--text-muted, #6c757d);
+        background: transparent;
+        border-radius: 0;
+        transition: all 0.3s ease;
+    }
 
-body.theme-dark .bulk-step {
-    --border-color: #3a3a4a;
-    --text-muted: #9899ac;
-    --text-color: #e0e0e0;
-}
+    .bulk-step:not(:last-child) {
+        margin-right: 2rem;
+    }
+
+    .bulk-step.active {
+        border-bottom-color: var(--primary-color, #553af2);
+        color: var(--primary-color, #553af2);
+    }
+
+    .bulk-step.completed {
+        border-bottom-color: var(--primary-color, #553af2);
+    }
+
+    .bulk-step-number {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
+        color: var(--primary-color, #553af2);
+    }
+
+    .bulk-step-title {
+        color: var(--text-color, #212529);
+        font-weight: 600;
+    }
+
+    body.theme-dark .bulk-step {
+        --border-color: #3a3a4a;
+        --text-muted: #9899ac;
+        --text-color: #e0e0e0;
+    }
+
+    @media (min-width: 1800px) {
+        .bulk-step-indicator {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .bulk-step-indicator {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .bulk-step:not(:last-child) {
+            margin-right: 0;
+        }
+
+        .bulk-step-title {
+            font-size: 0.9rem;
+        }
+    }
 </style>
 
-<div class="bulk-step-indicator card card-rounded card-body flex-row mb-4 shadow-sm border-0 px-4 py-4">
-    <div class="bulk-step text-start{% if current_step == 1 %} active{% elif current_step > 1 %} completed{% endif %}">
-        <span class="bulk-step-number">Step 1</span>
-        <span class="bulk-step-title">Upload CSV & ZIP</span>
-    </div>
-    <div class="bulk-step text-start{% if current_step == 2 %} active{% elif current_step > 2 %} completed{% endif %}">
-        <span class="bulk-step-number">Step 2</span>
-        <span class="bulk-step-title">Map Fields & Images</span>
-    </div>
-    <div class="bulk-step text-start{% if current_step == 3 %} active{% elif current_step > 3 %} completed{% endif %}">
-        <span class="bulk-step-number">Step 3</span>
-        <span class="bulk-step-title">Finalize & Warn</span>
+<div class="card card-rounded shadow-sm border-0 mb-4">
+    <div class="card-body px-4 py-4">
+        <div class="bulk-step-indicator">
+            <div
+                class="bulk-step text-start{% if current_step == 1 %} active{% elif current_step > 1 %} completed{% endif %}">
+                <span class="bulk-step-number">Step 1</span>
+                <span class="bulk-step-title">Upload CSV & ZIP</span>
+            </div>
+
+            <div
+                class="bulk-step text-start{% if current_step == 2 %} active{% elif current_step > 2 %} completed{% endif %}">
+                <span class="bulk-step-number">Step 2</span>
+                <span class="bulk-step-title">Map Fields & Images</span>
+            </div>
+
+            <div
+                class="bulk-step text-start{% if current_step == 3 %} active{% elif current_step > 3 %} completed{% endif %}">
+                <span class="bulk-step-number">Step 3</span>
+                <span class="bulk-step-title">Finalize & Warn</span>
+            </div>
+        </div>
     </div>
 </div>

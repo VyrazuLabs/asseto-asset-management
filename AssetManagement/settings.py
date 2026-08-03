@@ -124,7 +124,6 @@ TRACEBACK_SHOW_LOCALS = True
 TRACEBACK_LOCALS_MAX_LENGTH = None  # Set to None to show full locals information
 PRINT_TRACEBACK_INFO_TO_CONSOLE = True  # Set to False if not required
 MIDDLEWARE = [
-    "authentication.middleware.DBConnectionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -143,7 +142,6 @@ ROOT_URLCONF = "AssetManagement.urls"
 WSGI_APPLICATION = "AssetManagement.wsgi.application"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 try:
     os.environ["DB_ENGINE"]

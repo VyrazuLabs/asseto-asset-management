@@ -175,54 +175,71 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ### Prerequisites
 
-- [Python 3.11+](https://www.python.org/)
-- [MySQL](https://www.mysql.com/) (can be replaced by your preferred database)
-- [Docker](https://www.docker.com/) (optional, for containerized deployment)
+- [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
+- [Python 3.11+](https://www.python.org/) (optional, only for manual non-containerized setup)
+- [MySQL](https://www.mysql.com/) or [PostgreSQL](https://www.postgresql.org/) (optional, only for manual non-containerized setup)
 
-### Steps
+### Docker Containerized Setup (Recommended)
+
+The easiest way to get Asseto up and running is via the interactive docker setup script, which builds the application container, configures a chosen database (PostgreSQL/MySQL), routes traffic through Nginx, runs migrations, and collects static files automatically.
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/VyrazuLabs/asseto-asset-management.git
+   cd asseto-asset-management
+   ```
+
+2. **Run the interactive setup wizard:**
+   ```bash
+   chmod +x setup.sh
+   ./setup.sh
+   ```
+
+3. **Follow the interactive prompts** to configure the database choice, environment variables, optional firewall, and let the script handle the build.
+
+4. **Access the application** at `http://localhost`. To create an administrator account, run:
+   ```bash
+   docker compose exec -it web python manage.py createsuperuser
+   ```
+
+---
+
+### Manual / Local Developer Setup (No Docker)
 
 1. Clone the repository:
-
    ```bash
    git clone https://github.com/VyrazuLabs/asseto-asset-management.git
    cd asseto-asset-management
    ```
 
 2. Create and activate a virtual environment:
-
    ```bash
    python -m venv env
    source env/bin/activate  # On Windows use `env\Scripts\activate`
    ```
 
 3. Install dependencies:
-
    ```bash
    pip install -r requirements.txt
    ```
 
 4. Set up environment variables:
-
    ```bash
    cp .env.example .env
    ```
-
-   Edit the `.env` file with your preferred settings.
+   Edit the `.env` file with your database configurations and secret key.
 
 5. Apply migrations:
-
    ```bash
    python manage.py migrate
    ```
 
 6. Start the development server:
-
    ```bash
    python manage.py runserver
    ```
 
-7. Open your browser at `http://localhost:8000`, and create a superuser if necessary:
-
+7. Open your browser at `http://localhost:8000`, and create a superuser:
    ```bash
    python manage.py createsuperuser
    ```
