@@ -30,42 +30,34 @@
               action="{% if is_update %}{% url 'configurations:update_tag_configuration' configurations.id %}{% else %}{% url 'configurations:update_tag_configuration_without_id' %}{% endif %}"
               method="POST" novalidate>
             {% csrf_token %}
-            <div class="d-flex gap-2">
-                <div class="card w-50">
-                    <div class="card-header">
-                        <h5 class="card-title">Tag Configuration</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                <ul>
-                                    {% for err in form.non_field_errors %}
-                                    <li>{{ err }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                        <div class="row">
-                            <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
-                                <label for="id_prefix" class="mt-1">{{ trans.tag_prefix }}</label>
-                                {{ form.prefix }}
-                                {% for error in form.prefix.errors %}
-                                    <small class="text-danger">{{ error }}</small>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Tag Configuration</h5>
                 </div>
-                <div class="card w-50">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 col-12 d-flex w-100 mp-2 gap-3">
-                                <label for="id_number_suffix" class="mt-1">{{ trans.tag_suffix }}</label>
-                                {{ form.number_suffix }}
-                                {% for error in form.number_suffix.errors %}
-                                    <small class="text-danger">{{ error }}</small>
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for err in form.non_field_errors %}
+                                <li>{{ err }}</li>
                                 {% endfor %}
-                            </div>
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <label for="id_prefix" class="form-label">{{ trans.tag_prefix }}</label>
+                            {{ form.prefix }}
+                            {% for error in form.prefix.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="id_number_suffix" class="form-label">{{ trans.tag_suffix }}</label>
+                            {{ form.number_suffix }}
+                            {% for error in form.number_suffix.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

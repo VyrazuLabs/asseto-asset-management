@@ -406,6 +406,8 @@ body.theme-dark .list-page-header h1 {
 .status-repair    { background: #FFF7ED; color: #92400E; border: 1.5px solid #FDE68A; }
 .status-lost      { background: #FEF2F2; color: #991B1B; border: 1.5px solid #FECACA; }
 .status-deploy    { background: #EFF6FF; color: #1E40AF; border: 1.5px solid #BFDBFE; }
+.status-required  { background: #FEF2F2; color: #B91C1C; border: 1.5px solid #FECACA; }
+.status-optional  { background: #F1F5F9; color: #475569; border: 1.5px solid #E2E8F0; }
 
 /* ── Status toggle ───────────────────────────────────────────────────────── */
 .status-toggle .form-check-input {
@@ -621,6 +623,8 @@ body.theme-dark .status-repair    { background: #302515; color: #fbbf24; border-
 body.theme-dark .status-inactive,
 body.theme-dark .status-lost      { background: #301515; color: #fca5a5; border-color: #5c2020; }
 body.theme-dark .status-deploy    { background: #15203a; color: #93c5fd; border-color: #1e3a5f; }
+body.theme-dark .status-required  { background: #301515; color: #fca5a5; border-color: #5c2020; }
+body.theme-dark .status-optional  { background: #2a2a3d; color: #cbd5e1; border-color: #3e3e55; }
 
 /* Force rounded corners for buttons that are actual <button> elements */
 body.theme-dark button.btn-register,

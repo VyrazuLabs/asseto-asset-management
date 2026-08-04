@@ -2,7 +2,7 @@ import json
 from rest_framework import serializers
 from django.db import transaction
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
-from dashboard.models import CustomField
+
 from common.convert_base64_image import convert_image
 from django.utils import timezone
 from datetime import timedelta
@@ -217,22 +217,7 @@ class AssetSerializer(serializers.ModelSerializer):
         for image in images:
             AssetImage.objects.create(image=image, asset=asset)
 
-        if custom_fields:
-            for custom_field in custom_fields:
-                if not custom_field:
-                    continue
 
-                field_name, field_value = next(iter(custom_field.items()))
-
-                CustomField.objects.create(
-                    name=field_name,
-                    object_id=asset.id,
-                    field_type="text",
-                    field_name=field_name,
-                    field_value=field_value,
-                    entity_type="asset",
-                    organization=self.context["request"].user.organization,
-                )
 
         return asset
 
@@ -318,57 +303,7 @@ class AssetSerializer(serializers.ModelSerializer):
             AssetImage.objects.create(asset=instance, image=image)
 
         # 🚀 ONLY RUN IF USER SENT custom_fields
-        if custom_fields is not None:
 
-            existing_qs = CustomField.objects.filter(
-                object_id=instance.id, entity_type="asset"
-            )
-            existing_field_names = {cf.field_name for cf in existing_qs}
-
-            incoming_field_names = {
-                next(iter(cf.keys()))
-                for cf in custom_fields
-                if isinstance(cf, dict) and cf
-            }
-
-            deleted_field_names = existing_field_names - incoming_field_names
-
-            if deleted_field_names:
-                CustomField.objects.filter(
-                    object_id=instance.id,
-                    field_name__in=deleted_field_names,
-                    entity_type="asset",
-                ).delete()
-
-            for custom_field in custom_fields:
-                if not isinstance(custom_field, dict):
-                    continue
-
-                field_name = next(iter(custom_field.keys()), None)
-                field_value = custom_field.get(field_name)
-
-                if not field_name:
-                    continue
-
-                qs = CustomField.objects.filter(
-                    object_id=instance.id, field_name=field_name, entity_type="asset"
-                )
-
-                if field_value is None:
-                    qs.delete()
-                elif qs.exists():
-                    qs.update(
-                        field_value=field_value, field_type="text", name=field_name
-                    )
-                else:
-                    CustomField.objects.create(
-                        object_id=instance.id,
-                        field_name=field_name,
-                        field_value=field_value,
-                        entity_type="asset",
-                        field_type="text",
-                        name=field_name,
-                    )
 
         return instance
 

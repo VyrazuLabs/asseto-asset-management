@@ -38,7 +38,7 @@ from common.API_custom_response import (
     log_error_to_terminal,
 )
 from common.pagination import add_pagination
-from dashboard.models import CustomField
+
 from notifications.models import UserNotification
 
 # @api_view(['GET'])

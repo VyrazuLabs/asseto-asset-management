@@ -1,6 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load cf_tags %}
 
 {% block title %}{{ trans.user_profile }} - {{ user.full_name }} | Asseto{% endblock %}
 
@@ -58,7 +59,9 @@
           {% endif %}
         </div>
         <h2 class="profile-name">{{ user.full_name }}</h2>
-        <span class="profile-id">ID: {{ user.employee_id|default:"N/A" }}</span>
+        {% if user.employee_id %}
+        <span class="profile-id">ID: {{ user.employee_id }}</span>
+        {% endif %}
 
         <div class="profile-stats">
           <div class="stat-item">
@@ -120,6 +123,35 @@
 
     {# ── Main Area (Right) ──────────────────────────────────────────────── #}
     <main class="main-content">
+
+      {% if cf_definitions|cf_has_any_value:cf_values %}
+      <!-- Custom Fields -->
+      <div class="content-card">
+        <div class="card-header-flex border-bottom-0 pb-3">
+          <h3 class="card-header-title">{{ trans.custom_fields }}</h3>
+        </div>
+        <div class="detail-card-body">
+          <div class="detail-fields-grid">
+            {% for defn in cf_definitions %}
+            {% if cf_values|get_cf_value:defn.field_key %}
+            <div class="detail-field">
+              <span class="detail-field-label">{{ defn.field_label }}</span>
+              <span class="detail-field-value">
+                {% if defn.field_type == 'boolean' %}
+                  {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
+                {% elif defn.field_type == 'url' %}
+                  <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
+                {% else %}
+                  {{ cf_values|get_cf_value:defn.field_key }}
+                {% endif %}
+              </span>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       {% if assigned_assets %}
       <!-- Current Asset Assignments -->

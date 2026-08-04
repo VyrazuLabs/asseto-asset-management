@@ -1,6 +1,6 @@
 import json
 from rest_framework import serializers
-from dashboard.models import CustomField
+
 from products.models import Product, ProductImage
 from common.convert_base64_image import convert_image
 
@@ -113,19 +113,7 @@ class ProductSerializer(serializers.ModelSerializer):
             # image=convert_image(image)
             product_image = ProductImage.objects.create(image=image, product=product)
 
-        if custom_fields is not None:
-            for custom_field in custom_fields:
-                field_name = list(custom_field.keys())[0]
-                field_value = custom_field[field_name]
-                CustomField.objects.create(
-                    name=field_name,
-                    object_id=product.id,
-                    field_type="text",
-                    field_name=field_name,
-                    field_value=field_value,
-                    entity_type="product",
-                    organization=self.context["request"].user.organization,
-                )
+
         return product, product_image
 
     def update(self, instance, validated_data):
@@ -140,51 +128,7 @@ class ProductSerializer(serializers.ModelSerializer):
         for image in image_data:
             ProductImage.objects.create(product=instance, image=image)
 
-        existing_qs = CustomField.objects.filter(
-            object_id=instance.id, entity_type="product"
-        )
-        existing_field_names = {cf.field_name for cf in existing_qs}
 
-        incoming_field_names = {
-            next(iter(cf.keys())) for cf in custom_fields if isinstance(cf, dict) and cf
-        }
-
-        deleted_field_names = existing_field_names - incoming_field_names
-        if deleted_field_names:
-            CustomField.objects.filter(
-                object_id=instance.id,
-                field_name__in=deleted_field_names,
-                entity_type="product",
-            ).delete()
-
-        # 🔹 Create / Update incoming fields
-        for custom_field in custom_fields:
-            if not isinstance(custom_field, dict):
-                continue
-
-            field_name = next(iter(custom_field.keys()), None)
-            field_value = custom_field.get(field_name)
-
-            if not field_name:
-                continue
-
-            qs = CustomField.objects.filter(
-                object_id=instance.id, field_name=field_name, entity_type="product"
-            )
-
-            if field_value is None:
-                qs.delete()
-            elif qs.exists():
-                qs.update(field_value=field_value, field_type="text", name=field_name)
-            else:
-                CustomField.objects.create(
-                    object_id=instance.id,
-                    field_name=field_name,
-                    field_value=field_value,
-                    entity_type="product",
-                    field_type="text",
-                    name=field_name,
-                )
 
         return instance
 

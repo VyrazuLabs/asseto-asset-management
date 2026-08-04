@@ -9,7 +9,7 @@ from vendors.models import Vendor
 from django.core.paginator import Paginator
 from dashboard.models import Address
 from django.shortcuts import get_object_or_404
-from dashboard.models import CustomField
+
 from datetime import date
 import os
 
@@ -129,12 +129,6 @@ def get_vendor_details(request, id):
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
     get_custom_data = []
-    get_data = CustomField.objects.filter(object_id=vendor.id)
-    for it in get_data:
-        obj = {}
-        obj["field_name"] = it.field_name
-        obj["field_value"] = it.field_value
-        get_custom_data.append(obj)
     from assets.models import AssetImage, AssignAsset
     from audit.models import Audit
     from collections import defaultdict
@@ -166,6 +160,10 @@ def get_vendor_details(request, id):
     for audit in Audit.objects.filter(asset_id__in=asset_ids):
         asset_conditions_map[audit.asset_id].append(audit.condition)
 
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "vendor")
+    cf_values = get_values_for_entity(vendor.id, cf_definitions)
+
     context = {
         "sidebar": "vendors",
         "vendor": vendor,
@@ -177,6 +175,8 @@ def get_vendor_details(request, id):
         "asset_images": asset_images,
         "asset_user_map": asset_user_map,
         "asset_conditions_map": asset_conditions_map,
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
     }
     return context
 

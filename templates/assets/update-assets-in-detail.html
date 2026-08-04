@@ -177,32 +177,7 @@
 </div>
 
 {# ── Custom Fields ─────────────────────────────────────────────────────────── #}
-{% if custom_fields %}
-<div class="form-section">
-  <div class="section-header">
-    <div class="section-icon"><i class="bi bi-sliders"></i></div>
-    <h2>{{ trans.custom_fields }}</h2>
-  </div>
-  <div class="section-body">
-    <div class="row g-3" id="custom-field-container">
-      {% for cf in custom_fields %}
-      <div class="col-md-6 col-12 rm-custom-field">
-        <label class="field-label">{{ cf.field_name }}</label>
-        <input type="text" class="field-input"
-               name="custom_field_{{ cf.entity_id }}"
-               value="{{ cf.field_value }}"
-               autocomplete="off"
-               placeholder="{{ cf.field_name }}">
-      </div>
-      {% endfor %}
-    </div>
-    <div class="row g-3 mt-1" id="custom-field-new-container"></div>
-    <button type="button" id="addCustomFieldBtn" class="btn-add-row mt-3">
-      <i class="bi bi-plus-lg"></i> {{ trans.add_custom_field }}
-    </button>
-  </div>
-</div>
-{% endif %}
+{% include "custom_fields/_cf_fields_block.html" %}
 
 {# ── Asset Specifications ──────────────────────────────────────────────────── #}
 {% if assetSpecifications %}

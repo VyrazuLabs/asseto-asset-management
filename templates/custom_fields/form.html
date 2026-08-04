@@ -1,0 +1,117 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}{{ title }} | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/add-product.css' %}?v=1.3">
+{% endblock css %}
+
+{% block content %}
+<div class="add-product-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="add-page-header">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb page-breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'custom_fields:list' %}" class="breadcrumb-link">{{ trans.custom_fields }}</a></li>
+                    <li class="breadcrumb-item active">{{ title }}</li>
+                </ol>
+            </nav>
+            <h1>{{ title }}</h1>
+            <p class="subtitle">Configure the field metadata used by the asset, client, vendor, product and user modules.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'custom_fields:list' %}" class="btn-back-listing">
+                <i class="bi bi-arrow-left"></i> {{ trans.back_to_listing }}
+            </a>
+            <button type="submit" form="cfForm" class="btn-save-asset">
+                <i class="bi bi-floppy2"></i> {{ trans.save }}
+            </button>
+        </div>
+    </div>
+
+    {# ── Form Card ─────────────────────────────────────────────────────────── #}
+    <div class="form-card">
+        <form method="post" id="cfForm" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-4" role="alert">
+                {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# ── Section 1: Field Details ───────────────────────────────────── #}
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="bi bi-sliders"></i> <span>Field Details</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="{{ form.module.id_for_label }}">{{ form.module.label }} <span class="required">*</span></label>
+                        <select name="{{ form.module.html_name }}" id="{{ form.module.id_for_label }}" class="form-control" {% if form.module.field.required %}required{% endif %}>
+                            {% for choice_val, choice_label in form.module.field.choices %}
+                                <option value="{{ choice_val }}" {% if form.module.value|stringformat:"s" == choice_val|stringformat:"s" %}selected{% endif %}>{{ choice_label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.module.errors %}<div class="text-danger small mt-1">{{ form.module.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.field_type.id_for_label }}">{{ form.field_type.label }} <span class="required">*</span></label>
+                        <select name="{{ form.field_type.html_name }}" id="{{ form.field_type.id_for_label }}" class="form-control" {% if form.field_type.field.required %}required{% endif %}>
+                            {% for choice_val, choice_label in form.field_type.field.choices %}
+                                <option value="{{ choice_val }}" {% if form.field_type.value|stringformat:"s" == choice_val|stringformat:"s" %}selected{% endif %}>{{ choice_label }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if form.field_type.errors %}<div class="text-danger small mt-1">{{ form.field_type.errors.0 }}</div>{% endif %}
+                    </div>
+                   
+                    <div class="form-group">
+                        <label for="{{ form.field_label.id_for_label }}">{{ form.field_label.label }} <span class="required">*</span></label>
+                        <input type="text" name="{{ form.field_label.html_name }}" id="{{ form.field_label.id_for_label }}" class="form-control" value="{{ form.field_label.value|default_if_none:'' }}" {% if form.field_label.field.required %}required{% endif %} placeholder="e.g. Serial Number">
+                        {% if form.field_label.errors %}<div class="text-danger small mt-1">{{ form.field_label.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.field_key.id_for_label }}">{{ form.field_key.label }} <span class="required">*</span></label>
+                        <input type="text" name="{{ form.field_key.html_name }}" id="{{ form.field_key.id_for_label }}" class="form-control" value="{{ form.field_key.value|default_if_none:'' }}" {% if form.field_key.field.required %}required{% endif %} {% if form.field_key.field.disabled %}readonly{% endif %} placeholder="e.g. serial_number">
+                        {% if form.field_key.errors %}<div class="text-danger small mt-1">{{ form.field_key.errors.0 }}</div>{% endif %}
+                        {% if form.field_key.field.disabled %}
+                        <small class="text-muted">The key cannot be changed after creation.</small>
+                        {% endif %}
+                    </div>
+
+                     <div class="form-group">
+                        <label class="form-label d-block">{{ form.is_required.label }}</label>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" name="{{ form.is_required.html_name }}" id="{{ form.is_required.id_for_label }}" class="form-check-input" {% if form.is_required.value %}checked{% endif %}>
+                            <label for="{{ form.is_required.id_for_label }}" class="form-check-label">Make this field mandatory</label>
+                        </div>
+                        {% if form.is_required.errors %}<div class="text-danger small mt-1">{{ form.is_required.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Auto-generate slug from label for new fields
+        const labelInput = document.getElementById("{{ form.field_label.id_for_label }}");
+        const keyInput = document.getElementById("{{ form.field_key.id_for_label }}");
+
+        if (labelInput && keyInput && !keyInput.hasAttribute('readonly')) {
+            labelInput.addEventListener("keyup", function() {
+                const label = labelInput.value;
+                const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
+                keyInput.value = slug;
+            });
+        }
+    });
+</script>
+{% endblock content %}

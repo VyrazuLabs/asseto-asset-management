@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     "gate_pass",
     "clients",
     "client_portal",
+    "custom_fields",
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK = True

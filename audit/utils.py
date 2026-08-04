@@ -228,6 +228,8 @@ def next_audit_due(audit=None, asset=None):
 
 
 def next_audit_due_for_asset(asset):
+    if not asset or not asset.product:
+        return None
     interval_days = asset.product.get_audit_interval()
     if interval_days == 0:
         return None

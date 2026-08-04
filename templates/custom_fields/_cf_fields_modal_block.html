@@ -1,0 +1,52 @@
+{% load cf_tags %}
+{% if cf_definitions %}
+<!-- Section: Custom Fields -->
+<div class="section-header">
+    <div class="icon-box">
+        <i class="bi bi-list-stars"></i>
+    </div>
+    <h6 class="section-title">{{ trans.custom_fields }}</h6>
+</div>
+
+{% if cf_errors %}
+<div class="alert alert-danger py-2 mb-3">
+    {% for err in cf_errors %}
+    <div class="small">{{ err }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row g-3">
+    {% for defn in cf_definitions %}
+    <div class="col-md-6">
+        <div class="premium-input-group">
+            <label>{{ defn.field_label }}{% if defn.is_required %} <span class="text-danger">*</span>{% endif %}</label>
+            <div class="premium-input-with-icon">
+                {% if defn.field_type == "boolean" %}
+                <i class="bi bi-toggle-on"></i>
+                <div class="form-check form-switch mt-2" style="padding-left: 42px;">
+                    <input type="hidden" name="cf_{{ defn.field_key }}" value="off">
+                    <input type="checkbox"
+                        class="form-check-input"
+                        id="cf_{{ defn.field_key }}"
+                        name="cf_{{ defn.field_key }}"
+                        value="on"
+                        {% if cf_values|get_cf_value:defn.field_key == "true" or cf_values|get_cf_value:defn.field_key == "on" %}checked{% endif %}>
+                </div>
+                {% else %}
+                <i class="bi bi-input-cursor"></i>
+                <input
+                    type="{{ defn.field_type|cf_html_type }}"
+                    class="form-control"
+                    id="cf_{{ defn.field_key }}"
+                    name="cf_{{ defn.field_key }}"
+                    value="{{ cf_values|get_cf_value:defn.field_key }}"
+                    {% if defn.field_type == "decimal" %}step="any"{% endif %}
+                    {% if defn.is_required %}required{% endif %}>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

@@ -19,7 +19,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect, render
 from audit.models import Audit, AuditImage
 from authentication.models import User
-from dashboard.models import CustomField
+
 from .barcode import generate_barcode
 from .forms import AssetForm, AssignedAssetListForm, AssetImageForm, ReassignedAssetForm
 from .models import Asset, AssetImage, AssetSpecification, AssetStatus, AssignAsset

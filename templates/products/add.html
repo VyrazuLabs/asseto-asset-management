@@ -134,48 +134,7 @@
             </div>
 
             {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="bi bi-list-stars"></i> <span>{{ trans.custom_fields_section }}</span>
-                </div>
-                <div class="mb-3">
-                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-plus-lg me-1"></i> {{ trans.add_field }}
-                    </button>
-                </div>
-                <div id="custom-field-container">
-                    <div class="row custom-field-row">
-                        <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <input type="text" class="form-control" placeholder="{{ trans.field_name_placeholder }}" name="custom_field_name">
-                        </div>
-                        <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <input type="text" class="form-control" placeholder="{{ trans.field_value_placeholder }}" name="custom_field_value">
-                        </div>
-                        <div class="col-md-2 col-12">
-                            <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {# Template for additional custom fields (hidden) #}
-            <template id="custom-field-template">
-                <div class="row custom-field-row mt-3 rm-custom-field">
-                    <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="{{ trans.field_name_placeholder }}" name="custom_field_name">
-                    </div>
-                    <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="{{ trans.field_value_placeholder }}" name="custom_field_value">
-                    </div>
-                    <div class="col-md-2 col-12">
-                        <button type="button" class="btn btn-sm btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </template>
+            {% include "custom_fields/_cf_fields_block.html" %}
         </form>
     </div>
 </div>
@@ -205,12 +164,6 @@
                 });
         });
 
-        $("#addCustomFieldBtn").on('click', function () {
-            const template = document.getElementById("custom-field-template");
-            const clone = template.content.cloneNode(true);
-            $("#custom-field-container").append(clone);
-        });
-
         $("#id_image").on('change', function () {
             const input = this;
             if (input.files && input.files[0]) {
@@ -224,9 +177,5 @@
             }
         });
     });
-
-    function removeCustomField(el) {
-        $(el).closest(".custom-field-row").remove();
-    }
 </script>
 {% endblock content %}

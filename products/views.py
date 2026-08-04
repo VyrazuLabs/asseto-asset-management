@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from vendors.utils import render_to_csv, render_to_pdf
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Count
-from dashboard.models import CustomField
+
 from assets.models import AssetImage
 from assets.models import Asset, AssignAsset
 from django.views.decorators.csrf import csrf_exempt
@@ -78,7 +78,9 @@ def add_product(request):
         )
         image_form = ProductImageForm(request.POST, request.FILES)
         if form.is_valid() and image_form.is_valid():
-            added_product(request, form)
+            product = added_product(request, form)
+            from custom_fields.utils import save_values_for_entity
+            save_values_for_entity(request, product.id, "product")
             # print("Product added successfully")
             messages.success(request, "Product added successfully")
             return redirect("products:list")
@@ -86,10 +88,13 @@ def add_product(request):
         form = AddProductsForm(organization=request.user.organization)
         image_form = ProductImageForm()
 
+    from custom_fields.utils import get_definitions_for_module
+    cf_definitions = get_definitions_for_module(request.user.organization, "product")
     context = {
         "form": form,
         "title": "Add New Product",
         "image_form": image_form,
+        "cf_definitions": cf_definitions,
     }
     return render(request, "products/add.html", context)
 
@@ -122,11 +127,7 @@ def update_product(request, id):
     get_product_img = (
         ProductImage.objects.filter(product=product).order_by("-uploaded_at").values()
     )
-    custom_fields = CustomField.objects.filter(
-        entity_type="product",
-        object_id=product.id,
-        organization=request.user.organization,
-    )
+
     img_array = []
     for it in get_product_img:
         img_array.append(it)
@@ -155,15 +156,6 @@ def update_product(request, id):
                     {"success": True, "message": "Main picture deleted successfully."}
                 )
 
-            if delete_custom_field_ids:
-                CustomField.objects.filter(
-                    entity_id__in=delete_custom_field_ids,
-                    object_id=product.id,
-                    organization=request.user.organization,
-                ).delete()
-                return JsonResponse(
-                    {"success": True, "message": "Custom fields deleted successfully."}
-                )
 
             return JsonResponse(
                 {"success": False, "message": "No IDs provided for deletion."},
@@ -193,62 +185,23 @@ def update_product(request, id):
             for img_file in request.FILES.getlist("image"):
                 ProductImage.objects.create(product=product, image=img_file)
 
-            # Update existing custom fields
-            for cf in custom_fields:
-                key = f"custom_field_{cf.entity_id}"
-                new_val = request.POST.get(key, "")
-                if new_val != cf.field_value:
-                    cf.field_value = new_val
-                    cf.save()
-
-            # Add new custom fields
-            for key, value in request.POST.items():
-                if key.startswith("customfield_") and value.strip():
-                    field_id = key.replace("customfield_", "")
-                    try:
-                        original = CustomField.objects.get(
-                            pk=field_id,
-                            entity_type="product",
-                            organization=request.user.organization,
-                        )
-                        CustomField.objects.create(
-                            name=original.name,
-                            object_id=product.id,
-                            field_type=original.field_type,
-                            field_name=original.field_name,
-                            field_value=value,
-                            entity_type="product",
-                            organization=request.user.organization,
-                        )
-                    except CustomField.DoesNotExist:
-                        continue
-
-            # Add dynamically created fields
-            names = request.POST.getlist("custom_field_name")
-            values = request.POST.getlist("custom_field_value")
-
-            for name, val in zip(names, values):
-                if name.strip() and val.strip():
-                    CustomField.objects.create(
-                        name=name.strip(),
-                        object_id=product.id,
-                        field_type="text",
-                        field_name=name.strip(),
-                        field_value=val.strip(),
-                        entity_type="product",  # FIXED!
-                        organization=request.user.organization,
-                    )
+            from custom_fields.utils import save_values_for_entity
+            save_values_for_entity(request, product.id, "product")
 
             messages.success(request, "Product updated successfully")
             return redirect(f"/products/details/{product.id}")
 
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "product")
+    cf_values = get_values_for_entity(product.id, cf_definitions)
     context = {
         "form": form,
         "title": f"Edit - {product.name}",
         "product": product,
         "product_images": img_array,
         "img_form": img_form,
-        "custom_fields": custom_fields,
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
     }
     return render(request, "products/edit.html", context)
 
