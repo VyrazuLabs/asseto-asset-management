@@ -8,6 +8,7 @@ def get_definitions_for_module(organization, module):
         organization=organization,
         module=module,
         is_active=True,
+        is_deleted=False,
     ).order_by("field_label")
 
 

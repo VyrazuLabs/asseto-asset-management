@@ -78,11 +78,11 @@
                     </div>
                     <div class="form-group">
                         <label for="{{ form.field_key.id_for_label }}">{{ form.field_key.label }} <span class="required">*</span></label>
-                        <input type="text" name="{{ form.field_key.html_name }}" id="{{ form.field_key.id_for_label }}" class="form-control" value="{{ form.field_key.value|default_if_none:'' }}" {% if form.field_key.field.required %}required{% endif %} {% if form.field_key.field.disabled %}readonly{% endif %} placeholder="e.g. serial_number">
+                        <input type="text" name="{{ form.field_key.html_name }}" id="{{ form.field_key.id_for_label }}" class="form-control"
+                            value="{{ form.field_key.value|default_if_none:'' }}" readonly autocomplete="off">
                         {% if form.field_key.errors %}<div class="text-danger small mt-1">{{ form.field_key.errors.0 }}</div>{% endif %}
-                        {% if form.field_key.field.disabled %}
-                        <small class="text-muted">The key cannot be changed after creation.</small>
-                        {% endif %}
+                        <small class="text-muted">Auto-generated as <code>&lt;module&gt;_&lt;field label&gt;</code> (e.g.
+                            <code>client_total_amount</code>). It is read-only and cannot be changed.</small>
                     </div>
 
                      <div class="form-group">
@@ -101,17 +101,27 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Auto-generate slug from label for new fields
+        // Live-preview the auto-generated key (<module>_<label>). Read-only on purpose.
+        const moduleSelect = document.getElementById("{{ form.module.id_for_label }}");
         const labelInput = document.getElementById("{{ form.field_label.id_for_label }}");
         const keyInput = document.getElementById("{{ form.field_key.id_for_label }}");
 
-        if (labelInput && keyInput && !keyInput.hasAttribute('readonly')) {
-            labelInput.addEventListener("keyup", function() {
-                const label = labelInput.value;
-                const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
-                keyInput.value = slug;
-            });
+        function slugifyLabel(value) {
+            return (value || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/_+/g, '_');
         }
+
+        function previewKey() {
+            if (!keyInput) return;
+            const module = moduleSelect ? moduleSelect.value : '';
+            const slug = slugifyLabel(labelInput ? labelInput.value : '');
+            keyInput.value = (module && slug) ? module + '_' + slug : '';
+        }
+
+        {% if not cf %}
+        if (moduleSelect) moduleSelect.addEventListener("change", previewKey);
+        if (labelInput) labelInput.addEventListener("keyup", previewKey);
+        previewKey();
+        {% endif %}
     });
 </script>
 {% endblock content %}

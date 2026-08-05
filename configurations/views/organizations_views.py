@@ -47,6 +47,7 @@ def add_organization(request):
             request,
             "configurations/add_organization.html",
             context={
+                "title":"Add organization",
                 "org_data": get_org_data,
                 "currency": currency,
                 "currency_choices": CURRENCY_CHOICES,

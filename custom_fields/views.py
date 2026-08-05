@@ -17,7 +17,8 @@ ORPHANS = 1
 
 def get_custom_field_queryset(request):
     return CustomFieldDefinition.objects.filter(
-        organization=request.user.organization
+        organization=request.user.organization,
+        is_deleted=False,
     ).order_by("module", "field_label")
 
 
@@ -60,7 +61,9 @@ def search_custom_fields(request, page):
 @login_required
 def create_custom_field(request):
     if request.method == "POST":
-        form = CustomFieldDefinitionForm(request.POST)
+        form = CustomFieldDefinitionForm(
+            request.POST, organization=request.user.organization
+        )
         if form.is_valid():
             cf = form.save(commit=False)
             cf.organization = request.user.organization
@@ -85,7 +88,9 @@ def create_custom_field(request):
 def update_custom_field(request, pk):
     cf = get_object_or_404(CustomFieldDefinition, pk=pk, organization=request.user.organization)
     if request.method == "POST":
-        form = CustomFieldDefinitionForm(request.POST, instance=cf)
+        form = CustomFieldDefinitionForm(
+            request.POST, instance=cf, organization=request.user.organization
+        )
         if form.is_valid():
             cf = form.save(commit=False)
             cf.updated_by = str(request.user.id)
@@ -109,7 +114,7 @@ def update_custom_field(request, pk):
 def delete_custom_field(request, pk):
     cf = get_object_or_404(CustomFieldDefinition, pk=pk, organization=request.user.organization)
     if request.method == "POST":
-        cf.delete()
+        cf.soft_delete()
         messages.success(request, "Custom field deleted successfully.")
     return redirect("custom_fields:list")
 
@@ -134,7 +139,9 @@ class CustomFieldDefinitionAPIList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return CustomFieldDefinition.objects.filter(organization=self.request.user.organization)
+        return CustomFieldDefinition.objects.filter(
+            organization=self.request.user.organization, is_deleted=False
+        )
 
     def perform_create(self, serializer):
         serializer.save(
@@ -149,7 +156,9 @@ class CustomFieldDefinitionAPIDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return CustomFieldDefinition.objects.filter(organization=self.request.user.organization)
+        return CustomFieldDefinition.objects.filter(
+            organization=self.request.user.organization, is_deleted=False
+        )
 
     def perform_update(self, serializer):
         serializer.save(updated_by=str(self.request.user.id))

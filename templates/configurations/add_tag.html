@@ -44,20 +44,24 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <div class="row">
-                        <div class="col-md-6 col-12">
-                            <label for="id_prefix" class="form-label">{{ trans.tag_prefix }}</label>
-                            {{ form.prefix }}
-                            {% for error in form.prefix.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
+                    <div class="col gap-4 p-4 justify-content-around">
+                        <div class="col-md-4 col-12">
+                            <div class="form-group d-flex gap-4">
+                                <label for="id_prefix" class="form-label">{{ trans.tag_prefix }}</label>
+                                {{ form.prefix }}
+                                {% for error in form.prefix.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
                         </div>
-                        <div class="col-md-6 col-12">
-                            <label for="id_number_suffix" class="form-label">{{ trans.tag_suffix }}</label>
-                            {{ form.number_suffix }}
-                            {% for error in form.number_suffix.errors %}
-                                <small class="text-danger">{{ error }}</small>
-                            {% endfor %}
+                        <div class="col-md-4 col-12">
+                            <div class="form-group d-flex gap-4">
+                                <label for="id_number_suffix" class="form-label">{{ trans.tag_suffix }}</label>
+                                {{ form.number_suffix }}
+                                {% for error in form.number_suffix.errors %}
+                                    <small class="text-danger mb-3">{{ error }}</small>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>

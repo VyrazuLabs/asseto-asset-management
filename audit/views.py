@@ -98,10 +98,35 @@ def add_audit(request):
 
 @login_required
 def get_audits_by_id(request, id):
-    # Get the audit id
+    # Get the asset and its latest audit record
     get_asset = get_object_or_404(Asset, id=id)
     get_audit = Audit.objects.filter(asset__id=id).order_by("-created_at").first()
     get_assigned_user = AssignAsset.objects.filter(asset__id=id).first()
+    audit_images = AuditImage.objects.filter(audit=get_audit) if get_audit else []
+
+    def _render_form(extra=None):
+        if get_assigned_user is None:
+            context = {
+                "get_asset": get_asset,
+                "assigned_users": list(User.undeleted_objects.all()),
+            }
+        else:
+            context = {
+                "get_asset": get_asset,
+                "asset_assigned_users": get_assigned_user.user.full_name,
+            }
+        context.update(
+            {
+                "get_audit": get_audit,
+                "audit_images": audit_images,
+                "sidebar": "audit",
+                "title": "Update Audit Entry",
+            }
+        )
+        if extra:
+            context.update(extra)
+        return render(request, "audit/add_audit.html", context)
+
     if request.method == "POST":
         errors = {}
         comments = request.POST.get("comments", None)
@@ -114,52 +139,49 @@ def get_audits_by_id(request, id):
 
         # If ANY custom errors exist → return template with errors
         if errors:
-            return render(
-                request,
-                "audit/add_audit.html",
+            return _render_form(
                 {
                     "errors": errors,
                     "comments": comments,
+                    "condition": condition,
                     "title": "Update Audit",
-                    "assigned_users": User.undeleted_objects.all(),
-                },
+                }
             )
         files = request.FILES.getlist("image")
         if not files:
             file = request.FILES.get("image")
             if file:
                 files = [file]
-        created_audit = Audit.objects.create(
-            asset=get_asset,
-            assigned_to=get_assigned_user.user.full_name if get_assigned_user else "",
-            condition=condition,
-            notes=comments,
-            audited_by=request.user if request.user.is_authenticated else None,
-            created_at=datetime.now(),
-            organization=request.user.organization,
-        )
-        for f in files:
-            AuditImage.objects.create(audit=created_audit, image=f)
-        messages.success(request, "Audit added successfully")
-        return redirect("audit:completed_audits")
-
-    elif request.method == "GET":
-        if get_assigned_user is None:
-            user_list = list(User.undeleted_objects.all())
-            context = {
-                "get_asset": get_asset,
-                "assigned_users": user_list,
-                "sidebar": "audit",
-                "title": "Update Audit Entry",
-            }
+        if get_audit:
+            # Update the existing audit so condition, notes and images stay in sync
+            get_audit.condition = condition
+            get_audit.notes = comments
+            get_audit.audited_by = (
+                request.user if request.user.is_authenticated else None
+            )
+            get_audit.save()
+            audit = get_audit
+            messages.success(request, "Audit updated successfully")
         else:
-            context = {
-                "get_asset": get_asset,
-                "asset_assigned_users": get_assigned_user.user.full_name,
-                "sidebar": "audit",
-                "title": "Update Audit Entry",
-            }
-        return render(request, "audit/add_audit.html", context)
+            audit = Audit.objects.create(
+                asset=get_asset,
+                assigned_to=(
+                    get_assigned_user.user.full_name if get_assigned_user else ""
+                ),
+                condition=condition,
+                notes=comments,
+                audited_by=request.user if request.user.is_authenticated else None,
+                organization=request.user.organization,
+            )
+            if request.user.is_authenticated:
+                audit.created_at = datetime.now()
+                audit.save()
+            messages.success(request, "Audit added successfully")
+        for f in files:
+            AuditImage.objects.create(audit=audit, image=f)
+        return redirect("audit:details", audit.id)
+
+    return _render_form()
 
 
 @login_required
@@ -254,3 +276,17 @@ def get_asset_tag_list(request):
     tag = request.GET.get("tag")
     tags = get_tag_list(tag)
     return JsonResponse({"tags": tags})
+
+
+@login_required
+def delete_audit_image(request, id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    image = AuditImage.objects.filter(id=id).first()
+    if not image:
+        return JsonResponse({"error": "Image not found"}, status=404)
+    if request.user.is_authenticated and image.audit.organization_id != request.user.organization_id:
+        return JsonResponse({"error": "Permission denied"}, status=403)
+    image.image.delete(save=False)
+    image.delete()
+    return JsonResponse({"success": True})
