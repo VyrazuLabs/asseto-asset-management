@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% if page_object %}
 {% for cf in page_object %}
 <tr>
@@ -8,17 +9,17 @@
     {{ forloop.counter|stringformat:"02d" }}
     {% endif %}
   </td>
-  <td><span class="status-badge status-active">{{ cf.get_module_display }}</span></td>
+  <td><span class="status-badge status-active">{{ module_display|get_item:cf.module|default:cf.get_module_display }}</span></td>
   <td>
     <div class="cell-name-main">{{ cf.field_label }}</div>
   </td>
   <td><code>{{ cf.field_key }}</code></td>
-  <td>{{ cf.get_field_type_display }}</td>
+  <td>{{ field_type_display|get_item:cf.field_type|default:cf.get_field_type_display }}</td>
   <td class="text-center">
     {% if cf.is_required %}
-    <span class="status-badge status-required">Yes</span>
+    <span class="status-badge status-required">{{ trans.yes_badge }}</span>
     {% else %}
-    <span class="status-badge status-optional">No</span>
+    <span class="status-badge status-optional">{{ trans.no_badge }}</span>
     {% endif %}
   </td>
   <td class="text-center">
@@ -34,13 +35,13 @@
   </td>
   <td>
     <div class="row-actions">
-      <a href="{% url 'custom_fields:update' cf.id %}" class="action-btn" title="Edit">
+      <a href="{% url 'custom_fields:update' cf.id %}" class="action-btn" title="{{ trans.edit_custom_field }}">
         <i class="bi bi-pencil"></i>
       </a>
       <form action="{% url 'custom_fields:delete' cf.id %}" method="post" class="form-row-action"
-        onsubmit="return confirm('Are you sure you want to delete this custom field? It will be hidden but the data is kept.');">
+        onsubmit="return confirm('{{ trans.delete_confirm_custom_field_js|escapejs }}');">
         {% csrf_token %}
-        <button type="submit" class="action-btn danger" title="Delete">
+        <button type="submit" class="action-btn danger" title="{{ trans.delete_custom_field }}">
           <i class="bi bi-trash3"></i>
         </button>
       </form>
@@ -53,7 +54,7 @@
   <td colspan="8">
     <div class="table-empty-state">
       <i class="bi bi-search d-block"></i>
-      <p>No custom fields found matching your search.</p>
+      <p>{{ trans.no_custom_fields_found }}</p>
     </div>
   </td>
 </tr>

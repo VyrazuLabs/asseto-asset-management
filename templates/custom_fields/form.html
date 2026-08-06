@@ -21,7 +21,7 @@
                 </ol>
             </nav>
             <h1>{{ title }}</h1>
-            <p class="subtitle">Configure the field metadata used by the asset, client, vendor, product and user modules.</p>
+            <p class="subtitle">{{ trans.configure_field_metadata }}</p>
         </div>
         <div class="d-flex align-items-center gap-2">
             <a href="{% url 'custom_fields:list' %}" class="btn-back-listing">
@@ -49,7 +49,7 @@
             {# ── Section 1: Field Details ───────────────────────────────────── #}
             <div class="form-section">
                 <div class="section-header">
-                    <i class="bi bi-sliders"></i> <span>Field Details</span>
+                    <i class="bi bi-sliders"></i> <span>{{ trans.field_details_section }}</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
@@ -73,7 +73,7 @@
                    
                     <div class="form-group">
                         <label for="{{ form.field_label.id_for_label }}">{{ form.field_label.label }} <span class="required">*</span></label>
-                        <input type="text" name="{{ form.field_label.html_name }}" id="{{ form.field_label.id_for_label }}" class="form-control" value="{{ form.field_label.value|default_if_none:'' }}" {% if form.field_label.field.required %}required{% endif %} placeholder="e.g. Serial Number">
+                        <input type="text" name="{{ form.field_label.html_name }}" id="{{ form.field_label.id_for_label }}" class="form-control" value="{{ form.field_label.value|default_if_none:'' }}" {% if form.field_label.field.required %}required{% endif %} placeholder="{{ trans.eg_serial_number }}">
                         {% if form.field_label.errors %}<div class="text-danger small mt-1">{{ form.field_label.errors.0 }}</div>{% endif %}
                     </div>
                     <div class="form-group">
@@ -81,15 +81,15 @@
                         <input type="text" name="{{ form.field_key.html_name }}" id="{{ form.field_key.id_for_label }}" class="form-control"
                             value="{{ form.field_key.value|default_if_none:'' }}" readonly autocomplete="off">
                         {% if form.field_key.errors %}<div class="text-danger small mt-1">{{ form.field_key.errors.0 }}</div>{% endif %}
-                        <small class="text-muted">Auto-generated as <code>&lt;module&gt;_&lt;field label&gt;</code> (e.g.
-                            <code>client_total_amount</code>). It is read-only and cannot be changed.</small>
+                        <small class="text-muted">{{ trans.auto_generated_key_prefix }} <code>&lt;module&gt;_&lt;field label&gt;</code> (e.g.
+                            <code>client_total_amount</code>). {{ trans.auto_generated_key_readonly }}</small>
                     </div>
 
                      <div class="form-group">
                         <label class="form-label d-block">{{ form.is_required.label }}</label>
                         <div class="form-check form-switch">
                             <input type="checkbox" name="{{ form.is_required.html_name }}" id="{{ form.is_required.id_for_label }}" class="form-check-input" {% if form.is_required.value %}checked{% endif %}>
-                            <label for="{{ form.is_required.id_for_label }}" class="form-check-label">Make this field mandatory</label>
+                            <label for="{{ form.is_required.id_for_label }}" class="form-check-label">{{ trans.make_field_mandatory }}</label>
                         </div>
                         {% if form.is_required.errors %}<div class="text-danger small mt-1">{{ form.is_required.errors.0 }}</div>{% endif %}
                     </div>

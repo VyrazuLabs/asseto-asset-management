@@ -560,7 +560,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
                         'details': 'Maintenance',
                     })
 
-    context = {'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
+    context = {'title': 'Asset Details', 'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries,
                'cf_definitions': cf_definitions, 'cf_values': cf_values}
 

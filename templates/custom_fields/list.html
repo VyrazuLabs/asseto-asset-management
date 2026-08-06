@@ -1,7 +1,8 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load custom_filters %}
 
-{% block title %}Custom Fields | Asseto{% endblock %}
+{% block title %}{{ trans.custom_fields }} | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -20,11 +21,11 @@
       </ol>
     </nav>
     <h1>{{ trans.custom_fields }}</h1>
-    <p class="page-subtitle">Define reusable custom fields for assets, clients, vendors, products and users.</p>
+    <p class="page-subtitle">{{ trans.custom_fields_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
     <a href="{% url 'custom_fields:create' %}" class="btn-register">
-      <i class="bi bi-plus-lg"></i> Add Custom Field
+      <i class="bi bi-plus-lg"></i> {{ trans.add_custom_field }}
     </a>
   </div>
 </div>
@@ -33,9 +34,9 @@
 <div class="filter-card">
   <div id="cf-filter-form" class="row g-2 align-items-end">
     <div class="col">
-      <div class="filter-label">Search Field Label</div>
+      <div class="filter-label">{{ trans.search_field_label }}</div>
       <input name="search_text" type="search"
-        autocomplete="off" placeholder="Search by field label..."
+        autocomplete="off" placeholder="{{ trans.search_by_field_label }}"
         hx-get="{% url 'custom_fields:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search, change from:[name='module']"
         hx-target="#search_result"
@@ -44,15 +45,15 @@
     </div>
 
     <div class="col-auto">
-      <div class="filter-label">Module</div>
+      <div class="filter-label">{{ trans.module_label }}</div>
       <div class="dropdown">
         <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="module-btn" aria-label="Filter by module">
-          All Modules
+          {{ trans.all_modules }}
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('cf-filter-form'); var moduleInput=form.querySelector('[name=module]'); moduleInput.value=''; document.getElementById('module-btn').childNodes[0].textContent='All Modules '; moduleInput.dispatchEvent(new Event('change', {bubbles:true}));">All Modules</a></li>
+          <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('cf-filter-form'); var moduleInput=form.querySelector('[name=module]'); moduleInput.value=''; document.getElementById('module-btn').childNodes[0].textContent='{{ trans.all_modules }} '; moduleInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ trans.all_modules }}</a></li>
           {% for choice_val, choice_label in module_choices %}
-          <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('cf-filter-form'); var moduleInput=form.querySelector('[name=module]'); moduleInput.value='{{ choice_val }}'; document.getElementById('module-btn').childNodes[0].textContent='{{ choice_label }} '; moduleInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ choice_label }}</a></li>
+          <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('cf-filter-form'); var moduleInput=form.querySelector('[name=module]'); moduleInput.value='{{ choice_val }}'; document.getElementById('module-btn').childNodes[0].textContent='{{ module_display|get_item:choice_val|default:choice_label }} '; moduleInput.dispatchEvent(new Event('change', {bubbles:true}));">{{ module_display|get_item:choice_val|default:choice_label }}</a></li>
           {% endfor %}
         </ul>
         <input type="hidden" name="module">
@@ -60,7 +61,7 @@
     </div>
 
     <div class="col-auto">
-      <a href="{% url 'custom_fields:list' %}" class="btn-reset" title="Reset">
+      <a href="{% url 'custom_fields:list' %}" class="btn-reset" title="{{ trans.reset }}">
         <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
       </a>
     </div>
@@ -74,13 +75,13 @@
       <thead>
         <tr>
           <th>{{ trans.sl_no }}</th>
-          <th>Module</th>
-          <th>Label</th>
-          <th>Key</th>
-          <th>Type</th>
-          <th class="text-center">Required</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>{{ trans.module_label }}</th>
+          <th>{{ trans.label_column }}</th>
+          <th>{{ trans.key_column }}</th>
+          <th>{{ trans.type_column }}</th>
+          <th class="text-center">{{ trans.required_column }}</th>
+          <th>{{ trans.status_column }}</th>
+          <th>{{ trans.actions }}</th>
         </tr>
       </thead>
 
@@ -95,8 +96,8 @@
           <td colspan="8">
             <div class="table-empty-state">
               <i class="bi bi-sliders"></i>
-              <p>No custom fields defined yet.<br>
-                <a href="{% url 'custom_fields:create' %}" class="link-primary">Add your first custom field</a>
+              <p>{{ trans.no_custom_fields_defined }}<br>
+                <a href="{% url 'custom_fields:create' %}" class="link-primary">{{ trans.add_first_custom_field }}</a>
               </p>
             </div>
           </td>
@@ -106,7 +107,7 @@
     </table>
   </div>
 
-  {% include 'commons/list-pagination.html' with item_label="custom fields" %}
+  {% include 'commons/list-pagination.html' with item_label=trans.custom_fields %}
 </div>{# /.table-card #}
 
 {% endblock content %}

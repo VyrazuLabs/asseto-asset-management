@@ -16,10 +16,31 @@ class CustomFieldDefinitionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # Pop organization if passed (used for duplicate detection).
         self.organization = kwargs.pop("organization", None)
+        # Pop translations if passed (used to translate labels/choices/errors).
+        self.trans = kwargs.pop("trans", None) or {}
         super().__init__(*args, **kwargs)
         # The key is always auto-generated from module + label, so it is read-only.
         self.fields["field_key"].disabled = True
         self.fields["field_key"].required = False
+
+        label_map = {
+            "module": self.trans.get("module_label", "Module"),
+            "field_type": self.trans.get("field_type_label", "Field type"),
+            "field_label": self.trans.get("field_label_label", "Field label"),
+            "field_key": self.trans.get("field_key_label", "Field key"),
+            "is_required": self.trans.get("is_required_label", "Is required"),
+        }
+        for name, label in label_map.items():
+            self.fields[name].label = label
+
+        self.fields["module"].choices = [
+            (val, self.trans.get(f"module_{val}", label))
+            for val, label in self.fields["module"].choices
+        ]
+        self.fields["field_type"].choices = [
+            (val, self.trans.get(f"ft_{val}", label))
+            for val, label in self.fields["field_type"].choices
+        ]
 
     @staticmethod
     def slugify_label(label):
@@ -55,6 +76,9 @@ class CustomFieldDefinitionForm(forms.ModelForm):
             if qs.exists():
                 self.add_error(
                     "field_label",
-                    "A field with this name already exists for the selected module.",
+                    self.trans.get(
+                        "duplicate_field_label_error",
+                        "A field with this name already exists for the selected module.",
+                    ),
                 )
         return cleaned
