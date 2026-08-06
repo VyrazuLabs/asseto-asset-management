@@ -193,52 +193,7 @@
             </div>
 
             {# ── Section 4: Custom Fields ──────────────────────────────────────── #}
-            <div class="form-section">
-                <div class="section-header">
-                    <i class="bi bi-list-stars"></i> <span>{{ trans.custom_fields_section }}</span>
-                </div>
-                <div class="mb-3">
-                    <button type="button" id="addCustomFieldBtn" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-plus-lg me-1"></i> {{ trans.add_new_field }}
-                    </button>
-                </div>
-                <div id="custom-field-container">
-                    {% for cf in custom_fields %}
-                    <div class="row custom-field-row">
-                        <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">{{ trans.field_name_placeholder }}</label>
-                            <input type="text" class="form-control" name="existing_custom_field_name_{{ cf.id }}" value="{{ cf.field_name }}" readonly style="background: transparent; border: none; font-weight: 600;">
-                        </div>
-                        <div class="col-md-5 col-12 mb-2 mb-md-0">
-                            <label style="font-size: 0.78rem; font-weight: 700; color: var(--color-muted);">{{ trans.field_value_placeholder }}</label>
-                            <input type="text" class="form-control" name="custom_field_{{ cf.entity_id }}" value="{{ cf.field_value }}">
-                        </div>
-                        <div class="col-md-2 col-12 d-flex align-items-end">
-                            <button type="button" class="btn btn-sm btn-outline-danger w-100 delete-cf-btn" data-cf-id="{{ cf.entity_id }}" title="{{ trans.delete_confirm_custom_field }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {# Template for new custom fields #}
-            <template id="custom-field-template">
-                <div class="row custom-field-row mt-3 rm-custom-field">
-                    <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="{{ trans.new_field_name_placeholder }}" name="custom_field_name">
-                    </div>
-                    <div class="col-md-5 col-12 mb-2 mb-md-0">
-                        <input type="text" class="form-control" placeholder="{{ trans.new_field_value_placeholder }}" name="custom_field_value">
-                    </div>
-                    <div class="col-md-2 col-12">
-                        <button type="button" class="btn btn-outline-danger w-100 h-100" onclick="removeCustomField(this)">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            </template>
+            {% include "custom_fields/_cf_fields_block.html" %}
         </form>
     </div>
 </div>
@@ -305,30 +260,6 @@
             .catch(() => alert('{{ trans.network_error }}'));
         };
 
-        $('.delete-cf-btn').on('click', function () {
-            const cfId = $(this).data('cf-id');
-            const $row = $(this).closest('.custom-field-row');
-
-            if (!confirm('{{ trans.delete_confirm_custom_field_js }}')) return;
-
-            fetch('{% url "products:update_product" id=product.id %}', {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ delete_custom_field_ids: [cfId] })
-            })
-                .then(response => {
-                    if (response.ok) {
-                        $row.fadeOut(300, function () { $(this).remove(); });
-                    } else {
-                        alert('{{ trans.error_deleting_custom_field }}');
-                    }
-                })
-                .catch(() => alert('{{ trans.network_error }}'));
-        });
-
         const initialSubCategoryValue = $('#id_product_sub_category').val();
 
         $('#id_product_category').on('change', function () {
@@ -356,12 +287,6 @@
                 .catch(() => $subCatSelect.html('<option value="">Error loading</option>'));
         });
 
-        $("#addCustomFieldBtn").on('click', function () {
-            const template = document.getElementById("custom-field-template");
-            const clone = template.content.cloneNode(true);
-            $("#custom-field-container").append(clone);
-        });
-
         $("#id_image").on('change', function () {
             const input = this;
             if (input.files && input.files[0]) {
@@ -375,9 +300,5 @@
             }
         });
     });
-
-    function removeCustomField(el) {
-        $(el).closest(".custom-field-row").remove();
-    }
 </script>
 {% endblock content %}

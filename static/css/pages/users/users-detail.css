@@ -462,3 +462,29 @@ body.theme-dark .activity-title-main {
   gap: 1rem !important;
   align-items: center !important;
 }
+
+/* ── Custom Fields Grid ───────────────────────────────────────────────────── */
+.detail-card-body {
+  padding: 1.5rem;
+}
+
+.detail-fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 1.5rem;
+}
+@media (max-width: 600px) { .detail-fields-grid { grid-template-columns: 1fr; } }
+
+.detail-field { display: flex; flex-direction: column; gap: .25rem; }
+.detail-field-label {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.detail-field-value {
+  font-size: 1rem;
+  color: var(--color-text);
+  font-weight: 500;
+}

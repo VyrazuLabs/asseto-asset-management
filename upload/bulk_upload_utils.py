@@ -1,3 +1,4 @@
+from pandas import errors
 import csv
 import os
 import shutil
@@ -232,84 +233,76 @@ def commit_bulk_session(session, request):
         organization=organization, use_default_settings=True
     ).first()
 
-    post_save.disconnect(notify_admin_on_asset_created, sender=Asset)
+    for idx, row in enumerate(staged):
+        sid = transaction.savepoint()
+        try:
+            prod_id = row.get("product_target_id")
+            product = products_by_id.get(prod_id) if prod_id else None
 
-    try:
-        for idx, row in enumerate(staged):
-            sid = transaction.savepoint()
-            try:
-                prod_id = row.get("product_target_id")
-                product = products_by_id.get(prod_id) if prod_id else None
+            vend_id = row.get("vendor_target_id")
+            vendor = vendors_by_id.get(vend_id) if vend_id else None
 
-                vend_id = row.get("vendor_target_id")
-                vendor = vendors_by_id.get(vend_id) if vend_id else None
+            cli_id = row.get("client_target_id")
+            client = clients_by_id.get(cli_id) if cli_id else None
 
-                cli_id = row.get("client_target_id")
-                client = clients_by_id.get(cli_id) if cli_id else None
+            loc_id = row.get("location_target_id")
+            location = locations_by_id.get(loc_id) if loc_id else None
 
-                loc_id = row.get("location_target_id")
-                location = locations_by_id.get(loc_id) if loc_id else None
+            status_val = available_status
+            status_id = row.get("status_target_id")
+            if status_id:
+                status_val = statuses_by_id.get(status_id) or available_status
 
-                status_val = available_status
-                status_id = row.get("status_target_id")
-                if status_id:
-                    status_val = statuses_by_id.get(status_id) or available_status
-
-                tag = row.get("tag")
-                if not tag:
-                    if tag_config:
-                        tag = generate_asset_tag(
-                            prefix=tag_config.prefix,
-                            number_suffix=tag_config.number_suffix,
-                        )
-                    else:
-                        tag = generate_asset_tag(prefix="VY", number_suffix="001")
-
-                if tag in existing_tags:
-                    raise ValueError(
-                        f"Asset tag '{tag}' already exists. Tags must be unique."
+            tag = row.get("tag")
+            if not tag:
+                if tag_config:
+                    tag = generate_asset_tag(
+                        prefix=tag_config.prefix,
+                        number_suffix=tag_config.number_suffix,
                     )
-                existing_tags.add(tag)
+                else:
+                    tag = generate_asset_tag(prefix="VY", number_suffix="001")
 
-                asset = Asset.objects.create(
-                    organization=organization,
-                    name=row.get("name"),
-                    serial_no=row.get("serial_no"),
-                    tag=tag,
-                    price=float(row.get("price")) if row.get("price") else None,
-                    purchase_date=row.get("purchase_date") or None,
-                    warranty_expiry_date=row.get("warranty_expiry_date") or None,
-                    purchase_type=row.get("purchase_type"),
-                    description=row.get("description"),
-                    product=product,
-                    vendor=vendor,
-                    client=client,
-                    location=location,
-                    asset_status=status_val,
-                    created_by=str(request.user.id),
-                )
+            if tag in existing_tags:
+                raise ValueError(f"Asset tag '{tag}' already exists. Tags must be unique.")
+            existing_tags.add(tag)
 
-                img_path = row.get("matched_image_path")
-                if img_path:
-                    abs_img_path = os.path.abspath(img_path)
-                    if os.path.exists(abs_img_path):
-                        with open(abs_img_path, "rb") as f:
-                            AssetImage.objects.create(
-                                asset=asset,
-                                image=ContentFile(
-                                    f.read(), name=os.path.basename(abs_img_path)
-                                ),
-                            )
+            asset = Asset.objects.create(
+                organization=organization,
+                name=row.get("name"),
+                serial_no=row.get("serial_no"),
+                tag=tag,
+                price=float(row.get("price")) if row.get("price") else None,
+                purchase_date=row.get("purchase_date") or None,
+                warranty_expiry_date=row.get("warranty_expiry_date") or None,
+                purchase_type=row.get("purchase_type"),
+                description=row.get("description"),
+                product=product,
+                vendor=vendor,
+                client=client,
+                location=location,
+                asset_status=status_val,
+                created_by=str(request.user.id),
+            )
 
-                created_count += 1
-                transaction.savepoint_commit(sid)
+            img_path = row.get("matched_image_path")
+            if img_path:
+                abs_img_path = os.path.abspath(img_path)
+                if os.path.exists(abs_img_path):
+                    with open(abs_img_path, "rb") as f:
+                        AssetImage.objects.create(
+                            asset=asset,
+                            image=ContentFile(
+                                f.read(), name=os.path.basename(abs_img_path)
+                            ),
+                        )
 
-            except Exception as e:
-                transaction.savepoint_rollback(sid)
-                errors.append(f"Row {idx + 1} ({row.get('name')}): {str(e)}")
+            created_count += 1
+            transaction.savepoint_commit(sid)
 
-    finally:
-        post_save.disconnect(notify_admin_on_asset_created, sender=Asset)
+        except Exception as e:
+            transaction.savepoint_rollback(sid)
+            errors.append(f"Row {idx + 1} ({row.get('name')}): {str(e)}")
 
     if not errors:
         cleanup_bulk_import_files(session.id)

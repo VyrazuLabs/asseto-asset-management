@@ -1,5 +1,5 @@
 from assets.models import Asset, AssignAsset
-from dashboard.models import CustomField
+
 from products.models import ProductImage
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
@@ -174,12 +174,10 @@ def get_product_details(request, id):
     for it in get_product_img:
         img_array.append(it)
     get_custom_data = []
-    get_data = CustomField.objects.filter(object_id=product.id)
-    for it in get_data:
-        obj = {}
-        obj["field_name"] = it.field_name
-        obj["field_value"] = it.field_value
-        get_custom_data.append(obj)
+
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "product")
+    cf_values = get_values_for_entity(product.id, cf_definitions)
 
     arr_size = len(img_array)
     context = {
@@ -190,6 +188,8 @@ def get_product_details(request, id):
         "title": f"Details-{product.name}",
         "page_object": page_object,
         "get_custom_data": get_custom_data,
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
     }
     return context
 
@@ -203,40 +203,7 @@ def added_product(request, form):
     files = request.FILES
     for f in files.getlist("image"):  # 'image' is the name of your file input
         ProductImage.objects.create(product=product, image=f)
-    names = request.POST.getlist("custom_field_name")
-    values = request.POST.getlist("custom_field_value")
-    for key, value in request.POST.items():
-        if key.startswith("customfield_") and value.strip() != "":
-            field_id = key.replace("customfield_", "")
-            try:
-                cf = CustomField.objects.get(
-                    pk=field_id,
-                    entity_type="asset",
-                    organization=request.user.organization,
-                )
-                CustomField.objects.create(
-                    name=cf.name,
-                    object_id=product.id,
-                    field_type=cf.field_type,
-                    field_name=cf.field_name,
-                    field_value=value,
-                    entity_type="product",
-                    organization=request.user.organization,
-                )
-            except CustomField.DoesNotExist:
-                pass
-
-    for name, val in zip(names, values):
-        if name.strip() and val.strip():
-            CustomField.objects.create(
-                name=name.strip(),
-                object_id=product.id,
-                field_type="text",  # Defaulting new ones as text unless field type select is added
-                field_name=name.strip(),
-                field_value=val.strip(),
-                entity_type="product",
-                organization=request.user.organization,
-            )
+    return product
 
 
 def deleted_product(request, id):
@@ -378,13 +345,7 @@ def product_details(request, product):
             image_list.append(obj)
     product_detail["product_images"] = image_list
 
-    product_detail["custom_fields"] = custome_fields_list = []
-    get_custom_fields = CustomField.objects.filter(object_id=product.id)
-    if get_custom_fields:
-        for custom_field in get_custom_fields:
-            custom_fields_dict = {custom_field.field_name: custom_field.field_value}
-            custome_fields_list.append(custom_fields_dict)
-        product_detail["custom_fields"] = custome_fields_list
+    product_detail["custom_fields"] = []
 
     # get_asset=Asset.objects.filter(product=product.id,organization=request.user.organization)
     # asset_list=[]

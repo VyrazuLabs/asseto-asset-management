@@ -41,6 +41,7 @@ from gate_pass.urls import gate_pass_api_url_patterns
 from products.urls import product_api_urlpattrens
 from users.urls import user_api_url_patterns
 from vendors.urls import vendor_api_urlpatterns
+from custom_fields.urls import api_custom_field_url_patterns
 
 urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -72,6 +73,7 @@ urlpatterns = [
     path("gate-pass/", include("gate_pass.urls", namespace="gate_pass")),
     path("clients/", include("clients.urls", namespace="clients")),
     path("client-portal/", include("client_portal.urls", namespace="client_portal")),
+    path("custom-fields/", include("custom_fields.urls", namespace="custom_fields")),
     # django smart select urls
     path("chaining/", include("smart_selects.urls")),
     # Password Change Views
@@ -143,6 +145,7 @@ urlpatterns = (
     + audit_api_url_patterns
     + configuration_api_url_patterns
     + gate_pass_api_url_patterns
+    + api_custom_field_url_patterns
 )
 urlpatterns += [
     re_path(

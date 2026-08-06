@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load cf_tags %}
 
 {% block title %}{{ client.name }} | {{ trans.client_details }} | Asseto{% endblock %}
 
@@ -234,6 +235,38 @@
 
       </div>
     </div>
+
+    {# Custom Fields #}
+    {% if cf_definitions|cf_has_any_value:cf_values %}
+    <div class="detail-card mt-4">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon bg-purple"><i class="bi bi-sliders"></i></div>
+          <h2>{{ trans.custom_fields }}</h2>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-fields-grid">
+          {% for defn in cf_definitions %}
+          {% if cf_values|get_cf_value:defn.field_key %}
+          <div class="detail-field">
+            <span class="detail-field-label">{{ defn.field_label }}</span>
+            <span class="detail-field-value">
+              {% if defn.field_type == 'boolean' %}
+                {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
+              {% elif defn.field_type == 'url' %}
+                <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
+              {% else %}
+                {{ cf_values|get_cf_value:defn.field_key }}
+              {% endif %}
+            </span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
     {# Assets Table #}
     <div class="detail-card">

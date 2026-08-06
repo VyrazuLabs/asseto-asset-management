@@ -14,7 +14,7 @@ from datetime import date
 from configurations.utils import get_currency_and_datetime_format, format_datetime
 from configurations.utils import dynamic_display_name
 from django.db.models import Func, CharField
-from dashboard.models import CustomField
+
 from notifications.models import UserNotification
 from notifications.views import data
 
@@ -33,9 +33,7 @@ def assign_asset_user_list(request):
 def asset_details(id, request):
     asset = get_object_or_404(Asset, pk=id)
     asset_images = AssetImage.objects.filter(asset=asset).all()
-    custom_fields = CustomField.objects.filter(object_id=asset.id)
-    asset_statuses = AssetStatus.objects.all()
-    data = asset_data(request, asset, asset_images, asset_statuses, custom_fields)
+    data = asset_data(request, asset, asset_images, asset_statuses, [])
     return data
 
 
@@ -303,12 +301,7 @@ def asset_data(request, asset, asset_images, asset_statuses, custom_fields):
             }
             asset_image_list.append(asset_images_dict)
     asset_data["asset_images"] = asset_image_list
-    custom_fields_list = []
-    if custom_fields:
-        for custom_field in custom_fields:
-            custom_fields_dict = {custom_field.field_name: custom_field.field_value}
-            custom_fields_list.append(custom_fields_dict)
-    asset_data["custom_fields"] = custom_fields_list
+    asset_data["custom_fields"] = []
 
     months_int = asset.product.eol if asset.product and asset.product.eol else None
     today = timezone.now().date()

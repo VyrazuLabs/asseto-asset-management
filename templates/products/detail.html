@@ -1,5 +1,6 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
+{% load cf_tags %}
 {% block title %}{{ trans.product_details }} - {{ product.name }} | Asseto{% endblock %}
 
 {% block css %}
@@ -107,7 +108,7 @@
             </div>
 
             {# Custom Fields Card #}
-            {% if get_custom_data %}
+            {% if cf_definitions|cf_has_any_value:cf_values %}
             <div class="pd-card">
                 <div class="pd-card-header">
                     <h2 class="pd-card-title">
@@ -115,14 +116,24 @@
                     </h2>
                 </div>
                 <div class="pd-custom-grid">
-                    {% for cf in get_custom_data %}
+                    {% for defn in cf_definitions %}
+                    {% if cf_values|get_cf_value:defn.field_key %}
                     <div class="pd-custom-box">
                         <div class="pd-custom-box-info">
-                            <span class="pd-box-label">{{ cf.field_name }}</span>
-                            <span class="pd-box-value">{{ cf.field_value }}</span>
+                            <span class="pd-box-label">{{ defn.field_label }}</span>
+                            <span class="pd-box-value">
+                                {% if defn.field_type == 'boolean' %}
+                                    {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
+                                {% elif defn.field_type == 'url' %}
+                                    <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
+                                {% else %}
+                                    {{ cf_values|get_cf_value:defn.field_key }}
+                                {% endif %}
+                            </span>
                         </div>
                         <i class="bi bi-chevron-right"></i>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

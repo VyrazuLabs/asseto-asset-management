@@ -135,6 +135,9 @@
           </div>
         </div>
 
+        {# Custom Fields #}
+        {% include "custom_fields/_cf_fields_block.html" %}
+
       </div>{# /col-lg-8 #}
 
       {# ── RIGHT SIDEBAR ────────────────────────────────── #}
@@ -182,29 +185,6 @@
           </div>
         </div>
 
-        {# Custom Fields #}
-        <div class="sidebar-section">
-          <div class="sidebar-section-header">
-            <span>{{ trans.custom_fields_section }}</span>
-            <button type="button" class="sidebar-add-btn" id="add-custom-field-btn" aria-label="{{ trans.add_field }}">
-              <i class="bi bi-plus"></i>
-            </button>
-          </div>
-          <div class="sidebar-body" id="custom-field-container">
-            <p class="empty-placeholder" id="custom-fields-placeholder">{{ trans.no_custom_fields }}</p>
-            {# Template for cloning #}
-            <div class="d-none" id="custom-field-template">
-              <div class="spec-row rm-custom-field">
-                <input type="text" class="field-input" placeholder="{{ trans.field_name_placeholder }}" name="custom_field_name" autocomplete="off">
-                <input type="text" class="field-input" placeholder="{{ trans.field_value_placeholder }}" name="custom_field_value" autocomplete="off">
-                <button type="button" onclick="removeCustomField(this)" class="btn-rm-row" aria-label="{{ trans.remove }}">
-                  <i class="bi bi-dash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {# Compliance Check #}
         <div class="compliance-box">
           <i class="bi bi-shield-check"></i>
@@ -233,27 +213,6 @@
   };
   function removeSection(el) {
     el.closest(".rmsection").remove();
-  }
-
-  // ── Custom field rows ──────────────────────────────────────
-  document.getElementById("add-custom-field-btn").onclick = function () {
-    var placeholder = document.getElementById("custom-fields-placeholder");
-    if (placeholder) placeholder.remove();
-    var container = document.getElementById("custom-field-container");
-    var template  = document.getElementById("custom-field-template").querySelector(".rm-custom-field");
-    container.appendChild(template.cloneNode(true));
-  };
-  function removeCustomField(el) {
-    var row = el.closest(".rm-custom-field");
-    row.remove();
-    var container = document.getElementById("custom-field-container");
-    if (!container.querySelector(".rm-custom-field")) {
-      var p = document.createElement("p");
-      p.className = "empty-placeholder";
-      p.id = "custom-fields-placeholder";
-      p.textContent = "No custom fields added yet";
-      container.appendChild(p);
-    }
   }
 
   // ── Image preview ──────────────────────────────────────────

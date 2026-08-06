@@ -101,7 +101,7 @@ from .models import (
     ProductType,
     ProductCategory,
     Address,
-    CustomField,
+
     LicenseType,
 )
 from notifications.service import NotificationService
@@ -120,7 +120,7 @@ TRACKED_MODELS = (
     ProductType,
     ProductCategory,
     # Address,
-    CustomField,
+
     LicenseType,
 )
 

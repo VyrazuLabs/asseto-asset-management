@@ -37,6 +37,7 @@ def list_localizations(request):
         request,
         "configurations/list_localization.html",
         {
+            "title": "Localization",
             "configurations": configurations,
             "country_choices": COUNTRY_CHOICES,
             "currency_choices": CURRENCY_CHOICES,

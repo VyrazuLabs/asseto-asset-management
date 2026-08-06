@@ -228,6 +228,9 @@
                             <li class="submenu-item {% if submenu == 'organization' %}active{% endif %}">
                                 <a href="{% url 'configurations:add_organization' %}">{{ trans.organizations }}</a>
                             </li>
+                            <li class="submenu-item {% if submenu == 'custom_fields' %}active{% endif %}">
+                                <a href="{% url 'custom_fields:list' %}">{{ trans.custom_fields }}</a>
+                            </li>
                         </ul>
                     </li>
                 {% endif %}
