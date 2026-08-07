@@ -9,7 +9,8 @@ from django.http import HttpResponse, JsonResponse
 from upload.models import BulkUploadSession
 from upload.bulk_upload_utils import (
     parse_csv_file, extract_zip_images, match_images_to_rows,
-    apply_dept_location_mapping, commit_bulk_session, cleanup_bulk_import_files
+    apply_dept_location_mapping, commit_bulk_session, cleanup_bulk_import_files,
+    _get_active_asset_cfs,
 )
 from dashboard.models import Location, Department
 from assets.models import Product, Vendor, AssetStatus
@@ -17,6 +18,16 @@ from clients.models import Client
 from django.db.models import Q
 
 SESSION_KEY = 'bulk_import_session_id'
+
+# Sample placeholder values for each field type shown in the template CSV
+_CF_TYPE_SAMPLE = {
+    "text":    "Example text",
+    "integer": "10",
+    "decimal": "99.99",
+    "date":    "2024-01-15",
+    "boolean": "Yes",
+    "email":   "example@email.com",
+}
 
 @login_required
 # @permission_required('assets.add_asset') # Assuming permission exists or bypassing for now
@@ -33,7 +44,8 @@ def bulk_import_step1(request):
             messages.error(request, "File must be a CSV.")
             return redirect('upload:bulk_import_step1')
             
-        rows, errors = parse_csv_file(csv_file)
+        # Pass organization so custom field validation runs
+        rows, errors = parse_csv_file(csv_file, organization=request.user.organization)
         if errors:
             for err in errors[:5]:
                 messages.error(request, err)
@@ -139,6 +151,15 @@ def bulk_import_step2(request):
             if key in available_keys:
                 csv_headers.append((key, display))
                 available_keys.discard(key)
+
+        # Append active custom field columns with their human-readable label
+        active_cfs = _get_active_asset_cfs(request.user.organization).values('field_key', 'field_label')
+        for cf in active_cfs:
+            if cf['field_key'] in available_keys:
+                csv_headers.append((cf['field_key'], cf['field_label']))
+                available_keys.discard(cf['field_key'])
+
+        # Any remaining unknown keys (passthrough)
         for key in sorted(available_keys):
             csv_headers.append((key, key.replace('_', ' ').title()))
 
@@ -216,16 +237,27 @@ def download_asset_template_csv(request):
     response['Content-Disposition'] = 'attachment; filename="assets_template.csv"'
     
     writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-    writer.writerow([
+
+    # Core fixed columns
+    core_headers = [
         'asset_name', 'serial_no', 'tag', 'price', 'purchase_date',
-        'warranty_expiry_date', 'description',
-        'image_filename'
-    ])
-    writer.writerow([
+        'warranty_expiry_date', 'description', 'image_filename',
+    ]
+    core_sample = [
         'MacBook Pro M3 Max 16-inch', 'SN-APL-893011', 'LAP-001', '3499.99',
         '2024-01-15', '2027-01-15', 'Engineering laptop for development team',
-        'macbook_pro.jpg'
-    ])
+        'macbook_pro.jpg',
+    ]
+
+    # Fetch active asset custom fields for this organization
+    active_cfs = list(_get_active_asset_cfs(request.user.organization))
+
+    cf_headers = [cf.field_key for cf in active_cfs]
+    cf_sample  = [_CF_TYPE_SAMPLE.get(cf.field_type, 'Example') for cf in active_cfs]
+
+    writer.writerow(core_headers + cf_headers)
+    writer.writerow(core_sample  + cf_sample)
+
     return response
 
 @login_required
