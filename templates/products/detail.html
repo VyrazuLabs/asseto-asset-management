@@ -98,6 +98,27 @@
                         </span>
                     </div>
 
+                    {# Custom Fields #}
+                    {% if cf_definitions|cf_has_any_value:cf_values %}
+                    {% for defn in cf_definitions %}
+                    {% if cf_values|get_cf_value:defn.field_key %}
+                    <div class="pd-info-item">
+                        <span class="pd-label">{{ defn.field_label }}</span>
+                        <span class="pd-value">
+                            {% if defn.field_type == 'boolean' %}
+                                {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
+                            {% elif defn.field_type == 'url' %}
+                                <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
+                            {% else %}
+                                {{ cf_values|get_cf_value:defn.field_key }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+
                     <div class="pd-info-item full-width">
                         <span class="pd-label">{{ trans.description_label }}</span>
                         <div class="pd-description-box">
@@ -107,38 +128,7 @@
                 </div>
             </div>
 
-            {# Custom Fields Card #}
-            {% if cf_definitions|cf_has_any_value:cf_values %}
-            <div class="pd-card">
-                <div class="pd-card-header">
-                    <h2 class="pd-card-title">
-                        <i class="bi bi-puzzle"></i> {{ trans.custom_fields_section }}
-                    </h2>
-                </div>
-                <div class="pd-custom-grid">
-                    {% for defn in cf_definitions %}
-                    {% if cf_values|get_cf_value:defn.field_key %}
-                    <div class="pd-custom-box">
-                        <div class="pd-custom-box-info">
-                            <span class="pd-box-label">{{ defn.field_label }}</span>
-                            <span class="pd-box-value">
-                                {% if defn.field_type == 'boolean' %}
-                                    {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
-                                {% elif defn.field_type == 'url' %}
-                                    <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
-                                {% else %}
-                                    {{ cf_values|get_cf_value:defn.field_key }}
-                                {% endif %}
-                            </span>
-                        </div>
-                        <i class="bi bi-chevron-right"></i>
-                    </div>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
+
 
         {# ── Right Column ── #}
         <div class="pd-right-col">
