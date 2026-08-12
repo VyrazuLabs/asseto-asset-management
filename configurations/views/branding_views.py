@@ -32,6 +32,7 @@ def logo_upload(request):
             request,
             "configurations/logo.html",
             {
+                "title": "Branding",
                 "add_path_context": add_path_context,
                 "submenu": "branding",
                 "sidebar": "configurations",

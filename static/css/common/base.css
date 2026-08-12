@@ -89,3 +89,107 @@ body.theme-dark .carousel-control-next-icon {
     align-items: center;
     justify-content: center;
 }
+
+/* =============================================================================
+   Custom Fields section (shared partial, used across module add/edit forms)
+   ============================================================================= */
+
+.custom-fields-section {
+  position: relative;
+  background: var(--color-card);
+  border-radius: var(--card-radius);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  border-left: 4px solid var(--color-primary);
+}
+
+.custom-fields-section .section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1.5px solid var(--color-border);
+  margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+}
+
+.custom-fields-section .cf-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.custom-fields-section .cf-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.custom-fields-section .cf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem 2rem;
+}
+
+.custom-fields-section .cf-group.full-width {
+  grid-column: span 2;
+}
+
+.custom-fields-section .cf-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.35rem;
+}
+
+.custom-fields-section .cf-group label .required {
+  color: #EF4444;
+  margin-left: 0.15rem;
+}
+
+.custom-fields-section .cf-group .form-control {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-border);
+  border-radius: 7px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.925rem;
+  color: var(--color-text);
+  transition: all 0.2s;
+}
+
+.custom-fields-section .cf-group .form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.custom-fields-section .cf-group .form-switch {
+  padding-top: 0.45rem;
+}
+
+body.theme-dark .custom-fields-section .cf-group .form-control {
+  background: #151521;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+@media (max-width: 767.98px) {
+  .custom-fields-section .cf-grid {
+    grid-template-columns: 1fr;
+  }
+  .custom-fields-section .cf-group.full-width {
+    grid-column: span 1;
+  }
+}

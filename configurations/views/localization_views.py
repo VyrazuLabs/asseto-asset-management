@@ -3,8 +3,8 @@ from django.shortcuts import redirect, render
 
 from configurations.models import LocalizationConfiguration
 
-from ..constants import (COUNTRY_CHOICES, CURRENCY_CHOICES, DATETIME_CHOICES,
-                         DEFAULT_COUNTRY, DEFAULT_LANGUAGE, NAME_FORMATS)
+from ..constants import (ACTIVE_LANGUAGES, COUNTRY_CHOICES, CURRENCY_CHOICES,
+                         DATETIME_CHOICES, DEFAULT_COUNTRY, NAME_FORMATS)
 
 
 @login_required
@@ -18,6 +18,9 @@ def list_localizations(request):
     get_default_currency_format = {}
     get_default_country_format = {}
     if configurations:
+        for id, name in ACTIVE_LANGUAGES:
+            if id == configurations.default_language:
+                get_default_language = {"name": name, "id": id}
         for id, name in NAME_FORMATS:
             if id == configurations.name_display_format:
                 get_default_name_display_format = {"name": name, "id": id}
@@ -37,11 +40,12 @@ def list_localizations(request):
         request,
         "configurations/list_localization.html",
         {
+            "title": "Localization",
             "configurations": configurations,
             "country_choices": COUNTRY_CHOICES,
             "currency_choices": CURRENCY_CHOICES,
             "name_display_format": NAME_FORMATS,
-            "default_language": DEFAULT_LANGUAGE,
+            "default_language": ACTIVE_LANGUAGES,
             "datetime_choices": DATETIME_CHOICES,
             "default_country": DEFAULT_COUNTRY,
             "get_default_language": get_default_language,

@@ -1,6 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load cf_tags %}
 
 {% block title %}{{ trans.vendor_details }} - {{ vendor.name }} | Asseto{% endblock %}
 
@@ -95,6 +96,26 @@
                 <span class="value">{{ vendor.address.country|default:"-" }}</span>
             </div>
 
+            {# Custom Fields #}
+            {% if cf_definitions|cf_has_any_value:cf_values %}
+            {% for defn in cf_definitions %}
+            {% if cf_values|get_cf_value:defn.field_key %}
+            <div class="info-item">
+                <span class="label">{{ defn.field_label }}</span>
+                <span class="value">
+                    {% if defn.field_type == 'boolean' %}
+                        {% if cf_values|get_cf_value:defn.field_key == 'true' or cf_values|get_cf_value:defn.field_key == 'on' %}Yes{% else %}No{% endif %}
+                    {% elif defn.field_type == 'url' %}
+                        <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
+                    {% else %}
+                        {{ cf_values|get_cf_value:defn.field_key }}
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
             {# Description - Full Width #}
             <div class="info-item full-width">
                 <span class="label">{{ trans.description_label }}</span>
@@ -113,33 +134,7 @@
         </div>
     </div>
 
-    {# ── Custom Fields ─────────────────────────────────────────────────────── #}
-    {% if get_custom_data %}
-    <div class="table-card mb-4">
-        <div class="card-header-custom">
-            <i class="bi bi-list-stars"></i>
-            <h2><span>{{ trans.custom_fields }}</span></h2>
-        </div>
-        <div class="table-responsive">
-            <table class="list-table">
-                <thead>
-                    <tr>
-                        <th>{{ trans.field_name }}</th>
-                        <th>{{ trans.field_value }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for cf in get_custom_data %}
-                    <tr>
-                        <td class="font-bold">{{ cf.field_name }}</td>
-                        <td>{{ cf.field_value }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
+
 
     {# ── Asset List ────────────────────────────────────────────────────────── #}
     {% if assets_page_object %}

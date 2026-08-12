@@ -463,6 +463,10 @@ class ClientService:
                 }
             )
         activities.sort(key=lambda x: x["date"], reverse=True)
+        from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+        cf_definitions = get_definitions_for_module(request.user.organization, "client")
+        cf_values = get_values_for_entity(client.id, cf_definitions)
+        
         return {
             "sidebar": "clients",
             "title": f"{client.name} | Asseto",
@@ -474,4 +478,6 @@ class ClientService:
             "asset_search": asset_search,
             "total_asset_value": total_asset_value,
             "activities": activities[:15],
+            "cf_definitions": cf_definitions,
+            "cf_values": cf_values,
         }

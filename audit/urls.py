@@ -19,6 +19,7 @@ urlpatterns = [
         name="get_assigned_users",
     ),
     path("details/<str:id>/", views.audit_details, name="details"),
+    path("delete-image/<str:id>/", views.delete_audit_image, name="delete_audit_image",),
 ]
 
 audit_api_url_patterns = [

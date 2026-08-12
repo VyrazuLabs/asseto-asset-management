@@ -313,7 +313,7 @@
                 {% if message.tags == 'error' %}
                 <script>
                     Toastify({
-                        text: "{{ message }}",
+                        text: "{{ message|escapejs }}",
                         duration: 3000,
                         close: true,
                         style: { background: '#d9534f' }
@@ -322,7 +322,7 @@
                 {% else %}
                 <script>
                     Toastify({
-                        text: "{{ message }}",
+                        text: "{{ message|escapejs }}",
                         duration: 3000,
                         close: true,
                     }).showToast();

@@ -80,7 +80,8 @@
             <button type="button" data-value="3" class="condition-btn">{{ trans.bad }}</button>
             <button type="button" data-value="4" class="condition-btn">{{ trans.retired }}</button>
           </div>
-          <input type="hidden" name="condition" id="condition-input">
+          <input type="hidden" name="condition" id="condition-input"
+                 value="{% if condition is not None %}{{ condition }}{% elif get_audit %}{{ get_audit.condition }}{% endif %}">
           {% if errors.condition %}
             <span class="field-error">{{ errors.condition }}</span>
           {% endif %}
@@ -90,7 +91,7 @@
         <div>
           <label class="field-label">{{ trans.detailed_observations }} <span class="required-star">*</span></label>
           <textarea class="field-textarea" name="comments" rows="6"
-                    placeholder="{{ trans.enter_comments }}">{% if get_audit.comments %}{{ get_audit.comments }}{% endif %}</textarea>
+                    placeholder="{{ trans.enter_comments }}">{% if comments %}{{ comments }}{% elif get_audit %}{{ get_audit.notes }}{% endif %}</textarea>
           {% if errors.comments %}
             <span class="field-error">{{ errors.comments }}</span>
           {% endif %}
@@ -121,6 +122,26 @@
           <span class="upload-hint">{{ trans.files_selected_logged }}</span>
           <span id="audit-file-chosen" class="audit-file-chosen">{{ trans.no_file_chosen }}</span>
         </div>
+
+        {% if audit_images %}
+        <div class="mt-3">
+          <span class="upload-hint">{{ trans.existing_audit_images }}</span>
+          <div class="existing-audit-images">
+            {% for img in audit_images %}
+              {% if img.image %}
+              <div class="existing-audit-image" data-image-id="{{ img.id }}">
+                <img src="{{ img.image.url }}" alt="Audit Image {{ forloop.counter }}"
+                     onerror="this.parentElement.style.display='none';">
+                <button type="button" class="audit-image-delete" data-image-id="{{ img.id }}"
+                        title="{{ trans.delete_image }}" aria-label="{{ trans.delete_image }}">
+                  <i class="bi bi-x-circle-fill"></i>
+                </button>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -154,10 +175,9 @@ function updateFileLabel(input) {
     : (input.files[0]?.name || 'No file chosen');
 }
 
-// Drag-and-drop on upload area
+// Drag-and-drop on upload area (label click already opens the file picker natively)
 const uploadArea = document.querySelector('.audit-upload-area');
 if (uploadArea) {
-  uploadArea.addEventListener('click', () => document.getElementById('audit-image-input').click());
   uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
   uploadArea.addEventListener('drop', e => {
@@ -233,6 +253,42 @@ if (tagInput && suggestionBox) {
       .catch(console.error);
   });
 }
+
+// Delete existing audit image
+(function () {
+  const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+  const csrfToken = csrfInput ? csrfInput.value : '';
+  document.querySelectorAll('.audit-image-delete').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = this.dataset.imageId;
+      if (!id || !confirm('{{ trans.delete_image_confirm }}')) return;
+      fetch(`/audit/delete-image/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            const box = document.querySelector(`.existing-audit-image[data-image-id="${id}"]`);
+            if (box) box.parentElement.removeChild(box);
+            const container = document.querySelector('.existing-audit-images');
+            if (container && !container.querySelector('.existing-audit-image')) {
+              const wrap = container.closest('.mt-3');
+              if (wrap) wrap.remove();
+            }
+          } else {
+            alert(data.error || '{{ trans.delete_image_failed }}');
+          }
+        })
+        .catch(() => alert('{{ trans.delete_image_failed }}'));
+    });
+  });
+})();
 </script>
 
 {% endblock content %}

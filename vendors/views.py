@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from assets.models import Asset
 from vendors.utils import get_count_of_assets
-from dashboard.models import CustomField
+
 from datetime import date
 from .utils import (
     export_vendors_pdf_utils,
@@ -98,13 +98,18 @@ def add_vendor(request):
             vendor.address = address
             vendor.organization = request.user.organization
             vendor.save()
+            from custom_fields.utils import save_values_for_entity
+            save_values_for_entity(request, vendor.id, "vendor")
             messages.success(request, "Vendor added successfully")
             return redirect("vendors:list")
 
+    from custom_fields.utils import get_definitions_for_module
+    cf_definitions = get_definitions_for_module(request.user.organization, "vendor")
     context = {
         "vendor_form": vendor_form,
         "title": "Register Vendor",
         "address_form": address_form,
+        "cf_definitions": cf_definitions,
     }
     return render(request, "vendors/add.html", context=context)
 
@@ -137,15 +142,22 @@ def update_vendor(request, id):
         if vendor_form.is_valid() and address_form.is_valid():
             vendor_form.save()
             address_form.save()
+            from custom_fields.utils import save_values_for_entity
+            save_values_for_entity(request, vendor.id, "vendor")
             messages.success(request, "Vendor updated successfully")
             return redirect("vendors:list")
 
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "vendor")
+    cf_values = get_values_for_entity(vendor.id, cf_definitions)
     context = {
         "sidebar": "vendors",
         "vendor_form": vendor_form,
         "address_form": address_form,
         "vendor": vendor,
         "title": f"Update-{vendor.name}",
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
     }
     return render(request, "vendors/edit.html", context=context)
 

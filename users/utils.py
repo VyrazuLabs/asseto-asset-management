@@ -114,12 +114,17 @@ def get_user_detail_utils(request, id):
         "-assigned_date"
     )
     assigned_licenses_object = get_all_assigned_license(request, assigned_licenses)
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "user")
+    cf_values = get_values_for_entity(user.id, cf_definitions)
     return (
         get_user_full_name,
         user,
         history_page_object,
         asset_page_object,
         assigned_licenses_object,
+        cf_definitions,
+        cf_values,
     )
 
 

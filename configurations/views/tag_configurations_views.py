@@ -80,6 +80,7 @@ def list_tag_configurations(request):
         request,
         "configurations/list_tag.html",
         {
+            "title": "Tag Configuration",
             "configurations": configurations,
             "submenu": "tag-configuration",
             "sidebar": "configurations",

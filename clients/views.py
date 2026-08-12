@@ -44,6 +44,8 @@ def add_client(request):
             request.form = form
             try:
                 client = ClientService.create(request)
+                from custom_fields.utils import save_values_for_entity
+                save_values_for_entity(request, client.id, "client")
                 messages.success(request, "Client registered successfully.")
                 return redirect("clients:list")
             except ValueError as e:
@@ -57,11 +59,15 @@ def add_client(request):
     from roles.models import Role
 
     roles = Role.objects.filter(organization=request.user.organization).order_by("name")
+    from custom_fields.utils import get_definitions_for_module
+    cf_definitions = get_definitions_for_module(request.user.organization, "client")
+
     context = {
         "sidebar": "clients",
         "title": "Register Client",
         "form": form,
         "roles": roles,
+        "cf_definitions": cf_definitions,
     }
     return render(request, "clients/add.html", context)
 
@@ -78,6 +84,8 @@ def update_client(request, id):
             request.form = form
             try:
                 ClientService.update(request, client_id=id)
+                from custom_fields.utils import save_values_for_entity
+                save_values_for_entity(request, id, "client")
                 messages.success(request, "Client updated successfully.")
                 return redirect("clients:list")
             except ValueError as e:
@@ -93,12 +101,18 @@ def update_client(request, id):
     roles = Role.objects.filter(organization=request.user.organization).order_by(
         "related_name"
     )
+    from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+    cf_definitions = get_definitions_for_module(request.user.organization, "client")
+    cf_values = get_values_for_entity(client.id, cf_definitions)
+
     context = {
         "sidebar": "clients",
         "title": f"Edit {client.name}",
         "form": form,
         "client": client,
         "roles": roles,
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
     }
     return render(request, "clients/edit.html", context)
 
