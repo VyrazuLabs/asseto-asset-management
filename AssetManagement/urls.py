@@ -74,6 +74,7 @@ urlpatterns = [
     path("clients/", include("clients.urls", namespace="clients")),
     path("client-portal/", include("client_portal.urls", namespace="client_portal")),
     path("custom-fields/", include("custom_fields.urls", namespace="custom_fields")),
+    path("iot/", include("iot.urls", namespace="iot")),
     # django smart select urls
     path("chaining/", include("smart_selects.urls")),
     # Password Change Views

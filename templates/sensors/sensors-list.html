@@ -1,0 +1,167 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Sensors | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/sensors.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ───────────────────────────────────────────────────────────── #}
+<div class="sensors-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Sensors</li>
+      </ol>
+    </nav>
+    <h1>Sensor Devices</h1>
+    <p class="page-subtitle">Monitor and manage all IoT sensor devices linked to your assets.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <a href="{% url 'iot:add_sensor' %}" class="btn-sensor-add" id="btn-add-sensor">
+      <i class="bi bi-plus-lg"></i> Add Sensor
+    </a>
+  </div>
+</div>
+
+{# ── Table card ────────────────────────────────────────────────────────────── #}
+<div class="sensors-table-card">
+  <div class="table-responsive">
+    <table class="sensors-table" id="sensors-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Sensor Name</th>
+          <th>Type</th>
+          <th>Linked Asset</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      {% if page_object %}
+      <tbody id="sensors-tbody">
+        {% for sensor in page_object %}
+        <tr>
+          <td class="text-muted" style="font-size: 0.8rem;">
+            {{ page_object.start_index|add:forloop.counter0 }}
+          </td>
+
+          <td>
+            <div class="sensor-name-main">{{ sensor.name }}</div>
+            <div class="sensor-name-sub">{{ sensor.unit }}</div>
+          </td>
+
+          <td>
+            <span class="sensor-type-badge">{{ sensor.sensor_type }}</span>
+          </td>
+
+          <td>
+            {% if sensor.device__asset__name %}
+              {{ sensor.device__asset__name }}
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if sensor.is_active %}
+              <span class="sensor-status-active">Active</span>
+            {% else %}
+              <span class="sensor-status-inactive">Inactive</span>
+            {% endif %}
+          </td>
+
+          <td class="text-muted" style="font-size: 0.8rem; white-space: nowrap;">
+            {{ sensor.created_at|date:"d M Y" }}
+          </td>
+
+          <td>
+            <div class="sensor-row-actions">
+              {# ── Details – endpoint to be filled later ── #}
+              <a href="#"
+                 class="sensor-action-btn"
+                 title="View details"
+                 id="sensor-details-{{ sensor.id }}">
+                <i class="bi bi-eye"></i>
+              </a>
+
+              {# ── Update – endpoint to be filled later ── #}
+              <a href="#"
+                 class="sensor-action-btn"
+                 title="Edit sensor"
+                 id="sensor-edit-{{ sensor.id }}">
+                <i class="bi bi-pencil"></i>
+              </a>
+
+              {# ── Delete – endpoint to be filled later ── #}
+              <button type="button"
+                      class="sensor-action-btn danger"
+                      title="Delete sensor"
+                      id="sensor-delete-{{ sensor.id }}">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="7">
+            <div class="sensors-empty-state">
+              <i class="bi bi-cpu"></i>
+              <p class="mb-0">No sensor devices found.<br>
+                <a href="{% url 'iot:add_sensor' %}" class="link-primary">Add your first sensor</a>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+
+  {# ── Pagination ──────────────────────────────────────────────────────────── #}
+  {% if page_object %}
+  <div class="sensors-pagination-wrap">
+    <span>
+      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+      of <strong>{{ page_object.paginator.count }}</strong> sensors
+    </span>
+    <div class="sensors-pagination-nav">
+      {% if page_object.has_previous %}
+        <a href="?page={{ page_object.previous_page_number }}" class="sensors-page-btn" aria-label="Previous page">‹</a>
+      {% else %}
+        <span class="sensors-page-btn disabled" aria-disabled="true">‹</span>
+      {% endif %}
+
+      {% for num in page_object.paginator.page_range %}
+        {% if page_object.number == num %}
+          <span class="sensors-page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+          <a href="?page={{ num }}" class="sensors-page-btn">{{ num }}</a>
+        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+          <span class="sensors-page-btn disabled">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_object.has_next %}
+        <a href="?page={{ page_object.next_page_number }}" class="sensors-page-btn" aria-label="Next page">›</a>
+      {% else %}
+        <span class="sensors-page-btn disabled" aria-disabled="true">›</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>{# /.sensors-table-card #}
+
+{% endblock content %}

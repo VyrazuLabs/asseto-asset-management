@@ -70,7 +70,6 @@ def details_product(request, id):
 
 @login_required
 @permission_required("authentication.add_product")
-# @silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
         form = AddProductsForm(
