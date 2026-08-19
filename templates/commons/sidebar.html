@@ -160,6 +160,21 @@
                 </li>
                 {% endif %}
 
+                <li class="sidebar-item has-sub {% if sidebar == 'iot' %}active{% endif %}">
+                    <a href="javascript:void(0)" class="sidebar-link">
+                        <i class="bi bi-hdd-network-fill"></i>
+                        <span>IoT</span>
+                    </a>
+                    <ul class="submenu {% if sidebar == 'iot' %}active{% endif %}">
+                        <li class="submenu-item {% if submenu == 'devices' %}active{% endif %}">
+                            <a href="{% url 'iot:devices_list' %}">Devices</a>
+                        </li>
+                        <li class="submenu-item {% if submenu == 'sensors' %}active{% endif %}">
+                            <a href="{% url 'iot:sensors_list' %}">Sensors</a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
                     {% if request.user.is_superuser %}
                         <a href="javascript:void(0)" class="sidebar-link">

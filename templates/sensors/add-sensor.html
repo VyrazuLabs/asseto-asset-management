@@ -1,0 +1,211 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Add Sensor | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/sensors.css' %}">
+{% endblock css %}
+
+{% block content %}
+<form class="form" action="{% url 'iot:add_sensor' %}" method="POST" novalidate>
+  {% csrf_token %}
+
+  {# ── Page header ───────────────────────────────────────────────────────── #}
+  <div class="sensor-add-header">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb page-breadcrumb">
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'iot:sensors_list' %}" class="breadcrumb-link">Sensors</a></li>
+          <li class="breadcrumb-item active">Add Sensor</li>
+        </ol>
+      </nav>
+      <h1>Add Sensor Device</h1>
+      <p class="subtitle">Register a new IoT sensor and configure its threshold alert rules.</p>
+    </div>
+    <button type="submit" class="btn-save-sensor" id="btn-save-sensor">
+      <i class="bi bi-floppy2"></i> Save Sensor
+    </button>
+  </div>
+
+  {# ── Two-column layout ─────────────────────────────────────────────────── #}
+  <div class="row g-4">
+
+    {# ── LEFT COLUMN ─────────────────────────────────────────────────────── #}
+    <div class="col-lg-8">
+
+      {# ── Sensor Information ───────────────────────────────────────────── #}
+      <div class="sensor-form-section">
+        <div class="sensor-section-header">
+          <div class="sensor-section-icon"><i class="bi bi-cpu-fill"></i></div>
+          <h2>Sensor Information</h2>
+        </div>
+        <div class="sensor-section-body">
+          <div class="row g-3">
+
+            {# Sensor Name #}
+            <div class="col-12">
+              <label class="field-label" for="{{ sensor_form.name.id_for_label }}">
+                Sensor Name <span class="required">*</span>
+              </label>
+              {{ sensor_form.name }}
+              {% for error in sensor_form.name.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Linked Device #}
+            <div class="col-md-6">
+              <label class="field-label" for="{{ sensor_form.device.id_for_label }}">
+                Linked device <span class="required">*</span>
+              </label>
+              {{ sensor_form.device }}
+              {% for error in sensor_form.device.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Sensor Type #}
+            <div class="col-md-6">
+              <label class="field-label" for="{{ sensor_form.sensor_type.id_for_label }}">
+                Sensor Type <span class="required">*</span>
+              </label>
+              {{ sensor_form.sensor_type }}
+              {% for error in sensor_form.sensor_type.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Unit #}
+            <div class="col-md-6">
+              <label class="field-label" for="{{ sensor_form.unit.id_for_label }}">
+                Unit <span class="required">*</span>
+              </label>
+              {{ sensor_form.unit }}
+              {% for error in sensor_form.unit.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# MQTT Topic #}
+            <div class="col-md-6">
+              <label class="field-label" for="{{ sensor_form.mqtt_topic.id_for_label }}">
+                MQTT Topic
+              </label>
+              {{ sensor_form.mqtt_topic }}
+              <span class="field-hint">Leave blank to auto-generate from asset &amp; type.</span>
+              {% for error in sensor_form.mqtt_topic.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>{# /col-lg-8 #}
+
+    {# ── RIGHT COLUMN ────────────────────────────────────────────────────── #}
+    <div class="col-lg-4">
+
+      {# ── Threshold Alert ─────────────────────────────────────────────── #}
+      <div class="sensor-sidebar-card">
+        <div class="sensor-sidebar-card-header">Threshold Alert Rule</div>
+        <div class="sensor-sidebar-card-body">
+          <div class="row g-3">
+
+            {# Operator #}
+            <div class="col-12">
+              <label class="field-label" for="{{ sensor_threshold_form.operator.id_for_label }}">
+                Condition <span class="required">*</span>
+              </label>
+              {{ sensor_threshold_form.operator }}
+              {% for error in sensor_threshold_form.operator.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Value #}
+            <div class="col-12">
+              <label class="field-label" for="{{ sensor_threshold_form.value.id_for_label }}">
+                Threshold Value <span class="required">*</span>
+              </label>
+              {{ sensor_threshold_form.value }}
+              {% for error in sensor_threshold_form.value.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Severity #}
+            <div class="col-12">
+              <label class="field-label" for="{{ sensor_threshold_form.severity.id_for_label }}">
+                Severity <span class="required">*</span>
+              </label>
+              {{ sensor_threshold_form.severity }}
+              {% for error in sensor_threshold_form.severity.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {# ── Info box ────────────────────────────────────────────────────── #}
+      <div class="sensor-info-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+          <strong>Auto-generated fields</strong><br>
+          The <em>MQTT Topic</em> will be automatically generated
+          if left blank. You can override them manually if needed.
+        </div>
+      </div>
+
+      {# ── Required note ───────────────────────────────────────────────── #}
+      <p class="required-note mt-3">
+        <span class="required-star">*</span> Required field
+      </p>
+
+    </div>{# /col-lg-4 #}
+  </div>{# /row #}
+
+</form>
+{% endblock content %}
+
+{% block script %}
+{{ unit_mapper|json_script:"sensor-unit-mapper" }}
+<script>
+(function () {
+  const unitMapper = JSON.parse(document.getElementById('sensor-unit-mapper').textContent);
+  const typeSelect = document.getElementById('{{ sensor_form.sensor_type.id_for_label }}');
+  const unitSelect = document.getElementById('{{ sensor_form.unit.id_for_label }}');
+
+  function populateUnits() {
+    const type = typeSelect.value;
+    const units = unitMapper[type] || [];
+    unitSelect.innerHTML = '';
+    if (!units.length) {
+      const empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = 'Select a sensor type first';
+      unitSelect.appendChild(empty);
+      return;
+    }
+    units.forEach(function (unit) {
+      const opt = document.createElement('option');
+      opt.value = unit;
+      opt.textContent = unit;
+      unitSelect.appendChild(opt);
+    });
+  }
+
+  if (typeSelect) {
+    typeSelect.addEventListener('change', populateUnits);
+  }
+  if (unitSelect) {
+    populateUnits();
+  }
+})();
+</script>
+{% endblock script %}

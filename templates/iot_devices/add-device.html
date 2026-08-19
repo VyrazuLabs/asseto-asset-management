@@ -1,0 +1,217 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Add Device | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/devices.css' %}">
+{% endblock css %}
+
+{% block content %}
+<form class="form" action="{% url 'iot:add_device' %}" method="POST" novalidate>
+  {% csrf_token %}
+
+  {# ── Page header ───────────────────────────────────────────────────────── #}
+  <div class="device-add-header">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb page-breadcrumb">
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'iot:devices_list' %}" class="breadcrumb-link">Devices</a></li>
+          <li class="breadcrumb-item active">Add Device</li>
+        </ol>
+      </nav>
+      <h1>Add IoT Device</h1>
+      <p class="subtitle">Register a new IoT device and link it to an existing asset.</p>
+    </div>
+    <button type="submit" class="btn-save-device" id="btn-save-device">
+      <i class="bi bi-floppy2"></i> Save Device
+    </button>
+  </div>
+
+  {# ── Two-column layout ─────────────────────────────────────────────────── #}
+  <div class="row g-4">
+
+    {# ── LEFT COLUMN ─────────────────────────────────────────────────────── #}
+    <div class="col-lg-8">
+
+      {# ── Device Information ───────────────────────────────────────────── #}
+      <div class="device-form-section">
+        <div class="device-section-header">
+          <div class="device-section-icon"><i class="bi bi-hdd-network-fill"></i></div>
+          <h2>Device Information</h2>
+        </div>
+        <div class="device-section-body">
+          <div class="row g-3">
+
+            {# Device Name #}
+            <div class="col-12">
+              <label class="field-label" for="{{ form.name.id_for_label }}">
+                Device Name <span class="required">*</span>
+              </label>
+              {{ form.name }}
+              {% for error in form.name.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Device Serial Number #}
+            <div class="col-12">
+              <label class="field-label" for="{{ form.device_sn.id_for_label }}">
+                Serial Number <span class="required">*</span>
+              </label>
+              {{ form.device_sn }}
+              {% for error in form.device_sn.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            {# Linked Asset #}
+            <div class="col-12">
+              <label class="field-label" for="{{ form.asset.id_for_label }}">
+                Linked Asset
+              </label>
+              {{ form.asset }}
+              {% for error in form.asset.errors %}
+                <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>{# /col-lg-8 #}
+
+    {# ── RIGHT COLUMN ────────────────────────────────────────────────────── #}
+    <div class="col-lg-4">
+
+      {# ── Device Attachments ──────────────────────────────────────────── #}
+      <div class="device-sidebar-card">
+        <div class="device-sidebar-card-header">Device Attachments</div>
+        <div class="device-sidebar-card-body">
+
+          {{ attachments_formset.management_form }}
+
+          <div id="attachment-rows">
+            {% for attachment_form in attachments_formset %}
+            <div class="attachment-row">
+              <div class="attachment-fields">
+
+                {# Attached Part #}
+                <div>
+                  <label class="field-label" for="{{ attachment_form.attahed_part.id_for_label }}">
+                    Attached Part <span class="required">*</span>
+                  </label>
+                  {{ attachment_form.attahed_part }}
+                  {% for error in attachment_form.attahed_part.errors %}
+                    <span class="field-error">{{ error }}</span>
+                  {% endfor %}
+                </div>
+
+                {# MQTT Topic #}
+                <div>
+                  <label class="field-label" for="{{ attachment_form.mqtt_topic.id_for_label }}">
+                    MQTT Topic
+                  </label>
+                  {{ attachment_form.mqtt_topic }}
+                  <span class="field-hint">Leave blank to auto-generate.</span>
+                  {% for error in attachment_form.mqtt_topic.errors %}
+                    <span class="field-error">{{ error }}</span>
+                  {% endfor %}
+                </div>
+
+                {# Enabled toggle #}
+                <div>
+                  <div class="form-check form-switch mb-0">
+                    {{ attachment_form.is_enable }}
+                    <label class="form-check-label field-label" for="{{ attachment_form.is_enable.id_for_label }}">
+                      Enable Attachment
+                    </label>
+                  </div>
+                  {% for error in attachment_form.is_enable.errors %}
+                    <span class="field-error">{{ error }}</span>
+                  {% endfor %}
+                </div>
+
+              </div>
+
+              <button type="button" class="btn-rm-attachment" onclick="removeAttachment(this)" aria-label="Remove attachment">
+                <i class="bi bi-dash-lg"></i>
+              </button>
+            </div>
+            {% endfor %}
+          </div>
+
+          <button type="button" class="btn-add-attachment" id="btn-add-attachment">
+            <i class="bi bi-plus-lg"></i> Add Attachment
+          </button>
+
+        </div>
+      </div>
+
+      {# ── Hidden template for cloning new attachment rows ──────────────── #}
+      <div style="display:none">
+        <div class="attachment-row" id="attachment-template">
+          <div class="attachment-fields">
+
+            {# Attached Part #}
+            <div>
+              <label class="field-label" for="{{ attachments_formset.empty_form.attahed_part.id_for_label }}">
+                Attached Part <span class="required">*</span>
+              </label>
+              {{ attachments_formset.empty_form.attahed_part }}
+            </div>
+
+            {# MQTT Topic #}
+            <div>
+              <label class="field-label" for="{{ attachments_formset.empty_form.mqtt_topic.id_for_label }}">
+                MQTT Topic
+              </label>
+              {{ attachments_formset.empty_form.mqtt_topic }}
+              <span class="field-hint">Leave blank to auto-generate.</span>
+            </div>
+
+            {# Enabled toggle #}
+            <div>
+              <div class="form-check form-switch mb-0">
+                {{ attachments_formset.empty_form.is_enable }}
+                <label class="form-check-label field-label" for="{{ attachments_formset.empty_form.is_enable.id_for_label }}">
+                  Enable Attachment
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <button type="button" class="btn-rm-attachment" onclick="removeAttachment(this)" aria-label="Remove attachment">
+            <i class="bi bi-dash-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      {# ── Info box ────────────────────────────────────────────────────── #}
+      <div class="device-info-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+          <strong>Auto-generated fields</strong><br>
+          The <em>Device Token</em> and <em>MQTT Topic</em> are generated
+          automatically after saving. Use the <em>+</em> button to attach
+          multiple parts to this device.
+        </div>
+      </div>
+
+      {# ── Required note ───────────────────────────────────────────────── #}
+      <p class="required-note mt-3">
+        <span class="required-star">*</span> Required field
+      </p>
+
+    </div>{# /col-lg-4 #}
+  </div>{# /row #}
+
+</form>
+{% endblock content %}
+
+{% block script %}
+<script src="{% static 'js/pages/devices.js' %}" defer></script>
+{% endblock script %}

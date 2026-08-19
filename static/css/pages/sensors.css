@@ -1,0 +1,670 @@
+/* ── Sensors – shared page styles ─────────────────────────────────────────── */
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.sensors-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.sensors-page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+    color: var(--bs-body-color, #212529);
+}
+
+.sensors-page-header .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin: 0;
+}
+
+/* ── Action buttons in header ─────────────────────────────────────────────── */
+.btn-sensor-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-sensor-add:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+/* ── Table card ──────────────────────────────────────────────────────────── */
+.sensors-table-card {
+    background: var(--bs-body-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.sensors-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.sensors-table thead th {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    padding: 0.85rem 1rem;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color, #6c757d);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    white-space: nowrap;
+}
+
+.sensors-table tbody tr {
+    border-bottom: 1px solid var(--bs-border-color-translucent, #dee2e620);
+    transition: background 0.15s;
+}
+
+.sensors-table tbody tr:hover {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.sensors-table td {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+}
+
+/* ── Sensor name cell ────────────────────────────────────────────────────── */
+.sensor-name-main {
+    font-weight: 600;
+    color: var(--bs-body-color, #212529);
+}
+
+.sensor-name-sub {
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-top: 1px;
+}
+
+/* ── Type badge ──────────────────────────────────────────────────────────── */
+.sensor-type-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    white-space: nowrap;
+}
+
+/* ── Active / inactive status ────────────────────────────────────────────── */
+.sensor-status-active {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.sensor-status-active::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+}
+
+.sensor-status-inactive {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sensor-status-inactive::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--bs-secondary-color, #adb5bd);
+}
+
+/* ── Row actions ─────────────────────────────────────────────────────────── */
+.sensor-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sensor-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    background: transparent;
+    color: var(--bs-body-color, #212529);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    cursor: pointer;
+}
+
+.sensor-action-btn:hover {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.sensor-action-btn.danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.sensors-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sensors-empty-state i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.75rem;
+    opacity: 0.4;
+}
+
+/* ── Pagination (reuses list-common pattern) ─────────────────────────────── */
+.sensors-pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    font-size: 0.8rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sensors-pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.sensors-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 0.5rem;
+    border-radius: 7px;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    background: transparent;
+    color: var(--bs-body-color, #212529);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sensors-page-btn:hover {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    color: #4f46e5;
+}
+
+.sensors-page-btn.active {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+}
+
+.sensors-page-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── Add Sensor form page ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+.sensor-add-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.sensor-add-header h1 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.sensor-add-header .subtitle {
+    font-size: 0.875rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin: 0;
+}
+
+.btn-save-sensor {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.25rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.btn-save-sensor:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ── Form sections ──────────────────────────────────────────────────────── */
+.sensor-form-section {
+    background: var(--bs-body-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.sensor-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.sensor-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    font-size: 1rem;
+}
+
+.sensor-section-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.sensor-section-body {
+    padding: 1.25rem;
+}
+
+/* ── Field helpers ───────────────────────────────────────────────────────── */
+.field-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: var(--bs-body-color, #212529);
+}
+
+.field-label .required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.field-hint {
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-top: 0.25rem;
+}
+
+.field-error {
+    display: block;
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+}
+
+/* ── Right sidebar card ──────────────────────────────────────────────────── */
+.sensor-sidebar-card {
+    background: var(--bs-body-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+}
+
+.sensor-sidebar-card-header {
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.sensor-sidebar-card-body {
+    padding: 1rem;
+}
+
+/* ── Info box ────────────────────────────────────────────────────────────── */
+.sensor-info-box {
+    display: flex;
+    gap: 0.65rem;
+    padding: 0.85rem 1rem;
+    border-radius: 9px;
+    background: rgba(79, 70, 229, 0.06);
+    border: 1px solid rgba(79, 70, 229, 0.15);
+    font-size: 0.82rem;
+    color: var(--bs-body-color, #212529);
+}
+
+.sensor-info-box i {
+    color: #4f46e5;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* ── Required note ───────────────────────────────────────────────────────── */
+.required-note {
+    font-size: 0.78rem;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-top: 0.75rem;
+}
+
+.required-star {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* =============================================================================
+   DARK MODE OVERRIDES  (body.theme-dark — matches project-wide token values)
+   ============================================================================= */
+
+/* ── Token overrides ─────────────────────────────────────────────────────── */
+body.theme-dark {
+    --color-primary-light: #2a2650;
+    --color-card:          #1e1e2d;
+    --color-border:        #2e2e42;
+    --color-text:          #e0e0f0;
+    --color-muted:         #8b8ba4;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+body.theme-dark .sensors-page-header h1,
+body.theme-dark .sensor-add-header h1 {
+    color: var(--color-text);
+}
+
+body.theme-dark .sensors-page-header .page-subtitle,
+body.theme-dark .sensor-add-header .subtitle {
+    color: var(--color-muted);
+}
+
+/* ── Table card ──────────────────────────────────────────────────────────── */
+body.theme-dark .sensors-table-card {
+    background: var(--color-card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+body.theme-dark .sensors-table thead th {
+    background: #16162a;
+    color: var(--color-muted);
+    border-color: var(--color-border);
+}
+
+body.theme-dark .sensors-table tbody tr {
+    border-color: var(--color-border);
+}
+
+body.theme-dark .sensors-table tbody tr:hover {
+    background: #252538;
+}
+
+body.theme-dark .sensors-table td {
+    color: var(--color-text);
+}
+
+/* ── Sensor name cell ────────────────────────────────────────────────────── */
+body.theme-dark .sensor-name-main {
+    color: var(--color-text);
+}
+
+body.theme-dark .sensor-name-sub {
+    color: var(--color-muted);
+}
+
+/* ── Type badge ──────────────────────────────────────────────────────────── */
+body.theme-dark .sensor-type-badge {
+    background: rgba(129, 140, 248, 0.15);
+    color: #a5b4fc;
+}
+
+/* ── Status dots ─────────────────────────────────────────────────────────── */
+body.theme-dark .sensor-status-active {
+    color: #6ee7b7;
+}
+
+body.theme-dark .sensor-status-active::before {
+    background: #6ee7b7;
+}
+
+body.theme-dark .sensor-status-inactive {
+    color: var(--color-muted);
+}
+
+body.theme-dark .sensor-status-inactive::before {
+    background: var(--color-muted);
+}
+
+/* ── Row action buttons ──────────────────────────────────────────────────── */
+body.theme-dark .sensor-action-btn {
+    background: #151521;
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+body.theme-dark .sensor-action-btn:hover {
+    background: var(--color-primary-light);
+    color: #a5b4fc;
+    border-color: #4f46e5;
+}
+
+body.theme-dark .sensor-action-btn.danger:hover {
+    background: #301515;
+    color: #fca5a5;
+    border-color: #7f1d1d;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+body.theme-dark .sensors-empty-state {
+    color: var(--color-muted);
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────── */
+body.theme-dark .sensors-pagination-wrap {
+    border-color: var(--color-border);
+    color: var(--color-muted);
+}
+
+body.theme-dark .sensors-page-btn {
+    background: #151521;
+    color: var(--color-text);
+    border-color: var(--color-border);
+}
+
+body.theme-dark .sensors-page-btn:hover,
+body.theme-dark .sensors-page-btn.active {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+}
+
+/* ── Add Sensor: form section cards ──────────────────────────────────────── */
+body.theme-dark .sensor-form-section {
+    background: var(--color-card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-dark .sensor-section-header {
+    background: #16162a;
+    border-color: var(--color-border);
+}
+
+body.theme-dark .sensor-section-header h2 {
+    color: var(--color-text);
+}
+
+body.theme-dark .sensor-section-icon {
+    background: var(--color-primary-light);
+    color: #a5b4fc;
+}
+
+body.theme-dark .sensor-section-body {
+    background: var(--color-card);
+}
+
+/* ── Add Sensor: field labels & hints ────────────────────────────────────── */
+body.theme-dark .field-label {
+    color: var(--color-muted);
+}
+
+body.theme-dark .field-hint {
+    color: var(--color-muted);
+}
+
+/* ── Add Sensor: Django widget inputs (form-control / form-select) ─────────
+   These match the same selectors used in assets-form.css                     */
+body.theme-dark .sensor-section-body select,
+body.theme-dark .sensor-section-body input[type="text"],
+body.theme-dark .sensor-section-body input[type="number"],
+body.theme-dark .sensor-section-body input[type="date"],
+body.theme-dark .sensor-section-body textarea,
+body.theme-dark .sensor-section-body .form-control,
+body.theme-dark .sensor-section-body .form-select {
+    background-color: #151521 !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+}
+
+body.theme-dark .sensor-section-body select:focus,
+body.theme-dark .sensor-section-body input:focus,
+body.theme-dark .sensor-section-body textarea:focus,
+body.theme-dark .sensor-section-body .form-control:focus,
+body.theme-dark .sensor-section-body .form-select:focus {
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2) !important;
+}
+
+/* ── Right sidebar card ──────────────────────────────────────────────────── */
+body.theme-dark .sensor-sidebar-card {
+    background: var(--color-card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+body.theme-dark .sensor-sidebar-card-header {
+    background: #16162a;
+    border-color: var(--color-border);
+    color: var(--color-muted);
+}
+
+body.theme-dark .sensor-sidebar-card-body {
+    background: var(--color-card);
+}
+
+/* Threshold form inputs inside the sidebar card */
+body.theme-dark .sensor-sidebar-card select,
+body.theme-dark .sensor-sidebar-card input[type="text"],
+body.theme-dark .sensor-sidebar-card input[type="number"],
+body.theme-dark .sensor-sidebar-card .form-control,
+body.theme-dark .sensor-sidebar-card .form-select {
+    background-color: #151521 !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+}
+
+body.theme-dark .sensor-sidebar-card select:focus,
+body.theme-dark .sensor-sidebar-card input:focus,
+body.theme-dark .sensor-sidebar-card .form-control:focus,
+body.theme-dark .sensor-sidebar-card .form-select:focus {
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2) !important;
+}
+
+/* ── Info box ────────────────────────────────────────────────────────────── */
+body.theme-dark .sensor-info-box {
+    background: rgba(79, 70, 229, 0.1);
+    border-color: rgba(129, 140, 248, 0.25);
+    color: var(--color-text);
+}
+
+body.theme-dark .sensor-info-box i {
+    color: #a5b4fc;
+}
+
+/* ── Required note ───────────────────────────────────────────────────────── */
+body.theme-dark .required-note {
+    color: var(--color-muted);
+}
+
+/* ── Add Sensor: save button (gradient — stays the same in dark) ─────────── */
+body.theme-dark .btn-save-sensor,
+body.theme-dark .btn-sensor-add {
+    /* gradient already readable in dark; keep white text explicit */
+    color: #fff !important;
+}
+
+body.theme-dark .btn-save-sensor i,
+body.theme-dark .btn-sensor-add i {
+    color: #fff !important;
+}
+
+/* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+body.theme-dark .page-breadcrumb .breadcrumb-link {
+    color: var(--color-muted);
+}
+
+body.theme-dark .page-breadcrumb .breadcrumb-item.active {
+    color: #818cf8;
+}
+

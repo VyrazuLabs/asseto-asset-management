@@ -118,6 +118,7 @@ INSTALLED_APPS = [
     "clients",
     "client_portal",
     "custom_fields",
+    "iot"
 ]
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK = True
