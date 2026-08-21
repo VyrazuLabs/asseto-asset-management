@@ -588,3 +588,177 @@ body.theme-dark .status-completed { background: #15302a; color: #6ee7b7; border-
   color: var(--color-text);
   white-space: nowrap;
 }
+
+/* ── IoT Sensors & Telemetry ────────────────────────────────────────────── */
+.live-monitoring-badge {
+  background: #d1fae5;
+  color: #059669;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.live-monitoring-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
+  border-radius: 50%;
+}
+.sensor-status-active { background: #d1fae5; color: #059669; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+.sensor-status-warning { background: #fef08a; color: #ca8a04; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+.sensor-status-active::before { content: "• "; color: #10b981; }
+.sensor-status-warning::before { content: "• "; color: #eab308; }
+.text-good { color: #059669; font-weight: 600; }
+.text-check { color: #dc2626; font-weight: 600; }
+
+.chart-placeholder {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.chart-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.unresolved-alerts {
+  margin-top: 1.5rem;
+}
+.unresolved-alerts-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+.alert-critical { background: #fef2f2; border: 1px solid #fee2e2; }
+.alert-warning { background: #fefce8; border: 1px solid #fef08a; }
+.alert-icon-critical { color: #dc2626; font-size: 1.25rem; }
+.alert-icon-warning { color: #ca8a04; font-size: 1.25rem; }
+.alert-content { flex: 1; }
+.alert-header { display: flex; justify-content: space-between; margin-bottom: 0.25rem; }
+.alert-title-critical { color: #dc2626; font-weight: 700; font-size: 0.85rem; }
+.alert-title-warning { color: #ca8a04; font-weight: 700; font-size: 0.85rem; }
+.alert-time { color: var(--color-muted); font-size: 0.75rem; }
+.alert-desc { font-size: 0.85rem; color: var(--color-text); margin: 0; }
+
+/* ── Predictive Insights ────────────────────────────────────────────────── */
+.health-score-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.health-score-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.health-score-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #059669;
+  display: flex;
+  align-items: baseline;
+}
+.health-score-value span {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-weight: 600;
+  margin-left: 4px;
+}
+.health-score-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 4px solid #059669;
+  border-top-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #059669;
+  font-size: 1.25rem;
+}
+
+.predicted-failure-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.predicted-failure-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.predicted-failure-date {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.predicted-failure-date i { color: #3b82f6; }
+
+.recommendation-card {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+.recommendation-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.25rem;
+}
+.recommendation-desc {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.health-trend-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.health-trend-chart {
+  width: 100%;
+  height: 40px;
+}
+
+/* Dark mode overrides */
+body.theme-dark .chart-placeholder,
+body.theme-dark .predicted-failure-card { border-color: var(--color-border); }
+body.theme-dark .recommendation-card { background: #2a2a3d; }
+body.theme-dark .alert-critical { background: #451a1a; border-color: #7f1d1d; }
+body.theme-dark .alert-warning { background: #422a08; border-color: #713f12; }
+body.theme-dark .live-monitoring-badge { background: #064e3b; color: #34d399; }
+body.theme-dark .sensor-status-active { background: #064e3b; color: #34d399; }
+body.theme-dark .sensor-status-warning { background: #422a08; color: #facc15; }
