@@ -24,6 +24,13 @@ from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
 
+try:
+    from iot.models.device_models import Device
+    from iot.models.sensor_models import Sensor
+except ImportError:
+    Device = None
+    Sensor = None
+
 PAGE_SIZE = 25
 ORPHANS = 1
 
@@ -421,10 +428,29 @@ def details_of_asset(request, id):
     asset_barcode = generate_barcode(asset.tag)
     maintenance_records = MaintenanceRecord.objects.filter(asset=asset).order_by('-created_at')
     maintenance_form = MaintenanceRecordForm(organization=request.user.organization)
-    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form)
+    
+    sensors = []
+    sensors_page = 1
+    sensors_total_pages = 1
+    sensors_total_count = 0
+    if Device and Sensor and asset:
+        devices = Device.objects.filter(asset=asset, organization=request.user.organization)
+        all_sensors = Sensor.objects.filter(device__in=devices).select_related('device')
+        sensors_total_count = all_sensors.count()
+        paginator = Paginator(all_sensors, 5)
+        sensors_page = request.GET.get('sensors_page', 1)
+        try:
+            sensors_page = int(sensors_page)
+        except (TypeError, ValueError):
+            sensors_page = 1
+        sensors_page_obj = paginator.get_page(sensors_page)
+        sensors = sensors_page_obj
+        sensors_total_pages = paginator.num_pages
+        
+    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form,sensors,sensors_page,sensors_total_pages,sensors_total_count)
     return context
 
-def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None):
+def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None,sensors=None,sensors_page=1,sensors_total_pages=1,sensors_total_count=0):
     audit_data = []
     if get_audit_history:
         for audit in get_audit_history:
@@ -562,7 +588,8 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
 
     context = {'title': 'Asset Details', 'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries,
-               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date}
+               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date, 'sensors': sensors,
+               'sensors_page': sensors_page, 'sensors_total_pages': sensors_total_pages, 'sensors_total_count': sensors_total_count}
 
     return context
 

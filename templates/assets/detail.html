@@ -181,6 +181,126 @@
       </div>
     </div>
 
+    {# IoT Sensors & Telemetry #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-broadcast"></i></div>
+          <h2>IoT Sensors & Telemetry</h2>
+        </div>
+        <span class="live-monitoring-badge">Live Monitoring</span>
+      </div>
+      <div class="detail-card-body p-0">
+        <table class="detail-specs-table">
+          <thead>
+            <tr>
+              <th>SERIAL NO.</th>
+              <th>DEVICE NAME</th>
+              <th>SENSOR NAME</th>
+              <th>SENSOR TYPE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sensor in sensors %}
+            <tr>
+              <td>{{ sensor.device.device_sn }}</td>
+              <td>{{ sensor.device.name }}</td>
+              <td>{{ sensor.name }}</td>
+              <td>{{ sensor.get_sensor_type_display }}</td>
+              <td>
+                {% if sensor.is_paired == 2 %}
+                <span class="sensor-status-active">Paired</span>
+                {% elif sensor.is_paired == 1 %}
+                <span class="sensor-status-warning">Pairing</span>
+                {% else %}
+                <span class="sensor-status-warning">Unpaired</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">No sensors associated with this asset</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="px-3">
+          {% include 'commons/list-pagination.html' with page_object=sensors page_var='sensors_page' %}
+        </div>
+      </div>
+      <div class="detail-card-body pt-0">
+        <div class="chart-placeholder">
+          <div class="chart-title">24-HOUR TEMPERATURE TREND (SN-001)</div>
+          <svg viewBox="0 0 500 150" class="w-100" style="height: 200px; max-height: 100%;">
+            <!-- Grid lines -->
+            <line x1="0" y1="30" x2="500" y2="30" stroke="#e5e7eb" stroke-width="1" />
+            <line x1="0" y1="60" x2="500" y2="60" stroke="#e5e7eb" stroke-width="1" />
+            <line x1="0" y1="90" x2="500" y2="90" stroke="#e5e7eb" stroke-width="1" />
+            <line x1="0" y1="120" x2="500" y2="120" stroke="#e5e7eb" stroke-width="1" />
+    
+            <!-- Trend line area -->
+            <path
+              d="M 0 75 C 50 90, 100 97.5, 150 67.5 C 200 37.5, 250 22.5, 300 45 C 350 67.5, 400 82.5, 450 90 L 500 97.5 L 500 150 L 0 150 Z"
+              fill="#eff6ff" opacity="0.6" />
+            <!-- Trend line -->
+            <path
+              d="M 0 75 C 50 90, 100 97.5, 150 67.5 C 200 37.5, 250 22.5, 300 45 C 350 67.5, 400 82.5, 450 90 L 500 97.5"
+              fill="none" stroke="#3b82f6" stroke-width="2" />
+    
+            <!-- Data points -->
+            <circle cx="0" cy="75" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="83" cy="87" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="166" cy="60" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="250" cy="27" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="333" cy="52.5" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="416" cy="87" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="500" cy="97.5" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
+    
+            <!-- X-axis labels -->
+            <text x="0" y="142" font-size="10" fill="#6b7280">00:00</text>
+            <text x="83" y="142" font-size="10" fill="#6b7280" text-anchor="middle">04:00</text>
+            <text x="166" y="142" font-size="10" fill="#6b7280" text-anchor="middle">08:00</text>
+            <text x="250" y="142" font-size="10" fill="#6b7280" text-anchor="middle">12:00</text>
+            <text x="333" y="142" font-size="10" fill="#6b7280" text-anchor="middle">16:00</text>
+            <text x="416" y="142" font-size="10" fill="#6b7280" text-anchor="middle">20:00</text>
+            <text x="500" y="142" font-size="10" fill="#6b7280" text-anchor="end">23:50</text>
+    
+            <!-- Y-axis labels -->
+            <text x="0" y="30" font-size="10" fill="#6b7280">30</text>
+            <text x="0" y="60" font-size="10" fill="#6b7280">26</text>
+            <text x="0" y="90" font-size="10" fill="#6b7280">22</text>
+            <text x="0" y="120" font-size="10" fill="#6b7280">18</text>
+            <text x="0" y="142" font-size="10" fill="#6b7280">14</text>
+          </svg>
+        </div>
+    
+        <div class="unresolved-alerts">
+          <div class="unresolved-alerts-title">UNRESOLVED ALERTS</div>
+          <div class="alert-card alert-critical">
+            <i class="bi bi-exclamation-circle alert-icon-critical"></i>
+            <div class="alert-content">
+              <div class="alert-header">
+                <span class="alert-title-critical">Critical</span>
+                <span class="alert-time">2h ago</span>
+              </div>
+              <p class="alert-desc">High vibration detected on SN-002</p>
+            </div>
+          </div>
+          <div class="alert-card alert-warning">
+            <i class="bi bi-exclamation-triangle alert-icon-warning"></i>
+            <div class="alert-content">
+              <div class="alert-header">
+                <span class="alert-title-warning">Warning</span>
+                <span class="alert-time">5h ago</span>
+              </div>
+              <p class="alert-desc">Temperature threshold approaching</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     {# Specifications #}
     {% if assetSpecifications %}
@@ -383,6 +503,48 @@
             <img src="{% static 'images/No_Image.jpg' %}" class="detail-main-image" alt="No image available">
           </div>
         {% endif %}
+      </div>
+    </div>
+
+    {# Predictive Insights #}
+    <div class="detail-card">
+      <div class="detail-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <div class="section-icon"><i class="bi bi-lightbulb"></i></div>
+          <h2>Predictive Insights</h2>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="health-score-section">
+          <div>
+            <div class="health-score-label">HEALTH SCORE</div>
+            <div class="health-score-value">82<span>/ 100</span></div>
+          </div>
+          <div class="health-score-circle">
+            <i class="bi bi-heart-pulse"></i>
+          </div>
+        </div>
+    
+        <div class="predicted-failure-card">
+          <div class="predicted-failure-label">PREDICTED FAILURE DATE</div>
+          <div class="predicted-failure-date">
+            <i class="bi bi-calendar-event"></i> 2024-11-15
+          </div>
+        </div>
+    
+        <div class="recommendation-card">
+          <div class="recommendation-title">Recommendation:</div>
+          <p class="recommendation-desc">Schedule bearing lubrication within the next 15 days to prevent unexpected
+            downtime.</p>
+        </div>
+    
+        <div class="health-trend-label">HEALTH TREND (LAST 6 MONTHS)</div>
+        <div class="health-trend-chart">
+          <svg viewBox="0 0 300 40" class="w-100" style="height: 40px;">
+            <path d="M 0 30 C 50 25, 100 20, 150 15 C 200 10, 250 15, 300 10" fill="none" stroke="#059669"
+              stroke-width="2" />
+          </svg>
+        </div>
       </div>
     </div>
 
