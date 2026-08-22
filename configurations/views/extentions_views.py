@@ -1,11 +1,21 @@
 import base64
-from django.contrib.auth.decorators import login_required
+from pathlib import Path
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.constants import INTEGRATION_CHOICES
 from configurations.forms import ClientCredentialsForm
-from configurations.models import Extensions, SlackConfiguration
+from configurations.models import Extensions, InstalledExtension, SlackConfiguration
 
+from configurations.extensions.registry import read_enabled
+from configurations.extensions.reload import ReloadUnavailableError, trigger_reload
 from configurations.utils import hide_last_digits
+
+
+def check_admin(user):
+    return user.is_superuser
 
 
 @login_required
@@ -125,3 +135,51 @@ def api_extension_status(request, id):
     ext.status = 1 if status == "on" else 0
     ext.save()
     return redirect("configurations:list_extensions")
+
+
+@login_required
+@user_passes_test(check_admin)
+def manage_extensions(request):
+    """Read-only status page for CLI-installed extensions.
+
+    No install/enable/disable actions here (that's `manage.py` on the
+    server, per docs/extension-architecture.md §3) — the one action this
+    page offers is applying a pending restart. See §4.
+    """
+    installed = InstalledExtension.objects.all().order_by("name")
+    has_pending_restart = installed.filter(status="pending_restart").exists()
+    return render(
+        request,
+        "configurations/manage-extensions.html",
+        {"installed_extensions": installed, "has_pending_restart": has_pending_restart},
+    )
+
+
+@login_required
+@user_passes_test(check_admin)
+def trigger_extension_reload(request):
+    """POST-only: send SIGHUP to the gunicorn master to activate pending extension changes.
+
+    Flips every InstalledExtension row currently marked "pending_restart"
+    to its resolved state right after sending the signal — optimistic, not
+    confirmed against the new workers actually booting (documented gap,
+    see docs/extension-architecture.md §7 note in Stage 3).
+    """
+    if request.method != "POST":
+        return redirect("configurations:manage_extensions")
+
+    try:
+        trigger_reload(settings.GUNICORN_PID_FILE)
+    except (ReloadUnavailableError, OSError, ValueError) as exc:
+        messages.error(request, f"Could not trigger reload: {exc}")
+        return redirect("configurations:manage_extensions")
+
+    pending = InstalledExtension.objects.filter(status="pending_restart")
+    for ext in pending:
+        registry_path = Path(settings.BASE_DIR) / "extensions" / "registry.json"
+        enabled = read_enabled(registry_path)
+        ext.status = "active" if ext.manifest_json.get("entry_app") in enabled else "disabled"
+    InstalledExtension.objects.bulk_update(list(pending), ["status"])
+
+    messages.success(request, "Reload triggered — pending extension changes are now active.")
+    return redirect("configurations:manage_extensions")

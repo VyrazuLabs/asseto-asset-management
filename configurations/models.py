@@ -85,3 +85,68 @@ class SlackConfiguration(models.Model):
     channel_id = models.CharField(max_length=100, null=True, blank=True)
     client_id = models.CharField(max_length=100, null=True, blank=True)
     client_secret = models.CharField(max_length=100, null=True, blank=True)
+
+
+class InstalledExtension(models.Model):
+    """Platform-level record of an installed extension.
+
+    Org-agnostic — an extension is installed once per deployment (unlike
+    ``Extensions`` above, which is a per-org feature toggle). Maintained by
+    the install_extension/enable_extension/disable_extension management
+    commands, never edited directly. See docs/extension-architecture.md §6.
+    """
+
+    STATUS_CHOICES = [
+        ("installed", "Installed"),
+        ("pending_restart", "Pending Restart"),
+        ("active", "Active"),
+        ("disabled", "Disabled"),
+        ("error", "Error"),
+    ]
+    SOURCE_CHOICES = [("local", "Local"), ("github", "GitHub")]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+    app_label = models.CharField(max_length=100, unique=True)
+    version = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="installed")
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES)
+    source_url = models.CharField(max_length=500, null=True, blank=True)
+    manifest_json = models.JSONField()
+    installed_at = models.DateTimeField(auto_now_add=True)
+    enabled_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.status})"
+
+
+class ExtensionLicense(models.Model):
+    """Per-org activation state for a paid extension.
+
+    Activated via `python manage.py activate_extension` against an external
+    license server (out of this repo — see docs/extension-architecture.md
+    §5) and re-validated daily by a Celery beat task. `require_license()`
+    (configurations.extensions.license) checks this table before letting a
+    licensed extension do gated work.
+    """
+
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("expired", "Expired"),
+        ("invalid", "Invalid"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    extension = models.ForeignKey(
+        InstalledExtension, on_delete=models.CASCADE, related_name="licenses"
+    )
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    activation_token = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="invalid")
+    valid_until = models.DateTimeField(null=True, blank=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.extension.name} - {self.organization.name} ({self.status})"

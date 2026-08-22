@@ -32,7 +32,12 @@ urlpatterns=[
     path('add-organization/',add_organization,name='add_organization'),
 
     #for api extension
-    path('api-extension-status/<uuid:id>',api_extension_status,name='api_extension_status')
+    path('api-extension-status/<uuid:id>',api_extension_status,name='api_extension_status'),
+
+    # extension system — read-only status + apply-pending-restart, per
+    # docs/extension-architecture.md §4. Install/enable/disable stay CLI-only.
+    path('extensions/manage/', manage_extensions, name='manage_extensions'),
+    path('extensions/apply-changes/', trigger_extension_reload, name='trigger_extension_reload'),
 ]
 
 configuration_api_url_patterns = [

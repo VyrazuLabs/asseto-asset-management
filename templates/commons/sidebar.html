@@ -292,6 +292,16 @@
                         <span>{{ trans.support_ticket }}</span>
                     </a>
                 </li>
+
+                {# Extension-contributed items — always render after core, never reordered among core items. See docs/extension-architecture.md §10. #}
+                {% for item in extension_menu_items %}
+                <li class="sidebar-item {% if sidebar == item.slug %}active{% endif %}">
+                    <a href="{% url item.url_name %}" class="sidebar-link">
+                        <i class="{{ item.icon }}"></i>
+                        <span>{{ item.label }}</span>
+                    </a>
+                </li>
+                {% endfor %}
             </ul>
         </div>
     </div>

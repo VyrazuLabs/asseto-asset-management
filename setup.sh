@@ -320,7 +320,7 @@ version: '3.8'
 services:
   web:
     build: .
-    command: gunicorn AssetManagement.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn AssetManagement.wsgi:application --bind 0.0.0.0:8000 --pid /app/gunicorn.pid
     volumes:
       - django-static:/app/staticfiles
       - django-media:/app/media
@@ -369,7 +369,7 @@ version: '3.8'
 services:
   web:
     build: .
-    command: gunicorn AssetManagement.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn AssetManagement.wsgi:application --bind 0.0.0.0:8000 --pid /app/gunicorn.pid
     volumes:
       - django-static:/app/staticfiles
       - django-media:/app/media

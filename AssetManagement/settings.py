@@ -55,6 +55,25 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TASK_TIME_LIMIT = 30  # hard kill
 CELERY_TASK_SOFT_TIME_LIMIT = 25  # graceful timeout
 
+# Daily re-validation of paid-extension licenses against the external
+# license server (a separate project — see docs/extension-architecture.md
+# §5). Requires `celery beat` to be running; harmless if it isn't (the
+# task simply never fires, existing cached valid_until keeps governing
+# require_license()).
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    "revalidate-extension-licenses-daily": {
+        "task": "configurations.extensions.tasks.revalidate_extension_licenses",
+        "schedule": crontab(hour=3, minute=0),
+    },
+}
+
+# Base URL of the external license server (separate project, not built in
+# this repo). Unset by default — activate_extension/revalidate_extension_licenses
+# are no-ops until this is configured.
+LICENSE_SERVER_URL = os.environ.get("LICENSE_SERVER_URL")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -85,7 +104,7 @@ DEV_URL = os.environ.get("DEV_URL") if os.getcwd() == "/app" else None
 
 # Application definition
 
-INSTALLED_APPS = [
+STATIC_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -106,7 +125,6 @@ INSTALLED_APPS = [
     "smart_selects",
     "roles",
     "users",
-    "support",
     "notifications",
     "simple_history",
     "configurations",
@@ -119,6 +137,21 @@ INSTALLED_APPS = [
     "client_portal",
     "custom_fields",
 ]
+
+# Extension apps enabled via `python manage.py enable_extension` are appended
+# here from extensions/registry.json — never edited by hand. See
+# docs/extension-architecture.md §2. Read here (not from the DB) because
+# settings.py runs before the ORM/app registry exists; a missing or corrupt
+# registry degrades to an empty list rather than crashing startup.
+from configurations.extensions.apps_loader import load_enabled_extension_apps  # noqa: E402
+
+INSTALLED_APPS = STATIC_APPS + load_enabled_extension_apps(BASE_DIR)
+
+# Gunicorn's --pid file; the Extensions admin page sends SIGHUP to this PID
+# to gracefully activate pending extension changes. Absent under
+# `manage.py runserver` (local dev), which is fine — the reload button is a
+# no-op there. See docs/extension-architecture.md §4.
+GUNICORN_PID_FILE = os.environ.get("GUNICORN_PID_FILE", str(BASE_DIR / "gunicorn.pid"))
 # FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK = True
 TRACEBACK_SHOW_LOCALS = True
@@ -162,6 +195,7 @@ try:
                     "configurations.context_processors.login_page_logo",
                     "django.template.context_processors.request",
                     "configurations.context_processors.translations",
+                    "configurations.context_processors.extension_menu",
                 ],
             },
         },
@@ -179,6 +213,7 @@ except Exception:
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
                     "configurations.context_processors.translations",
+                    "configurations.context_processors.extension_menu",
                 ],
             },
         },

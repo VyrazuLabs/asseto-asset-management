@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import TextInput, Textarea, Select, DateTimeInput, NumberInput
-from support.models import SupportTicket, PRIORITY_CHOICES, TICKET_TYPE_CHOICES, IMPACT_CHOICES
+from extensions.core.support.models import SupportTicket, PRIORITY_CHOICES, TICKET_TYPE_CHOICES, IMPACT_CHOICES
 from assets.models import Asset
 
 class ClientSupportTicketForm(forms.ModelForm):

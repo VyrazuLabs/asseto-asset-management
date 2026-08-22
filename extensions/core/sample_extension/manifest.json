@@ -1,0 +1,7 @@
+{
+  "name": "sample_extension",
+  "version": "1.0.0",
+  "app_label": "ext_sample_extension",
+  "entry_app": "extensions.core.sample_extension",
+  "license_required": false
+}

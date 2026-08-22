@@ -1,0 +1,6 @@
+{
+  "enabled": [
+    "extensions.core.sample_extension",
+    "extensions.core.support"
+  ]
+}

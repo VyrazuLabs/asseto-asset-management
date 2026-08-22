@@ -1,0 +1,69 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+{% block content %}
+
+<div class="page-heading">
+    <div class="d-flex justify-content-between flex-wrap">
+        <div class="page-title">
+            <h3 class="page-name">Extensions</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
+                    <li class="breadcrumb-item active">Extensions</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <section class="section">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if has_pending_restart %}
+        <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+            <span>Some extension changes are pending a restart to take effect.</span>
+            <form method="post" action="{% url 'configurations:trigger_extension_reload' %}"
+                  hx-post="{% url 'configurations:trigger_extension_reload' %}"
+                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning btn-sm">Apply Changes</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Version</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Installed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ext in installed_extensions %}
+                        <tr>
+                            <td>{{ ext.name }}</td>
+                            <td>{{ ext.version }}</td>
+                            <td><span class="badge bg-secondary">{{ ext.get_status_display }}</span></td>
+                            <td>{{ ext.get_source_display }}</td>
+                            <td>{{ ext.installed_at }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No extensions installed. Use the server CLI (`python manage.py install_extension`) to add one.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

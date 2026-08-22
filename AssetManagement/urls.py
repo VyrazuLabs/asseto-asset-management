@@ -66,7 +66,9 @@ urlpatterns = [
     path("assets/", include("assets.urls", namespace="assets")),
     path("license/", include("license.urls", namespace="license")),
     path("roles/", include("roles.urls", namespace="roles")),
-    path("support/", include("support.urls", namespace="support")),
+    # Moved into extensions/core/support/ (docs/extension-architecture.md §7)
+    # — path/namespace kept identical to preserve the existing URL contract.
+    path("support/", include("extensions.core.support.urls", namespace="support")),
     path("users/", include("users.urls", namespace="users")),
     path("notifications/", include("notifications.urls", namespace="notifications")),
     path("configurations/", include("configurations.urls", namespace="configurations")),
@@ -152,6 +154,12 @@ urlpatterns += [
         r"^firebase-messaging-sw\.js$", serve, {"path": "firebase-messaging-sw.js"}
     ),
 ]
+
+# Enabled extensions (extensions/registry.json) get mounted at /ext/<name>/.
+# See docs/extension-architecture.md §2/§9.
+from configurations.extensions.url_loader import build_extension_urlpatterns  # noqa: E402
+
+urlpatterns += build_extension_urlpatterns(settings.BASE_DIR)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

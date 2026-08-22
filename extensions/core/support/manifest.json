@@ -1,0 +1,7 @@
+{
+  "name": "support",
+  "version": "1.0.0",
+  "app_label": "support",
+  "entry_app": "extensions.core.support",
+  "license_required": false
+}

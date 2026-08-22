@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from authentication.models import User
+from configurations.extensions.permissions import get_extension_permission_groups
 from roles.models import Role
 
 from .forms import RoleForm
@@ -77,7 +78,7 @@ def add(request):
             response["HX-Trigger"] = "roleAdded"
             return response
 
-    context = {"form": form}
+    context = {"form": form, "extension_permission_groups": get_extension_permission_groups()}
     return render(request, "roles/add-role-modal.html", context=context)
 
 
@@ -120,7 +121,11 @@ def update(request, name):
             response["HX-Trigger"] = "roleUpdated"
             return response
 
-    context = {"form": form, "permissions": permissions}
+    context = {
+        "form": form,
+        "permissions": permissions,
+        "extension_permission_groups": get_extension_permission_groups(),
+    }
     return render(request, "roles/update-role-modal.html", context=context)
 
 

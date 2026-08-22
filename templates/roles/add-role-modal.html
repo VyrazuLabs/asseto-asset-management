@@ -506,6 +506,28 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {# Extension-contributed permissions — appended after core, existing checkbox markup/name so roles/views.py save logic needs no changes. See docs/extension-architecture.md §10. #}
+                            {% for group in extension_permission_groups %}
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="{{ group.label }}"
+                                            id="chk-{{ group.label }}">
+                                        <label class="form-check-label" for="chk-{{ group.label }}">{{ group.label }}</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    {% for perm in group.permissions %}
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_{{ group.label }}" id="{{ perm.codename }}"
+                                            name="permissions[]" type="checkbox" value="{{ perm.codename }}">
+                                        <label class="form-check-label" for="{{ perm.codename }}">{{ perm.label }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

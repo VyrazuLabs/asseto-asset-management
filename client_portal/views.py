@@ -9,7 +9,7 @@ from django.http import HttpResponse, JsonResponse
 
 from clients.models import Client, ClientContact
 from assets.models import Asset, AssetImage, AssignAsset
-from support.models import (
+from extensions.core.support.models import (
     SupportTicket,
     TicketAttachment,
     TicketActivity,
@@ -20,7 +20,7 @@ from support.models import (
     TICKET_TYPE_CHOICES,
 )
 from .forms import ClientSupportTicketForm
-from support.utils import SupportTicketService
+from extensions.core.support.utils import SupportTicketService
 from django.core.exceptions import ValidationError
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location

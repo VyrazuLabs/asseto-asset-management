@@ -1,3 +1,4 @@
+from .extensions.menu import get_extension_menu_items
 from .models import LocalizationConfiguration, BrandingImages
 from .translations.utils import get_translations
 
@@ -41,6 +42,13 @@ def favicon_image(request):
             updated_favicon = BrandingImages.favicon_path + get_favicon.favicon
             return {"get_favicon": updated_favicon}
     return {"get_favicon": None}
+
+
+def extension_menu(request):
+    """Sidebar items contributed by active extensions, per docs/extension-architecture.md §10."""
+    if request.user.is_authenticated:
+        return {"extension_menu_items": get_extension_menu_items(request.user)}
+    return {"extension_menu_items": []}
 
 
 def login_page_logo(request):
