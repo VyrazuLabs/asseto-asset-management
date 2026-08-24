@@ -12,6 +12,26 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.6.7] — 2026-08-24
+
+### Added
+- **Global Dynamic Custom Fields** — Implemented global custom field system (`custom_fields` app) for Assets, Clients, Vendors, and Users with field definitions, value models, soft delete (`is_deleted`), and customizable UI forms and modals.
+- **Bulk Asset Import Custom Fields Support** — Added dynamic custom field data parsing and validation in CSV bulk asset upload workflows.
+- **Localization for Custom Fields** — Added multilingual translation keys (English, Hindi, Bengali, French) and enhanced error handling UI for custom field configurations.
+- **Authentication & Permission Decorators** — Enabled authentication and strict permission check decorators for listed assets view.
+
+### Changed
+- **Entity Details Views** — Redesigned details pages for Assets, Clients, Products, and Vendors to seamlessly display custom fields and their values.
+- **Audit Image Upload & Tag Config** — Refactored audit image upload and tag configuration forms for better UX and reliability.
+
+### Fixed
+- **Asset Details API** — Resolved serialization and response format bugs in the asset details API endpoint.
+
+### Security
+- **cryptography, pypdf & h2** — Updated project dependencies in `requirements.txt` to patch known security vulnerabilities.
+
+---
+
 ## [1.6.6] — 2026-08-03
 
 ### Added
