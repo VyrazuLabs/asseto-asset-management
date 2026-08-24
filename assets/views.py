@@ -97,8 +97,8 @@ def manage_access_for_assign_assets(user):
     return False
 
 
-# @login_required
-# @user_passes_test(manage_access_for_assets)
+@login_required
+@user_passes_test(manage_access_for_assets)
 def listed(request):
     assets_qs = filtered_asset(request)
     context = create_asset_list(request, assets_qs)

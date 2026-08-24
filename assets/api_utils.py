@@ -33,7 +33,7 @@ def assign_asset_user_list(request):
 def asset_details(id, request):
     asset = get_object_or_404(Asset, pk=id)
     asset_images = AssetImage.objects.filter(asset=asset).all()
-    data = asset_data(request, asset, asset_images, asset_statuses, [])
+    data = asset_data(request, asset, asset_images)
     return data
 
 
@@ -225,7 +225,7 @@ def get_assigned_user(request, asset):
     return assigned_user
 
 
-def asset_data(request, asset, asset_images, asset_statuses, custom_fields):
+def asset_data(request, asset, asset_images):
     current_host = request.get_host()
     obj = get_currency_and_datetime_format(request.user.organization)
     format_currency = obj["currency"] if obj["currency"] else "INR"
