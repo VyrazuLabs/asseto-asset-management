@@ -381,6 +381,77 @@ class SupportTicketService:
         )
 
     # ------------------------------------------------------------------
+    # Shared close/status/reassignment helpers (used by both the
+    # form-based web views and the JSON API views)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def validate_close_transition(ticket, new_status, submitted_happy_code):
+        """Raise ``ValidationError`` if *ticket* can't move to Closed (4) yet.
+
+        Only applies when the ticket has a client (directly or via its
+        asset) and is not already closed. ``submitted_happy_code`` is the
+        code the caller collected from the client (already stripped of
+        surrounding whitespace is not required).
+        """
+        if new_status != "4" or ticket.status == "4":
+            return
+        has_client = ticket.client is not None or (
+            ticket.asset is not None and ticket.asset.client is not None
+        )
+        if not has_client:
+            return
+        if not ticket.happy_code:
+            raise ValidationError(
+                "This ticket does not have a happy code. "
+                "Please ask the client to provide one."
+            )
+        submitted_code = (submitted_happy_code or "").strip().upper()
+        if not submitted_code:
+            raise ValidationError(
+                "Happy code is required to close this ticket. "
+                "Please enter the code provided by the client.",
+                params={"happy_code_required": True, "ticket_id": str(ticket.id)},
+            )
+        expected_code = ticket.happy_code.upper()
+        if submitted_code != expected_code and submitted_code != f"HC-{expected_code}":
+            raise ValidationError(
+                "Invalid happy code. Please check with the client for the correct code."
+            )
+
+    @staticmethod
+    def log_status_change(ticket, old_status, performed_by):
+        """Create a ``status_changed`` activity if the status actually changed."""
+        if old_status == ticket.status:
+            return
+        status_map = dict(STATUS_CHOICES)
+        old_label = status_map.get(old_status, old_status)
+        new_label = status_map.get(str(ticket.status), ticket.status)
+        TicketActivity.objects.create(
+            ticket=ticket,
+            activity_type="status_changed",
+            description=f"Status changed from {old_label} to {new_label}.",
+            performed_by=performed_by,
+        )
+
+    @staticmethod
+    def log_reassignment(ticket, old_assigned, performed_by):
+        """Create a ``reassigned`` activity if the assignee actually changed."""
+        if old_assigned == ticket.assigned_to:
+            return
+        desc = (
+            f"Ticket assigned to {ticket.assigned_to.get_full_name()}."
+            if ticket.assigned_to
+            else "Ticket unassigned."
+        )
+        TicketActivity.objects.create(
+            ticket=ticket,
+            activity_type="reassigned",
+            description=desc,
+            performed_by=performed_by,
+        )
+
+    # ------------------------------------------------------------------
     # Update
     # ------------------------------------------------------------------
 
@@ -398,61 +469,17 @@ class SupportTicketService:
         old_status = ticket.status
         old_assigned = ticket.assigned_to
 
-        # Validate happy code when closing a ticket (status = 4) and ticket has a client
         new_status = request.POST.get("status", old_status)
-        has_client = ticket.client is not None or (
-            ticket.asset is not None and ticket.asset.client is not None
+        SupportTicketService.validate_close_transition(
+            ticket, new_status, request.POST.get("happy_code")
         )
-        if new_status == "4" and old_status != "4" and has_client:
-            if not ticket.happy_code:
-                raise ValidationError(
-                    "This ticket does not have a happy code. "
-                    "Please ask the client to provide one."
-                )
-            submitted_code = request.POST.get("happy_code", "").strip().upper()
-            if not submitted_code:
-                raise ValidationError(
-                    "Happy code is required to close this ticket. "
-                    "Please enter the code provided by the client."
-                )
-            expected_code = ticket.happy_code.upper()
-            if (
-                submitted_code != expected_code
-                and submitted_code != f"HC-{expected_code}"
-            ):
-                raise ValidationError(
-                    "Invalid happy code. Please check with the client for the correct code."
-                )
 
         ticket = form.save(commit=False)
         ticket.updated_by = str(request.user.id)
         ticket.save()
 
-        # Log status change
-        if old_status != ticket.status:
-            status_map = dict(STATUS_CHOICES)
-            old_label = status_map.get(old_status, old_status)
-            new_label = status_map.get(str(ticket.status), ticket.status)
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="status_changed",
-                description=(f"Status changed from {old_label} to {new_label}."),
-                performed_by=request.user,
-            )
-
-        # Log reassignment
-        if old_assigned != ticket.assigned_to:
-            desc = (
-                f"Ticket assigned to {ticket.assigned_to.get_full_name()}."
-                if ticket.assigned_to
-                else "Ticket unassigned."
-            )
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="reassigned",
-                description=desc,
-                performed_by=request.user,
-            )
+        SupportTicketService.log_status_change(ticket, old_status, request.user)
+        SupportTicketService.log_reassignment(ticket, old_assigned, request.user)
 
         # Handle note / comment
         note_content = request.POST.get("note_content", "").strip()
@@ -528,47 +555,15 @@ class SupportTicketService:
             raise ValidationError("Invalid status.")
 
         old_status = ticket.status
-
-        # Happy code validation when moving to Closed
-        if new_status == "4" and old_status != "4":
-            has_client = ticket.client is not None or (
-                ticket.asset is not None and ticket.asset.client is not None
-            )
-            if has_client:
-                if not ticket.happy_code:
-                    raise ValidationError(
-                        "This ticket does not have a happy code. "
-                        "Please ask the client to provide one."
-                    )
-                submitted_code = request.POST.get("happy_code", "").strip().upper()
-                if not submitted_code:
-                    raise ValidationError(
-                        "Happy code is required to close this ticket.",
-                        params={
-                            "happy_code_required": True,
-                            "ticket_id": str(ticket.id),
-                        },
-                    )
-                expected_code = ticket.happy_code.upper()
-                if (
-                    submitted_code != expected_code
-                    and submitted_code != f"HC-{expected_code}"
-                ):
-                    raise ValidationError(
-                        "Invalid happy code. Please check with the client for the correct code."
-                    )
+        SupportTicketService.validate_close_transition(
+            ticket, new_status, request.POST.get("happy_code")
+        )
 
         ticket.status = new_status
         ticket.updated_by = str(request.user.id)
         ticket.save(update_fields=["status", "updated_by"])
 
-        status_map = dict(STATUS_CHOICES)
-        TicketActivity.objects.create(
-            ticket=ticket,
-            activity_type="status_changed",
-            description=f"Status changed from {status_map.get(old_status, old_status)} to {status_map.get(new_status, new_status)}.",
-            performed_by=request.user,
-        )
+        SupportTicketService.log_status_change(ticket, old_status, request.user)
 
         return {"success": True}
 

@@ -149,4 +149,25 @@ api_url_patterns = [
         api_views.GetWarrantyExpiredAssetFlag.as_view(),
         name="get_warranty_expired_assets_flag",
     ),
+    # maintenance / repair log api urls
+    path(
+        "api/asset/maintenance/list/",
+        api_views.MaintenanceRecordListAPIView.as_view(),
+        name="maintenance_record_list",
+    ),
+    path(
+        "api/asset/maintenance/add/",
+        api_views.MaintenanceRecordCreateAPIView.as_view(),
+        name="maintenance_record_add",
+    ),
+    path(
+        "api/asset/maintenance/<uuid:id>/",
+        api_views.MaintenanceRecordDetailAPIView.as_view(),
+        name="maintenance_record_detail",
+    ),
+    path(
+        "api/asset/maintenance/<uuid:id>/update/",
+        api_views.MaintenanceRecordUpdateAPIView.as_view(),
+        name="maintenance_record_update",
+    ),
 ]

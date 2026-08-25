@@ -1,13 +1,22 @@
+import random
+
 import json
 from rest_framework import serializers
 from django.db import transaction
-from assets.models import Asset, AssetImage, AssetStatus, AssignAsset
+from assets.models import Asset, AssetImage, AssetStatus, AssignAsset, MaintenanceRecord
 
 from common.convert_base64_image import convert_image
+from custom_fields.utils import (
+    get_definitions_for_module,
+    get_values_for_entity,
+    save_values_for_entity_dict,
+)
 from django.utils import timezone
 from datetime import timedelta
 from notifications.models import UserNotification
 from .api_utils import get_base_segment
+
+MAINTENANCE_CF_MODULE = "maintenance"
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -414,3 +423,99 @@ class AssignAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignAsset
         fields = ["user", "images"]
+
+
+class MaintenanceRecordSerializer(serializers.ModelSerializer):
+    """Read serializer for a repair/maintenance log entry, including
+    org-configured custom fields for the ``maintenance`` module."""
+
+    asset_name = serializers.CharField(source="asset.name", read_only=True)
+    asset_tag = serializers.CharField(source="asset.tag", read_only=True)
+    cf_definitions = serializers.SerializerMethodField()
+    cf_values = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MaintenanceRecord
+        fields = [
+            "id",
+            "asset",
+            "asset_name",
+            "asset_tag",
+            "service_id",
+            "date",
+            "maintenance_type",
+            "cost",
+            "technician",
+            "status",
+            "cf_definitions",
+            "cf_values",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
+
+    def get_cf_definitions(self, obj):
+        from custom_fields.serializers import CustomFieldDefinitionSerializer
+
+        definitions = get_definitions_for_module(obj.organization, MAINTENANCE_CF_MODULE)
+        return CustomFieldDefinitionSerializer(definitions, many=True).data
+
+    def get_cf_values(self, obj):
+        definitions = get_definitions_for_module(obj.organization, MAINTENANCE_CF_MODULE)
+        return get_values_for_entity(obj.id, definitions)
+
+
+class MaintenanceRecordWriteSerializer(serializers.ModelSerializer):
+    """Create/update serializer for repair/maintenance logs from the
+    mobile API. ``asset`` is required on create, ignored on update (a
+    record's asset never changes after creation)."""
+
+    custom_fields = serializers.DictField(required=False, default=dict)
+
+    class Meta:
+        model = MaintenanceRecord
+        fields = [
+            "asset",
+            "date",
+            "maintenance_type",
+            "cost",
+            "technician",
+            "status",
+            "custom_fields",
+        ]
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        custom_fields = validated_data.pop("custom_fields", {})
+
+        record = MaintenanceRecord.objects.create(
+            **validated_data,
+            organization=request.user.organization,
+            service_id=f"MN-{random.randint(10000, 99999)}",
+            created_by=str(request.user.id),
+        )
+        if custom_fields:
+            cf_errors = save_values_for_entity_dict(
+                request.user.organization, record.id, MAINTENANCE_CF_MODULE, custom_fields
+            )
+            if cf_errors:
+                raise serializers.ValidationError({"custom_fields": cf_errors})
+        return record
+
+    def update(self, instance, validated_data):
+        request = self.context["request"]
+        validated_data.pop("asset", None)
+        custom_fields = validated_data.pop("custom_fields", {})
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.updated_by = str(request.user.id)
+        instance.save()
+
+        if custom_fields:
+            cf_errors = save_values_for_entity_dict(
+                request.user.organization, instance.id, MAINTENANCE_CF_MODULE, custom_fields
+            )
+            if cf_errors:
+                raise serializers.ValidationError({"custom_fields": cf_errors})
+        return instance

@@ -42,6 +42,7 @@ from products.urls import product_api_urlpattrens
 from users.urls import user_api_url_patterns
 from vendors.urls import vendor_api_urlpatterns
 from custom_fields.urls import api_custom_field_url_patterns
+from support.urls import support_api_url_patterns
 
 urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -146,6 +147,7 @@ urlpatterns = (
     + configuration_api_url_patterns
     + gate_pass_api_url_patterns
     + api_custom_field_url_patterns
+    + support_api_url_patterns
 )
 urlpatterns += [
     re_path(

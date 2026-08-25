@@ -12,12 +12,14 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
-from assets.models import Asset, AssetImage, AssetStatus
+from assets.models import Asset, AssetImage, AssetStatus, MaintenanceRecord
 from assets.serializers import (
     AssetSerializer,
     NotificationSerializer,
     AssignAssetSerializer,
     SearchAssetSerializer,
+    MaintenanceRecordSerializer,
+    MaintenanceRecordWriteSerializer,
 )
 from assets.api_utils import (
     asset_data,
@@ -497,3 +499,105 @@ class GetWarrantyExpiredAssetFlag(APIView):
                 system_message=error_info["message"],
                 trace_back=error_info["traceback"],
             )
+
+
+class MaintenanceRecordListAPIView(APIView):
+    """List repair/maintenance log entries for the current org, paginated
+    and optionally filtered by ``asset`` (id) and/or ``status``."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name="page", type=int, default=1, description="Page number"),
+            OpenApiParameter(name="asset", type=str, required=False, description="Filter by asset id"),
+            OpenApiParameter(name="status", type=str, required=False),
+        ]
+    )
+    def get(self, request):
+        try:
+            qs = MaintenanceRecord.objects.filter(
+                organization=request.user.organization
+            ).select_related("asset")
+            asset_id = request.GET.get("asset")
+            if asset_id:
+                qs = qs.filter(asset_id=asset_id)
+            status = request.GET.get("status")
+            if status:
+                qs = qs.filter(status=status)
+            data = MaintenanceRecordSerializer(qs, many=True).data
+            page = int(request.GET.get("page", 1))
+            paginated_data = add_pagination(list(data), page=page)
+            return api_response(data=paginated_data, message="List get Successfully")
+        except ValueError as e:
+            return api_response(status=400, error_message=str(e))
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500, error_message=str(e))
+
+
+class MaintenanceRecordDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        try:
+            record = get_object_or_404(
+                MaintenanceRecord, pk=id, organization=request.user.organization
+            )
+            data = MaintenanceRecordSerializer(record).data
+            return api_response(data=data, message="Maintenance record retrieved successfully")
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500, error_message=str(e))
+
+
+class MaintenanceRecordCreateAPIView(APIView):
+    """Log a new repair/maintenance entry against an asset."""
+
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    @extend_schema(request={"multipart/form-data": MaintenanceRecordWriteSerializer})
+    def post(self, request):
+        try:
+            asset_id = request.data.get("asset")
+            get_object_or_404(Asset, pk=asset_id, organization=request.user.organization)
+
+            serializer = MaintenanceRecordWriteSerializer(
+                data=request.data, context={"request": request}
+            )
+            if not serializer.is_valid():
+                return api_response(status=400, validation_errors=serializer.errors)
+            record = serializer.save()
+            data = MaintenanceRecordSerializer(record).data
+            return api_response(status=201, data=data, message="Maintenance record added successfully")
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500, error_message=str(e))
+
+
+class MaintenanceRecordUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    @extend_schema(request={"multipart/form-data": MaintenanceRecordWriteSerializer})
+    def patch(self, request, id):
+        try:
+            record = get_object_or_404(
+                MaintenanceRecord, pk=id, organization=request.user.organization
+            )
+            serializer = MaintenanceRecordWriteSerializer(
+                record, data=request.data, partial=True, context={"request": request}
+            )
+            if not serializer.is_valid():
+                return api_response(status=400, validation_errors=serializer.errors)
+            record = serializer.save()
+            data = MaintenanceRecordSerializer(record).data
+            return api_response(data=data, message="Maintenance record updated successfully")
+        except Exception as e:
+            error_info = get_detailed_errors_info(e)
+            log_error_to_terminal(error_info)
+            return api_response(status=500, error_message=str(e))

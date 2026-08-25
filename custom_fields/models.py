@@ -5,11 +5,13 @@ from dashboard.models import TimeStampModel
 
 class CustomFieldDefinition(TimeStampModel):
     MODULE_CHOICES = [
-        ("client",  "Client"),
-        ("vendor",  "Vendor"),
-        ("product", "Product"),
-        ("user",    "User"),
-        ("asset",   "Asset"),
+        ("client",         "Client"),
+        ("vendor",         "Vendor"),
+        ("product",        "Product"),
+        ("user",           "User"),
+        ("asset",          "Asset"),
+        ("support_ticket", "Support Ticket"),
+        ("maintenance",    "Maintenance"),
     ]
     FIELD_TYPE_CHOICES = [
         ("text",     "Text"),
