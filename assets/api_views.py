@@ -501,7 +501,7 @@ class GetWarrantyExpiredAssetFlag(APIView):
             )
 
 
-MAINTENANCE_TAGS = ["Maintenance Records"]
+MAINTENANCE_TAGS = ["maintenance-records"]
 
 
 class MaintenanceRecordListAPIView(APIView):

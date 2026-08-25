@@ -18,7 +18,7 @@ from .serializers import (
 )
 from .utils import SupportTicketService
 
-TAGS = ["Support Tickets"]
+TAGS = ["support-tickets"]
 
 
 class TicketListAPIView(APIView):
