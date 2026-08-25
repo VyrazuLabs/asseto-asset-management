@@ -1,6 +1,8 @@
 import random
 
 import json
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 from rest_framework import serializers
 from django.db import transaction
 from assets.models import Asset, AssetImage, AssetStatus, AssignAsset, MaintenanceRecord
@@ -454,12 +456,14 @@ class MaintenanceRecordSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_cf_definitions(self, obj):
         from custom_fields.serializers import CustomFieldDefinitionSerializer
 
         definitions = get_definitions_for_module(obj.organization, MAINTENANCE_CF_MODULE)
         return CustomFieldDefinitionSerializer(definitions, many=True).data
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_cf_values(self, obj):
         definitions = get_definitions_for_module(obj.organization, MAINTENANCE_CF_MODULE)
         return get_values_for_entity(obj.id, definitions)

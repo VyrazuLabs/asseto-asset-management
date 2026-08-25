@@ -1,3 +1,5 @@
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 from rest_framework import serializers
 
 from custom_fields.utils import (
@@ -68,6 +70,21 @@ class TicketCommentSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "author", "display_name", "is_staff_comment", "attachments", "created_at"]
+
+
+class TicketStatusUpdateSerializer(serializers.Serializer):
+    """Request-body shape for the dedicated status-update endpoint — used
+    for API documentation only (the view reads ``request.data`` directly)."""
+
+    status = serializers.ChoiceField(
+        choices=["0", "1", "2", "3", "4"],
+        help_text="0=Open, 1=In Progress, 2=In Testing, 3=Resolved, 4=Closed",
+    )
+    happy_code = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Required when moving to Closed (4) on a ticket that has a client.",
+    )
 
 
 class TicketCommentCreateSerializer(serializers.Serializer):
@@ -151,15 +168,18 @@ class SupportTicketSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_assigned_to_name(self, obj):
         return obj.assigned_to.get_full_name() if obj.assigned_to else None
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_cf_definitions(self, obj):
         from custom_fields.serializers import CustomFieldDefinitionSerializer
 
         definitions = get_definitions_for_module(obj.organization, CF_MODULE)
         return CustomFieldDefinitionSerializer(definitions, many=True).data
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_cf_values(self, obj):
         definitions = get_definitions_for_module(obj.organization, CF_MODULE)
         return get_values_for_entity(obj.id, definitions)

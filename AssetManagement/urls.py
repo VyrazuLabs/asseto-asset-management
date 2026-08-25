@@ -20,11 +20,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.contrib.staticfiles.views import serve
 from django.urls import include, path, re_path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from assets.urls import api_url_patterns
 from audit.urls import audit_api_url_patterns
@@ -41,7 +37,6 @@ from gate_pass.urls import gate_pass_api_url_patterns
 from products.urls import product_api_urlpattrens
 from users.urls import user_api_url_patterns
 from vendors.urls import vendor_api_urlpatterns
-from custom_fields.urls import api_custom_field_url_patterns
 from support.urls import support_api_url_patterns
 
 urlpatterns = [
@@ -50,11 +45,6 @@ urlpatterns = [
         "api/docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
-    ),
-    path(
-        "api/schema/redoc/",
-        SpectacularRedocView.as_view(url_name="schema"),
-        name="redoc",
     ),
     path("audit/", include("audit.urls", namespace="audit")),
     path("secret/", admin.site.urls),
@@ -146,7 +136,6 @@ urlpatterns = (
     + audit_api_url_patterns
     + configuration_api_url_patterns
     + gate_pass_api_url_patterns
-    + api_custom_field_url_patterns
     + support_api_url_patterns
 )
 urlpatterns += [

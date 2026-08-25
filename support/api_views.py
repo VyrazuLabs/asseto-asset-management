@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
 from common.API_custom_response import api_response, get_detailed_errors_info, log_error_to_terminal
 from common.pagination import add_pagination
@@ -14,8 +14,11 @@ from .serializers import (
     SupportTicketWriteSerializer,
     TicketCommentSerializer,
     TicketCommentCreateSerializer,
+    TicketStatusUpdateSerializer,
 )
 from .utils import SupportTicketService
+
+TAGS = ["Support Tickets"]
 
 
 class TicketListAPIView(APIView):
@@ -26,13 +29,31 @@ class TicketListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
+        tags=TAGS,
+        operation_id="support_tickets_list",
+        summary="List support tickets",
+        description=(
+            "Paginated, org-scoped list of support tickets. Supports filtering "
+            "by status, priority, ticket_type, and a free-text search across "
+            "ticket id, subject, asset name, and assignee name."
+        ),
         parameters=[
             OpenApiParameter(name="page", type=int, default=1, description="Page number"),
-            OpenApiParameter(name="status", type=str, required=False),
-            OpenApiParameter(name="priority", type=str, required=False),
-            OpenApiParameter(name="ticket_type", type=str, required=False),
-            OpenApiParameter(name="search", type=str, required=False),
-        ]
+            OpenApiParameter(
+                name="status", type=str, required=False,
+                description="Filter by status: 0=Open, 1=In Progress, 2=In Testing, 3=Resolved, 4=Closed",
+            ),
+            OpenApiParameter(
+                name="priority", type=str, required=False,
+                description="Filter by priority: 0=Low, 1=Medium, 2=High, 3=Emergency",
+            ),
+            OpenApiParameter(
+                name="ticket_type", type=str, required=False,
+                description="hardware_repair | software_issue | network | preventive_maintenance | inspection | critical_failure | other",
+            ),
+            OpenApiParameter(name="search", type=str, required=False, description="Free-text search"),
+        ],
+        responses={200: OpenApiResponse(response=SupportTicketSerializer(many=True), description="Paginated list of tickets")},
     )
     def get(self, request):
         try:
@@ -55,6 +76,14 @@ class TicketDetailAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=TAGS,
+        operation_id="support_tickets_detail",
+        summary="Get support ticket detail",
+        description="Full ticket detail: attachments, comments, and cf_definitions/cf_values for the support_ticket custom-fields module.",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Ticket UUID")],
+        responses={200: OpenApiResponse(response=SupportTicketSerializer, description="Ticket detail")},
+    )
     def get(self, request, id):
         try:
             ticket = get_object_or_404(
@@ -76,7 +105,18 @@ class TicketCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    @extend_schema(request={"multipart/form-data": SupportTicketWriteSerializer})
+    @extend_schema(
+        tags=TAGS,
+        summary="Create a support ticket",
+        description=(
+            "Creates a ticket for the current org. Accepts JSON or "
+            "multipart/form-data (multipart required if uploading "
+            "attachments). ``custom_fields`` is an optional "
+            "``{field_key: value}`` dict for the support_ticket module."
+        ),
+        request={"multipart/form-data": SupportTicketWriteSerializer, "application/json": SupportTicketWriteSerializer},
+        responses={201: OpenApiResponse(response=SupportTicketSerializer, description="Ticket created")},
+    )
     def post(self, request):
         try:
             serializer = SupportTicketWriteSerializer(
@@ -99,7 +139,19 @@ class TicketUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    @extend_schema(request={"multipart/form-data": SupportTicketWriteSerializer})
+    @extend_schema(
+        tags=TAGS,
+        summary="Update a support ticket",
+        description=(
+            "Partial update of a ticket's fields. Use "
+            "``happy_code_confirm`` when moving ``status`` to Closed (4) "
+            "on a ticket that has a client — see the status-update "
+            "endpoint for the same rule."
+        ),
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Ticket UUID")],
+        request={"multipart/form-data": SupportTicketWriteSerializer, "application/json": SupportTicketWriteSerializer},
+        responses={200: OpenApiResponse(response=SupportTicketSerializer, description="Ticket updated")},
+    )
     def patch(self, request, id):
         try:
             ticket = get_object_or_404(
@@ -131,6 +183,18 @@ class TicketStatusUpdateAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=TAGS,
+        summary="Update ticket status",
+        description=(
+            "Transitions a ticket's status. Closing (status=4) a ticket "
+            "that has a client (directly or via its asset) requires "
+            "``happy_code`` matching the ticket's generated happy code."
+        ),
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Ticket UUID")],
+        request=TicketStatusUpdateSerializer,
+        responses={200: OpenApiResponse(description="{'success': true}")},
+    )
     def patch(self, request, id):
         try:
             from .models import STATUS_CHOICES, TicketActivity
@@ -170,6 +234,12 @@ class TicketCommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
+    @extend_schema(
+        tags=TAGS,
+        summary="List ticket comments",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Ticket UUID")],
+        responses={200: OpenApiResponse(response=TicketCommentSerializer(many=True), description="Comments, oldest first")},
+    )
     def get(self, request, id):
         try:
             ticket = get_object_or_404(
@@ -183,6 +253,14 @@ class TicketCommentAPIView(APIView):
             log_error_to_terminal(error_info)
             return api_response(status=500, error_message=str(e))
 
+    @extend_schema(
+        tags=TAGS,
+        summary="Add a ticket comment",
+        description="Adds a comment, with optional file attachments, and logs a comment activity.",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Ticket UUID")],
+        request={"multipart/form-data": TicketCommentCreateSerializer, "application/json": TicketCommentCreateSerializer},
+        responses={201: OpenApiResponse(response=TicketCommentSerializer, description="Comment created")},
+    )
     def post(self, request, id):
         try:
             ticket = get_object_or_404(
@@ -205,6 +283,12 @@ class TicketCommentAPIView(APIView):
 class TicketAttachmentDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=TAGS,
+        summary="Delete a ticket attachment",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Attachment UUID")],
+        responses={200: OpenApiResponse(description="Attachment deleted successfully")},
+    )
     def delete(self, request, id):
         try:
             attachment = get_object_or_404(
@@ -223,6 +307,12 @@ class AssetSearchAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=TAGS,
+        summary="Search assets for the ticket asset picker",
+        parameters=[OpenApiParameter(name="q", type=str, required=False, description="Search text (name, tag, or serial no.)")],
+        responses={200: OpenApiResponse(description="[{id, name, tag}]")},
+    )
     def get(self, request):
         try:
             query = request.GET.get("q", "").strip()
@@ -239,6 +329,12 @@ class TechnicianSearchAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=TAGS,
+        summary="Search technicians for the ticket assignee picker",
+        parameters=[OpenApiParameter(name="q", type=str, required=False, description="Search text (name or email)")],
+        responses={200: OpenApiResponse(description="[{id, full_name, email}]")},
+    )
     def get(self, request):
         try:
             query = request.GET.get("q", "").strip()

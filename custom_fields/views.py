@@ -4,12 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
-from .models import CustomFieldDefinition, CustomFieldValue
+from .models import CustomFieldDefinition
 from .forms import CustomFieldDefinitionForm
-from .serializers import CustomFieldDefinitionSerializer, CustomFieldValueSerializer
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -165,49 +162,3 @@ def toggle_custom_field(request, pk):
             trans["custom_field_toggle_message"].format(label=cf.field_label, state=state),
         )
     return redirect("custom_fields:list")
-
-
-# API Views
-
-class CustomFieldDefinitionAPIList(generics.ListCreateAPIView):
-    serializer_class = CustomFieldDefinitionSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return CustomFieldDefinition.objects.filter(
-            organization=self.request.user.organization, is_deleted=False
-        )
-
-    def perform_create(self, serializer):
-        serializer.save(
-            organization=self.request.user.organization,
-            created_by=str(self.request.user.id),
-            updated_by=str(self.request.user.id),
-        )
-
-
-class CustomFieldDefinitionAPIDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CustomFieldDefinitionSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return CustomFieldDefinition.objects.filter(
-            organization=self.request.user.organization, is_deleted=False
-        )
-
-    def perform_update(self, serializer):
-        serializer.save(updated_by=str(self.request.user.id))
-
-
-class CustomFieldValueAPIView(generics.ListAPIView):
-    serializer_class = CustomFieldValueSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        entity_uuid = self.request.query_params.get("entity_uuid")
-        if not entity_uuid:
-            return CustomFieldValue.objects.none()
-        return CustomFieldValue.objects.filter(
-            entity_uuid=entity_uuid,
-            definition__organization=self.request.user.organization
-        )

@@ -9,6 +9,8 @@ from vendors.models import Vendor
 from django.core.paginator import Paginator
 from dashboard.models import Address
 from django.shortcuts import get_object_or_404
+from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+from custom_fields.serializers import CustomFieldDefinitionSerializer
 
 from datetime import date
 import os
@@ -276,6 +278,14 @@ def vendor_details(get_vendor, request):
         ),
         "description": get_vendor.description if get_vendor.description else None,
     }
+    cf_definitions = get_definitions_for_module(request.user.organization, "vendor")
+    vendor_details_dict["cf_definitions"] = CustomFieldDefinitionSerializer(
+        cf_definitions, many=True
+    ).data
+    vendor_details_dict["cf_values"] = get_values_for_entity(
+        get_vendor.id, cf_definitions
+    )
+
     get_assets = Asset.undeleted_objects.filter(vendor=get_vendor.id)
     get_assets_count = Asset.undeleted_objects.filter(vendor=get_vendor.id).count()
     vendor_details_dict["assets_count"] = get_assets_count

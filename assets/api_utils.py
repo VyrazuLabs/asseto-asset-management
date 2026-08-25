@@ -20,6 +20,8 @@ from notifications.views import data
 
 # from assets.api_utils import BaseSegmentFunc
 from django.db.models import Value, BooleanField
+from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+from custom_fields.serializers import CustomFieldDefinitionSerializer
 
 
 def assign_asset_user_list(request):
@@ -301,7 +303,12 @@ def asset_data(request, asset, asset_images):
             }
             asset_image_list.append(asset_images_dict)
     asset_data["asset_images"] = asset_image_list
-    asset_data["custom_fields"] = []
+
+    cf_definitions = get_definitions_for_module(request.user.organization, "asset")
+    asset_data["cf_definitions"] = CustomFieldDefinitionSerializer(
+        cf_definitions, many=True
+    ).data
+    asset_data["cf_values"] = get_values_for_entity(asset.id, cf_definitions)
 
     months_int = asset.product.eol if asset.product and asset.product.eol else None
     today = timezone.now().date()

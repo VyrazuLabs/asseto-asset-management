@@ -11,6 +11,8 @@ from vendors.utils import render_to_csv, render_to_pdf
 from datetime import date
 import os
 from django.http import HttpResponse, JsonResponse
+from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+from custom_fields.serializers import CustomFieldDefinitionSerializer
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -345,7 +347,11 @@ def product_details(request, product):
             image_list.append(obj)
     product_detail["product_images"] = image_list
 
-    product_detail["custom_fields"] = []
+    cf_definitions = get_definitions_for_module(request.user.organization, "product")
+    product_detail["cf_definitions"] = CustomFieldDefinitionSerializer(
+        cf_definitions, many=True
+    ).data
+    product_detail["cf_values"] = get_values_for_entity(product.id, cf_definitions)
 
     # get_asset=Asset.objects.filter(product=product.id,organization=request.user.organization)
     # asset_list=[]

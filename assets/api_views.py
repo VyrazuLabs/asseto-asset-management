@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from drf_spectacular.types import OpenApiTypes
 
 from assets.models import Asset, AssetImage, AssetStatus, MaintenanceRecord
@@ -501,6 +501,9 @@ class GetWarrantyExpiredAssetFlag(APIView):
             )
 
 
+MAINTENANCE_TAGS = ["Maintenance Records"]
+
+
 class MaintenanceRecordListAPIView(APIView):
     """List repair/maintenance log entries for the current org, paginated
     and optionally filtered by ``asset`` (id) and/or ``status``."""
@@ -508,11 +511,15 @@ class MaintenanceRecordListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
+        tags=MAINTENANCE_TAGS,
+        summary="List maintenance/repair records",
+        description="Paginated, org-scoped list of repair/maintenance log entries, optionally filtered by asset id and/or status.",
         parameters=[
             OpenApiParameter(name="page", type=int, default=1, description="Page number"),
             OpenApiParameter(name="asset", type=str, required=False, description="Filter by asset id"),
-            OpenApiParameter(name="status", type=str, required=False),
-        ]
+            OpenApiParameter(name="status", type=str, required=False, description="Filter by status (free text, e.g. Completed/Scheduled)"),
+        ],
+        responses={200: OpenApiResponse(response=MaintenanceRecordSerializer(many=True), description="Paginated list of maintenance records")},
     )
     def get(self, request):
         try:
@@ -540,6 +547,13 @@ class MaintenanceRecordListAPIView(APIView):
 class MaintenanceRecordDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        tags=MAINTENANCE_TAGS,
+        summary="Get maintenance/repair record detail",
+        description="Full record detail, including cf_definitions/cf_values for the maintenance custom-fields module.",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Maintenance record UUID")],
+        responses={200: OpenApiResponse(response=MaintenanceRecordSerializer, description="Maintenance record detail")},
+    )
     def get(self, request, id):
         try:
             record = get_object_or_404(
@@ -559,7 +573,18 @@ class MaintenanceRecordCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    @extend_schema(request={"multipart/form-data": MaintenanceRecordWriteSerializer})
+    @extend_schema(
+        tags=MAINTENANCE_TAGS,
+        summary="Log a maintenance/repair record",
+        description=(
+            "Creates a repair/maintenance log entry against an asset in "
+            "the current org. ``asset`` is required. ``custom_fields`` "
+            "is an optional ``{field_key: value}`` dict for the "
+            "maintenance module. ``service_id`` is auto-generated."
+        ),
+        request={"multipart/form-data": MaintenanceRecordWriteSerializer, "application/json": MaintenanceRecordWriteSerializer},
+        responses={201: OpenApiResponse(response=MaintenanceRecordSerializer, description="Maintenance record created")},
+    )
     def post(self, request):
         try:
             asset_id = request.data.get("asset")
@@ -583,7 +608,14 @@ class MaintenanceRecordUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    @extend_schema(request={"multipart/form-data": MaintenanceRecordWriteSerializer})
+    @extend_schema(
+        tags=MAINTENANCE_TAGS,
+        summary="Update a maintenance/repair record",
+        description="Partial update of a repair/maintenance log entry. The asset on a record cannot be changed after creation.",
+        parameters=[OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH, description="Maintenance record UUID")],
+        request={"multipart/form-data": MaintenanceRecordWriteSerializer, "application/json": MaintenanceRecordWriteSerializer},
+        responses={200: OpenApiResponse(response=MaintenanceRecordSerializer, description="Maintenance record updated")},
+    )
     def patch(self, request, id):
         try:
             record = get_object_or_404(

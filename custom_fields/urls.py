@@ -11,10 +11,3 @@ urlpatterns = [
     path("<uuid:pk>/delete/",     views.delete_custom_field,  name="delete"),
     path("<uuid:pk>/toggle/",     views.toggle_custom_field,  name="toggle"),
 ]
-
-# API URLs
-api_custom_field_url_patterns = [
-    path("api/custom-fields/",           views.CustomFieldDefinitionAPIList.as_view(),   name="api_cf_list"),
-    path("api/custom-fields/<uuid:pk>/", views.CustomFieldDefinitionAPIDetail.as_view(), name="api_cf_detail"),
-    path("api/custom-fields/values/",    views.CustomFieldValueAPIView.as_view(),        name="api_cf_values"),
-]
