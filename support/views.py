@@ -18,14 +18,66 @@ def ticket_list(request):
 
 @login_required
 def add_ticket(request):
-    form = SupportTicketForm(organization=request.user.organization)
+    # ── Severity → Priority mapping ──────────────────────────────────────────
+    SEVERITY_PRIORITY_MAP = {"critical": "3", "warning": "2", "info": "1"}
 
-    if request.method == "POST":
+    # ── Build initial data from alarm URL params (GET request) ───────────────
+    initial_data = {}
+    alarm_id = request.GET.get("alarm_id") or request.POST.get("alarm_id")
+    prefill_asset = None  # asset object to auto-fill the search input in template
+
+    if request.method == "GET":
+        asset_id = request.GET.get("asset_id")
+        subject = request.GET.get("subject")
+        severity = request.GET.get("severity", "").lower()
+
+        if subject:
+            initial_data["subject"] = subject
+        if severity in SEVERITY_PRIORITY_MAP:
+            initial_data["priority"] = SEVERITY_PRIORITY_MAP[severity]
+
+        form = SupportTicketForm(initial=initial_data, organization=request.user.organization)
+
+        # If asset_id passed, pre-populate the asset field queryset AND pass
+        # the asset object to the template so JS can fill the visible text box.
+        if asset_id:
+            try:
+                from assets.models import Asset
+                asset = Asset.undeleted_objects.get(
+                    pk=asset_id, organization=request.user.organization
+                )
+                # Make the asset available in the hidden <select> queryset
+                form.fields["asset"].queryset = (
+                    form.fields["asset"].queryset | Asset.undeleted_objects.filter(pk=asset_id)
+                )
+                form.initial["asset"] = asset.pk
+                prefill_asset = asset          # passed to template for JS
+            except Exception:
+                pass
+
+    elif request.method == "POST":
         form = SupportTicketForm(
             request.POST, request.FILES, organization=request.user.organization
         )
         if form.is_valid():
-            SupportTicketService.create(request, form)
+            ticket = SupportTicketService.create(request, form)
+
+            # Link the alarm to this ticket and auto-acknowledge it
+            if alarm_id:
+                try:
+                    from iot.models.sensor_models import SensorAlarm
+                    from django.utils import timezone
+                    alarm = SensorAlarm.objects.get(pk=alarm_id)
+                    alarm.ticket = ticket
+                    # Auto-acknowledge if still active
+                    if alarm.status == "active":
+                        alarm.status = "acknowledged"
+                        alarm.acknowledged_by = request.user
+                        alarm.acknowledged_at = timezone.now()
+                    alarm.save()
+                except Exception:
+                    pass
+
             messages.success(request, "Ticket created successfully.")
             return redirect("support:ticket_list")
 
@@ -33,8 +85,12 @@ def add_ticket(request):
         "sidebar": "support",
         "title": "New Support Request",
         "form": form,
+        "alarm_id": alarm_id,
+        "prefill_asset": prefill_asset,
+
     }
     return render(request, "support/ticket_add.html", context)
+
 
 
 @login_required

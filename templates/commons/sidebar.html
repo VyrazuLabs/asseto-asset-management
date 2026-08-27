@@ -172,6 +172,9 @@
                         <li class="submenu-item {% if submenu == 'sensors' %}active{% endif %}">
                             <a href="{% url 'iot:sensors_list' %}">Sensors</a>
                         </li>
+                        <li class="submenu-item {% if submenu == 'thresholds' %}active{% endif %}">
+                            <a href="{% url 'iot:threshold_alarms' %}">Thresholds & Alarms</a>
+                        </li>
                     </ul>
                 </li>
 

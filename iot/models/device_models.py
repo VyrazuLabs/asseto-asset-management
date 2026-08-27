@@ -30,7 +30,7 @@ class Device(TimeStampModel, SoftDeleteModel):
 
 class DeviceAttachments(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization=models.OneToOneField(Organization, on_delete=models.DO_NOTHING)
+    organization=models.ForeignKey(Organization, on_delete=models.DO_NOTHING)
     attahed_part=models.CharField(max_length=255)
     device=models.ForeignKey(Device, on_delete=models.CASCADE, related_name="device_attachments")
     mqtt_topic = models.CharField(max_length=500, unique=True)

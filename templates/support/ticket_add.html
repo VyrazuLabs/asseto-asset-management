@@ -25,6 +25,15 @@
 {% block content %}
 <form class="form" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
+  {% if alarm_id %}<input type="hidden" name="alarm_id" value="{{ alarm_id }}">{% endif %}
+
+  {# ── Alarm Context Banner ──────────────────────────────────────── #}
+  {% if alarm_id %}
+  <div class="alert alert-info mx-4 mt-4 d-flex align-items-center gap-2" role="alert">
+    <i class="bi bi-bell-fill fs-5"></i>
+    <span>This ticket is being created from an IoT alarm. The asset, subject, and priority have been pre-filled. Once submitted, the alarm will be automatically <strong>acknowledged</strong> and linked to this ticket.</span>
+  </div>
+  {% endif %}
 
   {# ── Form Errors ──────────────────────────────────────── #}
   {% if form.errors %}
@@ -360,6 +369,41 @@
 
     setupSelector('priority-selector', 'priority');
     setupSelector('impact-selector', 'impact_level');
+
+    // ── Pre-fill Asset from Alarm (when launched via Create Ticket button) ──
+    {% if prefill_asset %}
+    (function () {
+      const assetInput  = document.getElementById('asset-search-input');
+      const assetSelect = document.getElementById('id_asset');
+      if (!assetInput || !assetSelect) return;
+
+      const assetId   = '{{ prefill_asset.id }}';
+      const assetName = '{{ prefill_asset.name|escapejs }}';
+      const assetTag  = '{{ prefill_asset.asset_tag|default:""|escapejs }}';
+
+      // Fill the visible text box
+      assetInput.value = assetTag ? `${assetName} (${assetTag})` : assetName;
+
+      // Add the option to the hidden select if it's not already there
+      let option = Array.from(assetSelect.options).find(o => o.value === assetId);
+      if (!option) {
+        option = new Option(assetName, assetId);
+        assetSelect.add(option);
+      }
+      assetSelect.value = assetId;
+    })();
+    {% endif %}
+
+    // ── Sync priority selector button active state from hidden input ────────
+    (function () {
+      const priorityInput = document.querySelector('input[name="priority"]');
+      if (!priorityInput || !priorityInput.value) return;
+      const priorityGroup = document.getElementById('priority-selector');
+      if (!priorityGroup) return;
+      priorityGroup.querySelectorAll('.selector-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-value') === priorityInput.value);
+      });
+    })();
 
     // ── File Upload Logic ─────────────────────────────────────────────────
     const fileInput = document.getElementById('ticket-file-input');

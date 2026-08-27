@@ -1,0 +1,114 @@
+{# ── Edit Threshold Rule Modal ────────────────────────────────────────────── #}
+<div class="modal fade threshold-modal" id="editThresholdModal-{{ threshold.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-pencil-square"></i> Edit Threshold Rule
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'iot:update_threshold' threshold.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Device <span class="text-danger">*</span></label>
+              <select name="device" class="form-select edit-device-select" data-threshold-id="{{ threshold.id }}" required>
+                <option value="">-- Select Device --</option>
+                {% for device in devices %}
+                  <option value="{{ device.id }}" {% if device.id == threshold.sensor.device.id %}selected{% endif %}>
+                    {{ device.name }} {% if device.asset %}({{ device.asset.name }}){% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Sensor <span class="text-danger">*</span></label>
+              <select name="sensor" class="form-select edit-sensor-select" data-threshold-id="{{ threshold.id }}" required>
+                <option value="{{ threshold.sensor.id }}" selected>{{ threshold.sensor.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Alarm Type <span class="text-danger">*</span></label>
+              <input type="text" name="alert_type" class="form-control" value="{{ threshold.alert_type }}" autocomplete="off" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Condition <span class="text-danger">*</span></label>
+              <select name="operator" class="form-select" required>
+                <option value="gt" {% if threshold.operator == "gt" %}selected{% endif %}>Greater Than</option>
+                <option value="lt" {% if threshold.operator == "lt" %}selected{% endif %}>Less Than</option>
+                <option value="eq" {% if threshold.operator == "eq" %}selected{% endif %}>Equal To</option>
+                <option value="neq" {% if threshold.operator == "neq" %}selected{% endif %}>Not Equal To</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Threshold Value <span class="text-danger">*</span></label>
+              <input type="number" name="value" class="form-control" value="{{ threshold.value }}" step="any" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Severity <span class="text-danger">*</span></label>
+              <div class="severity-selector" id="edit-severity-{{ threshold.id }}">
+                <input type="hidden" name="severity" value="{{ threshold.severity }}">
+                <div class="severity-option severity-option-info {% if threshold.severity == 'info' %}selected{% endif %}" data-value="info" onclick="selectSeverity('edit-{{ threshold.id }}', 'info')">
+                  <i class="bi bi-info-circle-fill"></i>
+                  <span>Info</span>
+                </div>
+                <div class="severity-option severity-option-warning {% if threshold.severity == 'warning' %}selected{% endif %}" data-value="warning" onclick="selectSeverity('edit-{{ threshold.id }}', 'warning')">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <span>Warning</span>
+                </div>
+                <div class="severity-option severity-option-critical {% if threshold.severity == 'critical' %}selected{% endif %}" data-value="critical" onclick="selectSeverity('edit-{{ threshold.id }}', 'critical')">
+                  <i class="bi bi-exclamation-octagon-fill"></i>
+                  <span>Critical</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Update Rule
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# ── Trigger Alarm Modal (manual test, nested under edit) ─────────────────── #}
+<div class="modal fade threshold-modal" id="triggerAlarmModal-{{ threshold.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-bell-fill"></i> Trigger Test Alarm
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'iot:trigger_alarm' threshold.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p class="text-muted mb-3">
+            Manually create an active alarm for
+            <strong>{{ threshold.sensor.name }}</strong>
+            ({{ threshold.alert_type }}).
+          </p>
+          <div class="mb-3">
+            <label class="form-label">Triggered Value ({{ threshold.sensor.unit }})</label>
+            <input type="number" name="triggered_value" class="form-control"
+                   value="{{ threshold.value }}" step="any" required>
+            <small class="text-muted">Optional — defaults to the rule's threshold value.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-bell"></i> Trigger Alarm
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

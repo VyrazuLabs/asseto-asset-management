@@ -1,0 +1,102 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}{{ sensor.name }} - Sensor Details | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.0">
+<link rel="stylesheet" href="{% static 'css/pages/sensor-detail.css' %}?v=1.0">
+{% endblock css %}
+
+{% block content %}
+<div class="sensor-details-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'iot:sensors_list' %}" class="breadcrumb-link">Sensors</a></li>
+            <li class="breadcrumb-item active">{{ sensor.name }}</li>
+          </ol>
+        </nav>
+        <h1>{{ sensor.name }}</h1>
+        <p class="page-subtitle">Overview for <strong>{{ sensor.name }}</strong></p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'iot:sensors_list' %}" class="btn-back">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <a href="{% url 'iot:edit_sensor' sensor.id %}" class="btn-update">
+          <i class="bi bi-pencil"></i> Edit Sensor
+        </a>
+      </div>
+    </div>
+
+    {# ── Sensor Information Card ───────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-cpu-fill"></i>
+            <h2><span>Sensor Information</span></h2>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Sensor Name</span>
+                <span class="value">{{ sensor.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Sensor Type</span>
+                <span class="value">
+                    <span class="sensor-detail-type">{{ sensor.get_sensor_type_display }}</span>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="label">Unit</span>
+                <span class="value">{{ sensor.unit }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Pairing Status</span>
+                <span class="value">
+                    {% if sensor.is_paired %}
+                        <span class="sensor-detail-status paired">Paired</span>
+                    {% else %}
+                        <span class="sensor-detail-status unpaired">Unpaired</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# ── Connection Details Card ───────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-broadcast"></i>
+            <h2><span>Connection Details</span></h2>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Linked Device</span>
+                <span class="value">
+                    {% if sensor.device %}
+                        <a href="{% url 'iot:device_details' sensor.device.id %}" class="sensor-detail-link">{{ sensor.device.name }}</a>
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="label">MQTT Topic</span>
+                <span class="value">
+                    <span class="sensor-detail-mqtt">{{ sensor.mqtt_topic }}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# ── History Section ───────────────────────────────────────────────────── #}
+    <div class="mt-4">
+        {% include 'commons/history.html' %}
+    </div>
+</div>
+{% endblock content %}

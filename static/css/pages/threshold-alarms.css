@@ -1,0 +1,522 @@
+/* =============================================================================
+   threshold-alarms.css — Threshold & Alarm Management page styles
+   ============================================================================= */
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+.threshold-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-border, #e5e7eb);
+    padding-bottom: 0;
+}
+
+.threshold-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.2rem;
+    border: none;
+    background: transparent;
+    color: var(--bs-secondary-color, #6c757d);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.threshold-tab:hover {
+    color: var(--color-text, #1f2937);
+    text-decoration: none;
+}
+
+.threshold-tab.active {
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+}
+
+.threshold-tab i {
+    font-size: 0.95rem;
+}
+
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 0.4rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+}
+
+.threshold-tab.active .tab-badge {
+    background: #4f46e5;
+    color: #fff;
+}
+
+/* ── Active Alarms Tab (red) ─────────────────────────────────────────────── */
+.threshold-tab-alarms {
+    color: #dc2626;
+}
+
+.threshold-tab-alarms:hover {
+    color: #b91c1c;
+}
+
+.threshold-tab-alarms .tab-badge {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+
+.threshold-tab-alarms.active {
+    color: #dc2626;
+    border-bottom-color: #dc2626;
+}
+
+.threshold-tab-alarms.active .tab-badge {
+    background: #dc2626;
+    color: #fff;
+}
+
+/* ── Row actions ─────────────────────────────────────────────────────────── */
+.sensor-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sensor-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    background: transparent;
+    color: var(--bs-body-color, #212529);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    cursor: pointer;
+}
+
+.sensor-action-btn:hover {
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.sensor-action-btn.danger:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* ── Active Alarm Row Colors ──────────────────────────────────────────────── */
+tr.alarm-row-critical {
+    background: rgba(220, 38, 38, 0.05) !important;
+    border-left: 3px solid #dc2626;
+}
+
+tr.alarm-row-critical:hover {
+    background: rgba(220, 38, 38, 0.1) !important;
+}
+
+tr.alarm-row-warning {
+    background: rgba(234, 179, 8, 0.05) !important;
+    border-left: 3px solid #ca8a04;
+}
+
+tr.alarm-row-warning:hover {
+    background: rgba(234, 179, 8, 0.1) !important;
+}
+
+tr.alarm-row-info {
+    background: rgba(59, 130, 246, 0.05) !important;
+    border-left: 3px solid #2563eb;
+}
+
+tr.alarm-row-info:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ── Severity Badges ──────────────────────────────────────────────────────── */
+.severity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.severity-critical {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+
+.severity-warning {
+    background: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+}
+
+.severity-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+/* ── Status Badges ──────────────────────────────────────────────────────── */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.status-active {
+    background: rgba(220, 38, 38, 0.12);
+    color: #dc2626;
+}
+
+.status-acknowledged {
+    background: rgba(234, 179, 8, 0.12);
+    color: #ca8a04;
+}
+
+.status-resolved {
+    background: rgba(22, 163, 74, 0.12);
+    color: #16a34a;
+}
+
+.status-timestamp {
+    margin-top: 0.25rem;
+    font-size: 0.72rem;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+/* ── Condition Badge ──────────────────────────────────────────────────────── */
+.condition-badge {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: monospace;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+/* ── Triggered Value ──────────────────────────────────────────────────────── */
+.triggered-value {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: rgba(220, 38, 38, 0.08);
+    color: #dc2626;
+    font-family: monospace;
+}
+
+/* ── Action Buttons ───────────────────────────────────────────────────────── */
+.ack-btn {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #2563eb !important;
+}
+
+.ack-btn:hover {
+    background: rgba(59, 130, 246, 0.2) !important;
+}
+
+.resolve-btn {
+    background: rgba(22, 163, 74, 0.1) !important;
+    color: #16a34a !important;
+}
+
+.resolve-btn:hover {
+    background: rgba(22, 163, 74, 0.2) !important;
+}
+
+/* ── Modal (matching locations/department pattern) ─────────────────────────── */
+.threshold-modal .modal-header {
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    padding: 1rem 1.5rem;
+    background: var(--bs-body-bg, #fff);
+}
+
+.threshold-modal .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.threshold-modal .modal-title i {
+    color: #4f46e5;
+}
+
+.threshold-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.threshold-modal .modal-footer {
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    padding: 0.85rem 1.5rem;
+    background: var(--bs-body-bg, #fff);
+}
+
+.threshold-modal .form-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text, #1f2937);
+    margin-bottom: 0.35rem;
+}
+
+.threshold-modal .field-error {
+    display: block;
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* ── Severity Selector (icon + name) ────────────────────────────────────── */
+.severity-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.severity-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    border: 2px solid var(--bs-border-color, #dee2e6);
+    background: var(--bs-body-bg, #fff);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.severity-option i {
+    font-size: 1rem;
+}
+
+.severity-option:hover {
+    transform: translateY(-1px);
+}
+
+/* Info */
+.severity-option-info i {
+    color: #2563eb;
+}
+.severity-option-info:hover {
+    border-color: #2563eb;
+    background: rgba(59, 130, 246, 0.06);
+}
+.severity-option-info.selected {
+    border-color: #2563eb;
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+/* Warning */
+.severity-option-warning i {
+    color: #ca8a04;
+}
+.severity-option-warning:hover {
+    border-color: #ca8a04;
+    background: rgba(234, 179, 8, 0.06);
+}
+.severity-option-warning.selected {
+    border-color: #ca8a04;
+    background: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+    box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.2);
+}
+
+/* Critical */
+.severity-option-critical i {
+    color: #dc2626;
+}
+.severity-option-critical:hover {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.06);
+}
+.severity-option-critical.selected {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.2);
+}
+
+/* ── Dark Mode ────────────────────────────────────────────────────────────── */
+body.theme-dark .threshold-tab {
+    color: #9CA3AF;
+}
+
+body.theme-dark .threshold-tab.active {
+    color: #a5b4fc;
+    border-bottom-color: #a5b4fc;
+}
+
+body.theme-dark .tab-badge {
+    background: rgba(129, 140, 248, 0.15);
+    color: #a5b4fc;
+}
+
+body.theme-dark .threshold-tab.active .tab-badge {
+    background: #a5b4fc;
+    color: #1f2937;
+}
+
+body.theme-dark .severity-critical {
+    background: rgba(248, 113, 113, 0.15);
+    color: #fca5a5;
+}
+
+body.theme-dark .severity-warning {
+    background: rgba(250, 204, 21, 0.15);
+    color: #fde047;
+}
+
+body.theme-dark .severity-info {
+    background: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+}
+
+body.theme-dark .status-active {
+    background: rgba(248, 113, 113, 0.15);
+    color: #fca5a5;
+}
+
+body.theme-dark .status-acknowledged {
+    background: rgba(250, 204, 21, 0.15);
+    color: #fde047;
+}
+
+body.theme-dark .status-resolved {
+    background: rgba(34, 197, 94, 0.15);
+    color: #86efac;
+}
+
+body.theme-dark .condition-badge {
+    background: #151521;
+    border-color: #2D2D3F;
+    color: #D1D5DB;
+}
+
+body.theme-dark .triggered-value {
+    background: rgba(248, 113, 113, 0.15);
+    color: #fca5a5;
+}
+
+body.theme-dark tr.alarm-row-critical {
+    background: rgba(248, 113, 113, 0.08) !important;
+    border-left-color: #f87171;
+}
+
+body.theme-dark tr.alarm-row-critical:hover {
+    background: rgba(248, 113, 113, 0.15) !important;
+}
+
+body.theme-dark tr.alarm-row-warning {
+    background: rgba(250, 204, 21, 0.08) !important;
+    border-left-color: #facc15;
+}
+
+body.theme-dark tr.alarm-row-warning:hover {
+    background: rgba(250, 204, 21, 0.15) !important;
+}
+
+body.theme-dark tr.alarm-row-info {
+    background: rgba(96, 165, 250, 0.08) !important;
+    border-left-color: #60a5fa;
+}
+
+body.theme-dark tr.alarm-row-info:hover {
+    background: rgba(96, 165, 250, 0.15) !important;
+}
+
+body.theme-dark .threshold-modal .modal-header {
+    border-color: #2D2D3F;
+    background: #1a1a2e;
+}
+
+body.theme-dark .threshold-modal .modal-footer {
+    border-color: #2D2D3F;
+    background: #1a1a2e;
+}
+
+body.theme-dark .threshold-modal .form-label {
+    color: #D1D5DB;
+}
+
+body.theme-dark .severity-option {
+    border-color: #2D2D3F;
+    background: #1a1a2e;
+    color: #D1D5DB;
+}
+
+body.theme-dark .severity-option-info i { color: #93c5fd; }
+body.theme-dark .severity-option-info:hover {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+}
+body.theme-dark .severity-option-info.selected {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+}
+
+body.theme-dark .severity-option-warning i { color: #fde047; }
+body.theme-dark .severity-option-warning:hover {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.1);
+}
+body.theme-dark .severity-option-warning.selected {
+    border-color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+    color: #fde047;
+}
+
+body.theme-dark .severity-option-critical i { color: #fca5a5; }
+body.theme-dark .severity-option-critical:hover {
+    border-color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+body.theme-dark .severity-option-critical.selected {
+    border-color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+    color: #fca5a5;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .threshold-tabs {
+        flex-wrap: wrap;
+    }
+
+    .threshold-tab {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+    }
+}

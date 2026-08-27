@@ -1,0 +1,81 @@
+{% load custom_filters %}
+{% load static %}
+
+{% for device in page_object %}
+<tr>
+  <td class="text-muted" style="font-size: 0.8rem;">
+    {{ page_object.start_index|add:forloop.counter0 }}
+  </td>
+
+  <td>
+    <div class="device-name-main">{{ device.name }}</div>
+  </td>
+
+  <td>
+    <span class="device-sn-badge">{{ device.device_sn }}</span>
+  </td>
+
+  <td>
+    {% if device.asset__name %}
+      <div class="device-asset-cell">
+        {% with img=asset_images|get_item:device.asset_id %}
+          <img class="device-asset-thumb"
+            src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+            alt="{{ device.asset__name }}"
+            onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+        {% endwith %}
+        <span>{{ device.asset__name }}</span>
+      </div>
+    {% else %}
+      <span class="text-muted">—</span>
+    {% endif %}
+  </td>
+
+  <td>
+    {% if device.is_paired %}
+      <span class="device-status-active">Paired</span>
+    {% else %}
+      <span class="device-status-inactive">Unpaired</span>
+    {% endif %}
+  </td>
+
+  <td class="text-muted" style="font-size: 0.8rem; white-space: nowrap;">
+    {{ device.created_at|date:"d M Y" }}
+  </td>
+
+  <td>
+    <div class="device-row-actions">
+      <a href="{% url 'iot:device_details' device.id %}"
+         class="device-action-btn"
+         title="View details"
+         id="device-details-{{ device.id }}">
+        <i class="bi bi-eye"></i>
+      </a>
+
+      <a href="{% url 'iot:edit_device' device.id %}"
+         class="device-action-btn"
+         title="Edit device">
+        <i class="bi bi-pencil"></i>
+      </a>
+
+      <button type="button"
+              class="device-action-btn danger"
+              title="Delete device"
+              id="device-delete-{{ device.id }}">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="7">
+    <div class="table-empty-state">
+      <i class="bi bi-hdd-network"></i>
+      <p class="mb-0">No IoT devices found.<br>
+        <a href="{% url 'iot:add_device' %}" class="link-primary">Add your first device</a>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endfor %}

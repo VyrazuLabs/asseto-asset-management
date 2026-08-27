@@ -1,0 +1,73 @@
+{% load static %}
+
+{% for sensor in page_object %}
+<tr>
+  <td class="text-muted" style="font-size: 0.8rem;">
+    {{ page_object.start_index|add:forloop.counter0 }}
+  </td>
+
+  <td>
+    <div class="sensor-name-main">{{ sensor.name }}</div>
+  </td>
+
+  <td>
+    {% if sensor.device__name %}
+      <span class="sensor-device-badge">{{ sensor.device__name }}</span>
+    {% else %}
+      <span class="text-muted">—</span>
+    {% endif %}
+  </td>
+
+  <td>
+    <span class="sensor-type-badge">{{ sensor.sensor_type }}</span>
+  </td>
+
+  <td>
+    <span class="sensor-unit-text">{{ sensor.unit }}</span>
+  </td>
+
+  <td>
+    {% if sensor.is_paired %}
+      <span class="sensor-status-active">Paired</span>
+    {% else %}
+      <span class="sensor-status-inactive">Unpaired</span>
+    {% endif %}
+  </td>
+
+  <td>
+    <div class="sensor-row-actions">
+      <a href="{% url 'iot:sensor_details' sensor.id %}"
+         class="sensor-action-btn"
+         title="View details"
+         id="sensor-details-{{ sensor.id }}">
+        <i class="bi bi-eye"></i>
+      </a>
+
+      <a href="{% url 'iot:edit_sensor' sensor.id %}"
+         class="sensor-action-btn"
+         title="Edit sensor"
+         id="sensor-edit-{{ sensor.id }}">
+        <i class="bi bi-pencil"></i>
+      </a>
+
+      <button type="button"
+              class="sensor-action-btn danger"
+              title="Delete sensor"
+              id="sensor-delete-{{ sensor.id }}">
+        <i class="bi bi-trash3"></i>
+      </button>
+    </div>
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="7">
+    <div class="table-empty-state">
+      <i class="bi bi-cpu"></i>
+      <p class="mb-0">No sensor devices found.<br>
+        <a href="{% url 'iot:add_sensor' %}" class="link-primary">Add your first sensor</a>
+      </p>
+    </div>
+  </td>
+</tr>
+{% endfor %}

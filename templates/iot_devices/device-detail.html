@@ -1,0 +1,178 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}{{ device.name }} - Device Details | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.0">
+<link rel="stylesheet" href="{% static 'css/pages/device-detail.css' %}?v=1.0">
+{% endblock css %}
+
+{% block content %}
+<div class="device-details-container">
+    {# ── Page header ───────────────────────────────────────────────────────── #}
+    <div class="list-page-header">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb page-breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'iot:devices_list' %}" class="breadcrumb-link">IoT Devices</a></li>
+            <li class="breadcrumb-item active">{{ device.name }}</li>
+          </ol>
+        </nav>
+        <h1>{{ device.name }}</h1>
+        <p class="page-subtitle">Overview for <strong>{{ device.name }}</strong></p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'iot:devices_list' %}" class="btn-back">
+          <i class="bi bi-arrow-left"></i> Back to Listing
+        </a>
+        <a href="{% url 'iot:edit_device' device.id %}" class="btn-update">
+          <i class="bi bi-pencil"></i> Edit Device
+        </a>
+      </div>
+    </div>
+
+    {# ── Device Information Card ───────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-hdd-network-fill"></i>
+            <h2><span>Device Information</span></h2>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Device Name</span>
+                <span class="value">{{ device.name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Serial Number</span>
+                <span class="value">
+                    <span class="device-detail-sn">{{ device.device_sn }}</span>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="label">Pairing Status</span>
+                <span class="value">
+                    {% if device.is_paired %}
+                        <span class="device-detail-status paired">Paired</span>
+                    {% else %}
+                        <span class="device-detail-status unpaired">Unpaired</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="label">Linked Asset</span>
+                <span class="value">{{ device.asset.name|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    {# ── Attachments Card ──────────────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-plug-fill"></i>
+            <h2><span>Device Attachments</span></h2>
+            {% if attachments %}
+            <span class="device-detail-sn" style="margin-left: auto;">{{ attachments|length }} attached</span>
+            {% endif %}
+        </div>
+        {% if attachments %}
+        <table class="device-detail-attachments-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Attached Part</th>
+                    <th>MQTT Topic</th>
+                    <th>Enabled</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attachment in attachments %}
+                <tr>
+                    <td data-label="#">{{ forloop.counter }}</td>
+                    <td data-label="Attached Part" style="font-weight: 600;">{{ attachment.attahed_part }}</td>
+                    <td data-label="MQTT Topic">
+                        <span class="mqtt-topic">{{ attachment.mqtt_topic }}</span>
+                    </td>
+                    <td data-label="Enabled">
+                        {% if attachment.is_enable %}
+                            <span class="enabled-badge yes">Enabled</span>
+                        {% else %}
+                            <span class="enabled-badge no">Disabled</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Created" style="white-space: nowrap;">{{ attachment.created_at|date:"d M Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="device-detail-empty">
+            <i class="bi bi-plug"></i>
+            <p>No attachments found for this device.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── Sensors Card ──────────────────────────────────────────────────────── #}
+    <div class="info-card">
+        <div class="card-header-custom">
+            <i class="bi bi-cpu-fill"></i>
+            <h2><span>Attached Sensors</span></h2>
+            {% if sensors %}
+            <span class="device-detail-sn" style="margin-left: auto;">{{ sensors|length }} sensor{{ sensors|length|pluralize }}</span>
+            {% endif %}
+        </div>
+        {% if sensors %}
+        <table class="device-detail-attachments-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Sensor Name</th>
+                    <th>Sensor Type</th>
+                    <th>Unit</th>
+                    <th>Pairing Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sensor in sensors %}
+                <tr>
+                    <td data-label="#">{{ forloop.counter }}</td>
+                    <td data-label="Sensor Name" style="font-weight: 600;">{{ sensor.name }}</td>
+                    <td data-label="Sensor Type"><span class="sensor-detail-type">{{ sensor.get_sensor_type_display }}</span></td>
+                    <td data-label="Unit">{{ sensor.unit }}</td>
+                    <td data-label="Pairing Status">
+                        {% if sensor.is_paired %}
+                            <span class="device-detail-status paired">Paired</span>
+                        {% else %}
+                            <span class="device-detail-status unpaired">Unpaired</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Actions">
+                        <a href="{% url 'iot:sensor_details' sensor.id %}"
+                           class="sensor-action-btn"
+                           title="View sensor details">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="device-detail-empty">
+            <i class="bi bi-cpu"></i>
+            <p>No sensors attached to this device.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── History Section ───────────────────────────────────────────────────── #}
+    <div class="mt-4">
+        {% include 'commons/history.html' %}
+    </div>
+</div>
+{% endblock content %}

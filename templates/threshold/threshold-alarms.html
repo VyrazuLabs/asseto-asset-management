@@ -1,0 +1,334 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Threshold & Alarms | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/threshold-alarms.css' %}">
+{% endblock css %}
+
+{% block content %}
+
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Threshold & Alarms</li>
+      </ol>
+    </nav>
+    <h1>Threshold & Alarm Management</h1>
+    <p class="page-subtitle">Configure threshold rules and monitor active sensor alarms.</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    <button type="button" class="btn-register" data-bs-toggle="modal" data-bs-target="#addThresholdModal">
+      <i class="bi bi-plus-lg"></i> Add Rule
+    </button>
+  </div>
+</div>
+
+{# ── Stat cards ─────────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+    <div>
+      <div class="stat-label">Active Alarms</div>
+      <div class="stat-value">{{ active_alarms_count|default:"0" }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-eye-fill"></i></div>
+    <div>
+      <div class="stat-label">Acknowledged</div>
+      <div class="stat-value">{{ acknowledged_alarms_count|default:"0" }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+    <div>
+      <div class="stat-label">Resolved</div>
+      <div class="stat-value">{{ resolved_alarms_count|default:"0" }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Tabs ─────────────────────────────────────────────────────────────────── #}
+<div class="threshold-tabs">
+  <a href="?tab=alarms" class="threshold-tab threshold-tab-alarms {% if active_tab == 'alarms' %}active{% endif %}">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    Active Alarms
+    {% if alarms_page_obj.paginator.count %}
+    <span class="tab-badge">{{ alarms_page_obj.paginator.count }}</span>
+    {% endif %}
+  </a>
+  <a href="?tab=rules" class="threshold-tab {% if active_tab == 'rules' %}active{% endif %}">
+    <i class="bi bi-gear-fill"></i>
+    Threshold Rules
+    {% if thresholds_page_obj.paginator.count %}
+    <span class="tab-badge">{{ thresholds_page_obj.paginator.count }}</span>
+    {% endif %}
+  </a>
+</div>
+
+{# ── Tab: Active Alarms ──────────────────────────────────────────────────── #}
+{% if active_tab == 'alarms' %}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Severity</th>
+          <th>Alarm Type</th>
+          <th>Sensor</th>
+          <th>Condition</th>
+          <th>Value at Trigger</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for alarm in alarms_page_obj %}
+        <tr class="alarm-row-{{ alarm.rule.severity }}">
+          <td class="text-muted" style="font-size: 0.8rem;">
+            {{ alarms_page_obj.start_index|add:forloop.counter0 }}
+          </td>
+          <td>
+            <span class="severity-badge severity-{{ alarm.rule.severity }}">
+              {{ alarm.rule.severity|upper }}
+            </span>
+          </td>
+          <td style="font-weight: 600;">{{ alarm.rule.alert_type }}</td>
+          <td>{{ alarm.sensor.name }}</td>
+          <td>
+            <span class="condition-badge">
+              {% if alarm.rule.operator == "gt" %}&gt;{% elif alarm.rule.operator == "lt" %}&lt;{% elif alarm.rule.operator == "eq" %}={% else %}!={% endif %}
+              {{ alarm.rule.value }} {{ alarm.sensor.unit }}
+            </span>
+          </td>
+          <td>
+            <span class="triggered-value">{{ alarm.triggered_value }} {{ alarm.sensor.unit }}</span>
+          </td>
+          <td>
+            <span class="status-badge status-{{ alarm.status }}">{{ alarm.status|upper }}</span>
+            {% if alarm.status == "acknowledged" or alarm.status == "resolved" %}
+              <div class="status-timestamp">{{ alarm.acknowledged_at|date:"Y-m-d H:i" }}</div>
+            {% endif %}
+          </td>
+          <td>
+            <div class="sensor-row-actions">
+              {% if alarm.status == "active" %}
+              <form method="POST" action="{% url 'iot:ack_alarm' alarm.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="sensor-action-btn ack-btn" title="Acknowledge">
+                  <i class="bi bi-check2-circle"></i>
+                </button>
+              </form>
+              {% endif %}
+              {% if alarm.status != "resolved" %}
+              <form method="POST" action="{% url 'iot:resolve_alarm' alarm.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="sensor-action-btn resolve-btn" title="Resolve">
+                  <i class="bi bi-check-circle-fill"></i>
+                </button>
+              </form>
+              {% endif %}
+              {# ── Ticket Button ─────────────────────────────────── #}
+              {% if alarm.status != "resolved" %}
+                {% if alarm.ticket %}
+                <a href="{% url 'support:ticket_detail' id=alarm.ticket.id %}"
+                   class="sensor-action-btn" title="View Ticket: {{ alarm.ticket.ticket_id }}"
+                   style="color: #0ea5e9;">
+                  <i class="bi bi-ticket-detailed-fill"></i>
+                </a>
+                {% else %}
+                <a href="{% url 'support:ticket_add' %}?alarm_id={{ alarm.id }}&subject=Alarm:%20{{ alarm.rule.alert_type|urlencode }}&severity={{ alarm.rule.severity }}&asset_id={{ alarm.sensor.device.asset.id }}"
+                   class="sensor-action-btn" title="Create Support Ticket"
+                   style="color: #8b5cf6;">
+                  <i class="bi bi-ticket-perforated"></i>
+                </a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">
+            <div class="table-empty-state">
+              <i class="bi bi-shield-check"></i>
+              <p class="mb-0">No alarms. All clear!</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'commons/list-pagination.html' with page_var="alarms_page" page_object=alarms_page_obj item_label="alarms" %}
+</div>
+{% endif %}
+
+{# ── Tab: Threshold Rules ─────────────────────────────────────────────────── #}
+{% if active_tab == 'rules' %}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="list-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Device</th>
+          <th>Sensor</th>
+          <th>Alert Type</th>
+          <th>Condition</th>
+          <th>Threshold Value</th>
+          <th>Severity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for threshold in thresholds_page_obj %}
+        <tr>
+          <td class="text-muted" style="font-size: 0.8rem;">
+            {{ thresholds_page_obj.start_index|add:forloop.counter0 }}
+          </td>
+          <td>
+            <span style="font-weight: 600;">{{ threshold.sensor.device.name }}</span>
+            <div style="font-size:0.78rem; color: #6b7280;">{{ threshold.sensor.device.asset.name|default:"-" }}</div>
+          </td>
+          <td style="font-weight: 600;">{{ threshold.sensor.name }}</td>
+          <td>{{ threshold.alert_type }}</td>
+          <td>
+            <span class="condition-badge">
+              {% if threshold.operator == "gt" %}&gt;{% elif threshold.operator == "lt" %}&lt;{% elif threshold.operator == "eq" %}={% else %}!={% endif %}
+              {{ threshold.value }} {{ threshold.sensor.unit }}
+            </span>
+          </td>
+          <td>{{ threshold.value }} {{ threshold.sensor.unit }}</td>
+          <td>
+            <span class="severity-badge severity-{{ threshold.severity }}">
+              {{ threshold.severity|upper }}
+            </span>
+          </td>
+          <td>
+            <div class="sensor-row-actions">
+              <a href="#" class="sensor-action-btn" title="Trigger alarm"
+                 data-bs-toggle="modal" data-bs-target="#triggerAlarmModal-{{ threshold.id }}">
+                <i class="bi bi-bell"></i>
+              </a>
+              <a href="#" class="sensor-action-btn" title="Edit rule"
+                 data-bs-toggle="modal" data-bs-target="#editThresholdModal-{{ threshold.id }}">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{% url 'iot:delete_threshold' threshold.id %}" style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this threshold rule?');">
+                {% csrf_token %}
+                <button type="submit" class="sensor-action-btn danger" title="Delete rule">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+
+        {# ── Per-threshold modals (edit + nested trigger) ──────────────── #}
+        {% include 'threshold/edit_threshold_modal.html' %}
+        {% endfor %}
+
+        {% if not thresholds_page_obj %}
+        <tr>
+          <td colspan="7">
+            <div class="table-empty-state">
+              <i class="bi bi-gear"></i>
+              <p class="mb-0">No threshold rules configured yet.<br>
+                <button type="button" class="link-primary btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#addThresholdModal">Create your first rule</button>
+              </p>
+            </div>
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'commons/list-pagination.html' with page_var="thresholds_page" page_object=thresholds_page_obj item_label="rules" %}
+</div>
+{% endif %}
+
+{# ── Add Threshold Rule Modal ─────────────────────────────────────────────── #}
+{% include 'threshold/add_threshold_modal.html' %}
+
+{# ── Scripts ──────────────────────────────────────────────────────────────── #}
+<script>
+function selectSeverity(prefix, value) {
+  var container = document.getElementById(prefix + '-severity-selector') ||
+                  document.getElementById('edit-severity-' + prefix.replace('edit-', ''));
+  if (!container) {
+    container = document.querySelector('[id$="-severity-selector"][id*="' + prefix + '"]');
+  }
+  if (!container) return;
+
+  var hidden = container.querySelector('input[type="hidden"]');
+  if (hidden) hidden.value = value;
+
+  var options = container.querySelectorAll('.severity-option');
+  options.forEach(function(opt) { opt.classList.remove('selected'); });
+
+  var chosen = container.querySelector('[data-value="' + value + '"]');
+  if (chosen) chosen.classList.add('selected');
+}
+
+// ── Device → Sensor cascade for Add Rule modal ──────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  const addDeviceSelect = document.getElementById('id_threshold_device');
+  const addSensorSelect = document.getElementById('id_threshold_sensor');
+
+  if (addDeviceSelect && addSensorSelect) {
+    addDeviceSelect.addEventListener('change', function () {
+      const deviceId = this.value;
+      addSensorSelect.innerHTML = '<option value="">-- Select Sensor --</option>';
+      if (!deviceId) return;
+      fetch(`/iot/sensors-by-device/${deviceId}/`)
+        .then(r => r.json())
+        .then(data => {
+          data.sensors.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.name} (${s.unit})`;
+            addSensorSelect.appendChild(opt);
+          });
+        })
+        .catch(err => console.error('Sensor fetch error:', err));
+    });
+  }
+
+  // ── Device → Sensor cascade for Edit Rule modals ────────────────────────
+  document.querySelectorAll('.edit-device-select').forEach(function (deviceSelect) {
+    const thresholdId = deviceSelect.dataset.thresholdId;
+    const sensorSelect = document.querySelector(`.edit-sensor-select[data-threshold-id="${thresholdId}"]`);
+    if (!sensorSelect) return;
+
+    deviceSelect.addEventListener('change', function () {
+      const deviceId = this.value;
+      sensorSelect.innerHTML = '<option value="">-- Select Sensor --</option>';
+      if (!deviceId) return;
+      fetch(`/iot/sensors-by-device/${deviceId}/`)
+        .then(r => r.json())
+        .then(data => {
+          data.sensors.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.name} (${s.unit})`;
+            sensorSelect.appendChild(opt);
+          });
+        })
+        .catch(err => console.error('Sensor fetch error:', err));
+    });
+  });
+});
+</script>
+
+{% endblock content %}

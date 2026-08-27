@@ -10,8 +10,8 @@
 
 {% block content %}
 
-{# ── Page header ───────────────────────────────────────────────────────────── #}
-<div class="devices-page-header">
+{# ── Page header ──────────────────────────────────────────────────────────── #}
+<div class="list-page-header">
   <div>
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb page-breadcrumb">
@@ -23,16 +23,51 @@
     <p class="page-subtitle">Monitor and manage all IoT devices linked to your assets.</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    <a href="{% url 'iot:add_device' %}" class="btn-device-add" id="btn-add-device">
+    <a href="{% url 'iot:add_device' %}" class="btn-register" id="btn-add-device">
       <i class="bi bi-plus-lg"></i> Add Device
     </a>
   </div>
 </div>
 
-{# ── Table card ────────────────────────────────────────────────────────────── #}
-<div class="devices-table-card">
+{# ── Filter bar ───────────────────────────────────────────────────────────── #}
+<div class="filter-card">
+  <div id="device-filter-form" class="row g-2 align-items-end">
+    <div class="col">
+      <div class="filter-label">Search Devices</div>
+      <input name="search_text" type="search" autocomplete="off"
+        placeholder="Search by name, serial number..."
+        value="{{ search_text|default:'' }}"
+        hx-get="{% url 'iot:devices_search' page_object.number %}"
+        hx-trigger="keyup changed delay:400ms, search"
+        hx-target="#devices-tbody"
+        hx-include="[name='status']"
+        class="form-control form-control-sm"
+        aria-label="Search devices">
+    </div>
+    <div class="col-auto">
+      <div class="filter-label">Status</div>
+      <select name="status" class="filter-select-btn" style="min-width: 150px;"
+        hx-get="{% url 'iot:devices_search' page_object.number %}"
+        hx-trigger="change"
+        hx-target="#devices-tbody"
+        hx-include="[name='search_text']">
+        <option value="">All Statuses</option>
+        <option value="paired" {% if selected_status == 'paired' %}selected{% endif %}>Paired</option>
+        <option value="unpaired" {% if selected_status == 'unpaired' %}selected{% endif %}>Unpaired</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <a href="{% url 'iot:devices_list' %}" class="btn-reset" title="Reset">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </a>
+    </div>
+  </div>
+</div>
+
+{# ── Table card ───────────────────────────────────────────────────────────── #}
+<div class="table-card">
   <div class="table-responsive">
-    <table class="devices-table" id="devices-table">
+    <table class="list-table" id="devices-table">
       <thead>
         <tr>
           <th>#</th>
@@ -47,76 +82,14 @@
 
       {% if page_object %}
       <tbody id="devices-tbody">
-        {% for device in page_object %}
-        <tr>
-          <td class="text-muted" style="font-size: 0.8rem;">
-            {{ page_object.start_index|add:forloop.counter0 }}
-          </td>
-
-          <td>
-            <div class="device-name-main">{{ device.name }}</div>
-          </td>
-
-          <td>
-            <span class="device-sn-badge">{{ device.device_sn }}</span>
-          </td>
-
-          <td>
-            {% if device.asset__name %}
-              {{ device.asset__name }}
-            {% else %}
-              <span class="text-muted">—</span>
-            {% endif %}
-          </td>
-
-          <td>
-            {% if device.is_paired %}
-              <span class="device-status-active">Paired</span>
-            {% else %}
-              <span class="device-status-inactive">Unpaired</span>
-            {% endif %}
-          </td>
-
-          <td class="text-muted" style="font-size: 0.8rem; white-space: nowrap;">
-            {{ device.created_at|date:"d M Y" }}
-          </td>
-
-          <td>
-            <div class="device-row-actions">
-              {# ── Details – endpoint to be filled later ── #}
-              <a href="#"
-                 class="device-action-btn"
-                 title="View details"
-                 id="device-details-{{ device.id }}">
-                <i class="bi bi-eye"></i>
-              </a>
-
-              {# ── Update – endpoint to be filled later ── #}
-              <a href="#"
-                 class="device-action-btn"
-                 title="Edit device"
-                 id="device-edit-{{ device.id }}">
-                <i class="bi bi-pencil"></i>
-              </a>
-
-              {# ── Delete – endpoint to be filled later ── #}
-              <button type="button"
-                      class="device-action-btn danger"
-                      title="Delete device"
-                      id="device-delete-{{ device.id }}">
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
+        {% include 'iot_devices/devices-data.html' %}
       </tbody>
 
       {% else %}
-      <tbody>
+      <tbody id="devices-tbody">
         <tr>
           <td colspan="7">
-            <div class="devices-empty-state">
+            <div class="table-empty-state">
               <i class="bi bi-hdd-network"></i>
               <p class="mb-0">No IoT devices found.<br>
                 <a href="{% url 'iot:add_device' %}" class="link-primary">Add your first device</a>
@@ -129,38 +102,7 @@
     </table>
   </div>
 
-  {# ── Pagination ──────────────────────────────────────────────────────────── #}
-  {% if page_object %}
-  <div class="devices-pagination-wrap">
-    <span>
-      Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-      of <strong>{{ page_object.paginator.count }}</strong> devices
-    </span>
-    <div class="devices-pagination-nav">
-      {% if page_object.has_previous %}
-        <a href="?page={{ page_object.previous_page_number }}" class="devices-page-btn" aria-label="Previous page">‹</a>
-      {% else %}
-        <span class="devices-page-btn disabled" aria-disabled="true">‹</span>
-      {% endif %}
-
-      {% for num in page_object.paginator.page_range %}
-        {% if page_object.number == num %}
-          <span class="devices-page-btn active" aria-current="page">{{ num }}</span>
-        {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-          <a href="?page={{ num }}" class="devices-page-btn">{{ num }}</a>
-        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-          <span class="devices-page-btn disabled">…</span>
-        {% endif %}
-      {% endfor %}
-
-      {% if page_object.has_next %}
-        <a href="?page={{ page_object.next_page_number }}" class="devices-page-btn" aria-label="Next page">›</a>
-      {% else %}
-        <span class="devices-page-btn disabled" aria-disabled="true">›</span>
-      {% endif %}
-    </div>
-  </div>
-  {% endif %}
-</div>{# /.devices-table-card #}
+  {% include 'commons/list-pagination.html' with item_label="devices" %}
+</div>
 
 {% endblock content %}

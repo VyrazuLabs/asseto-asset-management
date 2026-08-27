@@ -2,12 +2,12 @@ import paho.mqtt.client as mqtt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 
 from iot.constants import UNIT_MAPPER
-from iot.forms.sensor_forms import SensorForm, SensorThresholdForm
+from iot.forms.sensor_forms import SensorForm
 from iot.models.sensor_models import Sensor
-from iot.utils.sensors_utils import create_sensor_list, generate_mqtt_topic
+from iot.utils.sensors_utils import create_sensor_list, generate_mqtt_topic, get_sensor_details
 
 
 @login_required()
@@ -15,9 +15,8 @@ def create_sensor_device(request):
     organization = getattr(request.user, "organization", None)
     if request.method == "POST":
         sensor_form = SensorForm(request.POST, organization=organization)
-        sensor_threshold_form = SensorThresholdForm(request.POST)
 
-        if sensor_form.is_valid() and sensor_threshold_form.is_valid():
+        if sensor_form.is_valid():
             sensor = sensor_form.save(commit=False)
             sensor.organization = organization
             if not sensor.mqtt_topic:
@@ -27,15 +26,10 @@ def create_sensor_device(request):
                 )
             sensor.save()
 
-            threshold = sensor_threshold_form.save(commit=False)
-            threshold.sensor = sensor
-            threshold.save()
-
             messages.success(request, "Sensor added successfully")
             return redirect("iot:sensors_list")
     else:
         sensor_form = SensorForm(organization=organization)
-        sensor_threshold_form = SensorThresholdForm()
 
     return render(
         request,
@@ -43,7 +37,6 @@ def create_sensor_device(request):
         {
             "title": "Add sensor",
             "sensor_form": sensor_form,
-            "sensor_threshold_form": sensor_threshold_form,
             "unit_mapper": UNIT_MAPPER,
             "sidebar": "iot",
             "submenu": "sensors",
@@ -52,14 +45,53 @@ def create_sensor_device(request):
 
 
 @login_required()
+def edit_sensor(request, id):
+    sensor = get_object_or_404(
+        Sensor.undeleted_objects, pk=id, organization=request.user.organization
+    )
+    organization = getattr(request.user, "organization", None)
+
+    if request.method == "POST":
+        sensor_form = SensorForm(request.POST, instance=sensor, organization=organization)
+
+        if sensor_form.is_valid():
+            sensor_form.save()
+
+            messages.success(request, "Sensor updated successfully")
+            return redirect("iot:sensors_list")
+    else:
+        sensor_form = SensorForm(instance=sensor, organization=organization)
+
+    return render(
+        request,
+        "sensors/edit-sensor.html",
+        {
+            "title": f"Edit - {sensor.name}",
+            "sensor": sensor,
+            "sensor_form": sensor_form,
+            "unit_mapper": UNIT_MAPPER,
+            "sidebar": "iot",
+            "submenu": "sensors",
+        },
+    )
+
+
+@login_required()
+def sensor_details(request, id):
+    context = get_sensor_details(request, id)
+    return render(request, "sensors/sensor-detail.html", context)
+
+
+@login_required()
 def sensors_list(request):
     try:
         query_objects = Sensor.undeleted_objects.values(
             "id",
             "name",
+            "device__name",
             "sensor_type",
-            "device__asset__name",
-            "status",
+            "unit",
+            "is_paired",
             "created_at",
         ).order_by("-created_at")
         if hasattr(request.user, "organization") and request.user.organization:
@@ -72,6 +104,26 @@ def sensors_list(request):
     except Exception as e:
         print(str(e))
         return render(request, "sensors/sensors-list.html", context={"page_object": []})
+
+
+@login_required()
+def search_sensors(request, page):
+    try:
+        query_objects = Sensor.undeleted_objects.values(
+            "id",
+            "name",
+            "device__name",
+            "sensor_type",
+            "unit",
+            "is_paired",
+            "created_at",
+        ).order_by("-created_at")
+        if hasattr(request.user, "organization") and request.user.organization:
+            query_objects = query_objects.filter(organization=request.user.organization)
+        context = create_sensor_list(request, query_objects)
+    except Exception:
+        return HttpResponse(status=500)
+    return render(request, "sensors/sensors-data.html", context)
 
 
 @login_required()
