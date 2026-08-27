@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.conf import settings
 from simple_history.models import HistoricalRecords
 
 from assets.models import Asset
@@ -38,6 +39,9 @@ class Sensor(TimeStampModel, SoftDeleteModel):
 
     class Meta:
         db_table="sensor"
+
+    def __str__(self):
+        return self.name
         
 class SensorThreshold(TimeStampModel):
     OPERATOR_CHOICES = [
@@ -57,6 +61,35 @@ class SensorThreshold(TimeStampModel):
     operator = models.CharField(max_length=10, choices=OPERATOR_CHOICES)
     value = models.FloatField()
     severity = models.CharField(max_length=20, choices=SEVERITY_CHOICES)
+    alert_type = models.CharField(max_length=255, default="General Alarm")
+
 
     class Meta:
         db_table="sensor_threshold"
+
+class SensorAlarm(TimeStampModel):
+    STATUS_CHOICES = [
+        ("active", "Active"),
+        ("acknowledged", "Acknowledged"),
+        ("resolved", "Resolved"),
+    ]
+    rule = models.ForeignKey(SensorThreshold, on_delete=models.CASCADE, related_name="alarms")
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name="alarms")
+    triggered_value = models.FloatField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
+    acknowledged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='acknowledged_alarms')
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+    resolved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='resolved_alarms')
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    # Link to support ticket created for this alarm
+    ticket = models.ForeignKey(
+        "support.SupportTicket",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="alarms",
+    )
+
+    class Meta:
+        db_table="sensor_alarm"
+        ordering = ['-created_at']

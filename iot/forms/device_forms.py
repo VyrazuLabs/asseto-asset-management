@@ -63,7 +63,7 @@ class DeviceForm(forms.ModelForm):
 
 class DeviceAttachmentsForm(forms.ModelForm):
     attahed_part = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "form-control",
@@ -92,6 +92,7 @@ class DeviceAttachmentsForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        self.att_id = kwargs.pop("att_id", None)
         organization = kwargs.pop("organization", None)
         if not organization and len(args) > 1 and not isinstance(args[1], dict):
             args_list = list(args)

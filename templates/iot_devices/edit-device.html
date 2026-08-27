@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Add Device | Asseto{% endblock %}
+{% block title %}Edit Device | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -19,23 +19,23 @@
         <ol class="breadcrumb page-breadcrumb">
           <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
           <li class="breadcrumb-item"><a href="{% url 'iot:devices_list' %}" class="breadcrumb-link">Devices</a></li>
-          <li class="breadcrumb-item active">Add Device</li>
+          <li class="breadcrumb-item active">Edit Device</li>
         </ol>
       </nav>
-      <h1>Add IoT Device</h1>
-      <p class="subtitle">Register a new IoT device and link it to an existing asset.</p>
+      <h1>Edit IoT Device</h1>
+      <p class="subtitle">Update device information and manage attachments.</p>
     </div>
     <div class="d-flex align-items-center gap-2">
       <a href="{% url 'iot:devices_list' %}" class="btn-back-listing">
         <i class="bi bi-arrow-left"></i> Back to Listing
       </a>
-      <button type="submit" form="add-device-form" class="btn-save-asset">
-        <i class="bi bi-floppy2"></i> Save Device
+      <button type="submit" form="edit-device-form" class="btn-save-asset">
+        <i class="bi bi-floppy2"></i> Update Device
       </button>
     </div>
   </div>
 
-  <form class="form" id="add-device-form" action="{% url 'iot:add_device' %}" method="POST" novalidate>
+  <form class="form" id="edit-device-form" action="{% url 'iot:edit_device' device.id %}" method="POST" novalidate>
     {% csrf_token %}
 
     <div class="row g-4">
@@ -199,10 +199,8 @@
         <div class="device-info-box">
           <i class="bi bi-info-circle-fill"></i>
           <div>
-            <strong>Auto-generated fields</strong><br>
-            The <em>Device Token</em> and <em>MQTT Topic</em> are generated
-            automatically after saving. Use the <em>+</em> button to attach
-            multiple parts to this device.
+            <strong>Device Token</strong><br>
+            The device token is auto-generated on creation and cannot be changed.
           </div>
         </div>
 
