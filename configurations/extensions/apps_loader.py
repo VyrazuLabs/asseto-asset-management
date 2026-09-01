@@ -16,14 +16,12 @@ from configurations.extensions.registry import read_enabled
 def load_enabled_extension_apps(base_dir) -> list:
     """Return the list of enabled extension app import paths.
 
-    For each enabled "extensions.core.<name>" entry, if a same-named
-    override folder exists at "extensions/<name>/" (no core/ prefix), the
-    override app is prepended before the core app — Django's template/app
-    loader resolves by INSTALLED_APPS order, so listing the override first
-    makes its templates/static win over core's. Detected purely by
-    filesystem presence, never tracked in registry.json itself. A bare
-    folder with no matching core/ entry is ignored (not silently
-    auto-enabled — it must be enabled like any other extension). See
+    Each enabled entry is "extensions.core.<name>" (the core app itself).
+    Override folders at "extensions/<name>/" (no core/ prefix) are never
+    registered as separate Django apps here — an override is templates and
+    static assets only, not its own app, so it can't collide with the
+    core app's app label, models, or migrations. See
+    get_extension_override_dirs() for how overrides are wired in, and
     docs/extension-architecture.md §9.
 
     Args:
@@ -35,14 +33,40 @@ def load_enabled_extension_apps(base_dir) -> list:
     """
     extensions_dir = Path(base_dir) / "extensions"
     registry_path = extensions_dir / "registry.json"
+    return list(read_enabled(registry_path))
+
+
+def get_extension_override_dirs(base_dir) -> list:
+    """Return override folder paths for enabled core extensions.
+
+    For each enabled "extensions.core.<name>" entry, if a same-named
+    override folder exists at "extensions/<name>/" (no core/ prefix), its
+    path is included here so settings.py can list it first in TEMPLATES
+    DIRS / STATICFILES_DIRS — the filesystem loader is checked before
+    APP_DIRS, so an override's templates/static win over the core app's
+    own, without the override needing an apps.py or any app registration
+    at all. A bare folder with no matching core/ entry is ignored (not
+    silently auto-enabled — it must be enabled like any other extension).
+    See docs/extension-architecture.md §9.
+
+    Args:
+        base_dir: project BASE_DIR (settings.py's BASE_DIR).
+
+    Returns:
+        List of Path objects for override folders that exist on disk.
+        Empty list if extensions/registry.json is absent or unreadable.
+    """
+    extensions_dir = Path(base_dir) / "extensions"
+    registry_path = extensions_dir / "registry.json"
     enabled = read_enabled(registry_path)
 
-    result = []
+    prefix = "extensions.core."
+    dirs = []
     for app_path in enabled:
-        prefix = "extensions.core."
-        if app_path.startswith(prefix):
-            name = app_path[len(prefix):]
-            if (extensions_dir / name).is_dir():
-                result.append(f"extensions.{name}")
-        result.append(app_path)
-    return result
+        if not app_path.startswith(prefix):
+            continue
+        name = app_path[len(prefix):]
+        override_dir = extensions_dir / name
+        if override_dir.is_dir():
+            dirs.append(override_dir)
+    return dirs

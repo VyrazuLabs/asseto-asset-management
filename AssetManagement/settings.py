@@ -143,9 +143,19 @@ STATIC_APPS = [
 # docs/extension-architecture.md §2. Read here (not from the DB) because
 # settings.py runs before the ORM/app registry exists; a missing or corrupt
 # registry degrades to an empty list rather than crashing startup.
-from configurations.extensions.apps_loader import load_enabled_extension_apps  # noqa: E402
+from configurations.extensions.apps_loader import (  # noqa: E402
+    get_extension_override_dirs,
+    load_enabled_extension_apps,
+)
 
 INSTALLED_APPS = STATIC_APPS + load_enabled_extension_apps(BASE_DIR)
+
+# Override folders (extensions/<name>/, no core/ prefix) are templates and
+# static assets only — never a second INSTALLED_APPS entry, so they can't
+# collide with the core extension's app label/models. Listed first in
+# TEMPLATES DIRS / STATICFILES_DIRS below so they win over the core app's
+# own resources. See docs/extension-architecture.md §9.
+EXTENSION_OVERRIDE_DIRS = get_extension_override_dirs(BASE_DIR)
 
 # Gunicorn's --pid file; the Extensions admin page sends SIGHUP to this PID
 # to gracefully activate pending extension changes. Absent under
@@ -182,7 +192,7 @@ try:
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [BASE_DIR / "templates"],
+            "DIRS": [*[d / "templates" for d in EXTENSION_OVERRIDE_DIRS], BASE_DIR / "templates"],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -204,7 +214,7 @@ except Exception:
     TEMPLATES = [
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [BASE_DIR / "templates"],
+            "DIRS": [*[d / "templates" for d in EXTENSION_OVERRIDE_DIRS], BASE_DIR / "templates"],
             "APP_DIRS": True,
             "OPTIONS": {
                 "context_processors": [
@@ -283,7 +293,7 @@ STATIC_URL = "/static/"
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [*[d / "static" for d in EXTENSION_OVERRIDE_DIRS], BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 
