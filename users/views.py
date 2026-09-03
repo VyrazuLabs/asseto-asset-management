@@ -174,15 +174,23 @@ def add(request):
 
         if form.is_valid() and address_form.is_valid():
             from custom_fields.utils import validate_cf_values, save_values_for_entity
+
             cf_errors = validate_cf_values(request, "user")
             if cf_errors:
                 from custom_fields.utils import get_definitions_for_module
-                return render(request, "users/add-user-modal.html", {
-                    "form": form,
-                    "address_form": address_form,
-                    "cf_definitions": get_definitions_for_module(request.user.organization, "user"),
-                    "cf_errors": cf_errors,
-                })
+
+                return render(
+                    request,
+                    "users/add-user-modal.html",
+                    {
+                        "form": form,
+                        "address_form": address_form,
+                        "cf_definitions": get_definitions_for_module(
+                            request.user.organization, "user"
+                        ),
+                        "cf_errors": cf_errors,
+                    },
+                )
 
             user = form.save(commit=False)
             enable_login = request.POST.get("toggle_password") == "on"
@@ -199,8 +207,8 @@ def add(request):
             user.address = address
             user.is_active = True
             user.save()
-            is_technician = request.POST.get("is_technician",None)
-            if is_technician=="on":
+            is_technician = request.POST.get("is_technician", None)
+            if is_technician == "on":
                 Technician.objects.create(user=user)
             save_values_for_entity(request, user.id, "user")
             messages.success(request, "User added successfully")
@@ -217,8 +225,14 @@ def add(request):
             return HttpResponse("", status=204)
 
     from custom_fields.utils import get_definitions_for_module
+
     cf_definitions = get_definitions_for_module(request.user.organization, "user")
-    context = {"form": form, "address_form": address_form, "cf_definitions": cf_definitions, "cf_errors": []}
+    context = {
+        "form": form,
+        "address_form": address_form,
+        "cf_definitions": cf_definitions,
+        "cf_errors": [],
+    }
 
     return render(request, "users/add-user-modal.html", context)
 
@@ -250,26 +264,42 @@ def update(request, id):
 
         if form.is_valid() and address_form.is_valid():
             from custom_fields.utils import validate_cf_values, save_values_for_entity
+
             cf_errors = validate_cf_values(request, "user")
             if cf_errors:
-                from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+                from custom_fields.utils import (
+                    get_definitions_for_module,
+                    get_values_for_entity,
+                )
+
                 is_technician = Technician.objects.filter(user=user).exists()
-                return render(request, "users/update-user-modal.html", {
-                    "user": user,
-                    "form": form,
-                    "address_form": address_form,
-                    "is_technician": is_technician,
-                    "cf_definitions": get_definitions_for_module(request.user.organization, "user"),
-                    "cf_values": get_values_for_entity(user.id, get_definitions_for_module(request.user.organization, "user")),
-                    "cf_errors": cf_errors,
-                })
+                return render(
+                    request,
+                    "users/update-user-modal.html",
+                    {
+                        "user": user,
+                        "form": form,
+                        "address_form": address_form,
+                        "is_technician": is_technician,
+                        "cf_definitions": get_definitions_for_module(
+                            request.user.organization, "user"
+                        ),
+                        "cf_values": get_values_for_entity(
+                            user.id,
+                            get_definitions_for_module(
+                                request.user.organization, "user"
+                            ),
+                        ),
+                        "cf_errors": cf_errors,
+                    },
+                )
 
             if not form.instance.access_level:
                 form.instance.groups.clear()
-            
+
             if form.instance.role:
                 form.instance.role.user_set.add(form.instance)
-                
+
             new_email = form.cleaned_data["email"]
             if (old_email) != (new_email):
                 messages.success(
@@ -281,6 +311,14 @@ def update(request, id):
 
             form.save()
             address_form.save()
+
+            enable_login = request.POST.get("toggle_password") == "on"
+            if enable_login:
+                password1 = form.cleaned_data.get("password1", "")
+                password2 = form.cleaned_data.get("password2", "")
+                if password1 and password1 == password2:
+                    user.set_password(password1)
+                    user.save()
 
             save_values_for_entity(request, user.id, "user")
 
@@ -303,6 +341,7 @@ def update(request, id):
     is_technician = Technician.objects.filter(user=user).exists()
 
     from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+
     cf_definitions = get_definitions_for_module(request.user.organization, "user")
     cf_values = get_values_for_entity(user.id, cf_definitions)
 

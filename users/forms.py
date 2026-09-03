@@ -200,10 +200,22 @@ class UserUpdateForm(UserChangeForm):
         widget=forms.FileInput(attrs={"class": "form-control", "id": "inputFile"}),
     )
 
+    password1 = forms.CharField(required=False, widget=forms.PasswordInput)
+
+    password2 = forms.CharField(required=False, widget=forms.PasswordInput)
+
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop("organization", None)
         super().__init__(*args, **kwargs)
 
+        self.fields["password1"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Password"}
+        )
+        self.fields["password1"].required = False
+        self.fields["password2"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Repeat password"}
+        )
+        self.fields["password2"].required = False
         self.fields["department"].queryset = Department.undeleted_objects.filter(
             organization=self._organization, status=True
         )
