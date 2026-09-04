@@ -1,0 +1,52 @@
+.role-permissions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 400px;
+}
+
+/* One row per module (built by roles/templatetags/role_permission_tags.py's
+   permission_module_matrix), module name plus an icon per action colored
+   green/red for granted/denied — replaces the old flat action-only badge
+   list, which gave no indication of which module each permission governed
+   or which actions within a module were actually denied. */
+.permission-module-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.permission-module-name {
+    min-width: 90px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.permission-module-icons {
+    display: flex;
+    gap: 6px;
+}
+
+/* Soft-fill circular badges, matching the ACTIVE/INACTIVE stat-card style
+   used elsewhere in the dashboard (colored circle background + centered
+   icon) instead of a bare colored glyph. */
+.permission-action-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+}
+
+.permission-action-badge.granted {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+}
+
+.permission-action-badge.denied {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}

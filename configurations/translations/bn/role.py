@@ -11,6 +11,8 @@ STRINGS = {
     "delete_confirm_role": "আপনি কি নিশ্চিতভাবে এই ভূমিকাটি মুছতে চান?",
     "no_roles_found": "কোনো ভূমিকা পাওয়া যায়নি।",
     "no_permissions": "কোনো অনুমতি নেই",
+    "allowed": "অনুমোদিত",
+    "not_allowed": "অনুমোদিত নয়",
     "perm_add": "যোগ করুন",
     "perm_reassign": "পুনরায় বরাদ্দ করুন",
     "perm_unassign": "বরাদ্দ বাতিল করুন",

@@ -11,6 +11,8 @@ STRINGS = {
     "delete_confirm_role": "क्या आप वाकई इस भूमिका को हटाना चाहते हैं?",
     "no_roles_found": "कोई भूमिका नहीं मिली।",
     "no_permissions": "कोई अनुमति नहीं",
+    "allowed": "अनुमति है",
+    "not_allowed": "अनुमति नहीं है",
     "perm_add": "जोड़ें",
     "perm_reassign": "पुनः असाइन करें",
     "perm_unassign": "अनअसाइन करें",

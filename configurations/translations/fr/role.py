@@ -11,6 +11,8 @@ STRINGS = {
     "delete_confirm_role": "Êtes-vous sûr de vouloir supprimer ce rôle ?",
     "no_roles_found": "Aucun rôle trouvé.",
     "no_permissions": "Aucune autorisation",
+    "allowed": "Autorisé",
+    "not_allowed": "Non autorisé",
     "perm_add": "Ajouter",
     "perm_reassign": "Réaffecter",
     "perm_unassign": "Désaffecter",
