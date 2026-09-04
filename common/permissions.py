@@ -41,13 +41,25 @@ class PermissionAction:
 
 @dataclass(frozen=True)
 class PermissionModule:
-    """One section of the Role editor, backed by a real (or proxy) model."""
+    """One permission-granting unit, backed by a real (or proxy) model.
+
+    Each module maps to exactly one ContentType — required for correct
+    Permission rows — but several modules can share one ``display_group``
+    to render as a single card/chip (e.g. Assets + Assign Assets: two
+    different models, one user-facing "Assets" concept). Defaults to
+    ``label`` when a module isn't part of a larger group.
+    """
 
     key: str
     label: str
     app_label: str
     model_name: str
     actions: Sequence[PermissionAction] = field(default_factory=tuple)
+    display_group: str = ""
+
+    def __post_init__(self):
+        if not self.display_group:
+            object.__setattr__(self, "display_group", self.label)
 
     def codenames(self) -> list:
         """Return every codename declared for this module."""
@@ -79,7 +91,20 @@ PERMISSION_MODULES: list = [
     PermissionModule("vendors", "Vendors", "vendors", "vendor", _crud("vendors", "vendor", "vendor")),
     PermissionModule("products", "Products", "products", "product", _crud("products", "product", "product")),
     PermissionModule("users", "Users", "authentication", "user", _crud("authentication", "user", "users")),
-    PermissionModule("assets", "Assets", "assets", "asset", _crud("assets", "asset", "asset")),
+    PermissionModule(
+        "assets",
+        "Assets",
+        "assets",
+        "asset",
+        [
+            *_crud("assets", "asset", "asset"),
+            # Scope modifier, not a CRUD action: without it a non-superuser
+            # only sees assets currently assigned to them (via AssignAsset);
+            # with it they see every asset in the org. Checked in
+            # assets/utils.py's filtered_asset().
+            PermissionAction("scope", "all_asset", "All Records"),
+        ],
+    ),
     PermissionModule(
         "assign_assets",
         "Assign Assets",
@@ -91,10 +116,15 @@ PERMISSION_MODULES: list = [
             # assigned until Phase 3 makes it data-driven, so the action
             # set here must mirror its actual checkboxes, not the fuller
             # set originally proposed in the RBAC overhaul plan.
+            # NOTE: codename is "delete_assign_asset" (pre-existing name)
+            # but the modal's own label (trans.perm_unassign) calls it
+            # "Unassign" — it removes an assignment, not the asset itself.
+            # Labeled/iconed as "unassign" here to match what's shown.
             PermissionAction("add", "add_assign_asset", "Add"),
             PermissionAction("reassign", "reassign_assign_asset", "Reassign"),
-            PermissionAction("delete", "delete_assign_asset", "Delete"),
+            PermissionAction("unassign", "delete_assign_asset", "Unassign"),
         ],
+        display_group="Assets",
     ),
     PermissionModule(
         "gate_pass",
@@ -133,7 +163,18 @@ PERMISSION_MODULES: list = [
         [a for a in _crud("dashboard", "productcategory", "product_category") if a.action != "view"],
     ),
     PermissionModule(
-        "support_ticket", "Support Ticket", "support", "supportticket", _crud("support", "supportticket", "ticket")
+        "support_ticket",
+        "Support Ticket",
+        "support",
+        "supportticket",
+        [
+            *_crud("support", "supportticket", "ticket"),
+            # Scope modifier, not a CRUD action: without it a non-superuser
+            # only sees tickets assigned to them; with it they see every
+            # ticket in the org. Checked in
+            # support/utils.py's SupportTicketService.base_queryset().
+            PermissionAction("scope", "all_ticket", "All Records"),
+        ],
     ),
     # NOTE: "Extensions" was a Role-editor checkbox with no backing app at
     # all (no models, no gated views) — dropped from the registry rather
@@ -219,6 +260,7 @@ ACTION_ICONS = {
     "unassign": "bi-x-circle",
     "authorise": "bi-shield-check",
     "checkout": "bi-box-arrow-right",
+    "scope": "bi-globe2",
 }
 
 

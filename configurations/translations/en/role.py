@@ -16,6 +16,8 @@ STRINGS = {
     "perm_add": "Add",
     "perm_reassign": "Reassign",
     "perm_unassign": "Unassign",
+    "all_records": "All Records",
+    "all_records_hint": "See every record, not just the ones assigned to you.",
     "assign_assets_module": "Assign Assets",
     "add_role_modal_title": "Add Role",
     "update_role_modal_title": "Update Role",

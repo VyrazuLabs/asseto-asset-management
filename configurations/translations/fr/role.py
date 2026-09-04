@@ -16,6 +16,8 @@ STRINGS = {
     "perm_add": "Ajouter",
     "perm_reassign": "Réaffecter",
     "perm_unassign": "Désaffecter",
+    "all_records": "Tous les enregistrements",
+    "all_records_hint": "Voir tous les enregistrements, pas seulement ceux qui vous sont attribués.",
     "assign_assets_module": "Affecter des actifs",
     "add_role_modal_title": "Ajouter un rôle",
     "update_role_modal_title": "Mettre à jour le rôle",

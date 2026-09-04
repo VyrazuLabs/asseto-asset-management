@@ -1,6 +1,4 @@
-from django.contrib.auth.models import Permission, Group
 from authentication.models import User
-from django.contrib.contenttypes.models import ContentType
 from assets.models import AssetImage, AssignAsset
 from django.core.paginator import Paginator
 from configurations.utils import dynamic_display_name
@@ -17,76 +15,6 @@ from license.models import AssignLicense
 
 PAGE_SIZE = 10
 ORPHANS = 1
-
-PERMISSION_LIST = [
-    # products
-    "view_product",
-    "delete_product",
-    "edit_product",
-    "add_product",
-    # clients
-    "view_client",
-    "delete_client",
-    "edit_client",
-    "add_client",
-    # users
-    "view_users",
-    "delete_users",
-    "edit_users",
-    "add_users",
-    # vendors
-    "edit_vendor",
-    "add_vendor",
-    "view_vendor",
-    "delete_vendor",
-    # assets
-    "edit_asset",
-    "view_asset",
-    "delete_asset",
-    "add_asset",
-    # assign assets
-    "delete_assign_asset",
-    "reassign_assign_asset",
-    "add_assign_asset",
-    # gate pass
-    "view_gate_pass",
-    "add_gate_pass",
-    # departments
-    "edit_department",
-    "add_department",
-    "delete_department",
-    # locations
-    "add_location",
-    "edit_location",
-    "delete_location",
-    "view_location",
-    # product categories
-    "delete_product_category",
-    "edit_product_category",
-    "add_product_category",
-    # product types
-    "delete_product_type",
-    "edit_product_type",
-    "add_product_type",
-    # branding
-    "view_branding",
-    "add_branding" "edit_branding",
-    "delete_branding",
-    # localization
-    "view_localization",
-    "add_localization",
-    "delete_localization",
-    "edit_localization",
-    # tag_configuration
-    "view_tag_configuration",
-    "add_tag_configuration",
-    "edit_tag_configuration",
-    "delete_tag_configuration",
-    # upload
-    "view_upload",
-    "add_upload",
-]
-
 
 def get_user_detail_utils(request, id):
     user = get_object_or_404(
@@ -278,24 +206,6 @@ def toggle_two_factor_auth_utils(request):
     get_totp = UserTotp.objects.filter(user_id=get_user.id).first()
     get_totp.status = 1
     get_totp.save()
-
-
-def create_all_perm_role():
-
-    all_perms, created = Group.objects.get_or_create(name="all_perms")
-    all_perms.permissions.clear()
-    content_type = ContentType.objects.get_for_model(User)
-
-    for cname in PERMISSION_LIST:
-        temp_name = cname.split("_")
-        name = ""
-        for ele in temp_name:
-            name += ele + " "
-
-        permission, created = Permission.objects.get_or_create(
-            codename=cname, name=f"Can {name}", content_type=content_type
-        )
-        all_perms.permissions.add(permission)
 
 
 def make_fields_optional(form, fields=None):

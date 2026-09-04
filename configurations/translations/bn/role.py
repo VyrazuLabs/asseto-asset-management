@@ -16,6 +16,8 @@ STRINGS = {
     "perm_add": "যোগ করুন",
     "perm_reassign": "পুনরায় বরাদ্দ করুন",
     "perm_unassign": "বরাদ্দ বাতিল করুন",
+    "all_records": "সমস্ত রেকর্ড",
+    "all_records_hint": "শুধু আপনাকে বরাদ্দ করা নয়, সমস্ত রেকর্ড দেখুন।",
     "assign_assets_module": "সম্পদ বরাদ্দ করুন",
     "add_role_modal_title": "ভূমিকা যোগ করুন",
     "update_role_modal_title": "ভূমিকা আপডেট করুন",

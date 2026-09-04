@@ -60,3 +60,52 @@
     cursor: not-allowed;
     opacity: 0.65;
 }
+
+/* "All Records" scope row in the Role editor's Assets/Support Ticket cards
+   (templates/roles/update-role-modal.html, add-role-modal.html) — a
+   record-visibility toggle, not a CRUD action, so it gets a full-width row
+   below a divider instead of falling into the 2-column action grid as an
+   unlabeled 5th item with no context. */
+.module-card-scope {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-border);
+    background: rgba(var(--color-primary-rgb), 0.03);
+}
+
+.module-card-scope .form-check-input {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.module-card-scope label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.module-card-scope p {
+    margin: 0.15rem 0 0;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+}
+
+/* Sub-heading dividing action groups that come from different underlying
+   models within one merged card (e.g. Assets' own CRUD vs its Assign
+   Assets actions — two different Permission ContentTypes, one card).
+   Spans both grid columns so it reads as a section break, not another
+   checkbox row. */
+.perm-group-label {
+    grid-column: 1 / -1;
+    margin-top: 0.25rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--color-border);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+}

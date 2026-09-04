@@ -161,7 +161,6 @@
           <th>{{ trans.email_label }}</th>
           <th>{{ trans.assigned_assets }}</th>
           <th>{{ trans.designation }}</th>
-          <th>{{ trans.access_level }}</th>
           <th>{{ trans.last_login }}</th>
           {% if request.user.is_superuser %}
             <th>{{ trans.status_label }}</th>
@@ -221,14 +220,6 @@
           </td>
 
           <td>{{ user.role }}</td>
-
-          <td>
-            {% if user.access_level %}
-              <span class="access-badge access-all">All</span>
-            {% else %}
-              <span class="access-badge access-limited">Only Assigned</span>
-            {% endif %}
-          </td>
 
           <td>
             <span class="login-date">{{ user.last_login|default:"Never" }}</span>

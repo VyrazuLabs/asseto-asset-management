@@ -16,6 +16,8 @@ STRINGS = {
     "perm_add": "जोड़ें",
     "perm_reassign": "पुनः असाइन करें",
     "perm_unassign": "अनअसाइन करें",
+    "all_records": "सभी रिकॉर्ड",
+    "all_records_hint": "केवल आपको सौंपे गए रिकॉर्ड ही नहीं, बल्कि सभी रिकॉर्ड देखें।",
     "assign_assets_module": "संपत्ति असाइन करें",
     "add_role_modal_title": "भूमिका जोड़ें",
     "update_role_modal_title": "भूमिका अपडेट करें",
