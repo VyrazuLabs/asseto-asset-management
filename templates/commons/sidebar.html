@@ -286,12 +286,14 @@
                         </a>
                     </li>
                 {% endif %}
-                <li class="sidebar-item {% if sidebar == 'support' %}active{% endif %}">
-                    <a href="{% url 'support:ticket_list' %}" class="sidebar-link">
-                        <i class="bi bi-headset"></i>
-                        <span>{{ trans.support_ticket }}</span>
-                    </a>
-                </li>
+{% if perms.support.view_ticket %}
+<li class="sidebar-item {% if sidebar == 'support' %}active{% endif %}">
+    <a href="{% url 'support:ticket_list' %}" class="sidebar-link">
+        <i class="bi bi-headset"></i>
+        <span>{{ trans.support_ticket }}</span>
+    </a>
+</li>
+{% endif %}
             </ul>
         </div>
     </div>
