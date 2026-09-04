@@ -758,7 +758,29 @@
         const moduleCheckboxes = document.querySelectorAll('.ischeck');
         const childCheckboxes = document.querySelectorAll('.isscheck');
 
+        // Any module that has an explicit "view_*" checkbox requires it as
+        // a baseline: granting any other action in that module forces view
+        // on and locks it (visually, via .permission-locked — kept
+        // enabled, not `disabled`, so it still submits with the form); a
+        // module with no action checked has no view requirement either, so
+        // unchecking the module's last action drops view along with it
+        // ("module removed").
+        const findViewCheckbox = moduleId =>
+            [...document.querySelectorAll('.isscheck_' + moduleId)].find(c => c.id.startsWith('view_'));
+
+        const enforceViewMinimum = () => {
+            moduleCheckboxes.forEach(m => {
+                const viewBox = findViewCheckbox(m.dataset.id);
+                if (!viewBox) return;
+                const children = document.querySelectorAll('.isscheck_' + m.dataset.id);
+                const otherChecked = [...children].some(c => c !== viewBox && c.checked);
+                if (otherChecked) viewBox.checked = true;
+                viewBox.classList.toggle('permission-locked', otherChecked);
+            });
+        };
+
         const updateStates = () => {
+            enforceViewMinimum();
             moduleCheckboxes.forEach(m => {
                 const children = document.querySelectorAll('.isscheck_' + m.dataset.id);
                 m.checked = [...children].every(c => c.checked);
@@ -776,6 +798,7 @@
             mainCheckAll.addEventListener('change', e => {
                 childCheckboxes.forEach(c => c.checked = e.target.checked);
                 moduleCheckboxes.forEach(m => m.checked = e.target.checked);
+                updateStates();
             });
         }
 
@@ -787,7 +810,15 @@
         });
 
         childCheckboxes.forEach(c => {
-            c.addEventListener('change', updateStates);
+            c.addEventListener('change', e => {
+                // Block unchecking a locked view checkbox directly — it can
+                // only come off by removing every other action in its module.
+                if (e.target.id.startsWith('view_') && !e.target.checked && e.target.classList.contains('permission-locked')) {
+                    e.target.checked = true;
+                    return;
+                }
+                updateStates();
+            });
         });
 
         // HTMX and Notifications
