@@ -1,3 +1,4 @@
+{% load role_permission_tags %}
 {% if page_object %}
 {% for role in page_object %}
 <tr>
@@ -17,21 +18,23 @@
     <!-- PERMISSIONS -->
     <td>
         <div class="role-permissions-grid">
-            {% for permission in role.permissions.all %}
-                {% if 'add' in permission.codename %}
-                    <span class="permission-tag add">{{ trans.perm_add }}</span>
-                {% elif 'view' in permission.codename %}
-                    <span class="permission-tag view">{{ trans.view }}</span>
-                {% elif 'change' in permission.codename or 'edit' in permission.codename %}
-                    <span class="permission-tag edit">{{ trans.edit }}</span>
-                {% elif 'delete' in permission.codename %}
-                    <span class="permission-tag delete">{{ trans.delete }}</span>
-                {% else %}
-                    <span class="permission-tag other">{{ permission.name|truncatechars:10 }}</span>
-                {% endif %}
+            {% with matrix=role|permission_module_matrix %}
+            {% for entry in matrix %}
+                <div class="permission-module-row">
+                    <span class="permission-module-name">{{ entry.module }}</span>
+                    <span class="permission-module-icons">
+                        {% for action in entry.actions %}
+                            <span class="permission-action-badge {% if action.granted %}granted{% else %}denied{% endif %}"
+                                  title="{{ action.label }}: {% if action.granted %}{{ trans.allowed }}{% else %}{{ trans.not_allowed }}{% endif %}">
+                                <i class="bi {{ action.icon }}"></i>
+                            </span>
+                        {% endfor %}
+                    </span>
+                </div>
             {% empty %}
                 <span class="text-muted small">{{ trans.no_permissions }}</span>
             {% endfor %}
+            {% endwith %}
         </div>
     </td>
 

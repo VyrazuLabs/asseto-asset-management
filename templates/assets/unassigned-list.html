@@ -20,7 +20,7 @@
                 </ol>
             </nav>
         </div>
-        {% if perms.authentication.add_assign_asset %}
+        {% if perms.assets.add_assign_asset %}
             <div>
                 <!-- assign btn -->
                 <button type="button"
@@ -64,7 +64,7 @@
                             <th>Sl No.</th>
                             <th>Asset Name</th>
                             <th>Serial No.</th>
-                            {% if perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset%}
+                            {% if perms.assets.reassign_assign_asset or perms.assets.delete_assign_asset%}
                                 <th>Actions</th>
                             {% endif %}
                         </tr>
@@ -78,7 +78,7 @@
                             <td>{{assign_asset.serial_no}}</td>
                             <td>
                                 <a href="{% url 'assets:details' assign_asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                                {% if perms.authentication.reassign_assign_asset %}
+                                {% if perms.assets.reassign_assign_asset %}
                                 <button type="button"
                                     class="btn btn-info"
                                     hx-get="{% url 'assets:assign_asset_in_asset_list' assign_asset.id %}"

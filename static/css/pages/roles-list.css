@@ -1,0 +1,111 @@
+.role-permissions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 400px;
+}
+
+/* One row per module (built by roles/templatetags/role_permission_tags.py's
+   permission_module_matrix), module name plus an icon per action colored
+   green/red for granted/denied — replaces the old flat action-only badge
+   list, which gave no indication of which module each permission governed
+   or which actions within a module were actually denied. */
+.permission-module-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.permission-module-name {
+    min-width: 90px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.permission-module-icons {
+    display: flex;
+    gap: 6px;
+}
+
+/* Soft-fill circular badges, matching the ACTIVE/INACTIVE stat-card style
+   used elsewhere in the dashboard (colored circle background + centered
+   icon) instead of a bare colored glyph. */
+.permission-action-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+}
+
+.permission-action-badge.granted {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+}
+
+.permission-action-badge.denied {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* View is the baseline action for a module: once any other action in that
+   module is checked in the Role editor, its view_* checkbox gets forced on
+   and visually locked (see role_permission_tags.py / the modal's
+   initRolePermissions script) — kept enabled, not `disabled`, so it still
+   submits with the form. */
+.isscheck.permission-locked {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* "All Records" scope row in the Role editor's Assets/Support Ticket cards
+   (templates/roles/update-role-modal.html, add-role-modal.html) — a
+   record-visibility toggle, not a CRUD action, so it gets a full-width row
+   below a divider instead of falling into the 2-column action grid as an
+   unlabeled 5th item with no context. */
+.module-card-scope {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--color-border);
+    background: rgba(var(--color-primary-rgb), 0.03);
+}
+
+.module-card-scope .form-check-input {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.module-card-scope label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.module-card-scope p {
+    margin: 0.15rem 0 0;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+}
+
+/* Sub-heading dividing action groups that come from different underlying
+   models within one merged card (e.g. Assets' own CRUD vs its Assign
+   Assets actions — two different Permission ContentTypes, one card).
+   Spans both grid columns so it reads as a section break, not another
+   checkbox row. */
+.perm-group-label {
+    grid-column: 1 / -1;
+    margin-top: 0.25rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--color-border);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+}

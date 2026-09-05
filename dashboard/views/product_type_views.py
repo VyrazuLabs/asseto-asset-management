@@ -26,9 +26,9 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.delete_product_type",
-        "authentication.edit_product_type",
-        "authentication.add_product_type",
+        "dashboard.delete_product_type",
+        "dashboard.edit_product_type",
+        "dashboard.add_product_type",
     ]
     return any(user.has_perm(permission) for permission in permissions_list)
 
@@ -56,7 +56,7 @@ def product_type_list(request):
 
 # ADD
 @login_required
-@permission_required("authentication.add_product_type")
+@permission_required("dashboard.add_product_type")
 def add_product_type(request):
     form = ProductTypeForm(organization=request.user.organization)
 
@@ -107,7 +107,7 @@ def product_type_details(request, id):
 
 # DELETE
 @login_required
-@permission_required("authentication.delete_product_type")
+@permission_required("dashboard.delete_product_type")
 def delete_product_type(request, id):
     if request.method == "POST":
         product_type = get_object_or_404(
@@ -151,7 +151,7 @@ def product_type_status(request, id):
 
 # UPDATE
 @login_required
-@permission_required("authentication.edit_product_type")
+@permission_required("dashboard.edit_product_type")
 def update_product_type(request, id):
     product_type = get_object_or_404(
         ProductType.undeleted_objects, pk=id, organization=request.user.organization

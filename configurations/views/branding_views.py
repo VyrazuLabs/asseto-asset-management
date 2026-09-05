@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from configurations.models import BrandingImages
@@ -7,6 +7,7 @@ from configurations.utils import (add_path, create_or_update_image,
 
 
 @login_required
+@permission_required("configurations.view_configuration", raise_exception=True)
 def logo_upload(request):
     if request.method == "POST":
         logo = request.FILES.get("logo")
@@ -41,6 +42,7 @@ def logo_upload(request):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def delete_logo(request, id):
 
     get_logo = get_object_or_404(BrandingImages, pk=id)
@@ -51,6 +53,7 @@ def delete_logo(request, id):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def delete_favicon(request, id):
 
     get_logo = get_object_or_404(BrandingImages, pk=id)
@@ -61,6 +64,7 @@ def delete_favicon(request, id):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def delete_login_page_logo(request, id):
 
     get_logo = get_object_or_404(BrandingImages, pk=id)

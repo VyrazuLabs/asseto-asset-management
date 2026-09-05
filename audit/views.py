@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -10,6 +10,7 @@ from assets.models import Asset, AssignAsset
 from audit.models import AuditImage
 from audit.utils import get_tag_list
 from authentication.models import User
+from common.permissions import require_any_permission
 
 from .forms import AuditForm
 from .models import Audit
@@ -20,6 +21,7 @@ ORPHANS = 1
 
 
 @login_required
+@permission_required("audit.add_audit", raise_exception=True)
 def add_audit(request):
     id = request.GET.get("id", None)
     get_audit = Audit.objects.filter(id=id).first() if id else None
@@ -96,7 +98,7 @@ def add_audit(request):
         return render(request, "audit/add_audit.html", context)
 
 
-@login_required
+@require_any_permission("audit.add_audit", "audit.edit_audit")
 def get_audits_by_id(request, id):
     # Get the asset and its latest audit record
     get_asset = get_object_or_404(Asset, id=id)
@@ -185,12 +187,14 @@ def get_audits_by_id(request, id):
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def audit_list(request):
     audits = Audit.objects.all()
     return render(request, "audit/audit_list.html", context={"audits": audits})
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def asset_audit_history(request, id):
     audit_list = Audit.objects.filter(asset__id=id).order_by("-created_at")
     paginator = Paginator(audit_list, PAGE_SIZE, orphans=ORPHANS)
@@ -207,6 +211,7 @@ def asset_audit_history(request, id):
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def completed_audits(request):
     audits_page = get_completed_audit(request)
     stats = get_audit_stats(request)
@@ -221,6 +226,7 @@ def completed_audits(request):
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def pending_audits(request):
     pending_data = get_pending_audits(request)
     stats = get_audit_stats(request)
@@ -231,6 +237,7 @@ def pending_audits(request):
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def get_assigned_user(request, tag=None):
     if not tag:
         return JsonResponse({"error": "No tag provided"}, status=400)
@@ -254,6 +261,7 @@ def get_assigned_user(request, tag=None):
 
 
 @login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def audit_details(request, id=None):
     audit = Audit.objects.filter(id=id).first()
     data = {
@@ -272,6 +280,8 @@ def audit_details(request, id=None):
     )
 
 
+@login_required
+@permission_required("audit.view_audit", raise_exception=True)
 def get_asset_tag_list(request):
     tag = request.GET.get("tag")
     tags = get_tag_list(tag)
@@ -279,6 +289,7 @@ def get_asset_tag_list(request):
 
 
 @login_required
+@permission_required("audit.delete_audit", raise_exception=True)
 def delete_audit_image(request, id):
     if request.method != "POST":
         return JsonResponse({"error": "Method not allowed"}, status=405)

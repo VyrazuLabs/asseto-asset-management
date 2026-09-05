@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import redirect, render
 
 from configurations.models import LocalizationConfiguration
@@ -8,6 +8,7 @@ from ..constants import (ACTIVE_LANGUAGES, COUNTRY_CHOICES, CURRENCY_CHOICES,
 
 
 @login_required
+@permission_required("configurations.view_configuration", raise_exception=True)
 def list_localizations(request):
     configurations = LocalizationConfiguration.objects.filter(
         organization=request.user.organization
@@ -60,6 +61,7 @@ def list_localizations(request):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def create_localization_configuration(request):
     get_obj = LocalizationConfiguration.objects.filter(
         organization=request.user.organization

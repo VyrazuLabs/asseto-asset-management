@@ -69,7 +69,7 @@
             </a>
             {% endif %}
 
-            {% if perms.authentication.edit_product_category %}
+            {% if perms.dashboard.edit_product_category %}
             <button class="action-btn" hx-get="{% url 'dashboard:update_product_category' products.id %}"
                 hx-target="#update-product-category-modal-content" data-bs-toggle="modal"
                 data-bs-target="#update-product-category-modal" {% if products.name == "Root" %}disabled{% endif %}>
@@ -77,7 +77,7 @@
             </button>
             {% endif %}
 
-            {% if perms.authentication.delete_product_category %}
+            {% if perms.dashboard.delete_product_category %}
             <form method="post" action="{% url 'dashboard:delete_product_category' products.id %}"
                 class="form-row-action"
                    onsubmit="return confirm('{{ trans.delete_confirm_product_category }}')">

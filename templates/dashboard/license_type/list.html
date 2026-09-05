@@ -23,12 +23,14 @@
     <p class="page-subtitle">{{ trans.license_type_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_license_types' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_license_types_count %}
         <span class="count-badge">{{ deleted_license_types_count }}</span>
       {% endif %}
     </a>
+    {% endif %}
     {% if perms.authentication.add_license_type %}
     <button type="button" class="btn-register" id="add-license-type-button" hx-get="{% url 'dashboard:add_license_type' %}"
       hx-target="#add-license-type-modal-content" data-bs-toggle="modal" data-bs-target="#add-license-type-modal">

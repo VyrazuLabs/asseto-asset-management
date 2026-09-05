@@ -11,14 +11,14 @@ from authentication.models import User
 
 def manage_access(user):
     permissions_list = [
-        "authentication.view_product",
-        "authentication.delete_product",
-        "authentication.edit_product",
-        "authentication.add_product",
-        "authentication.edit_asset",
-        "authentication.view_asset",
-        "authentication.delete_asset",
-        "authentication.add_asset",
+        "products.view_product",
+        "products.delete_product",
+        "products.edit_product",
+        "products.add_product",
+        "assets.edit_asset",
+        "assets.view_asset",
+        "assets.delete_asset",
+        "assets.add_asset",
     ]
 
     for permission in permissions_list:

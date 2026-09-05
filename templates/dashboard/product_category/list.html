@@ -25,14 +25,16 @@
 
     <div class="d-flex align-items-center gap-2 mt-1">
 
+        {% if perms.recycle_bin.view_recycle_bin %}
         <a href="{% url 'recycle_bin:deleted_product_categories' %}" class="btn-trash">
             <i class="bi bi-trash3"></i> {{ trans.trash }}
             {% if deleted_product_categories_count %}
             <span class="count-badge">{{ deleted_product_categories_count }}</span>
             {% endif %}
         </a>
+        {% endif %}
 
-        {% if perms.authentication.add_product_category %}
+        {% if perms.dashboard.add_product_category %}
         <button type="button" class="btn-register" hx-get="{% url 'dashboard:add_product_category' %}"
             hx-target="#add-product-category-modal-content" data-bs-toggle="modal"
             data-bs-target="#add-product-category-modal">

@@ -20,7 +20,7 @@
                 </ol>
             </nav>
         </div>
-        {% if perms.authentication.add_assign_asset %}
+        {% if perms.assets.add_assign_asset %}
             <div>
                 <!-- assign btn -->
                 <button type="button"
@@ -64,7 +64,7 @@
                             <th>Tag</th>
                             <th>Assigned To</th>
                             <th>Department</th>
-                            {% if perms.authentication.reassign_assign_asset or perms.authentication.delete_assign_asset%}
+                            {% if perms.assets.reassign_assign_asset or perms.assets.delete_assign_asset%}
                                 <th>Actions</th>
                             {% endif %}
                         </tr>
@@ -85,13 +85,13 @@
                             <td>{{assign_asset.user.department.name}}</td>
                             <td>
                                 <a href="{% url 'assets:details' assign_asset.asset.id %}" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                                {% if perms.authentication.reassign_assign_asset %}
+                                {% if perms.assets.reassign_assign_asset %}
                                     <button type="button" class="btn btn-info "
                                         hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
                                         data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
                                     >Reassign</button>
                                 {% endif %}
-                                {% if perms.authentication.delete_assign_asset %}
+                                {% if perms.assets.delete_assign_asset %}
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                                         <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">
                                             {% csrf_token %}

@@ -39,10 +39,10 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.edit_vendor",
-        "authentication.add_vendor",
-        "authentication.view_vendor",
-        "authentication.delete_vendor",
+        "vendors.edit_vendor",
+        "vendors.add_vendor",
+        "vendors.view_vendor",
+        "vendors.delete_vendor",
     ]
 
     for permission in permissions_list:
@@ -66,7 +66,7 @@ def vendor_list(request):
 
 
 @login_required
-@permission_required("authentication.delete_vendor")
+@permission_required("vendors.delete_vendor")
 def delete_vendor(request, id):
     if request.method == "POST":
         vendor = get_object_or_404(
@@ -84,7 +84,7 @@ def delete_vendor(request, id):
 
 
 @login_required
-@permission_required("authentication.add_vendor")
+@permission_required("vendors.add_vendor")
 # @silk_profile(name="add_vendor")
 def add_vendor(request):
     vendor_form = VendorForm()
@@ -118,7 +118,7 @@ def add_vendor(request):
 
 
 @login_required
-@permission_required("authentication.view_vendor")
+@permission_required("vendors.view_vendor")
 def details(request, id):
     context = get_vendor_details(request, id)
     return render(request, "vendors/detail.html", context=context)
@@ -128,7 +128,7 @@ def details(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_vendor")
+@permission_required("vendors.edit_vendor")
 # @silk_profile(name="update_vendor")
 def update_vendor(request, id):
     vendor = get_object_or_404(Vendor.undeleted_objects, pk=id)
@@ -199,7 +199,7 @@ def status(request, id):
 
 
 @login_required
-@permission_required("authentication.view_vendor")
+@permission_required("vendors.view_vendor")
 def export_vendors_csv(request):
     response = export_vendor_csv_utils(request)
     return response
@@ -209,7 +209,7 @@ def export_vendors_csv(request):
 
 
 @login_required
-@permission_required("authentication.view_vendor")
+@permission_required("vendors.view_vendor")
 def export_vendors_pdf(request):
     response = export_vendors_pdf_utils(request)
     return response

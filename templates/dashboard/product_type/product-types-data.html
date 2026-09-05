@@ -62,7 +62,7 @@
             </a>
             {% endif %}
 
-            {% if perms.authentication.edit_product_type %}
+            {% if perms.dashboard.edit_product_type %}
             <button class="action-btn" hx-get="{% url 'dashboard:update_product_type' products.id %}"
                 hx-target="#update-product-type-modal-content" data-bs-toggle="modal"
                 data-bs-target="#update-product-type-modal">
@@ -70,7 +70,7 @@
             </button>
             {% endif %}
 
-            {% if perms.authentication.delete_product_type %}
+            {% if perms.dashboard.delete_product_type %}
             <form method="post" action="{% url 'dashboard:delete_product_type' products.id %}"
                 onsubmit="return confirm('{{ trans.delete_confirm_product_type }}')">
                 {% csrf_token %}

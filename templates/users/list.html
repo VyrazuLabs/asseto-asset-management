@@ -25,10 +25,12 @@
     <p class="page-subtitle">{{ trans.user_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_users' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_user_count %}<span class="count-badge">{{ deleted_user_count }}</span>{% endif %}
     </a>
+    {% endif %}
     {% if perms.authentication.add_users %}
       <button type="button" class="btn-register"
         hx-get="{% url 'users:add' %}" hx-target="#add-user-modal-content"
@@ -160,8 +162,7 @@
           <th>{{ trans.name_label }}</th>
           <th>{{ trans.email_label }}</th>
           <th>{{ trans.assigned_assets }}</th>
-          <th>{{ trans.designation }}</th>
-          <th>{{ trans.access_level }}</th>
+          <th>{{ trans.assigned_role }}</th>
           <th>{{ trans.last_login }}</th>
           {% if request.user.is_superuser %}
             <th>{{ trans.status_label }}</th>
@@ -221,14 +222,6 @@
           </td>
 
           <td>{{ user.role }}</td>
-
-          <td>
-            {% if user.access_level %}
-              <span class="access-badge access-all">All</span>
-            {% else %}
-              <span class="access-badge access-limited">Only Assigned</span>
-            {% endif %}
-          </td>
 
           <td>
             <span class="login-date">{{ user.last_login|default:"Never" }}</span>

@@ -16,7 +16,7 @@ from django.core.files.storage import default_storage
 
 
 @login_required
-@permission_required("authentication.add_product_type")
+@permission_required("dashboard.add_product_type")
 def product_type_list(request):
     page_object, stats = get_product_type_upload_list(request)
 
@@ -43,7 +43,7 @@ def search_product_type_upload(request, page):
 
 
 @login_required
-@permission_required("authentication.add_product_type")
+@permission_required("dashboard.add_product_type")
 def export_product_types_csv(request):
     header_list = ["Product Type Name"]
     context = {"header_list": header_list, "rows": []}
@@ -55,7 +55,7 @@ def export_product_types_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_product_type")
+@permission_required("dashboard.add_product_type")
 def import_product_types_csv(request):
 
     if request.method == "POST":
@@ -88,7 +88,7 @@ def import_product_types_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_product_type")
+@permission_required("dashboard.add_product_type")
 def product_type_render_to_mapper_model(request):
     if request.method == "POST":
         file_path = request.session.get("uploaded_csv")

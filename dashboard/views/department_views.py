@@ -25,9 +25,9 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.edit_department",
-        "authentication.add_department",
-        "authentication.delete_department",
+        "dashboard.edit_department",
+        "dashboard.add_department",
+        "dashboard.delete_department",
     ]
 
     for permission in permissions_list:
@@ -80,7 +80,7 @@ def department_details(request, id):
 
 
 @login_required
-@permission_required("authentication.add_department")
+@permission_required("dashboard.add_department")
 def add_department(request):
 
     form = DepartmentForm(request.POST or None)
@@ -101,7 +101,7 @@ def add_department(request):
 
 
 @login_required
-@permission_required("authentication.edit_department")
+@permission_required("dashboard.edit_department")
 def update_department(request, id):
 
     department = get_object_or_404(
@@ -124,7 +124,7 @@ def update_department(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_department")
+@permission_required("dashboard.delete_department")
 def delete_department(request, id):
 
     if request.method == "POST":
