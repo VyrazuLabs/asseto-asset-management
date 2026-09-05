@@ -30,6 +30,13 @@ repos:
         name: Prevent commits to main/master
         args: ["--branch=main", "--branch=master"]
 
+  # Gitleaks (secret scanning — blocks committed API keys, tokens, credentials)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+        name: Gitleaks secret scan
+
   # Ruff (linting and import sorting)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.18
