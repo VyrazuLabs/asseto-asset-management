@@ -18,13 +18,13 @@
         </td>
         <td>{{assign_asset.user.department.name}}</td>
         <td>
-            {% if perms.authentication.reassign_assign_asset %}
+            {% if perms.assets.reassign_assign_asset %}
                 <button type="button" class="btn btn-info"
                     hx-get="{% url 'assets:reassign_asset' assign_asset.id %}" hx-target="#reassign-asset-modal-content"
                     data-bs-toggle="modal" data-bs-target="#reassign-asset-modal"
                 >Reassign</button>
             {% endif %}
-            {% if perms.authentication.delete_assign_asset %}
+            {% if perms.assets.delete_assign_asset %}
                 <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
                     <form action="{% url 'assets:delete_assign' assign_asset.id %}" method="post" onsubmit="return confirm('Are you sure you want to unassign this?')">
                         {% csrf_token %}

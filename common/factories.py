@@ -10,7 +10,9 @@ import factory
 import factory.django
 
 from authentication.models import User
+from common.permissions import get_content_type_for_module
 from dashboard.models import Organization
+from roles.models import Role
 
 
 class OrganizationFactory(factory.django.DjangoModelFactory):
@@ -82,3 +84,73 @@ class UserFactory(factory.django.DjangoModelFactory):
             password=password,
             **kwargs,
         )
+
+
+class RoleFactory(factory.django.DjangoModelFactory):
+    """Factory for ``roles.models.Role``.
+
+    ``Role`` is a Django ``Group`` (multi-table inheritance) plus an
+    ``organization`` FK — ``name`` must stay unique per Group semantics, so
+    a random one is generated the same way ``roles/views.py`` does it.
+    """
+
+    class Meta:
+        model = Role
+
+    related_name = factory.Sequence(lambda n: f"Role {n}")
+    organization = factory.SubFactory(OrganizationFactory)
+
+    @factory.lazy_attribute
+    def name(self):
+        """Generate a unique Group.name, mirroring roles/views.py's uuid4().hex."""
+        import uuid
+
+        return uuid.uuid4().hex
+
+
+def make_user_with_permissions(*codenames: str, organization=None) -> User:
+    """Build a non-superuser ``User`` whose role grants exactly ``codenames``.
+
+    ``UserFactory``/``UserManager.create_user`` force-sets
+    ``is_superuser=True`` on every created user, so this explicitly flips
+    it back off after creation — otherwise every "permission denied" test
+    written against this helper would silently pass regardless of the
+    role's actual permissions.
+
+    Args:
+        *codenames: Fully-qualified permission strings the built user's
+            role should hold, e.g. ``"clients.view_client"``.
+        organization: Organization to scope the user/role to; a fresh one
+            is created if omitted.
+
+    Returns:
+        User: A saved, non-superuser user with a role granting exactly the
+        requested permissions.
+    """
+    from django.contrib.auth.models import Permission
+
+    org = organization or OrganizationFactory()
+    user = UserFactory(organization=org)
+    user.is_superuser = False
+    user.is_staff = True
+    user.save()
+
+    role = RoleFactory(organization=org)
+    for codename in codenames:
+        app_label, _, bare_codename = codename.partition(".")
+        module = next((m for m in _permission_modules() if m.app_label == app_label and bare_codename in m.codenames()), None)
+        if module is None:
+            raise ValueError(f"No PermissionModule owns codename {codename!r}")
+        content_type = get_content_type_for_module(module)
+        permission = Permission.objects.get(codename=bare_codename, content_type=content_type)
+        role.permissions.add(permission)
+
+    user.groups.add(role)
+    return user
+
+
+def _permission_modules():
+    """Lazy import to avoid a hard import-time dependency on the registry."""
+    from common.permissions import PERMISSION_MODULES
+
+    return PERMISSION_MODULES

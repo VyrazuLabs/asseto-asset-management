@@ -12,7 +12,7 @@ from license.utils import get_assigned_users
 
 
 @login_required
-@permission_required("authentication.view_license")
+@permission_required("license.view_license")
 def license_list(request):
     PAGE_SIZE = 25
     ORPHANS = 1
@@ -47,7 +47,7 @@ def license_list(request):
 
 
 @login_required
-@permission_required("authentication.add_license")
+@permission_required("license.add_license")
 def add_license(request):
     if request.method == "POST":
         license_form = LicenseForm(request.POST)
@@ -69,7 +69,7 @@ def add_license(request):
 
 
 @login_required
-@permission_required("authentication.view_license")
+@permission_required("license.view_license")
 def license_details(request, id):
     license = get_object_or_404(License, pk=id)
     history_list = License.history.filter(id=license.id)
@@ -87,7 +87,7 @@ def license_details(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_license")
+@permission_required("license.edit_license")
 def update_license(request, id):
     get_license = get_object_or_404(License, pk=id)
     if request.method == "POST":
@@ -111,7 +111,7 @@ def update_license(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_license")
+@permission_required("license.delete_license")
 def delete_license(request, id):
     get_license = get_object_or_404(License, pk=id)
     get_license.soft_delete()
@@ -120,7 +120,7 @@ def delete_license(request, id):
 
 
 @login_required
-@permission_required("authentication.view_license")
+@permission_required("license.view_license")
 def search_license(request):
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")

@@ -50,14 +50,6 @@
   <td>{{ user.role }}</td>
 
   <td>
-    {% if user.access_level %}
-    <span class="access-badge access-all">All</span>
-    {% else %}
-    <span class="access-badge access-limited">Only Assigned</span>
-    {% endif %}
-  </td>
-
-  <td>
     <span class="login-date">{{ user.last_login|default:"Never" }}</span>
   </td>
 

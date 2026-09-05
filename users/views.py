@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import (
     permission_required,
     user_passes_test,
 )
-from django.contrib.auth.models import Group
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,7 +20,6 @@ from dashboard.models import Address
 from .forms import AddressForm, UserForm, UserUpdateForm
 from .utils import (
     assigned_asset_to_user,
-    create_all_perm_role,
     create_user_notification_type_utils,
     export_users_csv_utils,
     export_users_pdf_utils,
@@ -90,13 +88,11 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def list(request):
-    users_list = (
-        User.undeleted_objects.filter(
-            is_superuser=False, organization=request.user.organization
-        )
-        .exclude(pk=request.user.id)
-        .order_by("-created_at")
-    )
+    # Every org user shows here now, including superusers and the viewer's
+    # own row — previously `is_superuser=False` + self-exclude hid both.
+    users_list = User.undeleted_objects.filter(
+        organization=request.user.organization
+    ).order_by("-created_at")
 
     total_user_count = users_list.count()
     active_user_count = users_list.filter(is_active=True).count()
@@ -166,7 +162,6 @@ def add(request):
     address_form = AddressForm()
 
     if request.method == "POST":
-        create_all_perm_role()
         form = UserForm(
             request.POST, request.FILES, organization=request.user.organization
         )
@@ -205,13 +200,6 @@ def add(request):
             save_values_for_entity(request, user.id, "user")
             messages.success(request, "User added successfully")
 
-            all_perms, created = Group.objects.get_or_create(name="all_perms")
-
-            if form.instance.access_level:
-                all_perms.user_set.add(form.instance)
-            else:
-                all_perms.user_set.remove(form.instance)
-
             if form.instance.role:
                 form.instance.role.user_set.add(form.instance)
             return HttpResponse("", status=204)
@@ -229,7 +217,6 @@ def add(request):
 @login_required
 @permission_required("authentication.edit_users")
 def update(request, id):
-    create_all_perm_role()
     user = get_object_or_404(
         User.undeleted_objects, pk=id, organization=request.user.organization
     )
@@ -264,9 +251,12 @@ def update(request, id):
                     "cf_errors": cf_errors,
                 })
 
-            if not form.instance.access_level:
-                form.instance.groups.clear()
-            
+            # Clear any previously-assigned role's Group membership before
+            # re-adding the (possibly changed) selected role, so switching
+            # a user's role in this form actually moves their permissions
+            # instead of accumulating every role they've ever had.
+            form.instance.groups.clear()
+
             if form.instance.role:
                 form.instance.role.user_set.add(form.instance)
                 
@@ -290,13 +280,6 @@ def update(request, id):
                 Technician.objects.get_or_create(user=user)
             else:
                 Technician.objects.filter(user=user).delete()
-
-            all_perms, created = Group.objects.get_or_create(name="all_perms")
-
-            if form.instance.access_level:
-                all_perms.user_set.add(form.instance)
-            else:
-                all_perms.user_set.remove(form.instance)
 
             return HttpResponse(status=204)
 

@@ -24,11 +24,13 @@
     <p class="page-subtitle">{{ trans.manage_products }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_products' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_product_count %}<span class="count-badge">{{ deleted_product_count }}</span>{% endif %}
     </a>
-    {% if perms.authentication.add_product %}
+    {% endif %}
+    {% if perms.products.add_product %}
       <a href="{% url 'products:add' %}" class="btn-register">
         <i class="bi bi-plus-lg"></i> {{ trans.add_product }}
       </a>
@@ -110,7 +112,7 @@
           <th>{{ trans.category }}</th>
           <th>{{ trans.total_assets }}</th>
           <th>{{ trans.status_label }}</th>
-          {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
+          {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
             <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
@@ -183,22 +185,22 @@
             {% endif %}
           </td>
 
-          {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
+          {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
           <td>
             <div class="row-actions">
-              {% if perms.authentication.view_product %}
+              {% if perms.products.view_product %}
                 <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
                   <i class="bi bi-eye"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.edit_product %}
+              {% if perms.products.edit_product %}
                 <a href="{% url 'products:update_product' products.id %}"
                   class="action-btn {% if is_demo %}disabled{% endif %}"
                   title="{{ trans.update_product }} {{ products.name }}">
                   <i class="bi bi-pencil"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.delete_product %}
+              {% if perms.products.delete_product %}
                 <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
                       onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
                   {% csrf_token %}

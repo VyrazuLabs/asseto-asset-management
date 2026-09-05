@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
@@ -11,12 +11,14 @@ from .utils import SupportTicketService
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def ticket_list(request):
     context = SupportTicketService.list(request)
     return render(request, "support/ticket_list.html", context)
 
 
 @login_required
+@permission_required("support.add_ticket", raise_exception=True)
 def add_ticket(request):
     form = SupportTicketForm(organization=request.user.organization)
 
@@ -38,6 +40,7 @@ def add_ticket(request):
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def ticket_detail(request, id):
     context = SupportTicketService.get_detail_context(request, id)
     ticket = context["ticket"]
@@ -64,6 +67,7 @@ def ticket_detail(request, id):
 
 
 @login_required
+@permission_required("support.edit_ticket", raise_exception=True)
 def update_ticket(request, id):
     ticket = get_object_or_404(
         SupportTicket.undeleted_objects, pk=id, organization=request.user.organization
@@ -93,6 +97,7 @@ def update_ticket(request, id):
 
 
 @login_required
+@permission_required("support.delete_ticket", raise_exception=True)
 def delete_ticket(request, id):
     if request.method == "POST":
         SupportTicketService.delete(request, id)
@@ -101,17 +106,20 @@ def delete_ticket(request, id):
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def search_tickets(request, page):
     context = SupportTicketService.search(request, page)
     return render(request, "support/tickets-data.html", context)
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def export_tickets(request):
     return SupportTicketService.export_csv(request)
 
 
 @login_required
+@permission_required("support.delete_ticket", raise_exception=True)
 def delete_ticket_attachment(request, id):
     ticket_id = SupportTicketService.delete_attachment(request, id)
     messages.success(request, "Attachment deleted successfully.")
@@ -119,6 +127,7 @@ def delete_ticket_attachment(request, id):
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def asset_search(request):
     query = request.GET.get("q", "").strip()
     results = SupportTicketService.search_assets(request.user, query)
@@ -126,6 +135,7 @@ def asset_search(request):
 
 
 @login_required
+@permission_required("support.view_ticket", raise_exception=True)
 def technician_search(request):
     query = request.GET.get("q", "").strip()
     results = SupportTicketService.search_technicians(request.user, query)
@@ -133,6 +143,7 @@ def technician_search(request):
 
 
 @login_required
+@permission_required("support.edit_ticket", raise_exception=True)
 @require_POST
 def update_ticket_status(request, id):
     """Update ticket status from Kanban drag-and-drop."""

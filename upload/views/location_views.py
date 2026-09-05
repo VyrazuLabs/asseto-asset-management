@@ -16,7 +16,7 @@ from django.core.files.storage import default_storage
 
 
 @login_required
-@permission_required("authentication.add_location")
+@permission_required("dashboard.add_location")
 def location_list(request):
     page_object, stats = get_location_upload_list(request)
 
@@ -43,7 +43,7 @@ def search_location_upload(request, page):
 
 
 @login_required
-@permission_required("authentication.add_location")
+@permission_required("dashboard.add_location")
 def export_locations_csv(request):
     header_list = [
         "Name",
@@ -66,7 +66,7 @@ def export_locations_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_location")
+@permission_required("dashboard.add_location")
 def import_locations_csv(request):
     if request.method == "POST":
         file = request.FILES.get("file")
@@ -109,7 +109,7 @@ def import_locations_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_location")
+@permission_required("dashboard.add_location")
 def location_render_to_mapper_modal(request):
     if request.method == "POST":
         file_path = request.session.get("uploaded_csv")
