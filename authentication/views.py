@@ -313,7 +313,6 @@ def user_login(request):
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]            
             user = authenticate(email=email, password=password)
-
             if user is not None:
                 if not AssetStatus.objects.filter(
                     can_modify=False
@@ -478,4 +477,3 @@ def logout_view(request):
   
     logout(request)
     return redirect("/")
-    
