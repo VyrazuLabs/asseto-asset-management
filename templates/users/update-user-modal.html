@@ -125,9 +125,42 @@
                 </div>
 
                 <div class="col-md-12">
+
+                    <div class="form-check form-switch mb-0">
+                        <input type="checkbox" class="form-check-input" id="toggle_password" name="toggle_password">
+                        <label class="form-check-label fw-bold" for="toggle_password">{{ trans.enable_user_login }}</label>
+                    </div>
                     <div class="form-check form-switch mt-2">
                         <input type="checkbox" class="form-check-input" id="is_technician" name="is_technician" {% if is_technician %}checked{% endif %}>
                         <label class="form-check-label fw-bold" for="is_technician">{{ trans.is_technician }}</label>
+                    </div>
+
+                </div>
+
+                <div id="password_fields" class="row g-3 d-none">
+                    <div class="col-md-6">
+                        <div class="premium-input-group">
+                            <label>{{ trans.password_label }}</label>
+                            <div class="premium-input-with-icon">
+                                <i class="bi bi-lock"></i>
+                                {{ form.password1 }}
+                            </div>
+                            {% for error in form.password1.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="premium-input-group">
+                            <label>{{ trans.repeat_password }}</label>
+                            <div class="premium-input-with-icon">
+                                <i class="bi bi-unlock"></i>
+                                {{ form.password2 }}
+                            </div>
+                            {% for error in form.password2.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

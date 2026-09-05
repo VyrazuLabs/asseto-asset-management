@@ -70,13 +70,12 @@
           </div>
           <div class="stat-item">
             <span class="stat-label">{{ trans.joined }}</span>
-            <span class="stat-value">{{ user.date_joined|date:"M Y" }}</span>
+            <span class="stat-value">{{ user.created_at|date:"M Y" }}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">{{ trans.security_level }}</span>
+            <span class="stat-label">{{ trans.role }}</span>
             <div class="text-end">
-              <span class="stat-value security-level">{{ trans.tier }} {{ user.role.level|default:"3" }}</span>
-              <div class="small text-muted">({{ user.role.related_name|default:trans.admin_role }})</div>
+              <div class="stat-value">{{ user.role.related_name|default:trans.admin_role }}</div>
             </div>
           </div>
         </div>
@@ -322,3 +321,7 @@
 </div>
 
 {% endblock content %}
+
+{% block script %}
+<script src="{% static 'js/pages/user_list.js' %}" defer></script>
+{% endblock script %}

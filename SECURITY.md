@@ -13,8 +13,8 @@ We actively support and maintain the following versions:
 
 | Version | Supported | Notes |
 |----------|------------|-------|
-| 1.6.x | ✅ | Current stable release |
-| 1.5.x | ⚠️ | Security patches only |
+| 1.7.x | ✅ | Current stable release |
+| 1.6.x | ⚠️ | Security patches only |
 
 If you are using an unsupported version, please upgrade to the latest release to receive critical fixes and security updates.
 

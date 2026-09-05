@@ -12,6 +12,32 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [1.7.0] — 2026-09-05
+
+### Added
+- **Granular RBAC Permissions Architecture** — Introduced `common/permissions.py` as the centralized single source of truth for all system role modules and permissions, replacing scattered permission strings.
+- **Role Editor Permission Matrix** — Implemented an interactive role add/edit modal that automatically enforces and locks prerequisite view permissions whenever add, edit, or delete actions are toggled.
+- **Role Listing Enhancements** — Redesigned role listing page with per-module granted/denied icon indicators (`static/css/pages/roles-list.css` and `role_permission_tags`), replacing legacy flat action badges.
+- **Permission Sync & Verification Commands** — Added custom Django management commands `sync_permissions` and `verify_permission_migration` for automated role permission synchronization and migration verification.
+- **Direct Password Reset in User Modal** — Added optional toggle to set or update user passwords directly from the update user modal with password confirmation validation.
+
+### Changed
+- **Permission Scoping for Assets & Support Tickets** — Replaced global access level checks with granular, permission-based scoping across assets and support tickets.
+- **Namespaced Permission Checks** — Migrated legacy permission checks from `authentication` app namespace to domain-specific feature namespaces (`assets`, `clients`, `vendors`, `products`, `dashboard`, `configurations`).
+- **Cleaned Obsolete Onboarding Templates** — Removed deprecated progression bar and first-time installation templates.
+
+### Fixed
+- **Role Assignment & Group Clearing** — Fixed role switching bug in user edit flow where previously-assigned role groups persisted, ensuring a clean transition between roles.
+- **User Detail & Modal Form Labels** — Corrected form field labels across user listing, add modal, and update modal views.
+- **Atomic Permission Updates** — Wrapped role permission updates within atomic database transactions to prevent partial updates on failure.
+
+### Security
+- **sqlparse** — Bumped `0.5.5 → 0.6.0` to resolve 5 HIGH/MODERATE CVEs including `TokenList.__init__` CPU DoS (CVE-2026-54284), quadratic DoS in `group_comments`, and ReDoS in dollar-quoted literals.
+- **pypdf** — Bumped `6.15.0 → 6.16.2` to patch infinite loop in `TreeObject.insert_child` (CVE-2026-84309), outline traversal resource exhaustion (CVE-2026-84310), and exponential XForm text extraction memory usage (CVE-2026-84311).
+- **djangorestframework** — Bumped `3.16.1 → 3.17.2` to properly enforce `DATA_UPLOAD_MAX_MEMORY_SIZE` during request parsing (CVE-2026-73228) and fix GET-protected data disclosure in `AdminRenderer` (CVE-2026-73229).
+
+---
+
 ## [1.6.7] — 2026-08-24
 
 ### Added
