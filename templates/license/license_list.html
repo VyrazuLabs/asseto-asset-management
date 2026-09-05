@@ -25,7 +25,7 @@
     <p class="page-subtitle">{{ trans.license_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
-    {% if perms.authentication.add_license %}
+    {% if perms.license.add_license %}
     <a href="{% url 'license:add_license' %}" class="btn-register">
       <i class="bi bi-plus-lg"></i> {{ trans.register_new_license }}
     </a>
@@ -209,19 +209,19 @@
 
           <td>
             <div class="row-actions">
-              {% if perms.authentication.view_license %}
+              {% if perms.license.view_license %}
               <a href="{% url 'license:license_details' license.id %}" class="action-btn"
                 title="{{ trans.view }} {{ license.name }}">
                 <i class="bi bi-eye"></i>
               </a>
               {% endif %}
-              {% if perms.authentication.edit_license %}
+              {% if perms.license.edit_license %}
               <a href="{% url 'license:update_license' license.id %}" class="action-btn"
                 title="{{ trans.edit }} {{ license.name }}">
                 <i class="bi bi-pencil"></i>
               </a>
               {% endif %}
-              {% if perms.authentication.delete_license %}
+              {% if perms.license.delete_license %}
               <form action="{% url 'license:delete_license' license.id %}" method="post" class="form-row-action"
                 onsubmit="return confirm('Delete {{ license.name }}?')">
                 {% csrf_token %}

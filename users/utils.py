@@ -59,13 +59,9 @@ def get_user_detail_utils(request, id):
 def export_users_pdf_utils(request):
     today = date.today()
 
-    users = (
-        User.undeleted_objects.filter(
-            organization=request.user.organization, is_superuser=False
-        )
-        .exclude(pk=request.user.id)
-        .order_by("-created_at")
-    )
+    users = User.undeleted_objects.filter(
+        organization=request.user.organization
+    ).order_by("-created_at")
     context = {"users": users}
     pdf = render_to_pdf("users/users-pdf.html", context_dict=context)
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -90,10 +86,7 @@ def export_users_csv_utils(request):
         "Office",
     ]
     user_list = (
-        User.undeleted_objects.filter(
-            organization=request.user.organization, is_superuser=False
-        )
-        .exclude(pk=request.user.id)
+        User.undeleted_objects.filter(organization=request.user.organization)
         .order_by("-created_at")
         .values_list(
             "full_name",
@@ -119,13 +112,7 @@ def search_user_utils(request, page):
     search_text = (request.GET.get("search_text") or "").strip()
     technician_filter = request.GET.get("technician", "").strip()  # "1", "0", or ""
 
-    base_qs = (
-        User.undeleted_objects.filter(
-            organization=request.user.organization,
-            is_superuser=False,
-        )
-        .exclude(pk=request.user.id)
-    )
+    base_qs = User.undeleted_objects.filter(organization=request.user.organization)
     if technician_filter == "1":
         base_qs = base_qs.filter(technician__isnull=False)
     elif technician_filter == "0":

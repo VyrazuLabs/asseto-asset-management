@@ -132,11 +132,12 @@ PERMISSION_MODULES: list = [
         "gate_pass",
         "gatepass",
         [
-            # Modal only exposes View/Add today — Edit/Delete/Authorise/
-            # Checkout are real gate_pass actions but not yet assignable
-            # anywhere, so they're left out until Phase 3/4 wires them up.
             PermissionAction("view", "view_gate_pass", "View"),
             PermissionAction("add", "add_gate_pass", "Add"),
+            PermissionAction("edit", "edit_gate_pass", "Edit"),
+            PermissionAction("delete", "delete_gate_pass", "Delete"),
+            PermissionAction("authorise", "authorise_gate_pass", "Authorise"),
+            PermissionAction("checkout", "checkout_gate_pass", "Checkout"),
         ],
     ),
     PermissionModule("locations", "Locations", "dashboard", "location", _crud("dashboard", "location", "location")),
@@ -183,7 +184,24 @@ PERMISSION_MODULES: list = [
     PermissionModule("upload", "Upload", "upload", "upload", _crud("upload", "upload", "upload")),
     PermissionModule("license", "License", "license", "license", _crud("license", "license", "license")),
     # New modules — decisions #1/#2 of the RBAC overhaul plan.
-    PermissionModule("roles", "Roles", "roles", "role", _crud("roles", "role", "role")),
+    PermissionModule(
+        "roles",
+        "Roles",
+        "roles",
+        "role",
+        [
+            PermissionAction("view", "view_role", "View"),
+            PermissionAction("add", "add_role", "Add"),
+            # Codename is "change_role", not "edit_role" — the Role model is
+            # a real (non-proxy) Django model, so Django's post_migrate
+            # signal already auto-creates add/change/delete/view_role using
+            # its own default naming. Reusing that codename here instead of
+            # inventing "edit_role" avoids two different Permission rows
+            # meaning the same thing on the same ContentType.
+            PermissionAction("edit", "change_role", "Edit"),
+            PermissionAction("delete", "delete_role", "Delete"),
+        ],
+    ),
     PermissionModule(
         "recycle_bin",
         "Recycle Bin",
@@ -279,6 +297,28 @@ def codename_to_display() -> dict:
         for module in PERMISSION_MODULES
         for action in module.actions
     }
+
+
+def get_content_type_for_codename(codename: str) -> ContentType | None:
+    """Resolve the real ContentType that owns a given permission codename.
+
+    Used by the Role editor (``roles/views.py``) to stop gluing every
+    assigned permission to the fake ``authentication.User`` ContentType
+    regardless of which module it actually governs — that mismatch is why
+    checks like ``perms.support.view_ticket`` stayed false even for roles
+    with the box checked.
+
+    Args:
+        codename: A permission codename, e.g. "view_ticket".
+
+    Returns:
+        ContentType | None: The owning module's ContentType, or None if no
+        registered module declares this codename.
+    """
+    for module in PERMISSION_MODULES:
+        if codename in module.codenames():
+            return get_content_type_for_module(module)
+    return None
 
 
 def codename_to_app_label() -> dict:

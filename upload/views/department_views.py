@@ -16,7 +16,7 @@ from django.core.files.storage import default_storage
 
 
 @login_required
-@permission_required("authentication.add_department")
+@permission_required("dashboard.add_department")
 def department_list(request):
     page_object, stats = get_department_upload_list(request)
 
@@ -43,7 +43,7 @@ def search_department_upload(request, page):
 
 
 @login_required
-@permission_required("authentication.add_department")
+@permission_required("dashboard.add_department")
 def export_departments_csv(request):
     header_list = [
         "Department Name",
@@ -60,7 +60,7 @@ def export_departments_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_department")
+@permission_required("dashboard.add_department")
 def import_departments_csv(request):
     if request.method == "POST":
         file = request.FILES.get("file")

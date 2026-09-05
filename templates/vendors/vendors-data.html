@@ -39,20 +39,20 @@
     {% endif %}
     {% endwith %}
   </td>
-  {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
+  {% if perms.vendors.edit_vendor or perms.vendors.view_vendor or perms.vendors.delete_vendor %}
   <td>
     <div class="row-actions">
-      {% if perms.authentication.view_vendor %}
+      {% if perms.vendors.view_vendor %}
       <a href="{% url 'vendors:details' vendors.id %}" class="action-btn" title="View {{ vendors.name }}">
         <i class="bi bi-eye"></i>
       </a>
       {% endif %}
-      {% if perms.authentication.edit_vendor %}
+      {% if perms.vendors.edit_vendor %}
       <a href="{% url 'vendors:update_vendor' vendors.id %}" class="action-btn" title="Edit {{ vendors.name }}">
         <i class="bi bi-pencil"></i>
       </a>
       {% endif %}
-      {% if perms.authentication.delete_vendor %}
+      {% if perms.vendors.delete_vendor %}
       <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" class="form-row-action"
         onsubmit="return confirm('Delete {{ vendors.name }}? It can be restored from Recycle Bin.')">
         {% csrf_token %}

@@ -1,6 +1,7 @@
 from zoneinfo import ZoneInfo
 
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -22,17 +23,20 @@ FIELDS = {
 }
 
 
+@permission_required("gate_pass.view_gate_pass", raise_exception=True)
 def listed(request):
     context = get_gate_pass_list()
     context["title"] = "Gate Passes"
     return render(request, "gate_pass/list.html", context=context)
 
 
+@permission_required("gate_pass.view_gate_pass", raise_exception=True)
 def filter_and_search(request):
     data = search_and_filter_gate_passes(request)
     return render(request, "gate_pass/search-data.html", {"data": data})
 
 
+@permission_required("gate_pass.add_gate_pass", raise_exception=True)
 def add(request):
     old = {}
     if request.method == "POST":
@@ -121,6 +125,7 @@ def add(request):
     )
 
 
+@permission_required("gate_pass.view_gate_pass", raise_exception=True)
 def detail(request, id):
     get_items = GatePass.objects.filter(id=id).first()
     obj = get_currency_and_datetime_format(request.user.organization)
@@ -133,12 +138,12 @@ def detail(request, id):
     return render(request, "gate_pass/detail.html", context=context)
 
 
+@permission_required("gate_pass.view_gate_pass", raise_exception=True)
 def print_doc(request, id):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
         return HttpResponse("Gate Pass not found", status=404)
 
-    print("Gate Pass Status:", gate_pass.STATUS_CHOICES[gate_pass.status][1])
     checkout_url = request.build_absolute_uri(
         reverse("gate-pass:checkout", args=[gate_pass.id])
     )
@@ -158,6 +163,8 @@ def print_doc(request, id):
     return render(request, "gate_pass/print-doc.html", context=context)
 
 
+# Deliberately ungated: the checkout link is shared with an external vendor
+# via the printed/QR gate pass document, scanned without an app login.
 def gate_pass_checkout(request, id):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
@@ -180,6 +187,7 @@ def gate_pass_checkout(request, id):
     )
 
 
+@permission_required("gate_pass.add_gate_pass", raise_exception=True)
 def vendor_search(request):
     names = request.GET.get("q", "").strip()
     vendors = Vendor.undeleted_objects.filter(
@@ -200,6 +208,7 @@ def vendor_search(request):
     return JsonResponse({"vendors": data})
 
 
+@permission_required("gate_pass.authorise_gate_pass", raise_exception=True)
 def authorisation(request, id, status):
     gate_pass = GatePass.objects.filter(id=id).first()
     if not gate_pass:
@@ -216,6 +225,7 @@ def authorisation(request, id, status):
     return redirect("gate_pass:list")
 
 
+@permission_required("gate_pass.add_gate_pass", raise_exception=True)
 def check_impact(request, tag):
     gate_pass = GatePass.objects.filter(asset__tag=tag).first()
     if not gate_pass:

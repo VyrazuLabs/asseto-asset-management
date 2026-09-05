@@ -25,12 +25,14 @@
     </p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_clients' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_client_count %}<span class="count-badge">{{ deleted_client_count }}</span>{% endif %}
     </a>
+    {% endif %}
 
-    {% if perms.authentication.add_client %}
+    {% if perms.clients.add_client %}
     <a href="{% url 'clients:add' %}" class="btn-register">
       <i class="bi bi-plus-lg"></i> {{ trans.register_client }}
     </a>
@@ -124,7 +126,7 @@
           <th class="text-center">{{ trans.total_assets_client }}</th>
           <th class="text-center">{{ trans.open_tickets_client }}</th>
           <th>{{ trans.status_label }}</th>
-          {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
+          {% if perms.clients.view_client or perms.clients.edit_client or perms.clients.delete_client %}
           <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>

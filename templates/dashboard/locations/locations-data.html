@@ -10,7 +10,7 @@
         <th>{{ trans.state_city }}</th>
         <th>{{ trans.zip_code_label }}</th>
         <th>{{ trans.status_label }}</th>
-        {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
+        {% if perms.dashboard.view_location or perms.dashboard.delete_location or perms.dashboard.edit_location %}
         <th>{{ trans.actions }}</th>
         {% endif %}
       </tr>
@@ -74,21 +74,21 @@
           {% endif %}
         </td>
 
-        {% if perms.authentication.view_location or perms.authentication.delete_location or perms.authentication.edit_location %}
+        {% if perms.dashboard.view_location or perms.dashboard.delete_location or perms.dashboard.edit_location %}
         <td>
           <div class="row-actions">
-            {% if perms.authentication.view_location %}
+            {% if perms.dashboard.view_location %}
             <a href="{% url 'dashboard:location_details' location.id %}" class="action-btn" title="{{ trans.view_details }}">
               <i class="bi bi-eye"></i>
             </a>
             {% endif %}
-            {% if perms.authentication.edit_location %}
+            {% if perms.dashboard.edit_location %}
             <a href="{% url 'dashboard:update_location' location.id %}"
               class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_location }}">
               <i class="bi bi-pencil"></i>
             </a>
             {% endif %}
-            {% if perms.authentication.delete_location %}
+            {% if perms.dashboard.delete_location %}
             <form action="{% url 'dashboard:delete_location' location.id %}" method="post" class="form-row-action"
               onsubmit="return confirm('{{ trans.delete_confirm_location }}')">
               {% csrf_token %}
@@ -111,7 +111,7 @@
           <div class="table-empty-state">
             <i class="bi bi-building d-block"></i>
             <p>{{ trans.no_locations_search }}<br>
-              {% if perms.authentication.add_location %}
+              {% if perms.dashboard.add_location %}
               <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                 hx-get="{% url 'dashboard:add_location' %}" hx-target="#add-location-modal-content"
                 data-bs-toggle="modal" data-bs-target="#add-location-modal">{{ trans.register_new_location }}</button>
