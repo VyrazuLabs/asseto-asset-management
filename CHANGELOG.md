@@ -12,7 +12,7 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
-## [1.7.0] — 2026-09-05
+## [v1.7.0] — 2026-09-05
 
 ### Added
 - **Granular RBAC Permissions Architecture** — Introduced `common/permissions.py` as the centralized single source of truth for all system role modules and permissions, replacing scattered permission strings.
