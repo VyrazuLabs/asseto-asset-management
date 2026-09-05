@@ -20,7 +20,7 @@
 .permission-module-name {
     min-width: 90px;
     font-weight: 500;
-    color: #495057;
+    color: var(--color-text);
 }
 
 .permission-module-icons {

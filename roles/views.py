@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -29,28 +30,34 @@ def _assign_role_permissions(role: Role, codenames: list) -> None:
     checks written against a real app_label (e.g. ``perms.support.view_ticket``)
     stayed false even when a role had the box checked.
 
+    Wrapped in a transaction: this does a clear() followed by N get_or_create
+    + add() calls, and a role controls live access — a failure partway
+    through must not leave the role holding zero or half its permissions.
+
     Args:
         role: The Role to update.
         codenames: Permission codenames submitted from the modal's checkboxes.
     """
     display = codename_to_display()
-    role.permissions.clear()
 
-    for codename in codenames:
-        content_type = get_content_type_for_codename(codename)
-        if content_type is None:
-            # Not declared in PERMISSION_MODULES — skip rather than silently
-            # gluing an unknown codename to an arbitrary ContentType.
-            logger.warning("Skipping unregistered permission codename %s for role %s", codename, role.name)
-            continue
+    with transaction.atomic():
+        role.permissions.clear()
 
-        _, action_label = display.get(codename, (None, codename.replace("_", " ").title()))
-        permission, _ = Permission.objects.get_or_create(
-            codename=codename,
-            content_type=content_type,
-            defaults={"name": f"Can {action_label.lower()}"},
-        )
-        role.permissions.add(permission)
+        for codename in codenames:
+            content_type = get_content_type_for_codename(codename)
+            if content_type is None:
+                # Not declared in PERMISSION_MODULES — skip rather than silently
+                # gluing an unknown codename to an arbitrary ContentType.
+                logger.warning("Skipping unregistered permission codename %s for role %s", codename, role.name)
+                continue
+
+            _, action_label = display.get(codename, (None, codename.replace("_", " ").title()))
+            permission, _ = Permission.objects.get_or_create(
+                codename=codename,
+                content_type=content_type,
+                defaults={"name": f"Can {action_label.lower()}"},
+            )
+            role.permissions.add(permission)
 
 
 @login_required
@@ -80,13 +87,14 @@ def add(request):
 
     if request.method == "POST":
         if form.is_valid():
-            role = form.save(commit=False)
-            role.name = uuid4().hex
-            role.organization = request.user.organization
-            role.save()
+            with transaction.atomic():
+                role = form.save(commit=False)
+                role.name = uuid4().hex
+                role.organization = request.user.organization
+                role.save()
 
-            permissions = request.POST.getlist("permissions[]")
-            _assign_role_permissions(role, permissions)
+                permissions = request.POST.getlist("permissions[]")
+                _assign_role_permissions(role, permissions)
 
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "roleAdded"
@@ -111,10 +119,11 @@ def update(request, name):
     if request.method == "POST":
 
         if form.is_valid():
-            form.save()
+            with transaction.atomic():
+                form.save()
 
-            permissions = request.POST.getlist("permissions[]")
-            _assign_role_permissions(role, permissions)
+                permissions = request.POST.getlist("permissions[]")
+                _assign_role_permissions(role, permissions)
 
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "roleUpdated"
