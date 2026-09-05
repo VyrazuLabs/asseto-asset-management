@@ -25,10 +25,10 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.add_location",
-        "authentication.edit_location",
-        "authentication.delete_location",
-        "authentication.view_location",
+        "dashboard.add_location",
+        "dashboard.edit_location",
+        "dashboard.delete_location",
+        "dashboard.view_location",
     ]
 
     for permission in permissions_list:
@@ -56,7 +56,7 @@ def locations(request):
 
 
 @login_required
-@permission_required("authentication.view_location")
+@permission_required("dashboard.view_location")
 def location_details(request, id):
 
     location = get_object_or_404(
@@ -79,7 +79,7 @@ def location_details(request, id):
 
 
 @login_required
-@permission_required("authentication.add_location")
+@permission_required("dashboard.add_location")
 def add_location(request):
     address_form = AddressForm(request.POST or None)
     location_form = LocationForm(request.POST or None)
@@ -106,7 +106,7 @@ def add_location(request):
 
 
 @login_required
-@permission_required("authentication.edit_location")
+@permission_required("dashboard.edit_location")
 def update_location(request, id):
 
     if Location.objects.filter(pk=id).exists():
@@ -152,7 +152,7 @@ def update_location(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_location")
+@permission_required("dashboard.delete_location")
 def delete_location(request, id):
 
     if request.method == "POST":

@@ -70,20 +70,20 @@
         {% endif %}
       </td>
 
-      {% if perms.authentication.delete_product or perms.authentication.view_product or perms.authentication.edit_product %}
+      {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
       <td>
         <div class="row-actions">
-          {% if perms.authentication.view_product %}
+          {% if perms.products.view_product %}
             <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
               <i class="bi bi-eye"></i>
             </a>
           {% endif %}
-          {% if perms.authentication.edit_product %}
+          {% if perms.products.edit_product %}
             <a href="{% url 'products:update_product' products.id %}" class="action-btn" title="{{ trans.update_product }} {{ products.name }}">
               <i class="bi bi-pencil"></i>
             </a>
           {% endif %}
-          {% if perms.authentication.delete_product %}
+          {% if perms.products.delete_product %}
             <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
                   onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
               {% csrf_token %}

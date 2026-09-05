@@ -23,11 +23,13 @@
     <p class="page-subtitle">{{ trans.product_type_manage_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_product_types' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_product_types_count %}<span class="count-badge">{{ deleted_product_types_count }}</span>{% endif %}
     </a>
-    {% if perms.authentication.add_product_type %}
+    {% endif %}
+    {% if perms.dashboard.add_product_type %}
     <button type="button" class="btn-register" id="add-product-type-button" hx-get="{% url 'dashboard:add_product_type' %}"
       hx-target="#add-product-type-modal-content" data-bs-toggle="modal" data-bs-target="#add-product-type-modal">
       <i class="bi bi-plus-lg"></i> {{ trans.add_product_type }}
@@ -132,7 +134,7 @@
           <th>{{ trans.type_name }}</th>
           <th>{{ trans.total_assets }}</th>
           <th>{{ trans.status }}</th>
-          {% if perms.authentication.edit_product_type or perms.authentication.delete_product_type or request.user.is_superuser %}
+          {% if perms.dashboard.edit_product_type or perms.dashboard.delete_product_type or request.user.is_superuser %}
           <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
@@ -187,7 +189,7 @@
                 <i class="bi bi-eye"></i>
               </a>
               {% endif %}
-              {% if perms.authentication.edit_product_type %}
+              {% if perms.dashboard.edit_product_type %}
               <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_product_type }}"
                 hx-get="{% url 'dashboard:update_product_type' pt.id %}" hx-target="#update-product-type-modal-content"
                 data-bs-toggle="modal" data-bs-target="#update-product-type-modal"
@@ -195,7 +197,7 @@
                 <i class="bi bi-pencil"></i>
               </button>
               {% endif %}
-              {% if perms.authentication.delete_product_type %}
+              {% if perms.dashboard.delete_product_type %}
               <form action="{% url 'dashboard:delete_product_type' pt.id %}" method="post" class="form-row-action"
                 onsubmit="return confirm('{{ trans.delete_confirm_product_type }}')">
                 {% csrf_token %}
@@ -217,7 +219,7 @@
             <div class="table-empty-state">
               <i class="bi bi-box-seam d-block"></i>
               <p>{{ trans.no_product_types_found }}<br>
-                {% if perms.authentication.add_product_type %}
+                {% if perms.dashboard.add_product_type %}
                 <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                   hx-get="{% url 'dashboard:add_product_type' %}" hx-target="#add-product-type-modal-content"
                   data-bs-toggle="modal" data-bs-target="#add-product-type-modal">{{ trans.create_first_product_type }}</button>

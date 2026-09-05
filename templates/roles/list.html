@@ -6,27 +6,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
-<style>
-    .role-permissions-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        max-width: 400px;
-    }
-    .permission-tag {
-        font-size: 10px;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .permission-tag.add { background: rgba(67, 94, 204, 0.1); color: #435ebe; border: 1px solid rgba(67, 94, 204, 0.2); }
-    .permission-tag.view { background: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.2); }
-    .permission-tag.edit { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; border: 1px solid rgba(13, 202, 240, 0.2); }
-    .permission-tag.delete { background: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); }
-    .permission-tag.other { background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.2); }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/roles-list.css' %}">
 {% endblock css %}
 
 {% block content %}

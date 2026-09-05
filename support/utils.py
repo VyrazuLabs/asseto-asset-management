@@ -50,12 +50,21 @@ class SupportTicketService:
 
     @staticmethod
     def base_queryset(user):
-        """Return the base queryset for the current user's organization."""
-        return (
-            SupportTicket.undeleted_objects.filter(organization=user.organization)
-            .select_related("asset", "assigned_to", "client")
-            .order_by("-created_at")
-        )
+        """Return the base queryset for the current user's organization.
+
+        Scoped to tickets assigned to ``user`` unless they hold
+        ``support.all_ticket`` (superusers always pass via Django's
+        ``has_perm``) — without it, a non-superuser only ever saw every
+        ticket in the org regardless of who it was assigned to.
+        """
+        qs = SupportTicket.undeleted_objects.filter(
+            organization=user.organization
+        ).select_related("asset", "assigned_to", "client")
+
+        if not user.has_perm("support.all_ticket"):
+            qs = qs.filter(assigned_to=user)
+
+        return qs.order_by("-created_at")
 
     @staticmethod
     def stats(user):

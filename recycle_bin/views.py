@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import ProtectedError
 from products.models import Product
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
@@ -24,12 +24,9 @@ PAGE_SIZE = 10
 ORPHANS = 1
 
 
-def check_admin(user):
-    return user.is_superuser
-
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_vendors(request):
     vendors_list = Vendor.deleted_objects.filter(
         organization=request.user.organization
@@ -49,7 +46,7 @@ def deleted_vendors(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_vendor_restore(request, id):
     try:
         if request.method == "POST":
@@ -67,7 +64,7 @@ def deleted_vendor_restore(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_vendor_permanently(request, id):
     try:
         if request.method == "POST":
@@ -85,6 +82,7 @@ def deleted_vendor_permanently(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_vendors_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -118,7 +116,7 @@ def deleted_vendors_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_products(request):
 
     products_list = Product.deleted_objects.filter(
@@ -139,7 +137,7 @@ def deleted_products(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_products_permanently(request, id):
 
     try:
@@ -162,7 +160,7 @@ def deleted_products_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_products_restore(request, id):
 
     try:
@@ -184,6 +182,7 @@ def deleted_products_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_products_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -215,7 +214,7 @@ def deleted_products_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_assets(request):
 
     asset_list = Asset.deleted_objects.all().order_by("-updated_at")
@@ -233,7 +232,7 @@ def deleted_assets(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_asset_restore(request, id):
     try:
         if request.method == "POST":
@@ -249,7 +248,7 @@ def deleted_asset_restore(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_asset_permanently(request, id):
     try:
         if request.method == "POST":
@@ -263,6 +262,7 @@ def deleted_asset_permanently(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_assets_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -298,7 +298,7 @@ def deleted_assets_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_users(request):
     user_list = User.deleted_objects.filter(
         organization=request.user.organization
@@ -318,7 +318,7 @@ def deleted_users(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_user_restore(request, id):
     try:
         if request.method == "POST":
@@ -334,7 +334,7 @@ def deleted_user_restore(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_user_permanently(request, id):
     try:
         if request.method == "POST":
@@ -350,6 +350,7 @@ def deleted_user_permanently(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_users_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -390,7 +391,7 @@ def deleted_users_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_locations(request):
 
     location_list = Location.deleted_objects.filter(
@@ -411,7 +412,7 @@ def deleted_locations(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_locations_permanently(request, id):
 
     try:
@@ -434,7 +435,7 @@ def deleted_locations_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_locations_restore(request, id):
 
     try:
@@ -456,6 +457,7 @@ def deleted_locations_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_locations_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -493,7 +495,7 @@ def deleted_locations_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_depertments(request):
 
     department_list = Department.deleted_objects.filter(
@@ -514,7 +516,7 @@ def deleted_depertments(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_departments_permanently(request, id):
 
     try:
@@ -539,7 +541,7 @@ def deleted_departments_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_departments_restore(request, id):
 
     try:
@@ -563,6 +565,7 @@ def deleted_departments_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_departments_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -596,7 +599,7 @@ def deleted_departments_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_product_categories(request):
 
     product_category_list = ProductCategory.deleted_objects.filter(
@@ -617,7 +620,7 @@ def deleted_product_categories(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_product_categories_permanently(request, id):
 
     try:
@@ -642,7 +645,7 @@ def deleted_product_categories_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_product_categories_restore(request, id):
 
     try:
@@ -666,6 +669,7 @@ def deleted_product_categories_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def search_deleted_product_categories(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -694,7 +698,7 @@ def search_deleted_product_categories(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_product_types(request):
 
     product_category_list = ProductType.deleted_objects.filter(
@@ -716,7 +720,7 @@ def deleted_product_types(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_product_types_permanently(request, id):
 
     try:
@@ -741,7 +745,7 @@ def deleted_product_types_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_product_types_restore(request, id):
 
     try:
@@ -765,6 +769,7 @@ def deleted_product_types_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_product_types_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -793,7 +798,7 @@ def deleted_product_types_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_asset_status(request):
 
     product_category_list = AssetStatus.deleted_objects.filter(
@@ -815,7 +820,7 @@ def deleted_asset_status(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_asset_status_permanently(request, id):
 
     try:
@@ -840,7 +845,7 @@ def deleted_asset_status_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_asset_status_restore(request, id):
 
     try:
@@ -864,6 +869,7 @@ def deleted_asset_status_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_asset_status_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -892,7 +898,7 @@ def deleted_asset_status_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_roles(request):
 
     product_category_list = AssetStatus.deleted_objects.filter(
@@ -914,7 +920,7 @@ def deleted_roles(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_roles_permanently(request, id):
 
     try:
@@ -939,7 +945,7 @@ def deleted_roles_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_roles_status_restore(request, id):
 
     try:
@@ -963,7 +969,7 @@ def deleted_roles_status_restore(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_license_types(request):
 
     product_category_list = LicenseType.deleted_objects.all().order_by("-updated_at")
@@ -982,7 +988,7 @@ def deleted_license_types(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_license_types_permanently(request, id):
 
     try:
@@ -1003,7 +1009,7 @@ def deleted_license_types_permanently(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_license_types_restore(request, id):
 
     try:
@@ -1023,6 +1029,7 @@ def deleted_license_types_restore(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_license_types_search(request, page):
     search_text = request.GET.get("search_text").strip()
     if search_text:
@@ -1051,7 +1058,7 @@ def deleted_license_types_search(request, page):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_clients(request):
     clients_list = Client.deleted_objects.filter(
         organization=request.user.organization
@@ -1071,7 +1078,7 @@ def deleted_clients(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
 def deleted_clients_restore(request, id):
     try:
         if request.method == "POST":
@@ -1087,7 +1094,7 @@ def deleted_clients_restore(request, id):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
 def deleted_clients_permanently(request, id):
     try:
         if request.method == "POST":
@@ -1105,6 +1112,7 @@ def deleted_clients_permanently(request, id):
 
 
 @login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_clients_search(request, page):
     search_text = (request.GET.get("search_text") or "").strip()
     if search_text:

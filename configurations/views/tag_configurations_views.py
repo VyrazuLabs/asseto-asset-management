@@ -1,15 +1,16 @@
 
 from django.http import HttpResponse
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
+from common.permissions import require_any_permission
 from configurations.forms import TagConfigurationForm
 from configurations.models import TagConfiguration
 
 
 @csrf_exempt
-@login_required
+@require_any_permission("configurations.add_configuration", "configurations.edit_configuration")
 def create_or_update_tag_configuration(request, id=None):
     # Check if we're editing an existing configuration
     instance = None
@@ -41,6 +42,7 @@ def create_or_update_tag_configuration(request, id=None):
 
 @csrf_exempt
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def update_tag_configuration(request, id=None):
     config = get_object_or_404(TagConfiguration, pk=id)
 
@@ -58,6 +60,7 @@ def update_tag_configuration(request, id=None):
 
 
 @login_required
+@permission_required("configurations.view_configuration", raise_exception=True)
 def list_tag_configurations(request):
     configurations = TagConfiguration.objects.filter(
         organization=request.user.organization
@@ -89,6 +92,7 @@ def list_tag_configurations(request):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def toggle_default_settings(request, id):
     config = get_object_or_404(
         TagConfiguration, pk=id, organization=request.user.organization

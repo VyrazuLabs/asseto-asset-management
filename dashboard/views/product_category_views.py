@@ -25,9 +25,9 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.delete_product_category",
-        "authentication.edit_product_category",
-        "authentication.add_product_category",
+        "dashboard.delete_product_category",
+        "dashboard.edit_product_category",
+        "dashboard.add_product_category",
     ]
 
     for permission in permissions_list:
@@ -60,7 +60,7 @@ def product_category_list(request):
 
 
 @login_required
-@permission_required("authentication.add_product_category")
+@permission_required("dashboard.add_product_category")
 def add_product_category(request):
     form = ProductCategoryForm(organization=request.user.organization)
 
@@ -103,7 +103,7 @@ def product_category_details(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_product_category")
+@permission_required("dashboard.delete_product_category")
 def delete_product_category(request, id):
 
     if request.method == "POST":
@@ -132,7 +132,7 @@ def delete_product_category(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_product_category")
+@permission_required("dashboard.edit_product_category")
 def update_product_category(request, id):
 
     product_category = get_object_or_404(

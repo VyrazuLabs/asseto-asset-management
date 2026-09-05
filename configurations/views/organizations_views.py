@@ -7,7 +7,10 @@ from dashboard.models import Organization
 
 
 @login_required
-@permission_required("authentication.delete_location")
+# Was "dashboard.delete_location" — an unrelated leftover codename that
+# happened to still resolve after the Phase 2 app_label migration; this view
+# manages the organization settings page, so it belongs on Configurations.
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def add_organization(request):
     if request.method == "POST":
         name = request.POST.get("organization_name")

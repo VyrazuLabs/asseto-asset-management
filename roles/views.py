@@ -1,29 +1,67 @@
+import logging
 from uuid import uuid4
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from authentication.models import User
+from common.permissions import codename_to_display, get_content_type_for_codename
 from roles.models import Role
 
 from .forms import RoleForm
 from .utils import get_roles_list_utils
 
+logger = logging.getLogger(__name__)
+
 PAGE_SIZE = 10
 ORPHANS = 1
 
 
-def check_admin(user):
-    return user.is_superuser
+def _assign_role_permissions(role: Role, codenames: list) -> None:
+    """Replace a role's permissions with the given codenames.
+
+    Resolves each codename's real ContentType via the ``common/permissions.py``
+    registry instead of gluing every permission to the fake
+    ``authentication.User`` ContentType — that old glue is why permission
+    checks written against a real app_label (e.g. ``perms.support.view_ticket``)
+    stayed false even when a role had the box checked.
+
+    Wrapped in a transaction: this does a clear() followed by N get_or_create
+    + add() calls, and a role controls live access — a failure partway
+    through must not leave the role holding zero or half its permissions.
+
+    Args:
+        role: The Role to update.
+        codenames: Permission codenames submitted from the modal's checkboxes.
+    """
+    display = codename_to_display()
+
+    with transaction.atomic():
+        role.permissions.clear()
+
+        for codename in codenames:
+            content_type = get_content_type_for_codename(codename)
+            if content_type is None:
+                # Not declared in PERMISSION_MODULES — skip rather than silently
+                # gluing an unknown codename to an arbitrary ContentType.
+                logger.warning("Skipping unregistered permission codename %s for role %s", codename, role.name)
+                continue
+
+            _, action_label = display.get(codename, (None, codename.replace("_", " ").title()))
+            permission, _ = Permission.objects.get_or_create(
+                codename=codename,
+                content_type=content_type,
+                defaults={"name": f"Can {action_label.lower()}"},
+            )
+            role.permissions.add(permission)
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("roles.view_role", raise_exception=True)
 def list(request):
     page_number = request.GET.get("page", 1)
     page_object, role_user_count, stats = get_roles_list_utils(request, page_number)
@@ -43,35 +81,20 @@ def list(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("roles.add_role", raise_exception=True)
 def add(request):
     form = RoleForm(request.POST or None, organization=request.user.organization)
 
     if request.method == "POST":
         if form.is_valid():
-            role = form.save(commit=False)
-            role.name = uuid4().hex
-            role.organization = request.user.organization
-            role.save()
+            with transaction.atomic():
+                role = form.save(commit=False)
+                role.name = uuid4().hex
+                role.organization = request.user.organization
+                role.save()
 
-            permissions = request.POST.getlist("permissions[]")
-            content_type = ContentType.objects.get_for_model(User)
-
-            role.permissions.clear()
-
-            for codename in permissions:
-
-                temp_name = codename.split("_")
-                name = ""
-
-                for ele in temp_name:
-                    name += ele + " "
-
-                permission, created = Permission.objects.get_or_create(
-                    codename=codename, name=f"Can {name}", content_type=content_type
-                )
-
-                role.permissions.add(permission)
+                permissions = request.POST.getlist("permissions[]")
+                _assign_role_permissions(role, permissions)
 
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "roleAdded"
@@ -82,7 +105,7 @@ def add(request):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("roles.change_role", raise_exception=True)
 def update(request, name):
     role = get_object_or_404(Role, name=name, organization=request.user.organization)
     form = RoleForm(
@@ -96,25 +119,11 @@ def update(request, name):
     if request.method == "POST":
 
         if form.is_valid():
-            form.save()
+            with transaction.atomic():
+                form.save()
 
-            permissions = request.POST.getlist("permissions[]")
-            role.permissions.clear()
-            content_type = ContentType.objects.get_for_model(User)
-
-            for codename in permissions:
-
-                temp_name = codename.split("_")
-                name = ""
-
-                for ele in temp_name:
-                    name += ele + " "
-
-                permission, created = Permission.objects.get_or_create(
-                    codename=codename, name=f"Can {name}", content_type=content_type
-                )
-
-                role.permissions.add(permission)
+                permissions = request.POST.getlist("permissions[]")
+                _assign_role_permissions(role, permissions)
 
             response = HttpResponse(status=204)
             response["HX-Trigger"] = "roleUpdated"
@@ -125,7 +134,7 @@ def update(request, name):
 
 
 @login_required
-@user_passes_test(check_admin)
+@permission_required("roles.delete_role", raise_exception=True)
 def delete(request, name):
     if request.method == "POST":
         role = get_object_or_404(
@@ -139,7 +148,8 @@ def delete(request, name):
     return redirect("roles:list")
 
 
-@user_passes_test(check_admin)
+@login_required
+@permission_required("roles.change_role", raise_exception=True)
 def status(request, name):
     if request.method == "POST":
         role = get_object_or_404(
@@ -151,6 +161,7 @@ def status(request, name):
 
 
 @login_required
+@permission_required("roles.view_role", raise_exception=True)
 def search(request, page):
     page_object, role_user_count, stats = get_roles_list_utils(request, page)
 

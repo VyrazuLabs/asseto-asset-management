@@ -24,11 +24,13 @@
     <p class="page-subtitle">{{ trans.manage_vendors }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_vendors' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_vendor_count %}<span class="count-badge">{{ deleted_vendor_count }}</span>{% endif %}
     </a>
-    {% if perms.authentication.add_vendor %}
+    {% endif %}
+    {% if perms.vendors.add_vendor %}
       <a href="{% url 'vendors:add' %}" class="btn-register">
         <i class="bi bi-plus-lg"></i> {{ trans.add_vendor }}
       </a>
@@ -129,7 +131,7 @@
           <th>{{ trans.phone_no }}</th>
           <th>{{ trans.status_label }}</th>
           <th>{{ trans.asset_count }}</th>
-          {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
+          {% if perms.vendors.edit_vendor or perms.vendors.view_vendor or perms.vendors.delete_vendor %}
             <th>{{ trans.actions }}</th>
           {% endif %}
         </tr>
@@ -175,22 +177,22 @@
               {% endif %}
             {% endwith %}
           </td>
-          {% if perms.authentication.edit_vendor or perms.authentication.view_vendor or perms.authentication.delete_vendor %}
+          {% if perms.vendors.edit_vendor or perms.vendors.view_vendor or perms.vendors.delete_vendor %}
           <td>
             <div class="row-actions">
-              {% if perms.authentication.view_vendor %}
+              {% if perms.vendors.view_vendor %}
                 <a href="{% url 'vendors:details' vendors.id %}" class="action-btn" title="View {{ vendors.name }}">
                   <i class="bi bi-eye"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.edit_vendor %}
+              {% if perms.vendors.edit_vendor %}
                 <a href="{% url 'vendors:update_vendor' vendors.id %}"
                   class="action-btn {% if is_demo %}disabled{% endif %}"
                   title="Edit {{ vendors.name }}">
                   <i class="bi bi-pencil"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.delete_vendor %}
+              {% if perms.vendors.delete_vendor %}
                 <form action="{% url 'vendors:delete_vendor' vendors.id %}" method="post" class="form-row-action"
                       onsubmit="return confirm('{{ trans.delete_confirm_vendor }}')">
                   {% csrf_token %}

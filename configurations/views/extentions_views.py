@@ -1,5 +1,5 @@
 import base64
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 from configurations.constants import INTEGRATION_CHOICES
 from configurations.forms import ClientCredentialsForm
@@ -9,6 +9,7 @@ from configurations.utils import hide_last_digits
 
 
 @login_required
+@permission_required("configurations.view_configuration", raise_exception=True)
 def integration(request):
     if request.method == "POST":
         integration_type = request.POST.get("integration_type")
@@ -50,6 +51,7 @@ def integration(request):
 
 
 @login_required
+@permission_required("configurations.view_configuration", raise_exception=True)
 def list_extensions(request):
     # integration_choices=INTEGRATION_CHOICES
     for choice_id, (entity_name, description) in INTEGRATION_CHOICES:
@@ -83,6 +85,7 @@ def list_extensions(request):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def extension_status(request, id):
     status = request.POST.get("status", "off")  # will be "on" or "off"
 
@@ -94,6 +97,7 @@ def extension_status(request, id):
 
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def save_slack_configuration(request):
     if request.method == "POST":
         client_id = request.POST.get("client_id", "").strip()
@@ -119,6 +123,7 @@ def save_slack_configuration(request):
         return redirect("configurations:integration")
 
 @login_required
+@permission_required("configurations.edit_configuration", raise_exception=True)
 def api_extension_status(request, id):
     status = request.POST.get("api_status", "off")
     ext = get_object_or_404(Extensions, pk=id)

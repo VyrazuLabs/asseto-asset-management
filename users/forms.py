@@ -37,15 +37,6 @@ class UserForm(forms.ModelForm):
             }
         ),
     )
-    access_level = forms.ChoiceField(
-        required=False,
-        choices=(
-            ("False", "Only Assigned"),
-            ("True", "All"),
-        ),
-        widget=forms.Select(attrs={"class": "form-control"}),
-    )
-
     role = forms.ModelChoiceField(
         required=False,
         queryset=None,
@@ -124,7 +115,6 @@ class UserForm(forms.ModelForm):
             "full_name",
             "email",
             "phone",
-            "access_level",
             "role",
             "location",
             "department",
@@ -163,15 +153,6 @@ class UserUpdateForm(UserChangeForm):
                 "autocomplete": "off",
             }
         ),
-    )
-
-    access_level = forms.ChoiceField(
-        required=False,
-        choices=(
-            ("False", "Only Assigned"),
-            ("True", "All"),
-        ),
-        widget=forms.Select(attrs={"class": "form-control"}),
     )
 
     role = forms.ModelChoiceField(
@@ -247,7 +228,6 @@ class UserUpdateForm(UserChangeForm):
             "full_name",
             "email",
             "phone",
-            "access_level",
             "role",
             "location",
             "department",

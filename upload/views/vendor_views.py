@@ -22,7 +22,7 @@ import csv
 
 
 @login_required
-@permission_required("authentication.add_vendor")
+@permission_required("vendors.add_vendor")
 def vendor_list(request):
     page_object, stats = get_vendor_upload_list(request)
     context = {
@@ -49,7 +49,7 @@ def search_vendor_upload(request, page):
 
 
 @login_required
-@permission_required("authentication.add_vendor")
+@permission_required("vendors.add_vendor")
 def export_vendors_csv(request):
     header_list = [
         "Vendor Name",
@@ -73,7 +73,7 @@ def export_vendors_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_vendor")
+@permission_required("vendors.add_vendor")
 def import_vendors_csv(request):
     if request.method == "POST":
         file = request.FILES.get("file")
@@ -119,7 +119,7 @@ def import_vendors_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_vendor")
+@permission_required("vendors.add_vendor")
 def vendor_render_to_mapper_modal(request):
     required_fields = ["Name", "Email", "Phone"]
     if request.method == "POST":

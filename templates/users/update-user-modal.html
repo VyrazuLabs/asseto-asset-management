@@ -104,19 +104,6 @@
                         {% endfor %}
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="premium-input-group">
-                        <label>{{ trans.access_level_label }}</label>
-                        <div class="premium-input-with-icon">
-                            <i class="bi bi-shield"></i>
-                            {{form.access_level}}
-                        </div>
-                        {% for error in form.access_level.errors %}
-                            <small class="text-danger">{{ error }}</small>
-                        {% endfor %}
-                    </div>
-                </div>
-
                 <div class="col-md-12">
                     <div class="premium-input-group">
                         <label>{{ trans.profile_picture }}</label>

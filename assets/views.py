@@ -70,10 +70,10 @@ def check_admin(user):
 
 def manage_access_for_assets(user):
     permissions_list = [
-        "authentication.edit_asset",
-        "authentication.view_asset",
-        "authentication.delete_asset",
-        "authentication.add_asset",
+        "assets.edit_asset",
+        "assets.view_asset",
+        "assets.delete_asset",
+        "assets.add_asset",
     ]
 
     for permission in permissions_list:
@@ -85,9 +85,9 @@ def manage_access_for_assets(user):
 
 def manage_access_for_assign_assets(user):
     permissions_list = [
-        "authentication.reassign_assign_asset",
-        "authentication.add_assign_asset",
-        "authentication.delete_assign_asset",
+        "assets.reassign_assign_asset",
+        "assets.add_assign_asset",
+        "assets.delete_assign_asset",
     ]
 
     for permission in permissions_list:
@@ -106,14 +106,14 @@ def listed(request):
 
 
 @login_required
-@permission_required("authentication.view_asset")
+@permission_required("assets.view_asset")
 def details(request, id):
     context = details_of_asset(request, id)
     return render(request, "assets/detail.html", context=context)
 
 
 @login_required
-@permission_required("authentication.add_asset")
+@permission_required("assets.add_asset")
 def add(request):
     image_form = AssetImageForm()
     if request.method == "POST":
@@ -140,7 +140,7 @@ def add(request):
 
 
 @login_required
-@permission_required("authentication.delete_asset")
+@permission_required("assets.delete_asset")
 def delete(request, id):
     if request.method == "POST":
         asset = get_object_or_404(Asset.undeleted_objects, pk=id)
@@ -197,7 +197,7 @@ def assigned_list(request):
     return render(request, "assets/assigned-list.html", context=context)
 
 @login_required
-@permission_required("authentication.add_assign_asset")
+@permission_required("assets.add_assign_asset")
 def assign_asset(request):
     if request.method == "POST":
         form = AssignedAssetForm(
@@ -223,7 +223,7 @@ def assign_asset(request):
 
 
 @login_required
-@permission_required("authentication.reassign_assign_asset")
+@permission_required("assets.reassign_assign_asset")
 def reassign_asset(request, id):
     assignAsset = get_object_or_404(
         AssignAsset, pk=id, asset__organization=request.user.organization
@@ -243,7 +243,7 @@ def reassign_asset(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_assign_asset")
+@permission_required("assets.delete_assign_asset")
 def delete_assign(request, id):
     if request.method == "POST":
         delete_assign_asset(request, id)
@@ -278,7 +278,7 @@ def delete_assign_asset_list(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_asset")
+@permission_required("assets.edit_asset")
 def update_in_detail(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)
     org = request.user.organization

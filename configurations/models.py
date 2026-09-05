@@ -85,3 +85,19 @@ class SlackConfiguration(models.Model):
     channel_id = models.CharField(max_length=100, null=True, blank=True)
     client_id = models.CharField(max_length=100, null=True, blank=True)
     client_secret = models.CharField(max_length=100, null=True, blank=True)
+
+
+class ConfigurationPermission(models.Model):
+    """Unmanaged anchor model for Configurations permissions.
+
+    "Configurations" spans several real settings models (BrandingImages,
+    TagConfiguration, LocalizationConfiguration, SlackConfiguration, ...)
+    with no single owning model. This model exists purely so
+    ``ContentType.objects.get_for_model()`` has a stable, real target for
+    the configuration-module permissions — it has no database table and is
+    never queried. See ``common/permissions.py`` for the module registry.
+    """
+
+    class Meta:
+        managed = False
+        default_permissions = ()

@@ -26,11 +26,13 @@
     <p class="page-subtitle">{{ trans.asset_inventory_subtitle }}</p>
   </div>
   <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
     <a href="{% url 'recycle_bin:deleted_assets' %}" class="btn-trash" title="{{ trans.recycle_bin }}">
       <i class="bi bi-trash3"></i> {{ trans.trash }}
       {% if deleted_asset_count %}<span class="count-badge">{{ deleted_asset_count }}</span>{% endif %}
     </a>
-    {% if perms.authentication.add_asset %}
+    {% endif %}
+    {% if perms.assets.add_asset %}
       <a href="{% url 'assets:add' %}" class="btn-register">
         <i class="bi bi-plus-lg"></i> {{ trans.register_new_asset }}
       </a>
@@ -228,7 +230,7 @@
           <th>{{ trans.vendor }}</th>
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
-          {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
+          {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
             <th>{{ trans.actions_col }}</th>
           {% endif %}
         </tr>
@@ -332,22 +334,22 @@
             {% endif %}
           </td>
 
-          {% if perms.authentication.edit_asset or perms.authentication.view_asset or perms.authentication.delete_asset %}
+          {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
           <td>
             <div class="row-actions">
-              {% if perms.authentication.view_asset %}
+              {% if perms.assets.view_asset %}
                 <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View {{ asset.name }}">
                   <i class="bi bi-eye"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.edit_asset %}
+              {% if perms.assets.edit_asset %}
                 <a href="{% url 'assets:update_in_detail' asset.id %}"
                   class="action-btn {% if is_demo %}disabled{% endif %}"
                   title="Edit {{ asset.name }}">
                   <i class="bi bi-pencil"></i>
                 </a>
               {% endif %}
-              {% if perms.authentication.delete_asset %}
+              {% if perms.assets.delete_asset %}
                 <form action="{% url 'assets:delete' asset.id %}" method="post" class="form-row-action"
                       onsubmit="return confirm('Delete {{ asset.name }}? It can be restored from Recycle Bin.')">
                   {% csrf_token %}

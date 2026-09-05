@@ -42,10 +42,10 @@ def check_admin(user):
 
 def manage_access(user):
     permissions_list = [
-        "authentication.view_product",
-        "authentication.delete_product",
-        "authentication.edit_product",
-        "authentication.add_product",
+        "products.view_product",
+        "products.delete_product",
+        "products.edit_product",
+        "products.add_product",
     ]
     for permission in permissions_list:
         if user.has_perm(permission):
@@ -62,14 +62,14 @@ def list(request):
 
 
 @login_required
-@permission_required("authentication.view_product")
+@permission_required("products.view_product")
 def details_product(request, id):
     context = get_product_details(request, id)
     return render(request, "products/detail.html", context=context)
 
 
 @login_required
-@permission_required("authentication.add_product")
+@permission_required("products.add_product")
 # @silk_profile(name="add_products")
 def add_product(request):
     if request.method == "POST":
@@ -100,7 +100,7 @@ def add_product(request):
 
 
 @login_required
-@permission_required("authentication.delete_product")
+@permission_required("products.delete_product")
 def delete_product(request, id):
     if request.method == "POST":
         get_asset_by_product_id = Asset.objects.filter(product_id=id).first()
@@ -117,7 +117,7 @@ def delete_product(request, id):
 
 @csrf_exempt
 @login_required
-@permission_required("authentication.edit_product")
+@permission_required("products.edit_product")
 def update_product(request, id):
     product = get_object_or_404(
         Product.undeleted_objects, pk=id, organization=request.user.organization
@@ -258,14 +258,14 @@ def search(request, page):
 
 
 @login_required
-@permission_required("authentication.view_product")
+@permission_required("products.view_product")
 def export_products_csv(request):
     response = exports_product_csv_utils(request)
     return response
 
 
 @login_required
-@permission_required("authentication.view_product")
+@permission_required("products.view_product")
 def export_products_pdf(request):
     response = export_product_pdf_utils(request)
     return response

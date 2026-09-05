@@ -10,7 +10,7 @@
         <th>{{ trans.total_asset }}</th>
         <th>{{ trans.contact_person_name_label }}</th>
         <th>{{ trans.status }}</th>
-        {% if perms.authentication.edit_department or perms.authentication.delete_department or request.user.is_superuser %}
+        {% if perms.dashboard.edit_department or perms.dashboard.delete_department or request.user.is_superuser %}
         <th>{{ trans.actions }}</th>
         {% endif %}
       </tr>
@@ -71,7 +71,7 @@
               <i class="bi bi-eye"></i>
             </a>
             {% endif %}
-            {% if perms.authentication.edit_department %}
+            {% if perms.dashboard.edit_department %}
             <button type="button" class="action-btn {% if is_demo %}disabled{% endif %}" title="{{ trans.edit_department }}"
               hx-get="{% url 'dashboard:update_department' department.id %}?modal=1&_={{ forloop.counter }}"
               hx-target="#update-department-modal-content" hx-cache="false"
@@ -79,7 +79,7 @@
               <i class="bi bi-pencil"></i>
             </button>
             {% endif %}
-            {% if perms.authentication.delete_department %}
+            {% if perms.dashboard.delete_department %}
             <form action="{% url 'dashboard:delete_department' department.id %}" method="post" class="form-row-action"
               onsubmit="return confirm('{{ trans.delete_confirm_department }}')">
               {% csrf_token %}
@@ -101,7 +101,7 @@
           <div class="table-empty-state">
             <i class="bi bi-people d-block"></i>
             <p>{{ trans.no_departments_search }}<br>
-{% if perms.authentication.add_department %}
+{% if perms.dashboard.add_department %}
                 <button type="button" class="btn btn-link link-primary p-0 border-0 bg-transparent"
                   onclick="openDepartmentModal()">{{ trans.create_first_department }}</button>
                 {% endif %}

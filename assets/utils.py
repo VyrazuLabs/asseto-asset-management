@@ -206,6 +206,16 @@ def filtered_asset(request):
         filters &= Q(location_id=location_id)
 
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
+
+    # Scoped to assets currently assigned to the requesting user unless
+    # they hold "assets.all_asset" (superusers always pass via Django's
+    # has_perm) — without it, a non-superuser saw every asset in the org
+    # regardless of who it was assigned to. distinct() guards against
+    # duplicate rows from an asset with more than one AssignAsset record
+    # (e.g. reassignment history).
+    if not request.user.has_perm("assets.all_asset"):
+        assets_qs = assets_qs.filter(assignasset__user=request.user).distinct()
+
     # Filter by product based on product type and category
     if product:
         assets_qs = assets_qs.filter(product_id=product)

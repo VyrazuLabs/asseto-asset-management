@@ -74,21 +74,21 @@
       {% endif %}
     {% endif %}
   </td>
-  {% if perms.authentication.view_client or perms.authentication.edit_client or perms.authentication.delete_client %}
+  {% if perms.clients.view_client or perms.clients.edit_client or perms.clients.delete_client %}
   <td>
     <div class="row-actions">
-      {% if perms.authentication.view_client %}
+      {% if perms.clients.view_client %}
         <a href="{% url 'clients:details' client.id %}" class="action-btn" title="View {{ client.name }}">
           <i class="bi bi-eye"></i>
         </a>
       {% endif %}
-      {% if perms.authentication.edit_client %}
+      {% if perms.clients.edit_client %}
         <a href="{% url 'clients:update' client.id %}"
           class="action-btn" title="Edit {{ client.name }}">
           <i class="bi bi-pencil"></i>
         </a>
       {% endif %}
-      {% if perms.authentication.delete_client %}
+      {% if perms.clients.delete_client %}
         <form action="{% url 'clients:delete' client.id %}" method="post" class="form-row-action"
               onsubmit="return confirm('{{ trans.delete_confirm_client }}')">
           {% csrf_token %}
