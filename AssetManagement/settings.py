@@ -10,39 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import json
 import os
 from datetime import timedelta
 from pathlib import Path
 
-import firebase_admin
-from cryptography.fernet import Fernet
 from decouple import config
 from dotenv import load_dotenv
-from firebase_admin import credentials
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env", override=True)
-cipher_suite = Fernet(b"NlISlEq9jlxcgOhAQpe4dN0hAeuwxmRCiTZzhrX7nic=")
 
-file_name = os.getenv(
-    "FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY", "firebase-credentials.json"
-)
-firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
-
-if firebase_credentials:
-    fernet = Fernet(os.getenv("FERNET_KEY").encode())
-    decrypted = fernet.decrypt(firebase_credentials.encode())
-    cred_dict = json.loads(decrypted.decode())
-
-    cred = credentials.Certificate(cred_dict)
-    firebase_admin.initialize_app(cred)
-
-elif file_name and file_name.strip().strip("'\""):
-    cred_path = BASE_DIR / file_name.strip().strip("'\"")
-    if cred_path.is_file():
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
+# Firebase Admin SDK is no longer initialized here. It's provisioned once via
+# an in-app "Connect Google Cloud" OAuth flow (google_integration app) and
+# stored, encrypted, in the DB — see google_integration.firebase_admin_client
+# .get_firebase_admin_app(), which lazily initializes it on first real use.
+FERNET_KEY = os.getenv("FERNET_KEY")
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI")
 
 LOGIN_REDIRECT_URL = "/"
 
@@ -110,6 +95,7 @@ INSTALLED_APPS = [
     "notifications",
     "simple_history",
     "configurations",
+    "google_integration",
     "drf_spectacular",
     "audit",
     "license",
@@ -119,7 +105,6 @@ INSTALLED_APPS = [
     "client_portal",
     "custom_fields",
 ]
-# FIREBASE_APP = initialize_app()
 ENABLE_TRACEBACK = True
 TRACEBACK_SHOW_LOCALS = True
 TRACEBACK_LOCALS_MAX_LENGTH = None  # Set to None to show full locals information

@@ -18,7 +18,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.contrib.staticfiles.views import serve
 from django.urls import include, path, re_path
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -42,6 +41,7 @@ from products.urls import product_api_urlpattrens
 from users.urls import user_api_url_patterns
 from vendors.urls import vendor_api_urlpatterns
 from custom_fields.urls import api_custom_field_url_patterns
+from google_integration import views as google_integration_views
 
 urlpatterns = [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
@@ -70,6 +70,7 @@ urlpatterns = [
     path("users/", include("users.urls", namespace="users")),
     path("notifications/", include("notifications.urls", namespace="notifications")),
     path("configurations/", include("configurations.urls", namespace="configurations")),
+    path("google-integration/", include("google_integration.urls", namespace="google_integration")),
     path("gate-pass/", include("gate_pass.urls", namespace="gate_pass")),
     path("clients/", include("clients.urls", namespace="clients")),
     path("client-portal/", include("client_portal.urls", namespace="client_portal")),
@@ -149,7 +150,7 @@ urlpatterns = (
 )
 urlpatterns += [
     re_path(
-        r"^firebase-messaging-sw\.js$", serve, {"path": "firebase-messaging-sw.js"}
+        r"^firebase-messaging-sw\.js$", google_integration_views.firebase_messaging_sw
     ),
 ]
 if settings.DEBUG:

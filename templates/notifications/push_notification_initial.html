@@ -1,5 +1,9 @@
 {% load static %}
-{% include 'static/firebase_messaging_sw.js' %}
+<!-- The old {% include 'static/firebase_messaging_sw.js' %} here pointed at a
+     path that never resolved (hyphen/underscore mismatch, wrong template
+     dir) and referenced an orphaned, separate Firebase project's hardcoded
+     key. Removed — the service worker is now served at the site root via
+     google_integration.views.firebase_messaging_sw, DB-config-driven. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

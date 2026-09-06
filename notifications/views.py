@@ -1,8 +1,17 @@
+import json
+import logging
+
 from django.shortcuts import render, redirect
 from .models import UserNotification, Notification
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
-import json
+
+from google_integration.firebase_admin_client import (
+    GoogleCloudNotConfiguredError,
+    get_firebase_admin_app,
+)
+
+logger = logging.getLogger(__name__)
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -171,16 +180,27 @@ def search(request, page):
 
 
 def send_data_message(token, title, body, image_url):
+    """Send a single FCM push notification.
+
+    Duplicate of `notifications.utils.send_data_message` — kept in sync here
+    since nothing currently imports this copy (the real send path uses
+    `notifications.tasks` -> `notifications.utils.send_data_message`); not
+    consolidated as part of this change, flagged as pre-existing duplication.
+    """
+    try:
+        app = get_firebase_admin_app()
+    except GoogleCloudNotConfiguredError:
+        logger.warning("Skipping push notification — Google Cloud not connected.")
+        return
+
     message = messaging.Message(
         notification=messaging.Notification(title=title, body=body, image=image_url),
         token=token,
     )
     try:
-        response = messaging.send(message)
-        # print('Successfully sent message:--', response)
-    except Exception as e:
-        print(f"Error sending message: {e}")
-    # return response
+        messaging.send(message, app=app)
+    except Exception:
+        logger.error("Error sending FCM push notification", exc_info=True)
 
 
 # This below function is to generate the token.But since token is generated from the mobile dev.. so we directly just fetch the token from the frontend.

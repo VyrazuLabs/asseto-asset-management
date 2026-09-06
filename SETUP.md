@@ -13,6 +13,7 @@ Welcome to the **Asseto Asset Management** setup guide. This document provides s
   - [Steps to Run](#steps-to-run-1)
 - [Post-Setup Configurations](#post-setup-configurations)
   - [Creating an Administrator Account](#creating-an-administrator-account)
+  - [Connecting Google Cloud (Firebase Push Notifications)](#connecting-google-cloud-firebase-push-notifications)
   - [Managing the Application](#managing-the-application)
 - [Troubleshooting](#troubleshooting)
   - [Port 80 Already Occupied](#port-80-already-occupied)
@@ -158,6 +159,69 @@ You can register new administrator user accounts and organizations at any time u
     --company_name "Acme Corp" \
     --company_website "acme.com"
   ```
+
+### Connecting Google Cloud (Firebase Push Notifications)
+
+Push notifications (browser + mobile) are delivered via Firebase Cloud
+Messaging. Asseto does **not** ship with a hardcoded Firebase project —
+each installation connects its own, once, via an in-app OAuth flow. Nothing
+below is a code change; it's a one-time setup step per installation, done by
+whoever administers this Asseto instance.
+
+**Why this step exists**: Google's OAuth requires every application to
+register its own OAuth client, pinned to the exact domain it's running on.
+Since every self-hosted Asseto installation runs on a different domain, one
+shared OAuth client checked into the repo can't work — this is the same
+reason self-hosted Nextcloud, Mastodon, and similar open-source projects all
+require an admin to create their own OAuth client rather than shipping one.
+
+**Step 1 — Create a Google Cloud OAuth Client** (one-time, per installation):
+
+1. Go to [console.cloud.google.com](https://console.cloud.google.com/) →
+   **APIs & Services → Credentials → + Create Credentials → OAuth client ID**.
+2. Application type: **Web application**.
+3. Under **Authorized redirect URIs**, add exactly:
+   ```
+   https://<your-domain>/google-integration/oauth/callback/
+   ```
+   (use `http://127.0.0.1:8000/google-integration/oauth/callback/` for local/manual setup).
+4. Click **Create** and copy the **Client ID** and **Client Secret** shown.
+5. Go to the **OAuth consent screen** tab → **Test users** → add the Google
+   account that will click "Connect" in step 2. This keeps the app in
+   Google's "Testing" mode, which skips their formal verification review —
+   fine for a single installation's own use.
+
+**Step 2 — Add the credentials to `.env`:**
+
+```bash
+FERNET_KEY=<generate: python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())">
+GOOGLE_OAUTH_CLIENT_ID=<from step 1>
+GOOGLE_OAUTH_CLIENT_SECRET=<from step 1>
+GOOGLE_OAUTH_REDIRECT_URI=https://<your-domain>/google-integration/oauth/callback/
+```
+
+Restart the application after editing `.env` for the new values to take effect.
+
+**Step 3 — Connect, in the app:**
+
+1. Log in as a superuser.
+2. Go to **Settings → Extensions**.
+3. On the **Firebase** card, click **Connect**, and approve the Google
+   consent screen using the account you added as a test user in step 1.
+4. Asseto automatically creates a new Google Cloud project, enables Firebase
+   on it, registers a web app, and generates a service account — all fields
+   are stored encrypted in the database. No further manual Firebase console
+   work is needed. The card shows **Connected ✓** with the created project ID
+   once done.
+
+**Who should perform step 3**: the Google account used to click Connect ends
+up owning the resulting Firebase project (and any billing if usage ever
+exceeds the free tier). If you're setting this up on behalf of a client, have
+*them* log in with their own Google account for this one click — see the
+[Post-Setup Configurations](#post-setup-configurations) note above; the
+OAuth client from step 1 is app-level and can be created by whoever manages
+hosting, but project ownership from step 3 should belong to whoever is
+actually operating the instance.
 
 ### Managing the Application
 For Docker deployments, use these standard commands to control the server:

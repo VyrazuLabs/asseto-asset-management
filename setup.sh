@@ -245,11 +245,24 @@ fi
 # Django SECRET_KEY generation
 SECRET_KEY_GEN=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))" 2>/dev/null || tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 50 2>/dev/null || echo "unsafe-secret-key-for-asseto-asset-management")
 
+# FERNET_KEY encrypts the DB-stored Google Cloud/Firebase service account
+# credential (google_integration app) — generated fresh per install.
+FERNET_KEY_GEN=$(python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" 2>/dev/null)
+
 # Write .env file
 echo -e "\nGenerating .env configuration file..."
 cat << EOF > .env
 SECRET_KEY="$SECRET_KEY_GEN"
-FIREBASE_APPLICATION_CREDENTIALS_FILE_DIRECTORY=
+FERNET_KEY="$FERNET_KEY_GEN"
+
+# Firebase push notifications are provisioned in-app after setup:
+# log in as a superuser, go to Settings > Extensions > Firebase, click
+# Connect. That requires a Google Cloud OAuth 2.0 Client (Web application
+# type) created ahead of time in https://console.cloud.google.com/ -
+# fill these in manually before using the Connect button:
+GOOGLE_OAUTH_CLIENT_ID=
+GOOGLE_OAUTH_CLIENT_SECRET=
+GOOGLE_OAUTH_REDIRECT_URI="http://$SERVER_NAME/google-integration/oauth/callback/"
 
 EMAIL_HOST="$EMAIL_HOST"
 EMAIL_HOST_USER="$EMAIL_HOST_USER"

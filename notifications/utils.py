@@ -1,9 +1,18 @@
+import logging
+
 from .models import UserNotification, Notification
 from django.http import HttpResponse, JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
 from authentication.models import User
 from firebase_admin import messaging
+
+from google_integration.firebase_admin_client import (
+    GoogleCloudNotConfiguredError,
+    get_firebase_admin_app,
+)
+
+logger = logging.getLogger(__name__)
 
 
 # Function to send email to a user regarding operation in asset
@@ -71,13 +80,28 @@ def notifications_call(user, entity_type, notification_title, notification_text)
 
 
 def send_data_message(token, title, body, image_url):
+    """Send a single FCM push notification.
+
+    Args:
+        token: the recipient device's FCM registration token.
+        title: notification title.
+        body: notification body text.
+        image_url: optional notification image URL.
+
+    Silently no-ops (logs a warning) if Google Cloud/Firebase hasn't been
+    connected yet — push delivery must never block email/Slack delivery.
+    """
+    try:
+        app = get_firebase_admin_app()
+    except GoogleCloudNotConfiguredError:
+        logger.warning("Skipping push notification — Google Cloud not connected.")
+        return
+
     message = messaging.Message(
         notification=messaging.Notification(title=title, body=body, image=image_url),
         token=token,
     )
     try:
-        response = messaging.send(message)
-        # print('Successfully sent message:--', response)
-    except Exception as e:
-        print(f"Error sending message: {e}")
-    # return response
+        messaging.send(message, app=app)
+    except Exception:
+        logger.error("Error sending FCM push notification", exc_info=True)

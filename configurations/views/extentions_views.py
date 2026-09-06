@@ -6,6 +6,7 @@ from configurations.forms import ClientCredentialsForm
 from configurations.models import Extensions, SlackConfiguration
 
 from configurations.utils import hide_last_digits
+from google_integration.models import GoogleCloudFirebaseConfig
 
 
 @login_required
@@ -80,7 +81,12 @@ def list_extensions(request):
     return render(
         request,
         "configurations/list-extensions.html",
-        {"integration_choices": get_extensions, "api_extension": get_api_extension},
+        {
+            "integration_choices": get_extensions,
+            "api_extension": get_api_extension,
+            # Instance-wide, not org-scoped — same config shown to every org's admins.
+            "firebase_config": GoogleCloudFirebaseConfig.objects.filter(pk=1).first(),
+        },
     )
 
 
