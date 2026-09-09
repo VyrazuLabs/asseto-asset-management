@@ -50,15 +50,19 @@
                                 <td>{{product.updated_at}}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                                        {% if perms.recycle_bin.restore_recycle_bin %}
                                         <form action="{% url 'recycle_bin:deleted_products_restore' product.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-success btn-sm" title="{{ trans.restore }}"><i class="bi bi-arrow-repeat"></i></button>
                                         </form>
+                                        {% endif %}
 
+                                        {% if perms.recycle_bin.delete_recycle_bin %}
                                         <form action="{% url 'recycle_bin:deleted_products_permanently' product.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-danger btn-sm" title="{{ trans.permanently_delete }}"><i class="bi bi-trash3-fill"></i></button>
                                         </form>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

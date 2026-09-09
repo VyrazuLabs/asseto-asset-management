@@ -249,8 +249,10 @@ def create_asset_list(request, assets_qs):
     user_list = User.objects.filter(org_filter, is_active=True).order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
     asset_status_list = AssetStatus.objects.filter(org_filter)
-    product_type_list = ProductType.objects.filter(org_filter).order_by("-created_at")
+    product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     asset_list = Asset.undeleted_objects.filter(org_filter).order_by("-created_at")
+    if not request.user.has_perm("assets.all_asset"):
+        asset_list = asset_list.filter(assignasset__user=request.user).distinct()
     deleted_asset_count = Asset.deleted_objects.filter(
         organization=request.user.organization
     ).count()
@@ -299,19 +301,12 @@ def create_asset_list(request, assets_qs):
     for img in images_qs:
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
-    # Stats for summary cards
+    # Stats for summary cards – scoped like the list
     total_value = (
-        Asset.undeleted_objects.filter(
-            organization=request.user.organization
-        ).aggregate(total=Sum("price"))["total"]
-        or 0
+        asset_list.aggregate(total=Sum("price"))["total"] or 0
     )
-    active_count = Asset.undeleted_objects.filter(
-        organization=request.user.organization
-    ).count()
-    assigned_count = Asset.undeleted_objects.filter(
-        organization=request.user.organization, is_assigned=True
-    ).count()
+    active_count = asset_list.count()
+    assigned_count = asset_list.filter(is_assigned=True).count()
 
     context = {
         "product_category_list": product_category_list,
@@ -645,7 +640,11 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
 
-    page_object = list(Asset.undeleted_objects.filter(q).order_by("-created_at")[:10])
+    # Scope to assigned assets unless user has all_asset
+    if not request.user.has_perm("assets.all_asset"):
+        q &= Q(assignasset__user=request.user)
+
+    page_object = list(Asset.undeleted_objects.filter(q).distinct().order_by("-created_at")[:10])
 
     asset_ids = [obj.id for obj in page_object]
     image_object = AssetImage.objects.filter(

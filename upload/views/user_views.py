@@ -19,7 +19,7 @@ from users.signals import notify_user_changes
 
 
 @login_required
-@permission_required("authentication.add_user")
+@permission_required("upload.view_upload")
 def user_list(request):
     page_object, stats = get_user_upload_list(request)
     context = {
@@ -45,7 +45,7 @@ def search_user_upload(request, page):
 
 
 @login_required
-@permission_required("authentication.add_user")
+@permission_required("upload.view_upload")
 def export_users_csv(request):
     header_list = [
         "Employee ID",
@@ -68,7 +68,7 @@ def export_users_csv(request):
 
 
 @login_required
-@permission_required("authentication.add_user")
+@permission_required("upload.view_upload")
 def import_user_csv(request):
     if request.method == "POST":
         file = request.FILES.get("file")
@@ -105,7 +105,7 @@ def import_user_csv(request):
         )
     
 @login_required
-@permission_required("authentication.add_user")
+@permission_required("upload.view_upload")
 @transaction.atomic
 def user_render_to_mapper_model(request):
     if request.method == "POST":

@@ -15,7 +15,7 @@ ORPHANS = 1
 
 
 @login_required
-@permission_required("authentication.view_asset_status")
+@permission_required("assets.view_asset_status")
 def asset_status_list(request):
     page_number = request.GET.get("page", 1)
     page_object, asset_status_asset_count, stats = get_asset_status_list_utils(
@@ -40,7 +40,7 @@ def asset_status_list(request):
 
 
 @login_required
-@permission_required("authentication.add_asset_status")
+@permission_required("assets.add_asset_status")
 def add_asset_status(request):
     form = AssetStatusForm(request.POST or None, request.user.organization)
 
@@ -65,7 +65,7 @@ def add_asset_status(request):
 
 
 @login_required
-@permission_required("authentication.asset_status_details")
+@permission_required("assets.view_asset_status")
 def asset_status_details(request, id):
     asset_status = get_object_or_404(AssetStatus.undeleted_objects, pk=id)
 
@@ -85,7 +85,7 @@ def asset_status_details(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_asset_status")
+@permission_required("assets.edit_asset_status")
 def edit_asset_status(request, id):
     asset_status = get_object_or_404(
         AssetStatus.undeleted_objects, pk=id, organization=request.user.organization
@@ -128,7 +128,7 @@ def asset_status_search(request, page):
 
 
 @login_required
-@permission_required("authentication.delete_asset_status")
+@permission_required("assets.delete_asset_status")
 def delete_asset_status(request, id):
     if request.method == "POST":
         product_category = get_object_or_404(

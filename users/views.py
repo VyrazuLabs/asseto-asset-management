@@ -333,6 +333,7 @@ def update(request, id):
         "form": form,
         "address_form": address_form,
         "is_technician": is_technician,
+        "has_usable_password": user.has_usable_password(),
         "cf_definitions": cf_definitions,
         "cf_values": cf_values,
         "cf_errors": [],
