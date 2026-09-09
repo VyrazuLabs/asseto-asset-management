@@ -307,64 +307,6 @@ def create_asset_list(request, assets_qs):
     )
     active_count = asset_list.count()
     assigned_count = asset_list.filter(is_assigned=True).count()
-    get_assigned_asset_list = (
-        AssignAsset.objects.select_related("user")
-        .filter(
-            Q(asset__in=asset_list) & Q(asset__organization=None)
-            | Q(asset__organization=request.user.organization)
-        )
-        .order_by("-assigned_date")
-    )
-    asset_user_map = {}
-    for assign in get_assigned_asset_list:
-        if assign.asset_id not in asset_user_map:
-            asset_user_map[assign.asset_id] = None
-        if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id] = {
-                "full_name": dynamic_display_name(
-                    request, fullname=assign.user.full_name
-                ),
-                "image": assign.user.profile_pic,
-            }
-    paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
-    if assets_qs.exists():
-        paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get("page")
-    page_object = paginator.get_page(page_number)
-    asset_form = AssetForm(organization=request.user.organization)
-    assign_asset_form = AssignedAssetForm(organization=request.user.organization)
-    reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
-    active_users = User.objects.filter(
-        is_active=True, organization=request.user.organization
-    )
-    # Gather the first image per asset in the current page
-    asset_ids_in_page = [asset.id for asset in page_object]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by(
-        "-uploaded_at"
-    )
-    is_demo = os.environ.get("IS_DEMO")
-    if is_demo:
-        is_demo = True
-    else:
-        is_demo = False
-    # Map asset ID to its first image
-    asset_images = {}
-    for img in images_qs:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
-    # Stats for summary cards
-    total_value = (
-        Asset.undeleted_objects.filter(
-            organization=request.user.organization
-        ).aggregate(total=Sum("price"))["total"]
-        or 0
-    )
-    active_count = Asset.undeleted_objects.filter(
-        organization=request.user.organization
-    ).count()
-    assigned_count = Asset.undeleted_objects.filter(
-        organization=request.user.organization, is_assigned=True
-    ).count()
 
     context = {
         "product_category_list": product_category_list,
