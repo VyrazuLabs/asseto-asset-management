@@ -78,10 +78,18 @@ def index(request):
         .exclude(Q(warranty_expiry_date__lt=today) | Q(warranty_expiry_date=None))
         .order_by("warranty_expiry_date")
     )
+    if not request.user.has_perm("assets.all_asset"):
+        expiring_assets = expiring_assets.filter(
+            assignasset__user=request.user
+        ).distinct()
 
     all_asset_list = Asset.undeleted_objects.filter(
         Q(organization=None) | Q(organization=request.user.organization)
     )
+    if not request.user.has_perm("assets.all_asset"):
+        all_asset_list = all_asset_list.filter(
+            assignasset__user=request.user
+        ).distinct()
     asset_count = all_asset_list.count()
 
     for asset in all_asset_list:
@@ -129,6 +137,8 @@ def index(request):
         Q(asset__organization=None)
         | Q(asset__organization=request.user.organization, asset__is_assigned=True)
     )
+    if not request.user.has_perm("assets.all_asset"):
+        assign_assets = assign_assets.filter(user=request.user)
     assign_assets_counts = assign_assets.count()
 
     unassign_assets_count = asset_count - assign_assets_counts

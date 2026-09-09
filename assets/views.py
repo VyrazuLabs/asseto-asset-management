@@ -271,6 +271,7 @@ def change_status(request, id):
 
 
 @login_required
+@permission_required("assets.delete_assign_asset")
 def delete_assign_asset_list(request, id):
     if request.method == "POST":
         unassign_asset_from_list(id, request.user.organization)
@@ -387,6 +388,7 @@ def assign_assets(request, id):
 
 
 @login_required
+@permission_required("assets.add_assign_asset")
 @transaction.atomic
 def assign_asset_in_asset_list(request, id):
     asset = get_object_or_404(Asset, pk=id, organization=request.user.organization)

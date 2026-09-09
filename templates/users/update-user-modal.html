@@ -127,7 +127,7 @@
                 <div class="col-md-12">
 
                     <div class="form-check form-switch mb-0">
-                        <input type="checkbox" class="form-check-input" id="toggle_password" name="toggle_password">
+                        <input type="checkbox" class="form-check-input" id="toggle_password" name="toggle_password" {% if has_usable_password %}checked{% endif %}>
                         <label class="form-check-label fw-bold" for="toggle_password">{{ trans.enable_user_login }}</label>
                     </div>
                     <div class="form-check form-switch mt-2">

@@ -11,14 +11,18 @@
         <td>{{products.name}}</td>
         <td>
             <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+                {% if perms.recycle_bin.restore_recycle_bin %}
                 <form action="{% url 'recycle_bin:deleted_product_types_restore' products.id %}" method="post" onsubmit="return confirm('{{ trans.restore_confirm }}')">
                     {% csrf_token %}
                     <button type="submit" value="Delete" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat"></i></button>
                 </form>
+                {% endif %}
+                {% if perms.recycle_bin.delete_recycle_bin %}
                 <form action="{% url 'recycle_bin:deleted_product_types_permanently' products.id %}" method="post" onsubmit="return confirm('{{ trans.delete_permanently_confirm }}')">
                     {% csrf_token %}
                     <button type="submit" value="Delete" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i></button>
                 </form>
+                {% endif %}
             </div>
         </td>
     </tr>

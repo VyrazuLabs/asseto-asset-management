@@ -50,6 +50,8 @@ def global_search(request):
         (Q(organization=request.user.organization) | Q(organization=None))
         & (Q(tag__icontains=search_text) | Q(name__icontains=search_text))
     ).order_by("-created_at")[:10]
+    if not request.user.has_perm("assets.all_asset"):
+        assets = assets.filter(assignasset__user=request.user).distinct()
 
     if request.user.is_superuser:
         try:

@@ -165,6 +165,10 @@ class AssetList(APIView):
                 .filter(organization=request.user.organization)
                 .order_by("-created_at")
             )
+            if not request.user.has_perm("assets.all_asset"):
+                asset_queryset = asset_queryset.filter(
+                    assignasset__user=request.user
+                ).distinct()
             data = convert_to_list(request, asset_queryset)
             page = int(request.GET.get("page"))
             paginated_data = add_pagination(data, page=page)
@@ -334,6 +338,10 @@ class SearchAsset(APIView):
                 | Q(location__office_name__icontains=search_text)
                 | Q(product__product_type__name__icontains=search_text),
             ).order_by("-created_at")
+            if not request.user.has_perm("assets.all_asset"):
+                get_asset_queryset = get_asset_queryset.filter(
+                    assignasset__user=request.user
+                ).distinct()
             if get_asset_queryset:
                 data = convert_to_list(request, get_asset_queryset)
                 return api_response(data=data, message="Asset found")

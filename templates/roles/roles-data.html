@@ -52,7 +52,7 @@
     <td>
         <div class="row-actions">
 
-            {% if perms.authentication.change_role %}
+            {% if perms.roles.change_role %}
             <button class="action-btn" hx-get="{% url 'roles:update' role.name %}"
                 hx-target="#update-role-modal-content" data-bs-toggle="modal"
                 data-bs-target="#update-role-modal">
@@ -60,7 +60,7 @@
             </button>
             {% endif %}
 
-            {% if perms.authentication.delete_role %}
+            {% if perms.roles.delete_role %}
             <form method="post" action="{% url 'roles:delete' role.name %}"
                 class="form-row-action"
                    onsubmit="return confirm('{{ trans.delete_confirm_role }}')">

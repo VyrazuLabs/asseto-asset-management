@@ -160,42 +160,42 @@
                 </li>
                 {% endif %}
 
-                {% if perms.dashboard.add_location or perms.dashboard.add_department or perms.dashboard.add_product_type or perms.dashboard.add_product_category or perms.roles.view_role %}
+                {% if perms.dashboard.view_location or perms.dashboard.view_department or perms.dashboard.view_product_type or perms.dashboard.view_product_category or perms.dashboard.view_license_type or perms.assets.view_asset_status or perms.roles.view_role %}
                 <li class="sidebar-item has-sub {% if sidebar == 'admin' %}active{% endif %}">
                     <a href="javascript:void(0)" class="sidebar-link">
                         <i class="bi bi-person-fill"></i>
                         <span>{{ trans.admin }}</span>
                     </a>
                     <ul class="submenu {% if sidebar == 'admin' %}active{% endif %}">
-                        {% if perms.dashboard.add_location or perms.dashboard.edit_location or perms.dashboard.delete_location or perms.dashboard.view_location %}
+                        {% if perms.dashboard.view_location %}
                             <li class="submenu-item {% if submenu == 'location' %}active{% endif %}">
                                 <a href="{% url 'dashboard:locations' %}">{{ trans.locations }}</a>
                             </li>
                         {% endif %}
-                        {% if perms.dashboard.add_department or perms.dashboard.delete_department or perms.dashboard.edit_department %}
+                        {% if perms.dashboard.view_department %}
                             <li class="submenu-item {% if submenu == 'department' %}active{% endif %}">
                                 <a href="{% url 'dashboard:departments' %}">{{ trans.departments }}</a>
                             </li>
                         {% endif %}
-                        {% if perms.dashboard.add_product_type or perms.dashboard.edit_product_type or perms.dashboard.edit_product_type %}
+                        {% if perms.dashboard.view_product_type %}
                             <li class="submenu-item {% if submenu == 'product_type' %}active{% endif %}">
                                 <a href="{% url 'dashboard:product_type_list' %}">{{ trans.product_types }}</a>
                             </li>
                         {% endif %}
 
-                        {% if perms.authentication.add_license_type or perms.authentication.edit_license_type %}
+                        {% if perms.dashboard.view_license_type %}
                             <li class="submenu-item {% if submenu == 'license_type' %}active{% endif %}">
                                 <a href="{% url 'dashboard:license_type_list' %}">{{ trans.license_types }}</a>
                             </li>
                         {% endif %}
 
-                        {% if perms.dashboard.delete_product_category or perms.dashboard.add_product_category or perms.dashboard.edit_product_category %}
+                        {% if perms.dashboard.view_product_category %}
                             <li class="submenu-item {% if submenu == 'product_category' %}active{% endif %}">
                                 <a href="{% url 'dashboard:product_category_list' %}">{{ trans.product_categories }}</a>
                             </li>
                         {% endif %}
 
-                        {% if perms.dashboard.delete_product_category or perms.dashboard.add_product_category or perms.dashboard.edit_product_category %}
+                        {% if perms.assets.view_asset_status %}
                             <li class="submenu-item {% if submenu == 'Asset_Status' %}active{% endif %}">
                                 <a href="{% url 'assets:asset_status_list' %}">{{ trans.asset_status }}</a>
                             </li>
@@ -234,51 +234,38 @@
                         </ul>
                     </li>
                 {% endif %}
-                {% if perms.vendors.add_vendor or perms.dashboard.add_location or perms.dashboard.add_department or perms.dashboard.add_product_type or perms.dashboard.add_product_category %}
+                {% if perms.upload.view_upload %}
                     <li class="sidebar-item has-sub {% if sidebar == 'upload' %}active{% endif %}">
                         <a href="javascript:void(0)" class="sidebar-link">
                             <i class="bi bi-hdd-fill"></i>
                             <span>{{ trans.upload }}</span>
                         </a>
                         <ul class="submenu {% if sidebar == 'upload' %}active{% endif %}">
-                            {% if perms.vendors.add_vendor %}
-                                <li class="submenu-item {% if submenu == 'vendors' %}active{% endif %}">
-                                    <a href="{% url 'upload:vendor_list' %}">{{ trans.vendors }}</a>
-                                </li>
-                            {% endif %}
-                            {% if perms.dashboard.add_location %}
-                                <li class="submenu-item {% if submenu == 'locations' %}active{% endif %}">
-                                    <a href="{% url 'upload:location_list' %}">{{ trans.locations }}</a>
-                                </li>
-                            {% endif %}
-                            {% if perms.dashboard.add_department %}
-                                <li class="submenu-item {% if submenu == 'departments' %} active {% endif %}">
-                                    <a href="{% url 'upload:department_list' %}">{{ trans.departments }}</a>
-                                </li>
-                            {% endif %}
-                            {% if perms.dashboard.add_product_type %}
-                                <li class="submenu-item {% if submenu == 'product_types' %}active{% endif %}">
-                                    <a href="{% url 'upload:product_type_list' %}">{{ trans.product_types }}</a>
-                                </li>
-                            {% endif %}
-                            {% if perms.dashboard.add_product_category %}
-                                <li class="submenu-item {% if submenu == 'product_categories' %}active{% endif %}">
-                                    <a href="{% url 'upload:product_category_list' %}">{{ trans.product_categories }}</a>
-                                </li>
-                            {% endif %}
-
-                            {% if perms.authentication.add_users %}
-                                <li class="submenu-item {% if submenu == 'users' %}active{% endif %}">
-                                    <a href="{% url 'upload:user_list' %}">{{ trans.users }}</a>
-                                </li>
-                            {% endif %}
+                            <li class="submenu-item {% if submenu == 'vendors' %}active{% endif %}">
+                                <a href="{% url 'upload:vendor_list' %}">{{ trans.vendors }}</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'locations' %}active{% endif %}">
+                                <a href="{% url 'upload:location_list' %}">{{ trans.locations }}</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'departments' %} active {% endif %}">
+                                <a href="{% url 'upload:department_list' %}">{{ trans.departments }}</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'product_types' %}active{% endif %}">
+                                <a href="{% url 'upload:product_type_list' %}">{{ trans.product_types }}</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'product_categories' %}active{% endif %}">
+                                <a href="{% url 'upload:product_category_list' %}">{{ trans.product_categories }}</a>
+                            </li>
+                            <li class="submenu-item {% if submenu == 'users' %}active{% endif %}">
+                                <a href="{% url 'upload:user_list' %}">{{ trans.users }}</a>
+                            </li>
                             <li class="submenu-item {% if submenu == 'bulk_import' %}active{% endif %}">
                                 <a href="{% url 'upload:bulk_import_step1' %}">Assets</a>
                             </li>
                         </ul>
                     </li>
                 {% endif %}
-                {% if perms.configurations.view_configuration %}
+                {% if perms.configurations.view_extensions %}
                     <li class="sidebar-item {% if sidebar == 'extensions' %}active{% endif %}">
                         <a href="{% url 'configurations:list_extensions' %}" class="sidebar-link">
                             <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-circuit-battery"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M2 12h4" /><path d="M18 12h4" /><path d="M18 5v14" /><path d="M14 9v6" /><path d="M10 5v14" /><path d="M6 9v6" /></svg></i>

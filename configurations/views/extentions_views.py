@@ -9,7 +9,7 @@ from configurations.utils import hide_last_digits
 
 
 @login_required
-@permission_required("configurations.view_configuration", raise_exception=True)
+@permission_required("configurations.view_extensions", raise_exception=True)
 def integration(request):
     if request.method == "POST":
         integration_type = request.POST.get("integration_type")
@@ -51,7 +51,7 @@ def integration(request):
 
 
 @login_required
-@permission_required("configurations.view_configuration", raise_exception=True)
+@permission_required("configurations.view_extensions", raise_exception=True)
 def list_extensions(request):
     # integration_choices=INTEGRATION_CHOICES
     for choice_id, (entity_name, description) in INTEGRATION_CHOICES:
