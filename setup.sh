@@ -44,7 +44,7 @@ if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
         echo -e "${RED}Error: Package manager not recognized. Please install python3.11 manually.${NC}"
         exit 1
     fi
-
+SERVER_NAME
     # Re-verify installation
     if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
         echo -e "${RED}Error: Failed to install Python. Please install python3.11 manually.${NC}"

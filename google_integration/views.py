@@ -31,6 +31,7 @@ def connect_google(request):
 @login_required
 @user_passes_test(_is_superuser)
 def google_oauth_callback(request):
+
     """Handle Google's OAuth redirect: verify state, provision, persist.
 
     Rejects on missing/mismatched `state` before any network call — the
@@ -67,7 +68,9 @@ def google_oauth_callback(request):
         config.save()
 
     reset_cached_app()
-    messages.success(request, "Google Cloud connected — Firebase push notifications are now active.")
+    messages.success(
+        request, "Google Cloud connected — Firebase push notifications are now active."
+    )
     return redirect(reverse("configurations:list_extensions"))
 
 
@@ -91,7 +94,9 @@ def firebase_messaging_sw(request):
                 "appId": config.web_app_id if config else "",
             }
         ),
-        "vapid_key_json": json.dumps(config.web_vapid_key if config and config.web_vapid_key else ""),
+        "vapid_key_json": json.dumps(
+            config.web_vapid_key if config and config.web_vapid_key else ""
+        ),
     }
     return render(
         request,

@@ -7,6 +7,11 @@ import time
 from google.auth.transport.requests import AuthorizedSession
 from google.oauth2.credentials import Credentials
 
+from google_integration.models import GoogleCloudFirebaseConfig
+
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
 from .oauth import SCOPES
 
 logger = logging.getLogger(__name__)
@@ -30,22 +35,39 @@ class ProvisioningError(Exception):
 def _authed_session(token_response: dict) -> AuthorizedSession:
     """Build a Google API session from an OAuth token-exchange response."""
     credentials = Credentials(token=token_response["access_token"], scopes=SCOPES)
-    return AuthorizedSession(credentials)
+    session = AuthorizedSession(credentials)
+    retries = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[500, 502, 503, 504],
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
 
 
 def _generate_project_id() -> str:
     """Generate a globally-unique-enough GCP project ID (6-30 chars, lowercase)."""
-    suffix = "".join(secrets.choice(string.digits + "abcdefghijklmnopqrstuvwxyz") for _ in range(8))
+    suffix = "".join(
+        secrets.choice(string.digits + "abcdefghijklmnopqrstuvwxyz") for _ in range(8)
+    )
     return f"asseto-{suffix}"
 
 
-def _poll_operation(session: AuthorizedSession, operation_name: str) -> dict:
+def _poll_operation(
+    session: AuthorizedSession,
+    operation_name: str,
+    base_url: str = FIREBASE_BASE,
+) -> dict:
     """Poll a Google API long-running Operation until it reports `done`.
 
     Args:
         session: authorized session to use for the poll requests.
         operation_name: the `name` field of the Operation resource
             (e.g. "operations/abc123" or "projects/.../operations/abc123").
+        base_url: base API service endpoint for the operation (defaults to FIREBASE_BASE).
 
     Returns:
         The final Operation resource body.
@@ -54,15 +76,28 @@ def _poll_operation(session: AuthorizedSession, operation_name: str) -> dict:
         ProvisioningError: If the operation fails or doesn't complete within
             `OPERATION_POLL_TIMEOUT_SECONDS`.
     """
+    if not operation_name or operation_name == "DONE_OPERATION" or operation_name.endswith("/DONE_OPERATION"):
+        return {"done": True}
+
     deadline = time.monotonic() + OPERATION_POLL_TIMEOUT_SECONDS
-    url = f"{CLOUD_RESOURCE_MANAGER_BASE}/{operation_name}"
+    if operation_name.startswith("http://") or operation_name.startswith("https://"):
+        url = operation_name
+    else:
+        url = f"{base_url.rstrip('/')}/{operation_name.lstrip('/')}"
+
     while time.monotonic() < deadline:
         resp = session.get(url, timeout=30)
+        if not resp.ok:
+            print("STATUS:", resp.status_code)
+            print("RESPONSE:", resp.text)
+
         resp.raise_for_status()
         body = resp.json()
         if body.get("done"):
             if "error" in body:
-                raise ProvisioningError(f"Operation {operation_name} failed: {body['error']}")
+                raise ProvisioningError(
+                    f"Operation {operation_name} failed: {body['error']}"
+                )
             return body
         time.sleep(OPERATION_POLL_INTERVAL_SECONDS)
     raise ProvisioningError(f"Operation {operation_name} did not complete in time")
@@ -78,24 +113,52 @@ def create_gcp_project(session: AuthorizedSession, display_name: str) -> str:
     Returns:
         The created project's `projectId`.
     """
+
+    project = GoogleCloudFirebaseConfig.objects.filter(id=1).first()
+
+    if project is not None and project.gcp_project_id:
+        return project.gcp_project_id
+
     project_id = _generate_project_id()
     resp = session.post(
         f"{CLOUD_RESOURCE_MANAGER_BASE}/projects",
         json={"projectId": project_id, "displayName": display_name},
         timeout=30,
     )
+    if not resp.ok:
+        print("STATUS:", resp.status_code)
+        print("RESPONSE:", resp.text)
+
     resp.raise_for_status()
-    _poll_operation(session, resp.json()["name"])
+    json_object = resp.json()
+    if not json_object.get("done") and "name" in json_object:
+        _poll_operation(session, json_object["name"], base_url=CLOUD_RESOURCE_MANAGER_BASE)
+
     return project_id
 
 
-def enable_firebase_api(session: AuthorizedSession, project_id: str) -> None:
-    """Enable the Firebase Management API on the project (required before addFirebase)."""
-    resp = session.post(
-        f"{SERVICE_USAGE_BASE}/projects/{project_id}/services/firebase.googleapis.com:enable",
-        timeout=30,
-    )
-    resp.raise_for_status()
+def enable_required_apis(session: AuthorizedSession, project_id: str) -> None:
+    """Enable required GCP APIs on the project (Firebase Management and IAM APIs)."""
+    services = ["firebase.googleapis.com", "iam.googleapis.com"]
+    for service in services:
+        resp = session.post(
+            f"{SERVICE_USAGE_BASE}/projects/{project_id}/services/{service}:enable",
+            timeout=30,
+        )
+        if resp.status_code == 409:
+            continue
+        if not resp.ok:
+            print(f"ServiceUsage enable {service} status:", resp.status_code)
+            print(f"ServiceUsage enable {service} response:", resp.text)
+        resp.raise_for_status()
+        body = resp.json()
+        if not body.get("done") and "name" in body:
+            _poll_operation(session, body["name"], base_url=SERVICE_USAGE_BASE)
+
+
+# def enable_firebase_api(session: AuthorizedSession, project_id: str) -> None:
+#     """Enable the required GCP APIs on the project (Firebase & IAM)."""
+#     enable_required_apis(session, project_id)
 
 
 def add_firebase_to_project(session: AuthorizedSession, project_id: str) -> None:
@@ -104,11 +167,22 @@ def add_firebase_to_project(session: AuthorizedSession, project_id: str) -> None
         f"{FIREBASE_BASE}/projects/{project_id}:addFirebase",
         timeout=30,
     )
+    if resp.status_code == 409:
+        logger.info("Firebase is already added to project %s", project_id)
+        return
+
+    if not resp.ok:
+        print("Firebase API status:", resp.status_code)
+        print("Firebase API response:", resp.text)
     resp.raise_for_status()
-    _poll_operation(session, resp.json()["name"])
+    body = resp.json()
+    if not body.get("done") and "name" in body:
+        _poll_operation(session, body["name"], base_url=FIREBASE_BASE)
 
 
-def create_firebase_web_app(session: AuthorizedSession, project_id: str, display_name: str) -> str:
+def create_firebase_web_app(
+    session: AuthorizedSession, project_id: str, display_name: str
+) -> str:
     """Create a Firebase Web App under the project.
 
     Returns:
@@ -119,12 +193,31 @@ def create_firebase_web_app(session: AuthorizedSession, project_id: str, display
         json={"displayName": display_name},
         timeout=30,
     )
+    if resp.status_code == 409:
+        list_resp = session.get(
+            f"{FIREBASE_BASE}/projects/{project_id}/webApps",
+            timeout=30,
+        )
+        if list_resp.ok:
+            apps = list_resp.json().get("apps", [])
+            if apps:
+                return apps[0]["appId"]
+    if not resp.ok:
+        print("Firebase API status:", resp.status_code)
+        print("Firebase API response:", resp.text)
+
     resp.raise_for_status()
-    operation = _poll_operation(session, resp.json()["name"])
+    body = resp.json()
+    if body.get("done"):
+        operation = body
+    else:
+        operation = _poll_operation(session, body.get("name", ""), base_url=FIREBASE_BASE)
     return operation["response"]["appId"]
 
 
-def get_web_app_config(session: AuthorizedSession, project_id: str, app_id: str) -> dict:
+def get_web_app_config(
+    session: AuthorizedSession, project_id: str, app_id: str
+) -> dict:
     """Fetch the Firebase web app's client config (apiKey, authDomain, etc.)."""
     resp = session.get(
         f"{FIREBASE_BASE}/projects/{project_id}/webApps/{app_id}/config",
@@ -148,18 +241,27 @@ def create_service_account(session: AuthorizedSession, project_id: str) -> str:
         },
         timeout=30,
     )
+    if resp.status_code == 409:
+        return f"{SERVICE_ACCOUNT_ID}@{project_id}.iam.gserviceaccount.com"
+    if not resp.ok:
+        print("IAM API status:", resp.status_code)
+        print("IAM API response:", resp.text)
     resp.raise_for_status()
     return resp.json()["email"]
 
 
-def grant_firebase_admin_role(session: AuthorizedSession, project_id: str, service_account_email: str) -> None:
+def grant_firebase_admin_role(
+    session: AuthorizedSession, project_id: str, service_account_email: str
+) -> None:
     """Grant the service account the Firebase Admin SDK role on the project."""
     member = f"serviceAccount:{service_account_email}"
     policy_url = f"{CLOUD_RESOURCE_MANAGER_BASE}/projects/{project_id}:getIamPolicy"
     resp = session.post(policy_url, timeout=30)
     resp.raise_for_status()
     policy = resp.json()
-    policy.setdefault("bindings", []).append({"role": FIREBASE_ADMIN_ROLE, "members": [member]})
+    policy.setdefault("bindings", []).append(
+        {"role": FIREBASE_ADMIN_ROLE, "members": [member]}
+    )
     set_resp = session.post(
         f"{CLOUD_RESOURCE_MANAGER_BASE}/projects/{project_id}:setIamPolicy",
         json={"policy": policy},
@@ -168,7 +270,9 @@ def grant_firebase_admin_role(session: AuthorizedSession, project_id: str, servi
     set_resp.raise_for_status()
 
 
-def create_service_account_key(session: AuthorizedSession, project_id: str, service_account_email: str) -> str:
+def create_service_account_key(
+    session: AuthorizedSession, project_id: str, service_account_email: str
+) -> str:
     """Generate a service account key (JSON) for the Firebase Admin service account.
 
     Returns:
@@ -204,14 +308,18 @@ def provision_firebase_project(token_response: dict, display_name: str) -> dict:
 
     try:
         project_id = create_gcp_project(session, display_name)
-        enable_firebase_api(session, project_id)
+        enable_required_apis(session, project_id)
         add_firebase_to_project(session, project_id)
         app_id = create_firebase_web_app(session, project_id, display_name)
         web_config = get_web_app_config(session, project_id, app_id)
         service_account_email = create_service_account(session, project_id)
         grant_firebase_admin_role(session, project_id, service_account_email)
-        service_account_json = create_service_account_key(session, project_id, service_account_email)
-    except Exception as exc:  # noqa: BLE001 - any API-call failure must surface as ProvisioningError
+        service_account_json = create_service_account_key(
+            session, project_id, service_account_email
+        )
+    except (
+        Exception
+    ) as exc:  # noqa: BLE001 - any API-call failure must surface as ProvisioningError
         logger.error("Firebase provisioning failed: %s", exc, exc_info=True)
         raise ProvisioningError(str(exc)) from exc
 

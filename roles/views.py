@@ -48,10 +48,16 @@ def _assign_role_permissions(role: Role, codenames: list) -> None:
             if content_type is None:
                 # Not declared in PERMISSION_MODULES — skip rather than silently
                 # gluing an unknown codename to an arbitrary ContentType.
-                logger.warning("Skipping unregistered permission codename %s for role %s", codename, role.name)
+                logger.warning(
+                    "Skipping unregistered permission codename %s for role %s",
+                    codename,
+                    role.name,
+                )
                 continue
 
-            _, action_label = display.get(codename, (None, codename.replace("_", " ").title()))
+            _, action_label = display.get(
+                codename, (None, codename.replace("_", " ").title())
+            )
             permission, _ = Permission.objects.get_or_create(
                 codename=codename,
                 content_type=content_type,

@@ -87,10 +87,26 @@ def _crud(app_label: str, model_name: str, noun: str) -> list:
 
 
 PERMISSION_MODULES: list = [
-    PermissionModule("clients", "Clients", "clients", "client", _crud("clients", "client", "client")),
-    PermissionModule("vendors", "Vendors", "vendors", "vendor", _crud("vendors", "vendor", "vendor")),
-    PermissionModule("products", "Products", "products", "product", _crud("products", "product", "product")),
-    PermissionModule("users", "Users", "authentication", "user", _crud("authentication", "user", "users")),
+    PermissionModule(
+        "clients", "Clients", "clients", "client", _crud("clients", "client", "client")
+    ),
+    PermissionModule(
+        "vendors", "Vendors", "vendors", "vendor", _crud("vendors", "vendor", "vendor")
+    ),
+    PermissionModule(
+        "products",
+        "Products",
+        "products",
+        "product",
+        _crud("products", "product", "product"),
+    ),
+    PermissionModule(
+        "users",
+        "Users",
+        "authentication",
+        "user",
+        _crud("authentication", "user", "users"),
+    ),
     PermissionModule(
         "assets",
         "Assets",
@@ -140,28 +156,46 @@ PERMISSION_MODULES: list = [
             PermissionAction("checkout", "checkout_gate_pass", "Checkout"),
         ],
     ),
-    PermissionModule("locations", "Locations", "dashboard", "location", _crud("dashboard", "location", "location")),
+    PermissionModule(
+        "locations",
+        "Locations",
+        "dashboard",
+        "location",
+        _crud("dashboard", "location", "location"),
+    ),
     PermissionModule(
         "departments",
         "Departments",
         "dashboard",
         "department",
         # No "view" checkbox in the modal for this module — see note above.
-        [a for a in _crud("dashboard", "department", "department") if a.action != "view"],
+        [
+            a
+            for a in _crud("dashboard", "department", "department")
+            if a.action != "view"
+        ],
     ),
     PermissionModule(
         "product_type",
         "Product Types",
         "dashboard",
         "producttype",
-        [a for a in _crud("dashboard", "producttype", "product_type") if a.action != "view"],
+        [
+            a
+            for a in _crud("dashboard", "producttype", "product_type")
+            if a.action != "view"
+        ],
     ),
     PermissionModule(
         "product_category",
         "Product Categories",
         "dashboard",
         "productcategory",
-        [a for a in _crud("dashboard", "productcategory", "product_category") if a.action != "view"],
+        [
+            a
+            for a in _crud("dashboard", "productcategory", "product_category")
+            if a.action != "view"
+        ],
     ),
     PermissionModule(
         "support_ticket",
@@ -181,8 +215,16 @@ PERMISSION_MODULES: list = [
     # all (no models, no gated views) — dropped from the registry rather
     # than inventing a new Django app mid-refactor. Re-add once a real
     # extensions app exists to gate.
-    PermissionModule("upload", "Upload", "upload", "upload", _crud("upload", "upload", "upload")),
-    PermissionModule("license", "License", "license", "license", _crud("license", "license", "license")),
+    PermissionModule(
+        "upload", "Upload", "upload", "upload", _crud("upload", "upload", "upload")
+    ),
+    PermissionModule(
+        "license",
+        "License",
+        "license",
+        "license",
+        _crud("license", "license", "license"),
+    ),
     # New modules — decisions #1/#2 of the RBAC overhaul plan.
     PermissionModule(
         "roles",
@@ -213,9 +255,15 @@ PERMISSION_MODULES: list = [
             PermissionAction("delete", "delete_recycle_bin", "Permanently Delete"),
         ],
     ),
-    PermissionModule("audit", "Audit", "audit", "audit", _crud("audit", "audit", "audit")),
     PermissionModule(
-        "notifications", "Notifications", "notifications", "notification", _crud("notifications", "notification", "notification")
+        "audit", "Audit", "audit", "audit", _crud("audit", "audit", "audit")
+    ),
+    PermissionModule(
+        "notifications",
+        "Notifications",
+        "notifications",
+        "notification",
+        _crud("notifications", "notification", "notification"),
     ),
     PermissionModule(
         "custom_fields",
@@ -331,7 +379,11 @@ def codename_to_app_label() -> dict:
     Returns:
         dict[str, str]: Codename to owning app_label.
     """
-    return {action.codename: module.app_label for module in PERMISSION_MODULES for action in module.actions}
+    return {
+        action.codename: module.app_label
+        for module in PERMISSION_MODULES
+        for action in module.actions
+    }
 
 
 def has_any_permission(user, *codenames: str) -> bool:

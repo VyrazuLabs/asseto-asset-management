@@ -130,7 +130,7 @@
 
                     <div class="p-3">
                         {% if firebase_config.is_connected %}
-                        <span class="badge bg-success">Connected ✓ (project: {{ firebase_config.gcp_project_id }})</span>
+                        <span class="badge bg-success">Connected (project: {{ firebase_config.gcp_project_id }})</span>
                         <a class="btn btn-sm btn-outline-secondary ms-2" href="{% url 'google_integration:connect_google' %}">Reconnect</a>
                         {% else %}
                         <a class="btn btn-sm btn-primary" href="{% url 'google_integration:connect_google' %}">Connect</a>
