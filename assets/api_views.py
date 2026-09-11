@@ -41,6 +41,8 @@ from common.pagination import add_pagination
 
 from notifications.models import UserNotification
 
+from .services import unassign_asset_from_list
+
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 # def get_push_notification(request):
@@ -453,8 +455,9 @@ class UnAssignAsset(APIView):
 
     def post(self, request, id):
         get_asset = get_object_or_404(Asset, pk=id)
-        get_asset.is_assigned = False
-        get_asset.save()
+        unassign_asset_from_list(
+            asset_id=get_asset.id, organization=request.user.organization
+        )
         return api_response(status=200, message="asset unassigned successfully")
 
 
