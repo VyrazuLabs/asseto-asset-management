@@ -1,71 +1,61 @@
-# Release Notes — v1.7.0
+# Release Notes — v1.8.0
 
-**Tag**: `v1.7.0`  
+**Tag**: `v1.8.0`  
 **Target Branch**: `main`  
-**Date**: September 5, 2026  
-**Title**: `v1.7.0 — Granular RBAC Permissions Architecture, User Security Updates & Dependency Fixes`
+**Date**: September 13, 2026  
+**Title**: `v1.8.0 — Granular RBAC Permissions Enforcement, Asset Assignment Fixes & Security Hardening`
 
 ---
 
 ## 🚀 Overview
 
-Asseto **v1.7.0** introduces a centralized **Granular RBAC Permission Architecture**, enhanced user management security controls (including in-modal password resets), clean role-switching transitions, and critical dependency security patches for `sqlparse`, `pypdf`, and `djangorestframework`.
+Asseto **v1.8.0** delivers platform-wide RBAC permission enforcement across Admin, Configurations, Upload, and Recycle Bin modules, resolves asset assignment status inconsistencies in the REST API (ASM-34), secures Firebase messaging service worker secrets (V-001), and introduces automated secret scanning via Gitleaks.
 
 ---
 
 ## ✨ Added
 
-* **Granular RBAC Permissions Architecture** — Introduced `common/permissions.py` as the centralized single source of truth for all role modules and permissions across the platform, eliminating hardcoded and scattered permission strings.
-* **Role Editor Permission Matrix** — Implemented an interactive role add/edit modal that automatically enforces and locks prerequisite view permissions whenever add, edit, or delete actions are toggled.
-* **Role Listing Enhancements** — Redesigned the roles listing page with per-module granted/denied icon rows (`static/css/pages/roles-list.css` and `role_permission_tags`), replacing legacy flat action badges for clear visual auditing.
-* **Permission Sync & Verification Commands** — Added custom Django management commands `sync_permissions` and `verify_permission_migration` for automated role permission synchronization and migration verification.
-* **Direct Password Reset in User Modal** — Added an optional toggle to set or update user passwords directly from the update user modal with password confirmation validation.
+* **Automated Secret Scanning** — Added Gitleaks (`v8.18.4`) hook to pre-commit configuration (`.pre-commit-config.yaml`) to prevent sensitive credentials and tokens from entering version control.
+* **Granular UI Permission Gates for Recycle Bin** — Added role permission guards (`has_role_permission`) across all Recycle Bin templates (`deleted-Product-Category`, `deleted-Product-types`, `deleted-asset-status`, `deleted-assets`, `deleted-clients`, `deleted-department`, `deleted-license-type`, `deleted-location`, `deleted-products`, `deleted-users`, `deleted-vendors`) and partial tables to conditionally restrict restore and permanent delete actions based on user permissions.
+* **Role Permission Guards in Navigation & Assets** — Enforced role-based access checks across sidebar navigation items (`templates/commons/sidebar.html`), asset listings, filter-out assets views, and user edit modals.
 
 ---
 
 ## 🔄 Changed
 
-* **Permission Scoping for Assets & Support Tickets** — Replaced global access level checks with granular, permission-based scoping across assets and support tickets.
-* **Namespaced Permission Checks** — Migrated legacy permission checks from the `authentication` app namespace to domain-specific feature namespaces (`assets`, `clients`, `vendors`, `products`, `dashboard`, `configurations`).
-* **Cleaned Obsolete Onboarding Templates** — Removed deprecated progression bar and first-time installation templates to keep the UI clean and maintainable.
+* **Permission Registry & Role Modals Refactoring** — Refined permission structures and constants in `common/permissions.py`. Redesigned and updated role create and edit modals (`templates/roles/add-role-modal.html`, `templates/roles/update-role-modal.html`) to dynamically handle category grouping and enforce view permission dependencies when modifying permissions.
+* **Upload & Configuration Backend Permission Scoping** — Updated permission decorators and view-level authorization across CSV upload views (`department_views`, `location_views`, `product_category_views`, `product_type_views`, `user_views`, `vendor_views`), extensions configuration views, global search, and license type management.
+* **Code Cleanup** — Removed dead and duplicate helper functions from `assets/utils.py` to streamline codebase maintainability.
 
 ---
 
 ## 🐛 Fixed
 
-* **Role Assignment & Group Clearing** — Fixed a role switching bug in the user edit flow where previously assigned role groups persisted, ensuring a clean transition between roles without accumulating legacy permissions.
-* **User Detail & Modal Form Labels** — Corrected form field labels and layout consistency across the user listing, add modal, and update modal views.
-* **Atomic Permission Updates** — Wrapped role permission updates within atomic database transactions to guarantee integrity and prevent partial state on error.
+* **Asset Assignment Status Consistency (ASM-34)** — Fixed `UnAssignAsset` API view in `assets/api_views.py` to follow the standard unassignment routine (updating asset status, clearing assigned attributes, and recording unassignment history), matching the Asset List UI flow.
+* **Role Edit Modals & Script Handlers** — Fixed permission checkbox bindings and dynamic select behaviors in role update and creation modals.
 
 ---
 
 ## 🛡️ Security Updates
 
-* **sqlparse (`0.5.5 → 0.6.0`)** — Patched 5 HIGH/MODERATE security vulnerabilities including CPU DoS via `TokenList.__init__` (CVE-2026-54284), quadratic DoS in `group_comments`, and ReDoS in dollar-quoted SQL literals.
-* **pypdf (`6.15.0 → 6.16.2`)** — Patched infinite loop in `TreeObject.insert_child` (CVE-2026-84309), outline traversal resource exhaustion (CVE-2026-84310), and exponential XForm text extraction memory usage (CVE-2026-84311).
-* **djangorestframework (`3.16.1 → 3.17.2`)** — Enforced `DATA_UPLOAD_MAX_MEMORY_SIZE` limits during request parsing to mitigate payload DoS (CVE-2026-73228) and resolved GET-protected data disclosure in `AdminRenderer` (CVE-2026-73229).
+* **Firebase Messaging Service Worker Hardcoded Secrets (V-001)** — Resolved vulnerability in `static/firebase-messaging-sw.js` by removing hardcoded Firebase API credentials and dynamically reading configuration parameters passed securely via service worker registration URL search parameters.
+* **Pre-commit Secret Detection** — Enabled Gitleaks scanner to identify and block potential secret leakage before commit.
 
 ---
 
 ## 🗄️ Database Migrations & Commands
 
-This release introduces the following database migrations:
-* `configurations`: `0010_configurationpermission`
-* `recycle_bin`: `0001_initial`
-* `roles`: `0005_grandfather_gate_pass_audit_configurations`
+No new database migrations are introduced in this release.
 
 ### Post-Deployment Execution:
 ```bash
-# 1. Run migrations
+# 1. (Optional) Run migrations to verify database state
 python manage.py migrate
 
 # 2. Sync permissions across all roles and system groups
 python manage.py sync_permissions
-
-# 3. (Optional) Verify permission migration integrity
-python manage.py verify_permission_migration
 ```
 
 ---
 
-**Full Changelog**: https://github.com/VyrazuLabs/asseto-asset-management/compare/v1.6.7...v1.7.0
+**Full Changelog**: https://github.com/VyrazuLabs/asseto-asset-management/compare/v1.7.0...v1.8.0
