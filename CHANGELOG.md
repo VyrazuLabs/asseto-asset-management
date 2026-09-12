@@ -12,6 +12,27 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [v1.8.0] — 2026-09-13
+
+### Added
+- **Automated Secret Scanning** — Added Gitleaks hook (`v8.18.4`) to pre-commit configuration (`.pre-commit-config.yaml`) for automated secret and credential leak prevention.
+- **Granular Recycle Bin Permission Controls** — Added role permission guards (`has_role_permission`) across all Recycle Bin templates and table partials to conditionally restrict restore and permanent delete actions.
+- **Navigation & Asset Permission Guards** — Enforced role-based access control across sidebar navigation items (`templates/commons/sidebar.html`), asset list and filter views, and user edit modals.
+
+### Changed
+- **Permission Registry & Role Modals Refactor** — Updated permission definitions and mappings in `common/permissions.py` and overhauled role add/edit modals (`templates/roles/add-role-modal.html`, `templates/roles/update-role-modal.html`) with improved category layouts, checkboxes, and prerequisite view locking.
+- **Backend View Authorization** — Enforced role permissions across upload views (departments, locations, product categories, product types, users, vendors), configuration views, and license types.
+- **Asset Utility Cleanup** — Removed redundant and duplicate helper code from `assets/utils.py`.
+
+### Fixed
+- **Asset Assignment Status Consistency (ASM-34)** — Fixed `UnAssignAsset` REST API endpoint in `assets/api_views.py` to follow the standard unassignment workflow consistent with the web interface.
+- **Role Modal Permission Bindings** — Resolved script handling and checkbox binding issues in role creation and update modals.
+
+### Security
+- **Firebase Messaging Service Worker (V-001)** — Removed hardcoded Firebase credentials from `static/firebase-messaging-sw.js`, migrating to secure dynamic registration query parameter initialization.
+
+---
+
 ## [v1.7.0] — 2026-09-05
 
 ### Added

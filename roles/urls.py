@@ -4,7 +4,7 @@ from .views import *
 app_name = "roles"
 
 urlpatterns = [
-    path("list", list, name="list"),
+    path("list", roles_list, name="list"),
     path("add", add, name="add"),
     path("update/<str:name>", update, name="update"),
     path("delete/<str:name>", delete, name="delete"),

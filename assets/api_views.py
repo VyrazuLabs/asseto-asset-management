@@ -41,6 +41,8 @@ from common.pagination import add_pagination
 
 from notifications.models import UserNotification
 
+from .services import unassign_asset_from_list
+
 # @api_view(['GET'])
 # @permission_classes([IsAuthenticated])
 # def get_push_notification(request):
@@ -165,6 +167,10 @@ class AssetList(APIView):
                 .filter(organization=request.user.organization)
                 .order_by("-created_at")
             )
+            if not request.user.has_perm("assets.all_asset"):
+                asset_queryset = asset_queryset.filter(
+                    assignasset__user=request.user
+                ).distinct()
             data = convert_to_list(request, asset_queryset)
             page = int(request.GET.get("page"))
             paginated_data = add_pagination(data, page=page)
@@ -334,6 +340,10 @@ class SearchAsset(APIView):
                 | Q(location__office_name__icontains=search_text)
                 | Q(product__product_type__name__icontains=search_text),
             ).order_by("-created_at")
+            if not request.user.has_perm("assets.all_asset"):
+                get_asset_queryset = get_asset_queryset.filter(
+                    assignasset__user=request.user
+                ).distinct()
             if get_asset_queryset:
                 data = convert_to_list(request, get_asset_queryset)
                 return api_response(data=data, message="Asset found")
@@ -445,8 +455,9 @@ class UnAssignAsset(APIView):
 
     def post(self, request, id):
         get_asset = get_object_or_404(Asset, pk=id)
-        get_asset.is_assigned = False
-        get_asset.save()
+        unassign_asset_from_list(
+            asset_id=get_asset.id, organization=request.user.organization
+        )
         return api_response(status=200, message="asset unassigned successfully")
 
 

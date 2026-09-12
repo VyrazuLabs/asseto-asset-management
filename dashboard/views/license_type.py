@@ -10,7 +10,7 @@ from dashboard.utils import get_license_type_list
 
 
 @login_required
-@permission_required("authentication.view_license_type")
+@permission_required("dashboard.view_license_type")
 def license_type_list(request):
     page_object, license_type_form, license_type_count, stats = get_license_type_list(
         request
@@ -29,7 +29,7 @@ def license_type_list(request):
 
 
 @login_required
-@permission_required("authentication.add_license_type")
+@permission_required("dashboard.add_license_type")
 def license_type_add(request):
     if request.method == "POST":
         license_type_form = LicenseTypeForm(request.POST)
@@ -53,7 +53,7 @@ def license_type_add(request):
 
 
 @login_required
-@permission_required("authentication.view_license_type")
+@permission_required("dashboard.view_license_type")
 def license_type_details(request, id):
     get_license_type = get_object_or_404(LicenseType, pk=id)
     history_list = LicenseType.history.filter(id=get_license_type.id)
@@ -72,7 +72,7 @@ def license_type_details(request, id):
 
 
 @login_required
-@permission_required("authentication.edit_license_type")
+@permission_required("dashboard.edit_license_type")
 def update_license_type(request, id):
     get_license_type = get_object_or_404(LicenseType, pk=id)
     if request.method == "POST":
@@ -107,7 +107,7 @@ def license_type_status(request, id):
 
 
 @login_required
-@permission_required("authentication.delete_license_type")
+@permission_required("dashboard.delete_license_type")
 def delete_license_type(request, id):
     if request.method == "POST":
         get_license_type = get_object_or_404(LicenseType, pk=id)

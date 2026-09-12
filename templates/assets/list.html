@@ -299,14 +299,17 @@
                   <span>{{ map.full_name|default:"Unknown User" }}</span>
                 </div>
               {% endwith %}
+              {% if perms.assets.delete_assign_asset %}
               <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
                     class="form-row-action"
                     onsubmit="return confirm('Unassign this asset?')">
                 {% csrf_token %}
                 <button type="submit" class="btn-unassign">Unassign</button>
               </form>
+              {% endif %}
             {% else %}
               <span class="unassigned-label">Unassigned</span>
+              {% if perms.assets.add_assign_asset %}
               <button type="button" class="btn-assign mt-1"
                 hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
                 hx-target="#assign-asset-modal-list-content"
@@ -315,6 +318,7 @@
                 aria-label="Assign {{ asset.name }}">
                 + Assign
               </button>
+              {% endif %}
             {% endif %}
           </td>
 

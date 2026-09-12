@@ -141,28 +141,11 @@ PERMISSION_MODULES: list = [
         ],
     ),
     PermissionModule("locations", "Locations", "dashboard", "location", _crud("dashboard", "location", "location")),
-    PermissionModule(
-        "departments",
-        "Departments",
-        "dashboard",
-        "department",
-        # No "view" checkbox in the modal for this module — see note above.
-        [a for a in _crud("dashboard", "department", "department") if a.action != "view"],
-    ),
-    PermissionModule(
-        "product_type",
-        "Product Types",
-        "dashboard",
-        "producttype",
-        [a for a in _crud("dashboard", "producttype", "product_type") if a.action != "view"],
-    ),
-    PermissionModule(
-        "product_category",
-        "Product Categories",
-        "dashboard",
-        "productcategory",
-        [a for a in _crud("dashboard", "productcategory", "product_category") if a.action != "view"],
-    ),
+    PermissionModule("departments", "Departments", "dashboard", "department", _crud("dashboard", "department", "department")),
+    PermissionModule("product_type", "Product Types", "dashboard", "producttype", _crud("dashboard", "producttype", "product_type")),
+    PermissionModule("product_category", "Product Categories", "dashboard", "productcategory", _crud("dashboard", "productcategory", "product_category")),
+    PermissionModule("license_type", "License Types", "dashboard", "licensetype", _crud("dashboard", "licensetype", "license_type")),
+    PermissionModule("asset_status", "Asset Status", "assets", "assetstatus", _crud("assets", "assetstatus", "asset_status")),
     PermissionModule(
         "support_ticket",
         "Support Ticket",
@@ -181,7 +164,15 @@ PERMISSION_MODULES: list = [
     # all (no models, no gated views) — dropped from the registry rather
     # than inventing a new Django app mid-refactor. Re-add once a real
     # extensions app exists to gate.
-    PermissionModule("upload", "Upload", "upload", "upload", _crud("upload", "upload", "upload")),
+    PermissionModule(
+        "upload",
+        "Upload",
+        "upload",
+        "upload",
+        [
+            PermissionAction("view", "view_upload", "View"),
+        ],
+    ),
     PermissionModule("license", "License", "license", "license", _crud("license", "license", "license")),
     # New modules — decisions #1/#2 of the RBAC overhaul plan.
     PermissionModule(
@@ -229,7 +220,18 @@ PERMISSION_MODULES: list = [
         "Configurations",
         "configurations",
         "configurationpermission",
-        _crud("configurations", "configurationpermission", "configuration"),
+        [
+            PermissionAction("view", "view_configuration", "View"),
+        ],
+    ),
+    PermissionModule(
+        "extensions",
+        "Extensions",
+        "configurations",
+        "extensionspermission",
+        [
+            PermissionAction("view", "view_extensions", "View"),
+        ],
     ),
 ]
 

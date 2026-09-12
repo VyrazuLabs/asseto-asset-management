@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from common.permissions import codename_to_display, get_content_type_for_codename
+from common.permissions import PERMISSION_MODULES, codename_to_display, get_content_type_for_codename
 from roles.models import Role
 
 from .forms import RoleForm
@@ -40,6 +40,20 @@ def _assign_role_permissions(role: Role, codenames: list) -> None:
     """
     display = codename_to_display()
 
+    # Server-side view-lock: if any non-view action is granted for a module,
+    # the view action for that module must also be granted. This prevents
+    # a role from having edit/add/delete on a module without being able to
+    # see it in the sidebar or access its pages.
+    codename_set = set(codenames)
+    for module in PERMISSION_MODULES:
+        view_action = next((a for a in module.actions if a.action == "view"), None)
+        if view_action is None:
+            continue
+        other_actions_in_module = [a for a in module.actions if a.action != "view"]
+        if any(a.codename in codename_set for a in other_actions_in_module):
+            codename_set.add(view_action.codename)
+    codenames = list(codename_set)
+
     with transaction.atomic():
         role.permissions.clear()
 
@@ -62,7 +76,7 @@ def _assign_role_permissions(role: Role, codenames: list) -> None:
 
 @login_required
 @permission_required("roles.view_role", raise_exception=True)
-def list(request):
+def roles_list(request):
     page_number = request.GET.get("page", 1)
     page_object, role_user_count, stats = get_roles_list_utils(request, page_number)
 

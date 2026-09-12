@@ -208,6 +208,13 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampModel, SoftDeleteModel):
             return self.dynamic_display_name(self.full_name)
         return ""
 
+    def has_perm(self, perm, obj=None):
+        if self.is_superuser:
+            return super().has_perm(perm, obj)
+        if self.role and not self.role.status:
+            return False
+        return super().has_perm(perm, obj)
+
 
 class UserTotp(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_totp", null=False)

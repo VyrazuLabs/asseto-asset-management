@@ -2,14 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging.js";
 // Cred will be set as per the cred of mobile dev
+// NOTE: Firebase web config values are public identifiers by design (see
+// https://firebase.google.com/docs/projects/api-keys). They must never be paired
+// with an unrestricted Firebase project - restrict this API key (HTTP referrer /
+// API restrictions in Google Cloud Console) and enforce Firebase Security Rules /
+// App Check server-side so possession of these values alone grants no access.
   const firebaseConfig = {
-//     apiKey: "AIzaSyBdBIbK2e1JDbZGKKXU6yFwL1ze0jprq6Y",
-//     authDomain: "asseto-push-notification.firebaseapp.com",
-//     projectId: "asseto-push-notification",
-//     storageBucket: "asseto-push-notification.firebasestorage.app",
-//     messagingSenderId: "600702361358",
-//     appId: "1:600702361358:web:58cb3c2ee78e9b1280415f",
-//     measurementId: "G-R0J26HTEVL"
       apiKey: 'AIzaSyBiUQoc2jSnM8Et_908_Jcj75RTz1IGgco',
       appId: '1:373301044674:android:e331be3913f69c4518225b',
       messagingSenderId: '373301044674',

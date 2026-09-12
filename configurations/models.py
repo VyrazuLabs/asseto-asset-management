@@ -101,3 +101,17 @@ class ConfigurationPermission(models.Model):
     class Meta:
         managed = False
         default_permissions = ()
+
+
+class ExtensionsPermission(models.Model):
+    """Unmanaged anchor model for Extensions permissions.
+
+    Extensions (Slack, API integrations) are managed through the
+    configurations app but logically a separate module. This proxy model
+    gives ``ContentType.objects.get_for_model()`` a stable target for
+    ``view_extensions`` permission checks. See ``common/permissions.py``.
+    """
+
+    class Meta:
+        managed = False
+        default_permissions = ()
