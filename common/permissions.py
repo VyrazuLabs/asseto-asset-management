@@ -233,6 +233,13 @@ PERMISSION_MODULES: list = [
             PermissionAction("view", "view_extensions", "View"),
         ],
     ),
+    PermissionModule(
+        "consumables",
+        "Consumables",
+        "consumables",
+        "consumable",
+        _crud("consumables", "consumable", "consumable"),
+    ),
 ]
 
 
