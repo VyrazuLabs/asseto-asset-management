@@ -1,0 +1,38 @@
+{% if page_object %}
+    {% for consumable in page_object %}
+    <tr>
+        <td>
+            {% if page_object.start_index %}
+                {{page_object.start_index|add:forloop.counter0}}
+            {% else %}
+                {{forloop.counter}}
+            {% endif %}
+        </td>
+        <td>{{consumable.consumable_name|default:"-"}}</td>
+        <td>{{consumable.product.name|default:"-"}}</td>
+        <td>{{consumable.vendor.name|default:"-"}}</td>
+        <td>{{consumable.location.office_name|default:"-"}}</td>
+        <td>{{consumable.item_no|default:"-"}}</td>
+        <td>{{consumable.quantity|default:"-"}}</td>
+        <td>{{consumable.updated_at}}</td>
+        <td>
+            <div class="d-flex gap-1" role="group" aria-label="Basic example">
+                {% if perms.recycle_bin.restore_recycle_bin %}
+                <form action="{% url 'recycle_bin:deleted_consumable_restore' consumable.id %}" method="post" onsubmit="return confirm('Are you sure you want to restore this consumable?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-sm" title="Restore"><i class="bi bi-arrow-repeat"></i></button>
+                </form>
+                {% endif %}
+                {% if perms.recycle_bin.delete_recycle_bin %}
+                <form action="{% url 'recycle_bin:deleted_consumable_permanently' consumable.id %}" method="post" onsubmit="return confirm('Are you sure you want to permanently delete this consumable? This action cannot be undone.')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" title="Delete Permanently"><i class="bi bi-trash3-fill"></i></button>
+                </form>
+                {% endif %}
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <td colspan="9" class="text-center">No records found.</td>
+{% endif %}
