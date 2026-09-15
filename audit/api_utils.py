@@ -101,7 +101,9 @@ def get_pending_audits(request):
             AssetImage.objects.filter(asset=asset).order_by("-uploaded_at").first()
         )
         next_due_date = next_audit_due_for_asset(asset)
-        if next_due_date and next_due_date > datetime.now().date():
+        if next_due_date is None:
+            continue
+        if next_due_date > datetime.now().date():
             continue
         dict = {
             "assigned_to": assigned_asset.user.full_name if assigned_asset else "",
