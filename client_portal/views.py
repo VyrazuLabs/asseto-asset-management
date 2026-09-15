@@ -68,7 +68,7 @@ def client_portal_login(request):
             .select_related("client")
             .first()
         )
-
+        print("--------------------->",contact)
         if not contact:
             # Security note: In some cases, we might not want to reveal if an email exists,
             # but for a portal like this, a clear error helps legitimate users.

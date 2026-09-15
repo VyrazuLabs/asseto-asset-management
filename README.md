@@ -49,6 +49,8 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ## Table of Contents
 
+- [Latest Features](#latest-features)
+- [Updated Feature](#updated-feature)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
@@ -62,6 +64,127 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - [Releasing](#releasing)
 - [License](#license)
 - [Contact](#contact)
+
+## ✨ Latest Features
+
+<table>
+  <tr>
+    <td width="55%" valign="top">
+      <h3>🚀 Bulk Asset Upload</h3>
+      <p>Say goodbye to tedious manual data entry! Asseto’s all-new <b>Bulk Asset Upload</b> feature enables IT and operations teams to upload bulk asset data all at once using structured CSV templates.</p>
+      <h4>Why Use It?</h4>
+      <ul>
+        <li>⚡ <b>Save Time:</b> Onboard entire departments or batch purchases in a single click.</li>
+        <li>🎯 <b>Eliminate Human Error:</b> Built-in validation ensures consistent asset data.</li>
+        <li>🔄 <b>Effortless Migration:</b> Transition from Excel seamlessly.</li>
+        <li>📈 <b>Built for Scale:</b> Effortlessly scale from 10 to 10,000+ assets.</li>
+      </ul>
+    </td>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/asset-bulk-upload.png" alt="Bulk Asset Upload" width="100%" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/Clients.png" alt="Client Module" width="100%" />
+    </td>
+    <td width="55%" valign="top">
+      <h3>🏢 Client Module</h3>
+      <p>Effortlessly register and manage client organizations and external stakeholders with built-in portal security controls.</p>
+      <h4>Why Use It?</h4>
+      <ul>
+        <li>🔒 <b>Granular Access Control:</b> Toggle portal access permissions per client instantly.</li>
+        <li>🔑 <b>Passwordless OTP Login:</b> Secure authentication via one-time passwords sent to registered emails.</li>
+        <li>💼 <b>Centralized Management:</b> Keep all external client records, contacts, and active contracts organized.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="55%" valign="top">
+      <h3>🎫 Support Ticket Module</h3>
+      <p>Bridge the gap between clients and support teams with comprehensive issue tracking and real-time communication.</p>
+      <h4>Why Use It?</h4>
+      <ul>
+        <li>📊 <b>Flexible Kanban & List Views:</b> Manage ticket progress with an intuitive drag-and-drop board or detailed list.</li>
+        <li>🔗 <b>Asset-Linked Ticketing:</b> Track repair and service requests tied directly to specific hardware assets.</li>
+        <li>💬 <b>Collaborative Threads:</b> In-ticket messaging allows admins and clients to discuss issues and share updates seamlessly.</li>
+      </ul>
+    </td>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/support-ticket.png" alt="Support Ticket Module" width="100%" />
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/client-portal-login.png" alt="Client Portal Login" width="48%" style="margin-right:2%;"/>
+      <img src="static/images/client-portal.png" alt="Client Portal Dashboard" width="48%" />
+    </td>
+    <td width="55%" valign="top">
+      <h3>🌐 Client Portal</h3>
+      <p>Give your clients direct, real-time access to their assigned asset fleet and support requests without exposing internal systems.</p>
+      <h4>Why Offer It?</h4>
+      <ul>
+        <li>👁️ <b>Total Asset Visibility:</b> Clients can view all equipment assigned to them, complete with statuses and serial numbers.</li>
+        <li>⚡ <b>Self-Service Requests:</b> Clients can log new support tickets against specific assets directly from the portal.</li>
+        <li>🛡️ <b>Enhanced Transparency:</b> Keep clients confident with full visibility into their equipment lifecycle and support histories.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="55%" valign="top">
+      <h3>🏷️ Gate Pass Module</h3>
+      <p>Initiate and manage the movement of assets inward or outward securely. Ensure full accountability at your facility gates with approval workflows and scannable QR codes.</p>
+      <h4>Why Use It?</h4>
+      <ul>
+        <li>🛡️ <b>Secure Approvals:</b> Authorized users can seamlessly approve or reject gate pass requests.</li>
+        <li>🚫 <b>Prevent Duplicates:</b> Assets with pending passes are locked to prevent duplicate movement requests.</li>
+        <li>📱 <b>QR Code Verification:</b> Print gate pass documents with QR codes for instant scanning and automatic movement status updates.</li>
+        <li>📝 <b>Complete Audit Trail:</b> Track the full lifecycle of approvals, rejections, and physical movements.</li>
+      </ul>
+    </td>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/Gate-Pass.png" alt="Gate Pass Module" width="100%" />
+    </td>
+  </tr>
+</table>
+
+---
+
+## 🔄 Updated Feature
+
+<table>
+  <tr>
+    <td width="45%" align="center" valign="middle">
+      <img src="static/images/add-custome-field.png" alt="Add Custom Field" width="48%" style="margin-right:2%;"/>
+      <img src="static/images/custom-field.png" alt="Universal Custom Fields" width="48%" />
+    </td>
+    <td width="55%" valign="top">
+      <h3>🧩 Universal Custom Fields</h3>
+      <p><b>Problem:</b> Custom fields were previously only available for Assets, limiting system flexibility.</p>
+      <p><b>Solution:</b> We hear you! Now, you can create a custom field once and use it universally across <b>Assets, Users, Products, Vendors, and Clients</b>. Repetitive work is officially gone.</p>
+      <h4>Why You'll Love It:</h4>
+      <ul>
+        <li>🚀 <b>Repetitive Work Gone:</b> Create a field just once instead of recreating it for every entity type manually.</li>
+        <li>🔗 <b>Total Flexibility:</b> Easily capture and track unique organizational data across all modules seamlessly.</li>
+        <li>📈 <b>Unified Data Structure:</b> Keep your custom data consistent and standardized everywhere.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+---
 
 ## Features
 
@@ -79,6 +202,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - **Asset Repair Logs**: Repair histories, maintenance costs, status changes, and servicing vendors.
 - **Consumables Management**: Inventory tracking, stock-level alerts, and distribution management for office accessories.
 - **Bulk Uploads**: Import Vendors, Locations, Departments, Categories, and Products via CSV templates.
+- **Gate Pass Management**: Manage inward/outward asset movements with QR-code verifiable gate passes and approval workflows.
 
 ### Integration & Multi-Channel Sync
 
@@ -90,8 +214,9 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ### Portals & Customer Support
 
-- **Client Portal**: External rental clients log in to view rented assets and manage support requests.
-- **Support Ticket Management**: Issue reporting, tracking, and resolution workflows.
+- **Client Module**: Register and manage external clients within the system. Control access via the *Client Portal Access* toggle, allowing clients to log in securely with passwordless OTP verification sent to their registered email.
+- **Support Ticket Module**: Manage asset service and maintenance requests with List and Kanban views. Includes drag-and-drop status transitions, ticket lifecycle tracking, and built-in comment/conversation threads for seamless communication between admins and clients.
+- **Client Portal**: Empower clients with a dedicated self-service portal to view all assigned assets, track active support tickets, and submit new issues directly against their hardware inventory.
 
 ## Screenshots
 
@@ -139,6 +264,42 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 </details>
 
 <details>
+<summary><b>Client Module</b> — register clients & control portal access</summary>
+
+![Client Module](static/images/Clients.png)
+
+- Navigate to the **Clients** section to register and manage client organizations.
+- Control client access using the **Client Portal Access** toggle.
+- Enabled clients log into the Client Portal seamlessly using OTP-based email verification.
+
+</details>
+
+<details>
+<summary><b>Support Ticket Module</b> — List & Kanban views with interactive ticket management</summary>
+
+![Support Ticket Module](static/images/support-ticket.png)
+
+- View and manage support tickets using List View or interactive **Kanban View**.
+- Drag and drop ticket cards across status columns (e.g., Open, In Progress, Resolved).
+- Create, edit, and track tickets tied directly to specific assets.
+- Collaborate with clients through the built-in comment and conversation thread within each ticket.
+
+</details>
+
+<details>
+<summary><b>Client Portal</b> — OTP login & self-service asset management</summary>
+
+![Client Portal Login](static/images/client-portal-login.png)
+
+![Client Portal Dashboard](static/images/client-portal.png)
+
+- **OTP Authentication**: Clients log in securely via OTP sent to their registered email address.
+- **Asset Visibility**: View all hardware and equipment currently assigned to their organization.
+- **Ticket Tracking**: View ticket resolution progress and log new support tickets directly against assigned assets.
+
+</details>
+
+<details>
 <summary><b>Assets</b> — profiles, assignment, and state transitions</summary>
 
 ![Assets Section](static/images/018-New%20Assets.png)
@@ -146,6 +307,17 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - Navigate to the **Assets** section.
 - Create/edit asset profiles and assign them to users.
 - Manage state transitions (e.g., Reassign, Unassign).
+
+</details>
+
+<details>
+<summary><b>Bulk Asset Upload</b> — import bulk asset data all at once via CSV</summary>
+
+![Bulk Asset Upload](static/images/asset-bulk-upload.png)
+
+- Navigate to the **Assets** or **Bulk Upload** section.
+- Upload multiple hardware, laptop, and equipment records simultaneously using structured CSV files.
+- Accelerate workspace onboarding and batch inventory updates seamlessly.
 
 </details>
 
@@ -168,6 +340,18 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - Access the **Recycle Bin** from the settings panel.
 - View soft-deleted records grouped by category.
 - Restore items back to active tables or permanently purge them.
+
+</details>
+
+<details>
+<summary><b>Gate Pass Module</b> — manage inward and outward asset movements</summary>
+
+![Gate Pass Module](static/images/Gate-Pass.png)
+
+- Create and manage Gate Passes for single or multiple assets securely.
+- Prevent duplicate requests with automatic pending pass detection.
+- Print QR codes on Gate Pass documents for instant gate scanning and status updates.
+- Maintain comprehensive audit trails of all approvals, rejections, and asset movements.
 
 </details>
 
@@ -290,9 +474,9 @@ The web platform is deepening its lifecycle, security, and localization capabili
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🟡 | [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management) | 1 / 3 |
+| 🟢 | [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management) | 3 / 3 |
 | 🟡 | [Security & Audit Systems](ROADMAP.md#security--audit-systems) | 2 / 3 |
-| 🔵 | [Localization & User Preferences](ROADMAP.md#localization--user-preferences) | 0 / 1 |
+| 🟢 | [Localization & User Preferences](ROADMAP.md#localization--user-preferences) | 1 / 1 |
 
 ### Integrations & APIs
 
@@ -309,7 +493,7 @@ External-facing portal and ticketing improvements are planned — see [Client Po
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🔵 | [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management) | 0 / 2 |
+| 🟢 | [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management) | 2 / 2 |
 
 ### Mobile Application
 
@@ -317,7 +501,7 @@ The Flutter companion app is under active development — see [Mobile Applicatio
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🔵 | [Mobile Application Development](ROADMAP.md#mobile-application-development) | 0 / 1 |
+| 🟢 | [Mobile Application Development](ROADMAP.md#mobile-application-development) | 1 / 1 |
 
 ## Contributing
 
