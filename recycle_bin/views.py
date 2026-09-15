@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from clients.models import Client
+from consumables.models import Consumable
 
 PAGE_SIZE = 10
 ORPHANS = 1
@@ -1139,4 +1140,94 @@ def deleted_clients_search(request, page):
     page_object = paginator.get_page(page_number)
     return render(
         request, "recycle_bin/deleted-clients-data.html", {"page_object": page_object}
+    )
+
+
+@login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
+def deleted_consumables(request):
+    consumables_list = Consumable.deleted_objects.filter(
+        organization=request.user.organization
+    ).select_related("product", "vendor", "location").order_by("-updated_at")
+    paginator = Paginator(consumables_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get("page")
+    page_object = paginator.get_page(page_number)
+
+    context = {
+        "sidebar": "trash",
+        "submenu": "consumables",
+        "page_object": page_object,
+        "title": "Deleted Consumables",
+    }
+
+    return render(request, "recycle_bin/deleted-consumables.html", context=context)
+
+
+@login_required
+@permission_required("recycle_bin.restore_recycle_bin", raise_exception=True)
+def deleted_consumable_restore(request, id):
+    try:
+        if request.method == "POST":
+            consumable = get_object_or_404(
+                Consumable.deleted_objects, pk=id, organization=request.user.organization
+            )
+            consumable.restore()
+            history_id = consumable.history.first().history_id
+            consumable.history.filter(pk=history_id).update(history_type="^")
+            messages.success(request, "Consumable restored successfully")
+    except:
+        messages.error(request, "Consumable can not be restored")
+
+    return redirect("recycle_bin:deleted_consumables")
+
+
+@login_required
+@permission_required("recycle_bin.delete_recycle_bin", raise_exception=True)
+def deleted_consumable_permanently(request, id):
+    try:
+        if request.method == "POST":
+            consumable = get_object_or_404(
+                Consumable.deleted_objects, pk=id, organization=request.user.organization
+            )
+            consumable.delete()
+            messages.success(request, "Consumable deleted permanently")
+    except ProtectedError:
+        messages.error(request, "Error! Consumable is used in other records")
+    except:
+        messages.error(request, "Consumable can not be deleted")
+
+    return redirect("recycle_bin:deleted_consumables")
+
+
+@login_required
+@permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
+def deleted_consumables_search(request, page):
+    search_text = (request.GET.get("search_text") or "").strip()
+    if search_text:
+        return render(
+            request,
+            "recycle_bin/deleted-consumables-data.html",
+            {
+                "page_object": Consumable.deleted_objects.filter(
+                    Q(organization=request.user.organization)
+                    & (
+                        Q(consumable_name__icontains=search_text)
+                        | Q(product__name__icontains=search_text)
+                        | Q(vendor__name__icontains=search_text)
+                        | Q(location__office_name__icontains=search_text)
+                        | Q(item_no__icontains=search_text)
+                        | Q(order_number__icontains=search_text)
+                    )
+                ).select_related("product", "vendor", "location").order_by("-updated_at")[:10]
+            },
+        )
+
+    consumables_list = Consumable.deleted_objects.filter(
+        organization=request.user.organization
+    ).select_related("product", "vendor", "location").order_by("-updated_at")
+    paginator = Paginator(consumables_list, PAGE_SIZE, orphans=ORPHANS)
+    page_number = page
+    page_object = paginator.get_page(page_number)
+    return render(
+        request, "recycle_bin/deleted-consumables-data.html", {"page_object": page_object}
     )

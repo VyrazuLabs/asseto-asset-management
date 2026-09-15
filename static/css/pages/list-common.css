@@ -223,6 +223,7 @@ body.theme-dark .list-page-header h1 {
 .stat-icon.green  { background: #ECFDF5; color: #059669; }
 .stat-icon.orange { background: #FFF7ED; color: #EA580C; }
 .stat-icon.red    { background: #FEF2F2; color: #DC2626; }
+.stat-icon.purple { background: #F5F3FF; color: #7C3AED; }
 .stat-label {
   font-size: .78rem;
   font-weight: 600;
@@ -560,6 +561,7 @@ body.theme-dark .stat-icon.blue   { background: #2a2a45; color: #a5b4fc; }
 body.theme-dark .stat-icon.green  { background: #15302a; color: #6ee7b7; }
 body.theme-dark .stat-icon.orange { background: #302515; color: #fbbf24; }
 body.theme-dark .stat-icon.red    { background: #301515; color: #fca5a5; }
+body.theme-dark .stat-icon.purple { background: #2d1f4e; color: #c4b5fd; }
 
 body.theme-dark .filter-card input[type=search],
 body.theme-dark .filter-select-btn,

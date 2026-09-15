@@ -151,6 +151,14 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if perms.consumables.view_consumable %}
+                <li class="sidebar-item {% if sidebar == 'consumables' %}active{% endif %}">
+                    <a href="{% url 'consumables:list' %}" class="sidebar-link">
+                        <i class="bi bi-box-seam-fill"></i>
+                        <span>Consumables</span>
+                    </a>
+                </li>
+                {% endif %}
                 {% if perms.license.edit_license or perms.license.delete_license or perms.license.add_license %}
                 <li class="sidebar-item {% if sidebar == 'license' %}active{% endif %}">
                     <a href="{% url 'license:license_list' %}" class="sidebar-link">

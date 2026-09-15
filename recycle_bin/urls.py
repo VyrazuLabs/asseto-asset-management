@@ -194,4 +194,22 @@ urlpatterns = [
         views.deleted_clients_search,
         name="deleted_clients_search",
     ),
+    path(
+        "deleted-consumables", views.deleted_consumables, name="deleted_consumables"
+    ),
+    path(
+        "deleted-consumables/restore/<uuid:id>",
+        views.deleted_consumable_restore,
+        name="deleted_consumable_restore",
+    ),
+    path(
+        "deleted-consumables/delete/<uuid:id>",
+        views.deleted_consumable_permanently,
+        name="deleted_consumable_permanently",
+    ),
+    path(
+        "deleted-consumables-search/<str:page>",
+        views.deleted_consumables_search,
+        name="deleted_consumables_search",
+    ),
 ]
