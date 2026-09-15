@@ -16,7 +16,7 @@
                         <i class="bi bi-geo-alt-fill"></i>
                     </div>
                 </td>
-                <td class="fw-bold">{{ location.address.address_line_one }}</td>
+                <td class="fw-bold">{{ location.office_name|default:"---" }}</td>
                 <td class="text-muted">{{ location.address.city|default:"---" }}</td>
                 <td class="text-muted">{{ location.formatted_date }}</td>
                 <td style="width: 40px; text-align: right;">

@@ -117,7 +117,7 @@ def location_render_to_mapper_modal(request):
             messages.error(request, "CSV file not found in session.")
             return redirect("upload:location_list")
 
-        df = pd.read_csv(file_path, encoding="utf-8-sig")
+        df = pd.read_csv(file_path, encoding="utf-8-sig").fillna("")
         mapping = {}
         locations_fields = [
             "Name",
