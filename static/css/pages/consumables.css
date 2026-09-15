@@ -1,0 +1,123 @@
+/* Consumables module: list, detail, add/edit */
+
+.consumable-row-media {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.consumable-status-badge-low {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.consumable-status-badge-low.inline {
+  margin-left: 6px;
+}
+
+.consumable-action-btn-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.consumable-select-full-width {
+  width: 100%;
+}
+
+.consumable-form-actions-hidden {
+  display: none;
+}
+
+.consumable-avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+
+.consumable-image-card-body {
+  padding: 1.25rem;
+}
+
+.detail-main-image-wrap {
+  cursor: pointer;
+}
+
+.detail-main-image-wrap:hover {
+  opacity: 0.9;
+}
+
+.detail-modal-image {
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.section-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.consumable-image-wrap {
+  position: relative;
+  display: inline-block;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 120px;
+}
+
+.consumable-image-wrap img {
+  display: block;
+  max-height: 120px;
+  border-radius: 8px;
+}
+
+.consumable-image-delete {
+  position: absolute;
+  top: .3rem;
+  right: .3rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(220, 38, 38, .85);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .15s;
+}
+
+.consumable-image-wrap:hover .consumable-image-delete {
+  opacity: 1;
+}
+
+.select2-container--default .select2-selection--single {
+  height: 38px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 5px 12px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 26px;
+  color: #495057;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 36px;
+}
+
+.select2-container--open .select2-dropdown {
+  border-color: #86b7fe;
+}

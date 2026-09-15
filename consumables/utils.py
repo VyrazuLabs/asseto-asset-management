@@ -7,7 +7,55 @@ PAGE_SIZE = 10
 ORPHANS = 1
 
 
+def notify_low_stock(consumable, actor, remaining):
+    """
+    Send a low-stock notification for a consumable, if it has dropped to or
+    below its configured minimum quantity.
+
+    Args:
+        consumable: Consumable instance to check and notify about.
+        actor: User the notification is sent as/to (the acting user).
+        remaining: Current quantity to compare against consumable.min_qty.
+
+    Returns:
+        None.
+    """
+    if consumable.min_qty is None or remaining is None or remaining > consumable.min_qty:
+        return
+
+    from notifications.service import NotificationService
+
+    consumable_name = consumable.consumable_name or "Consumable"
+    notif_message = (
+        f"{consumable_name} is below or almost below the minimum quantity "
+        f"required (Min: {consumable.min_qty}, Current: {remaining})."
+    )
+    try:
+        NotificationService.send(
+            user=actor,
+            title="Low Stock Alert",
+            message=notif_message,
+            icon="bi-exclamation-triangle",
+            link=f"/consumables/detail/{consumable.pk}",
+            object_id=str(consumable.pk),
+            instance_id="consumable",
+        )
+    except Exception:
+        pass
+
+
 def consumable_list_util(request):
+    """
+    Build the context for the consumables list page: paginated, org-scoped
+    consumables plus summary stats (totals, low-stock count) and filter data.
+
+    Args:
+        request: The current HttpRequest (used for org scoping and the
+            "page" query param).
+
+    Returns:
+        dict: Template context for consumables/list.html.
+    """
     qs = Consumable.undeleted_objects.filter(
         organization=request.user.organization
     ).select_related("product", "vendor", "location").order_by("-created_at")
@@ -49,6 +97,19 @@ def consumable_list_util(request):
 
 
 def search_utils(request, page):
+    """
+    Search org-scoped consumables by name, product, vendor, location, item
+    no. or order number, and paginate the results.
+
+    Args:
+        request: The current HttpRequest (used for org scoping and the
+            "search_text" query param).
+        page: Page number to return from the paginator.
+
+    Returns:
+        tuple[Page, int]: (paginated consumables, count of soft-deleted
+        consumables for the organization).
+    """
     search_text = (request.GET.get("search_text") or "").strip()
     filters = Q(organization=request.user.organization)
 
@@ -75,6 +136,22 @@ def search_utils(request, page):
 
 
 def get_consumable_details(request, pk):
+    """
+    Build the context for the consumable detail page: the consumable itself,
+    its paginated audit history, and its paginated checkout history.
+
+    Args:
+        request: The current HttpRequest (used for org scoping and the
+            "page"/"checkout_page" query params).
+        pk: Primary key of the Consumable to look up.
+
+    Returns:
+        dict: Template context for consumables/detail.html.
+
+    Raises:
+        Http404: If no undeleted consumable with this pk exists for the
+            requesting user's organization.
+    """
     consumable = get_object_or_404(
         Consumable.undeleted_objects,
         pk=pk,

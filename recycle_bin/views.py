@@ -1202,7 +1202,7 @@ def deleted_consumable_permanently(request, id):
 @login_required
 @permission_required("recycle_bin.view_recycle_bin", raise_exception=True)
 def deleted_consumables_search(request, page):
-    search_text = request.GET.get("search_text").strip()
+    search_text = (request.GET.get("search_text") or "").strip()
     if search_text:
         return render(
             request,

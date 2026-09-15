@@ -7,6 +7,8 @@ from django.db.models import Q
 
 
 class ConsumableForm(forms.ModelForm):
+    """ModelForm for creating/editing a Consumable, scoped to an organization for its FK choices."""
+
     consumable_name = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "off"}),

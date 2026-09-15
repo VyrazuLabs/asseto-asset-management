@@ -6,24 +6,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<style>
-  .select2-container--default .select2-selection--single {
-    height: 38px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    padding: 5px 12px;
-  }
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 26px;
-    color: #495057;
-  }
-  .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 36px;
-  }
-  .select2-container--open .select2-dropdown {
-    border-color: #86b7fe;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/consumables.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -132,7 +115,7 @@
         {% for c in page_object %}
         <tr>
           <td class="table-index-cell">{{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}</td>
-          <td style="display:flex;align-items:center;gap:10px;">
+          <td class="consumable-row-media">
             <img class="list-thumb"
               src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
               alt="{{ c.consumable_name }}"
@@ -147,7 +130,7 @@
           <td>{{ c.quantity|default:"-" }}</td>
           <td>
             {% if c.is_low_stock %}
-              <span class="status-badge" style="background:#fff3cd;color:#856404;">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
+              <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
             {% else %}
               {{ c.remaining_quantity|default_if_none:c.quantity|default:"-" }}
             {% endif %}
@@ -171,7 +154,7 @@
                 <i class="bi bi-box-arrow-right"></i>
               </button>
               {% else %}
-              <button type="button" class="action-btn" title="Cannot be checked out.Check the remaining quantity." disabled style="opacity:0.4;cursor:not-allowed;">
+              <button type="button" class="action-btn consumable-action-btn-disabled" title="Cannot be checked out.Check the remaining quantity." disabled>
                 <i class="bi bi-box-arrow-right"></i>
               </button>
               {% endif %}
@@ -252,7 +235,7 @@
           </div>
           <div class="mb-3">
             <label for="modalUserSelect" class="form-label fw-bold">Select User <span class="text-danger">*</span></label>
-            <select name="user" id="modalUserSelect" class="form-select" required style="width:100%">
+            <select name="user" id="modalUserSelect" class="form-select consumable-select-full-width" required>
               <option value="" selected disabled>Select User</option>
               {% for u in users %}
               <option value="{{ u.pk }}" data-search="{{ u.get_full_name|default:u.username }} {{ u.username|lower }}">{{ u.get_full_name|default:u.username }}</option>

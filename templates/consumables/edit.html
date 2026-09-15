@@ -6,39 +6,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/add-vendor.css' %}?v=1.3">
-<style>
-  .consumable-image-wrap {
-    position: relative;
-    display: inline-block;
-    border-radius: 8px;
-    overflow: hidden;
-    max-height: 120px;
-  }
-  .consumable-image-wrap img {
-    display: block;
-    max-height: 120px;
-    border-radius: 8px;
-  }
-  .consumable-image-delete {
-    position: absolute;
-    top: .3rem;
-    right: .3rem;
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: rgba(220,38,38,.85);
-    color: #fff;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .75rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity .15s;
-  }
-  .consumable-image-wrap:hover .consumable-image-delete { opacity: 1; }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/consumables.css' %}">
 {% endblock css %}
 
 {% block content %}

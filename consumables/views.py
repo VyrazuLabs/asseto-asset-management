@@ -1,14 +1,15 @@
+from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse
 from .models import Consumable
 from .forms import ConsumableForm
-from .utils import consumable_list_util, search_utils, get_consumable_details
+from .utils import consumable_list_util, search_utils, get_consumable_details, notify_low_stock
 
 
 def manage_access(user):
+    """Return True if the user holds any consumables permission."""
     perms = [
         "consumables.view_consumable",
         "consumables.add_consumable",
@@ -21,6 +22,7 @@ def manage_access(user):
 @login_required
 @user_passes_test(manage_access)
 def consumable_list(request):
+    """Render the paginated consumables list page for the user's organization."""
     context = consumable_list_util(request)
     return render(request, "consumables/list.html", context)
 
@@ -28,6 +30,7 @@ def consumable_list(request):
 @login_required
 @permission_required("consumables.add_consumable")
 def add_consumable(request):
+    """Create a new consumable for the user's organization, notifying on low stock."""
     form = ConsumableForm(organization=request.user.organization)
     if request.method == "POST":
         form = ConsumableForm(request.POST, request.FILES, organization=request.user.organization)
@@ -36,23 +39,7 @@ def add_consumable(request):
             consumable.organization = request.user.organization
             consumable.save()
 
-            if consumable.min_qty is not None and consumable.quantity is not None and consumable.quantity <= consumable.min_qty:
-                from notifications.service import NotificationService
-                consumable_name = consumable.consumable_name or "Consumable"
-                notif_title = "Low Stock Alert"
-                notif_message = f"{consumable_name} is below or almost below the minimum quantity required (Min: {consumable.min_qty}, Current: {consumable.quantity})."
-                try:
-                    NotificationService.send(
-                        user=request.user,
-                        title=notif_title,
-                        message=notif_message,
-                        icon="bi-exclamation-triangle",
-                        link=f"/consumables/detail/{consumable.pk}",
-                        object_id=str(consumable.pk),
-                        instance_id="consumable",
-                    )
-                except Exception:
-                    pass
+            notify_low_stock(consumable, request.user, consumable.quantity)
 
             messages.success(request, "Consumable added successfully.")
             return redirect("consumables:list")
@@ -63,6 +50,7 @@ def add_consumable(request):
 @login_required
 @permission_required("consumables.view_consumable")
 def detail_consumable(request, pk):
+    """Render the consumable detail page, including history and checkouts."""
     context = get_consumable_details(request, pk)
     return render(request, "consumables/detail.html", context)
 
@@ -70,6 +58,7 @@ def detail_consumable(request, pk):
 @login_required
 @permission_required("consumables.edit_consumable")
 def edit_consumable(request, pk):
+    """Update a consumable belonging to the user's organization, notifying on low stock."""
     consumable = get_object_or_404(
         Consumable.undeleted_objects, pk=pk, organization=request.user.organization
     )
@@ -89,23 +78,7 @@ def edit_consumable(request, pk):
                 consumable.save()
 
             qty = consumable.remaining_quantity if consumable.remaining_quantity is not None else consumable.quantity
-            if consumable.min_qty is not None and qty is not None and qty <= consumable.min_qty:
-                from notifications.service import NotificationService
-                consumable_name = consumable.consumable_name or "Consumable"
-                notif_title = "Low Stock Alert"
-                notif_message = f"{consumable_name} is below or almost below the minimum quantity required (Min: {consumable.min_qty}, Remaining: {qty})."
-                try:
-                    NotificationService.send(
-                        user=request.user,
-                        title=notif_title,
-                        message=notif_message,
-                        icon="bi-exclamation-triangle",
-                        link=f"/consumables/detail/{consumable.pk}",
-                        object_id=str(consumable.pk),
-                        instance_id="consumable",
-                    )
-                except Exception:
-                    pass
+            notify_low_stock(consumable, request.user, qty)
 
             messages.success(request, "Consumable updated successfully.")
             return redirect("consumables:detail", pk=consumable.pk)
@@ -116,6 +89,7 @@ def edit_consumable(request, pk):
 @login_required
 @permission_required("consumables.delete_consumable")
 def delete_consumable(request, pk):
+    """Soft-delete a consumable belonging to the user's organization."""
     if request.method == "POST":
         consumable = get_object_or_404(
             Consumable.undeleted_objects, pk=pk, organization=request.user.organization
@@ -129,6 +103,7 @@ def delete_consumable(request, pk):
 
 @login_required
 def search(request, page):
+    """Render the consumables table rows matching a search query (used by htmx)."""
     page_object, deleted_count = search_utils(request, page)
     return render(
         request,
@@ -140,10 +115,14 @@ def search(request, page):
 @login_required
 @permission_required("consumables.edit_consumable")
 def checkout_consumable(request, pk):
+    """
+    Check out a quantity of a consumable to a user, decrementing its
+    remaining stock and notifying on low stock.
+
+    Locks the consumable row for the duration of the read-check-write on
+    remaining_quantity so concurrent checkouts cannot oversell stock.
+    """
     if request.method == "POST":
-        consumable = get_object_or_404(
-            Consumable.undeleted_objects, pk=pk, organization=request.user.organization
-        )
         user_id = request.POST.get("user")
         try:
             checkout_qty = int(request.POST.get("quantity", 0))
@@ -154,12 +133,23 @@ def checkout_consumable(request, pk):
 
         if checkout_qty <= 0:
             messages.error(request, "Please enter a valid quantity to checkout.")
-        elif consumable.remaining_quantity is not None and checkout_qty > consumable.remaining_quantity:
-            messages.error(request, f"Cannot checkout more than remaining quantity ({consumable.remaining_quantity}).")
-        else:
-            from django.contrib.auth import get_user_model
-            from .models import ConsumableCheckout
-            User = get_user_model()
+            return redirect("consumables:list")
+
+        from django.contrib.auth import get_user_model
+        from .models import ConsumableCheckout
+        User = get_user_model()
+
+        with transaction.atomic():
+            consumable = get_object_or_404(
+                Consumable.undeleted_objects.select_for_update(),
+                pk=pk,
+                organization=request.user.organization,
+            )
+
+            if consumable.remaining_quantity is not None and checkout_qty > consumable.remaining_quantity:
+                messages.error(request, f"Cannot checkout more than remaining quantity ({consumable.remaining_quantity}).")
+                return redirect("consumables:list")
+
             target_user = get_object_or_404(User, pk=user_id, organization=request.user.organization)
 
             ConsumableCheckout.objects.create(
@@ -173,25 +163,7 @@ def checkout_consumable(request, pk):
             consumable.remaining_quantity = max(0, current_rem - checkout_qty)
             consumable.save()
 
-            if consumable.min_qty is not None and consumable.remaining_quantity <= consumable.min_qty:
-                from notifications.service import NotificationService
-                consumable_name = consumable.consumable_name or "Consumable"
-                notif_title = "Low Stock Alert"
-                notif_message = f"{consumable_name} is below or almost below the minimum quantity required (Min: {consumable.min_qty}, Remaining: {consumable.remaining_quantity})."
-                try:
-                    NotificationService.send(
-                        user=request.user,
-                        title=notif_title,
-                        message=notif_message,
-                        icon="bi-exclamation-triangle",
-                        link=f"/consumables/detail/{consumable.pk}",
-                        object_id=str(consumable.pk),
-                        instance_id="consumable",
-                    )
-                except Exception:
-                    pass
-
-            messages.success(request, f"Successfully checked out {checkout_qty} item(s) to {target_user}.")
+        notify_low_stock(consumable, request.user, consumable.remaining_quantity)
+        messages.success(request, f"Successfully checked out {checkout_qty} item(s) to {target_user}.")
 
     return redirect("consumables:list")
-
