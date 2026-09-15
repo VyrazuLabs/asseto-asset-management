@@ -10,23 +10,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/vendor-details.css' %}?v=1.2">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
-<style>
-  .detail-main-image-wrap { cursor: pointer; }
-  .detail-main-image-wrap:hover { opacity: 0.9; }
-  .detail-modal-image { max-height: 75vh; object-fit: contain; border-radius: 8px; }
-  .section-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .95rem;
-    background: var(--color-primary-light);
-    color: var(--color-primary);
-    flex-shrink: 0;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/consumables.css' %}">
 {% endblock css %}
 
 {% block content %}
@@ -102,7 +86,7 @@
             <span class="value">
               {{ consumable.quantity|default:"-" }}
               {% if consumable.is_low_stock %}
-                <span class="status-badge" style="background:#fff3cd;color:#856404;margin-left:6px;">Low Stock</span>
+                <span class="status-badge consumable-status-badge-low inline">Low Stock</span>
               {% endif %}
             </span>
           </div>
@@ -155,14 +139,12 @@
                         {% if checkout.user.profile_pic %}
                           <img src="{{ checkout.user.profile_pic.url }}"
                             alt="{{ checkout.user.get_full_name|default:checkout.user.username }}"
-                            class="rounded-circle flex-shrink-0"
-                            style="width:32px;height:32px;object-fit:cover;"
+                            class="rounded-circle flex-shrink-0 consumable-avatar"
                             onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';">
                         {% else %}
                           <img src="{% static 'images/faces/1.jpg' %}"
                             alt="Default"
-                            class="rounded-circle flex-shrink-0"
-                            style="width:32px;height:32px;object-fit:cover;">
+                            class="rounded-circle flex-shrink-0 consumable-avatar">
                         {% endif %}
                         <div class="cell-name-main">{{ checkout.user.get_full_name|default:checkout.user.username }}</div>
                       </div>
@@ -201,7 +183,7 @@
           <i class="bi bi-images"></i>
           <h2><span>Image</span></h2>
         </div>
-        <div style="padding:1.25rem;">
+        <div class="consumable-image-card-body">
           {% if consumable.image %}
             <div class="detail-main-image-wrap" data-bs-toggle="modal" data-bs-target="#consumableImageModal">
               <img src="{{ consumable.image.url }}" class="detail-main-image" alt="{{ consumable.consumable_name }}"

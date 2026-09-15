@@ -11,6 +11,7 @@ from django.conf import settings
 
 
 def consumable_image_path(instance, filename):
+    """Build the upload path for a Consumable's image, keyed by pk once assigned."""
     upload_to = "consumables/"
     ext = filename.split(".")[-1]
     if instance.pk:
@@ -21,6 +22,8 @@ def consumable_image_path(instance, filename):
 
 
 class Consumable(TimeStampModel, SoftDeleteModel):
+    """A tracked consumable stock item: purchase details, current/remaining quantity, and a min-qty low-stock threshold."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     consumable_name = models.CharField(max_length=255, blank=True, null=True)
     product = models.ForeignKey(
@@ -53,17 +56,22 @@ class Consumable(TimeStampModel, SoftDeleteModel):
         return self.consumable_name or "Consumable"
 
     def save(self, *args, **kwargs):
+        """Default remaining_quantity to quantity on first save, then save as normal."""
         if self.remaining_quantity is None and self.quantity is not None:
             self.remaining_quantity = self.quantity
         super().save(*args, **kwargs)
 
     def is_low_stock(self):
+        """Return True if remaining (or total) quantity is at or below min_qty."""
         qty = self.remaining_quantity if self.remaining_quantity is not None else self.quantity
         if qty is not None and self.min_qty is not None:
             return qty <= self.min_qty
         return False
 
+
 class ConsumableCheckout(TimeStampModel):
+    """A record of a quantity of a Consumable checked out to a user."""
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     consumable = models.ForeignKey(Consumable, on_delete=models.CASCADE, related_name="checkouts")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="consumable_checkouts")

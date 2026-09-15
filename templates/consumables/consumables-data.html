@@ -2,7 +2,7 @@
 {% for c in page_object %}
 <tr>
   <td class="table-index-cell">{{ forloop.counter }}</td>
-  <td style="display:flex;align-items:center;gap:10px;">
+  <td class="consumable-row-media">
     <img class="list-thumb"
       src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
       alt="{{ c.consumable_name }}"
@@ -17,7 +17,7 @@
   <td>{{ c.quantity|default:"-" }}</td>
   <td>
     {% if c.is_low_stock %}
-      <span class="status-badge" style="background:#fff3cd;color:#856404;">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
+      <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
     {% else %}
       {{ c.remaining_quantity|default_if_none:c.quantity|default:"-" }}
     {% endif %}
@@ -40,7 +40,7 @@
         <i class="bi bi-box-arrow-right"></i>
       </button>
       {% else %}
-      <button type="button" class="action-btn" title="Cannot be checked out" disabled style="opacity:0.4;cursor:not-allowed;">
+      <button type="button" class="action-btn consumable-action-btn-disabled" title="Cannot be checked out" disabled>
         <i class="bi bi-box-arrow-right"></i>
       </button>
       {% endif %}
