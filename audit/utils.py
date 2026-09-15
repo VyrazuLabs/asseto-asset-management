@@ -17,12 +17,10 @@ def get_audit_stats(request):
     asset_list = Asset.undeleted_objects.all()
     pending_count = 0
     for asset in asset_list:
-        has_audit = Audit.objects.filter(asset=asset).order_by("-created_at").first()
         next_due = next_audit_due_for_asset(asset)
-        if has_audit and next_due:
-            if next_due <= datetime.now().date():
-                pending_count += 1
-        elif not has_audit:
+        if next_due is None:
+            continue
+        if next_due <= datetime.now().date():
             pending_count += 1
 
     return {
@@ -93,9 +91,10 @@ def get_pending_audits(request):
         # )
         has_audit = Audit.objects.filter(asset=asset).order_by("-created_at").first()
         next_due_date = next_audit_due_for_asset(asset)
-        if has_audit and next_due_date:
-            if next_due_date > datetime.now().date():
-                continue
+        if next_due_date is None:
+            continue
+        if next_due_date > datetime.now().date():
+            continue
         data = {}
         data["asset"] = asset
         data["expected_audit_date"] = next_due_date
