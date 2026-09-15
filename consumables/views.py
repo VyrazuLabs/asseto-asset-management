@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.decorators import user_passes_test
-from .models import Consumable
+from .models import Consumable, ConsumableDocument
 from .forms import ConsumableForm
 from .utils import consumable_list_util, search_utils, get_consumable_details, notify_low_stock
 
@@ -38,6 +38,15 @@ def add_consumable(request):
             consumable = form.save(commit=False)
             consumable.organization = request.user.organization
             consumable.save()
+
+            for f in request.FILES.getlist("documents"):
+                ConsumableDocument.objects.create(
+                    consumable=consumable,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                    uploaded_by=request.user,
+                )
 
             notify_low_stock(consumable, request.user, consumable.quantity)
 
@@ -76,6 +85,21 @@ def edit_consumable(request, pk):
                     consumable.image.delete(save=False)
                 consumable.image = None
                 consumable.save()
+
+            delete_doc_ids = request.POST.getlist("delete_documents")
+            if delete_doc_ids:
+                for doc in consumable.documents.filter(id__in=delete_doc_ids):
+                    doc.file.delete(save=False)
+                    doc.delete()
+
+            for f in request.FILES.getlist("documents"):
+                ConsumableDocument.objects.create(
+                    consumable=consumable,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                    uploaded_by=request.user,
+                )
 
             qty = consumable.remaining_quantity if consumable.remaining_quantity is not None else consumable.quantity
             notify_low_stock(consumable, request.user, qty)
