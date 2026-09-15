@@ -31,6 +31,29 @@
 
 *This is a shared, resettable demo account — please don't store anything sensitive in it.*
 
+## 📱 Mobile Application
+
+Take full control of your asset management on the go! Asseto's **companion mobile app** brings the power of your dashboard directly to your pocket.
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-1.webp" width="32%" alt="Asseto Mobile App View 1" />
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-2.webp" width="32%" alt="Asseto Mobile App View 2" />
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-3.webp" width="32%" alt="Asseto Mobile App View 3" />
+  </a>
+</p>
+
+### 🚀 Why You'll Love It:
+- **Scan & Go:** Instantly audit and verify assets in the field by scanning QR codes.
+- **Real-Time Sync:** Every assignment, repair, or status update reflects instantly on the web.
+- **Manage Anywhere:** Track hardware, assign equipment, and oversee your inventory from anywhere.
+
+**[Download Asseto on Google Play →](https://play.google.com/store/apps/details?id=com.vyrazu.asseto)**
+
 ## Why Asseto?
 
 Most teams still track laptops, equipment, and rented assets in spreadsheets — no custody trail, no audit history, and no way to prove who had what when it matters. Asseto replaces that with a single system of record: every assignment, repair, and modification is logged automatically, deleted records land in a recoverable Recycle Bin, and access is governed by custom roles and two-factor authentication. It ships with a REST API, Slack and Firebase push notifications, and a companion Flutter mobile app for physical audits in the field.
@@ -49,8 +72,6 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ## Table of Contents
 
-- [Latest Features](#latest-features)
-- [Updated Feature](#updated-feature)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
@@ -64,127 +85,6 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - [Releasing](#releasing)
 - [License](#license)
 - [Contact](#contact)
-
-## ✨ Latest Features
-
-<table>
-  <tr>
-    <td width="55%" valign="top">
-      <h3>🚀 Bulk Asset Upload</h3>
-      <p>Say goodbye to tedious manual data entry! Asseto’s all-new <b>Bulk Asset Upload</b> feature enables IT and operations teams to upload bulk asset data all at once using structured CSV templates.</p>
-      <h4>Why Use It?</h4>
-      <ul>
-        <li>⚡ <b>Save Time:</b> Onboard entire departments or batch purchases in a single click.</li>
-        <li>🎯 <b>Eliminate Human Error:</b> Built-in validation ensures consistent asset data.</li>
-        <li>🔄 <b>Effortless Migration:</b> Transition from Excel seamlessly.</li>
-        <li>📈 <b>Built for Scale:</b> Effortlessly scale from 10 to 10,000+ assets.</li>
-      </ul>
-    </td>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/asset-bulk-upload.png" alt="Bulk Asset Upload" width="100%" />
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/Clients.png" alt="Client Module" width="100%" />
-    </td>
-    <td width="55%" valign="top">
-      <h3>🏢 Client Module</h3>
-      <p>Effortlessly register and manage client organizations and external stakeholders with built-in portal security controls.</p>
-      <h4>Why Use It?</h4>
-      <ul>
-        <li>🔒 <b>Granular Access Control:</b> Toggle portal access permissions per client instantly.</li>
-        <li>🔑 <b>Passwordless OTP Login:</b> Secure authentication via one-time passwords sent to registered emails.</li>
-        <li>💼 <b>Centralized Management:</b> Keep all external client records, contacts, and active contracts organized.</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td width="55%" valign="top">
-      <h3>🎫 Support Ticket Module</h3>
-      <p>Bridge the gap between clients and support teams with comprehensive issue tracking and real-time communication.</p>
-      <h4>Why Use It?</h4>
-      <ul>
-        <li>📊 <b>Flexible Kanban & List Views:</b> Manage ticket progress with an intuitive drag-and-drop board or detailed list.</li>
-        <li>🔗 <b>Asset-Linked Ticketing:</b> Track repair and service requests tied directly to specific hardware assets.</li>
-        <li>💬 <b>Collaborative Threads:</b> In-ticket messaging allows admins and clients to discuss issues and share updates seamlessly.</li>
-      </ul>
-    </td>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/support-ticket.png" alt="Support Ticket Module" width="100%" />
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/client-portal-login.png" alt="Client Portal Login" width="48%" style="margin-right:2%;"/>
-      <img src="static/images/client-portal.png" alt="Client Portal Dashboard" width="48%" />
-    </td>
-    <td width="55%" valign="top">
-      <h3>🌐 Client Portal</h3>
-      <p>Give your clients direct, real-time access to their assigned asset fleet and support requests without exposing internal systems.</p>
-      <h4>Why Offer It?</h4>
-      <ul>
-        <li>👁️ <b>Total Asset Visibility:</b> Clients can view all equipment assigned to them, complete with statuses and serial numbers.</li>
-        <li>⚡ <b>Self-Service Requests:</b> Clients can log new support tickets against specific assets directly from the portal.</li>
-        <li>🛡️ <b>Enhanced Transparency:</b> Keep clients confident with full visibility into their equipment lifecycle and support histories.</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td width="55%" valign="top">
-      <h3>🏷️ Gate Pass Module</h3>
-      <p>Initiate and manage the movement of assets inward or outward securely. Ensure full accountability at your facility gates with approval workflows and scannable QR codes.</p>
-      <h4>Why Use It?</h4>
-      <ul>
-        <li>🛡️ <b>Secure Approvals:</b> Authorized users can seamlessly approve or reject gate pass requests.</li>
-        <li>🚫 <b>Prevent Duplicates:</b> Assets with pending passes are locked to prevent duplicate movement requests.</li>
-        <li>📱 <b>QR Code Verification:</b> Print gate pass documents with QR codes for instant scanning and automatic movement status updates.</li>
-        <li>📝 <b>Complete Audit Trail:</b> Track the full lifecycle of approvals, rejections, and physical movements.</li>
-      </ul>
-    </td>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/Gate-Pass.png" alt="Gate Pass Module" width="100%" />
-    </td>
-  </tr>
-</table>
-
----
-
-## 🔄 Updated Feature
-
-<table>
-  <tr>
-    <td width="45%" align="center" valign="middle">
-      <img src="static/images/add-custome-field.png" alt="Add Custom Field" width="48%" style="margin-right:2%;"/>
-      <img src="static/images/custom-field.png" alt="Universal Custom Fields" width="48%" />
-    </td>
-    <td width="55%" valign="top">
-      <h3>🧩 Universal Custom Fields</h3>
-      <p><b>Problem:</b> Custom fields were previously only available for Assets, limiting system flexibility.</p>
-      <p><b>Solution:</b> We hear you! Now, you can create a custom field once and use it universally across <b>Assets, Users, Products, Vendors, and Clients</b>. Repetitive work is officially gone.</p>
-      <h4>Why You'll Love It:</h4>
-      <ul>
-        <li>🚀 <b>Repetitive Work Gone:</b> Create a field just once instead of recreating it for every entity type manually.</li>
-        <li>🔗 <b>Total Flexibility:</b> Easily capture and track unique organizational data across all modules seamlessly.</li>
-        <li>📈 <b>Unified Data Structure:</b> Keep your custom data consistent and standardized everywhere.</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-
----
 
 ## Features
 
@@ -201,16 +101,29 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - **Asset Configuration Management**: Custom specification fields and category-based templates for diverse asset classes.
 - **Asset Repair Logs**: Repair histories, maintenance costs, status changes, and servicing vendors.
 - **Consumables Management**: Inventory tracking, stock-level alerts, and distribution management for office accessories.
-- **Bulk Uploads**: Import Vendors, Locations, Departments, Categories, and Products via CSV templates.
-- **Gate Pass Management**: Manage inward/outward asset movements with QR-code verifiable gate passes and approval workflows.
+- **Bulk Uploads**: Import Assets, Vendors, Locations, Departments, Categories, and Products via CSV templates.
+
+### Gate Pass Management
+
+- **Inward & Outward Asset Movement**: Securely initiate and manage asset movements across your facilities.
+- **Approval Workflows**: Authorized users can approve or reject gate pass requests with complete audit logs.
+- **Prevent Duplicate Movement**: Lock assets with pending gate passes to prevent duplicate movement requests.
+- **QR Code Verification**: Print gate pass documents with QR codes for instant physical scanning and automated status updates.
+
+### Configurations
+
+- **Universal Custom Fields**: Create a custom field once and use it universally across Assets, Users, Products, Vendors, and Clients to standardize unique organizational data.
+- **Branding**: Customize system logos, login page branding, and favicon to match your company's brand identity.
+- **Tag Configurations**: Generate and manage custom asset tags
+- **Localization**: Configure local standard currencies, date formats, and multi-language interface preferences. Complete interface internationalization (i18n) for global teams.
+- **Organization Settings**: Set and manage company profiles, organization details, and global workspace defaults.
 
 ### Integration & Multi-Channel Sync
 
 - **REST API**: Secure endpoints to read and synchronize asset data with external systems.
-- **Slack Integration**: Push immediate alerts and updates to Slack workspace channels.
-- **Flexible Notifications**: Multi-channel notifications across Email and Firebase (FCM) push alerts.
+- **Slack Integration**: Push immediate alerts and updates to Slack workspace channels.(Improving)
+- **Flexible Notifications**: Multi-channel notifications across Email and Firebase (FCM) push alerts.(Improving)
 - **Mobile Application**: Flutter-based companion app for remote management and physical audits.
-- **Multi-Language Support**: Complete interface internationalization (i18n) for global teams.
 
 ### Portals & Customer Support
 
