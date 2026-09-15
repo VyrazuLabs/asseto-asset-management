@@ -171,6 +171,80 @@
         </div>
       </div>
 
+      {# ── Documents ── #}
+      <div class="detail-card mt-4">
+        <div class="detail-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <div class="section-icon"><i class="bi bi-paperclip"></i></div>
+            <h2>Supporting Documents</h2>
+          </div>
+        </div>
+        <div class="detail-card-body p-0">
+          {% if documents %}
+          <div class="table-responsive">
+            <table class="list-table" id="documentsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>File Name</th>
+                  <th>Size</th>
+                  <th>Uploaded By</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for doc in documents %}
+                <tr>
+                  <td class="table-index-cell">{{ forloop.counter|stringformat:"02d" }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      {% with ext=doc.file_name|lower %}
+                      {% if ".pdf" in ext %}
+                      <i class="bi bi-file-earmark-pdf text-danger fs-5"></i>
+                      {% elif ".doc" in ext or ".docx" in ext %}
+                      <i class="bi bi-file-earmark-word text-primary fs-5"></i>
+                      {% elif ".xls" in ext or ".xlsx" in ext %}
+                      <i class="bi bi-file-earmark-excel text-success fs-5"></i>
+                      {% elif ".jpg" in ext or ".jpeg" in ext or ".png" in ext or ".gif" in ext or ".webp" in ext %}
+                      <i class="bi bi-file-earmark-image text-warning fs-5"></i>
+                      {% else %}
+                      <i class="bi bi-file-earmark text-muted fs-5"></i>
+                      {% endif %}
+                      {% endwith %}
+                      <span class="cell-name-main">{{ doc.file_name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {% if doc.file_size >= 1048576 %}
+                    {{ doc.file_size|filesizeformat }}
+                    {% elif doc.file_size >= 1024 %}
+                    {{ doc.file_size|filesizeformat }}
+                    {% else %}
+                    {{ doc.file_size }} B
+                    {% endif %}
+                  </td>
+                  <td>{{ doc.uploaded_by.get_full_name|default:doc.uploaded_by.username|default:"-" }}</td>
+                  <td>{{ doc.created_at|date:"d M Y, h:i A" }}</td>
+                  <td>
+                    <a href="{{ doc.file.url }}" class="action-btn" title="Download" download>
+                      <i class="bi bi-download"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="detail-empty-state">
+            <i class="bi bi-paperclip"></i><br>
+            <p>No documents uploaded.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
       <div class="mt-4">
         {% include 'commons/history.html' %}
       </div>

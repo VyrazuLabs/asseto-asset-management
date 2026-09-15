@@ -175,6 +175,7 @@ def get_consumable_details(request, pk):
         "consumable": consumable,
         "page_object": page_object,
         "checkout_page_object": checkout_page_object,
+        "documents": consumable.documents.all(),
         "title": f"Consumable - {consumable}",
         "sidebar": "consumables",
     }

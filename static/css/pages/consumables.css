@@ -121,3 +121,43 @@
 .select2-container--open .select2-dropdown {
   border-color: #86b7fe;
 }
+
+/* Document list in edit/add forms */
+.consumable-docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--color-bg, #f8f9fa);
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 8px;
+}
+
+.consumable-doc-item {
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.consumable-doc-item:hover {
+  background: rgba(var(--color-primary-rgb, 99,102,241), 0.06);
+}
+
+.consumable-doc-label {
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  margin: 0;
+  user-select: none;
+}
+
+/* Checked row — subtle red tint to indicate deletion */
+.consumable-doc-item:has(input:checked) {
+  background: rgba(220, 38, 38, 0.06);
+  text-decoration: line-through;
+  opacity: 0.7;
+}

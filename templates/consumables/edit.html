@@ -158,6 +158,34 @@
           </div>
         </div>
       </div>
+      {# Section 5: Documents #}
+      <div class="form-section">
+        <div class="section-header">
+          <i class="bi bi-paperclip"></i> <span>Supporting Documents</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label for="id_documents">Upload New Documents</label>
+            {{ form.documents }}
+      
+            {% for doc in consumable.documents.all %}
+            <div class="existing-document-name">
+              {{ doc.file_name }}
+            </div>
+            {% endfor %}
+      
+            <small class="text-muted">
+              You can select multiple files. Accepted: pdf, doc, docx, xls, xlsx, images, etc.
+            </small>
+      
+            {% if form.documents.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.documents.errors.0 }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </form>
   </div>
 </div>

@@ -83,3 +83,29 @@ class ConsumableCheckout(TimeStampModel):
 
     def __str__(self):
         return f"{self.consumable} - {self.user} - {self.quantity}"
+
+
+def consumable_document_path(instance, filename):
+    upload_to = "consumable_documents/"
+    ext = filename.split(".")[-1]
+    filename = "{}.{}".format(uuid4().hex, ext)
+    return os.path.join(upload_to, filename)
+
+
+class ConsumableDocument(TimeStampModel):
+    """A document (bill, receipt, etc.) attached to a Consumable."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    consumable = models.ForeignKey(Consumable, on_delete=models.CASCADE, related_name="documents")
+    file = models.FileField(upload_to=consumable_document_path)
+    file_name = models.CharField(max_length=255)
+    file_size = models.PositiveIntegerField(default=0)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.file_name

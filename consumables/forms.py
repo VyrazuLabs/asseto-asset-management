@@ -6,6 +6,24 @@ from dashboard.models import Location
 from django.db.models import Q
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput(attrs={"class": "form-control", "id": "id_documents"}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+
 class ConsumableForm(forms.ModelForm):
     """ModelForm for creating/editing a Consumable, scoped to an organization for its FK choices."""
 
@@ -67,6 +85,7 @@ class ConsumableForm(forms.ModelForm):
         required=False,
         widget=forms.FileInput(attrs={"class": "form-control", "id": "id_image"}),
     )
+    documents = MultipleFileField(required=False, label="Upload Documents")
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop("organization", None)
