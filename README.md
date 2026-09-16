@@ -52,7 +52,7 @@ Take full control of your asset management on the go! Asseto's **companion mobil
 - **Real-Time Sync:** Every assignment, repair, or status update reflects instantly on the web.
 - **Manage Anywhere:** Track hardware, assign equipment, and oversee your inventory from anywhere.
 
-**[Download Asseto on Google Play →](https://play.google.com/store/apps/details?id=com.vyrazu.asseto)**
+<a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">**Download Asseto on Google Play →**</a>
 
 ## Why Asseto?
 
@@ -133,7 +133,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 ## Screenshots
 
-<details>
+<details open>
 <summary><b>Admin Section</b> — manage Locations, Departments, Product Types, Categories, and Roles</summary>
 
 ![Admin Section](static/images/014-New%20Location.png)
@@ -144,7 +144,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Vendors</b> — add, search, and export vendor records</summary>
 
 ![Vendors Section](static/images/015-New%20Vendor.png)
@@ -155,7 +155,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Products</b> — product lines, specifications, and inventory counts</summary>
 
 ![Products Section](static/images/016-New%20Product.png)
@@ -166,7 +166,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Users</b> — accounts, roles, and permissions</summary>
 
 ![Users Section](static/images/017-New%20Users.png)
@@ -176,7 +176,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Client Module</b> — register clients & control portal access</summary>
 
 ![Client Module](static/images/Clients.png)
@@ -187,7 +187,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Support Ticket Module</b> — List & Kanban views with interactive ticket management</summary>
 
 ![Support Ticket Module](static/images/support-ticket.png)
@@ -199,7 +199,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Client Portal</b> — OTP login & self-service asset management</summary>
 
 ![Client Portal Login](static/images/client-portal-login.png)
@@ -212,7 +212,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Assets</b> — profiles, assignment, and state transitions</summary>
 
 ![Assets Section](static/images/018-New%20Assets.png)
@@ -223,7 +223,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Bulk Asset Upload</b> — import bulk asset data all at once via CSV</summary>
 
 ![Bulk Asset Upload](static/images/asset-bulk-upload.png)
@@ -234,7 +234,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Upload</b> — CSV templates for bulk data insertion</summary>
 
 ![Upload Section](static/images/019-%20New%20Upload.png)
@@ -245,7 +245,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Recycle Bin</b> — restore or purge soft-deleted records</summary>
 
 ![Recycle Bin Section](static/images/013-recycle_bin.png)
@@ -256,7 +256,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Gate Pass Module</b> — manage inward and outward asset movements</summary>
 
 ![Gate Pass Module](static/images/Gate-Pass.png)
