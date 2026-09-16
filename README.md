@@ -52,7 +52,9 @@ Take full control of your asset management on the go! Asseto's **companion mobil
 - **Real-Time Sync:** Every assignment, repair, or status update reflects instantly on the web.
 - **Manage Anywhere:** Track hardware, assign equipment, and oversee your inventory from anywhere.
 
-<a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">**Download Asseto on Google Play →**</a>
+<!-- <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">**Download Asseto on Google Play →**</a> -->
+<a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank" rel="noopener noreferrer">**Download Asseto on Google Play →**</a>
+
 
 ## Why Asseto?
 
