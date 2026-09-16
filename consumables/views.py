@@ -101,7 +101,17 @@ def edit_consumable(request, pk):
                     uploaded_by=request.user,
                 )
 
-            qty = consumable.remaining_quantity if consumable.remaining_quantity is not None else consumable.quantity
+            # Recalculate remaining_quantity
+            from django.db.models import Sum
+            total_checked_out = consumable.checkouts.aggregate(
+                total=Sum("quantity")
+            )["total"] or 0
+            
+            new_qty = consumable.quantity or 0
+            consumable.remaining_quantity = max(0, new_qty - total_checked_out)
+            consumable.save(update_fields=["remaining_quantity"])
+
+            qty = consumable.remaining_quantity
             notify_low_stock(consumable, request.user, qty)
 
             messages.success(request, "Consumable updated successfully.")
