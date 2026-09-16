@@ -100,7 +100,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - **Asset Assignment & Custody**: Assign assets to users, track reassignments, and keep active custody logs.
 - **Asset Configuration Management**: Custom specification fields and category-based templates for diverse asset classes.
 - **Asset Repair Logs**: Repair histories, maintenance costs, status changes, and servicing vendors.
-- **Consumables Management**: Inventory tracking, stock-level alerts, and distribution management for office accessories.
+- **Consumables Management**: Track consumable stock with full purchase context — vendor, item/order numbers, purchase date, and cost. Check out quantities to users with automatic remaining-stock decrement and checkout history, set minimum-quantity thresholds that trigger automatic low-stock alerts, attach receipts/invoices and images to each consumable, and search or import your inventory with soft-delete recovery.
 - **Bulk Uploads**: Import Assets, Vendors, Locations, Departments, Categories, and Products via CSV templates.
 
 ### Gate Pass Management
@@ -220,6 +220,19 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - Navigate to the **Assets** section.
 - Create/edit asset profiles and assign them to users.
 - Manage state transitions (e.g., Reassign, Unassign).
+
+</details>
+
+<details open>
+<summary><b>Consumables</b> — track stock, checkouts, and low-stock alerts</summary>
+
+![Consumables Section](static/images/consumables.png)
+
+- Navigate to the **Consumables** section to manage consumable stock items.
+- Track purchase details such as vendor, order number, purchase date, and cost.
+- Check out quantities to users; remaining stock is decremented automatically with full checkout history.
+- Set minimum-quantity thresholds to trigger automatic low-stock alerts.
+- Attach images and supporting documents (bills, receipts) to each consumable.
 
 </details>
 
