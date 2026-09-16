@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
@@ -169,14 +170,36 @@ def toggle_custom_field(request, pk):
 
 # API Views
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="module",
+                required=False,
+                location=OpenApiParameter.QUERY,
+                enum=[value for value, _ in CustomFieldDefinition.MODULE_CHOICES],
+            )
+        ]
+    )
+)
 class CustomFieldDefinitionAPIList(generics.ListCreateAPIView):
     serializer_class = CustomFieldDefinitionSerializer
     permission_classes = [IsAuthenticated]
+    module_choices = [value for value, label in CustomFieldDefinition.MODULE_CHOICES]
 
     def get_queryset(self):
-        return CustomFieldDefinition.objects.filter(
+        custom_field_definitions = CustomFieldDefinition.objects.filter(
             organization=self.request.user.organization, is_deleted=False
         )
+
+        module = (self.request.query_params.get("module", None) or "").strip()
+
+        if module in self.module_choices:
+            custom_field_definitions = custom_field_definitions.filter(
+                module=self.module_choices[self.module_choices.index(module)]
+            )
+
+        return custom_field_definitions
 
     def perform_create(self, serializer):
         serializer.save(
