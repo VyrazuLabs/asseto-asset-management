@@ -102,6 +102,7 @@
           <th>Location</th>
           <th>Item No.</th>
           <th>Total QTY</th>
+          <th>Checked Out</th>
           <th>Remaining QTY</th>
           <th>Min QTY</th>
           <th>Purchase Cost</th>
@@ -128,6 +129,7 @@
           <td>{{ c.location.office_name|default:"-" }}</td>
           <td>{{ c.item_no|default:"-" }}</td>
           <td>{{ c.quantity|default:"-" }}</td>
+          <td>{{ c.total_checked_out }}</td>
           <td>
             {% if c.is_low_stock %}
               <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
@@ -188,7 +190,7 @@
       {% else %}
       <tbody>
         <tr>
-          <td colspan="11">
+          <td colspan="12">
             <div class="table-empty-state">
               <i class="bi bi-box-seam"></i>
               <p>No consumables found.<br>

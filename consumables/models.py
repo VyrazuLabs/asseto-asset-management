@@ -68,6 +68,12 @@ class Consumable(TimeStampModel, SoftDeleteModel):
             return qty <= self.min_qty
         return False
 
+    @property
+    def total_checked_out(self):
+        """Return the total quantity checked out."""
+        qty = self.quantity or 0
+        rem = self.remaining_quantity if self.remaining_quantity is not None else qty
+        return max(0, qty - rem)
 
 class ConsumableCheckout(TimeStampModel):
     """A record of a quantity of a Consumable checked out to a user."""

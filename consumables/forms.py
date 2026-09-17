@@ -118,3 +118,17 @@ class ConsumableForm(forms.ModelForm):
             "notes",
             "image",
         ]
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get("quantity")
+        # Only validate against checkouts if we're editing an existing instance
+        if self.instance and self.instance.pk and quantity is not None:
+            from django.db.models import Sum
+            total_checked_out = self.instance.checkouts.aggregate(
+                total=Sum("quantity")
+            )["total"] or 0
+            if quantity < total_checked_out:
+                raise forms.ValidationError(
+                    f"Cannot set quantity below already checked-out quantity ({total_checked_out})."
+                )
+        return quantity
