@@ -31,6 +31,29 @@
 
 *This is a shared, resettable demo account — please don't store anything sensitive in it.*
 
+## 📱 Mobile Application
+
+Take full control of your asset management on the go! Asseto's **companion mobile app** brings the power of your dashboard directly to your pocket.
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-1.webp" width="32%" alt="Asseto Mobile App View 1" />
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-2.webp" width="32%" alt="Asseto Mobile App View 2" />
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">
+    <img src="static/images/mobile-application-img-3.webp" width="32%" alt="Asseto Mobile App View 3" />
+  </a>
+</p>
+
+### 🚀 Why You'll Love It:
+- **Scan & Go:** Instantly audit and verify assets in the field by scanning QR codes.
+- **Real-Time Sync:** Every assignment, repair, or status update reflects instantly on the web.
+- **Manage Anywhere:** Track hardware, assign equipment, and oversee your inventory from anywhere.
+
+<a href="https://play.google.com/store/apps/details?id=com.vyrazu.asseto" target="_blank">**Download Asseto on Google Play →**</a>
+
 ## Why Asseto?
 
 Most teams still track laptops, equipment, and rented assets in spreadsheets — no custody trail, no audit history, and no way to prove who had what when it matters. Asseto replaces that with a single system of record: every assignment, repair, and modification is logged automatically, deleted records land in a recoverable Recycle Bin, and access is governed by custom roles and two-factor authentication. It ships with a REST API, Slack and Firebase push notifications, and a companion Flutter mobile app for physical audits in the field.
@@ -77,25 +100,40 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - **Asset Assignment & Custody**: Assign assets to users, track reassignments, and keep active custody logs.
 - **Asset Configuration Management**: Custom specification fields and category-based templates for diverse asset classes.
 - **Asset Repair Logs**: Repair histories, maintenance costs, status changes, and servicing vendors.
-- **Consumables Management**: Inventory tracking, stock-level alerts, and distribution management for office accessories.
-- **Bulk Uploads**: Import Vendors, Locations, Departments, Categories, and Products via CSV templates.
+- **Consumables Management**: Track consumable stock with full purchase context — vendor, item/order numbers, purchase date, and cost. Check out quantities to users with automatic remaining-stock decrement and checkout history, set minimum-quantity thresholds that trigger automatic low-stock alerts, attach receipts/invoices and images to each consumable, and search or import your inventory with soft-delete recovery.
+- **Bulk Uploads**: Import Assets, Vendors, Locations, Departments, Categories, and Products via CSV templates.
+
+### Gate Pass Management
+
+- **Inward & Outward Asset Movement**: Securely initiate and manage asset movements across your facilities.
+- **Approval Workflows**: Authorized users can approve or reject gate pass requests with complete audit logs.
+- **Prevent Duplicate Movement**: Lock assets with pending gate passes to prevent duplicate movement requests.
+- **QR Code Verification**: Print gate pass documents with QR codes for instant physical scanning and automated status updates.
+
+### Configurations
+
+- **Universal Custom Fields**: Create a custom field once and use it universally across Assets, Users, Products, Vendors, and Clients to standardize unique organizational data.
+- **Branding**: Customize system logos, login page branding, and favicon to match your company's brand identity.
+- **Tag Configurations**: Generate and manage custom asset tags
+- **Localization**: Configure local standard currencies, date formats, and multi-language interface preferences. Complete interface internationalization (i18n) for global teams.
+- **Organization Settings**: Set and manage company profiles, organization details, and global workspace defaults.
 
 ### Integration & Multi-Channel Sync
 
 - **REST API**: Secure endpoints to read and synchronize asset data with external systems.
-- **Slack Integration**: Push immediate alerts and updates to Slack workspace channels.
-- **Flexible Notifications**: Multi-channel notifications across Email and Firebase (FCM) push alerts.
+- **Slack Integration**: Push immediate alerts and updates to Slack workspace channels.(Improving)
+- **Flexible Notifications**: Multi-channel notifications across Email and Firebase (FCM) push alerts.(Improving)
 - **Mobile Application**: Flutter-based companion app for remote management and physical audits.
-- **Multi-Language Support**: Complete interface internationalization (i18n) for global teams.
 
 ### Portals & Customer Support
 
-- **Client Portal**: External rental clients log in to view rented assets and manage support requests.
-- **Support Ticket Management**: Issue reporting, tracking, and resolution workflows.
+- **Client Module**: Register and manage external clients within the system. Control access via the *Client Portal Access* toggle, allowing clients to log in securely with passwordless OTP verification sent to their registered email.
+- **Support Ticket Module**: Manage asset service and maintenance requests with List and Kanban views. Includes drag-and-drop status transitions, ticket lifecycle tracking, and built-in comment/conversation threads for seamless communication between admins and clients.
+- **Client Portal**: Empower clients with a dedicated self-service portal to view all assigned assets, track active support tickets, and submit new issues directly against their hardware inventory.
 
 ## Screenshots
 
-<details>
+<details open>
 <summary><b>Admin Section</b> — manage Locations, Departments, Product Types, Categories, and Roles</summary>
 
 ![Admin Section](static/images/014-New%20Location.png)
@@ -106,7 +144,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Vendors</b> — add, search, and export vendor records</summary>
 
 ![Vendors Section](static/images/015-New%20Vendor.png)
@@ -117,7 +155,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Products</b> — product lines, specifications, and inventory counts</summary>
 
 ![Products Section](static/images/016-New%20Product.png)
@@ -128,7 +166,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Users</b> — accounts, roles, and permissions</summary>
 
 ![Users Section](static/images/017-New%20Users.png)
@@ -138,7 +176,43 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
+<summary><b>Client Module</b> — register clients & control portal access</summary>
+
+![Client Module](static/images/Clients.png)
+
+- Navigate to the **Clients** section to register and manage client organizations.
+- Control client access using the **Client Portal Access** toggle.
+- Enabled clients log into the Client Portal seamlessly using OTP-based email verification.
+
+</details>
+
+<details open>
+<summary><b>Support Ticket Module</b> — List & Kanban views with interactive ticket management</summary>
+
+![Support Ticket Module](static/images/support-ticket.png)
+
+- View and manage support tickets using List View or interactive **Kanban View**.
+- Drag and drop ticket cards across status columns (e.g., Open, In Progress, Resolved).
+- Create, edit, and track tickets tied directly to specific assets.
+- Collaborate with clients through the built-in comment and conversation thread within each ticket.
+
+</details>
+
+<details open>
+<summary><b>Client Portal</b> — OTP login & self-service asset management</summary>
+
+![Client Portal Login](static/images/client-portal-login.png)
+
+![Client Portal Dashboard](static/images/client-portal.png)
+
+- **OTP Authentication**: Clients log in securely via OTP sent to their registered email address.
+- **Asset Visibility**: View all hardware and equipment currently assigned to their organization.
+- **Ticket Tracking**: View ticket resolution progress and log new support tickets directly against assigned assets.
+
+</details>
+
+<details open>
 <summary><b>Assets</b> — profiles, assignment, and state transitions</summary>
 
 ![Assets Section](static/images/018-New%20Assets.png)
@@ -149,7 +223,31 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
+<summary><b>Consumables</b> — track stock, checkouts, and low-stock alerts</summary>
+
+![Consumables Section](static/images/consumables.png)
+
+- Navigate to the **Consumables** section to manage consumable stock items.
+- Track purchase details such as vendor, order number, purchase date, and cost.
+- Check out quantities to users; remaining stock is decremented automatically with full checkout history.
+- Set minimum-quantity thresholds to trigger automatic low-stock alerts.
+- Attach images and supporting documents (bills, receipts) to each consumable.
+
+</details>
+
+<details open>
+<summary><b>Bulk Asset Upload</b> — import bulk asset data all at once via CSV</summary>
+
+![Bulk Asset Upload](static/images/asset-bulk-upload.png)
+
+- Navigate to the **Assets** or **Bulk Upload** section.
+- Upload multiple hardware, laptop, and equipment records simultaneously using structured CSV files.
+- Accelerate workspace onboarding and batch inventory updates seamlessly.
+
+</details>
+
+<details open>
 <summary><b>Upload</b> — CSV templates for bulk data insertion</summary>
 
 ![Upload Section](static/images/019-%20New%20Upload.png)
@@ -160,7 +258,7 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 
 </details>
 
-<details>
+<details open>
 <summary><b>Recycle Bin</b> — restore or purge soft-deleted records</summary>
 
 ![Recycle Bin Section](static/images/013-recycle_bin.png)
@@ -168,6 +266,18 @@ Check the [Releases page](https://github.com/VyrazuLabs/asseto-asset-management/
 - Access the **Recycle Bin** from the settings panel.
 - View soft-deleted records grouped by category.
 - Restore items back to active tables or permanently purge them.
+
+</details>
+
+<details open>
+<summary><b>Gate Pass Module</b> — manage inward and outward asset movements</summary>
+
+![Gate Pass Module](static/images/Gate-Pass.png)
+
+- Create and manage Gate Passes for single or multiple assets securely.
+- Prevent duplicate requests with automatic pending pass detection.
+- Print QR codes on Gate Pass documents for instant gate scanning and status updates.
+- Maintain comprehensive audit trails of all approvals, rejections, and asset movements.
 
 </details>
 
@@ -290,9 +400,9 @@ The web platform is deepening its lifecycle, security, and localization capabili
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🟡 | [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management) | 1 / 3 |
+| 🟢 | [Asset Configurations & Lifecycle Management](ROADMAP.md#asset-configurations--lifecycle-management) | 3 / 3 |
 | 🟡 | [Security & Audit Systems](ROADMAP.md#security--audit-systems) | 2 / 3 |
-| 🔵 | [Localization & User Preferences](ROADMAP.md#localization--user-preferences) | 0 / 1 |
+| 🟢 | [Localization & User Preferences](ROADMAP.md#localization--user-preferences) | 1 / 1 |
 
 ### Integrations & APIs
 
@@ -309,7 +419,7 @@ External-facing portal and ticketing improvements are planned — see [Client Po
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🔵 | [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management) | 0 / 2 |
+| 🟢 | [Client Portal & Ticket Management](ROADMAP.md#client-portal--ticket-management) | 2 / 2 |
 
 ### Mobile Application
 
@@ -317,7 +427,7 @@ The Flutter companion app is under active development — see [Mobile Applicatio
 
 | Status | Milestone | Goals Completed |
 |---|---|---|
-| 🔵 | [Mobile Application Development](ROADMAP.md#mobile-application-development) | 0 / 1 |
+| 🟢 | [Mobile Application Development](ROADMAP.md#mobile-application-development) | 1 / 1 |
 
 ## Contributing
 

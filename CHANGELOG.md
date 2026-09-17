@@ -12,6 +12,22 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [v1.8.1] — 2026-09-17
+
+### Added
+- **Consumables Management Module** — Comprehensive non-capital inventory tracking (quantity, remaining quantity, purchase details, location, vendor), automated low stock email alerts (`consumables/utils.py`), supporting document uploads (`ConsumableDocument`), soft-delete Recycle Bin workflow, and granular RBAC permission gates.
+- **Custom Fields API Filtering** — Added `module` query parameter support in `Get Custom Fields List API` (`custom_fields/views.py`) for module-filtered custom fields retrieval.
+
+### Changed
+- **Audit Scheduling Guard Clauses** — Added defensive `None` next due date handling in `audit/utils.py` and `audit/api_utils.py` preventing calculation errors.
+- **Showcase & Documentation Updates** — Expanded `README.md` and `ROADMAP.md` with system architecture diagrams, milestone updates, and rich UI previews for core modules.
+
+### Fixed
+- **Consumables Quantity Recalculation** — Resolved quantity update and remaining quantity calculation discrepancies in `consumables/forms.py` and views.
+- **Location Bulk Upload Empty Cells** — Fixed `NaN` parsing issue when bulk uploading CSV files with empty location cells (`upload/views/location_views.py`).
+
+---
+
 ## [v1.8.0] — 2026-09-13
 
 ### Added

@@ -1,0 +1,326 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block title %}Consumables | Asseto{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'css/pages/consumables.css' %}">
+{% endblock css %}
+
+{% block content %}
+<div class="list-page-header">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
+        <li class="breadcrumb-item active">Consumables</li>
+      </ol>
+    </nav>
+    <h1>Consumables</h1>
+    <p class="page-subtitle">Manage your consumable stock and inventory</p>
+  </div>
+  <div class="d-flex align-items-center gap-2 mt-1">
+    {% if perms.recycle_bin.view_recycle_bin %}
+    <a href="{% url 'recycle_bin:deleted_consumables' %}" class="btn-trash" title="Recycle Bin">
+      <i class="bi bi-trash3"></i> Trash
+      {% if deleted_count %}<span class="count-badge">{{ deleted_count }}</span>{% endif %}
+    </a>
+    {% endif %}
+    {% if perms.consumables.add_consumable %}
+    <a href="{% url 'consumables:add' %}" class="btn-register">
+      <i class="bi bi-plus-lg"></i> Add Consumable
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Stat cards #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="bi bi-box-seam"></i></div>
+    <div>
+      <div class="stat-label">Total Consumables</div>
+      <div class="stat-value">{{ total_count }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-hash"></i></div>
+    <div>
+      <div class="stat-label">Total Quantity</div>
+      <div class="stat-value">{{ total_quantity }}</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="bi bi-exclamation-triangle-fill"></i></div>
+    <div>
+      <div class="stat-label">Low Stock</div>
+      <div class="stat-value">{{ low_stock_count }}</div>
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-icon purple"><i class="bi bi-currency-rupee"></i></div>
+    <div>
+      <div class="stat-label">Total Purchase Cost</div>
+      <div class="stat-value">₹{{ total_purchase_cost|floatformat:2 }}</div>
+    </div>
+  </div>
+</div>
+
+{# ── Filter bar #}
+<div class="filter-card">
+  <div id="consumable-filter-form" class="row g-2 align-items-end">
+    <div class="col">
+      <div class="filter-label">Search Consumable</div>
+      <input name="search_text" type="search"
+        autocomplete="off" placeholder="Search by product, vendor, location, item no..."
+        hx-get="{% url 'consumables:search' page_object.number %}"
+        hx-trigger="keyup changed delay:400ms, search"
+        hx-target="#search_result"
+        aria-label="Search consumable">
+    </div>
+    <div class="col-auto">
+      <a href="{% url 'consumables:list' %}" class="btn-reset" title="Reset">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </a>
+    </div>
+  </div>
+</div>
+
+{# ── Table card #}
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="list-table" id="consumables-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Product</th>
+          <th>Vendor</th>
+          <th>Location</th>
+          <th>Item No.</th>
+          <th>Total QTY</th>
+          <th>Checked Out</th>
+          <th>Remaining QTY</th>
+          <th>Min QTY</th>
+          <th>Purchase Cost</th>
+          {% if perms.consumables.view_consumable or perms.consumables.edit_consumable or perms.consumables.delete_consumable %}
+          <th>Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      {% if page_object %}
+      <tbody id="search_result">
+        {% for c in page_object %}
+        <tr>
+          <td class="table-index-cell">{{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}</td>
+          <td class="consumable-row-media">
+            <img class="list-thumb"
+              src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+              alt="{{ c.consumable_name }}"
+              width="52" height="52"
+              onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            <div class="cell-name-main">{{ c.consumable_name|default:"-" }}</div>
+          </td>
+          <td>{{ c.product.name|default:"-" }}</td>
+          <td>{{ c.vendor.name|default:"-" }}</td>
+          <td>{{ c.location.office_name|default:"-" }}</td>
+          <td>{{ c.item_no|default:"-" }}</td>
+          <td>{{ c.quantity|default:"-" }}</td>
+          <td>{{ c.total_checked_out }}</td>
+          <td>
+            {% if c.is_low_stock %}
+              <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
+            {% else %}
+              {{ c.remaining_quantity|default_if_none:c.quantity|default:"-" }}
+            {% endif %}
+          </td>
+          <td>
+            {% if c.is_low_stock and c.min_qty is not None %}
+              <span title="This item is below the minimum quantity required">{{ c.min_qty }} <i class="bi bi-exclamation-triangle text-danger"></i></span>
+            {% else %}
+              {{ c.min_qty|default:"-" }}
+            {% endif %}
+          </td>
+          <td>{% if c.purchase_cost %}₹{{ c.purchase_cost }}{% else %}-{% endif %}</td>
+          {% if perms.consumables.view_consumable or perms.consumables.edit_consumable or perms.consumables.delete_consumable %}
+          <td>
+            <div class="row-actions">
+              {% if perms.consumables.edit_consumable %}
+              {% with rem_qty=c.remaining_quantity|default_if_none:c.quantity|default:"0" %}
+              {% if rem_qty != "0" %}
+              <button type="button" class="action-btn" title="Checkout"
+                      onclick="openCheckoutModal('{{ c.pk }}', '{{ c.consumable_name|escapejs }}', '{{ c.product.name|escapejs|default:"-" }}', '{{ c.quantity|default:"0" }}', '{{ rem_qty }}')">
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
+              {% else %}
+              <button type="button" class="action-btn consumable-action-btn-disabled" title="Cannot be checked out.Check the remaining quantity." disabled>
+                <i class="bi bi-box-arrow-right"></i>
+              </button>
+              {% endif %}
+              {% endwith %}
+              {% endif %}
+              {% if perms.consumables.view_consumable %}
+              <a href="{% url 'consumables:detail' c.pk %}" class="action-btn" title="View">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% endif %}
+              {% if perms.consumables.edit_consumable %}
+              <a href="{% url 'consumables:edit' c.pk %}" class="action-btn" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% endif %}
+              {% if perms.consumables.delete_consumable %}
+              <form action="{% url 'consumables:delete' c.pk %}" method="post" class="form-row-action"
+                    onsubmit="return confirm('Are you sure you want to delete this consumable?')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn danger" title="Delete">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+      {% else %}
+      <tbody>
+        <tr>
+          <td colspan="12">
+            <div class="table-empty-state">
+              <i class="bi bi-box-seam"></i>
+              <p>No consumables found.<br>
+                <a href="{% url 'consumables:add' %}" class="link-primary">Add your first consumable</a>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      {% endif %}
+    </table>
+  </div>
+  {% include 'commons/list-pagination.html' with item_label="consumables" %}
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>Checkout Consumable</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="checkoutForm" method="post" action="">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Consumable Name</label>
+            <input type="text" id="modalConsumableName" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Product</label>
+            <input type="text" id="modalProductName" class="form-control" readonly>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold">Total Quantity</label>
+              <input type="text" id="modalTotalQty" class="form-control" readonly>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold">Remaining Quantity</label>
+              <input type="text" id="modalRemainingQty" class="form-control" readonly>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="modalUserSelect" class="form-label fw-bold">Select User <span class="text-danger">*</span></label>
+            <select name="user" id="modalUserSelect" class="form-select consumable-select-full-width" required>
+              <option value="" selected disabled>Select User</option>
+              {% for u in users %}
+              <option value="{{ u.pk }}" data-search="{{ u.get_full_name|default:u.username }} {{ u.username|lower }}">{{ u.get_full_name|default:u.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="modalCheckoutQty" class="form-label fw-bold">Quantity to Checkout <span class="text-danger">*</span></label>
+            <input type="number" name="quantity" id="modalCheckoutQty" class="form-control" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label for="modalNotes" class="form-label fw-bold">Notes</label>
+            <textarea name="notes" id="modalNotes" class="form-control" rows="3" placeholder="Optional notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Checkout</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  var $checkoutModal = $('#checkoutModal');
+  var $userSelect = $('#modalUserSelect');
+
+  $checkoutModal.on('shown.bs.modal', function () {
+    if (!$userSelect.data('select2')) {
+      $userSelect.select2({
+        placeholder: "Search and select user...",
+        allowClear: true,
+        dropdownParent: $checkoutModal,
+        width: '100%',
+        minimumInputLength: 0,
+        language: {
+          noResults: function() {
+            return "No users found";
+          },
+          searching: function() {
+            return "Searching...";
+          }
+        }
+      });
+    }
+  });
+
+  $checkoutModal.on('hidden.bs.modal', function () {
+    if ($userSelect.data('select2')) {
+      $userSelect.select2('destroy');
+    }
+  });
+});
+
+function openCheckoutModal(id, name, product, totalQty, remainingQty) {
+  document.getElementById('modalConsumableName').value = name;
+  document.getElementById('modalProductName').value = product;
+  document.getElementById('modalTotalQty').value = totalQty;
+  document.getElementById('modalRemainingQty').value = remainingQty;
+  document.getElementById('modalCheckoutQty').max = remainingQty;
+  document.getElementById('modalCheckoutQty').value = 1;
+  document.getElementById('modalNotes').value = '';
+  
+  var form = document.getElementById('checkoutForm');
+  form.action = "{% url 'consumables:checkout' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', id);
+  
+  // reset select2 selection
+  var $userSelect = $('#modalUserSelect');
+  if ($userSelect.data('select2')) {
+    $userSelect.val(null).trigger('change');
+  } else {
+    $userSelect.val('');
+  }
+  
+  var modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+  modal.show();
+}
+</script>
+{% endblock content %}

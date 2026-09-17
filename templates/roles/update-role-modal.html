@@ -508,6 +508,34 @@
                                 </div>
                             </div>
 
+                            <!-- Consumables -->
+                            <div class="module-permission-card">
+                                <div class="module-card-header">
+                                    <div class="form-check">
+                                        <input class="form-check-input ischeck" type="checkbox" data-id="Consumables" id="chk-Consumables">
+                                        <label class="form-check-label" for="chk-Consumables">Consumables</label>
+                                    </div>
+                                </div>
+                                <div class="module-card-body">
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Consumables" id="view_consumable" name="permissions[]" type="checkbox" value="view_consumable" {% if 'view_consumable' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="view_consumable">{{ trans.view }}</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Consumables" id="add_consumable" name="permissions[]" type="checkbox" value="add_consumable" {% if 'add_consumable' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="add_consumable">{{ trans.perm_add }}</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Consumables" id="edit_consumable" name="permissions[]" type="checkbox" value="edit_consumable" {% if 'edit_consumable' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="edit_consumable">{{ trans.edit }}</label>
+                                    </div>
+                                    <div class="perm-item">
+                                        <input class="form-check-input isscheck isscheck_Consumables" id="delete_consumable" name="permissions[]" type="checkbox" value="delete_consumable" {% if 'delete_consumable' in permissions %} checked {% endif %}>
+                                        <label class="form-check-label" for="delete_consumable">{{ trans.delete }}</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Recycle Bin -->
                             <div class="module-permission-card">
                                 <div class="module-card-header">

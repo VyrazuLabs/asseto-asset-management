@@ -97,7 +97,7 @@
           {% with asset=data.asset %}
           <tr>
             <td class="table-index-cell">
-              {{ forloop.counter|stringformat:"02d" }}
+              {{ data_set.start_index|add:forloop.counter0|stringformat:"02d" }}
             </td>
 
             <td>

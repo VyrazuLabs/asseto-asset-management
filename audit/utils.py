@@ -17,12 +17,10 @@ def get_audit_stats(request):
     asset_list = Asset.undeleted_objects.all()
     pending_count = 0
     for asset in asset_list:
-        has_audit = Audit.objects.filter(asset=asset).order_by("-created_at").first()
         next_due = next_audit_due_for_asset(asset)
-        if has_audit and next_due:
-            if next_due <= datetime.now().date():
-                pending_count += 1
-        elif not has_audit:
+        if next_due is None:
+            continue
+        if next_due <= datetime.now().date():
             pending_count += 1
 
     return {
@@ -84,28 +82,26 @@ def get_pending_audits(request):
     asset_list = Asset.undeleted_objects.all()
     data_set = []
     for asset in asset_list:
-        # latest_audit = Audit.objects.filter(
-        #     asset=OuterRef("pk")
-        # ).order_by("-created_at")
-
-        # assets = Asset.objects.annotate(
-        #     last_audit_date=Subquery(latest_audit.values("created_at")[:1])
-        # )
         has_audit = Audit.objects.filter(asset=asset).order_by("-created_at").first()
         next_due_date = next_audit_due_for_asset(asset)
-        if has_audit and next_due_date:
-            if next_due_date > datetime.now().date():
-                continue
+        if next_due_date is None:
+            continue
+        if next_due_date > datetime.now().date():
+            continue
         data = {}
         data["asset"] = asset
         data["expected_audit_date"] = next_due_date
         data["last_audit_date"] = has_audit
         data_set.append(data)
 
+    page = request.GET.get("page", 1)
+    paginator = Paginator(data_set, 10)
+    page_object = paginator.get_page(page)
+
     from assets.models import AssetImage, AssignAsset
     from collections import defaultdict
 
-    asset_ids = [data["asset"].id for data in data_set if data.get("asset")]
+    asset_ids = [data["asset"].id for data in page_object if data.get("asset")]
 
     asset_images = {}
     for img in AssetImage.objects.filter(
@@ -133,7 +129,7 @@ def get_pending_audits(request):
         asset_conditions_map[a.asset_id].append(a.condition)
 
     return {
-        "data_set": data_set,
+        "data_set": page_object,
         "asset_images": asset_images,
         "asset_user_map": asset_user_map,
         "asset_conditions_map": asset_conditions_map,
