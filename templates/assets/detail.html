@@ -134,6 +134,11 @@
           </div>
 
           <div class="detail-field">
+            <span class="detail-field-label">{{ trans.client }}</span>
+            <span class="detail-field-value">{{ asset.client.name|default:"—" }}</span>
+          </div>
+
+          <div class="detail-field">
             <span class="detail-field-label">{{ trans.purchase_date }}</span>
             <span class="detail-field-value">{{ asset.purchase_date|default:"—" }}</span>
           </div>

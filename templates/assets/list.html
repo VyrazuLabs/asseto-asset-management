@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {% endblock css %}
 
 {% block content %}
@@ -125,23 +126,44 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">{{ trans.product_types }}</div>
+        <div class="filter-label">{{ trans.product_name }}</div>
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
-            All Types
-            
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product">
+            All Products
+          </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
-            {% for type in product_type_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product]').value='';document.getElementById('product-btn').childNodes[0].textContent='{{ trans.all_products }} ';htmx.trigger('#asset-filter-form','change');">All Products</a></li>
+            {% for product in product_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
-              {{ type.name }}
+              onclick="event.preventDefault();document.querySelector('[name=product]').value='{{ product.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ product.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ product.name }}
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="type">
+          <input type="hidden" name="product">
         </div>
       </div>
+
+      {% if has_clients %}
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">{{ trans.clients }}</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="client-btn" aria-label="Filter by client">
+            All Clients
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=client]').value='';document.getElementById('client-btn').childNodes[0].textContent='All Clients ';htmx.trigger('#asset-filter-form','change');">All Clients</a></li>
+            {% for client in client_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=client]').value='{{ client.id }}';document.getElementById('client-btn').childNodes[0].textContent='{{ client.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ client.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="client">
+        </div>
+      </div>
+      {% endif %}
 
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">{{ trans.product_categories }}</div>
@@ -226,8 +248,9 @@
           <th>{{ trans.image_label_col }}</th>
           <th>{{ trans.asset_tag_col }}</th>
           <th>{{ trans.asset_name_col }}</th>
-          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.product_name }}</th>
           <th>{{ trans.vendor }}</th>
+          {% if has_clients %}<th>{{ trans.client }}</th>{% endif %}
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
           {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
@@ -274,7 +297,7 @@
             {% endwith %}
           </td>
 
-          <td>{{ asset.product.product_type }}</td>
+          <td>{{ asset.product.name }}</td>
 
           <td>
             {{ asset.vendor }}
@@ -282,6 +305,16 @@
               <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
             {% endif %}
           </td>
+
+          {% if has_clients %}
+          <td>
+            {% if asset.client %}
+              {{ asset.client.name }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          {% endif %}
 
           <td>
             {% if asset.is_assigned %}
@@ -298,15 +331,27 @@
                   {% endif %}
                   <span>{{ map.full_name|default:"Unknown User" }}</span>
                 </div>
+                <div class="d-flex gap-1 align-items-center mt-1">
+                {% if perms.assets.delete_assign_asset %}
+                <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
+                      class="form-row-action d-inline m-0"
+                      onsubmit="return confirm('Unassign this asset?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-unassign">Unassign</button>
+                </form>
+                {% endif %}
+                {% if perms.assets.reassign_assign_asset and map.assign_id %}
+                <button type="button" class="btn-reassign"
+                  hx-get="{% url 'assets:reassign_asset' map.assign_id %}"
+                  hx-target="#reassign-asset-modal-content"
+                  data-bs-toggle="modal"
+                  data-bs-target="#reassign-asset-list-modal"
+                  aria-label="Reassign {{ asset.name }}">
+                  Reassign
+                </button>
+                {% endif %}
+                </div>
               {% endwith %}
-              {% if perms.assets.delete_assign_asset %}
-              <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
-                    class="form-row-action"
-                    onsubmit="return confirm('Unassign this asset?')">
-                {% csrf_token %}
-                <button type="submit" class="btn-unassign">Unassign</button>
-              </form>
-              {% endif %}
             {% else %}
               <span class="unassigned-label">Unassigned</span>
               {% if perms.assets.add_assign_asset %}
@@ -431,6 +476,12 @@
   </div>
 </div>
 
+<div class="modal fade" id="reassign-asset-list-modal" tabindex="-1" aria-labelledby="reassignAssetLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="reassign-asset-modal-content" hx-target="this"></div>
+  </div>
+</div>
+
 <script>
 function getCookie(name) {
   let cookieValue = null;
@@ -462,6 +513,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+var $raUserSelect = null;
+function initReassignSelect2() {
+    $raUserSelect = $('#reassign-asset-list-modal [name="user"]');
+    if ($raUserSelect.length && !$raUserSelect.data('select2')) {
+        $raUserSelect.select2({
+            theme: 'default',
+            width: '100%',
+            dropdownParent: $('#reassign-asset-list-modal'),
+            placeholder: 'Search for a user...',
+            allowClear: true
+        });
+    }
+}
+var reassignModal = document.getElementById('reassign-asset-list-modal');
+if (reassignModal) {
+    reassignModal.addEventListener('shown.bs.modal', function() { initReassignSelect2(); });
+    reassignModal.addEventListener('hide.bs.modal', function() {
+        if ($raUserSelect && $raUserSelect.data('select2')) { $raUserSelect.select2('destroy'); }
+    });
+}
 </script>
 
 {% endblock %}

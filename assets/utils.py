@@ -8,6 +8,8 @@ from configurations.models import TagConfiguration
 from configurations.utils import dynamic_display_name, format_datetime, generate_asset_tag, get_currency_and_datetime_format
 from .models import Asset,AssignAsset,AssetImage,AssetStatus,AssetStatusChoice,Location,Vendor,MaintenanceRecord
 from dashboard.models import Department,ProductType,ProductCategory
+from products.models import Product
+from clients.models import Client
 from .forms import AssetForm, AssignedAssetForm,ReassignedAssetForm,MaintenanceRecordForm
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
@@ -168,6 +170,7 @@ def get_asset_filter_data(request):
 
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
+    client_data = request.POST.get("client-data")
     product = request.POST.get("product")  # gets the id of the product
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
@@ -175,7 +178,8 @@ def filtered_asset(request):
     department_id = request.GET.get("department")
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
-    type_id = request.GET.get("type")
+    product_id = request.GET.get("product")
+    client_id = request.GET.get("client")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(
         organization=request.user.organization if request.user.organization else None
@@ -191,7 +195,7 @@ def filtered_asset(request):
             | Q(vendor__name__icontains=search_text)
             | Q(vendor__gstin_number__icontains=search_text)
             | Q(location__office_name__icontains=search_text)
-            | Q(product__product_type__name__icontains=search_text)
+            | Q(client__name__icontains=search_text)
         )
 
     if vendor_id:
@@ -200,10 +204,18 @@ def filtered_asset(request):
         filters &= Q(asset_status__name__icontains=status_name)
     if category_id:
         filters &= Q(product__product_sub_category_id=category_id)
-    if type_id:
-        filters &= Q(product__product_type_id=type_id)
+    if product_id:
+        filters &= Q(product_id=product_id)
+    if client_id:
+        filters &= Q(client_id=client_id)
     if location_id:
         filters &= Q(location_id=location_id)
+
+    is_assigned = request.GET.get("is_assigned")
+    if is_assigned == 'true':
+        filters &= Q(is_assigned=True)
+    elif is_assigned == 'false':
+        filters &= Q(is_assigned=False)
 
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
 
@@ -228,6 +240,8 @@ def filtered_asset(request):
         assets_qs = assets_qs.filter(assignasset__user=user_data).prefetch_related(
             Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
         )
+    if client_data:
+        assets_qs = assets_qs.filter(client_id=client_data)
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -250,6 +264,8 @@ def create_asset_list(request, assets_qs):
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
+    product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
+    client_list = Client.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
     asset_list = Asset.undeleted_objects.filter(org_filter).order_by("-created_at")
     if not request.user.has_perm("assets.all_asset"):
         asset_list = asset_list.filter(assignasset__user=request.user).distinct()
@@ -267,14 +283,16 @@ def create_asset_list(request, assets_qs):
     asset_user_map = {}
     for assign in get_assigned_asset_list:
         if assign.asset_id not in asset_user_map:
-            asset_user_map[assign.asset_id] = None
-        if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id] = {
-                "full_name": dynamic_display_name(
-                    request, fullname=assign.user.full_name
-                ),
-                "image": assign.user.profile_pic,
-            }
+            if assign.user:
+                asset_user_map[assign.asset_id] = {
+                    "full_name": dynamic_display_name(
+                        request, fullname=assign.user.full_name
+                    ),
+                    "image": assign.user.profile_pic,
+                    "assign_id": assign.id,
+                }
+            else:
+                asset_user_map[assign.asset_id] = None
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     if assets_qs.exists():
         paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
@@ -314,6 +332,9 @@ def create_asset_list(request, assets_qs):
         "location_list": location_list,
         "asset_user_map": asset_user_map,
         "product_type_list": product_type_list,
+        "product_list": product_list,
+        "client_list": client_list,
+        "has_clients": client_list.exists(),
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
@@ -609,7 +630,8 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     user_id = request.GET.get("user")
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
-    product_type_id = request.GET.get("type")
+    product_id = request.GET.get("product")
+    client_id = request.GET.get("client")
 
     # Start query
     q = Q(organization=request.user.organization)
@@ -624,7 +646,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
             | Q(vendor__name__icontains=search_text)
             | Q(vendor__gstin_number__icontains=search_text)
             | Q(location__office_name__icontains=search_text)
-            | Q(product__product_type__name__icontains=search_text)
+            | Q(client__name__icontains=search_text)
             | Q(tag__icontains=search_text)
         )
 
@@ -637,8 +659,11 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if product_category_id:
         q &= Q(product__product_category__id=product_category_id)
 
-    if product_type_id:
-        q &= Q(product__product_type_id=product_type_id)
+    if product_id:
+        q &= Q(product_id=product_id)
+
+    if client_id:
+        q &= Q(client_id=client_id)
 
     # Scope to assigned assets unless user has all_asset
     if not request.user.has_perm("assets.all_asset"):
@@ -691,14 +716,19 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
                     request, fullname=assign.user.full_name
                 ),
                 "image": assign.user.profile_pic,
+                "assign_id": assign.id,
             }
 
+    has_clients = Client.undeleted_objects.filter(
+        organization=request.user.organization
+    ).exists()
     context = {
         "page_object": page_object,
         "asset_user_map": asset_user_map,
         "asset_images": asset_images,
         "list_of_audited_assets": list_of_audited_assets,
         "asset_conditions_map": asset_conditions_map,
+        "has_clients": has_clients,
     }
     return context
 

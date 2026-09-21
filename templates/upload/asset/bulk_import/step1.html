@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Assets Upload History - Step 1 | Asseto{% endblock %}
+{% block title %}{{ trans.bulk_import_title }} - Step 1 | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -104,13 +104,13 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb page-breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
-                <li class="breadcrumb-item active">Assets Upload History</li>
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">{{ trans.assets }}</a></li>
+                <li class="breadcrumb-item active">{{ trans.bulk_import_title }}</li>
             </ol>
         </nav>
-        <h1>Assets Upload History</h1>
-        <p class="text-muted small">View and manage history of imported asset records.</p>
+        <h1>{{ trans.bulk_import_title }}</h1>
+        <p class="text-muted small">{{ trans.bulk_import_subtitle }}</p>
     </div>
 </div>
 
@@ -121,8 +121,8 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
     <div class="col-md-4 mb-4">
         <div class="card card-rounded shadow-sm h-100 p-2">
             <div class="card-body">
-                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-down text-primary" style="color: #553af2 !important;"></i> Download Sample Templates</h5>
-                <p class="text-muted small mb-4" style="line-height: 1.6;">To guarantee perfect mapping, formulate your bulk assets spreadsheet and asset photos according to the standards defined inside our reference schemas.</p>
+                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-down text-primary" style="color: #553af2 !important;"></i> {{ trans.download_sample_templates }}</h5>
+                <p class="text-muted small mb-4" style="line-height: 1.6;">{{ trans.download_template_desc }}</p>
                 <div class="d-grid gap-3">
                     <a href="{% url 'upload:bulk_import_template_csv' %}" class="btn text-start p-3 d-flex align-items-center justify-content-between" style="background-color: #f0fdf4; border: 1px solid #dcfce7; border-radius: 12px; text-decoration: none; color: inherit;">
                         <div class="d-flex align-items-center gap-3">
@@ -131,7 +131,7 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
                             </div>
                             <div style="line-height:1.2;">
                                 <div class="fw-bold" style="font-size: 0.8rem;">assets_template.csv</div>
-                                <div class="text-muted" style="font-size: 0.7rem;">Preformatted schema file</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">{{ trans.csv_template_label }}</div>
                             </div>
                         </div>
                         <i class="bi bi-arrow-down text-muted"></i>
@@ -143,14 +143,14 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
                             </div>
                             <div style="line-height:1.2;">
                                 <div class="fw-bold" style="font-size: 0.8rem;">asset_photos.zip</div>
-                                <div class="text-muted" style="font-size: 0.7rem;">Sample asset images directory</div>
+                                <div class="text-muted" style="font-size: 0.7rem;">{{ trans.zip_template_label }}</div>
                             </div>
                         </div>
                         <i class="bi bi-arrow-down text-muted"></i>
                     </a>
                 </div>
                 <div class="mt-4 p-3 rounded" style="background-color: #f5f3ff; color: #6b21a8; font-size: 0.75rem;">
-                    <i class="bi bi-info-circle-fill me-1" style="color: #553af2;"></i> <strong style="color: #553af2;">Pro-Tip:</strong> Name the column containing your photo files <code>image_filename</code> in your CSV sheet!
+                    <i class="bi bi-info-circle-fill me-1" style="color: #553af2;"></i> <strong style="color: #553af2;">{{ trans.pro_tip }}</strong> {{ trans.pro_tip_text }}
                 </div>
             </div>
         </div>
@@ -160,8 +160,8 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
     <div class="col-md-8 mb-4">
         <div class="card card-rounded shadow-sm h-100 p-2">
             <div class="card-body">
-                                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-up text-primary" style="color: #553af2 !important;"></i> Upload Files</h5>
-                <p class="text-muted small mb-4">Attach your metadata worksheet and compressed ZIP containing the referenced pictures.</p>
+                                <h5 class="card-title fw-bold mb-3" style="color: #4a5568;"><i class="bi bi-cloud-arrow-up text-primary" style="color: #553af2 !important;"></i> {{ trans.upload_files }}</h5>
+                <p class="text-muted small mb-4">{{ trans.upload_files_desc }}</p>
                 
                 <form method="POST" enctype="multipart/form-data" action="{% url 'upload:bulk_import_step1' %}" novalidate>
                     {% csrf_token %}
@@ -171,36 +171,36 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
                             <!-- Empty State CSV -->
                             <div id="csvEmptyState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center align-items-center" style="border: 2px dashed #cbd5e1; background-color: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('csvFiles').click()">
                                 <i class="bi bi-cloud-arrow-up text-muted mb-2" style="font-size: 2rem;"></i>
-                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">Click to upload CSV File</div>
-                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">Support for .csv format</div>
+                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">{{ trans.click_to_upload_csv }}</div>
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">{{ trans.csv_format_support }}</div>
                             </div>
                             
                             <!-- Filled State CSV -->
                             <div id="csvFilledState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center d-none" style="border: 2px dashed #4ade80; background-color: #f0fdf4; cursor: pointer;">
                                 <div class="mx-auto mb-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.2;"><i class="bi bi-check-lg" style="opacity: 1; color: #166534;"></i></div>
                                 <div id="csvFileName" class="fw-bold fs-6" style="color: #1f2937;">asseto_hardware_list.csv</div>
-                                <div class="small" style="color: #166534; font-weight: 500;">Successfully attached</div>
-                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'csvFiles', 'csvEmptyState', 'csvFilledState')">Click here to re-upload</div>
+                                <div class="small" style="color: #166534; font-weight: 500;">{{ trans.successfully_attached }}</div>
+                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'csvFiles', 'csvEmptyState', 'csvFilledState')">{{ trans.re_upload }}</div>
                             </div>
                             <input type="file" id="csvFiles" name="csv_file" accept=".csv" style="display: none;" onchange="handleFileSelect(this, 'csvEmptyState', 'csvFilledState', 'csvFileName'); hideError()">
                             <div id="csvError" class="d-none text-danger small mt-2" style="font-size: 0.75rem;">
-                                <i class="bi bi-exclamation-circle-fill me-1"></i> Please select a CSV file before proceeding.
+                                <i class="bi bi-exclamation-circle-fill me-1"></i> {{ trans.csv_error_msg }}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Empty State ZIP -->
                             <div id="zipEmptyState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center align-items-center" style="border: 2px dashed #cbd5e1; background-color: #f8fafc; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('zipFiles').click()">
                                 <i class="bi bi-file-earmark-zip text-muted mb-2" style="font-size: 2rem;"></i>
-                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">Click to upload ZIP File (Optional)</div>
-                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">Support for .zip containing images</div>
+                                <div class="fw-bold" style="color: #475569; font-size: 0.9rem;">{{ trans.click_to_upload_zip }}</div>
+                                <div class="small text-muted mt-1" style="font-size: 0.75rem;">{{ trans.zip_format_support }}</div>
                             </div>
                             
                             <!-- Filled State ZIP -->
                             <div id="zipFilledState" class="p-4 rounded text-center h-100 d-flex flex-column justify-content-center d-none" style="border: 2px dashed #4ade80; background-color: #f0fdf4; cursor: pointer;">
                                 <div class="mx-auto mb-2 bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; opacity: 0.2;"><i class="bi bi-check-lg" style="opacity: 1; color: #166534;"></i></div>
                                 <div id="zipFileName" class="fw-bold fs-6" style="color: #1f2937;">asset_photos.zip</div>
-                                <div class="small" style="color: #166534; font-weight: 500;">Successfully attached</div>
-                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'zipFiles', 'zipEmptyState', 'zipFilledState')">Click here to re-upload</div>
+                                <div class="small" style="color: #166534; font-weight: 500;">{{ trans.successfully_attached }}</div>
+                                <div class="mt-3 text-muted" style="font-size: 0.65rem; text-transform: uppercase;" onclick="clearFile(event, 'zipFiles', 'zipEmptyState', 'zipFilledState')">{{ trans.re_upload }}</div>
                             </div>
                             <input type="file" id="zipFiles" name="zip_file" accept=".zip" style="display: none;" onchange="handleFileSelect(this, 'zipEmptyState', 'zipFilledState', 'zipFileName')">
                         </div>
@@ -208,7 +208,7 @@ body.theme-dark a[href*="template.zip"] i.bi-arrow-down {
                     
                     <div class="d-flex justify-content-end gap-2 mt-5">
                         <button type="submit" class="btn fw-bold px-4 pt-2 pb-2" style="background-color: #553af2; color: #fff; border-radius: 8px;">
-                            Process & View List <i class="bi bi-arrow-right"></i>
+                            {{ trans.process_view_list }} <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </form>

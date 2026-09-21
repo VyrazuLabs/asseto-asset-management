@@ -421,10 +421,34 @@ body.theme-dark .list-page-header h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   color: var(--color-muted);
+  text-align: center;
+  }
+  
+  .table-empty-state i {
+    font-size: 3rem;
+    opacity: .3;
+    margin-bottom: 1rem;
+    display: block;
+    line-height: 1;
+  }
+  
+  .table-empty-state p {
+    font-size: .95rem;
+    margin: 25px;
+    line-height: 1.6;
 }
-.table-empty-state i { font-size: 3rem; opacity: .3; margin-bottom: 1rem; }
-.table-empty-state p { font-size: .95rem; }
+.table-empty-state p br {
+  display: block;
+  content: '';
+  margin-top: 0.5rem;
+}
+
+.table-empty-state .btn {
+  display: inline-block;
+  margin-top: 0.25rem;
+}
 
 /* ── Pagination ──────────────────────────────────────────────────────────── */
 .pagination-wrap {
@@ -479,7 +503,11 @@ body.theme-dark .list-page-header h1 {
 }
 
 /* ── Zero-margin form (inline action forms in table rows) ────────────────── */
-.form-row-action { margin: 0; }
+.form-row-action {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
 
 /* ── Name cell pattern ───────────────────────────────────────────────────── */
 .cell-name-main { font-weight: 600; color: var(--color-text); }

@@ -1,51 +1,57 @@
-<div class="modal-header bg-dark text-white">
-    <h5 class="modal-title">Map CSV Fields to Vendor Fields</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
-<form method="post" action="{% url 'upload:vendor-compare_data' %}" id="mappingForm">
-    {% csrf_token %}
-    <div class="modal-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Vendor Field</th>
-                    <th>CSV Header</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for field in fields %}
-                <tr>
-                    <td>
-                        {{ field }}
-
-                        {% if field in required_fields %}
-                        <span class="text-danger">*</span>
-                        <div class="text-danger small mt-1 d-none" id="error-{{ field }}">
-                            This field is required
-                        </div>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <select name="mapping_{{ field }}" class="form-select mapping-select"
-                        {% if field in required_fields %}data-required="true" {% endif %}>
-                            <option value="">-- Select --</option>
-                            {% for header in headers %}
-                            <option value="{{ header }}">{{ header }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-success" id="importBtn" disabled>
-            Import Vendors
+<div class="upload-modal-content">
+    <div class="upload-modal-header">
+        <h5 class="modal-title"><i class="bi bi-diagram-3"></i> Map CSV Fields to Vendor Fields</h5>
+        <button type="button" class="upload-btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
-</form>
+    <form method="post" action="{% url 'upload:vendor-compare_data' %}" id="mappingForm">
+        {% csrf_token %}
+        <div class="upload-modal-body">
+            <table class="upload-mapping-table">
+                <thead>
+                    <tr>
+                        <th>Vendor Field</th>
+                        <th>CSV Header</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in fields %}
+                    <tr>
+                        <td>
+                            {{ field }}
+
+                            {% if field in required_fields %}
+                            <span class="text-danger">*</span>
+                            <div class="text-danger small mt-1 d-none" id="error-{{ field }}">
+                                This field is required
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <select name="mapping_{{ field }}" class="form-select mapping-select"
+                            {% if field in required_fields %}data-required="true" {% endif %}>
+                                <option value="">-- Select --</option>
+                                {% for header in headers %}
+                                <option value="{{ header }}">{{ header }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="upload-modal-footer">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> Close
+            </button>
+            <button type="submit" class="btn-save" id="importBtn" disabled>
+                <i class="bi bi-check-lg"></i> Import Vendors
+            </button>
+        </div>
+    </form>
+</div>
 
 <script>
     (function () {

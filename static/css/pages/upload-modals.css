@@ -1,0 +1,266 @@
+/* =============================================================================
+   upload-modals.css — Shared styles for upload CSV and mapping modals
+   Used by: vendors, users, departments, locations, product_categories, product_types
+   ============================================================================= */
+
+/* ── Modal Content ──────────────────────────────────────────────────────── */
+.upload-modal-content {
+    border: none;
+    border-radius: 12px;
+    background: var(--color-card);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Modal Header ───────────────────────────────────────────────────────── */
+.upload-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.upload-modal-header .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.upload-modal-header .modal-title i {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.upload-btn-close {
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.upload-btn-close:hover {
+    background: var(--color-bg);
+    color: var(--color-text);
+}
+
+/* ── Modal Body ─────────────────────────────────────────────────────────── */
+.upload-modal-body {
+    padding: 1.25rem;
+}
+
+.upload-modal-body .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+}
+
+.upload-modal-body .form-group label .required {
+    color: #EF4444;
+    margin-left: 0.15rem;
+}
+
+.upload-modal-body .form-group input,
+.upload-modal-body .form-group select,
+.upload-modal-body .form-group textarea {
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+.upload-modal-body .form-group input:focus,
+.upload-modal-body .form-group select:focus,
+.upload-modal-body .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-card);
+}
+
+.upload-modal-body .text-muted {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin-top: 0.25rem;
+}
+
+.upload-modal-body .text-danger {
+    font-size: 0.7rem;
+    margin-top: 0.2rem;
+}
+
+/* ── Mapping Table ──────────────────────────────────────────────────────── */
+.upload-mapping-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.upload-mapping-table thead th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.6rem 0.75rem;
+    background: #FAFBFC;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.upload-mapping-table tbody td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    color: var(--color-text);
+}
+
+.upload-mapping-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.upload-mapping-table .form-select {
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+.upload-mapping-table .form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-card);
+}
+
+/* ── Modal Footer ───────────────────────────────────────────────────────── */
+.upload-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.upload-modal-footer .btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-modal-footer .btn-cancel:hover {
+    border-color: var(--color-text);
+    color: var(--color-text);
+}
+
+.upload-modal-footer .btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 1rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-modal-footer .btn-save:hover {
+    background: #4338CA;
+}
+
+.upload-modal-footer .btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Dark Mode ──────────────────────────────────────────────────────────── */
+body.theme-dark .upload-modal-content {
+    background: #1E1E2D;
+}
+
+body.theme-dark .upload-modal-header {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .upload-modal-header .modal-title {
+    color: #F9FAFB;
+}
+
+body.theme-dark .upload-btn-close {
+    color: #9CA3AF;
+}
+
+body.theme-dark .upload-btn-close:hover {
+    background: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .upload-modal-body .form-group input,
+body.theme-dark .upload-modal-body .form-group select,
+body.theme-dark .upload-modal-body .form-group textarea {
+    background: #161625;
+    border-color: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .upload-mapping-table thead th {
+    background: #16162a;
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .upload-mapping-table tbody td {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .upload-mapping-table .form-select {
+    background: #161625;
+    border-color: #2D2D3F;
+    color: #F9FAFB;
+}
+
+body.theme-dark .upload-modal-footer {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .upload-modal-footer .btn-cancel {
+    background: #1E1E2D;
+    border-color: #2D2D3F;
+    color: #9CA3AF;
+}
+
+body.theme-dark .upload-modal-footer .btn-cancel:hover {
+    border-color: #F9FAFB;
+    color: #F9FAFB;
+}

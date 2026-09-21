@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Add Consumable | Asseto{% endblock %}
+{% block title %}{{ trans.consumable_add_title }}{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -15,20 +15,20 @@
     <div>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb page-breadcrumb">
-          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'consumables:list' %}" class="breadcrumb-link">Consumables</a></li>
-          <li class="breadcrumb-item active">Add Consumable</li>
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.consumable_breadcrumb_dashboard }}</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'consumables:list' %}" class="breadcrumb-link">{{ trans.consumable_breadcrumb_list }}</a></li>
+          <li class="breadcrumb-item active">{{ trans.consumable_breadcrumb_add }}</li>
         </ol>
       </nav>
-      <h1>Add Consumable</h1>
-      <p class="subtitle">Register a new consumable item in inventory</p>
+      <h1>{{ trans.consumable_add_heading }}</h1>
+      <p class="subtitle">{{ trans.consumable_add_subtitle }}</p>
     </div>
     <div class="d-flex align-items-center gap-2">
       <a href="{% url 'consumables:list' %}" class="btn-back-listing">
-        <i class="bi bi-arrow-left"></i> Back to Listing
+        <i class="bi bi-arrow-left"></i> {{ trans.consumable_btn_back }}
       </a>
       <button type="button" class="btn-save-asset" onclick="document.getElementById('consumable-form').submit();">
-        <i class="bi bi-floppy2"></i> Save
+        <i class="bi bi-floppy2"></i> {{ trans.consumable_btn_save }}
       </button>
     </div>
   </div>
@@ -40,32 +40,32 @@
       {# Section 1: Product & Vendor #}
       <div class="form-section">
         <div class="section-header">
-          <i class="bi bi-box-seam-fill"></i> <span>Consumable & Product Details</span>
+          <i class="bi bi-box-seam-fill"></i> <span>{{ trans.consumable_section_product }}</span>
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="{{ form.consumable_name.id_for_label }}">Consumable Name <span class="required">*</span></label>
+            <label for="{{ form.consumable_name.id_for_label }}">{{ trans.consumable_form_name }} <span class="required">*</span></label>
             {{ form.consumable_name }}
             {% if form.consumable_name.errors %}
             <div class="text-danger small mt-1">{{ form.consumable_name.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.product.id_for_label }}">Product <span class="required">*</span></label>
+            <label for="{{ form.product.id_for_label }}">{{ trans.consumable_form_product }} <span class="required">*</span></label>
             {{ form.product }}
             {% if form.product.errors %}
             <div class="text-danger small mt-1">{{ form.product.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.vendor.id_for_label }}">Vendor</label>
+            <label for="{{ form.vendor.id_for_label }}">{{ trans.consumable_form_vendor }}</label>
             {{ form.vendor }}
             {% if form.vendor.errors %}
             <div class="text-danger small mt-1">{{ form.vendor.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.location.id_for_label }}">Location</label>
+            <label for="{{ form.location.id_for_label }}">{{ trans.consumable_form_location }}</label>
             {{ form.location }}
             {% if form.location.errors %}
             <div class="text-danger small mt-1">{{ form.location.errors.0 }}</div>
@@ -77,46 +77,46 @@
       {# Section 2: Purchase Details #}
       <div class="form-section">
         <div class="section-header">
-          <i class="bi bi-receipt"></i> <span>Purchase Details</span>
+          <i class="bi bi-receipt"></i> <span>{{ trans.consumable_section_purchase }}</span>
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="{{ form.item_no.id_for_label }}">Item No.</label>
+            <label for="{{ form.item_no.id_for_label }}">{{ trans.consumable_form_item_no }}</label>
             {{ form.item_no }}
             {% if form.item_no.errors %}
             <div class="text-danger small mt-1">{{ form.item_no.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.order_number.id_for_label }}">Order Number</label>
+            <label for="{{ form.order_number.id_for_label }}">{{ trans.consumable_form_order_number }}</label>
             {{ form.order_number }}
             {% if form.order_number.errors %}
             <div class="text-danger small mt-1">{{ form.order_number.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.purchase_date.id_for_label }}">Purchase Date</label>
+            <label for="{{ form.purchase_date.id_for_label }}">{{ trans.consumable_form_purchase_date }}</label>
             {{ form.purchase_date }}
             {% if form.purchase_date.errors %}
             <div class="text-danger small mt-1">{{ form.purchase_date.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.purchase_cost.id_for_label }}">Purchase Cost (₹)</label>
+            <label for="{{ form.purchase_cost.id_for_label }}">{{ trans.consumable_form_purchase_cost }} (₹)</label>
             {{ form.purchase_cost }}
             {% if form.purchase_cost.errors %}
             <div class="text-danger small mt-1">{{ form.purchase_cost.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.quantity.id_for_label }}">Quantity</label>
+            <label for="{{ form.quantity.id_for_label }}">{{ trans.consumable_form_quantity }}</label>
             {{ form.quantity }}
             {% if form.quantity.errors %}
             <div class="text-danger small mt-1">{{ form.quantity.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.min_qty.id_for_label }}">Min. QTY <i class="bi bi-exclamation-circle text-danger" title="Minimum number of items that should be available before an alert gets triggered.Leave Min. QTY blank if you do not want to receive alerts for low inventory."></i></label>
+            <label for="{{ form.min_qty.id_for_label }}">{{ trans.consumable_form_min_qty }} <i class="bi bi-exclamation-circle text-danger" title="{{ trans.consumable_form_min_qty_tooltip }}"></i></label>
             {{ form.min_qty }}
             {% if form.min_qty.errors %}
             <div class="text-danger small mt-1">{{ form.min_qty.errors.0 }}</div>
@@ -128,20 +128,20 @@
       {# Section 4: Additional Details #}
       <div class="form-section">
         <div class="section-header">
-          <i class="bi bi-file-earmark-text-fill"></i> <span>Additional Details</span>
+          <i class="bi bi-file-earmark-text-fill"></i> <span>{{ trans.consumable_section_additional }}</span>
         </div>
         <div class="form-grid">
           <div class="form-group full-width">
-            <label for="{{ form.notes.id_for_label }}">Notes</label>
+            <label for="{{ form.notes.id_for_label }}">{{ trans.consumable_form_notes }}</label>
             {{ form.notes }}
             {% if form.notes.errors %}
             <div class="text-danger small mt-1">{{ form.notes.errors.0 }}</div>
             {% endif %}
           </div>
           <div class="form-group">
-            <label for="{{ form.image.id_for_label }}">Upload Image</label>
+            <label for="{{ form.image.id_for_label }}">{{ trans.consumable_form_upload_image }}</label>
             {{ form.image }}
-            <small class="text-muted">Accepted: jpg, jpeg, png, gif, svg, webp. Max 100MB.</small>
+            <small class="text-muted">{{ trans.consumable_form_image_help }}</small>
             {% if form.image.errors %}
             <div class="text-danger small mt-1">{{ form.image.errors.0 }}</div>
             {% endif %}
@@ -152,13 +152,13 @@
       {# Section 5: Documents #}
       <div class="form-section">
         <div class="section-header">
-          <i class="bi bi-paperclip"></i> <span>Supporting Documents</span>
+          <i class="bi bi-paperclip"></i> <span>{{ trans.consumable_section_documents }}</span>
         </div>
         <div class="form-grid">
           <div class="form-group full-width">
-            <label for="id_documents">Upload Documents</label>
+            <label for="id_documents">{{ trans.consumable_form_upload_documents }}</label>
             {{ form.documents }}
-            <small class="text-muted">You can select multiple files. Accepted: pdf, doc, docx, xls, xlsx, images, etc.</small>
+            <small class="text-muted">{{ trans.consumable_form_documents_help }}</small>
             {% if form.documents.errors %}
             <div class="text-danger small mt-1">{{ form.documents.errors.0 }}</div>
             {% endif %}
@@ -167,7 +167,7 @@
       </div>
 
       <div class="form-actions consumable-form-actions-hidden">
-        <button type="submit" class="btn-save">Save Consumable</button>
+        <button type="submit" class="btn-save">{{ trans.consumable_btn_save_consumable }}</button>
       </div>
     </form>
   </div>

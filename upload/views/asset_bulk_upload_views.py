@@ -16,6 +16,7 @@ from dashboard.models import Location, Department
 from assets.models import Product, Vendor, AssetStatus
 from clients.models import Client
 from django.db.models import Q
+from configurations.translations.utils import get_translations
 
 SESSION_KEY = 'bulk_import_session_id'
 
@@ -125,6 +126,8 @@ def bulk_import_step2(request):
     statuses = AssetStatus.undeleted_objects.filter(
         Q(organization=request.user.organization) | Q(organization__isnull=True)
     )
+
+    trans = get_translations(request.session.get("org_lang_id"))
     
     staged_data_for_template = []
     csv_headers = []
@@ -134,22 +137,22 @@ def bulk_import_step2(request):
             'location_target_id', 'status_target_id',
             'purchase_type', 'matched_image_path', 'image_status'
         }
-        # Define preferred order and display names for known CSV columns
+        # Define preferred order and translation keys for known CSV columns
         column_defs = [
-            ('serial_no', 'Serial Number'),
-            ('asset_name', 'Asset Name'),
-            ('name', 'Asset Name'),
-            ('tag', 'Tag'),
-            ('price', 'Price'),
-            ('purchase_date', 'Purchase Date'),
-            ('warranty_expiry_date', 'Warranty Expiry'),
-            ('description', 'Description'),
-            ('image_filename', 'Image File'),
+            ('serial_no', 'col_serial_no'),
+            ('asset_name', 'col_asset_name'),
+            ('name', 'col_asset_name'),
+            ('tag', 'col_tag'),
+            ('price', 'col_price'),
+            ('purchase_date', 'col_purchase_date'),
+            ('warranty_expiry_date', 'col_warranty_expiry'),
+            ('description', 'col_description'),
+            ('image_filename', 'col_image_file'),
         ]
         available_keys = set(session.staged_data[0].keys()) - exclude_keys
-        for key, display in column_defs:
+        for key, trans_key in column_defs:
             if key in available_keys:
-                csv_headers.append((key, display))
+                csv_headers.append((key, getattr(trans, trans_key, key.replace('_', ' ').title())))
                 available_keys.discard(key)
 
         # Append active custom field columns with their human-readable label

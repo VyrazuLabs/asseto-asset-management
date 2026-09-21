@@ -1,53 +1,59 @@
-<div class="modal-header bg-dark text-white">
-    <h5 class="modal-title">{{ trans.map_fields_title }}</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
-<form method="post" action="{% url 'upload:locations_compare_data' %}" id="mappingForm">
-    {% csrf_token %}
-    <div class="modal-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>{{ trans.location_field }}</th>
-                    <th>{{ trans.csv_header }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for field in fields %}
-                <tr>
-                    <td>
-                        {{ field }}
-
-                        {% if field in required_fields %}
-                            <span class="text-danger">*</span>
-                            <div class="text-danger small mt-1 d-none" id="error-{{ forloop.counter }}">
-                                {{ trans.this_field_is_required }}
-                            </div>
-                        {% endif %}
-                    </td>
-
-                    <td>
-                        <select name="mapping_{{ field }}" class="form-select mapping-select"
-                            data-error-id="error-{{ forloop.counter }}"
-                            {% if field in required_fields %}data-required="true" {% endif %}>
-                            <option value="">{{ trans.select_option }}</option>
-                            {% for header in headers %}
-                            <option value="{{ header }}">{{ header }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.close }}</button>
-        <button type="submit" class="btn btn-success" id="importBtn" disabled>
-            {{ trans.import_locations }}
+<div class="upload-modal-content">
+    <div class="upload-modal-header">
+        <h5 class="modal-title"><i class="bi bi-geo-alt"></i> {{ trans.map_fields_title }}</h5>
+        <button type="button" class="upload-btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
         </button>
     </div>
-</form>
+    <form method="post" action="{% url 'upload:locations_compare_data' %}" id="mappingForm">
+        {% csrf_token %}
+        <div class="upload-modal-body">
+            <table class="upload-mapping-table">
+                <thead>
+                    <tr>
+                        <th>{{ trans.location_field }}</th>
+                        <th>{{ trans.csv_header }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in fields %}
+                    <tr>
+                        <td>
+                            {{ field }}
+
+                            {% if field in required_fields %}
+                                <span class="text-danger">*</span>
+                                <div class="text-danger small mt-1 d-none" id="error-{{ forloop.counter }}">
+                                    {{ trans.this_field_is_required }}
+                                </div>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <select name="mapping_{{ field }}" class="form-select mapping-select"
+                                data-error-id="error-{{ forloop.counter }}"
+                                {% if field in required_fields %}data-required="true" {% endif %}>
+                                <option value="">{{ trans.select_option }}</option>
+                                {% for header in headers %}
+                                <option value="{{ header }}">{{ header }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="upload-modal-footer">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> {{ trans.close }}
+            </button>
+            <button type="submit" class="btn-save" id="importBtn" disabled>
+                <i class="bi bi-check-lg"></i> {{ trans.import_locations }}
+            </button>
+        </div>
+    </form>
+</div>
 
 <script>
     (function () {

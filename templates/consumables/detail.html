@@ -4,7 +4,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-{% block title %}Consumable Detail | Asseto{% endblock %}
+{% block title %}{{ trans.consumable_detail_title }}{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -19,21 +19,21 @@
     <div>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb page-breadcrumb">
-          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-          <li class="breadcrumb-item"><a href="{% url 'consumables:list' %}" class="breadcrumb-link">Consumables</a></li>
+          <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.consumable_breadcrumb_dashboard }}</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'consumables:list' %}" class="breadcrumb-link">{{ trans.consumable_breadcrumb_list }}</a></li>
           <li class="breadcrumb-item active">{{ consumable }}</li>
         </ol>
       </nav>
       <h1>{{ consumable }}</h1>
-      <p class="page-subtitle">Consumable item details</p>
+      <p class="page-subtitle">{{ trans.consumable_detail_subtitle }}</p>
     </div>
     <div class="d-flex align-items-center gap-2">
       <a href="{% url 'consumables:list' %}" class="btn-back">
-        <i class="bi bi-arrow-left"></i> Back to Listing
+        <i class="bi bi-arrow-left"></i> {{ trans.consumable_btn_back }}
       </a>
       {% if perms.consumables.edit_consumable %}
       <a href="{% url 'consumables:edit' consumable.pk %}" class="btn-update">
-        <i class="bi bi-pencil"></i> Update Consumable
+        <i class="bi bi-pencil"></i> {{ trans.consumable_btn_update }} {{ trans.consumable_heading|truncatechars:20 }}
       </a>
       {% endif %}
     </div>
@@ -45,57 +45,57 @@
       <div class="info-card">
         <div class="card-header-custom">
           <i class="bi bi-box-seam"></i>
-          <h2><span>Consumable Information</span></h2>
+          <h2><span>{{ trans.consumable_detail_info }}</span></h2>
         </div>
 
         <div class="info-grid">
           <div class="info-item">
-            <span class="label">Consumable Name</span>
+            <span class="label">{{ trans.consumable_form_name }}</span>
             <span class="value">{{ consumable.consumable_name|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Product</span>
+            <span class="label">{{ trans.consumable_form_product }}</span>
             <span class="value">{{ consumable.product.name|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Vendor</span>
+            <span class="label">{{ trans.consumable_form_vendor }}</span>
             <span class="value">{{ consumable.vendor.name|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Location</span>
+            <span class="label">{{ trans.consumable_form_location }}</span>
             <span class="value">{{ consumable.location.office_name|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Item No.</span>
+            <span class="label">{{ trans.consumable_form_item_no }}</span>
             <span class="value">{{ consumable.item_no|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Order Number</span>
+            <span class="label">{{ trans.consumable_form_order_number }}</span>
             <span class="value">{{ consumable.order_number|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Purchase Date</span>
+            <span class="label">{{ trans.consumable_form_purchase_date }}</span>
             <span class="value">{{ consumable.purchase_date|default:"-" }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Purchase Cost</span>
+            <span class="label">{{ trans.consumable_form_purchase_cost }}</span>
             <span class="value">{% if consumable.purchase_cost %}₹{{ consumable.purchase_cost }}{% else %}-{% endif %}</span>
           </div>
           <div class="info-item">
-            <span class="label">Quantity</span>
+            <span class="label">{{ trans.consumable_form_quantity }}</span>
             <span class="value">
               {{ consumable.quantity|default:"-" }}
               {% if consumable.is_low_stock %}
-                <span class="status-badge consumable-status-badge-low inline">Low Stock</span>
+                <span class="status-badge consumable-status-badge-low inline">{{ trans.consumable_detail_low_stock }}</span>
               {% endif %}
             </span>
           </div>
           <div class="info-item">
-            <span class="label">Min. QTY</span>
+            <span class="label">{{ trans.consumable_form_min_qty }}</span>
             <span class="value">{{ consumable.min_qty|default:"-" }}</span>
           </div>
           <div class="info-item full-width">
-            <span class="label">Notes</span>
+            <span class="label">{{ trans.consumable_form_notes }}</span>
             <div class="value">{{ consumable.notes|default:"-"|urlize }}</div>
           </div>
         </div>
@@ -106,7 +106,7 @@
         <div class="detail-card-header">
           <div class="d-flex align-items-center gap-2">
             <div class="section-icon"><i class="bi bi-box-arrow-right"></i></div>
-            <h2>Assigned Consumables</h2>
+            <h2>{{ trans.consumable_detail_assigned }}</h2>
           </div>
         </div>
         <div class="detail-card-body p-0">
@@ -115,13 +115,13 @@
               <table class="list-table" id="checkoutTable">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>User</th>
-                    <th>Quantity</th>
-                    <th>Purchase Cost</th>
-                    <th>Checked Out Date</th>
-                    <th>Notes</th>
-                    <th>Created By</th>
+                    <th>{{ trans.consumable_col_hash }}</th>
+                    <th>{{ trans.consumable_detail_checkout_user }}</th>
+                    <th>{{ trans.consumable_detail_checkout_qty }}</th>
+                    <th>{{ trans.consumable_detail_checkout_cost }}</th>
+                    <th>{{ trans.consumable_detail_checkout_date }}</th>
+                    <th>{{ trans.consumable_detail_checkout_notes }}</th>
+                    <th>{{ trans.consumable_detail_checkout_created_by }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -165,7 +165,7 @@
           {% else %}
             <div class="detail-empty-state">
               <i class="bi bi-inbox"></i><br>
-              <p>No checkout records found.</p>
+              <p>{{ trans.consumable_no_checkout_records }}</p>
             </div>
           {% endif %}
         </div>
@@ -176,7 +176,7 @@
         <div class="detail-card-header">
           <div class="d-flex align-items-center gap-2">
             <div class="section-icon"><i class="bi bi-paperclip"></i></div>
-            <h2>Supporting Documents</h2>
+            <h2>{{ trans.consumable_detail_documents }}</h2>
           </div>
         </div>
         <div class="detail-card-body p-0">
@@ -185,12 +185,12 @@
             <table class="list-table" id="documentsTable">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>File Name</th>
-                  <th>Size</th>
-                  <th>Uploaded By</th>
-                  <th>Date</th>
-                  <th>Action</th>
+                  <th>{{ trans.consumable_col_hash }}</th>
+                  <th>{{ trans.consumable_detail_doc_name }}</th>
+                  <th>{{ trans.consumable_detail_doc_size }}</th>
+                  <th>{{ trans.consumable_detail_doc_uploaded_by }}</th>
+                  <th>{{ trans.consumable_detail_doc_date }}</th>
+                  <th>{{ trans.consumable_detail_doc_action }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -227,7 +227,7 @@
                   <td>{{ doc.uploaded_by.get_full_name|default:doc.uploaded_by.username|default:"-" }}</td>
                   <td>{{ doc.created_at|date:"d M Y, h:i A" }}</td>
                   <td>
-                    <a href="{{ doc.file.url }}" class="action-btn" title="Download" download>
+                    <a href="{{ doc.file.url }}" class="action-btn" title="{{ trans.consumable_detail_doc_download }}" download>
                       <i class="bi bi-download"></i>
                     </a>
                   </td>
@@ -239,7 +239,7 @@
           {% else %}
           <div class="detail-empty-state">
             <i class="bi bi-paperclip"></i><br>
-            <p>No documents uploaded.</p>
+            <p>{{ trans.consumable_no_documents }}</p>
           </div>
           {% endif %}
         </div>
@@ -255,7 +255,7 @@
       <div class="info-card">
         <div class="card-header-custom">
           <i class="bi bi-images"></i>
-          <h2><span>Image</span></h2>
+          <h2><span>{{ trans.consumable_detail_image }}</span></h2>
         </div>
         <div class="consumable-image-card-body">
           {% if consumable.image %}
@@ -265,7 +265,7 @@
             </div>
           {% else %}
             <div class="detail-main-image-wrap" data-bs-toggle="modal" data-bs-target="#consumableImageModal">
-              <img src="{% static 'images/No_Image.jpg' %}" class="detail-main-image" alt="No image available">
+              <img src="{% static 'images/No_Image.jpg' %}" class="detail-main-image" alt="{{ trans.consumable_detail_no_image }}">
             </div>
           {% endif %}
         </div>
@@ -279,7 +279,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ consumable.consumable_name|default:"Consumable" }} - Image</h5>
+        <h5 class="modal-title">{{ trans.consumable_detail_image_modal|safe|cut:"%s" }} {{ consumable.consumable_name|default:"Consumable" }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
@@ -287,7 +287,7 @@
           <img src="{{ consumable.image.url }}" alt="{{ consumable.consumable_name }}" class="detail-modal-image"
                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
         {% else %}
-          <img src="{% static 'images/No_Image.jpg' %}" alt="No image available" class="detail-modal-image">
+          <img src="{% static 'images/No_Image.jpg' %}" alt="{{ trans.consumable_detail_no_image }}" class="detail-modal-image">
         {% endif %}
       </div>
     </div>

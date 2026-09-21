@@ -25,7 +25,7 @@
   </td>
   <td>
     {% if c.is_low_stock and c.min_qty is not None %}
-      <span title="This item is below the minimum quantity required">{{ c.min_qty }} <i class="bi bi-exclamation-triangle text-danger"></i></span>
+      <span title="{{ trans.consumable_low_stock_tooltip }}">{{ c.min_qty }} <i class="bi bi-exclamation-triangle text-danger"></i></span>
     {% else %}
       {{ c.min_qty|default:"-" }}
     {% endif %}
@@ -36,28 +36,28 @@
       {% if perms.consumables.edit_consumable %}
       {% with rem_qty=c.remaining_quantity|default_if_none:c.quantity|default:"0" %}
       {% if rem_qty != "0" %}
-      <button type="button" class="action-btn" title="Checkout"
+      <button type="button" class="action-btn" title="{{ trans.consumable_action_checkout }}"
               onclick="openCheckoutModal('{{ c.pk }}', '{{ c.consumable_name|escapejs }}', '{{ c.product.name|escapejs|default:"-" }}', '{{ c.quantity|default:"0" }}', '{{ rem_qty }}')">
         <i class="bi bi-box-arrow-right"></i>
       </button>
       {% else %}
-      <button type="button" class="action-btn consumable-action-btn-disabled" title="Cannot be checked out" disabled>
+      <button type="button" class="action-btn consumable-action-btn-disabled" title="{{ trans.consumable_checkout_disabled_short }}" disabled>
         <i class="bi bi-box-arrow-right"></i>
       </button>
       {% endif %}
       {% endwith %}
       {% endif %}
       {% if perms.consumables.view_consumable %}
-      <a href="{% url 'consumables:detail' c.pk %}" class="action-btn" title="View"><i class="bi bi-eye"></i></a>
+      <a href="{% url 'consumables:detail' c.pk %}" class="action-btn" title="{{ trans.consumable_action_view }}"><i class="bi bi-eye"></i></a>
       {% endif %}
       {% if perms.consumables.edit_consumable %}
-      <a href="{% url 'consumables:edit' c.pk %}" class="action-btn" title="Edit"><i class="bi bi-pencil"></i></a>
+      <a href="{% url 'consumables:edit' c.pk %}" class="action-btn" title="{{ trans.consumable_action_edit }}"><i class="bi bi-pencil"></i></a>
       {% endif %}
       {% if perms.consumables.delete_consumable %}
       <form action="{% url 'consumables:delete' c.pk %}" method="post" class="form-row-action"
-            onsubmit="return confirm('Delete this consumable?')">
+            onsubmit="return confirm('{{ trans.consumable_confirm_delete_short }}')">
         {% csrf_token %}
-        <button type="submit" class="action-btn danger" title="Delete"><i class="bi bi-trash3"></i></button>
+        <button type="submit" class="action-btn danger" title="{{ trans.consumable_action_delete }}"><i class="bi bi-trash3"></i></button>
       </form>
       {% endif %}
     </div>
@@ -68,7 +68,7 @@
   <td colspan="12">
     <div class="table-empty-state">
       <i class="bi bi-box-seam"></i>
-      <p>No consumables found.</p>
+      <p>{{ trans.consumable_no_found }}</p>
     </div>
   </td>
 </tr>
