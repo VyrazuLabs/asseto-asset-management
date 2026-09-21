@@ -41,12 +41,20 @@
         {% endwith %}
       </td>
 
-      <td>{{ asset.product.product_type }}</td>
+      <td>{{ asset.product.name }}</td>
 
       <td>
         {{ asset.vendor }}
         {% if asset.vendor.is_deleted %}
           <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+        {% endif %}
+      </td>
+
+      <td>
+        {% if asset.client %}
+          {{ asset.client.name }}
+        {% else %}
+          —
         {% endif %}
       </td>
 

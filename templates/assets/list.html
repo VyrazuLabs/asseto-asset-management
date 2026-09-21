@@ -126,21 +126,40 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">{{ trans.product_types }}</div>
+        <div class="filter-label">{{ trans.product_name }}</div>
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="type-btn" aria-label="Filter by product type">
-            All Types
-            
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product">
+            All Products
+          </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=type]').value='';document.getElementById('type-btn').childNodes[0].textContent='{{ trans.all_types }} ';htmx.trigger('#asset-filter-form','change');">All Types</a></li>
-            {% for type in product_type_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product]').value='';document.getElementById('product-btn').childNodes[0].textContent='{{ trans.all_products }} ';htmx.trigger('#asset-filter-form','change');">All Products</a></li>
+            {% for product in product_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=type]').value='{{ type.id }}';document.getElementById('type-btn').childNodes[0].textContent='{{ type.name }} ';htmx.trigger('#asset-filter-form','change');">
-              {{ type.name }}
+              onclick="event.preventDefault();document.querySelector('[name=product]').value='{{ product.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ product.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ product.name }}
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="type">
+          <input type="hidden" name="product">
+        </div>
+      </div>
+
+      <div class="col-6 col-sm-4 col-lg-auto">
+        <div class="filter-label">{{ trans.clients }}</div>
+        <div class="dropdown">
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="client-btn" aria-label="Filter by client">
+            All Clients
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=client]').value='';document.getElementById('client-btn').childNodes[0].textContent='All Clients ';htmx.trigger('#asset-filter-form','change');">All Clients</a></li>
+            {% for client in client_list %}
+            <li><a href="#" class="dropdown-item"
+              onclick="event.preventDefault();document.querySelector('[name=client]').value='{{ client.id }}';document.getElementById('client-btn').childNodes[0].textContent='{{ client.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ client.name }}
+            </a></li>
+            {% endfor %}
+          </ul>
+          <input type="hidden" name="client">
         </div>
       </div>
 
@@ -227,8 +246,9 @@
           <th>{{ trans.image_label_col }}</th>
           <th>{{ trans.asset_tag_col }}</th>
           <th>{{ trans.asset_name_col }}</th>
-          <th>{{ trans.product_type }}</th>
+          <th>{{ trans.product_name }}</th>
           <th>{{ trans.vendor }}</th>
+          <th>{{ trans.client }}</th>
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
           {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
@@ -275,12 +295,20 @@
             {% endwith %}
           </td>
 
-          <td>{{ asset.product.product_type }}</td>
+          <td>{{ asset.product.name }}</td>
 
           <td>
             {{ asset.vendor }}
             {% if asset.vendor.is_deleted %}
               <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if asset.client %}
+              {{ asset.client.name }}
+            {% else %}
+              —
             {% endif %}
           </td>
 
