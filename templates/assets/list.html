@@ -144,6 +144,7 @@
         </div>
       </div>
 
+      {% if has_clients %}
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">{{ trans.clients }}</div>
         <div class="dropdown">
@@ -162,6 +163,7 @@
           <input type="hidden" name="client">
         </div>
       </div>
+      {% endif %}
 
       <div class="col-6 col-sm-4 col-lg-auto">
         <div class="filter-label">{{ trans.product_categories }}</div>
@@ -248,7 +250,7 @@
           <th>{{ trans.asset_name_col }}</th>
           <th>{{ trans.product_name }}</th>
           <th>{{ trans.vendor }}</th>
-          <th>{{ trans.client }}</th>
+          {% if has_clients %}<th>{{ trans.client }}</th>{% endif %}
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
           {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
@@ -304,6 +306,7 @@
             {% endif %}
           </td>
 
+          {% if has_clients %}
           <td>
             {% if asset.client %}
               {{ asset.client.name }}
@@ -311,6 +314,7 @@
               —
             {% endif %}
           </td>
+          {% endif %}
 
           <td>
             {% if asset.is_assigned %}

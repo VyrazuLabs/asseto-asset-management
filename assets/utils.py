@@ -334,6 +334,7 @@ def create_asset_list(request, assets_qs):
         "product_type_list": product_type_list,
         "product_list": product_list,
         "client_list": client_list,
+        "has_clients": client_list.exists(),
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
@@ -718,12 +719,16 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
                 "assign_id": assign.id,
             }
 
+    has_clients = Client.undeleted_objects.filter(
+        organization=request.user.organization
+    ).exists()
     context = {
         "page_object": page_object,
         "asset_user_map": asset_user_map,
         "asset_images": asset_images,
         "list_of_audited_assets": list_of_audited_assets,
         "asset_conditions_map": asset_conditions_map,
+        "has_clients": has_clients,
     }
     return context
 

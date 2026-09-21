@@ -50,6 +50,7 @@
         {% endif %}
       </td>
 
+      {% if has_clients %}
       <td>
         {% if asset.client %}
           {{ asset.client.name }}
@@ -57,6 +58,7 @@
           —
         {% endif %}
       </td>
+      {% endif %}
 
       <td>
         {% if asset.is_assigned %}
