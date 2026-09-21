@@ -1,36 +1,154 @@
-<div class="modal-header bg-dark text-center">
-    <h5 class="modal-title white w-100" id="myModalLabel160">Reassign Asset</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal"
-        aria-label="Close">
-    </button>
-</div>
-<form hx-post='{{request.path}}' novalidate>
-    {% csrf_token %}
-    <div class="modal-body">
-        <div class="row">
-            <div class="form-group">
-                <label for="last-name-column">Assign To</label>
-                {{form.user}}
+<div class="modal-content">
+    <div class="ra-header">
+        <div>
+            <h5 class="ra-title"><i class="bi bi-arrow-repeat"></i> {{ trans.perm_reassign }} Asset</h5>
+            <p class="ra-subtitle">Assign this asset to a different user</p>
+        </div>
+        <button type="button" class="btn-close-ra" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+
+    <form hx-post="{{ request.path }}" novalidate>
+        {% csrf_token %}
+        <div class="ra-body">
+            <div class="ra-form-group">
+                <label>{{ trans.assigned_to }} <span class="required">*</span></label>
+                {{ form.user }}
                 {% for error in form.user.errors %}
-                    <small class="text-danger mb-3">{{ error }}</small>
+                <small class="text-danger">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="ra-form-group mb-0">
+                <label>{{ trans.assignment_notes }}</label>
+                {{ form.notes }}
+                {% for error in form.notes.errors %}
+                <small class="text-danger">{{ error }}</small>
                 {% endfor %}
             </div>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-light-secondary"
-            data-bs-dismiss="modal">
-            <i class="bx bx-x d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">Close</span>
-        </button>
-        <button type="submit" class="btn btn-sm btn-info ml-1"
-            onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;"
-        >
-            <i class="bx bx-check d-block d-sm-none"></i>
-            <span class="d-none d-sm-block">Save</span>
-        </button>
-    </div>
-</form>
+
+        <div class="ra-footer">
+            <button type="button" class="btn-ra-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
+            </button>
+            <button type="submit" class="btn-ra-save"
+                onclick="this.innerHTML = `<span class='spinner-grow spinner-grow-sm' role='status' aria-hidden='true'></span> Saving...`;">
+                <i class="bi bi-check-lg"></i> {{ trans.save }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.ra-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+}
+.ra-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+.ra-title i { color: #0284C7; font-size: 1.1rem; }
+.ra-subtitle { font-size: .8rem; color: var(--color-muted); margin: .25rem 0 0; }
+.btn-close-ra {
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+.btn-close-ra:hover { background: var(--color-bg); color: var(--color-text); }
+.ra-body { padding: 1.25rem; max-height: 60vh; overflow-y: auto; }
+.ra-form-group { margin-bottom: 1.25rem; }
+.ra-form-group label {
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .3rem;
+}
+.ra-form-group label .required { color: #EF4444; margin-left: .15rem; }
+.ra-form-group input,
+.ra-form-group select,
+.ra-form-group textarea {
+    width: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: .45rem .65rem;
+    font-size: .85rem;
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+.ra-form-group input:focus,
+.ra-form-group select:focus,
+.ra-form-group textarea:focus {
+    outline: none;
+    border-color: #0284C7;
+    background: var(--color-card);
+}
+.ra-form-group textarea { resize: vertical; min-height: 70px; }
+.ra-form-group .text-danger { font-size: .7rem; margin-top: .2rem; }
+.ra-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-border);
+}
+.btn-ra-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .45rem .85rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-ra-cancel:hover { border-color: var(--color-text); color: var(--color-text); }
+.btn-ra-save {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .45rem 1rem;
+    background: #0284C7;
+    border: none;
+    border-radius: 6px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-ra-save:hover { background: #0369A1; }
+body.theme-dark .btn-ra-save { background: #0284C7; }
+body.theme-dark .btn-ra-save:hover { background: #0369A1; }
+</style>
+
 <script>
     htmx.on("htmx:beforeSwap", (e) => {
         if ((e.detail.target.id == "reassign-asset-modal-content") && !e.detail.xhr.response) {

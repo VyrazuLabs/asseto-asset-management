@@ -133,12 +133,13 @@ def index(request):
     )
     location_count = location_list.count()
 
-    assign_assets = AssignAsset.objects.filter(
-        Q(asset__organization=None)
-        | Q(asset__organization=request.user.organization, asset__is_assigned=True)
+    assign_assets = Asset.undeleted_objects.filter(
+        is_assigned=True
+    ).filter(
+        Q(organization=None) | Q(organization=request.user.organization)
     )
     if not request.user.has_perm("assets.all_asset"):
-        assign_assets = assign_assets.filter(user=request.user)
+        assign_assets = assign_assets.filter(assignasset__user=request.user).distinct()
     assign_assets_counts = assign_assets.count()
 
     unassign_assets_count = asset_count - assign_assets_counts

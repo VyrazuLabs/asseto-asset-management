@@ -65,15 +65,27 @@
               {% endif %}
               <span>{{ map.full_name|default:"Unknown User" }}</span>
             </div>
+            <div class="d-flex gap-1 align-items-center mt-1">
+            {% if perms.assets.delete_assign_asset %}
+            <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
+                  class="form-row-action m-0"
+                  onsubmit="return confirm('Unassign this asset?')">
+              {% csrf_token %}
+              <button type="submit" class="btn-unassign">Unassign</button>
+            </form>
+            {% endif %}
+            {% if perms.assets.reassign_assign_asset and map.assign_id %}
+            <button type="button" class="btn-reassign"
+              hx-get="{% url 'assets:reassign_asset' map.assign_id %}"
+              hx-target="#reassign-asset-modal-content"
+              data-bs-toggle="modal"
+              data-bs-target="#reassign-asset-list-modal"
+              aria-label="Reassign {{ asset.name }}">
+              Reassign
+            </button>
+            {% endif %}
+            </div>
           {% endwith %}
-          {% if perms.assets.delete_assign_asset %}
-          <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
-                class="form-row-action"
-                onsubmit="return confirm('Unassign this asset?')">
-            {% csrf_token %}
-            <button type="submit" class="btn-unassign">Unassign</button>
-          </form>
-          {% endif %}
         {% else %}
           <span class="unassigned-label">Unassigned</span>
           {% if perms.assets.add_assign_asset %}

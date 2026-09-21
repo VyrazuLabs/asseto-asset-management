@@ -96,6 +96,23 @@ body.theme-dark .btn-cancel:hover {
   border-color: var(--color-primary);
 }
 
+.btn-reassign {
+  background: #E0F2FE;
+  color: #0284C7;
+  border: 1.5px solid #BAE6FD;
+  border-radius: 6px;
+  padding: .3rem .8rem;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reassign:hover {
+  background: #0284C7;
+  color: #fff;
+  border-color: #0284C7;
+}
+
 .btn-unassign {
   background: #FEF2F2;
   color: #DC2626;
@@ -328,6 +345,12 @@ body.theme-dark .btn-unassign {
 body.theme-dark .btn-assign {
   background: var(--color-primary-light);
   border-color: #3d3780;
+}
+
+body.theme-dark .btn-reassign {
+  background: #0c4a6e;
+  border-color: #0369a1;
+  color: #BAE6FD;
 }
 
 body.theme-dark .btn-add-row {

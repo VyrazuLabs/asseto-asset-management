@@ -3,8 +3,8 @@
         <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.12);">
             <div class="modal-header border-0 pb-0">
                 <div>
-                    <h5 class="fw-bold mb-1"><i class="bi bi-images me-2" style="color: #553af2;"></i>Select Image</h5>
-                    <p class="text-muted small mb-0">Click an image to select it, or click again to deselect. Use <strong>Remove Image</strong> to clear the selection.</p>
+                    <h5 class="fw-bold mb-1"><i class="bi bi-images me-2" style="color: #553af2;"></i>{{ trans.select_image }}</h5>
+                    <p class="text-muted small mb-0">{{ trans.select_image_desc|safe }}</p>
                 </div>
                 <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
@@ -13,7 +13,7 @@
                 {% if image_map and image_map|length > 0 %}
                 <div class="d-flex justify-content-end align-items-center mb-3">
                     <button type="button" class="btn btn-outline-danger btn-sm" style="border-radius: 8px; font-size: 0.75rem;" onclick="clearImageSelection()">
-                        <i class="bi bi-trash3 me-1"></i> Remove Image
+                        <i class="bi bi-trash3 me-1"></i> {{ trans.remove_image }}
                     </button>
                 </div>
                 <div class="modal-img-grid">
@@ -27,8 +27,8 @@
                 {% else %}
                 <div class="d-flex flex-column align-items-center justify-content-center py-5 text-muted" style="min-height: 200px;">
                     <i class="bi bi-inbox fs-1 mb-3"></i>
-                    <p class="mb-1">No images were uploaded via ZIP.</p>
-                    <p class="small mb-0">Go back to Step 1 and upload a ZIP file containing images.</p>
+                    <p class="mb-1">{{ trans.no_images_zip }}</p>
+                    <p class="small mb-0">{{ trans.no_images_hint }}</p>
                 </div>
                 {% endif %}
             </div>
@@ -37,8 +37,8 @@
                     <span id="imageModalStatus" class="text-muted small"></span>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-outline-secondary" onclick="closeModal()" style="border-radius: 20px;">Cancel</button>
-                    <button type="button" class="btn btn-purple" onclick="closeModal()" style="border-radius: 20px;">Done</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="closeModal()" style="border-radius: 20px;">{{ trans.cancel }}</button>
+                    <button type="button" class="btn btn-purple" onclick="closeModal()" style="border-radius: 20px;">{{ trans.done }}</button>
                 </div>
             </div>
         </div>

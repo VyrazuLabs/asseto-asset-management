@@ -168,6 +168,7 @@ def get_asset_filter_data(request):
 
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
+    client_data = request.POST.get("client-data")
     product = request.POST.get("product")  # gets the id of the product
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
@@ -205,6 +206,12 @@ def filtered_asset(request):
     if location_id:
         filters &= Q(location_id=location_id)
 
+    is_assigned = request.GET.get("is_assigned")
+    if is_assigned == 'true':
+        filters &= Q(is_assigned=True)
+    elif is_assigned == 'false':
+        filters &= Q(is_assigned=False)
+
     assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
 
     # Scoped to assets currently assigned to the requesting user unless
@@ -228,6 +235,8 @@ def filtered_asset(request):
         assets_qs = assets_qs.filter(assignasset__user=user_data).prefetch_related(
             Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
         )
+    if client_data:
+        assets_qs = assets_qs.filter(client_id=client_data)
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -267,14 +276,16 @@ def create_asset_list(request, assets_qs):
     asset_user_map = {}
     for assign in get_assigned_asset_list:
         if assign.asset_id not in asset_user_map:
-            asset_user_map[assign.asset_id] = None
-        if assign.user:  # avoid None users
-            asset_user_map[assign.asset_id] = {
-                "full_name": dynamic_display_name(
-                    request, fullname=assign.user.full_name
-                ),
-                "image": assign.user.profile_pic,
-            }
+            if assign.user:
+                asset_user_map[assign.asset_id] = {
+                    "full_name": dynamic_display_name(
+                        request, fullname=assign.user.full_name
+                    ),
+                    "image": assign.user.profile_pic,
+                    "assign_id": assign.id,
+                }
+            else:
+                asset_user_map[assign.asset_id] = None
     paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
     if assets_qs.exists():
         paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
@@ -691,6 +702,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
                     request, fullname=assign.user.full_name
                 ),
                 "image": assign.user.profile_pic,
+                "assign_id": assign.id,
             }
 
     context = {

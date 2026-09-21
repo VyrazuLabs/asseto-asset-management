@@ -78,20 +78,20 @@
         <div class="bulk-step-indicator">
             <div
                 class="bulk-step text-start{% if current_step == 1 %} active{% elif current_step > 1 %} completed{% endif %}">
-                <span class="bulk-step-number">Step 1</span>
-                <span class="bulk-step-title">Upload CSV & ZIP</span>
+                <span class="bulk-step-number">{{ trans.step }} 1</span>
+                <span class="bulk-step-title">{{ trans.step1_title }}</span>
             </div>
 
             <div
                 class="bulk-step text-start{% if current_step == 2 %} active{% elif current_step > 2 %} completed{% endif %}">
-                <span class="bulk-step-number">Step 2</span>
-                <span class="bulk-step-title">Map Fields & Images</span>
+                <span class="bulk-step-number">{{ trans.step }} 2</span>
+                <span class="bulk-step-title">{{ trans.step2_title }}</span>
             </div>
 
             <div
                 class="bulk-step text-start{% if current_step == 3 %} active{% elif current_step > 3 %} completed{% endif %}">
-                <span class="bulk-step-number">Step 3</span>
-                <span class="bulk-step-title">Finalize & Warn</span>
+                <span class="bulk-step-number">{{ trans.step }} 3</span>
+                <span class="bulk-step-title">{{ trans.step3_title }}</span>
             </div>
         </div>
     </div>

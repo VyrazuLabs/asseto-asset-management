@@ -164,37 +164,6 @@ def search(request, page):
     return render(request, "assets/assets-data.html", context=context)
 
 
-@login_required
-@user_passes_test(manage_access_for_assign_assets)
-def assigned_list(request):
-    assign_asset_list = (
-        AssignAsset.objects.select_related(
-            "asset",
-            "asset__vendor",
-            "asset__product",
-            "asset__location",
-            "asset__asset_status",
-            "user",
-            "user__department",
-        )
-        .filter(
-            asset__is_assigned=True,
-            asset__organization=request.user.organization or None,
-        )
-        .order_by("-asset__created_at")
-    )
-    paginator = Paginator(assign_asset_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get("page")
-    page_object = paginator.get_page(page_number)
-
-    context = {
-        "sidebar": "assets",
-        "submenu": "assigned-assets",
-        "page_object": page_object,
-        "title": "Assigned Assets",
-    }
-
-    return render(request, "assets/assigned-list.html", context=context)
 
 @login_required
 @permission_required("assets.add_assign_asset")
@@ -238,7 +207,8 @@ def reassign_asset(request, id):
             form.save()
             messages.success(request, "Asset re-assigned successfully")
             return HttpResponse(status=204)
-    context = {"form": form}
+    asset = assignAsset.asset
+    context = {"form": form, "asset": asset}
     return render(request, "assets/reassign-asset-modal.html", context=context)
 
 
@@ -425,42 +395,6 @@ def assign_asset_in_asset_list(request, id):
     context = {"form": form, "asset": asset, "asset_image": asset_image}
     return render(request, "assets/assign-asset-modal-in-list.html", context=context)
 
-
-@login_required
-def assign_asset_search(request, page):
-    search_text = request.GET.get("search_text").strip()
-    if search_text:
-        return render(
-            request,
-            "assets/assigned-assets-data.html",
-            {
-                "page_object": AssignAsset.objects.select_related(
-                    "asset", "user", "user__department"
-                )
-                .filter(
-                    Q(asset__organization=request.user.organization)
-                    & (
-                        Q(asset__name__icontains=search_text)
-                        | Q(asset__serial_no__icontains=search_text)
-                        | Q(user__full_name__icontains=search_text)
-                        | Q(user__department__name__icontains=search_text)
-                    )
-                )
-                .order_by("-asset__created_at")[:10]
-            },
-        )
-
-    asset_list = (
-        AssignAsset.objects.select_related("asset", "user", "user__department")
-        .filter(asset__organization=request.user.organization)
-        .order_by("-asset__created_at")
-    )
-    paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
-    return render(
-        request, "assets/assigned-assets-data.html", {"page_object": page_object}
-    )
 
 
 # SLACK INTEGRATION OAUTH CALL

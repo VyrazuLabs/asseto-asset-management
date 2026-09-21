@@ -1,7 +1,7 @@
 {% extends 'layouts/main-layout.html' %}
 {% load static %}
 
-{% block title %}Assets Upload History - Step 3 | Asseto{% endblock %}
+{% block title %}{{ trans.bulk_import_title }} - Step 3 | Asseto{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
@@ -165,12 +165,12 @@ body.theme-dark .card-title {
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb page-breadcrumb">
-                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">Assets</a></li>
-                <li class="breadcrumb-item active">Assets Upload History</li>
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'assets:list' %}" class="breadcrumb-link">{{ trans.assets }}</a></li>
+                <li class="breadcrumb-item active">{{ trans.bulk_import_title }}</li>
             </ol>
         </nav>
-        <h1>Assets Upload History</h1>
+        <h1>{{ trans.bulk_import_title }}</h1>
     </div>
 </div>
 
@@ -181,31 +181,31 @@ body.theme-dark .card-title {
     <div class="col-lg-8 mb-4">
         <div class="card card-rounded h-100 p-3">
             <div class="card-body">
-                <h5 class="card-title fw-bold">Pre-Flight Import Summary</h5>
-                <p class="text-muted small mb-4">Carefully inspect the processed database configurations before finalizing compilation.</p>
+                <h5 class="card-title fw-bold">{{ trans.pre_flight_summary }}</h5>
+                <p class="text-muted small mb-4">{{ trans.pre_flight_desc }}</p>
                 
                 <div class="row mx-0 border rounded mb-4 mt-3 py-2">
                     <div class="col-3 stat-box">
                         <h3 class="text-primary" style="color: #553af2 !important;">{{ session.total_rows }}</h3>
-                        <span>Total Assets</span>
+                        <span>{{ trans.total_assets }}</span>
                     </div>
                     <div class="col-3 stat-box">
                         <h3 class="text-success">{{ session.matched_images }}</h3>
-                        <span>Images Matched</span>
+                        <span>{{ trans.images_matched }}</span>
                     </div>
                     <div class="col-3 stat-box">
                         <h3 class="text-warning text-dark">{{ session.total_rows }}</h3>
-                        <span>Mapped Rows</span>
+                        <span>{{ trans.mapped_rows }}</span>
                     </div>
                     <div class="col-3 stat-box">
                         <h3 class="text-danger">{{ session.unmatched_images }}</h3>
-                        <span>Unmatched Images</span>
+                        <span>{{ trans.unmatched_images }}</span>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">Final Package Configuration</span>
-                    <span class="text-muted small">{{ session.total_rows }} Rows Ready</span>
+                    <span class="fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase;">{{ trans.final_package_config }}</span>
+                    <span class="text-muted small">{{ session.total_rows }} {{ trans.rows_ready }}</span>
                 </div>
                 
                 <ul class="list-group list-group-flush border-top">
@@ -230,7 +230,7 @@ body.theme-dark .card-title {
                     {% endfor %}
                     {% if session.total_rows > 5 %}
                     <li class="list-group-item text-center py-3 text-muted small">
-                        ... and {{ session.total_rows|add:"-5" }} more rows
+                        ... and {{ session.total_rows|add:"-5" }} {{ trans.more_rows }}
                     </li>
                     {% endif %}
                 </ul>
@@ -243,14 +243,14 @@ body.theme-dark .card-title {
         <div class="card card-rounded h-100 p-3">
             <div class="card-body d-flex flex-column">
                 <div class="warning-panel mb-4">
-                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-triangle-fill"></i> ABSOLUTE SYSTEM WARNING</h6>
+                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-triangle-fill"></i> {{ trans.absolute_warning }}</h6>
                     <p class="text-danger fw-bold" style="font-size: 0.85rem;">
-                        This bulk import action initiates persistent transactional entries inside Asseto's database. This operations flow is completely irreversible.
+                        {{ trans.warning_text }}
                     </p>
                     <ul class="text-danger small ps-3 mb-0 mt-3" style="font-size: 0.75rem; line-height: 1.5;">
-                        <li class="mb-1">Duplicate entries must be manually purged row by row.</li>
-                        <li class="mb-1">System audits logs will instantly lock values permanently.</li>
-                        <li>Cloud-bucket image references cannot be updated retrospectively.</li>
+                        <li class="mb-1">{{ trans.warningDuplicate }}</li>
+                        <li class="mb-1">{{ trans.warningAudit }}</li>
+                        <li>{{ trans.warningImage }}</li>
                     </ul>
                 </div>
 
@@ -260,24 +260,24 @@ body.theme-dark .card-title {
                     <div class="d-flex align-items-start gap-2 mb-4 bg-light p-3 rounded border">
                         <input class="form-check-input mt-1 flex-shrink-0" type="checkbox" id="confirmImport" name="confirm_import" required style="width: 1.1em; height: 1.1em;">
                         <label class="text-secondary" for="confirmImport" style="font-size: 0.85rem; font-weight: 500; line-height: 1.4;">
-                            I verify all mapped attributes are validated and agree to write updates to production schemas.
+                            {{ trans.confirm_verify }}
                         </label>
                     </div>
                     
                     <button type="submit" class="btn btn-purple fw-bold shadow-sm w-100 mb-2" id="commitBtn" disabled>
-                        <i class="bi bi-cloud-upload me-1"></i> Commit & Write to Database
+                        <i class="bi bi-cloud-upload me-1"></i> {{ trans.commit_database }}
                     </button>
                     
                     <a href="{% url 'upload:bulk_import_step2' %}" class="btn btn-outline-secondary fw-bold w-100 mb-2" style="border-radius: 8px; font-size: 0.9rem;">
-                        <i class="bi bi-arrow-left me-1"></i> Return to Mapping
+                        <i class="bi bi-arrow-left me-1"></i> {{ trans.return_mapping }}
                     </a>
                 </form>
 
                 <form method="POST" action="{% url 'upload:bulk_import_cancel' %}"
-                      onsubmit="return confirm('Are you sure you want to cancel? All staged data and uploaded images will be deleted.');">
+                      onsubmit="return confirm('{{ trans.cancel_confirm }}');">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger fw-bold w-100" style="border-radius: 8px; font-size: 0.9rem;">
-                        <i class="bi bi-x-circle me-1"></i> Cancel & Discard
+                        <i class="bi bi-x-circle me-1"></i> {{ trans.cancel_discard }}
                     </button>
                 </form>
             </div>
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function() {
         if (confirmCheckbox.checked) {
             commitBtn.disabled = true;
-            commitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Committing...';
+            commitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> {{ trans.committing }}';
         }
     });
 });

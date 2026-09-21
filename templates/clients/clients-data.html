@@ -42,7 +42,13 @@
   </td>
   <td class="text-center">
     {% if client.asset_count %}
-      <span class="count-pill">{{ client.asset_count }}</span>
+      <form method="post" action="{% url 'assets:list' %}">
+        {% csrf_token %}
+        <input type="hidden" name="client-data" value="{{ client.id }}">
+        <button type="submit" class="count-pill">
+          {{ client.asset_count }}
+        </button>
+      </form>
     {% else %}
       <span class="count-pill zero">0</span>
     {% endif %}
