@@ -45,6 +45,7 @@ from authentication.models import User
 
 PAGE_SIZE = 25
 ORPHANS = 1
+MAX_FILTERED_RESULTS = 500
 
 
 @login_required
@@ -217,7 +218,7 @@ def filtered_asset(request):
     elif is_assigned == 'false':
         filters &= Q(is_assigned=False)
 
-    assets_qs = Asset.undeleted_objects.filter(filters).order_by("-created_at")
+    assets_qs = Asset.undeleted_objects.filter(filters).select_related('location', 'product__product_type').order_by("-created_at")
 
     # Scoped to assets currently assigned to the requesting user unless
     # they hold "assets.all_asset" (superusers always pass via Django's
@@ -266,7 +267,7 @@ def create_asset_list(request, assets_qs):
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
     client_list = Client.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
-    asset_list = Asset.undeleted_objects.filter(org_filter).select_related('location').order_by("-created_at")
+    asset_list = Asset.undeleted_objects.filter(org_filter).select_related('location', 'product__product_type').order_by("-created_at")
     if not request.user.has_perm("assets.all_asset"):
         asset_list = asset_list.filter(assignasset__user=request.user).distinct()
     deleted_asset_count = Asset.deleted_objects.filter(
@@ -687,7 +688,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         )
         search_qs = (
             Asset.undeleted_objects.filter(q, assignasset__user_id=user_id)
-            .select_related('location')
+            .select_related('location', 'product__product_type')
             .prefetch_related(
                 Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
             )
@@ -696,24 +697,24 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     elif department_id:
         search_qs = Asset.undeleted_objects.filter(
             q, assignasset__user__department_id=department_id
-        ).select_related('location').order_by("-created_at")
+        ).select_related('location', 'product__product_type').order_by("-created_at")
     else:
-        search_qs = Asset.undeleted_objects.filter(q).select_related('location').order_by("-created_at")
+        search_qs = Asset.undeleted_objects.filter(q).select_related('location', 'product__product_type').order_by("-created_at")
 
-    # If any search/filter is active, return ALL matching results (no pagination cap).
-    # Pagination only applies to the unfiltered browse view.
+    # If any search/filter is active, skip the small per-page cap so matches
+    # aren't hidden behind pages, but still bound the result set — an
+    # unfiltered browse view uses regular pagination below.
     any_filter_active = any([
         search_text, vendor_id, status_id, user_id, department_id,
         product_category_id, product_type_id, client_id, location_id,
     ])
 
     if any_filter_active:
-        # Return every matching asset so none are hidden behind pages
-        page_object = search_qs.distinct()
+        paginator = Paginator(search_qs.distinct(), MAX_FILTERED_RESULTS, orphans=ORPHANS)
     else:
         paginator = Paginator(search_qs, PAGE_SIZE, orphans=ORPHANS)
-        page_number = request.GET.get("page")
-        page_object = paginator.get_page(page_number)
+    page_number = request.GET.get("page")
+    page_object = paginator.get_page(page_number)
 
     asset_ids = [asset.id for asset in page_object]
     image_object = AssetImage.objects.filter(
@@ -753,7 +754,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         "list_of_audited_assets": list_of_audited_assets,
         "asset_conditions_map": asset_conditions_map,
         "has_clients": has_clients,
-        "is_filtered": any_filter_active,
     }
     return context
 
