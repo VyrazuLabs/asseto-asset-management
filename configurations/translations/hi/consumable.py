@@ -50,6 +50,7 @@ STRINGS = {
     "consumable_col_location": "स्थान",
     "consumable_col_item_no": "आइटम नं.",
     "consumable_col_total_qty": "कुल मात्रा",
+    "consumable_col_checked_out": "चेकआउट किया गया",
     "consumable_col_remaining_qty": "शेष मात्रा",
     "consumable_col_min_qty": "न्यूनतम मात्रा",
     "consumable_col_purchase_cost": "खरीद लागत",

@@ -126,21 +126,21 @@
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">{{ trans.product_name }}</div>
+        <div class="filter-label">{{ trans.product_type }}</div>
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product">
-            All Products
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product type">
+            All Product Types
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product]').value='';document.getElementById('product-btn').childNodes[0].textContent='{{ trans.all_products }} ';htmx.trigger('#asset-filter-form','change');">All Products</a></li>
-            {% for product in product_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product_type]').value='';document.getElementById('product-btn').childNodes[0].textContent='All Product Types ';htmx.trigger('#asset-filter-form','change');">All Product Types</a></li>
+            {% for pt in product_type_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=product]').value='{{ product.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ product.name }} ';htmx.trigger('#asset-filter-form','change');">
-              {{ product.name }}
+              onclick="event.preventDefault();document.querySelector('[name=product_type]').value='{{ pt.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ pt.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ pt.name }}
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="product">
+          <input type="hidden" name="product_type">
         </div>
       </div>
 
@@ -248,9 +248,10 @@
           <th>{{ trans.image_label_col }}</th>
           <th>{{ trans.asset_tag_col }}</th>
           <th>{{ trans.asset_name_col }}</th>
-          <th>{{ trans.product_name }}</th>
-          <th>{{ trans.vendor }}</th>
-          {% if has_clients %}<th>{{ trans.client }}</th>{% endif %}
+          <th>{{ trans.product_type }}</th>
+<th>{{ trans.vendor }}</th>
+<th>{{ trans.location }}</th>
+{% if has_clients %}<th>{{ trans.client }}</th>{% endif %}
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
           {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
@@ -284,7 +285,7 @@
               {% with condition_list|default:''|last as condition %}
                 <div class="asset-name-main">{{ asset.name }}</div>
                 <div class="asset-name-sub">
-                  {% if asset.product %}{{ asset.product.name }}{% endif %}
+                  {% if asset.product %}{{ asset.product.product_type.name }}{% endif %}
                   {% if condition == 0 or condition == 1 %}
                     &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
                   {% elif condition == 2 %}
@@ -297,12 +298,20 @@
             {% endwith %}
           </td>
 
-          <td>{{ asset.product.name }}</td>
+          <td>{{ asset.product.product_type.name }}</td>
 
           <td>
             {{ asset.vendor }}
             {% if asset.vendor.is_deleted %}
               <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if asset.location %}
+              {{ asset.location.office_name }}
+            {% else %}
+              —
             {% endif %}
           </td>
 

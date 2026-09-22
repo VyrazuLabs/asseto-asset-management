@@ -28,7 +28,7 @@
           {% with condition_list|default:''|last as condition %}
             <div class="asset-name-main">{{ asset.name }}</div>
             <div class="asset-name-sub">
-              {% if asset.product %}{{ asset.product.name }}{% endif %}
+              {% if asset.product %}{{ asset.product.product_type.name }}{% endif %}
               {% if condition == 0 or condition == 1 %}
                 &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
               {% elif condition == 2 %}
@@ -41,16 +41,24 @@
         {% endwith %}
       </td>
 
-      <td>{{ asset.product.name }}</td>
+<td>{{ asset.product.product_type.name }}</td>
 
-      <td>
-        {{ asset.vendor }}
-        {% if asset.vendor.is_deleted %}
-          <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
-        {% endif %}
-      </td>
+<td>
+  {{ asset.vendor }}
+  {% if asset.vendor.is_deleted %}
+    <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+  {% endif %}
+</td>
 
-      {% if has_clients %}
+<td>
+  {% if asset.location %}
+    {{ asset.location.office_name }}
+  {% else %}
+    —
+  {% endif %}
+</td>
+
+{% if has_clients %}
       <td>
         {% if asset.client %}
           {{ asset.client.name }}
@@ -171,6 +179,57 @@
         </div>
       </td>
     </tr>
+{% endif %}
+
+{% if page_object.paginator.count > 0 %}
+<tr>
+  <td colspan="10">
+    <div class="pagination-wrap">
+      <span>
+        Showing <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
+        of <strong>{{ page_object.paginator.count }}</strong> assets
+      </span>
+      <div class="pagination-nav">
+        {% if page_object.has_previous %}
+          <a href="?page={{ page_object.previous_page_number }}"
+             class="page-btn" aria-label="Previous page"
+             hx-get="{% url 'assets:search' page_object.previous_page_number %}"
+             hx-include="#asset-filter-form"
+             hx-target="#search_result"
+             hx-swap="innerHTML">‹</a>
+        {% else %}
+          <span class="page-btn disabled" aria-disabled="true">‹</span>
+        {% endif %}
+
+        {% for num in page_object.paginator.page_range %}
+          {% if page_object.number == num %}
+            <span class="page-btn active" aria-current="page">{{ num }}</span>
+          {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
+            <a href="?page={{ num }}"
+               class="page-btn"
+               hx-get="{% url 'assets:search' num %}"
+               hx-include="#asset-filter-form"
+               hx-target="#search_result"
+               hx-swap="innerHTML">{{ num }}</a>
+          {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
+            <span class="page-ellipsis">…</span>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_object.has_next %}
+          <a href="?page={{ page_object.next_page_number }}"
+             class="page-btn" aria-label="Next page"
+             hx-get="{% url 'assets:search' page_object.next_page_number %}"
+             hx-include="#asset-filter-form"
+             hx-target="#search_result"
+             hx-swap="innerHTML">›</a>
+        {% else %}
+          <span class="page-btn disabled" aria-disabled="true">›</span>
+        {% endif %}
+      </div>
+    </div>
+  </td>
+</tr>
 {% endif %}
 
 <script>

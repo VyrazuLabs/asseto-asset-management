@@ -171,14 +171,14 @@ def get_asset_filter_data(request):
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
     client_data = request.POST.get("client-data")
-    product = request.POST.get("product")  # gets the id of the product
+    product_type = request.POST.get("product_type")  # gets the id of the product type
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
     status_name = request.GET.get("status")
     department_id = request.GET.get("department")
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
-    product_id = request.GET.get("product")
+    product_type_id = request.GET.get("product_type")
     client_id = request.GET.get("client")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(
@@ -191,7 +191,7 @@ def filtered_asset(request):
             | Q(name__icontains=search_text)
             | Q(serial_no__icontains=search_text)
             | Q(purchase_type__icontains=search_text)
-            | Q(product__name__icontains=search_text)
+            | Q(product__product_type__name__icontains=search_text)
             | Q(vendor__name__icontains=search_text)
             | Q(vendor__gstin_number__icontains=search_text)
             | Q(location__office_name__icontains=search_text)
@@ -204,8 +204,8 @@ def filtered_asset(request):
         filters &= Q(asset_status__name__icontains=status_name)
     if category_id:
         filters &= Q(product__product_sub_category_id=category_id)
-    if product_id:
-        filters &= Q(product_id=product_id)
+    if product_type_id:
+        filters &= Q(product__product_type_id=product_type_id)
     if client_id:
         filters &= Q(client_id=client_id)
     if location_id:
@@ -228,9 +228,9 @@ def filtered_asset(request):
     if not request.user.has_perm("assets.all_asset"):
         assets_qs = assets_qs.filter(assignasset__user=request.user).distinct()
 
-    # Filter by product based on product type and category
-    if product:
-        assets_qs = assets_qs.filter(product_id=product)
+    # Filter by product type
+    if product_type:
+        assets_qs = assets_qs.filter(product__product_type_id=product_type)
     if user_data:
         assigned_qs = (
             AssignAsset.objects.filter(user_id=user_data)
@@ -266,7 +266,7 @@ def create_asset_list(request, assets_qs):
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
     client_list = Client.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
-    asset_list = Asset.undeleted_objects.filter(org_filter).order_by("-created_at")
+    asset_list = Asset.undeleted_objects.filter(org_filter).select_related('location').order_by("-created_at")
     if not request.user.has_perm("assets.all_asset"):
         asset_list = asset_list.filter(assignasset__user=request.user).distinct()
     deleted_asset_count = Asset.deleted_objects.filter(
@@ -518,6 +518,13 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
             if eol_date is not None
             else ""
         )
+    cf_values_formatted = {}
+    for defn in cf_definitions:
+        val = cf_values.get(defn.field_key)
+        if val and defn.field_type == 'date' and get_date_format:
+            cf_values_formatted[defn.field_key] = format_datetime(x=val, output_format=get_date_format)
+        else:
+            cf_values_formatted[defn.field_key] = val
 
 
     from authentication.models import User, Technician
@@ -588,7 +595,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
 
     context = {'title': 'Asset Details', 'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries,
-               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date}
+               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'cf_values_formatted': cf_values_formatted, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date}
 
     return context
 
@@ -630,8 +637,9 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     user_id = request.GET.get("user")
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
-    product_id = request.GET.get("product")
+    product_type_id = request.GET.get("product_type")
     client_id = request.GET.get("client")
+    location_id = request.GET.get("location")
 
     # Start query
     q = Q(organization=request.user.organization)
@@ -642,7 +650,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
             Q(name__icontains=search_text)
             | Q(serial_no__icontains=search_text)
             | Q(purchase_type__icontains=search_text)
-            | Q(product__name__icontains=search_text)
+            | Q(product__product_type__name__icontains=search_text)
             | Q(vendor__name__icontains=search_text)
             | Q(vendor__gstin_number__icontains=search_text)
             | Q(location__office_name__icontains=search_text)
@@ -659,19 +667,55 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if product_category_id:
         q &= Q(product__product_category__id=product_category_id)
 
-    if product_id:
-        q &= Q(product_id=product_id)
+    if product_type_id:
+        q &= Q(product__product_type_id=product_type_id)
 
     if client_id:
         q &= Q(client_id=client_id)
+    if location_id:
+        q &= Q(location_id=location_id)
 
     # Scope to assigned assets unless user has all_asset
     if not request.user.has_perm("assets.all_asset"):
         q &= Q(assignasset__user=request.user)
 
-    page_object = list(Asset.undeleted_objects.filter(q).distinct().order_by("-created_at")[:10])
+    if user_id:
+        assigned_qs = (
+            AssignAsset.objects.filter(user_id=user_id)
+            .select_related("user")
+            .order_by("-assigned_date")
+        )
+        search_qs = (
+            Asset.undeleted_objects.filter(q, assignasset__user_id=user_id)
+            .select_related('location')
+            .prefetch_related(
+                Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
+            )
+            .order_by("-created_at")
+        )
+    elif department_id:
+        search_qs = Asset.undeleted_objects.filter(
+            q, assignasset__user__department_id=department_id
+        ).select_related('location').order_by("-created_at")
+    else:
+        search_qs = Asset.undeleted_objects.filter(q).select_related('location').order_by("-created_at")
 
-    asset_ids = [obj.id for obj in page_object]
+    # If any search/filter is active, return ALL matching results (no pagination cap).
+    # Pagination only applies to the unfiltered browse view.
+    any_filter_active = any([
+        search_text, vendor_id, status_id, user_id, department_id,
+        product_category_id, product_type_id, client_id, location_id,
+    ])
+
+    if any_filter_active:
+        # Return every matching asset so none are hidden behind pages
+        page_object = search_qs.distinct()
+    else:
+        paginator = Paginator(search_qs, PAGE_SIZE, orphans=ORPHANS)
+        page_number = request.GET.get("page")
+        page_object = paginator.get_page(page_number)
+
+    asset_ids = [asset.id for asset in page_object]
     image_object = AssetImage.objects.filter(
         asset__organization=request.user.organization, asset_id__in=asset_ids
     ).order_by("-uploaded_at")
@@ -681,26 +725,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         if img.asset_id not in asset_images:
             asset_images[img.asset_id] = img
 
-    if user_id:
-        assigned_qs = (
-            AssignAsset.objects.filter(user_id=user_id)
-            .select_related("user")
-            .order_by("-assigned_date")
-        )
-        page_object = (
-            Asset.undeleted_objects.filter(q, assignasset__user_id=user_id)
-            .prefetch_related(
-                Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
-            )
-            .order_by("-created_at")[:10]
-        )
-    elif department_id:
-        assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
-        page_object = Asset.undeleted_objects.filter(
-            q, assignasset__user__department_id=department_id
-        ).order_by("-created_at")[:10]
-    else:
-        page_object = Asset.undeleted_objects.filter(q).order_by("-created_at")[:10]
     asset_user_map = {}
     get_assigned_asset_list = (
         AssignAsset.objects.select_related("user")
@@ -729,11 +753,9 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         "list_of_audited_assets": list_of_audited_assets,
         "asset_conditions_map": asset_conditions_map,
         "has_clients": has_clients,
+        "is_filtered": any_filter_active,
     }
     return context
-
-
-    pass
 
 
 def autogenerated_tag(request, form):

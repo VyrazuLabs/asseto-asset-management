@@ -160,7 +160,7 @@
               {% elif defn.field_type == 'url' %}
                 <a href="{{ cf_values|get_cf_value:defn.field_key }}" target="_blank">{{ cf_values|get_cf_value:defn.field_key }}</a>
               {% else %}
-                {{ cf_values|get_cf_value:defn.field_key }}
+                {{ cf_values_formatted|get_cf_value:defn.field_key }}
               {% endif %}
             </span>
           </div>

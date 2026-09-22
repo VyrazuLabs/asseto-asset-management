@@ -160,6 +160,8 @@ def delete(request, id):
 
 @login_required
 def search(request, page):
+    request.GET = request.GET.copy()
+    request.GET["page"] = page
     context = search_asset(request)
     return render(request, "assets/assets-data.html", context=context)
 
