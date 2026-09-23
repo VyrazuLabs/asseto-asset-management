@@ -150,9 +150,12 @@ body.theme-dark .btn-ra-save:hover { background: #0369A1; }
 </style>
 
 <script>
-    htmx.on("htmx:beforeSwap", (e) => {
-        if ((e.detail.target.id == "reassign-asset-modal-content") && !e.detail.xhr.response) {
-            location.reload()
-        }
-    })
+    if (!window.__raBeforeSwapBound) {
+        window.__raBeforeSwapBound = true;
+        htmx.on("htmx:beforeSwap", (e) => {
+            if ((e.detail.target.id == "reassign-asset-modal-content") && !e.detail.xhr.response) {
+                location.reload()
+            }
+        })
+    }
 </script>

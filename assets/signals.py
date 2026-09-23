@@ -1,6 +1,7 @@
 import structlog
 from django.apps import AppConfig
 from authentication.models import User
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .seeders import seed_asset_statuses
@@ -13,6 +14,16 @@ User = get_user_model()
 
 log = structlog.get_logger(__name__)
 log.info("asset_signals_loaded")
+
+
+def _send_after_commit(**kwargs):
+    """Queue NotificationService.send until the current transaction commits.
+
+    post_save runs inside callers' @transaction.atomic blocks; sending here
+    would hold row locks open for the whole (potentially slow) notification
+    path (Celery retry + sync fallback + Firebase), which invited deadlocks.
+    """
+    transaction.on_commit(lambda: NotificationService.send(**kwargs))
 
 
 @receiver(post_save, sender=Asset)
@@ -53,7 +64,7 @@ def asset_notification(sender, instance, created, **kwargs):
         # Soft delete detection
         deleted_change = any(f for f in changed_fields if f[0] == "is_deleted")
         if deleted_change and instance.is_deleted:
-            NotificationService.send(
+            _send_after_commit(
                 user=admin,
                 title="Asset Deleted",
                 message=f"Asset '{instance.name}', ({instance.tag}) was deleted.",
@@ -67,7 +78,7 @@ def asset_notification(sender, instance, created, **kwargs):
         # Status change detection
         status_change = any(f for f in changed_fields if f[0] == "asset_status")
         if status_change:
-            NotificationService.send(
+            _send_after_commit(
                 user=admin,
                 title="Asset Status Changed",
                 message=f"Asset '{instance.name}' status changed.",
@@ -82,7 +93,7 @@ def asset_notification(sender, instance, created, **kwargs):
         assigned_change = any(f for f in changed_fields if f[0] == "is_assigned")
         if assigned_change:
             status_text = "Assigned" if instance.is_assigned else "Unassigned"
-            NotificationService.send(
+            _send_after_commit(
                 user=admin,
                 title="Asset Assignment Updated",
                 message=f"Asset '{instance.name}' is now {status_text}.",
@@ -98,7 +109,7 @@ def asset_notification(sender, instance, created, **kwargs):
             for f in changed_fields
         )
 
-        NotificationService.send(
+        _send_after_commit(
             user=admin,
             title="Asset Updated",
             message=f"Asset '{instance.name}' updated",

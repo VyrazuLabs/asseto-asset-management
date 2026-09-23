@@ -556,6 +556,57 @@ document.body.addEventListener('htmx:afterSettle', function(evt) {
         bootstrap.Modal.getOrCreateInstance(document.getElementById('assign-asset-list-modal')).show();
     }
 });
+
+// Delegated once here: htmx useTemplateFragments double-evaluates inline scripts in
+// swapped fragments, which double-bound a submit listener and fired two concurrent
+// POSTs (MySQL 1213 deadlock). One document-level listener = one POST per submit.
+document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form || form.id !== 'assign-asset-form') return;
+    e.preventDefault();
+    if (form.dataset.submitting === '1') return;
+    form.dataset.submitting = '1';
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    fetch(form.dataset.assignUrl, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value }
+    })
+    .then(function(response) {
+        if (response.ok) {
+            var modalEl = document.getElementById('assign-asset-list-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modalEl.addEventListener('hidden.bs.modal', function onHidden() {
+                    modalEl.removeEventListener('hidden.bs.modal', onHidden);
+                    location.reload();
+                }, { once: true });
+                modal.hide();
+            } else {
+                location.reload();
+            }
+            return;
+        }
+        if (response.status >= 500) {
+            form.dataset.submitting = '0';
+            if (submitBtn) submitBtn.disabled = false;
+            alert('Could not assign asset. Please try again.');
+            return null;
+        }
+        return response.text().then(function(html) {
+            document.getElementById('assign-asset-modal-list-content').innerHTML = html;
+            form.dataset.submitting = '0';
+        });
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        form.dataset.submitting = '0';
+        if (submitBtn) submitBtn.disabled = false;
+    });
+});
 </script>
 
 {% endblock %}
