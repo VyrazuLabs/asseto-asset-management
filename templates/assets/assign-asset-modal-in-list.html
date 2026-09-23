@@ -80,6 +80,7 @@
     </div>
 </form>
 
+
 <script>
     document.getElementById("assign-asset-form").addEventListener("submit", function(e) {
         e.preventDefault();
@@ -96,9 +97,20 @@
         })
         .then(response => {
             if (response.ok) {
-                let modal = bootstrap.Modal.getInstance(document.getElementById("assign-asset-list-modal"));
-                modal.hide();
-                location.reload();
+                let modalEl = document.getElementById("assign-asset-list-modal");
+                let modal = bootstrap.Modal.getInstance(modalEl);
+
+                if (modal) {
+                    // Wait for animation to fully finish before reloading
+                    // (avoids "modal operation in progress" Bootstrap error)
+                    modalEl.addEventListener("hidden.bs.modal", function onHidden() {
+                        modalEl.removeEventListener("hidden.bs.modal", onHidden);
+                        location.reload();
+                    }, { once: true });
+                    modal.hide();
+                } else {
+                    location.reload();
+                }
             } else {
                 return response.text().then(html => {
                     document.getElementById("assign-asset-modal-list-content").innerHTML = html;

@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import uuid
 from django.http import JsonResponse
 from django.utils import timezone
 from audit.models import Audit, AuditImage
@@ -202,7 +203,11 @@ def filtered_asset(request):
     if vendor_id:
         filters &= Q(vendor_id=vendor_id)
     if status_name:
-        filters &= Q(asset_status__name__icontains=status_name)
+        try:
+            uuid.UUID(str(status_name))
+            filters &= Q(asset_status_id=status_name)
+        except (ValueError, TypeError, AttributeError):
+            filters &= Q(asset_status__name__icontains=status_name)
     if category_id:
         filters &= Q(product__product_sub_category_id=category_id)
     if product_type_id:
@@ -294,9 +299,7 @@ def create_asset_list(request, assets_qs):
                 }
             else:
                 asset_user_map[assign.asset_id] = None
-    paginator = Paginator(asset_list, PAGE_SIZE, orphans=ORPHANS)
-    if assets_qs.exists():
-        paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
+    paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
     asset_form = AssetForm(organization=request.user.organization)
@@ -634,13 +637,14 @@ def search_asset(request):
 def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
-    status_id = request.GET.get("status")
+    status_value = request.GET.get("status")
     user_id = request.GET.get("user")
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
     client_id = request.GET.get("client")
     location_id = request.GET.get("location")
+    is_assigned = request.GET.get("is_assigned")
 
     # Start query
     q = Q(organization=request.user.organization)
@@ -662,11 +666,16 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if vendor_id:
         q &= Q(vendor_id=vendor_id)
 
-    if status_id:
-        q &= Q(asset_status_id=status_id)
+    if status_value:
+        import uuid
+        try:
+            uuid.UUID(str(status_value))
+            q &= Q(asset_status_id=status_value)
+        except ValueError:
+            q &= Q(asset_status__name__iexact=status_value)
 
     if product_category_id:
-        q &= Q(product__product_category__id=product_category_id)
+        q &= Q(product__product_sub_category_id=product_category_id)
 
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
@@ -675,6 +684,10 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(client_id=client_id)
     if location_id:
         q &= Q(location_id=location_id)
+    if is_assigned == "true":
+        q &= Q(is_assigned=True)
+    elif is_assigned == "false":
+        q &= Q(is_assigned=False)
 
     # Scope to assigned assets unless user has all_asset
     if not request.user.has_perm("assets.all_asset"):
@@ -705,14 +718,14 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     # aren't hidden behind pages, but still bound the result set — an
     # unfiltered browse view uses regular pagination below.
     any_filter_active = any([
-        search_text, vendor_id, status_id, user_id, department_id,
+        search_text, vendor_id, status_value, user_id, department_id,
         product_category_id, product_type_id, client_id, location_id,
+        is_assigned,
     ])
 
     if any_filter_active:
-        paginator = Paginator(search_qs.distinct(), MAX_FILTERED_RESULTS, orphans=ORPHANS)
-    else:
-        paginator = Paginator(search_qs, PAGE_SIZE, orphans=ORPHANS)
+        search_qs = search_qs.distinct()
+    paginator = Paginator(search_qs, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
 
@@ -754,6 +767,8 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         "list_of_audited_assets": list_of_audited_assets,
         "asset_conditions_map": asset_conditions_map,
         "has_clients": has_clients,
+        "asset_form": AssetForm(organization=request.user.organization),
+        "is_demo": bool(os.environ.get("IS_DEMO")),
     }
     return context
 

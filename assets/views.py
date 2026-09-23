@@ -247,6 +247,7 @@ def change_status(request, id):
 def delete_assign_asset_list(request, id):
     if request.method == "POST":
         unassign_asset_from_list(id, request.user.organization)
+        messages.success(request, "Asset unassigned successfully.")
     return redirect("assets:list")
 
 
