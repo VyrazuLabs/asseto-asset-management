@@ -9,6 +9,7 @@ STRINGS = {
     'tag_or_name': 'Tag ou Nom…',
     'all_vendors': 'Tous les fournisseurs',
     'all_types': 'Tous les types',
+    'product_type': 'Type de produit',
     'all_categories': 'Toutes les catégories',
     'all_locations': 'Tous les emplacements',
     'all_dept': 'Tous les départements',

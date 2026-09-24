@@ -14,6 +14,8 @@
 
 {% block content %}
 
+<script>htmx.config.useTemplateFragments = true;</script>
+
 {# ── Page header ──────────────────────────────────────────────────────────── #}
 <div class="assets-page-header">
   <div>
@@ -70,18 +72,16 @@
 <div class="filter-card">
   {% csrf_token %}
   <form id="asset-filter-form"
-        hx-get="{% url 'assets:search' page_object.number %}"
+        hx-get="{% url 'assets:search' 1 %}"
         hx-target="#search_result"
-        hx-trigger="change, keyup changed delay:400ms from:input">
+        hx-trigger="change, keyup delay:400ms from:input, search from:input">
+    <input type="hidden" name="is_assigned" value="{{ request.GET.is_assigned|default:'' }}">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-sm-6 col-lg">
         <div class="filter-label">{{ trans.search_asset_label }}</div>
         <input name="search_text" type="search"
           autocomplete="off" placeholder="{{ trans.tag_or_name }}"
-          hx-get="{% url 'assets:search' page_object.number %}"
-          hx-trigger="keyup changed delay:400ms, search"
-          hx-target="#search_result"
           aria-label="Search assets">
       </div>
 
@@ -101,7 +101,7 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="status">
+          <input type="hidden" name="status" value="{{ request.GET.status|default:'' }}">
         </div>
       </div>
 
@@ -121,26 +121,26 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="vendor">
+          <input type="hidden" name="vendor" value="{{ request.GET.vendor|default:'' }}">
         </div>
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
-        <div class="filter-label">{{ trans.product_name }}</div>
+        <div class="filter-label">{{ trans.product_type }}</div>
         <div class="dropdown">
-          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product">
-            All Products
+          <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="product-btn" aria-label="Filter by product type">
+            All Product Types
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product]').value='';document.getElementById('product-btn').childNodes[0].textContent='{{ trans.all_products }} ';htmx.trigger('#asset-filter-form','change');">All Products</a></li>
-            {% for product in product_list %}
+            <li><a href="#" class="dropdown-item" onclick="event.preventDefault();document.querySelector('[name=product_type]').value='';document.getElementById('product-btn').childNodes[0].textContent='All Product Types ';htmx.trigger('#asset-filter-form','change');">All Product Types</a></li>
+            {% for pt in product_type_list %}
             <li><a href="#" class="dropdown-item"
-              onclick="event.preventDefault();document.querySelector('[name=product]').value='{{ product.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ product.name }} ';htmx.trigger('#asset-filter-form','change');">
-              {{ product.name }}
+              onclick="event.preventDefault();document.querySelector('[name=product_type]').value='{{ pt.id }}';document.getElementById('product-btn').childNodes[0].textContent='{{ pt.name }} ';htmx.trigger('#asset-filter-form','change');">
+              {{ pt.name }}
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="product">
+          <input type="hidden" name="product_type" value="{{ request.GET.product_type|default:'' }}">
         </div>
       </div>
 
@@ -160,7 +160,7 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="client">
+          <input type="hidden" name="client" value="{{ request.GET.client|default:'' }}">
         </div>
       </div>
       {% endif %}
@@ -181,7 +181,7 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="category">
+          <input type="hidden" name="category" value="{{ request.GET.category|default:'' }}">
         </div>
       </div>
 
@@ -201,7 +201,7 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="location">
+          <input type="hidden" name="location" value="{{ request.GET.location|default:'' }}">
         </div>
       </div>
 
@@ -221,7 +221,7 @@
             </a></li>
             {% endfor %}
           </ul>
-          <input type="hidden" name="department">
+          <input type="hidden" name="department" value="{{ request.GET.department|default:'' }}">
         </div>
       </div>
 
@@ -248,8 +248,9 @@
           <th>{{ trans.image_label_col }}</th>
           <th>{{ trans.asset_tag_col }}</th>
           <th>{{ trans.asset_name_col }}</th>
-          <th>{{ trans.product_name }}</th>
+          <th>{{ trans.product_type }}</th>
           <th>{{ trans.vendor }}</th>
+          <th>{{ trans.location }}</th>
           {% if has_clients %}<th>{{ trans.client }}</th>{% endif %}
           <th>{{ trans.assigned_to_col }}</th>
           <th>{{ trans.status_col }}</th>
@@ -266,149 +267,146 @@
           <td class="table-index-cell">
             {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
           </td>
-
+        
           <td>
             {% with img=asset_images|get_item:asset.id %}
-              <img class="asset-thumb"
-                src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
-                alt="{{ asset.name }}"
-                width="52" height="52"
-                onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+            <img class="asset-thumb"
+              src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+              alt="{{ asset.name }}" width="52" height="52"
+              onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
             {% endwith %}
           </td>
-
+        
           <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
-
+        
           <td>
             {% with asset_conditions_map|get_item:asset.id as condition_list %}
-              {% with condition_list|default:''|last as condition %}
-                <div class="asset-name-main">{{ asset.name }}</div>
-                <div class="asset-name-sub">
-                  {% if asset.product %}{{ asset.product.name }}{% endif %}
-                  {% if condition == 0 or condition == 1 %}
-                    &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
-                  {% elif condition == 2 %}
-                    &nbsp;·&nbsp;<span class="state-good">● Good</span>
-                  {% elif condition == 3 or condition == 4 %}
-                    &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
-                  {% endif %}
-                </div>
-              {% endwith %}
+            {% with condition_list|default:''|last as condition %}
+            <div class="asset-name-main">{{ asset.name }}</div>
+            <div class="asset-name-sub">
+              {% if asset.product %}{{ asset.product.product_type.name }}{% endif %}
+              {% if condition == 0 or condition == 1 %}
+              &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+              {% elif condition == 2 %}
+              &nbsp;·&nbsp;<span class="state-good">● Good</span>
+              {% elif condition == 3 or condition == 4 %}
+              &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+              {% endif %}
+            </div>
+            {% endwith %}
             {% endwith %}
           </td>
-
-          <td>{{ asset.product.name }}</td>
-
+        
+          <td>{{ asset.product.product_type.name }}</td>
+        
           <td>
             {{ asset.vendor }}
             {% if asset.vendor.is_deleted %}
-              <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+            <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
             {% endif %}
           </td>
-
+        
+          <td>
+            {% if asset.location %}
+            {{ asset.location.office_name }}
+            {% else %}
+            —
+            {% endif %}
+          </td>
+        
           {% if has_clients %}
           <td>
             {% if asset.client %}
-              {{ asset.client.name }}
+            {{ asset.client.name }}
             {% else %}
-              —
+            —
             {% endif %}
           </td>
           {% endif %}
-
+        
           <td>
             {% if asset.is_assigned %}
-              {% with map=asset_user_map|get_item:asset.id %}
-                <div class="assignee-chip mb-1">
-                  {% if map.image %}
-                    <img src="{{ map.image.url }}"
-                      onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
-                      alt="{{ map.full_name }}" width="22" height="22">
-                  {% else %}
-                    <span class="assignee-initials">
-                      {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
-                    </span>
-                  {% endif %}
-                  <span>{{ map.full_name|default:"Unknown User" }}</span>
-                </div>
-                <div class="d-flex gap-1 align-items-center mt-1">
-                {% if perms.assets.delete_assign_asset %}
-                <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
-                      class="form-row-action d-inline m-0"
-                      onsubmit="return confirm('Unassign this asset?')">
-                  {% csrf_token %}
-                  <button type="submit" class="btn-unassign">Unassign</button>
-                </form>
-                {% endif %}
-                {% if perms.assets.reassign_assign_asset and map.assign_id %}
-                <button type="button" class="btn-reassign"
-                  hx-get="{% url 'assets:reassign_asset' map.assign_id %}"
-                  hx-target="#reassign-asset-modal-content"
-                  data-bs-toggle="modal"
-                  data-bs-target="#reassign-asset-list-modal"
-                  aria-label="Reassign {{ asset.name }}">
-                  Reassign
-                </button>
-                {% endif %}
-                </div>
-              {% endwith %}
-            {% else %}
-              <span class="unassigned-label">Unassigned</span>
-              {% if perms.assets.add_assign_asset %}
-              <button type="button" class="btn-assign mt-1"
-                hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
-                hx-target="#assign-asset-modal-list-content"
-                data-bs-toggle="modal"
-                data-bs-target="#assign-asset-list-modal"
-                aria-label="Assign {{ asset.name }}">
-                + Assign
+            {% with map=asset_user_map|get_item:asset.id %}
+            <div class="assignee-chip mb-1">
+              {% if map.image %}
+              <img src="{{ map.image.url }}" onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
+                alt="{{ map.full_name }}" width="22" height="22">
+              {% else %}
+              <span class="assignee-initials">
+                {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
+              </span>
+              {% endif %}
+              <span>{{ map.full_name|default:"Unknown User" }}</span>
+            </div>
+            <div class="d-flex gap-1 align-items-center mt-1">
+              {% if perms.assets.delete_assign_asset %}
+              <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
+                class="form-row-action d-inline m-0" onsubmit="return confirm('Unassign this asset?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-unassign">Unassign</button>
+              </form>
+              {% endif %}
+              {% if perms.assets.reassign_assign_asset and map.assign_id %}
+              <button type="button" class="btn-reassign" hx-get="{% url 'assets:reassign_asset' map.assign_id %}"
+                hx-target="#reassign-asset-modal-content" data-bs-toggle="modal" data-bs-target="#reassign-asset-list-modal"
+                aria-label="Reassign {{ asset.name }}">
+                Reassign
               </button>
               {% endif %}
+            </div>
+            {% endwith %}
+            {% else %}
+            <span class="unassigned-label">Unassigned</span>
+            {% if perms.assets.add_assign_asset %}
+            <button type="button" class="btn-assign mt-1"
+              hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+              hx-target="#assign-asset-modal-list-content"
+              aria-label="Assign {{ asset.name }}">
+              + Assign
+            </button>
+            {% endif %}
             {% endif %}
           </td>
-
+        
           <td>
             {% if not asset.is_assigned %}
-              <select class="status-select status-select-inline" data-asset-id="{{ asset.id }}"
-                      aria-label="Status for {{ asset.name }}">
-                <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
-                {% for value, label in asset_form.fields.status.choices %}
-                  {% if value != asset.asset_status.name %}
-                    <option value="{{ value }}">{{ label }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
+            <select class="status-select status-select-inline" data-asset-id="{{ asset.id }}"
+              aria-label="Status for {{ asset.name }}">
+              <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
+              {% for value, label in asset_form.fields.status.choices %}
+              {% if value != asset.asset_status.name %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
             {% else %}
-              <span class="status-badge status-allocated">Allocated</span>
+            <span class="status-badge status-allocated">Allocated</span>
             {% endif %}
           </td>
-
+        
           {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
           <td>
             <div class="row-actions">
               {% if perms.assets.view_asset %}
-                <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View {{ asset.name }}">
-                  <i class="bi bi-eye"></i>
-                </a>
+              <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View {{ asset.name }}">
+                <i class="bi bi-eye"></i>
+              </a>
               {% endif %}
               {% if perms.assets.edit_asset %}
-                <a href="{% url 'assets:update_in_detail' asset.id %}"
-                  class="action-btn {% if is_demo %}disabled{% endif %}"
-                  title="Edit {{ asset.name }}">
-                  <i class="bi bi-pencil"></i>
-                </a>
+              <a href="{% url 'assets:update_in_detail' asset.id %}" class="action-btn {% if is_demo %}disabled{% endif %}"
+                title="Edit {{ asset.name }}">
+                <i class="bi bi-pencil"></i>
+              </a>
               {% endif %}
               {% if perms.assets.delete_asset %}
-                <form action="{% url 'assets:delete' asset.id %}" method="post" class="form-row-action"
-                      onsubmit="return confirm('Delete {{ asset.name }}? It can be restored from Recycle Bin.')">
-                  {% csrf_token %}
-                  <button type="submit"
-                    class="action-btn danger {% if is_demo %}disabled{% endif %}"
-                    title="Delete {{ asset.name }}"
-                    {% if is_demo %}disabled{% endif %}>
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </form>
+              <form action="{% url 'assets:delete' asset.id %}" method="post" class="form-row-action"
+                onsubmit="return confirm('Delete {{ asset.name }}? It can be restored from Recycle Bin.')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn danger {% if is_demo %}disabled{% endif %}"
+                  title="Delete {{ asset.name }}" {% if is_demo %}disabled{% endif %}>
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
               {% endif %}
               <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="action-btn" title="Audit history">
                 <i class="bi bi-archive"></i>
@@ -438,14 +436,18 @@
   </div>
 
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
-  <div class="pagination-wrap">
+  <div class="pagination-wrap" id="asset-pagination">
     <span>
       {{ trans.showing_label }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
       {{ trans.of_label }} <strong>{{ page_object.paginator.count }}</strong> {{ trans.assets_lower }}
     </span>
     <div class="pagination-nav">
       {% if page_object.has_previous %}
-        <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
+        <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page"
+           hx-get="{% url 'assets:search' page_object.previous_page_number %}"
+           hx-include="#asset-filter-form"
+           hx-target="#search_result"
+           hx-swap="innerHTML">‹</a>
       {% else %}
         <span class="page-btn disabled" aria-disabled="true">‹</span>
       {% endif %}
@@ -454,14 +456,22 @@
         {% if page_object.number == num %}
           <span class="page-btn active" aria-current="page">{{ num }}</span>
         {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+          <a href="?page={{ num }}" class="page-btn"
+             hx-get="{% url 'assets:search' num %}"
+             hx-include="#asset-filter-form"
+             hx-target="#search_result"
+             hx-swap="innerHTML">{{ num }}</a>
         {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
           <span class="page-ellipsis">…</span>
         {% endif %}
       {% endfor %}
 
       {% if page_object.has_next %}
-        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
+        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page"
+           hx-get="{% url 'assets:search' page_object.next_page_number %}"
+           hx-include="#asset-filter-form"
+           hx-target="#search_result"
+           hx-swap="innerHTML">›</a>
       {% else %}
         <span class="page-btn disabled" aria-disabled="true">›</span>
       {% endif %}
@@ -498,21 +508,20 @@ function getCookie(name) {
   return cookieValue;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll('.status-select').forEach(function (select) {
-    select.addEventListener('change', function () {
-      const assetId = this.dataset.assetId;
-      const statusValue = this.value;
-      fetch(`/assets/change-status/${assetId}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
-        body: JSON.stringify({ status: statusValue })
-      })
-      .then(response => { if (!response.ok) throw new Error("Status update failed"); })
-      .catch(error => { alert(error.message); location.reload(); });
-    });
-  });
+document.addEventListener("change", function (e) {
+  var select = e.target;
+  if (!select.classList || !select.classList.contains("status-select")) return;
+  const assetId = select.dataset.assetId;
+  const statusValue = select.value;
+  fetch(`/assets/change-status/${assetId}/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": getCookie("csrftoken") },
+    body: JSON.stringify({ status: statusValue })
+  })
+  .then(response => { if (!response.ok) throw new Error("Status update failed"); })
+  .catch(error => { alert(error.message); location.reload(); });
 });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
@@ -536,6 +545,68 @@ if (reassignModal) {
         if ($raUserSelect && $raUserSelect.data('select2')) { $raUserSelect.select2('destroy'); }
     });
 }
+</script>
+
+<script>
+// Open the assign modal only after HTMX has fully settled content into it.
+// The htmx:afterSettle event fires on the *target* element (the div that received
+// the response), not on the button that triggered the request.
+document.body.addEventListener('htmx:afterSettle', function(evt) {
+    if (evt.detail && evt.detail.target && evt.detail.target.id === 'assign-asset-modal-list-content') {
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('assign-asset-list-modal')).show();
+    }
+});
+
+// Delegated once here: htmx useTemplateFragments double-evaluates inline scripts in
+// swapped fragments, which double-bound a submit listener and fired two concurrent
+// POSTs (MySQL 1213 deadlock). One document-level listener = one POST per submit.
+document.addEventListener('submit', function(e) {
+    var form = e.target;
+    if (!form || form.id !== 'assign-asset-form') return;
+    e.preventDefault();
+    if (form.dataset.submitting === '1') return;
+    form.dataset.submitting = '1';
+
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    fetch(form.dataset.assignUrl, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value }
+    })
+    .then(function(response) {
+        if (response.ok) {
+            var modalEl = document.getElementById('assign-asset-list-modal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modalEl.addEventListener('hidden.bs.modal', function onHidden() {
+                    modalEl.removeEventListener('hidden.bs.modal', onHidden);
+                    location.reload();
+                }, { once: true });
+                modal.hide();
+            } else {
+                location.reload();
+            }
+            return;
+        }
+        if (response.status >= 500) {
+            form.dataset.submitting = '0';
+            if (submitBtn) submitBtn.disabled = false;
+            alert('Could not assign asset. Please try again.');
+            return null;
+        }
+        return response.text().then(function(html) {
+            document.getElementById('assign-asset-modal-list-content').innerHTML = html;
+            form.dataset.submitting = '0';
+        });
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        form.dataset.submitting = '0';
+        if (submitBtn) submitBtn.disabled = false;
+    });
+});
 </script>
 
 {% endblock %}

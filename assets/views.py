@@ -160,6 +160,8 @@ def delete(request, id):
 
 @login_required
 def search(request, page):
+    request.GET = request.GET.copy()
+    request.GET["page"] = page
     context = search_asset(request)
     return render(request, "assets/assets-data.html", context=context)
 
@@ -245,6 +247,7 @@ def change_status(request, id):
 def delete_assign_asset_list(request, id):
     if request.method == "POST":
         unassign_asset_from_list(id, request.user.organization)
+        messages.success(request, "Asset unassigned successfully.")
     return redirect("assets:list")
 
 

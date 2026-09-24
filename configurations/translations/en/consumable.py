@@ -50,6 +50,7 @@ STRINGS = {
     "consumable_col_location": "Location",
     "consumable_col_item_no": "Item No.",
     "consumable_col_total_qty": "Total QTY",
+    "consumable_col_checked_out": "Checked Out",
     "consumable_col_remaining_qty": "Remaining QTY",
     "consumable_col_min_qty": "Min QTY",
     "consumable_col_purchase_cost": "Purchase Cost",
