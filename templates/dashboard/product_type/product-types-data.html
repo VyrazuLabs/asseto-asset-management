@@ -1,97 +1,117 @@
 {% load custom_filters %}
 
-{% if page_object %}
-{% for products in page_object %}
-<tr>
-
-    <!-- INDEX -->
-    <td class="table-index-cell">
-        {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-    </td>
-
-    <!-- NAME -->
-    <td>
-        <div class="cell-name-main">
-            {{ products.name }}
-        </div>
-    </td>
-
-    <!-- ASSET COUNT -->
-    <td>
-        {% with asset_count=product_type_asset_count|get_item:products.id %}
-        {% if not asset_count %}
-        <span class="count-pill zero">0</span>
-        {% else %}
-        <form method="post" action="{% url 'assets:list' %}" class="d-inline">
-            {% csrf_token %}
-            <input type="hidden" name="type" value="{{ products.id }}">
-            <button type="submit" class="count-pill">
-                {{ asset_count }}
-            </button>
-        </form>
+<div class="table-responsive">
+  <table class="list-table" id="table1">
+    <thead>
+      <tr>
+        <th>{{ trans.sl_no }}</th>
+        <th>{{ trans.type_name }}</th>
+        <th>{{ trans.total_assets }}</th>
+        <th>{{ trans.status }}</th>
+        {% if perms.dashboard.edit_product_type or perms.dashboard.delete_product_type or request.user.is_superuser %}
+        <th>{{ trans.actions }}</th>
         {% endif %}
-        {% endwith %}
-    </td>
+      </tr>
+    </thead>
+    {% if page_object %}
+    <tbody id="search_result">
+      {% for pt in page_object %}
+      <tr>
 
-    <!-- STATUS -->
-    <td>
-        {% if request.user.is_superuser %}
-        <div class="status-toggle">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox"
-                    hx-post="{% url 'dashboard:product_type_status' products.id %}"
-                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' {% if products.status %}checked{% endif %}>
-            </div>
-        </div>
-        {% else %}
-        {% if products.status %}
-        <span class="status-badge status-active">{{ trans.active }}</span>
-        {% else %}
-        <span class="status-badge status-inactive">{{ trans.inactive }}</span>
-        {% endif %}
-        {% endif %}
-    </td>
+          <!-- INDEX -->
+          <td class="table-index-cell">
+              {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+          </td>
 
-    <!-- ACTIONS -->
-    <td>
-        <div class="row-actions">
+          <!-- NAME -->
+          <td>
+              <div class="cell-name-main">
+                  {{ pt.name }}
+              </div>
+          </td>
 
-            {% if request.user.is_superuser %}
-            <a href="{% url 'dashboard:product_type_details' products.id %}" class="action-btn">
-                <i class="bi bi-eye"></i>
-            </a>
-            {% endif %}
+          <!-- ASSET COUNT -->
+          <td>
+              {% with asset_count=product_type_asset_count|get_item:pt.id %}
+              {% if not asset_count %}
+              <span class="count-pill zero">0</span>
+              {% else %}
+              <form method="post" action="{% url 'assets:list' %}" class="d-inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="type" value="{{ pt.id }}">
+                  <button type="submit" class="count-pill">
+                      {{ asset_count }}
+                  </button>
+              </form>
+              {% endif %}
+              {% endwith %}
+          </td>
 
-            {% if perms.dashboard.edit_product_type %}
-            <button class="action-btn" hx-get="{% url 'dashboard:update_product_type' products.id %}"
-                hx-target="#update-product-type-modal-content" data-bs-toggle="modal"
-                data-bs-target="#update-product-type-modal">
-                <i class="bi bi-pencil"></i>
-            </button>
-            {% endif %}
+          <!-- STATUS -->
+          <td>
+              {% if request.user.is_superuser %}
+              <div class="status-toggle">
+                  <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox"
+                          hx-post="{% url 'dashboard:product_type_status' pt.id %}"
+                          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' {% if pt.status %}checked{% endif %}
+                          {% if pt.can_modify is False %}disabled{% endif %}>
+                  </div>
+              </div>
+              {% else %}
+              {% if pt.status %}
+              <span class="status-badge status-active">{{ trans.active }}</span>
+              {% else %}
+              <span class="status-badge status-inactive">{{ trans.inactive }}</span>
+              {% endif %}
+              {% endif %}
+          </td>
 
-            {% if perms.dashboard.delete_product_type %}
-            <form method="post" action="{% url 'dashboard:delete_product_type' products.id %}"
-                onsubmit="return confirm('{{ trans.delete_confirm_product_type }}')">
-                {% csrf_token %}
-                <button class="action-btn danger">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </form>
-            {% endif %}
+          <!-- ACTIONS -->
+          <td>
+              <div class="row-actions">
 
-        </div>
-    </td>
+                  {% if request.user.is_superuser %}
+                  <a href="{% url 'dashboard:product_type_details' pt.id %}" class="action-btn">
+                      <i class="bi bi-eye"></i>
+                  </a>
+                  {% endif %}
 
-</tr>
-{% endfor %}
+                  {% if perms.dashboard.edit_product_type %}
+                  <button class="action-btn" hx-get="{% url 'dashboard:update_product_type' pt.id %}"
+                      hx-target="#update-product-type-modal-content" data-bs-toggle="modal"
+                      data-bs-target="#update-product-type-modal" {% if pt.can_modify is False %}disabled{% endif %}>
+                      <i class="bi bi-pencil"></i>
+                  </button>
+                  {% endif %}
 
-{% else %}
-<tr>
-    <td colspan="5">
-        <div class="table-empty-state text-center">
-            <p>{{ trans.no_product_types_found }}</p>
-        </div>
-    </td>
-</tr>
-{% endif %}
+                  {% if perms.dashboard.delete_product_type %}
+                  <form method="post" action="{% url 'dashboard:delete_product_type' pt.id %}"
+                      onsubmit="return confirm('{{ trans.delete_confirm_product_type }}')">
+                      {% csrf_token %}
+                      <button class="action-btn danger" {% if pt.can_modify is False %}disabled{% endif %}>
+                          <i class="bi bi-trash3"></i>
+                      </button>
+                  </form>
+                  {% endif %}
+
+              </div>
+          </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody>
+      <tr>
+          <td colspan="5">
+              <div class="table-empty-state text-center">
+                  <p>{{ trans.no_product_types_found }}</p>
+              </div>
+          </td>
+      </tr>
+    </tbody>
+    {% endif %}
+  </table>
+</div>
+{% include 'commons/htmx-pagination.html' with search_url="/admin/product-types/search/" filter_form="#product-type-filter-form" target="#product-type-list-section" item_label=trans.product_types %}

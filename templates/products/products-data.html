@@ -1,109 +1,132 @@
 {% load custom_filters %}
 {% load static %}
-{% if page_object %}
-    {% for products in page_object %}
-    <tr>
-      <td class="table-index-cell">
-        {% if page_object.start_index %}
+<div class="table-responsive">
+  <table class="list-table" id="table1">
+    <thead>
+      <tr>
+        <th>{{ trans.sl_no }}</th>
+        <th>{{ trans.image_label }}</th>
+        <th>{{ trans.product_name }}</th>
+        <th>{{ trans.product_type }}</th>
+        <th>{{ trans.category }}</th>
+        <th>{{ trans.total_assets }}</th>
+        <th>{{ trans.status_label }}</th>
+        {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
+          <th>{{ trans.actions }}</th>
+        {% endif %}
+      </tr>
+    </thead>
+    {% if page_object %}
+    <tbody id="search_result">
+      {% for products in page_object %}
+      <tr>
+        <td class="table-index-cell">
+          {% if page_object.start_index %}
           {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-        {% else %}
-          {{ forloop.counter|stringformat:"02d" }}
-        {% endif %}
-      </td>
-
-      <td>
-        {% with img=product_images|get_item:products.id %}
-          <img class="list-thumb"
-            src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
-            alt="{{ products.name }}"
-            width="52" height="52"
-            onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
-        {% endwith %}
-      </td>
-
-      <td>
-        <div class="cell-name-main">{{ products.name }}</div>
-      </td>
-
-      <td>
-        {{ products.product_type }}
-        {% if products.product_type.is_deleted %}
-          <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.product_type_deleted_warning }}"></i>
-        {% endif %}
-      </td>
-
-      <td>
-        {% if products.product_sub_category %}
-          {{ products.product_sub_category.name }}
-        {% else %}
-          -
-        {% endif %}
-      </td>
-
-      <td>
-        {% if products.total_assets != 0 %}
-          <form method="post" action="{% url 'assets:list' %}">
-            {% csrf_token %}
-            <input type="hidden" name="product" value="{{ products.id }}">
-            <button type="submit" class="count-pill">{{ products.total_assets }}</button>
-          </form>
-        {% else %}
-          <span class="count-pill zero">0</span>
-        {% endif %}
-      </td>
-
-      <td>
-        {% if request.user.is_superuser %}
-          <div class="form-check form-switch status-toggle">
-            <input
-              class="form-check-input"
-              hx-post="{% url 'products:status' products.id %}"
-              hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
-              type="checkbox" {% if products.status %} checked {% endif %}>
-          </div>
-        {% else %}
-          {% if products.status %}
-            <span class="status-badge status-active">{{ trans.active_status }}</span>
           {% else %}
-            <span class="status-badge status-inactive">{{ trans.inactive_status }}</span>
+          {{ forloop.counter|stringformat:"02d" }}
           {% endif %}
-        {% endif %}
-      </td>
+        </td>
 
-      {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
-      <td>
-        <div class="row-actions">
-          {% if perms.products.view_product %}
-            <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
-              <i class="bi bi-eye"></i>
-            </a>
+        <td>
+          {% with img=product_images|get_item:products.id %}
+            <img class="list-thumb"
+              src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+              alt="{{ products.name }}"
+              width="52" height="52"
+              onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+          {% endwith %}
+        </td>
+
+        <td>
+          <div class="cell-name-main">{{ products.name }}</div>
+        </td>
+
+        <td>
+          {{ products.product_type }}
+          {% if products.product_type.is_deleted %}
+            <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.product_type_deleted_warning }}"></i>
           {% endif %}
-          {% if perms.products.edit_product %}
-            <a href="{% url 'products:update_product' products.id %}" class="action-btn" title="{{ trans.update_product }} {{ products.name }}">
-              <i class="bi bi-pencil"></i>
-            </a>
+        </td>
+
+        <td>
+          {% if products.product_sub_category %}
+            {{ products.product_sub_category.name }}
+          {% else %}
+            -
           {% endif %}
-          {% if perms.products.delete_product %}
-            <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
-                  onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
+        </td>
+
+        <td>
+          {% if products.total_assets != 0 %}
+            <form method="post" action="{% url 'assets:list' %}">
               {% csrf_token %}
-              <button type="submit" class="action-btn danger" title="{{ trans.delete_confirm_product }}">
-                <i class="bi bi-trash3"></i>
-              </button>
+              <input type="hidden" name="product" value="{{ products.id }}">
+              <button type="submit" class="count-pill">{{ products.total_assets }}</button>
             </form>
+          {% else %}
+            <span class="count-pill zero">0</span>
           {% endif %}
-        </div>
-      </td>
-      {% endif %}
-    </tr>
-    {% endfor %}
-{% else %}
-    <tr>
-      <td colspan="8">
-        <div class="table-empty-state">
-          <i class="bi bi-search d-block"></i>
-          <p>{{ trans.no_products_search }}</p>
-        </div>
-      </td>
-    </tr>
-{% endif %}
+        </td>
+
+        <td>
+          {% if request.user.is_superuser %}
+            <div class="form-check form-switch status-toggle">
+              <input
+                class="form-check-input"
+                hx-post="{% url 'products:status' products.id %}"
+                hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}'
+                type="checkbox" {% if products.status %} checked {% endif %}>
+            </div>
+          {% else %}
+            {% if products.status %}
+              <span class="status-badge status-active">{{ trans.active_status }}</span>
+            {% else %}
+              <span class="status-badge status-inactive">{{ trans.inactive_status }}</span>
+            {% endif %}
+          {% endif %}
+        </td>
+
+        {% if perms.products.delete_product or perms.products.view_product or perms.products.edit_product %}
+        <td>
+          <div class="row-actions">
+            {% if perms.products.view_product %}
+              <a href="{% url 'products:details_product' products.id %}" class="action-btn" title="{{ trans.product_details }} {{ products.name }}">
+                <i class="bi bi-eye"></i>
+              </a>
+            {% endif %}
+            {% if perms.products.edit_product %}
+              <a href="{% url 'products:update_product' products.id %}" class="action-btn" title="{{ trans.update_product }} {{ products.name }}">
+                <i class="bi bi-pencil"></i>
+              </a>
+            {% endif %}
+            {% if perms.products.delete_product %}
+              <form action="{% url 'products:delete_product' products.id %}" method="post" class="form-row-action"
+                    onsubmit="return confirm('{{ trans.delete_confirm_product }}')">
+                {% csrf_token %}
+                <button type="submit" class="action-btn danger" title="{{ trans.delete_confirm_product }}">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody>
+      <tr>
+        <td colspan="8">
+          <div class="table-empty-state">
+            <i class="bi bi-search d-block"></i>
+            <p>{{ trans.no_products_search }}</p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    {% endif %}
+  </table>
+</div>
+{% include 'commons/htmx-pagination.html' with search_url="/products/search/" filter_form="#product-filter-form" target="#products-list-section" item_label="products" %}

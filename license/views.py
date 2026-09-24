@@ -121,7 +121,9 @@ def delete_license(request, id):
 
 @login_required
 @permission_required("license.view_license")
-def search_license(request):
+def search_license(request, page):
+    PAGE_SIZE = 25
+    ORPHANS = 1
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
     license_type_id = request.GET.get("license_type")
@@ -143,9 +145,11 @@ def search_license(request):
         q &= Q(license_type_id=license_type_id)
 
     licenses = License.undeleted_objects.filter(q).order_by("-created_at")
+    paginator = Paginator(licenses, PAGE_SIZE, orphans=ORPHANS)
+    page_object = paginator.get_page(page)
     assigned_user = get_assigned_users()
     return render(
         request,
         "license/searched_data.html",
-        context={"licenses": licenses, "assigned_user": assigned_user},
+        context={"page_object": page_object, "assigned_user": assigned_user},
     )

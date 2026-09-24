@@ -49,6 +49,7 @@ def locations(request):
         "page_object": page_object,
         "location_asset_count": location_asset_count,
         "title": "Locations",
+        "is_demo": IS_DEMO,
         **stats,
     }
 
@@ -199,6 +200,7 @@ def search_location(request, page):
         {
             "page_object": page_object,
             "location_asset_count": location_asset_count,
+            "is_demo": IS_DEMO,
             **stats,
         },
     )

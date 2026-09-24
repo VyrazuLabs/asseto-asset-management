@@ -72,7 +72,8 @@
         autocomplete="off" placeholder="{{ trans.search_placeholder }}"
         hx-get="{% url 'vendors:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search, change from:[name='status']"
-        hx-target="#search_result"
+        hx-target="#vendors-list-section"
+        hx-swap="innerHTML"
         hx-include="[name='status']"
         aria-label="{{ trans.search_vendor }}">
     </div>
@@ -119,6 +120,7 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
+  <div id="vendors-list-section">
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
@@ -228,7 +230,8 @@
     </table>
   </div>
 
-  {% include 'commons/list-pagination.html' with item_label="vendors" %}
+  {% include 'commons/htmx-pagination.html' with search_url="/vendors/search/" filter_form="#vendor-filter-form" target="#vendors-list-section" item_label="vendors" %}
+  </div>{# /#vendors-list-section #}
 </div>{# /.table-card #}
 
 {# ── Add vendor modal ────────────────────────────────────────────────────── #}

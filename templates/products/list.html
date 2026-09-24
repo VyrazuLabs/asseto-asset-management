@@ -65,14 +65,14 @@
 
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
-  <div class="row g-2 align-items-end">
+  <div id="product-filter-form" class="row g-2 align-items-end">
     <div class="col">
       <div class="filter-label">{{ trans.search_product }}</div>
       <input name="search_text" type="search"
         autocomplete="off" placeholder="{{ trans.search_product_placeholder }}"
         hx-get="{% url 'products:search' page_object.number|default:'1' %}"
         hx-trigger="keyup changed delay:400ms, search"
-        hx-target="#search_result"
+        hx-target="#products-list-section"
         aria-label="{{ trans.search_product }}">
     </div>
     {% if request.user.is_superuser %}
@@ -101,6 +101,7 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
+  <div id="products-list-section">
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
@@ -236,7 +237,8 @@
     </table>
   </div>
 
-  {% include 'commons/list-pagination.html' with item_label="products" %}
+  {% include 'commons/htmx-pagination.html' with search_url="/products/search/" filter_form="#product-filter-form" target="#products-list-section" item_label="products" %}
+  </div>{# /#products-list-section #}
 </div>{# /.table-card #}
 
 {# ── Modals ───────────────────────────────────────────────────────────────── #}

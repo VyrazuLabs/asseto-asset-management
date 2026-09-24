@@ -95,13 +95,9 @@ def search_utils(request, page):
         status_val = True if status == "active" else False
         filters &= Q(status=status_val)
 
-    if search_text:
-        vendors_list = Vendor.undeleted_objects.filter(filters).order_by("-created_at")[:10]
-        page_object = vendors_list
-    else:
-        vendors_list = Vendor.undeleted_objects.filter(filters).order_by("-created_at")
-        paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
-        page_object = paginator.get_page(page)
+    vendors_list = Vendor.undeleted_objects.filter(filters).order_by("-created_at")
+    paginator = Paginator(vendors_list, PAGE_SIZE, orphans=ORPHANS)
+    page_object = paginator.get_page(page)
 
     count_array = []
     for it in page_object:

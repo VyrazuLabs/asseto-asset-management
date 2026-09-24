@@ -1,75 +1,114 @@
 {% load static %}
-{% for c in page_object %}
-<tr>
-  <td class="table-index-cell">{{ forloop.counter }}</td>
-  <td class="consumable-row-media">
-    <img class="list-thumb"
-      src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
-      alt="{{ c.consumable_name }}"
-      width="52" height="52"
-      onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
-    <div class="cell-name-main">{{ c.consumable_name|default:"-" }}</div>
-  </td>
-  <td>{{ c.product.name|default:"-" }}</td>
-  <td>{{ c.vendor.name|default:"-" }}</td>
-  <td>{{ c.location.office_name|default:"-" }}</td>
-  <td>{{ c.item_no|default:"-" }}</td>
-  <td>{{ c.quantity|default:"-" }}</td>
-  <td>{{ c.total_checked_out }}</td>
-  <td>
-    {% if c.is_low_stock %}
-      <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
+<div class="table-responsive">
+  <table class="list-table" id="consumables-table">
+    <thead>
+      <tr>
+        <th>{{ trans.consumable_col_hash }}</th>
+        <th>{{ trans.consumable_col_name }}</th>
+        <th>{{ trans.consumable_col_product }}</th>
+        <th>{{ trans.consumable_col_vendor }}</th>
+        <th>{{ trans.consumable_col_location }}</th>
+        <th>{{ trans.consumable_col_item_no }}</th>
+        <th>{{ trans.consumable_col_total_qty }}</th>
+        <th>{{ trans.consumable_col_checked_out }}</th>
+        <th>{{ trans.consumable_col_remaining_qty }}</th>
+        <th>{{ trans.consumable_col_min_qty }}</th>
+        <th>{{ trans.consumable_col_purchase_cost }}</th>
+        {% if perms.consumables.view_consumable or perms.consumables.edit_consumable or perms.consumables.delete_consumable %}
+        <th>{{ trans.consumable_col_actions }}</th>
+        {% endif %}
+      </tr>
+    </thead>
+    {% if page_object %}
+    <tbody id="search_result">
+      {% for c in page_object %}
+      <tr>
+        <td class="table-index-cell">{{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}</td>
+        <td class="consumable-row-media">
+          <img class="list-thumb"
+            src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+            alt="{{ c.consumable_name }}"
+            width="52" height="52"
+            onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+          <div class="cell-name-main">{{ c.consumable_name|default:"-" }}</div>
+        </td>
+        <td>{{ c.product.name|default:"-" }}</td>
+        <td>{{ c.vendor.name|default:"-" }}</td>
+        <td>{{ c.location.office_name|default:"-" }}</td>
+        <td>{{ c.item_no|default:"-" }}</td>
+        <td>{{ c.quantity|default:"-" }}</td>
+        <td>{{ c.total_checked_out }}</td>
+        <td>
+          {% if c.is_low_stock %}
+            <span class="status-badge consumable-status-badge-low">{{ c.remaining_quantity|default_if_none:c.quantity|default:"0" }} ⚠</span>
+          {% else %}
+            {{ c.remaining_quantity|default_if_none:c.quantity|default:"-" }}
+          {% endif %}
+        </td>
+        <td>
+          {% if c.is_low_stock and c.min_qty is not None %}
+            <span title="{{ trans.consumable_low_stock_tooltip }}">{{ c.min_qty }} <i class="bi bi-exclamation-triangle text-danger"></i></span>
+          {% else %}
+            {{ c.min_qty|default:"-" }}
+          {% endif %}
+        </td>
+        <td>{% if c.purchase_cost %}₹{{ c.purchase_cost }}{% else %}-{% endif %}</td>
+        {% if perms.consumables.view_consumable or perms.consumables.edit_consumable or perms.consumables.delete_consumable %}
+        <td>
+          <div class="row-actions">
+            {% if perms.consumables.edit_consumable %}
+            {% with rem_qty=c.remaining_quantity|default_if_none:c.quantity|default:"0" %}
+            {% if rem_qty != "0" %}
+            <button type="button" class="action-btn" title="{{ trans.consumable_action_checkout }}"
+                    onclick="openCheckoutModal('{{ c.pk }}', '{{ c.consumable_name|escapejs }}', '{{ c.product.name|escapejs|default:"-" }}', '{{ c.quantity|default:"0" }}', '{{ rem_qty }}')">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+            {% else %}
+            <button type="button" class="action-btn consumable-action-btn-disabled" title="{{ trans.consumable_checkout_disabled }}" disabled>
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+            {% endif %}
+            {% endwith %}
+            {% endif %}
+            {% if perms.consumables.view_consumable %}
+            <a href="{% url 'consumables:detail' c.pk %}" class="action-btn" title="{{ trans.consumable_action_view }}">
+              <i class="bi bi-eye"></i>
+            </a>
+            {% endif %}
+            {% if perms.consumables.edit_consumable %}
+            <a href="{% url 'consumables:edit' c.pk %}" class="action-btn" title="{{ trans.consumable_action_edit }}">
+              <i class="bi bi-pencil"></i>
+            </a>
+            {% endif %}
+            {% if perms.consumables.delete_consumable %}
+            <form action="{% url 'consumables:delete' c.pk %}" method="post" class="form-row-action"
+                  onsubmit="return confirm('{{ trans.consumable_confirm_delete }}')">
+              {% csrf_token %}
+              <button type="submit" class="action-btn danger" title="{{ trans.consumable_action_delete }}">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
     {% else %}
-      {{ c.remaining_quantity|default_if_none:c.quantity|default:"-" }}
+    <tbody>
+      <tr>
+        <td colspan="12">
+          <div class="table-empty-state">
+            <i class="bi bi-box-seam"></i>
+            <p>{{ trans.consumable_no_found }}<br>
+              <a href="{% url 'consumables:add' %}" class="link-primary">{{ trans.consumable_add_first }}</a>
+            </p>
+          </div>
+        </td>
+      </tr>
+    </tbody>
     {% endif %}
-  </td>
-  <td>
-    {% if c.is_low_stock and c.min_qty is not None %}
-      <span title="{{ trans.consumable_low_stock_tooltip }}">{{ c.min_qty }} <i class="bi bi-exclamation-triangle text-danger"></i></span>
-    {% else %}
-      {{ c.min_qty|default:"-" }}
-    {% endif %}
-  </td>
-  <td>{% if c.purchase_cost %}₹{{ c.purchase_cost }}{% else %}-{% endif %}</td>
-  <td>
-    <div class="row-actions">
-      {% if perms.consumables.edit_consumable %}
-      {% with rem_qty=c.remaining_quantity|default_if_none:c.quantity|default:"0" %}
-      {% if rem_qty != "0" %}
-      <button type="button" class="action-btn" title="{{ trans.consumable_action_checkout }}"
-              onclick="openCheckoutModal('{{ c.pk }}', '{{ c.consumable_name|escapejs }}', '{{ c.product.name|escapejs|default:"-" }}', '{{ c.quantity|default:"0" }}', '{{ rem_qty }}')">
-        <i class="bi bi-box-arrow-right"></i>
-      </button>
-      {% else %}
-      <button type="button" class="action-btn consumable-action-btn-disabled" title="{{ trans.consumable_checkout_disabled_short }}" disabled>
-        <i class="bi bi-box-arrow-right"></i>
-      </button>
-      {% endif %}
-      {% endwith %}
-      {% endif %}
-      {% if perms.consumables.view_consumable %}
-      <a href="{% url 'consumables:detail' c.pk %}" class="action-btn" title="{{ trans.consumable_action_view }}"><i class="bi bi-eye"></i></a>
-      {% endif %}
-      {% if perms.consumables.edit_consumable %}
-      <a href="{% url 'consumables:edit' c.pk %}" class="action-btn" title="{{ trans.consumable_action_edit }}"><i class="bi bi-pencil"></i></a>
-      {% endif %}
-      {% if perms.consumables.delete_consumable %}
-      <form action="{% url 'consumables:delete' c.pk %}" method="post" class="form-row-action"
-            onsubmit="return confirm('{{ trans.consumable_confirm_delete_short }}')">
-        {% csrf_token %}
-        <button type="submit" class="action-btn danger" title="{{ trans.consumable_action_delete }}"><i class="bi bi-trash3"></i></button>
-      </form>
-      {% endif %}
-    </div>
-  </td>
-</tr>
-{% empty %}
-<tr>
-  <td colspan="12">
-    <div class="table-empty-state">
-      <i class="bi bi-box-seam"></i>
-      <p>{{ trans.consumable_no_found }}</p>
-    </div>
-  </td>
-</tr>
-{% endfor %}
+  </table>
+</div>
+{% include 'commons/htmx-pagination.html' with search_url="/consumables/search/" filter_form="#consumable-filter-form" target="#consumables-list-section" item_label="consumables" %}
