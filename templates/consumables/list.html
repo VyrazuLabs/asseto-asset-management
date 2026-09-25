@@ -5,7 +5,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="{% static 'css/pages/consumables.css' %}">
 {% endblock css %}
 
@@ -239,7 +238,8 @@
           </div>
           <div class="mb-3">
             <label for="modalUserSelect" class="form-label fw-bold">{{ trans.consumable_checkout_select_user }} <span class="text-danger">*</span></label>
-            <select name="user" id="modalUserSelect" class="form-select consumable-select-full-width" required>
+            <select name="user" id="modalUserSelect" class="form-select consumable-select-full-width" required
+              data-placeholder="{{ trans.consumable_checkout_select_user }}" data-select2-no-results="{{ trans.consumable_checkout_no_users }}" data-select2-searching="{{ trans.consumable_checkout_searching }}">
               <option value="" selected disabled>{{ trans.consumable_checkout_select_user }}</option>
               {% for u in users %}
               <option value="{{ u.pk }}" data-search="{{ u.get_full_name|default:u.username }} {{ u.username|lower }}">{{ u.get_full_name|default:u.username }}</option>
@@ -264,42 +264,10 @@
   </div>
 </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
-$(document).ready(function() {
-  var $checkoutModal = $('#checkoutModal');
-  var $userSelect = $('#modalUserSelect');
-
-  $checkoutModal.on('shown.bs.modal', function () {
-    if (!$userSelect.data('select2')) {
-      $userSelect.select2({
-        placeholder: "{{ trans.consumable_checkout_search_user }}",
-        allowClear: true,
-        dropdownParent: $checkoutModal,
-        width: '100%',
-        minimumInputLength: 0,
-        language: {
-          noResults: function() {
-            return "{{ trans.consumable_checkout_no_users }}";
-          },
-          searching: function() {
-            return "{{ trans.consumable_checkout_searching }}";
-          }
-        }
-      });
-    }
-  });
-
-  $checkoutModal.on('hidden.bs.modal', function () {
-    if ($userSelect.data('select2')) {
-      $userSelect.select2('destroy');
-    }
-  });
-});
+// Select2 for #modalUserSelect is initialized globally by static/js/select2-init.js
+// (dropdownParent auto-set to this modal; messages via data-select2-no-results /
+// data-select2-searching attributes on the select).
 
 function openCheckoutModal(id, name, product, totalQty, remainingQty) {
   document.getElementById('modalConsumableName').value = name;

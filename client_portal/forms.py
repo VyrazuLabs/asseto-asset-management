@@ -25,7 +25,8 @@ class ClientSupportTicketForm(forms.ModelForm):
         widget=Select(attrs={
             'class': 'form-control asset-select',
             'data-placeholder': 'Search serial number, asset ID, or name...',
-            'required': 'required'
+            'required': 'required',
+            'data-no-select2': 'true'
         })
     )
     priority = forms.ChoiceField(

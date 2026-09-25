@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-list.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-form.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {% endblock css %}
 
 {% block content %}
@@ -370,7 +369,7 @@
         
           <td>
             {% if not asset.is_assigned %}
-            <select class="status-select status-select-inline" data-asset-id="{{ asset.id }}"
+            <select class="status-select status-select-inline" data-no-select2 data-asset-id="{{ asset.id }}"
               aria-label="Status for {{ asset.name }}">
               <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
               {% for value, label in asset_form.fields.status.choices %}
@@ -521,30 +520,6 @@ document.addEventListener("change", function (e) {
   .then(response => { if (!response.ok) throw new Error("Status update failed"); })
   .catch(error => { alert(error.message); location.reload(); });
 });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-var $raUserSelect = null;
-function initReassignSelect2() {
-    $raUserSelect = $('#reassign-asset-list-modal [name="user"]');
-    if ($raUserSelect.length && !$raUserSelect.data('select2')) {
-        $raUserSelect.select2({
-            theme: 'default',
-            width: '100%',
-            dropdownParent: $('#reassign-asset-list-modal'),
-            placeholder: 'Search for a user...',
-            allowClear: true
-        });
-    }
-}
-var reassignModal = document.getElementById('reassign-asset-list-modal');
-if (reassignModal) {
-    reassignModal.addEventListener('shown.bs.modal', function() { initReassignSelect2(); });
-    reassignModal.addEventListener('hide.bs.modal', function() {
-        if ($raUserSelect && $raUserSelect.data('select2')) { $raUserSelect.select2('destroy'); }
-    });
-}
 </script>
 
 <script>

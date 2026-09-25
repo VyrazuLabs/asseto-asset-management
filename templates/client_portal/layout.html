@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{% static 'css/client-portal.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link rel="stylesheet" href="{% static 'vendor/select2/css/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/common/select2-theme.css' %}" />
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <style>
@@ -242,6 +244,8 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'vendor/select2/js/select2.min.js' %}"></script>
     {% block extra_js %}{% endblock %}
+    <script defer src="{% static 'js/select2-init.js' %}"></script>
 </body>
 </html>

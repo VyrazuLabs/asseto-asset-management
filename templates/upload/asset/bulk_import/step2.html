@@ -568,20 +568,29 @@ function clearCellImage(rowIndex) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('apply-bulk').addEventListener('click', function() {
-        var prodVal = document.getElementById('bulk-product').value;
-        var venVal = document.getElementById('bulk-vendor').value;
-        var cliVal = document.getElementById('bulk-client').value;
-        var locVal = document.getElementById('bulk-location').value;
-        var stVal = document.getElementById('bulk-status').value;
-        var typeVal = document.getElementById('bulk-type').value;
+    // Select2 only re-renders its visible box when the <select> fires
+    // `change`. Assigning .value directly sets the underlying option but
+    // leaves the displayed Select2 box stale, so the batch update looked
+    // like it did nothing. Set the value and always notify Select2.
+    function applyToAll(selector, value) {
+        if (!value) return;
+        document.querySelectorAll(selector).forEach(function(sel) {
+            if (window.jQuery) {
+                window.jQuery(sel).val(value).trigger('change');
+            } else {
+                sel.value = value;
+                sel.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+    }
 
-        if(prodVal) document.querySelectorAll('.prod-select').forEach(function(sel) { sel.value = prodVal; });
-        if(venVal) document.querySelectorAll('.ven-select').forEach(function(sel) { sel.value = venVal; });
-        if(cliVal) document.querySelectorAll('.cli-select').forEach(function(sel) { sel.value = cliVal; });
-        if(locVal) document.querySelectorAll('.loc-select').forEach(function(sel) { sel.value = locVal; });
-        if(stVal) document.querySelectorAll('.st-select').forEach(function(sel) { sel.value = stVal; });
-        if(typeVal) document.querySelectorAll('.type-select').forEach(function(sel) { sel.value = typeVal; });
+    document.getElementById('apply-bulk').addEventListener('click', function() {
+        applyToAll('.prod-select', document.getElementById('bulk-product').value);
+        applyToAll('.ven-select', document.getElementById('bulk-vendor').value);
+        applyToAll('.cli-select', document.getElementById('bulk-client').value);
+        applyToAll('.loc-select', document.getElementById('bulk-location').value);
+        applyToAll('.st-select', document.getElementById('bulk-status').value);
+        applyToAll('.type-select', document.getElementById('bulk-type').value);
     });
 
     document.getElementById('continue-btn').addEventListener('click', function(e) {
