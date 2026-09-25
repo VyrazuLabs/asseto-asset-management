@@ -84,7 +84,7 @@
     </div>
     <div class="col-auto">
       <div class="filter-label">{{ trans.status_label }}</div>
-      <select name="status" class="filter-select-btn" style="min-width: 150px;">
+      <select name="status" class="filter-select-btn" style="min-width: 150px;" data-no-select2>
         <option value="All Statuses">{{ trans.all_statuses }}</option>
         {% for val, label in status_choices %}
         <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>

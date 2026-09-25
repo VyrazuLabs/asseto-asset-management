@@ -111,7 +111,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.status_label }}</div>
-                    <select name="status" class="form-select">
+                    <select name="status" class="form-select" data-no-select2>
                         <option value="">{{ trans.all_statuses }}</option>
                         {% for val, label in status_choices %}
                         <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}

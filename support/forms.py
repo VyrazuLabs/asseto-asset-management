@@ -40,6 +40,7 @@ class SupportTicketForm(forms.ModelForm):
                 "class": "form-control asset-select",
                 "data-placeholder": "Search serial number, asset ID, or name...",
                 "required": "required",
+                "data-no-select2": "true",
             }
         ),
     )
@@ -69,6 +70,7 @@ class SupportTicketForm(forms.ModelForm):
             attrs={
                 "class": "form-control assigned-select",
                 "data-placeholder": "Search technician by name...",
+                "data-no-select2": "true",
             }
         ),
     )

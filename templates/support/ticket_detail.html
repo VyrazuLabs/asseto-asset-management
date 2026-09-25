@@ -26,7 +26,7 @@
             <div class="d-flex align-items-center gap-2 mb-2">
                 <span class="t-badge t-badge-id">#{{ ticket.ticket_id }}</span>
                 <div class="status-dropdown-wrapper" style="position:relative;">
-                    <select id="statusSelect" class="t-badge t-badge-status-{{ ticket.status }}" style="width:auto;padding:0.25rem 1.75rem 0.25rem 0.75rem;border:1.5px solid rgba(0,0,0,0.15);border-radius:6px;cursor:pointer;appearance:auto;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">
+                    <select id="statusSelect" data-no-select2 class="t-badge t-badge-status-{{ ticket.status }}" style="width:auto;padding:0.25rem 1.75rem 0.25rem 0.75rem;border:1.5px solid rgba(0,0,0,0.15);border-radius:6px;cursor:pointer;appearance:auto;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">
                         {% for key, label in status_choices %}
                         <option value="{{ key }}" {% if ticket.status == key %}selected{% endif %}
                             style="{% if key == '0' %}background-color:#E0F7FA;color:#00838F;{% elif key == '1' %}background-color:#1E3A8A;color:#fff;{% elif key == '2' %}background-color:#FEF3C7;color:#D97706;{% elif key == '3' %}background-color:#E8F5E9;color:#2E7D32;{% elif key == '4' %}background-color:#F1F3F5;color:#495057;{% endif %}padding:4px 8px;font-weight:600;">{{ label|upper }}</option>

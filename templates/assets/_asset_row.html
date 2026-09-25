@@ -119,7 +119,7 @@
 
   <td>
     {% if not asset.is_assigned %}
-      <select class="status-select status-select-inline" data-asset-id="{{ asset.id }}"
+      <select class="status-select status-select-inline" data-no-select2 data-asset-id="{{ asset.id }}"
               aria-label="Status for {{ asset.name }}">
         <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
         {% for value, label in asset_form.fields.status.choices %}
