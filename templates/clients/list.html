@@ -78,13 +78,13 @@
       <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_client_placeholder }}"
         hx-get="{% url 'clients:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search, change from:[name='status']"
-        hx-target="#client_search_result"
+        hx-target="#clients-list-section"
         hx-include="[name='status']"
         aria-label="{{ trans.search_client }}">
     </div>
     <div class="col-auto">
       <div class="filter-label">{{ trans.status_label }}</div>
-      <select name="status" class="filter-select-btn" style="min-width: 150px;">
+      <select name="status" class="filter-select-btn" style="min-width: 150px;" data-no-select2>
         <option value="All Statuses">{{ trans.all_statuses }}</option>
         {% for val, label in status_choices %}
         <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>
@@ -115,45 +115,9 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
-  <div class="table-responsive">
-    <table class="list-table" id="client-table">
-      <thead>
-        <tr>
-          <th>{{ trans.sl_no }}</th>
-          <th>{{ trans.name_label }}</th>
-          <th>{{ trans.industry_type }}</th>
-          <th>{{ trans.contact_person }}</th>
-          <th class="text-center">{{ trans.total_assets_client }}</th>
-          <th class="text-center">{{ trans.open_tickets_client }}</th>
-          <th>{{ trans.status_label }}</th>
-          {% if perms.clients.view_client or perms.clients.edit_client or perms.clients.delete_client %}
-          <th>{{ trans.actions }}</th>
-          {% endif %}
-        </tr>
-      </thead>
-
-      {% if page_object %}
-      <tbody id="client_search_result">
-        {% include 'clients/clients-data.html' %}
-      </tbody>
-      {% else %}
-      <tbody>
-        <tr>
-          <td colspan="8">
-            <div class="table-empty-state">
-              <i class="bi bi-people"></i>
-              <p>{{ trans.no_clients_found }}<br>
-                <a href="{% url 'clients:add' %}" class="link-primary">{{ trans.add_first_client }}</a>
-              </p>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      {% endif %}
-    </table>
+  <div id="clients-list-section">
+    {% include 'clients/clients-data.html' %}
   </div>
-
-  {% include 'commons/list-pagination.html' with item_label="clients" %}
 </div>
 
 {% endblock content %}

@@ -35,6 +35,7 @@ STRINGS = {
     "audit": "Audit",
     "assets": "Assets",
     "gate_pass": "Gate Pass",
+    "consumables": "Consumables",
     "license": "License",
     "admin": "Admin",
     "configuration": "Configuration",

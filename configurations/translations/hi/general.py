@@ -35,6 +35,7 @@ STRINGS = {
     "audit": "ऑडिट",
     "assets": "संपत्ति",
     "gate_pass": "गेट पास",
+    "consumables": "उपभोग्य वस्तुएं",
     "license": "लाइसेंस",
     "admin": "व्यवस्थापक",
     "configuration": "कॉन्फ़िगरेशन",

@@ -53,13 +53,14 @@ def asset_data_util(request):
             assignasset__user=request.user
         ).distinct()
     asset_count = all_asset_list.count()
-    assign_assets_counts = AssignAsset.objects.filter(
-        Q(asset__organization=None, asset__is_assigned=True)
-        | Q(asset__organization=request.user.organization, asset__is_assigned=True)
+    assign_assets = Asset.undeleted_objects.filter(
+        is_assigned=True
+    ).filter(
+        Q(organization=None) | Q(organization=request.user.organization)
     )
     if not request.user.has_perm("assets.all_asset"):
-        assign_assets_counts = assign_assets_counts.filter(user=request.user)
-    assign_assets_counts = assign_assets_counts.count()
+        assign_assets = assign_assets.filter(assignasset__user=request.user).distinct()
+    assign_assets_counts = assign_assets.count()
     data = asset_datas(
         expiring_assets, all_asset_list, asset_count, assign_assets_counts
     )

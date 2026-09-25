@@ -21,7 +21,6 @@ urlpatterns = [
     path("add", views.add, name="add"),
     path("search/<str:page>", views.search, name="search"),
     # assigned assets
-    path("assigned-list", views.assigned_list, name="assigned_list"),
     path("assign-asset", views.assign_assets, name="assign_asset"),
     path("delete-assign/<uuid:id>", views.delete_assign, name="delete_assign"),
     path(
@@ -34,11 +33,7 @@ urlpatterns = [
         views.assign_asset_in_asset_list,
         name="assign_asset_in_asset_list",
     ),
-    path(
-        "assign_asset_search/<str:page>",
-        views.assign_asset_search,
-        name="assign_asset_search",
-    ),
+
     path("reassign-asset/<uuid:id>", views.reassign_asset, name="reassign_asset"),
     # urls for pie chart
     path(

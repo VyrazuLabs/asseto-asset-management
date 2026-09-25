@@ -68,15 +68,15 @@
 {# ── Filter bar ───────────────────────────────────────────────────────────── #}
 <div class="filter-card">
   {% csrf_token %}
-  <form id="license-filter-form" hx-get="{% url 'license:search_license' %}" hx-target="#search_result"
-    hx-trigger="change, keyup changed delay:400ms from:input">
+  <form id="license-filter-form" hx-get="{% url 'license:search_license' '1' %}" hx-target="#licenses-list-section"
+    hx-trigger="change delay:200ms">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-sm-6 col-lg">
         <div class="filter-label">{{ trans.search_license }}</div>
         <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_license_placeholder }}"
-          hx-get="{% url 'license:search_license' %}" hx-trigger="keyup changed delay:400ms, search"
-          hx-target="#search_result" aria-label="Search licenses">
+          hx-get="{% url 'license:search_license' '1' %}" hx-trigger="keyup changed delay:400ms, search"
+          hx-target="#licenses-list-section" hx-include="#license-filter-form" aria-label="Search licenses">
       </div>
 
       <div class="col-6 col-sm-4 col-lg-auto">
@@ -135,153 +135,9 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
-  <div class="table-responsive">
-    <table class="assets-table" id="table1">
-      <thead>
-        <tr>
-          <th>{{ trans.sl_no }}</th>
-          <th>{{ trans.license_name }}</th>
-          <th>{{ trans.type }}</th>
-          <th>{{ trans.seats }}</th>
-          <th>{{ trans.vendor }}</th>
-          <th>{{ trans.assigned_to }}</th>
-          <th>{{ trans.start_date }}</th>
-          <th>{{ trans.expiry_date }}</th>
-          <th>{{ trans.actions }}</th>
-        </tr>
-      </thead>
-
-      <tbody id="search_result">
-        {% if page_object %}
-        {% for license in page_object %}
-        <tr>
-          <td class="table-index-cell">
-            {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-          </td>
-
-          <td>
-            <div class="asset-name-main">{{ license.name }}</div>
-          </td>
-
-          <td><span class="status-badge status-deploy">{{ license.license_type.name }}</span></td>
-
-          <td><span class="asset-tag-pill">{{ license.seats }}</span></td>
-
-          <td>
-            {{ license.vendor.name|default:"-" }}
-            {% if license.vendor.is_deleted %}
-            <i class="bi bi-exclamation-triangle text-warning" title="{{ trans.vendor_deleted_warning }}"></i>
-            {% endif %}
-          </td>
-
-          <td>
-            {% if license.is_assigned %}
-            {% with map=assigned_user|get_item:license.id %}
-            <div class="assignee-chip mb-1">
-              {% if map.image %}
-              <img src="{{ map.image.url }}" onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
-                alt="{{ map.name }}" width="22" height="22">
-              {% else %}
-              <span class="assignee-initials">
-                {% if map.name %}{{ map.name|slice:":2"|upper }}{% else %}??{% endif %}
-              </span>
-              {% endif %}
-              <span>{{ map.name|default:trans.unknown_user }}</span>
-            </div>
-            {% endwith %}
-            <form action="{% url 'license:unassign_license' license.id %}" method="post" class="form-row-action"
-              onsubmit="return confirm('{{ trans.unassign_confirm }}')">
-              {% csrf_token %}
-              <button type="submit" class="btn-unassign">{{ trans.unassign }}</button>
-            </form>
-            {% else %}
-            <span class="unassigned-label">{{ trans.unassigned }}</span>
-            <button type="button" class="btn-assign mt-1" hx-get="{% url 'license:assign_license' license.id %}"
-              hx-target="#assign-license-modal-content" hx-trigger="click" data-bs-toggle="modal"
-              data-bs-target="#assign-license-list-modal" aria-label="Assign {{ license.name }}">
-              {{ trans.assign_label }}
-            </button>
-            {% endif %}
-          </td>
-
-          <td>{{ license.start_date|date:"M d, Y"|default:"-" }}</td>
-          <td>{{ license.expiry_date|date:"M d, Y"|default:"-" }}</td>
-
-          <td>
-            <div class="row-actions">
-              {% if perms.license.view_license %}
-              <a href="{% url 'license:license_details' license.id %}" class="action-btn"
-                title="{{ trans.view }} {{ license.name }}">
-                <i class="bi bi-eye"></i>
-              </a>
-              {% endif %}
-              {% if perms.license.edit_license %}
-              <a href="{% url 'license:update_license' license.id %}" class="action-btn"
-                title="{{ trans.edit }} {{ license.name }}">
-                <i class="bi bi-pencil"></i>
-              </a>
-              {% endif %}
-              {% if perms.license.delete_license %}
-              <form action="{% url 'license:delete_license' license.id %}" method="post" class="form-row-action"
-                onsubmit="return confirm('Delete {{ license.name }}?')">
-                {% csrf_token %}
-                <button type="submit" class="action-btn danger" title="{{ trans.delete }} {{ license.name }}">
-                  <i class="bi bi-trash3"></i>
-                </button>
-              </form>
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-
-        {% else %}
-        <tr>
-          <td colspan="9">
-            <div class="table-empty-state">
-              <i class="bi bi-inbox d-block"></i>
-              <p>{{ trans.no_licenses_found }}<br>
-                <a href="{% url 'license:add_license' %}" class="link-primary">{{ trans.register_first_license }}</a>
-              </p>
-            </div>
-          </td>
-        </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
-
-  {# ── Pagination ─────────────────────────────────────────────────────────── #}
-  {% if page_object %}
-  <div class="pagination-wrap">
-    <span>
-      {{ trans.showing_label }} <strong>{{ page_object.start_index }}–{{ page_object.end_index }}</strong>
-      {{ trans.of_label }} <strong>{{ page_object.paginator.count }}</strong> {{ trans.licenses_lower }}
-    </span>
-    <div class="pagination-nav">
-      {% if page_object.has_previous %}
-      <a href="?page={{ page_object.previous_page_number }}" class="page-btn" aria-label="Previous page">‹</a>
-      {% else %}
-      <span class="page-btn disabled" aria-disabled="true">‹</span>
-      {% endif %}
-
-      {% for num in page_object.paginator.page_range %}
-      {% if page_object.number == num %}
-      <span class="page-btn active" aria-current="page">{{ num }}</span>
-      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %} <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
-        {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-        <span class="page-ellipsis">…</span>
-        {% endif %}
-        {% endfor %}
-
-        {% if page_object.has_next %}
-        <a href="?page={{ page_object.next_page_number }}" class="page-btn" aria-label="Next page">›</a>
-        {% else %}
-        <span class="page-btn disabled" aria-disabled="true">›</span>
-        {% endif %}
-    </div>
-  </div>
-  {% endif %}
+  <div id="licenses-list-section">
+    {% include 'license/searched_data.html' %}
+  </div>{# /#licenses-list-section #}
 </div>{# /.table-card #}
 
 {# ── Assign modal ─────────────────────────────────────────────────────────── #}

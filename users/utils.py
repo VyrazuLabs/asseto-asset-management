@@ -119,29 +119,26 @@ def search_user_utils(request, page):
         base_qs = base_qs.filter(technician__isnull=True)
 
     if search_text:
-        users_list = (
-            base_qs.filter(
-                Q(username__icontains=search_text)
-                | Q(full_name__icontains=search_text)
-                | Q(phone__icontains=search_text)
-                | Q(employee_id__icontains=search_text)
-                | Q(department__name__icontains=search_text)
-                | Q(role__related_name__icontains=search_text)
-                | Q(location__office_name__icontains=search_text)
-                | Q(address__address_line_one__icontains=search_text)
-                | Q(address__address_line_two__icontains=search_text)
-                | Q(address__country__icontains=search_text)
-                | Q(address__state__icontains=search_text)
-                | Q(address__pin_code__icontains=search_text)
-                | Q(address__city__icontains=search_text)
-            )
-            .order_by("-created_at")[:10]
+        users_list = base_qs.filter(
+            Q(username__icontains=search_text)
+            | Q(full_name__icontains=search_text)
+            | Q(phone__icontains=search_text)
+            | Q(employee_id__icontains=search_text)
+            | Q(department__name__icontains=search_text)
+            | Q(role__related_name__icontains=search_text)
+            | Q(location__office_name__icontains=search_text)
+            | Q(address__address_line_one__icontains=search_text)
+            | Q(address__address_line_two__icontains=search_text)
+            | Q(address__country__icontains=search_text)
+            | Q(address__state__icontains=search_text)
+            | Q(address__pin_code__icontains=search_text)
+            | Q(address__city__icontains=search_text)
         )
-        page_object = users_list
     else:
-        users_list = base_qs.order_by("-created_at")
-        paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
-        page_object = paginator.get_page(page)
+        users_list = base_qs
+    users_list = users_list.order_by("-created_at")
+    paginator = Paginator(users_list, PAGE_SIZE, orphans=ORPHANS)
+    page_object = paginator.get_page(page)
 
     user_ids = [u.id for u in page_object]
 

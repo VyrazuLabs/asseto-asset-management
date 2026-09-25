@@ -278,6 +278,12 @@ class ReassignedAssetForm(forms.ModelForm):
         empty_label="--SELECT--",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "Add an optional note for this reassignment..."}
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         self._organization = kwargs.pop("organization", None)
@@ -288,7 +294,7 @@ class ReassignedAssetForm(forms.ModelForm):
 
     class Meta:
         model = AssignAsset
-        fields = ["user"]
+        fields = ["user", "notes"]
 
 
 class AssetStatusForm(forms.ModelForm):

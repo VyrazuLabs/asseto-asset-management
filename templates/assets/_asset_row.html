@@ -1,0 +1,169 @@
+{% load custom_filters %}
+{% load static %}
+<tr>
+  <td class="table-index-cell">
+    {% if page_object.start_index %}
+      {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+    {% else %}
+      {{ forloop.counter|stringformat:"02d" }}
+    {% endif %}
+  </td>
+
+  <td>
+    {% with img=asset_images|get_item:asset.id %}
+      <img class="asset-thumb"
+        src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
+        alt="{{ asset.name }}"
+        width="52" height="52"
+        onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">
+    {% endwith %}
+  </td>
+
+  <td><span class="asset-tag-pill">{{ asset.tag }}</span></td>
+
+  <td>
+    {% with asset_conditions_map|get_item:asset.id as condition_list %}
+      {% with condition_list|default:''|last as condition %}
+        <div class="asset-name-main">{{ asset.name }}</div>
+        <div class="asset-name-sub">
+          {% if asset.product %}{{ asset.product.name }}{% endif %}
+          {% if condition == 0 or condition == 1 %}
+            &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
+          {% elif condition == 2 %}
+            &nbsp;·&nbsp;<span class="state-good">● Good</span>
+          {% elif condition == 3 or condition == 4 %}
+            &nbsp;·&nbsp;<span class="state-poor">● Needs Repair</span>
+          {% endif %}
+        </div>
+      {% endwith %}
+    {% endwith %}
+  </td>
+
+  <td>{{ asset.product.product_type.name }}</td>
+
+  <td>
+    {{ asset.vendor }}
+    {% if asset.vendor.is_deleted %}
+      <i class="bi bi-exclamation-triangle text-warning" title="Vendor is deleted"></i>
+    {% endif %}
+  </td>
+
+  <td>
+    {% if asset.location %}
+      {{ asset.location.office_name }}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+
+  {% if has_clients %}
+  <td>
+    {% if asset.client %}
+      {{ asset.client.name }}
+    {% else %}
+      —
+    {% endif %}
+  </td>
+  {% endif %}
+
+  <td>
+    {% if asset.is_assigned %}
+      {% with map=asset_user_map|get_item:asset.id %}
+        <div class="assignee-chip mb-1">
+          {% if map.image %}
+            <img src="{{ map.image.url }}"
+              onerror="this.onerror=null;this.src='{% static 'images/faces/1.jpg' %}';"
+              alt="{{ map.full_name }}" width="22" height="22">
+          {% else %}
+            <span class="assignee-initials">
+              {% if map.full_name %}{{ map.full_name|slice:":2"|upper }}{% else %}??{% endif %}
+            </span>
+          {% endif %}
+          <span>{{ map.full_name|default:"Unknown User" }}</span>
+        </div>
+        <div class="d-flex gap-1 align-items-center mt-1">
+        {% if perms.assets.delete_assign_asset %}
+        <form action="{% url 'assets:delete_assign_asset_list' asset.id %}" method="post"
+              class="form-row-action d-inline m-0"
+              onsubmit="return confirm('Unassign this asset?')">
+          {% csrf_token %}
+          <button type="submit" class="btn-unassign">Unassign</button>
+        </form>
+        {% endif %}
+        {% if perms.assets.reassign_assign_asset and map.assign_id %}
+        <button type="button" class="btn-reassign"
+          hx-get="{% url 'assets:reassign_asset' map.assign_id %}"
+          hx-target="#reassign-asset-modal-content"
+          data-bs-toggle="modal"
+          data-bs-target="#reassign-asset-list-modal"
+          aria-label="Reassign {{ asset.name }}">
+          Reassign
+        </button>
+        {% endif %}
+        </div>
+      {% endwith %}
+    {% else %}
+      <span class="unassigned-label">Unassigned</span>
+      {% if perms.assets.add_assign_asset %}
+      <button type="button" class="btn-assign mt-1"
+        hx-get="{% url 'assets:assign_asset_in_asset_list' asset.id %}"
+        hx-target="#assign-asset-modal-list-content"
+        data-bs-toggle="modal"
+        data-bs-target="#assign-asset-list-modal"
+        aria-label="Assign {{ asset.name }}">
+        + Assign
+      </button>
+      {% endif %}
+    {% endif %}
+  </td>
+
+  <td>
+    {% if not asset.is_assigned %}
+      <select class="status-select status-select-inline" data-no-select2 data-asset-id="{{ asset.id }}"
+              aria-label="Status for {{ asset.name }}">
+        <option value="{{ asset.asset_status.name }}" selected>{{ asset.asset_status.name }}</option>
+        {% for value, label in asset_form.fields.status.choices %}
+          {% if value != asset.asset_status.name %}
+            <option value="{{ value }}">{{ label }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    {% else %}
+      <span class="status-badge status-allocated">Allocated</span>
+    {% endif %}
+  </td>
+
+  {% if perms.assets.edit_asset or perms.assets.view_asset or perms.assets.delete_asset %}
+  <td>
+    <div class="row-actions">
+      {% if perms.assets.view_asset %}
+        <a href="{% url 'assets:details' asset.id %}" class="action-btn" title="View {{ asset.name }}">
+          <i class="bi bi-eye"></i>
+        </a>
+      {% endif %}
+      {% if perms.assets.edit_asset %}
+        <a href="{% url 'assets:update_in_detail' asset.id %}"
+          class="action-btn {% if is_demo %}disabled{% endif %}"
+          title="Edit {{ asset.name }}">
+          <i class="bi bi-pencil"></i>
+        </a>
+      {% endif %}
+      {% if perms.assets.delete_asset %}
+        <form action="{% url 'assets:delete' asset.id %}" method="post" class="form-row-action"
+              onsubmit="return confirm('Delete {{ asset.name }}? It can be restored from Recycle Bin.')">
+          {% csrf_token %}
+          <button type="submit"
+            class="action-btn danger {% if is_demo %}disabled{% endif %}"
+            title="Delete {{ asset.name }}"
+            {% if is_demo %}disabled{% endif %}>
+            <i class="bi bi-trash3"></i>
+          </button>
+        </form>
+      {% endif %}
+      <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="action-btn" title="Audit history">
+        <i class="bi bi-archive"></i>
+      </a>
+    </div>
+  </td>
+  {% endif %}
+</tr>

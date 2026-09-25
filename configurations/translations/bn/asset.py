@@ -9,6 +9,7 @@ STRINGS = {
     'tag_or_name': 'ট্যাগ বা নাম…',
     'all_vendors': 'সমস্ত ভেন্ডর',
     'all_types': 'সমস্ত ধরণ',
+    'product_type': 'পণ্যের ধরন',
     'all_categories': 'সমস্ত বিভাগ',
     'all_locations': 'সমস্ত স্থান',
     'all_dept': 'সমস্ত বিভাগ',

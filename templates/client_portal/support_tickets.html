@@ -108,7 +108,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">Status</div>
-                    <select name="status" class="form-select">
+                    <select name="status" class="form-select" data-no-select2>
                         <option value="">All Statuses</option>
                         {% for val, label in status_choices %}
                         <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}</option>

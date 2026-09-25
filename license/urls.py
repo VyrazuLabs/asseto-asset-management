@@ -9,7 +9,7 @@ urlpatterns = [
     path("details/<int:id>", views.license_details, name="license_details"),
     path("update/<int:id>", views.update_license, name="update_license"),
     path("delete/<int:id>", views.delete_license, name="delete_license"),
-    path("search/", views.search_license, name="search_license"),
+    path("search/<str:page>", views.search_license, name="search_license"),
     # AssignLicense
     path(
         "assign-license/<int:license_id>",

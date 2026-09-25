@@ -115,37 +115,7 @@
 </div>
 
 {# ── Pagination ─────────────────────────────────────────────────────────── #}
-<div class="pagination-wrap">
-  <span>
-    {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-    {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.departments }}
-  </span>
-  <div class="pagination-nav">
-    {% if page_object.has_previous %}
-    <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
-      class="page-btn">‹</a>
-    {% else %}
-    <span class="page-btn disabled">‹</span>
-    {% endif %}
-
-    {% for num in page_object.paginator.page_range %}
-    {% if page_object.number == num %}
-    <span class="page-btn active">{{ num }}</span>
-    {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-    <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">{{ num }}</a>
-    {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-    <span class="page-ellipsis">…</span>
-    {% endif %}
-    {% endfor %}
-
-    {% if page_object.has_next %}
-    <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
-      class="page-btn">›</a>
-    {% else %}
-    <span class="page-btn disabled">›</span>
-    {% endif %}
-  </div>
-</div>
+{% include 'commons/htmx-pagination.html' with search_url="/admin/departments/search/" filter_form="#department-filter-form" target="#department-list-container" item_label=trans.departments %}
 
 {# ── OOB Swaps for Stats ────────────────────────────────────────────────── #}
 <div id="total-department-count" hx-swap-oob="innerHTML">{{ total_departments }}</div>

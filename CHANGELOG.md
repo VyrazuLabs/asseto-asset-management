@@ -12,6 +12,28 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [v1.8.2] — 2026-09-25
+
+### Added
+- **Select2 Dynamic Search Dropdowns** — Integrated Select2 library (`static/vendor/select2/`) with custom theme styling (`static/css/common/select2-theme.css`) and global initializer (`static/js/select2-init.js`) across Client Portal, Support Tickets, Assets, Consumables, and Bulk Import workflows.
+- **Common Filtered HTMX Pagination** — Introduced a reusable filtered pagination partial (`templates/commons/htmx-pagination.html`) preserving active search filters and query parameters across 14 module list views.
+- **Multi-Language Translations** — Added comprehensive translation coverage for Bengali (`bn`), Hindi (`hi`), and French (`fr`) for Consumables, Upload, Asset, and General configuration dictionaries.
+- **Client Column & Filters in Asset List** — Added client filter dropdown and conditional client column visibility in asset list views.
+
+### Changed
+- **Asset Table Row Componentization** — Refactored asset table rows into a modular partial template (`templates/assets/_asset_row.html`) for cleaner maintenance and improved HTMX rendering performance.
+- **Bulk Upload & Mapping Modals UI Overhaul** — Modernized bulk import step indicators and modal interfaces with dedicated styling (`static/css/pages/upload-modals.css`).
+
+### Fixed
+- **Asset Assignment & Reassignment Workflow** — Resolved errors encountered during asset assignment and user association in `assets/utils.py` and `assets/views.py`.
+- **Asset Search & Date Formatting** — Fixed search and pagination state preservation on the asset list view, along with standardizing system default date formats.
+- **Dashboard Count & Percentage Metrics** — Fixed department and location calculation accuracy in dashboard views.
+
+### Security
+- **Python Dependencies Vulnerability Patching** — Upgraded `cryptography>=43.0.1` and `requests>=2.32.2` in `requirements.txt` to remediate known Dependabot security advisories.
+
+---
+
 ## [v1.8.1] — 2026-09-17
 
 ### Added

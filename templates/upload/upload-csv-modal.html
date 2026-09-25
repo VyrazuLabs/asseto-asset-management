@@ -1,10 +1,11 @@
+{% load static %}
 <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<div class="modal-content">
-    <div class="modal-header bg-dark text-white">
-        <span class="modal-title w-100 text-center" id="myModalLabel150">
-            {{ trans.upload }} {{ page }}
-        </span>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="upload-modal-content">
+    <div class="upload-modal-header">
+        <h5 class="modal-title"><i class="bi bi-upload"></i> {{ trans.upload }} {{ page }}</h5>
+        <button type="button" class="upload-btn-close" data-bs-dismiss="modal" aria-label="{{ trans.close_modal }}">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <form
@@ -16,29 +17,24 @@
         enctype="multipart/form-data"
     >
         {% csrf_token %}
-        <div class="modal-body">
-            <div class="card">
-                <div class="card-content py-0">
-                    <div class="card-body py-0 pt-2">
-                        <input class="form-control" type="file" id="formFile" name="file"
-                               accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                               onchange="toggleSubmitButton()">
-                        <small>* {{ trans.csv_file_instruction }}</small><br>
-                        <small>* {{ trans.proper_format_instruction }}</small><br>
-                        <small>* {{ trans.max_lines_instruction }}</small>
-                    </div>
-                </div>
+        <div class="upload-modal-body">
+            <div class="form-group">
+                <label>{{ trans.select_csv_file }} <span class="required">*</span></label>
+                <input class="form-control" type="file" id="formFile" name="file"
+                       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                       onchange="toggleSubmitButton()">
+                <small class="text-muted">* {{ trans.csv_file_instruction }}</small><br>
+                <small class="text-muted">* {{ trans.proper_format_instruction }}</small><br>
+                <small class="text-muted">* {{ trans.max_lines_instruction }}</small>
             </div>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-light-secondary" data-bs-dismiss="modal">
-                <i class="bx bx-x d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">{{ trans.close }}</span>
+        <div class="upload-modal-footer">
+            <button type="button" class="btn-cancel" data-bs-dismiss="modal">
+                <i class="bi bi-x-lg"></i> {{ trans.cancel }}
             </button>
-            <button type="submit" class="btn btn-sm btn-info ml-1" id="submitButton" disabled>
-                <i class="bx bx-check d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">{{ trans.upload }}</span>
+            <button type="submit" class="btn-save" id="submitButton" disabled>
+                <i class="bi bi-check-lg"></i> {{ trans.upload }}
             </button>
         </div>
     </form>
@@ -48,9 +44,8 @@
     function toggleSubmitButton() {
         const fileInput = document.getElementById('formFile');
         const submitButton = document.getElementById('submitButton');
-        submitButton.disabled = !fileInput.files.length; // Disable if no files, enable if files exist
+        submitButton.disabled = !fileInput.files.length;
     }
 
-    // Initialize button state on page load
     document.addEventListener('DOMContentLoaded', toggleSubmitButton);
 </script>
