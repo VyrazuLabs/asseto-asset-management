@@ -51,6 +51,7 @@ def departments(request):
         "department_form": department_form,
         "department_asset_count": department_asset_count,
         "title": "Departments",
+        "is_demo": IS_DEMO,
         **stats,
     }
     return render(request, "dashboard/departments/list.html", context=context)
@@ -173,6 +174,7 @@ def search_department(request, page):
         {
             "page_object": page_object,
             "department_asset_count": department_asset_count,
+            "is_demo": IS_DEMO,
             **stats,
         },
     )

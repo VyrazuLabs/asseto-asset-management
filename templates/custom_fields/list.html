@@ -39,7 +39,7 @@
         autocomplete="off" placeholder="{{ trans.search_by_field_label }}"
         hx-get="{% url 'custom_fields:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search, change from:[name='module']"
-        hx-target="#search_result"
+        hx-target="#custom-fields-list-section"
         hx-include="[name='module']"
         aria-label="Search custom fields">
     </div>
@@ -70,44 +70,9 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
-  <div class="table-responsive">
-    <table class="list-table" id="table1">
-      <thead>
-        <tr>
-          <th>{{ trans.sl_no }}</th>
-          <th>{{ trans.module_label }}</th>
-          <th>{{ trans.label_column }}</th>
-          <th>{{ trans.key_column }}</th>
-          <th>{{ trans.type_column }}</th>
-          <th class="text-center">{{ trans.required_column }}</th>
-          <th>{{ trans.status_column }}</th>
-          <th>{{ trans.actions }}</th>
-        </tr>
-      </thead>
-
-      {% if page_object %}
-      <tbody id="search_result">
-        {% include 'custom_fields/cf-data.html' %}
-      </tbody>
-
-      {% else %}
-      <tbody>
-        <tr>
-          <td colspan="8">
-            <div class="table-empty-state">
-              <i class="bi bi-sliders"></i>
-              <p>{{ trans.no_custom_fields_defined }}<br>
-                <a href="{% url 'custom_fields:create' %}" class="link-primary">{{ trans.add_first_custom_field }}</a>
-              </p>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      {% endif %}
-    </table>
+  <div id="custom-fields-list-section">
+    {% include 'custom_fields/cf-data.html' %}
   </div>
-
-  {% include 'commons/list-pagination.html' with item_label=trans.custom_fields %}
 </div>{# /.table-card #}
 
 {% endblock content %}

@@ -78,7 +78,7 @@
         autocomplete="off" placeholder="{{ trans.consumable_search_placeholder }}"
         hx-get="{% url 'consumables:search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search"
-        hx-target="#search_result"
+        hx-target="#consumables-list-section"
         aria-label="{{ trans.consumable_search_label }}">
     </div>
     <div class="col-auto">
@@ -91,6 +91,7 @@
 
 {# ── Table card #}
 <div class="table-card">
+  <div id="consumables-list-section">
   <div class="table-responsive">
     <table class="list-table" id="consumables-table">
       <thead>
@@ -203,7 +204,8 @@
       {% endif %}
     </table>
   </div>
-  {% include 'commons/list-pagination.html' with item_label="consumables" %}
+  {% include 'commons/htmx-pagination.html' with search_url="/consumables/search/" filter_form="#consumable-filter-form" target="#consumables-list-section" item_label="consumables" %}
+  </div>{# /#consumables-list-section #}
 </div>
 
 <!-- Checkout Modal -->

@@ -67,14 +67,14 @@
 <div class="filter-card">
   {% csrf_token %}
   <form id="product-type-filter-form" hx-get="{% url 'dashboard:search_product_type' page_object.number %}"
-    hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+    hx-target="#product-type-list-section" hx-trigger="change, keyup changed delay:400ms from:input">
     <div class="row g-2 align-items-end">
 
       <div class="col-12 col-md-6 col-lg">
         <div class="filter-label">{{ trans.search_product_type }}</div>
         <input name="search_text" type="search" autocomplete="off" placeholder="{{ trans.search_product_type_placeholder }}"
           hx-get="{% url 'dashboard:search_product_type' page_object.number %}"
-          hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result" aria-label="{{ trans.search_product_type }}">
+          hx-trigger="keyup changed delay:400ms, search" hx-target="#product-type-list-section" aria-label="{{ trans.search_product_type }}">
       </div>
 
       <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
@@ -126,6 +126,7 @@
     </div>
   </div>
 
+  <div id="product-type-list-section">
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
@@ -234,37 +235,8 @@
   </div>
 
   {# ── Pagination ─────────────────────────────────────────────────────────── #}
-  <div class="pagination-wrap">
-    <span>
-      {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-      {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.product_types }}
-    </span>
-    <div class="pagination-nav">
-      {% if page_object.has_previous %}
-      <a href="?page={{ page_object.previous_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
-        class="page-btn">‹</a>
-      {% else %}
-      <span class="page-btn disabled">‹</span>
-      {% endif %}
-
-      {% for num in page_object.paginator.page_range %}
-      {% if page_object.number == num %}
-      <span class="page-btn active">{{ num }}</span>
-      {% elif num == 1 or num == page_object.paginator.num_pages or num >= page_object.number|add:"-2" and num <= page_object.number|add:"2" %}
-      <a href="?page={{ num }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="page-btn">{{ num }}</a>
-      {% elif num == page_object.number|add:"-3" or num == page_object.number|add:"3" %}
-      <span class="page-ellipsis">…</span>
-      {% endif %}
-      {% endfor %}
-
-      {% if page_object.has_next %}
-      <a href="?page={{ page_object.next_page_number }}{% if request.GET.search_text %}&search_text={{ request.GET.search_text }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
-        class="page-btn">›</a>
-      {% else %}
-      <span class="page-btn disabled">›</span>
-      {% endif %}
-    </div>
-  </div>
+  {% include 'commons/htmx-pagination.html' with search_url="/admin/product-types/search/" filter_form="#product-type-filter-form" target="#product-type-list-section" item_label=trans.product_types %}
+  </div>{# /#product-type-list-section #}
 </div>
 
 <script>

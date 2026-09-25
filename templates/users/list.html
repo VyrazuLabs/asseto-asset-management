@@ -70,8 +70,8 @@
 <div class="filter-card">
   <form id="user-filter-form"
         hx-get="{% url 'users:search' page_object.number %}"
-        hx-target="#search_result"
-        hx-trigger="change, keyup changed delay:400ms from:input">
+        hx-target="#users-list-section"
+        hx-trigger="change">
     <div class="row g-2 align-items-end">
 
       <div class="col">
@@ -79,6 +79,10 @@
         <input name="search_text" type="search"
           autocomplete="off"
           placeholder="{{ trans.search_user_placeholder }}"
+          hx-get="{% url 'users:search' page_object.number %}"
+          hx-trigger="keyup changed delay:400ms, search"
+          hx-target="#users-list-section"
+          hx-include="[name='technician']"
           aria-label="{{ trans.search_user }}">
       </div>
 
@@ -153,6 +157,7 @@
 
 {# ── Table card ───────────────────────────────────────────────────────────── #}
 <div class="table-card">
+  <div id="users-list-section">
   <div class="table-responsive">
     <table class="list-table" id="table1">
       <thead>
@@ -300,7 +305,8 @@
     </table>
   </div>
 
-  {% include 'commons/list-pagination.html' with item_label="users" %}
+  {% include 'commons/htmx-pagination.html' with search_url="/users/search/" filter_form="#user-filter-form" target="#users-list-section" item_label="users" %}
+  </div>{# /#users-list-section #}
 </div>{# /.table-card #}
 
 {# ── Modals ───────────────────────────────────────────────────────────────── #}

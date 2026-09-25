@@ -75,7 +75,7 @@
 <div class="filter-card">
     {% csrf_token %}
     <form id="product-category-filter-form" hx-get="{% url 'dashboard:search_product_category' page_object.number %}"
-        hx-target="#search_result" hx-trigger="change, keyup changed delay:400ms from:input">
+        hx-target="#product-category-list-section" hx-trigger="change, keyup changed delay:400ms from:input">
 
         <div class="row g-2 align-items-end">
 
@@ -83,7 +83,7 @@
                 <div class="filter-label">{{ trans.search_category }}</div>
                 <input name="search_text" type="search" placeholder="{{ trans.search_category_placeholder }}"
                     hx-get="{% url 'dashboard:search_product_category' page_object.number %}"
-                    hx-trigger="keyup changed delay:400ms, search" hx-target="#search_result">
+                    hx-trigger="keyup changed delay:400ms, search" hx-target="#product-category-list-section">
             </div>
 
             <div class="col-6 col-md-3 col-lg-auto" style="min-width: 160px;">
@@ -133,56 +133,8 @@
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="list-table">
-            <thead>
-                <tr>
-                    <th>{{ trans.sl_no }}</th>
-                    <th>{{ trans.name_label }}</th>
-                    <th>{{ trans.total_assets }}</th>
-                    <th>{{ trans.parent }}</th>
-                    <th>{{ trans.status_label }}</th>
-                    <th>{{ trans.actions }}</th>
-                </tr>
-            </thead>
-
-            <tbody id="search_result">
-                {% include 'dashboard/product_category/product-categories-data.html' %}
-            </tbody>
-
-        </table>
-    </div>
-
-    <!-- PAGINATION -->
-    <div class="pagination-wrap">
-        <span>
-            {{ trans.showing_label }} <strong>{{ page_object.start_index|default:0 }}–{{ page_object.end_index|default:0 }}</strong>
-            {{ trans.of_label }} <strong>{{ page_object.paginator.count|default:0 }}</strong> {{ trans.categories_lower }}
-        </span>
-
-        <div class="pagination-nav">
-
-            {% if page_object.has_previous %}
-            <a href="?page={{ page_object.previous_page_number }}" class="page-btn">‹</a>
-            {% else %}
-            <span class="page-btn disabled">‹</span>
-            {% endif %}
-
-            {% for num in page_object.paginator.page_range %}
-            {% if page_object.number == num %}
-            <span class="page-btn active">{{ num }}</span>
-            {% elif num > page_object.number|add:"-3" and num < page_object.number|add:"3" %} <a href="?page={{ num }}"
-                class="page-btn">{{ num }}</a>
-                {% endif %}
-                {% endfor %}
-
-                {% if page_object.has_next %}
-                <a href="?page={{ page_object.next_page_number }}" class="page-btn">›</a>
-                {% else %}
-                <span class="page-btn disabled">›</span>
-                {% endif %}
-
-        </div>
+    <div id="product-category-list-section">
+        {% include 'dashboard/product_category/product-categories-data.html' %}
     </div>
 
 </div>

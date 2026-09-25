@@ -1,87 +1,105 @@
 {% load role_permission_tags %}
-{% if page_object %}
-{% for role in page_object %}
-<tr>
+<div class="table-responsive">
+  <table class="list-table">
+    <thead>
+      <tr>
+        <th>{{ trans.sl_no }}</th>
+        <th>{{ trans.role_name }}</th>
+        <th>{{ trans.permissions }}</th>
+        <th>{{ trans.status_label }}</th>
+        <th>{{ trans.actions }}</th>
+      </tr>
+    </thead>
+    {% if page_object %}
+    <tbody id="search_result">
+      {% for role in page_object %}
+      <tr>
 
-    <!-- INDEX -->
-    <td class="table-index-cell">
-        {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
-    </td>
+          <!-- INDEX -->
+          <td class="table-index-cell">
+              {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
+          </td>
 
-    <!-- ROLE NAME -->
-    <td>
-        <div class="cell-name-main">
-            {{ role.related_name }}
-        </div>
-    </td>
+          <!-- ROLE NAME -->
+          <td>
+              <div class="cell-name-main">
+                  {{ role.related_name }}
+              </div>
+          </td>
 
-    <!-- PERMISSIONS -->
-    <td>
-        <div class="role-permissions-grid">
-            {% with matrix=role|permission_module_matrix %}
-            {% for entry in matrix %}
-                <div class="permission-module-row">
-                    <span class="permission-module-name">{{ entry.module }}</span>
-                    <span class="permission-module-icons">
-                        {% for action in entry.actions %}
-                            <span class="permission-action-badge {% if action.granted %}granted{% else %}denied{% endif %}"
-                                  title="{{ action.label }}: {% if action.granted %}{{ trans.allowed }}{% else %}{{ trans.not_allowed }}{% endif %}">
-                                <i class="bi {{ action.icon }}"></i>
-                            </span>
-                        {% endfor %}
-                    </span>
-                </div>
-            {% empty %}
-                <span class="text-muted small">{{ trans.no_permissions }}</span>
-            {% endfor %}
-            {% endwith %}
-        </div>
-    </td>
+          <!-- PERMISSIONS -->
+          <td>
+              <div class="role-permissions-grid">
+                  {% with matrix=role|permission_module_matrix %}
+                  {% for entry in matrix %}
+                      <div class="permission-module-row">
+                          <span class="permission-module-name">{{ entry.module }}</span>
+                          <span class="permission-module-icons">
+                              {% for action in entry.actions %}
+                                  <span class="permission-action-badge {% if action.granted %}granted{% else %}denied{% endif %}"
+                                        title="{{ action.label }}: {% if action.granted %}{{ trans.allowed }}{% else %}{{ trans.not_allowed }}{% endif %}">
+                                      <i class="bi {{ action.icon }}"></i>
+                                  </span>
+                              {% endfor %}
+                          </span>
+                      </div>
+                  {% empty %}
+                      <span class="text-muted small">{{ trans.no_permissions }}</span>
+                  {% endfor %}
+                  {% endwith %}
+              </div>
+          </td>
 
-    <!-- STATUS -->
-    <td>
-        <div class="status-toggle">
-            <div class="form-check form-switch">
-                <input class="form-check-input" hx-post="{% url 'roles:status' role.name %}"
-                    hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' type="checkbox" {% if role.status %}checked{% endif %}>
-            </div>
-        </div>
-    </td>
+          <!-- STATUS -->
+          <td>
+              <div class="status-toggle">
+                  <div class="form-check form-switch">
+                      <input class="form-check-input" hx-post="{% url 'roles:status' role.name %}"
+                          hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' type="checkbox" {% if role.status %}checked{% endif %}>
+                  </div>
+              </div>
+          </td>
 
-    <!-- ACTIONS -->
-    <td>
-        <div class="row-actions">
+          <!-- ACTIONS -->
+          <td>
+              <div class="row-actions">
 
-            {% if perms.roles.change_role %}
-            <button class="action-btn" hx-get="{% url 'roles:update' role.name %}"
-                hx-target="#update-role-modal-content" data-bs-toggle="modal"
-                data-bs-target="#update-role-modal">
-                <i class="bi bi-pencil"></i>
-            </button>
-            {% endif %}
+                  {% if perms.roles.change_role %}
+                  <button class="action-btn" hx-get="{% url 'roles:update' role.name %}"
+                      hx-target="#update-role-modal-content" data-bs-toggle="modal"
+                      data-bs-target="#update-role-modal">
+                      <i class="bi bi-pencil"></i>
+                  </button>
+                  {% endif %}
 
-            {% if perms.roles.delete_role %}
-            <form method="post" action="{% url 'roles:delete' role.name %}"
-                class="form-row-action"
-                   onsubmit="return confirm('{{ trans.delete_confirm_role }}')">
-                {% csrf_token %}
-                <button class="action-btn danger">
-                    <i class="bi bi-trash3"></i>
-                </button>
-            </form>
-            {% endif %}
+                  {% if perms.roles.delete_role %}
+                  <form method="post" action="{% url 'roles:delete' role.name %}"
+                      class="form-row-action"
+                         onsubmit="return confirm('{{ trans.delete_confirm_role }}')">
+                      {% csrf_token %}
+                      <button class="action-btn danger">
+                          <i class="bi bi-trash3"></i>
+                      </button>
+                  </form>
+                  {% endif %}
 
-        </div>
-    </td>
+              </div>
+          </td>
 
-</tr>
-{% endfor %}
-{% else %}
-<tr>
-    <td colspan="5">
-        <div class="table-empty-state text-center">
-            <p>{{ trans.no_roles_found }}</p>
-        </div>
-    </td>
-</tr>
-{% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% else %}
+    <tbody>
+      <tr>
+          <td colspan="5">
+              <div class="table-empty-state text-center">
+                  <p>{{ trans.no_roles_found }}</p>
+              </div>
+          </td>
+      </tr>
+    </tbody>
+    {% endif %}
+  </table>
+</div>
+{% include 'commons/htmx-pagination.html' with search_url="/roles/search/" filter_form="#role-filter-form" target="#roles-list-section" item_label=trans.roles_lower %}

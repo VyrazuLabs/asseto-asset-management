@@ -284,7 +284,7 @@
             {% with condition_list|default:''|last as condition %}
             <div class="asset-name-main">{{ asset.name }}</div>
             <div class="asset-name-sub">
-              {% if asset.product %}{{ asset.product.product_type.name }}{% endif %}
+              {% if asset.product %}{{ asset.product.name }}{% endif %}
               {% if condition == 0 or condition == 1 %}
               &nbsp;·&nbsp;<span class="state-excellent">● Excellent</span>
               {% elif condition == 2 %}
