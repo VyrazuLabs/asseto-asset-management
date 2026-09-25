@@ -1,65 +1,75 @@
-# Release Notes — v1.8.1
+# Release Notes — v1.8.2
 
-**Tag**: `v1.8.1`  
+**Tag**: `v1.8.2`  
 **Target Branch**: `main`  
-**Date**: September 17, 2026  
-**Title**: `v1.8.1 — Consumables Management Module, Custom Fields Filtering & Bulk Upload Fixes`
+**Date**: September 25, 2026  
+**Title**: `v1.8.2 — Select2 Dynamic Search Integration, Common Filtered Pagination, Multi-Language Translations & Security Updates`
 
 ---
 
 ## 🚀 Overview
 
-Asseto **v1.8.1** introduces a full-featured **Consumables Management Module** for tracking non-capital inventory with low stock alert automation and document attachments, extends the **Custom Fields API** with module-based query filtering, fixes bulk location upload empty cell parsing, and delivers substantial documentation enhancements across the platform.
+Asseto **v1.8.2** introduces Select2 dynamic search dropdowns across key platform forms and filters, implements a unified HTMX filtered pagination component across 14 module list views, resolves asset assignment and search pagination issues, expands internationalization support with Bengali, Hindi, and French translations for Consumables and Upload modules, and resolves open Dependabot security advisories.
 
 ---
 
 ## ✨ Added
 
-* **Consumables Management Module (PR #268, #274)**:
-  * **Inventory Tracking** — Complete lifecycle management for consumables including consumable name, item category, total quantity, remaining quantity, purchase date, unit price, assigned vendor, and storage location.
-  * **Low Stock Alerts & Notifications** — Configurable minimum stock alert thresholds with automated email notifications triggered when stock levels dip (`consumables/utils.py`).
-  * **Supporting Document Attachments** — Dedicated supporting document upload and viewing pipeline (`ConsumableDocument`) on add, edit, and detail views.
-  * **Recycle Bin Integration** — Full soft-delete lifecycle support with restore and permanent purge capabilities in the Recycle Bin module (`recycle_bin/views.py`, `templates/recycle_bin/deleted-consumables.html`).
-  * **Granular RBAC Permissions** — Centralized permission scoping for the Consumables module registered in `common/permissions.py` and dynamic permission checkboxes in role creation and update modals.
-  * **Modern Styling** — Standalone responsive UI styling in `static/css/pages/consumables.css` and table partials.
-* **Custom Fields API Module Filtering (PR #273)**:
-  * Added optional `module` query parameter support in the `Get Custom Fields List API` (`custom_fields/views.py`) allowing filtered field retrieval by target module (e.g., `?module=asset`, `?module=consumables`).
+* **Select2 Dynamic Search Dropdowns (PR #278)**:
+  * Replaced native select elements with searchable Select2 dropdowns across Client Portal, Support Tickets, Asset Details, Consumables, Clients, and Bulk Upload mapping steps.
+  * Added vendor Select2 distribution files (`static/vendor/select2/css/select2.min.css`, `static/vendor/select2/js/select2.min.js`).
+  * Implemented an Asseto design system theme (`static/css/common/select2-theme.css`) and automated initialization script (`static/js/select2-init.js`).
+* **Common Filtered HTMX Pagination (PR #277)**:
+  * Implemented a unified pagination component (`templates/commons/htmx-pagination.html`) that maintains active search queries and filter parameters across page changes.
+  * Standardized across 14 list views: Assets, Clients, Consumables, Custom Fields, Departments, Locations, Product Categories, Product Types, Products, License Types, Roles, Support Tickets, Users, and Vendors.
+* **Multi-Language Translation Support (PR #275)**:
+  * Added localized translation dictionaries for Bengali (`bn`), Hindi (`hi`), and French (`fr`) covering Consumables, Upload, Asset, and General configuration strings.
+* **Client Filtering in Asset List (PR #275)**:
+  * Added client filter dropdown and conditional client column display in the asset list page.
 
 ---
 
 ## 🔄 Changed
 
-* **Audit Scheduling Guard Clauses (PR #268)**:
-  * Refactored `audit/utils.py` and `audit/api_utils.py` with defensive guard clauses handling `None` next due dates to prevent calculation exceptions during audit scheduling.
-* **Platform Documentation & Showcase Overhaul (PR #272)**:
-  * Revamped `README.md` and `ROADMAP.md` with comprehensive feature breakdowns, architecture summaries, and high-resolution interface visuals for Clients, Gate Pass, Custom Fields, Bulk Upload, Client Portal, Consumables, and Support Tickets.
+* **Asset Table Partial Template (PR #276)**:
+  * Extracted asset table rows into a modular partial template (`templates/assets/_asset_row.html`) for improved reusability and HTMX updates.
+* **Bulk Upload Interface Polish (PR #275)**:
+  * Enhanced Bulk Upload UI with refined step indicators and streamlined modal styling (`static/css/pages/upload-modals.css`).
 
 ---
 
 ## 🐛 Fixed
 
-* **Consumables Quantity Tracking Inconsistencies (PR #274)**:
-  * Fixed quantity update and remaining quantity recalculation logic in `consumables/forms.py` and `consumables/views.py`.
-* **Location Bulk Upload Empty Cell Parsing (PR #270)**:
-  * Resolved `NaN` parsing errors in `upload/views/location_views.py` and `templates/dashboard/partials/recent_locations.html` when processing CSV uploads containing empty location cells.
+* **Asset Assignment & User Allocation (PR #276)**:
+  * Fixed errors occurring during asset assignment and user re-assignment in `assets/utils.py` and `assets/views.py`.
+* **Asset Search & Date Format Filtering (PR #276)**:
+  * Resolved pagination reset and filtering discrepancies when searching assets, and corrected date formatting based on default system settings.
+* **Dashboard Analytics Calculations (PR #275)**:
+  * Fixed count and percentage calculation discrepancies in department and location dashboard views.
+
+---
+
+## 🛡️ Security Updates
+
+* **Dependency Vulnerability Remediation**:
+  * Upgraded `cryptography` to `>=43.0.1` in `requirements.txt` to resolve CVE-2024-12797 and related advisories.
+  * Upgraded `requests` to `>=2.32.2` in `requirements.txt` to resolve CVE-2024-35195.
 
 ---
 
 ## 🗄️ Database Migrations & Commands
 
-This release introduces the following database migrations:
-* `configurations`: `0011_extensionspermission`
-* `consumables`: `0001_initial`, `0002_consumable_consumable_name_and_more`, `0003_consumable_remaining_quantity_and_more`, `0004_consumabledocument`
+No new database migrations are introduced in this release.
 
 ### Post-Deployment Execution:
 ```bash
-# 1. Run migrations
+# 1. (Optional) Run migrations to verify database state
 python manage.py migrate
 
-# 2. Sync permissions across all roles and system groups
-python manage.py sync_permissions
+# 2. Collect static files
+python manage.py collectstatic --noinput
 ```
 
 ---
 
-**Full Changelog**: https://github.com/VyrazuLabs/asseto-asset-management/compare/v1.8.0...v1.8.1
+**Full Changelog**: https://github.com/VyrazuLabs/asseto-asset-management/compare/v1.8.1...v1.8.2
