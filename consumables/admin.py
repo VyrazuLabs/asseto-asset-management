@@ -4,5 +4,5 @@ from .models import Consumable
 
 @admin.register(Consumable)
 class ConsumableAdmin(admin.ModelAdmin):
-    list_display = ["id", "product", "vendor", "location", "quantity", "min_qty", "organization"]
+    list_display = ["consumable_id", "product", "vendor", "location", "quantity", "min_qty", "organization"]
     search_fields = ["product__name", "vendor__name", "item_no", "order_number"]

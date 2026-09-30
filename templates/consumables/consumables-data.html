@@ -3,7 +3,7 @@
   <table class="list-table" id="consumables-table">
     <thead>
       <tr>
-        <th>{{ trans.consumable_col_hash }}</th>
+        <th>{{ trans.consumable_col_id }}</th>
         <th>{{ trans.consumable_col_name }}</th>
         <th>{{ trans.consumable_col_product }}</th>
         <th>{{ trans.consumable_col_vendor }}</th>
@@ -23,7 +23,7 @@
     <tbody id="search_result">
       {% for c in page_object %}
       <tr>
-        <td class="table-index-cell">{{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}</td>
+        <td class="table-index-cell">{% if c.consumable_id %}#{{ c.consumable_id }}{% else %}-{% endif %}</td>
         <td class="consumable-row-media">
           <img class="list-thumb"
             src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
