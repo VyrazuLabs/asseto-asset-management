@@ -175,16 +175,7 @@ class UserSerializer(serializers.ModelSerializer):
     #     return search_text
 
 
-class SearchUserSerializer(serializers.ModelSerializer):
+class SearchUserSerializer(serializers.Serializer):
     search_text = serializers.CharField(required=False)
     role = serializers.CharField(required=False)
     status = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = ["search_text", "role", "status"]
-
-    def validate(self, search_text):
-        if not search_text:
-            return None
-        return search_text
