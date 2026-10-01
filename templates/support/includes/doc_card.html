@@ -1,0 +1,35 @@
+<div class="doc-card-wrapper position-relative d-inline-block w-100" style="max-width: 300px; flex: 1;" onmouseenter="this.querySelector('.btn-delete-doc') && (this.querySelector('.btn-delete-doc').style.opacity='1')" onmouseleave="this.querySelector('.btn-delete-doc') && (this.querySelector('.btn-delete-doc').style.opacity='0')">
+    <a href="{{ att.file.url }}" target="_blank" class="doc-card m-0" style="width: 100%; max-width: 100%;">
+        <div class="doc-icon">
+            {% if "pdf" in att.file_name|lower %}
+            <span class="text-primary fw-bold" style="font-size: 0.6rem;">{{ trans.pdf_label }}</span>
+            {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
+            <img src="{{ att.file.url }}" alt="Preview"
+                style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+            {% else %}
+            <i class="bi bi-file-text text-secondary fs-5"></i>
+            {% endif %}
+        </div>
+        <div class="doc-info">
+            <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
+            <div class="doc-meta">
+                {{ att.file_size|filesizeformat|default:"2.4 MB" }} •
+                {% if "pdf" in att.file_name|lower %}{{ trans.pdf_label }}
+                {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}{{ trans.image_label }}
+                {% else %}{{ trans.file_label }}{% endif %}
+            </div>
+        </div>
+        <div class="doc-download">
+            <i class="bi bi-download"></i>
+        </div>
+    </a>
+    
+
+    <button type="button" class="btn-delete-doc position-absolute top-0 end-0 m-1 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-danger border-0" 
+            style="width: 24px; height: 24px; opacity: 0; transition: opacity 0.2s; z-index: 5;"
+            onclick="event.preventDefault(); if(confirm('{{ trans.delete_attachment_confirm|default:'Are you sure you want to delete this attachment?' }}')) { location.href='{% url 'support:ticket_attachment_delete' att.id %}' }"
+            title="Delete">
+        <i class="bi bi-trash fs-6"></i>
+    </button>
+  
+</div>

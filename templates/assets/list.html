@@ -225,6 +225,21 @@
       </div>
 
       <div class="col-auto">
+        <div class="dropdown">
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="{{ trans.export }}">
+            <i class="bi bi-download"></i> {{ trans.export }}
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item asset-export-csv" href="{% url 'assets:export_csv' %}">
+                <i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-auto">
         <a href="{% url 'assets:list' %}" class="btn-reset" title="{{ trans.reset }} all filters">
           <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
@@ -581,6 +596,17 @@ document.addEventListener('submit', function(e) {
         form.dataset.submitting = '0';
         if (submitBtn) submitBtn.disabled = false;
     });
+});
+</script>
+
+<script>
+document.addEventListener("click", function (e) {
+  var link = e.target && e.target.closest ? e.target.closest(".asset-export-csv") : null;
+  if (!link) return;
+  e.preventDefault();
+  var form = document.getElementById("asset-filter-form");
+  var params = form ? new URLSearchParams(new FormData(form)).toString() : "";
+  window.location.href = link.getAttribute("href") + (params ? "?" + params : "");
 });
 </script>
 
