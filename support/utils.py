@@ -497,6 +497,45 @@ class SupportTicketService:
         ticket.soft_delete()
 
     # ------------------------------------------------------------------
+    # Upload attachments (from detail page)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def upload_attachments(request, ticket_id):
+        """Save files uploaded from the detail page.
+
+        Returns a dict for ``JsonResponse``:
+        ``{"success": True, "html": "...", "count": N}``.
+        Raises ``ValidationError`` when nothing is selected or validation fails.
+        """
+        ticket = get_object_or_404(
+            SupportTicket.undeleted_objects,
+            pk=ticket_id,
+            organization=request.user.organization,
+        )
+
+        files = request.FILES.getlist("attachments")
+        if not files:
+            raise ValidationError("No file selected.")
+
+        SupportTicketService.validate_attachments(files)
+        created = SupportTicketService._save_attachments(
+            ticket, files, request.user
+        )
+
+        html = "".join(
+            render_to_string(
+                "support/includes/doc_card.html", {"att": att}, request=request
+            )
+            for att in created
+        )
+        return {
+            "success": True,
+            "html": html,
+            "count": ticket.attachments.count(),
+        }
+
+    # ------------------------------------------------------------------
     # Delete attachment
     # ------------------------------------------------------------------
 
@@ -693,11 +732,15 @@ class SupportTicketService:
     @staticmethod
     def _save_attachments(ticket, files, user):
         """Persist a list of uploaded files as ``TicketAttachment`` records."""
+        created = []
         for f in files:
-            TicketAttachment.objects.create(
-                ticket=ticket,
-                file=f,
-                file_name=f.name,
-                file_size=f.size,
-                uploaded_by=user,
+            created.append(
+                TicketAttachment.objects.create(
+                    ticket=ticket,
+                    file=f,
+                    file_name=f.name,
+                    file_size=f.size,
+                    uploaded_by=user,
+                )
             )
+        return created

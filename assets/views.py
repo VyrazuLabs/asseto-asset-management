@@ -45,6 +45,7 @@ from .utils import (
     get_audit_images,
     delete_assign_asset,
     search_asset,
+    export_assets_csv_utils,
     add_asset,
     assign_asset_in_form,
     details_of_asset,
@@ -103,6 +104,12 @@ def listed(request):
     assets_qs = filtered_asset(request)
     context = create_asset_list(request, assets_qs)
     return render(request, "assets/list.html", context=context)
+
+
+@login_required
+@user_passes_test(manage_access_for_assets)
+def export_assets_csv(request):
+    return export_assets_csv_utils(request)
 
 
 @login_required

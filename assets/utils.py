@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import random
@@ -253,6 +254,54 @@ def filtered_asset(request):
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
 
     return assets_qs
+
+
+def export_assets_csv_utils(request):
+    today = date.today()
+    assets_qs = filtered_asset(request).select_related(
+        "product",
+        "product__product_type",
+        "vendor",
+        "location",
+        "client",
+        "asset_status",
+    )
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="export-assets-{today}.csv"'
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Asset Tag",
+            "Asset Name",
+            "Product",
+            "Product Type",
+            "Vendor",
+            "Location",
+            "Client",
+            "Status",
+        ]
+    )
+    for asset in assets_qs:
+        product = asset.product
+        writer.writerow(
+            [
+                asset.tag,
+                asset.name,
+                product.name if product else "",
+                product.product_type.name if product and product.product_type else "",
+                asset.vendor.name if asset.vendor else "",
+                asset.location.office_name if asset.location else "",
+                asset.client.name if asset.client else "",
+                "Allocated"
+                if asset.is_assigned
+                else (asset.asset_status.name if asset.asset_status else ""),
+            ]
+        )
+    return response
 
 
 def create_asset_list(request, assets_qs):

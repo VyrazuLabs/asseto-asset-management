@@ -121,7 +121,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.issue_priority }}</div>
-                    <select name="priority" class="form-select">
+                    <select name="priority" class="form-select" data-no-select2>
                         <option value="">{{ trans.all_priorities }}</option>
                         {% for val, label in priority_choices %}
                         <option value="{{ val }}" {% if request.GET.priority == val %}selected{% endif %}>{{ label }}
@@ -131,7 +131,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.ticket_type }}</div>
-                    <select name="ticket_type" class="form-select">
+                    <select name="ticket_type" class="form-select" data-no-select2>
                         <option value="">{{ trans.all_types_filter }}</option>
                         {% for val, label in ticket_type_choices %}
                         <option value="{{ val }}" {% if request.GET.ticket_type == val %}selected{% endif %}>{{ label }}
@@ -139,7 +139,7 @@
                         {% endfor %}
                     </select>
                 </div>
-<div class="col-auto">
+                <div class="col-auto">
                     <a href="{% url 'support:ticket_export' %}" class="btn-export"
                        {% if not perms.support.view_ticket %}style="display:none"{% endif %}>
                         <i class="bi bi-download"></i> {{ trans.export }}
