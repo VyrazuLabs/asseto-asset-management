@@ -108,8 +108,7 @@
         <div class="filter-label">{{ trans.vendors }}</div>
         <div class="dropdown">
           <button class="filter-select-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="vendor-btn" aria-label="Filter by vendor">
-            All Vendors
-           
+            {% if selected_vendor %}{{ selected_vendor.name }}{% else %}{{ trans.all_vendors }}{% endif %}
           </button>
           <ul class="dropdown-menu">
             <li><a href="#" class="dropdown-item" onclick="event.preventDefault(); var form=document.getElementById('asset-filter-form'); form.querySelector('[name=vendor]').value=''; document.getElementById('vendor-btn').childNodes[0].textContent='{{ trans.all_vendors }} '; htmx.trigger(form,'change');">All Vendors</a></li>
@@ -140,6 +139,7 @@
             {% endfor %}
           </ul>
           <input type="hidden" name="product_type" value="{{ request.GET.product_type|default:'' }}">
+          <input type="hidden" name="product" value="{{ request.GET.product|default:'' }}">
         </div>
       </div>
 

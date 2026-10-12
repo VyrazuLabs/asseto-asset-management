@@ -5,6 +5,7 @@ STRINGS = {
     "total_renters": "कुल किराएदार",
     "total_assets_client": "कुल संपत्ति",
     "open_tickets_client": "खुले सहायता टिकट",
+    "view_tickets_client": "के टिकट देखें",
     "search_client": "ग्राहक खोजें",
     "search_client_placeholder": "ग्राहक का नाम या आईडी खोजें...",
     "all_statuses": "सभी स्थितियां",

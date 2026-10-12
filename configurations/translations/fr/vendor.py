@@ -21,6 +21,7 @@ STRINGS = {
     "phone_no": "N° de téléphone",
     "actions": "Actions",
     "asset_count": "Nombre d'actifs",
+    "view_assets_vendor": "Voir les actifs de",
     "no_vendors_found": "Aucun fournisseur trouvé.",
     "vendor_identity": "Identité du fournisseur",
     "vendor_name_label": "NOM DU FOURNISSEUR",

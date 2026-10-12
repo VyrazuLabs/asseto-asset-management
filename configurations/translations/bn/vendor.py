@@ -21,6 +21,7 @@ STRINGS = {
     "phone_no": "ফোন নম্বর",
     "actions": "অ্যাকশন",
     "asset_count": "সম্পদ সংখ্যা",
+    "view_assets_vendor": "অ্যাসেট দেখুন:",
     "no_vendors_found": "কোন ভেন্ডর পাওয়া যায়নি।",
     "add_first_vendor": "আপনার প্রথম ভেন্ডর যোগ করুন",
     "vendor_identity": "ভেন্ডর পরিচয়",

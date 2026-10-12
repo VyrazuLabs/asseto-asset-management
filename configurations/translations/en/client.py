@@ -5,6 +5,7 @@ STRINGS = {
     "total_renters": "Total Renters",
     "total_assets_client": "Total Assets",
     "open_tickets_client": "Open Support Tickets",
+    "view_tickets_client": "View tickets for",
     "search_client": "Search Client",
     "search_client_placeholder": "Search Client Name or ID...",
     "all_statuses": "All Status",
