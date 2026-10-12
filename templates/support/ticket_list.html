@@ -101,6 +101,7 @@
     <div class="filter-card" id="filter-bar-section">
         <form id="ticket-filter-form" hx-get="{% url 'support:ticket_search' '1' %}" hx-target="#tickets-list-section"
             hx-trigger="change delay:200ms from:select">
+            <input type="hidden" name="client" value="{{ request.GET.client|default:'' }}">
             <div class="row g-2 align-items-end">
                 <div class="col">
                     <div class="filter-label">{{ trans.search_label }}</div>
@@ -140,7 +141,7 @@
                     </select>
                 </div>
 <div class="col-auto">
-                    <a href="{% url 'support:ticket_export' %}" class="btn-export"
+                    <a href="{% url 'support:ticket_export' %}{% if request.GET.client %}?client={{ request.GET.client|urlencode }}{% endif %}" class="btn-export"
                        {% if not perms.support.view_ticket %}style="display:none"{% endif %}>
                         <i class="bi bi-download"></i> {{ trans.export }}
                     </a>

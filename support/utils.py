@@ -8,6 +8,7 @@ module as dictated by the project rules (DJANGO_DEVELOPMENT_RULES).
 
 import csv
 import logging
+import uuid
 from itertools import chain
 
 from django.core.paginator import Paginator
@@ -67,9 +68,15 @@ class SupportTicketService:
         return qs.order_by("-created_at")
 
     @staticmethod
-    def stats(user):
-        """Compute stat-card values for the ticket list dashboard."""
+    def stats(user, params=None):
+        """Compute stat-card values for the ticket list dashboard.
+
+        When ``params`` carries a ``client`` value the cards are scoped to
+        that client, matching the filtered listing below them.
+        """
         qs = SupportTicketService.base_queryset(user)
+        if params is not None:
+            qs = SupportTicketService.filter_by_client(qs, params.get("client"))
         return {
             "total_active": qs.exclude(status="4").count(),
             "pending_parts": qs.filter(
@@ -84,8 +91,28 @@ class SupportTicketService:
     # ------------------------------------------------------------------
 
     @staticmethod
+    def filter_by_client(qs, client_id):
+        """Scope *qs* to a single client when ``client_id`` is a valid UUID.
+
+        Tickets belong to a client either directly (``client`` FK) or through
+        their asset — mirrors the client portal listing. Malformed values are
+        ignored so a hand-edited URL never breaks the page.
+        """
+        client_id = (client_id or "").strip()
+        if not client_id:
+            return qs
+        try:
+            uuid.UUID(str(client_id))
+        except (ValueError, TypeError, AttributeError):
+            logger.warning(f"Ignoring invalid client filter value: {client_id}")
+            return qs
+        return qs.filter(
+            Q(client_id=client_id) | Q(asset__client_id=client_id)
+        ).distinct()
+
+    @staticmethod
     def apply_filters(qs, params):
-        """Apply search, status, priority, and ticket_type filters to *qs*.
+        """Apply search, status, priority, ticket_type and client filters to *qs*.
 
         ``params`` is typically ``request.GET``.
         """
@@ -107,6 +134,8 @@ class SupportTicketService:
             qs = qs.filter(priority=priority)
         if ticket_type:
             qs = qs.filter(ticket_type=ticket_type)
+
+        qs = SupportTicketService.filter_by_client(qs, params.get("client"))
 
         return qs.order_by("-created_at")
 
@@ -145,7 +174,7 @@ class SupportTicketService:
             "priority_choices": PRIORITY_CHOICES,
             "ticket_type_choices": TICKET_TYPE_CHOICES,
             "asset_images": SupportTicketService.collect_asset_images(page_object),
-            **SupportTicketService.stats(request.user),
+            **SupportTicketService.stats(request.user, request.GET),
         }
 
     # ------------------------------------------------------------------

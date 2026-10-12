@@ -21,6 +21,7 @@ STRINGS = {
     "phone_no": "फोन नंबर",
     "actions": "कार्रवाई",
     "asset_count": "संपत्ति संख्या",
+    "view_assets_vendor": "संपत्ति देखें:",
     "no_vendors_found": "कोई विक्रेता नहीं मिला।",
     "add_first_vendor": "अपना पहला विक्रेता जोड़ें",
     "vendor_identity": "विक्रेता की पहचान",

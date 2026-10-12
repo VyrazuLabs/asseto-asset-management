@@ -5,6 +5,7 @@ STRINGS = {
     "total_renters": "Total des locataires",
     "total_assets_client": "Total des actifs",
     "open_tickets_client": "Tickets de support ouverts",
+    "view_tickets_client": "Voir les tickets de",
     "search_client": "Rechercher un client",
     "search_client_placeholder": "Rechercher un nom ou un ID de client...",
     "all_statuses": "Tous les statuts",

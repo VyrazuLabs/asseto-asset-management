@@ -5,6 +5,7 @@ STRINGS = {
     "total_renters": "মোট ভাড়াটে",
     "total_assets_client": "মোট সম্পদ",
     "open_tickets_client": "খোলা সাপোর্ট টিকিট",
+    "view_tickets_client": "এর টিকিট দেখুন",
     "search_client": "ক্লায়েন্ট সন্ধান করুন",
     "search_client_placeholder": "ক্লায়েন্টের নাম বা আইডি সন্ধান করুন...",
     "all_statuses": "সমস্ত স্থিতি",

@@ -73,7 +73,14 @@
         </td>
         <td class="text-center">
           {% if client.open_tickets_count %}
-            <span class="count-pill">{{ client.open_tickets_count }}</span>
+            {% if perms.support.view_ticket %}
+              <a href="{% url 'support:ticket_list' %}?client={{ client.id }}"
+                 class="count-pill" title="{{ trans.view_tickets_client }} {{ client.name }}">
+                {{ client.open_tickets_count }}
+              </a>
+            {% else %}
+              <span class="count-pill">{{ client.open_tickets_count }}</span>
+            {% endif %}
           {% else %}
             <span class="count-pill zero">0</span>
           {% endif %}
