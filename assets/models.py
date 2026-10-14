@@ -97,6 +97,21 @@ class Asset(TimeStampModel, SoftDeleteModel):
         verbose_name = "Asset"
         verbose_name_plural = "Assets"
         ordering = ["-created_at"]
+        indexes = [
+            # list pages always scope
+            # by organization and order by -created_at.
+            models.Index(
+                fields=["organization", "created_at"], name="asset_org_created_idx"
+            ),
+            # Client portal list: filter by client, order by -created_at.
+            models.Index(
+                fields=["client", "created_at"], name="asset_client_created_idx"
+            ),
+            # Dashboard/list filters on assignment state per org.
+            models.Index(
+                fields=["organization", "is_assigned"], name="asset_org_assigned_idx"
+            ),
+        ]
 
     def get_status(self):
         return AssetStatusChoice(self.status).label
@@ -114,6 +129,12 @@ class AssetImage(models.Model):
         verbose_name = "Asset Image"
         verbose_name_plural = "Asset Images"
         ordering = ["-uploaded_at"]
+        indexes = [
+            # "newest image per asset" lookups: WHERE asset_id = ? ORDER BY -uploaded_at
+            models.Index(
+                fields=["asset", "uploaded_at"], name="aimg_asset_uploaded_idx"
+            ),
+        ]
 
     def __str__(self):
         if self.image and hasattr(self.image, "url"):
@@ -133,6 +154,12 @@ class AssignAsset(models.Model):
         verbose_name = "Assign Asset"
         verbose_name_plural = "Assign Assets"
         ordering = ["-assigned_date"]
+        indexes = [
+            # "latest assignment for this asset" lookups: WHERE asset_id = ? ORDER BY -assigned_date
+            models.Index(
+                fields=["asset", "assigned_date"], name="aa_asset_assigned_idx"
+            ),
+        ]
 
 class MaintenanceRecord(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

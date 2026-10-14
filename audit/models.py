@@ -34,6 +34,14 @@ class Audit(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     audited_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
+    class Meta:
+        indexes = [
+            # "latest audit for this asset" lookups: WHERE asset_id = ? ORDER BY -created_at
+            models.Index(
+                fields=["asset", "created_at"], name="audit_asset_created_idx"
+            ),
+        ]
+
     def condition_label(self):
         return dict(self.CONDITION_CHOICES).get(self.condition)
 

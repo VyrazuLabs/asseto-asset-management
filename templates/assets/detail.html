@@ -278,12 +278,12 @@
           <div class="section-icon"><i class="bi bi-clipboard-check"></i></div>
           <h2>{{ trans.audit_history }}</h2>
         </div>
-        {% if get_audit_history %}
+        {% if audit_data %}
           <a href="{% url 'audit:get_audits_by_id' asset.id %}" class="detail-view-all">{{ trans.view_all_records }}</a>
         {% endif %}
       </div>
       <div class="detail-card-body p-0">
-        {% if get_audit_history %}
+        {% if audit_data %}
         <table class="detail-audit-table">
           <thead>
             <tr>
@@ -295,12 +295,12 @@
             </tr>
           </thead>
           <tbody>
-            {% for audit in get_audit_history %}
+            {% for audit in audit_data %}
             <tr>
               <td class="table-index-cell">{{ forloop.counter|stringformat:"02d" }}</td>
               <td>
-                {% if audit.audit_image %}
-                  <img src="{{ audit.id|audit_image_url }}" class="audit-thumb" alt="Audit proof">
+                {% if audit.audit_image and audit.audit_image.image %}
+                  <img src="{{ audit.audit_image.image.url }}" class="audit-thumb" alt="Audit proof">
                 {% else %}
                   <div class="audit-thumb-empty"><i class="bi bi-image"></i></div>
                 {% endif %}
