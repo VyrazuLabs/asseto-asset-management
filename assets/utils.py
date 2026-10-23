@@ -206,20 +206,7 @@ def filtered_asset(request):
     if product_type_id:
         filters &= Q(product__product_type_id=product_type_id)
     if client_id:
-        try:
-            client_obj = Client.undeleted_objects.filter(id=client_id).first()
-            if client_obj:
-                same_name_ids = list(
-                    Client.undeleted_objects.filter(
-                        organization=request.user.organization,
-                        name__iexact=client_obj.name,
-                    ).values_list("id", flat=True)
-                )
-                filters &= Q(client_id__in=same_name_ids)
-            else:
-                filters &= Q(client_id=client_id)
-        except Exception:
-            filters &= Q(client_id=client_id)
+        filters &= Q(client_id=client_id)
     if location_id:
         filters &= Q(location_id=location_id)
 
@@ -261,26 +248,31 @@ def filtered_asset(request):
     return assets_qs
 
 
-def create_asset_list(request, assets_qs):
-    org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    visible_asset_ids = list(
-        Asset.undeleted_objects.filter(org_filter).values_list("id", flat=True)
-    )
+def _build_audit_conditions(org_filter):
+    """Return (asset_conditions_map, list_of_audited_assets) using a DB subquery."""
+    visible_asset_subquery = Asset.undeleted_objects.filter(org_filter).values("id")
     audits_for_org = (
-        Audit.objects.filter(asset_id__in=visible_asset_ids)
+        Audit.objects.filter(asset_id__in=visible_asset_subquery)
         .values("asset_id", "condition")
     )
     asset_conditions_map = defaultdict(list)
-    audited_asset_ids = set()
     for row in audits_for_org:
         asset_conditions_map[row["asset_id"]].append(row["condition"])
-        audited_asset_ids.add(row["asset_id"])
 
-    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
+    audited_asset_subquery = audits_for_org.values("asset_id")
+    list_of_audited_assets = Asset.undeleted_objects.filter(
+        id__in=audited_asset_subquery
+    )
+    return asset_conditions_map, list_of_audited_assets
+
+
+def create_asset_list(request, assets_qs):
+    org_filter = Q(organization=None) | Q(organization=request.user.organization)
+    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
     product_category_list = ProductCategory.undeleted_objects.filter(org_filter)
     department_list = Department.undeleted_objects.filter(org_filter)
     location_list = Location.undeleted_objects.filter(org_filter)
-    user_list = User.objects.filter(org_filter, is_active=True).order_by("-created_at")
+    user_list = User.objects.filter(org_filter, is_active=True).select_related("department", "location").order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
@@ -681,20 +673,7 @@ def add_asset(request, form):
 
 def search_asset(request):
     org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    visible_asset_ids = list(
-        Asset.undeleted_objects.filter(org_filter).values_list("id", flat=True)
-    )
-    audits_for_org = (
-        Audit.objects.filter(asset_id__in=visible_asset_ids)
-        .values("asset_id", "condition")
-    )
-    asset_conditions_map = defaultdict(list)
-    audited_asset_ids = set()
-    for row in audits_for_org:
-        asset_conditions_map[row["asset_id"]].append(row["condition"])
-        audited_asset_ids.add(row["asset_id"])
-
-    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
+    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
     context = search_with_filters(request, list_of_audited_assets, asset_conditions_map)
     return context
 
@@ -746,20 +725,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(product__product_type_id=product_type_id)
 
     if client_id:
-        try:
-            client_obj = Client.undeleted_objects.filter(id=client_id).first()
-            if client_obj:
-                same_name_ids = list(
-                    Client.undeleted_objects.filter(
-                        organization=request.user.organization,
-                        name__iexact=client_obj.name,
-                    ).values_list("id", flat=True)
-                )
-                q &= Q(client_id__in=same_name_ids)
-            else:
-                q &= Q(client_id=client_id)
-        except Exception:
-            q &= Q(client_id=client_id)
+        q &= Q(client_id=client_id)
     if location_id:
         q &= Q(location_id=location_id)
     if is_assigned == "true":

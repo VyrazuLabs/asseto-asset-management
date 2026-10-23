@@ -7,7 +7,7 @@
   </td>
   <td>
     <div class="d-flex gap-3 align-items-center">
-      {% with item.asset.images.first as img %}
+      {% with item.asset.images.all.0 as img %}
       <img src="{% if img %}{{ img.image.url }}{% else %}{% static 'images/No_Image.jpg' %}{% endif %}"
         alt="{{ item.asset.name }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px;"
         onerror="this.onerror=null;this.src='{% static 'images/No_Image.jpg' %}';">

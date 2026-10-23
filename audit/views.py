@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -197,7 +198,10 @@ def get_audits_by_id(request, id):
 @login_required
 @permission_required("audit.view_audit", raise_exception=True)
 def audit_list(request):
-    audits = Audit.objects.filter(organization=request.user.organization)
+    audits = Audit.objects.filter(
+        Q(organization=request.user.organization)
+        | Q(organization__isnull=True, asset__organization=request.user.organization)
+    )
     return render(request, "audit/audit_list.html", context={"audits": audits})
 
 
@@ -205,7 +209,9 @@ def audit_list(request):
 @permission_required("audit.view_audit", raise_exception=True)
 def asset_audit_history(request, id):
     audit_list = Audit.objects.filter(
-        asset__id=id, organization=request.user.organization
+        Q(organization=request.user.organization)
+        | Q(organization__isnull=True, asset__organization=request.user.organization),
+        asset__id=id,
     ).order_by("-created_at")
     paginator = Paginator(audit_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get("page")

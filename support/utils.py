@@ -13,13 +13,13 @@ from itertools import chain
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Q, F, OuterRef, Subquery
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.timezone import now
 
-from assets.models import Asset, AssetImage
+from assets.models import Asset
 from authentication.models import User
 
 from .models import (
@@ -117,16 +117,10 @@ class SupportTicketService:
     @staticmethod
     def collect_asset_images(page_object):
         """Map asset IDs to their newest image, decided in SQL (one query)."""
+        from assets.utils import first_image_map
+
         asset_ids = [t.asset_id for t in page_object if t.asset_id]
-        if not asset_ids:
-            return {}
-        newest = AssetImage.objects.filter(asset_id=OuterRef("asset_id")).order_by(
-            "-uploaded_at"
-        )
-        rows = AssetImage.objects.filter(asset_id__in=asset_ids).annotate(
-            newest_pk=Subquery(newest.values("pk")[:1])
-        ).filter(pk=F("newest_pk"))
-        return {img.asset_id: img for img in rows}
+        return first_image_map(asset_ids)
 
     # ------------------------------------------------------------------
     # List
