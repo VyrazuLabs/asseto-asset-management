@@ -1,5 +1,6 @@
 from authentication.models import User
 from assets.models import AssetImage, AssignAsset
+from collections import Counter
 from django.core.paginator import Paginator
 from configurations.utils import dynamic_display_name
 from authentication.models import User, UserTotp
@@ -20,7 +21,11 @@ def get_user_detail_utils(request, id):
     user = get_object_or_404(
         User.undeleted_objects, pk=id, organization=request.user.organization
     )
-    assigned_assets = AssignAsset.objects.filter(user=user)
+    assigned_assets = (
+        AssignAsset.objects.filter(user=user)
+        .select_related("asset")
+        .prefetch_related("asset__images")
+    )
     # Filter history specifically for this user
     history_list = user.history.all().order_by("-history_date")
     history_paginator = Paginator(history_list, 5, orphans=1)
@@ -234,14 +239,24 @@ def get_all_assigned_license(request, assigned_licenses):
 
 def user_data(request, user_list):
     current_host = request.get_host()
+    # Join department/location/role once instead of loading them per user, and
+    # count assignments with a single grouped query instead of one COUNT per user.
+    if hasattr(user_list, "select_related"):
+        user_list = user_list.select_related("department", "location", "role")
+    users = list(user_list)
+    asset_counts = Counter(
+        AssignAsset.objects.filter(user_id__in=[u.id for u in users]).values_list(
+            "user_id", flat=True
+        )
+    )
     user_data_list = []
-    for user in user_list:
+    for user in users:
         user_data_list.append(
             {
                 "id": user.id,
-                "department_id": user.department.id if user.department else None,
-                "location_id": user.location.id if user.location else None,
-                "role_id": str(user.role.id) if user.role else None,
+                "department_id": user.department_id if user.department_id else None,
+                "location_id": user.location_id if user.location_id else None,
+                "role_id": str(user.role_id) if user.role_id else None,
                 "full_name": (
                     dynamic_display_name(request, fullname=user.full_name)
                     if user.full_name
@@ -256,7 +271,7 @@ def user_data(request, user_list):
                     if user.profile_pic
                     else None
                 ),
-                "asset_count": AssignAsset.objects.filter(user=user.id).count(),
+                "asset_count": asset_counts.get(user.id, 0),
                 "department": user.department.name if user.department else None,
                 "location": user.location.office_name if user.location else None,
             }

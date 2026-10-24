@@ -116,12 +116,11 @@ class SupportTicketService:
 
     @staticmethod
     def collect_asset_images(page_object):
-        """Build a dict mapping asset IDs to their first image."""
-        asset_images = {}
-        for ticket in page_object:
-            if ticket.asset:
-                asset_images[ticket.asset.id] = ticket.asset.images.first()
-        return asset_images
+        """Map asset IDs to their newest image, decided in SQL (one query)."""
+        from assets.utils import first_image_map
+
+        asset_ids = [t.asset_id for t in page_object if t.asset_id]
+        return first_image_map(asset_ids)
 
     # ------------------------------------------------------------------
     # List

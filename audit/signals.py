@@ -34,7 +34,10 @@ def audit_created_notification(sender, instance, created, **kwargs):
 
     # Notify Assigned Asset User (if exists)
     assign_record = (
-        AssignAsset.objects.filter(asset=asset).order_by("-assigned_date").first()
+        AssignAsset.objects.filter(asset=asset)
+        .select_related("user")
+        .order_by("-assigned_date")
+        .first()
     )
 
     if assign_record and assign_record.user:

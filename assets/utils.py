@@ -22,7 +22,7 @@ from dateutil.relativedelta import relativedelta
 import requests
 from collections import defaultdict
 from django.db import transaction
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, F, OuterRef, Subquery
 from notifications.utils import notifications_call
 from assets.barcode import generate_barcode
 from .models import AssetSpecification
@@ -139,15 +139,8 @@ def get_asset_filter_data(request):
         is_active=True, organization=request.user.organization
     )
     asset_ids_in_page = [asset.id for asset in page_object]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by(
-        "-uploaded_at"
-    )
-
-    # Map asset ID to its first image
-    asset_images = {}
-    for img in images_qs:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
+    # Newest image per asset, decided in SQL instead of reducing all rows in Python
+    asset_images = first_image_map(asset_ids_in_page)
     return {
         "product_category_list": product_category_list,
         "department_list": department_list,
@@ -223,7 +216,7 @@ def filtered_asset(request):
     elif is_assigned == 'false':
         filters &= Q(is_assigned=False)
 
-    assets_qs = Asset.undeleted_objects.filter(filters).select_related('location', 'product__product_type').order_by("-created_at")
+    assets_qs = Asset.undeleted_objects.filter(filters).select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status').order_by("-created_at")
 
     # Scoped to assets currently assigned to the requesting user unless
     # they hold "assets.all_asset" (superusers always pass via Django's
@@ -255,35 +248,62 @@ def filtered_asset(request):
     return assets_qs
 
 
-def create_asset_list(request, assets_qs):
-    list_of_audits = Audit.objects.select_related("asset").filter(asset__isnull=False)
-    list_of_assigned_audits = [audit.asset_id for audit in list_of_audits]
-    list_of_audited_assets = Asset.objects.filter(id__in=list_of_assigned_audits)
+def _build_audit_conditions(org_filter):
+    """Return (asset_conditions_map, list_of_audited_assets) using a DB subquery."""
+    visible_asset_subquery = Asset.undeleted_objects.filter(org_filter).values("id")
+    audits_for_org = (
+        Audit.objects.filter(asset_id__in=visible_asset_subquery)
+        .values("asset_id", "condition")
+    )
     asset_conditions_map = defaultdict(list)
-    for audit in list_of_audits:
-        asset_conditions_map[audit.asset_id].append(audit.condition)
+    for row in audits_for_org:
+        asset_conditions_map[row["asset_id"]].append(row["condition"])
+
+    audited_asset_subquery = audits_for_org.values("asset_id")
+    list_of_audited_assets = Asset.undeleted_objects.filter(
+        id__in=audited_asset_subquery
+    )
+    return asset_conditions_map, list_of_audited_assets
+
+
+def create_asset_list(request, assets_qs):
     org_filter = Q(organization=None) | Q(organization=request.user.organization)
+    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
     product_category_list = ProductCategory.undeleted_objects.filter(org_filter)
     department_list = Department.undeleted_objects.filter(org_filter)
     location_list = Location.undeleted_objects.filter(org_filter)
-    user_list = User.objects.filter(org_filter, is_active=True).order_by("-created_at")
+    user_list = User.objects.filter(org_filter, is_active=True).select_related("department", "location").order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
-    client_list = Client.undeleted_objects.filter(organization=request.user.organization).order_by("-created_at")
+    raw_client_list = Client.undeleted_objects.filter(
+        organization=request.user.organization
+    ).order_by("-created_at")
+    seen_client_names = set()
+    client_list = []
+    for c in raw_client_list:
+        clean_name = (c.name or "").strip().lower()
+        if clean_name not in seen_client_names:
+            seen_client_names.add(clean_name)
+            client_list.append(c)
     asset_list = Asset.undeleted_objects.filter(org_filter).select_related('location', 'product__product_type').order_by("-created_at")
     if not request.user.has_perm("assets.all_asset"):
         asset_list = asset_list.filter(assignasset__user=request.user).distinct()
     deleted_asset_count = Asset.deleted_objects.filter(
         organization=request.user.organization
     ).count()
+    paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
+    page_number = request.GET.get("page")
+    page_object = paginator.get_page(page_number)
+    # Only the rows actually rendered on this page need an assigned-user map or
+    # a thumbnail, so both queries are scoped to these ids — they stay
+    # page-sized instead of loading every assignment in the organisation.
+    asset_ids_in_page = [asset.id for asset in page_object]
+
     get_assigned_asset_list = (
         AssignAsset.objects.select_related("user")
-        .filter(
-            Q(asset__in=asset_list) & Q(asset__organization=None)
-            | Q(asset__organization=request.user.organization)
-        )
+        .filter(asset_id__in=asset_ids_in_page)
         .order_by("-assigned_date")
     )
     asset_user_map = {}
@@ -299,36 +319,25 @@ def create_asset_list(request, assets_qs):
                 }
             else:
                 asset_user_map[assign.asset_id] = None
-    paginator = Paginator(assets_qs, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get("page")
-    page_object = paginator.get_page(page_number)
     asset_form = AssetForm(organization=request.user.organization)
     assign_asset_form = AssignedAssetForm(organization=request.user.organization)
     reassign_asset_form = ReassignedAssetForm(organization=request.user.organization)
     active_users = User.objects.filter(
         is_active=True, organization=request.user.organization
     )
-    # Gather the first image per asset in the current page
-    asset_ids_in_page = [asset.id for asset in page_object]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids_in_page).order_by(
-        "-uploaded_at"
+    # Newest image per asset, decided in SQL instead of reducing all rows in Python
+    asset_images = first_image_map(asset_ids_in_page)
+    is_demo = bool(os.environ.get("IS_DEMO"))
+    # Stats for summary cards – scoped like the list. One aggregate pass
+    # replaces the three separate count/aggregate queries that used to run here.
+    stats = asset_list.aggregate(
+        total=Sum("price"),
+        active_count=Count("id"),
+        assigned_count=Count("id", filter=Q(is_assigned=True)),
     )
-    is_demo = os.environ.get("IS_DEMO")
-    if is_demo:
-        is_demo = True
-    else:
-        is_demo = False
-    # Map asset ID to its first image
-    asset_images = {}
-    for img in images_qs:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
-    # Stats for summary cards – scoped like the list
-    total_value = (
-        asset_list.aggregate(total=Sum("price"))["total"] or 0
-    )
-    active_count = asset_list.count()
-    assigned_count = asset_list.filter(is_assigned=True).count()
+    total_value = stats["total"] or 0
+    active_count = stats["active_count"]
+    assigned_count = stats["assigned_count"]
 
     context = {
         "product_category_list": product_category_list,
@@ -338,7 +347,7 @@ def create_asset_list(request, assets_qs):
         "product_type_list": product_type_list,
         "product_list": product_list,
         "client_list": client_list,
-        "has_clients": client_list.exists(),
+        "has_clients": bool(client_list),
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
@@ -441,32 +450,62 @@ def get_asset_images(asset):
     return images
 
 
+def first_image_map(asset_ids):
+    """Map asset.id -> newest AssetImage, decided in SQL (one query)."""
+    asset_ids = list(asset_ids)
+    if not asset_ids:
+        return {}
+    newest = AssetImage.objects.filter(asset_id=OuterRef("asset_id")).order_by(
+        "-uploaded_at"
+    )
+    rows = AssetImage.objects.filter(asset_id__in=asset_ids).annotate(
+        newest_pk=Subquery(newest.values("pk")[:1])
+    ).filter(pk=F("newest_pk"))
+    return {img.asset_id: img for img in rows}
+
+
 def details_of_asset(request, id):
-    get_audit_history = Audit.objects.filter(asset_id=id)
-    get_audit_image = get_audit_images(id)
-    asset = Asset.objects.filter(pk=id, organization=request.user.organization).first()
-    assigned_asset = AssignAsset.objects.filter(asset=asset).first()
+    get_audit_history = Audit.objects.filter(asset_id=id).select_related("asset").prefetch_related(
+        Prefetch(
+            "images",
+            queryset=AuditImage.objects.order_by("-uploaded_at"),
+            to_attr="prefetched_images",
+        )
+    )
+    asset = get_object_or_404(
+        Asset.objects
+        .select_related("product__product_type", "vendor", "location", "asset_status", "client", "organization"),
+        pk=id,
+        organization=request.user.organization,
+    )
+    assigned_asset = AssignAsset.objects.select_related("user").filter(asset=asset).first()
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     get_asset_img = get_asset_images(asset)
     asset_barcode = generate_barcode(asset.tag)
     maintenance_records = MaintenanceRecord.objects.filter(asset=asset).order_by('-created_at')
     maintenance_form = MaintenanceRecordForm(organization=request.user.organization)
-    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form)
+    context=asset_details(request,get_audit_history,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form)
     return context
 
-def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None):
+def asset_details(request,get_audit_history,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None):
     audit_data = []
     if get_audit_history:
         for audit in get_audit_history:
+            if hasattr(audit, "prefetched_images"):
+                audit_image = audit.prefetched_images[0] if audit.prefetched_images else None
+            else:
+                audit_image = (
+                    AuditImage.objects.filter(audit=audit)
+                    .order_by("-uploaded_at")
+                    .first()
+                )
             data = {
                 "id": audit.id,
                 "asset_name": audit.asset.name,
                 "condition_label": audit.condition_label,
                 "notes": audit.notes,
                 "created_at": audit.created_at,
-                "audit_image": AuditImage.objects.filter(audit=audit)
-                .order_by("-uploaded_at")
-                .first(),
+                "audit_image": audit_image,
             }
             audit_data.append(data)
 
@@ -474,10 +513,6 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
         assigned_user = assigned_asset.user.full_name
     else:
         assigned_user = None
-
-    if asset is None:
-        assetSpecifications = AssignAsset.objects.filter(id=id).first()
-        asset = assetSpecifications.asset
 
     img_array = []
 
@@ -490,7 +525,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
     else:
         eol_date = None
     arr_size = len(img_array)
-    history_list = asset.history.all()
+    history_list = asset.history.all().order_by("-history_date", "-history_id")
     paginator = Paginator(history_list, 5, orphans=1)
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
@@ -501,11 +536,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
     obj = get_currency_and_datetime_format(organization)
     get_currency = obj["currency"]
     get_date_format = obj["date_format"]
-    is_demo = True
-    if is_demo:
-        is_demo = True
-    else:
-        is_demo = False
+    is_demo = bool(os.environ.get("IS_DEMO"))
     if get_date_format:
         asset.warranty_expiry_date = (
             format_datetime(x=asset.warranty_expiry_date, output_format=get_date_format)
@@ -563,43 +594,60 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
 
     maintenance_history_entries = []
     if maintenance_records:
-        for record in maintenance_records:
+        records = list(maintenance_records)
+
+        # Load every record's audit trail in ONE query instead of one query per
+        # record (the historical rows are keyed by the original `id`).
+        history_map = None
+        records_with_trail = [r for r in records if r.updated_by]
+        if records_with_trail:
+            try:
+                trail_model = MaintenanceRecord.history.model
+                history_map = defaultdict(list)
+                for h in trail_model.objects.filter(
+                    id__in=[r.id for r in records_with_trail]
+                ).order_by("history_date", "history_id"):
+                    history_map[h.id].append(h)
+            except Exception:
+                history_map = None
+
+        for record in records:
             maintenance_history_entries.append({
                 'type': 'created',
                 'timestamp': record.created_at,
                 'user_id': record.created_by,
                 'details': maintenance_type_labels.get(record.maintenance_type, record.maintenance_type),
             })
-            if record.updated_by:
-                try:
-                    history = list(record.history.all().order_by('history_date'))
-                    prev = None
-                    for h in history:
-                        if h.history_type == '~' and prev:
-                            changes = []
-                            if h.technician != prev.technician:
-                                changes.append('Technician')
-                            if h.status != prev.status:
-                                changes.append('Status')
-                            if changes:
-                                maintenance_history_entries.append({
-                                    'type': 'updated',
-                                    'timestamp': h.history_date,
-                                    'user_id': h.updated_by,
-                                    'details': ', '.join(changes),
-                                })
-                        prev = h
-                except Exception:
-                    maintenance_history_entries.append({
-                        'type': 'updated',
-                        'timestamp': record.updated_at,
-                        'user_id': record.updated_by,
-                        'details': 'Maintenance',
-                    })
+            if not record.updated_by:
+                continue
+            if history_map is None:
+                maintenance_history_entries.append({
+                    'type': 'updated',
+                    'timestamp': record.updated_at,
+                    'user_id': record.updated_by,
+                    'details': 'Maintenance',
+                })
+                continue
+            prev = None
+            for h in history_map.get(record.id, ()):
+                if h.history_type == '~' and prev:
+                    changes = []
+                    if h.technician != prev.technician:
+                        changes.append('Technician')
+                    if h.status != prev.status:
+                        changes.append('Status')
+                    if changes:
+                        maintenance_history_entries.append({
+                            'type': 'updated',
+                            'timestamp': h.history_date,
+                            'user_id': h.updated_by,
+                            'details': ', '.join(changes),
+                        })
+                prev = h
 
     context = {'title': 'Asset Details', 'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
                'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries,
-               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'cf_values_formatted': cf_values_formatted, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date}
+               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'cf_values_formatted': cf_values_formatted, 'get_asset_img': get_asset_img, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date, 'is_demo': is_demo}
 
     return context
 
@@ -624,12 +672,8 @@ def add_asset(request, form):
 
 
 def search_asset(request):
-    list_of_audits = Audit.objects.select_related("asset").filter(asset__isnull=False)
-    list_of_assigned_audits = [audit.asset_id for audit in list_of_audits]
-    list_of_audited_assets = Asset.objects.filter(id__in=list_of_assigned_audits)
-    asset_conditions_map = defaultdict(list)
-    for audit in list_of_audits:
-        asset_conditions_map[audit.asset_id].append(audit.condition)
+    org_filter = Q(organization=None) | Q(organization=request.user.organization)
+    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
     context = search_with_filters(request, list_of_audited_assets, asset_conditions_map)
     return context
 
@@ -701,7 +745,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         )
         search_qs = (
             Asset.undeleted_objects.filter(q, assignasset__user_id=user_id)
-            .select_related('location', 'product__product_type')
+            .select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status')
             .prefetch_related(
                 Prefetch("assignasset_set", queryset=assigned_qs, to_attr="assignments")
             )
@@ -710,9 +754,9 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     elif department_id:
         search_qs = Asset.undeleted_objects.filter(
             q, assignasset__user__department_id=department_id
-        ).select_related('location', 'product__product_type').order_by("-created_at")
+        ).select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status').order_by("-created_at")
     else:
-        search_qs = Asset.undeleted_objects.filter(q).select_related('location', 'product__product_type').order_by("-created_at")
+        search_qs = Asset.undeleted_objects.filter(q).select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status').order_by("-created_at")
 
     # If any search/filter is active, skip the small per-page cap so matches
     # aren't hidden behind pages, but still bound the result set — an
@@ -730,15 +774,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     page_object = paginator.get_page(page_number)
 
     asset_ids = [asset.id for asset in page_object]
-    image_object = AssetImage.objects.filter(
-        asset__organization=request.user.organization, asset_id__in=asset_ids
-    ).order_by("-uploaded_at")
-
-    asset_images = {}
-    for img in image_object:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
-
+    asset_images = first_image_map(asset_ids)
     asset_user_map = {}
     get_assigned_asset_list = (
         AssignAsset.objects.select_related("user")
@@ -786,25 +822,15 @@ def autogenerated_tag(request, form):
 
 
 def create_char_data(data):
-    assigned = 0
-    unassigned = 0
-    for asset in data:
-        if asset.is_assigned:
-            assigned += 1
-        else:
-            unassigned += 1
-    if data is None:
-        chart_data = [
-            ["Status", "Assets"],
-            ["Assigned", 0],
-            ["Unassigned", 0],
-        ]
-    chart_data = [
+    if not data:
+        return [["Status", "Assets"], ["Assigned", 0], ["Unassigned", 0]]
+    assigned = sum(1 for asset in data if asset.is_assigned)
+    unassigned = sum(1 for asset in data if not asset.is_assigned)
+    return [
         ["Status", "Assets"],
         ["Assigned", assigned],
         ["Unassigned", unassigned],
     ]
-    return chart_data
 
 
 def delete_asset_images(request, asset):
@@ -851,12 +877,6 @@ def save_new_images(request, asset):
 #         return HttpResponse("Notification sent!", status=200)
 #     else:
 #         return HttpResponse("Failed to send notification", status=500)
-
-
-def redirect_from_slack_url(request, obj_id):
-    endpoint = f"/assets/details/{obj_id}"
-    url = request.build_absolute_uri(endpoint)
-    return url
 
 
 def set_slack_webhook(organization, admin, url):
@@ -1036,10 +1056,15 @@ def get_asset_status_list_utils(request, page_number=None):
         Q(organization=None) | Q(organization=request.user.organization)
     )
 
-    # STATS
-    total_statuses = base_query.count()
-    active_statuses = base_query.filter(status=True).count()
-    inactive_statuses = base_query.filter(status=False).count()
+    # STATS — single scan for total/active/inactive (deleted uses another queryset)
+    status_counts = base_query.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_statuses = status_counts["total"]
+    active_statuses = status_counts["active"]
+    inactive_statuses = status_counts["inactive"]
     deleted_statuses_count = AssetStatus.deleted_objects.filter(
         Q(organization=None, can_modify=True)
         | Q(organization=request.user.organization, can_modify=True)

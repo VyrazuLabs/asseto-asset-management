@@ -37,7 +37,7 @@ def export_clients_csv_utils(request):
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
             .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False), distinct=True),
                 open_tickets_count=Count(
                     'assets__tickets',
                     filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
@@ -106,7 +106,7 @@ def export_clients_pdf_utils(request):
         client_queryset = (
             Client.undeleted_objects.filter(organization=request.user.organization)
             .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False), distinct=True),
                 open_tickets_count=Count(
                     'assets__tickets',
                     filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
@@ -155,7 +155,7 @@ class ClientService:
         return (
             Client.undeleted_objects.filter(organization=user.organization)
             .annotate(
-                asset_count=Count('assets', filter=Q(assets__is_deleted=False)),
+                asset_count=Count('assets', filter=Q(assets__is_deleted=False), distinct=True),
                 open_tickets_count=Count(
                     'assets__tickets',
                     filter=Q(assets__tickets__is_deleted=False) & ~Q(assets__tickets__status__in=['3', '4']),
