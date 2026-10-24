@@ -122,6 +122,13 @@
             <div class="text-danger small mt-1">{{ form.min_qty.errors.0 }}</div>
             {% endif %}
           </div>
+          <div class="form-group consumable-serialized-toggle">
+            <div class="form-check">
+              {{ form.is_serialized }}
+              <label class="form-check-label" for="{{ form.is_serialized.id_for_label }}">{{ trans.consumable_form_serialized }}</label>
+            </div>
+            <div class="text-muted small mt-1">{% if form.is_serialized.field.disabled %}{{ trans.consumable_form_serialized_locked }}{% else %}{{ trans.consumable_form_serialized_help }}{% endif %}</div>
+          </div>
         </div>
       </div>
 

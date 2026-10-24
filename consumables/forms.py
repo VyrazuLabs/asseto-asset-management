@@ -1,5 +1,5 @@
 from django import forms
-from .models import Consumable
+from .models import Consumable, ConsumableUnit
 from products.models import Product
 from vendors.models import Vendor
 from dashboard.models import Location
@@ -85,6 +85,10 @@ class ConsumableForm(forms.ModelForm):
         required=False,
         widget=forms.FileInput(attrs={"class": "form-control", "id": "id_image"}),
     )
+    is_serialized = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
     documents = MultipleFileField(required=False, label="Upload Documents")
 
     def __init__(self, *args, **kwargs):
@@ -102,6 +106,10 @@ class ConsumableForm(forms.ModelForm):
             org_filter
         ).order_by("office_name")
 
+        # Mode is locked once stock has moved: qty checkouts can't be mapped onto units.
+        if self.instance.pk and self.instance.checkouts.exists():
+            self.fields["is_serialized"].disabled = True
+
     class Meta:
         model = Consumable
         fields = [
@@ -115,6 +123,7 @@ class ConsumableForm(forms.ModelForm):
             "purchase_cost",
             "quantity",
             "min_qty",
+            "is_serialized",
             "notes",
             "image",
         ]
@@ -130,5 +139,14 @@ class ConsumableForm(forms.ModelForm):
             if quantity < total_checked_out:
                 raise forms.ValidationError(
                     f"Cannot set quantity below already checked-out quantity ({total_checked_out})."
+                )
+        if self.instance.pk and self.instance.is_serialized and quantity is not None:
+            owned = self.instance.units.exclude(
+                status__in=ConsumableUnit.RETIRED_STATUSES
+            ).count()
+            if quantity < owned:
+                raise forms.ValidationError(
+                    f"Serialized quantity cannot be lowered below {owned}. "
+                    "Mark individual units as lost or disposed instead."
                 )
         return quantity

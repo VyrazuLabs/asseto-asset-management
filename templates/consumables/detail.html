@@ -21,10 +21,10 @@
         <ol class="breadcrumb page-breadcrumb">
           <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.consumable_breadcrumb_dashboard }}</a></li>
           <li class="breadcrumb-item"><a href="{% url 'consumables:list' %}" class="breadcrumb-link">{{ trans.consumable_breadcrumb_list }}</a></li>
-          <li class="breadcrumb-item active">{{ consumable }}</li>
+          <li class="breadcrumb-item active">{% if consumable.consumable_id %}#{{ consumable.consumable_id }} - {% endif %}{{ consumable }}</li>
         </ol>
       </nav>
-      <h1>{{ consumable }}</h1>
+      <h1>{% if consumable.consumable_id %}#{{ consumable.consumable_id }} - {% endif %}{{ consumable }}</h1>
       <p class="page-subtitle">{{ trans.consumable_detail_subtitle }}</p>
     </div>
     <div class="d-flex align-items-center gap-2">
@@ -32,6 +32,18 @@
         <i class="bi bi-arrow-left"></i> {{ trans.consumable_btn_back }}
       </a>
       {% if perms.consumables.edit_consumable %}
+      {% with rem_qty=consumable.remaining_quantity|default_if_none:consumable.quantity|default:"0" %}
+      {% if rem_qty != "0" %}
+      <button type="button" class="btn-update"
+              onclick="openCheckoutModal('{{ consumable.pk }}', '{{ consumable.consumable_name|escapejs }}', '{{ consumable.product.name|escapejs|default:"-" }}', '{{ consumable.quantity|default:"0" }}', '{{ rem_qty }}', {{ consumable.is_serialized|yesno:'true,false' }})">
+        <i class="bi bi-box-arrow-right"></i> {{ trans.consumable_action_checkout }}
+      </button>
+      {% else %}
+      <button type="button" class="btn-update consumable-action-btn-disabled" title="{{ trans.consumable_checkout_disabled }}" disabled>
+        <i class="bi bi-box-arrow-right"></i> {{ trans.consumable_action_checkout }}
+      </button>
+      {% endif %}
+      {% endwith %}
       <a href="{% url 'consumables:edit' consumable.pk %}" class="btn-update">
         <i class="bi bi-pencil"></i> {{ trans.consumable_btn_update }} {{ trans.consumable_heading|truncatechars:20 }}
       </a>
@@ -118,6 +130,7 @@
                     <th>{{ trans.consumable_col_hash }}</th>
                     <th>{{ trans.consumable_detail_checkout_user }}</th>
                     <th>{{ trans.consumable_detail_checkout_qty }}</th>
+                    {% if consumable.is_serialized %}<th>{{ trans.consumable_detail_checkout_units }}</th>{% endif %}
                     <th>{{ trans.consumable_detail_checkout_cost }}</th>
                     <th>{{ trans.consumable_detail_checkout_date }}</th>
                     <th>{{ trans.consumable_detail_checkout_notes }}</th>
@@ -150,6 +163,7 @@
                       </div>
                     </td>
                     <td>{{ checkout.quantity }}</td>
+                    {% if consumable.is_serialized %}<td>{% for u in checkout.units.all %}{{ u.sub_id }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}</td>{% endif %}
                     <td>{% if checkout.total_amount %}₹{{ checkout.total_amount|floatformat:2 }}{% else %}-{% endif %}</td>
                     <td>{{ checkout.created_at|date:"d M Y, h:i A" }}</td>
                     <td>{{ checkout.notes|default:"-" }}</td>
@@ -170,6 +184,69 @@
           {% endif %}
         </div>
       </div>
+
+      {% if consumable.is_serialized %}
+      {# ── Units ── #}
+      <div class="detail-card mt-4">
+        <div class="detail-card-header">
+          <div class="d-flex align-items-center justify-content-between w-100">
+            <div class="d-flex align-items-center gap-2">
+              <div class="section-icon"><i class="bi bi-upc-scan"></i></div>
+              <h2>{{ trans.consumable_detail_units }}</h2>
+            </div>
+            {% if perms.consumables.edit_consumable %}
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bulkSerialsModal">
+              <i class="bi bi-tags"></i> {{ trans.consumable_units_bulk_btn }}
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="detail-card-body p-0">
+          <div class="table-responsive">
+            <table class="list-table" id="unitsTable">
+              <thead>
+                <tr>
+                  <th>{{ trans.consumable_col_unit_id }}</th>
+                  <th>{{ trans.consumable_col_serial }}</th>
+                  <th>{{ trans.consumable_col_status }}</th>
+                  <th>{{ trans.consumable_col_holder }}</th>
+                  {% if perms.consumables.edit_consumable %}<th>{{ trans.consumable_col_actions }}</th>{% endif %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for unit in units %}
+                <tr>
+                  <td class="table-index-cell">{{ unit.sub_id }}</td>
+                  <td>
+                    {% if perms.consumables.edit_consumable %}
+                    <form action="{% url 'consumables:update_unit' unit.pk %}" method="post" class="d-flex gap-2">
+                      {% csrf_token %}
+                      <input type="text" name="serial_no" value="{{ unit.serial_no|default:'' }}" class="form-control form-control-sm" maxlength="255">
+                      <button type="submit" class="btn btn-sm btn-outline-primary">{{ trans.consumable_unit_save }}</button>
+                    </form>
+                    {% else %}{{ unit.serial_no|default:"-" }}{% endif %}
+                  </td>
+                  <td>{{ unit.get_status_display }}</td>
+                  <td>{% if unit.checkout %}{{ unit.checkout.user.get_full_name|default:unit.checkout.user.username }}{% else %}-{% endif %}</td>
+                  {% if perms.consumables.edit_consumable %}
+                  <td>
+                    {% if unit.status == "in_stock" %}
+                    <form action="{% url 'consumables:update_unit' unit.pk %}" method="post" class="d-flex gap-2" onsubmit="return confirm('{{ trans.consumable_unit_confirm_retire|escapejs }}')">
+                      {% csrf_token %}
+                      <button type="submit" name="retire" value="lost" class="btn btn-sm btn-outline-warning">{{ trans.consumable_unit_mark_lost }}</button>
+                      <button type="submit" name="retire" value="disposed" class="btn btn-sm btn-outline-danger">{{ trans.consumable_unit_mark_disposed }}</button>
+                    </form>
+                    {% else %}-{% endif %}
+                  </td>
+                  {% endif %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       {# ── Documents ── #}
       <div class="detail-card mt-4">
@@ -293,4 +370,32 @@
     </div>
   </div>
 </div>
+
+{% if consumable.is_serialized and perms.consumables.edit_consumable %}
+<div class="modal fade" id="bulkSerialsModal" tabindex="-1" aria-labelledby="bulkSerialsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bulkSerialsModalLabel">{{ trans.consumable_units_bulk_title }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'consumables:bulk_serials' consumable.pk %}" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p class="text-muted small">{{ trans.consumable_units_bulk_help }}</p>
+          <textarea name="serials" class="form-control" rows="8" required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.consumable_checkout_cancel }}</button>
+          <button type="submit" class="btn btn-primary">{{ trans.consumable_units_bulk_save }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if perms.consumables.edit_consumable %}
+{% include 'consumables/_checkout-modal.html' with return_to='detail' %}
+{% endif %}
 {% endblock content %}

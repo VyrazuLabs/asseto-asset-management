@@ -1,0 +1,113 @@
+{% comment %}Checkout modal + opener shared by the list and detail pages. Pass return_to="detail" to land back on the detail page after checkout.{% endcomment %}
+<div class="modal fade" id="checkoutModal" data-preserve-content tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel"><i class="bi bi-box-arrow-right me-2"></i>{{ trans.consumable_checkout_title }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="checkoutForm" method="post" action="">
+        {% csrf_token %}
+        {% if return_to %}<input type="hidden" name="return_to" value="{{ return_to }}">{% endif %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">{{ trans.consumable_checkout_name }}</label>
+            <input type="text" id="modalConsumableName" class="form-control" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">{{ trans.consumable_checkout_product }}</label>
+            <input type="text" id="modalProductName" class="form-control" readonly>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <label class="form-label fw-bold">{{ trans.consumable_checkout_total_qty }}</label>
+              <input type="text" id="modalTotalQty" class="form-control" readonly>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold">{{ trans.consumable_checkout_remaining_qty }}</label>
+              <input type="text" id="modalRemainingQty" class="form-control" readonly>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="modalUserSelect" class="form-label fw-bold">{{ trans.consumable_checkout_select_user }} <span class="text-danger">*</span></label>
+            <select name="user" id="modalUserSelect" class="form-select consumable-select-full-width" required
+              data-placeholder="{{ trans.consumable_checkout_select_user }}" data-select2-no-results="{{ trans.consumable_checkout_no_users }}" data-select2-searching="{{ trans.consumable_checkout_searching }}">
+              <option value="" selected disabled>{{ trans.consumable_checkout_select_user }}</option>
+              {% for u in users %}
+              <option value="{{ u.pk }}" data-search="{{ u.get_full_name|default:u.username }} {{ u.username|lower }}">{{ u.get_full_name|default:u.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3 d-none" id="modalUnitGroup">
+            <label for="modalUnitSelect" class="form-label fw-bold">{{ trans.consumable_checkout_pick_units }} <span class="text-danger">*</span></label>
+            <select name="units" id="modalUnitSelect" class="form-select consumable-select-full-width" multiple disabled
+              data-placeholder="{{ trans.consumable_checkout_pick_units }}" data-allow-clear="false"></select>
+          </div>
+          <div class="mb-3" id="modalQtyGroup">
+            <label for="modalCheckoutQty" class="form-label fw-bold">{{ trans.consumable_checkout_qty }} <span class="text-danger">*</span></label>
+            <input type="number" name="quantity" id="modalCheckoutQty" class="form-control" min="1" required>
+          </div>
+          <div class="mb-3">
+            <label for="modalNotes" class="form-label fw-bold">{{ trans.consumable_checkout_notes }}</label>
+            <textarea name="notes" id="modalNotes" class="form-control" rows="3" placeholder="{{ trans.consumable_checkout_notes_placeholder }}"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ trans.consumable_checkout_cancel }}</button>
+          <button type="submit" class="btn btn-primary">{{ trans.consumable_checkout_save }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Select2 for #modalUserSelect is initialized globally by static/js/select2-init.js
+// (dropdownParent auto-set to this modal; messages via data-select2-no-results /
+// data-select2-searching attributes on the select).
+
+function openCheckoutModal(id, name, product, totalQty, remainingQty, isSerialized) {
+  document.getElementById('modalConsumableName').value = name;
+  document.getElementById('modalProductName').value = product;
+  document.getElementById('modalTotalQty').value = totalQty;
+  document.getElementById('modalRemainingQty').value = remainingQty;
+  var qtyInput = document.getElementById('modalCheckoutQty');
+  var unitSelect = document.getElementById('modalUnitSelect');
+  qtyInput.max = remainingQty;
+  qtyInput.value = 1;
+  qtyInput.disabled = !!isSerialized;
+  document.getElementById('modalQtyGroup').classList.toggle('d-none', !!isSerialized);
+  document.getElementById('modalUnitGroup').classList.toggle('d-none', !isSerialized);
+  unitSelect.innerHTML = '';
+  unitSelect.disabled = !isSerialized;
+  unitSelect.required = !!isSerialized;
+  if (isSerialized) {
+    var unitsUrl = "{% url 'consumables:available_units' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', id);
+    fetch(unitsUrl, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        data.units.forEach(function (u) {
+          var opt = document.createElement('option');
+          opt.value = u.id;
+          opt.textContent = u.serial_no ? u.sub_id + ' - ' + u.serial_no : u.sub_id;
+          unitSelect.appendChild(opt);
+        });
+        $(unitSelect).val(null).trigger('change');
+      });
+  }
+  document.getElementById('modalNotes').value = '';
+  
+  var form = document.getElementById('checkoutForm');
+  form.action = "{% url 'consumables:checkout' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', id);
+  
+  // reset select2 selection
+  var $userSelect = $('#modalUserSelect');
+  if ($userSelect.data('select2')) {
+    $userSelect.val(null).trigger('change');
+  } else {
+    $userSelect.val('');
+  }
+  
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('checkoutModal')).show();
+}
+</script>
