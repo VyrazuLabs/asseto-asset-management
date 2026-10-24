@@ -12,6 +12,13 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [v1.8.4] — 2026-10-25
+
+### Security
+- **Python Dependencies Vulnerability Updates** — Upgraded `PyJWT` to `2.15.0` and `virtualenv` to `21.14.13` in `requirements.txt` to patch known security vulnerabilities.
+
+---
+
 ## [v1.8.3] — 2026-10-25
 
 ### Added
