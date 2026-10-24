@@ -203,46 +203,37 @@
     {# Supporting Documents #}
     <div class="docs-header mt-5">
         <h6 class="fw-bold mb-0">{{ trans.supporting_documents }}</h6>
-        {% if attachments %}
-        <span class="docs-count">{{ attachments|length }} {{ trans.files_label }}</span>
-        {% endif %}
-    </div>
-    <div class="docs-container mb-5">
-        {% for att in attachments %}
-        <a href="{{ att.file.url }}" target="_blank" class="doc-card">
-            <div class="doc-icon">
-                {% if "pdf" in att.file_name|lower %}
-                <span class="text-primary fw-bold" style="font-size: 0.6rem;">{{ trans.pdf_label }}</span>
-                {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
-                <img src="{{ att.file.url }}" alt="Preview"
-                    style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-                {% else %}
-                <i class="bi bi-file-text text-secondary fs-5"></i>
-                {% endif %}
-            </div>
-            <div class="doc-info">
-                <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
-                <div class="doc-meta">
-                    {{ att.file_size|filesizeformat|default:"2.4 MB" }} •
-                    {% if "pdf" in att.file_name|lower %}{{ trans.pdf_label }}
-                    {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower %}{{ trans.image_label }}
-                    {% else %}{{ trans.file_label }}{% endif %}
-                </div>
-            </div>
-            <div class="doc-download">
-                <i class="bi bi-download"></i>
-            </div>
-        </a>
-        {% empty %}
-        <div class="doc-empty-state">
-            <div class="empty-icon-wrap">
-                <i class="bi bi-files"></i>
-            </div>
-            <h6>{{ trans.no_supporting_documents }}</h6>
-            <p>{{ trans.no_supporting_documents_text }}</p>
+        <div class="d-flex align-items-center gap-3">
+            <span class="docs-count{% if not attachments %} d-none{% endif %}" id="docs-count"
+                data-label="{{ trans.files_label }}">{{ attachments|length }} {{ trans.files_label }}</span>
         </div>
+    </div>
+    <div class="docs-container mb-4" id="docs-container">
+        {% for att in attachments %}
+        {% include 'support/includes/doc_card.html' %}
         {% endfor %}
     </div>
+
+    {% if perms.support.edit_ticket %}
+    <form id="doc-upload-form" enctype="multipart/form-data" class="mb-5">
+      {% csrf_token %}
+      <label class="doc-upload-area w-100" for="doc-upload-input" style="cursor: pointer;">
+        <i class="bi bi-cloud-arrow-up d-block"></i>
+        <div class="doc-upload-label">{{ trans.drop_images_here }}</div>
+        <div class="doc-upload-hint">{{ trans.upload_hint }}</div>
+        <input type="file" id="doc-upload-input" name="attachments" multiple style="display: none;">
+      </label>
+      <div id="doc-upload-list" class="small text-muted mt-3"></div>
+      <div id="doc-upload-error" class="text-danger small mt-2 d-none"></div>
+      
+      <div class="mt-3 text-end d-none" id="upload-actions">
+        <button type="button" class="btn btn-light px-4 me-2" id="doc-upload-cancel">{{ trans.cancel }}</button>
+        <button type="submit" class="btn btn-primary px-4" id="doc-upload-btn">
+          <i class="bi bi-upload me-1"></i>{{ trans.upload }}
+        </button>
+      </div>
+    </form>
+    {% endif %}
 
     {# Comments Section #}
     <div class="detail-card mb-4">
@@ -352,6 +343,8 @@
   </div>
 </div>
 
+
+
 {% endblock content %}
 
 {% block script %}
@@ -453,6 +446,97 @@ document.addEventListener('DOMContentLoaded', function () {
     happyCodeInput.addEventListener('input', function () {
         happyCodeError.classList.add('d-none');
         this.value = this.value.toUpperCase();
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const uploadForm = document.getElementById('doc-upload-form');
+    if (!uploadForm) return;
+
+    const fileInput = document.getElementById('doc-upload-input');
+    const uploadList = document.getElementById('doc-upload-list');
+    const errorBox = document.getElementById('doc-upload-error');
+    const uploadBtn = document.getElementById('doc-upload-btn');
+    const docsContainer = document.getElementById('docs-container');
+    const docsCount = document.getElementById('docs-count');
+    const uploadActions = document.getElementById('upload-actions');
+    const cancelBtn = document.getElementById('doc-upload-cancel');
+
+    function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.classList.remove('d-none');
+    }
+
+    function resetUploadForm() {
+        uploadForm.reset();
+        uploadList.innerHTML = '';
+        errorBox.classList.add('d-none');
+        if (uploadActions) {
+            uploadActions.classList.add('d-none');
+        }
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', resetUploadForm);
+    }
+
+    fileInput.addEventListener('change', function () {
+        errorBox.classList.add('d-none');
+        uploadList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            if (uploadActions) {
+                uploadActions.classList.remove('d-none');
+            }
+            Array.from(this.files).forEach(function (file) {
+                const row = document.createElement('div');
+                row.className = 'py-1';
+                row.innerHTML = '<i class="bi bi-file-earmark me-2 text-primary"></i>' +
+                    file.name + ' <span class="text-muted small ms-1">(' +
+                    Math.max(1, Math.round(file.size / 1024)) + ' KB)</span>';
+                uploadList.appendChild(row);
+            });
+        } else {
+            if (uploadActions) {
+                uploadActions.classList.add('d-none');
+            }
+        }
+    });
+
+    uploadForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        if (!fileInput.files.length) {
+            showError('Please select at least one file.');
+            return;
+        }
+
+        uploadBtn.disabled = true;
+        const formData = new FormData(uploadForm);
+
+        fetch('{% url "support:ticket_upload_attachment" ticket.id %}', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        })
+        .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+        .then(function (res) {
+            uploadBtn.disabled = false;
+            if (!res.ok || !res.data.success) {
+                showError(res.data.error || 'Upload failed. Please try again.');
+                return;
+            }
+            docsContainer.insertAdjacentHTML('afterbegin', res.data.html);
+            docsCount.textContent = res.data.count + ' ' + docsCount.dataset.label;
+            docsCount.classList.remove('d-none');
+            resetUploadForm();
+        })
+        .catch(function () {
+            uploadBtn.disabled = false;
+            showError('Network error. Please try again.');
+        });
     });
 });
 </script>

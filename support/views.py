@@ -123,7 +123,21 @@ def export_tickets(request):
 def delete_ticket_attachment(request, id):
     ticket_id = SupportTicketService.delete_attachment(request, id)
     messages.success(request, "Attachment deleted successfully.")
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
     return redirect("support:ticket_update", id=ticket_id)
+
+
+@login_required
+@permission_required("support.edit_ticket", raise_exception=True)
+@require_POST
+def upload_ticket_attachment(request, id):
+    try:
+        return JsonResponse(SupportTicketService.upload_attachments(request, id))
+    except ValidationError as e:
+        err_msg = e.message if hasattr(e, "message") else ", ".join(e.messages)
+        return JsonResponse({"success": False, "error": err_msg}, status=400)
 
 
 @login_required

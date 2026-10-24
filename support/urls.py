@@ -17,6 +17,11 @@ urlpatterns = [
         views.delete_ticket_attachment,
         name="ticket_attachment_delete",
     ),
+    path(
+        "tickets/<uuid:id>/upload-attachment/",
+        views.upload_ticket_attachment,
+        name="ticket_upload_attachment",
+    ),
     path("asset-search/", views.asset_search, name="asset_search"),
     path("technician-search/", views.technician_search, name="technician_search"),
     path("tickets/<uuid:id>/update-status/", views.update_ticket_status, name="ticket_update_status"),

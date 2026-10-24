@@ -1535,6 +1535,72 @@ body.theme-dark .modal-body .form-control {
     text-transform: uppercase;
 }
 
+.btn-upload-doc {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #3b5bec;
+    background-color: rgba(59, 91, 236, 0.1);
+    border: 1px solid rgba(59, 91, 236, 0.3);
+    border-radius: 8px;
+    padding: 0.4rem 0.85rem;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-upload-doc:hover,
+.btn-upload-doc:focus {
+    background-color: #3b5bec;
+    border-color: #3b5bec;
+    color: #fff;
+}
+
+.doc-upload-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 2px dashed var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.doc-upload-area:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+.doc-upload-area i {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.doc-upload-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.doc-upload-hint {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    margin-top: 0.15rem;
+}
+
+.doc-upload-area input[type=file] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
 .docs-container {
     display: flex;
     flex-wrap: wrap;
@@ -1765,4 +1831,29 @@ body.theme-dark .doc-empty-state h6 {
 
 body.theme-dark .doc-empty-state p {
     color: #94a3b8;
+}
+
+body.theme-dark .btn-upload-doc {
+    background-color: rgba(129, 140, 248, 0.12);
+    border-color: rgba(129, 140, 248, 0.35);
+    color: #a5b4fc;
+}
+
+body.theme-dark .btn-upload-doc:hover,
+body.theme-dark .btn-upload-doc:focus {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: #fff;
+}
+
+body.theme-dark .doc-upload-area {
+    border-color: #2D2D3F;
+}
+
+body.theme-dark .doc-upload-area:hover {
+    background-color: #2a2650;
+}
+
+body.theme-dark .doc-upload-label {
+    color: #e0e0f0;
 }

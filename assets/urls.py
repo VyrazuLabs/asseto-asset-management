@@ -20,6 +20,7 @@ urlpatterns = [
     ),
     path("add", views.add, name="add"),
     path("search/<str:page>", views.search, name="search"),
+    path("export/csv", views.export_assets_csv, name="export_csv"),
     # assigned assets
     path("assign-asset", views.assign_assets, name="assign_asset"),
     path("delete-assign/<uuid:id>", views.delete_assign, name="delete_assign"),
