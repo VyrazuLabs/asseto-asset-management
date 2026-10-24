@@ -98,7 +98,7 @@ pycparser==2.23
 Pygments==2.20.0
 pyHanko==0.30.0
 pyhanko-certvalidator==0.28.0
-PyJWT==2.14.0
+PyJWT==2.15.0
 # PyMySQL==1.1.1
 pyotp==2.9.0
 pypdf==6.21.2
@@ -148,7 +148,7 @@ uritemplate==4.2.0
 uritools==5.0.0
 urllib3==2.8.0
 vine==5.1.0
-virtualenv==21.14.9
+virtualenv==21.14.13
 wcwidth==0.6.0
 webencodings==0.5.1
 websocket-client==1.9.0
