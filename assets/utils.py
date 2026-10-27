@@ -17,7 +17,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
 from .models import Asset
 from configurations.models import SlackConfiguration
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import requests
@@ -256,6 +256,53 @@ def filtered_asset(request):
     return assets_qs
 
 
+def _safe_csv_cell(value):
+    """Prefix cells starting with formula characters to prevent Excel/Sheets injection."""
+    text = "" if value is None else str(value)
+    if text and text[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + text
+    return text
+
+
+def _csv_rows(qs):
+    """Yield CSV rows with safe cells for formula injection prevention."""
+    class Echo:
+        def write(self, value):
+            return value
+
+    writer = csv.writer(Echo())
+    yield writer.writerow(
+        [
+            _safe_csv_cell("Asset Tag"),
+            _safe_csv_cell("Asset Name"),
+            _safe_csv_cell("Product"),
+            _safe_csv_cell("Product Type"),
+            _safe_csv_cell("Vendor"),
+            _safe_csv_cell("Location"),
+            _safe_csv_cell("Client"),
+            _safe_csv_cell("Status"),
+        ]
+    )
+    for asset in qs.iterator(chunk_size=2000):
+        product = asset.product
+        yield writer.writerow(
+            [
+                _safe_csv_cell(asset.tag),
+                _safe_csv_cell(asset.name),
+                _safe_csv_cell(product.name if product else ""),
+                _safe_csv_cell(product.product_type.name if product and product.product_type else ""),
+                _safe_csv_cell(asset.vendor.name if asset.vendor else ""),
+                _safe_csv_cell(asset.location.office_name if asset.location else ""),
+                _safe_csv_cell(asset.client.name if asset.client else ""),
+                _safe_csv_cell(
+                    "Allocated"
+                    if asset.is_assigned
+                    else (asset.asset_status.name if asset.asset_status else "")
+                ),
+            ]
+        )
+
+
 def export_assets_csv_utils(request):
     today = date.today()
     assets_qs = filtered_asset(request).select_related(
@@ -267,40 +314,10 @@ def export_assets_csv_utils(request):
         "asset_status",
     )
 
-    response = HttpResponse(content_type="text/csv")
+    response = StreamingHttpResponse(_csv_rows(assets_qs), content_type="text/csv")
     response["Content-Disposition"] = (
         f'attachment; filename="export-assets-{today}.csv"'
     )
-
-    writer = csv.writer(response)
-    writer.writerow(
-        [
-            "Asset Tag",
-            "Asset Name",
-            "Product",
-            "Product Type",
-            "Vendor",
-            "Location",
-            "Client",
-            "Status",
-        ]
-    )
-    for asset in assets_qs:
-        product = asset.product
-        writer.writerow(
-            [
-                asset.tag,
-                asset.name,
-                product.name if product else "",
-                product.product_type.name if product and product.product_type else "",
-                asset.vendor.name if asset.vendor else "",
-                asset.location.office_name if asset.location else "",
-                asset.client.name if asset.client else "",
-                "Allocated"
-                if asset.is_assigned
-                else (asset.asset_status.name if asset.asset_status else ""),
-            ]
-        )
     return response
 
 

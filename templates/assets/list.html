@@ -599,15 +599,8 @@ document.addEventListener('submit', function(e) {
 });
 </script>
 
-<script>
-document.addEventListener("click", function (e) {
-  var link = e.target && e.target.closest ? e.target.closest(".asset-export-csv") : null;
-  if (!link) return;
-  e.preventDefault();
-  var form = document.getElementById("asset-filter-form");
-  var params = form ? new URLSearchParams(new FormData(form)).toString() : "";
-  window.location.href = link.getAttribute("href") + (params ? "?" + params : "");
-});
-</script>
-
 {% endblock %}
+
+{% block script %}
+<script src="{% static 'js/pages/asset_list.js' %}"></script>
+{% endblock script %}

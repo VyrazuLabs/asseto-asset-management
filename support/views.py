@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import SupportTicketForm
@@ -120,13 +121,18 @@ def export_tickets(request):
 
 @login_required
 @permission_required("support.delete_ticket", raise_exception=True)
+@require_POST
 def delete_ticket_attachment(request, id):
     ticket_id = SupportTicketService.delete_attachment(request, id)
     messages.success(request, "Attachment deleted successfully.")
     referer = request.META.get('HTTP_REFERER')
-    if referer:
+    if referer and url_has_allowed_host_and_scheme(
+        referer,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
         return redirect(referer)
-    return redirect("support:ticket_update", id=ticket_id)
+    return redirect("support:ticket_detail", id=ticket_id)
 
 
 @login_required

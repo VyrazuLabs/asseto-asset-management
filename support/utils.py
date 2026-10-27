@@ -8,13 +8,14 @@ module as dictated by the project rules (DJANGO_DEVELOPMENT_RULES).
 
 import csv
 import logging
+import os
 from itertools import chain
 
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.timezone import now
@@ -174,24 +175,25 @@ class SupportTicketService:
     def create(request, form):
         """Create a new ticket with attachments and initial activity."""
         try:
-            ticket = form.save(commit=False)
-            ticket.organization = request.user.organization
-            ticket.created_by = str(request.user.id)
-            ticket.save()
+            with transaction.atomic():
+                ticket = form.save(commit=False)
+                ticket.organization = request.user.organization
+                ticket.created_by = str(request.user.id)
+                ticket.save()
 
-            # Handle file uploads
-            SupportTicketService._save_attachments(
-                ticket, request.FILES.getlist("attachments"), request.user
-            )
+                # Handle file uploads
+                SupportTicketService._save_attachments(
+                    ticket, request.FILES.getlist("attachments"), request.user
+                )
 
-            # Create initial activity
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="created",
-                description=(f"Ticket initiated by {request.user.get_full_name()}."),
-                performed_by=request.user,
-            )
-            return ticket
+                # Create initial activity
+                TicketActivity.objects.create(
+                    ticket=ticket,
+                    activity_type="created",
+                    description=(f"Ticket initiated by {request.user.get_full_name()}."),
+                    performed_by=request.user,
+                )
+                return ticket
         except Exception:
             logger.exception("Error creating support ticket")
             raise
@@ -263,7 +265,6 @@ class SupportTicketService:
         "gif",
         "bmp",
         "webp",
-        "svg",
         "pdf",
         "doc",
         "docx",
@@ -289,7 +290,7 @@ class SupportTicketService:
             if f.size > SupportTicketService.MAX_FILE_SIZE:
                 raise ValidationError(f"File '{f.name}' exceeds the 10MB size limit.")
 
-            ext = f.name.split(".")[-1].lower() if "." in f.name else ""
+            ext = os.path.splitext(f.name)[1].lower().lstrip(".")
             if ext not in SupportTicketService.ALLOWED_EXTENSIONS:
                 raise ValidationError(f"File type '.{ext}' is not allowed.")
 
@@ -433,52 +434,53 @@ class SupportTicketService:
                     "Invalid happy code. Please check with the client for the correct code."
                 )
 
-        ticket = form.save(commit=False)
-        ticket.updated_by = str(request.user.id)
-        ticket.save()
+        with transaction.atomic():
+            ticket = form.save(commit=False)
+            ticket.updated_by = str(request.user.id)
+            ticket.save()
 
-        # Log status change
-        if old_status != ticket.status:
-            status_map = dict(STATUS_CHOICES)
-            old_label = status_map.get(old_status, old_status)
-            new_label = status_map.get(str(ticket.status), ticket.status)
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="status_changed",
-                description=(f"Status changed from {old_label} to {new_label}."),
-                performed_by=request.user,
-            )
+            # Log status change
+            if old_status != ticket.status:
+                status_map = dict(STATUS_CHOICES)
+                old_label = status_map.get(old_status, old_status)
+                new_label = status_map.get(str(ticket.status), ticket.status)
+                TicketActivity.objects.create(
+                    ticket=ticket,
+                    activity_type="status_changed",
+                    description=(f"Status changed from {old_label} to {new_label}."),
+                    performed_by=request.user,
+                )
 
-        # Log reassignment
-        if old_assigned != ticket.assigned_to:
-            desc = (
-                f"Ticket assigned to {ticket.assigned_to.get_full_name()}."
-                if ticket.assigned_to
-                else "Ticket unassigned."
-            )
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="reassigned",
-                description=desc,
-                performed_by=request.user,
-            )
+            # Log reassignment
+            if old_assigned != ticket.assigned_to:
+                desc = (
+                    f"Ticket assigned to {ticket.assigned_to.get_full_name()}."
+                    if ticket.assigned_to
+                    else "Ticket unassigned."
+                )
+                TicketActivity.objects.create(
+                    ticket=ticket,
+                    activity_type="reassigned",
+                    description=desc,
+                    performed_by=request.user,
+                )
 
-        # Handle note / comment
-        note_content = request.POST.get("note_content", "").strip()
-        if note_content:
-            is_internal = request.POST.get("is_internal") == "on"
-            TicketActivity.objects.create(
-                ticket=ticket,
-                activity_type="internal_note" if is_internal else "comment",
-                description=note_content,
-                is_internal=is_internal,
-                performed_by=request.user,
-            )
+            # Handle note / comment
+            note_content = request.POST.get("note_content", "").strip()
+            if note_content:
+                is_internal = request.POST.get("is_internal") == "on"
+                TicketActivity.objects.create(
+                    ticket=ticket,
+                    activity_type="internal_note" if is_internal else "comment",
+                    description=note_content,
+                    is_internal=is_internal,
+                    performed_by=request.user,
+                )
 
-        # Handle new file uploads
-        SupportTicketService._save_attachments(
-            ticket, request.FILES.getlist("attachments"), request.user
-        )
+            # Handle new file uploads
+            SupportTicketService._save_attachments(
+                ticket, request.FILES.getlist("attachments"), request.user
+            )
 
         return ticket
 
@@ -631,43 +633,13 @@ class SupportTicketService:
             qs = SupportTicketService.base_queryset(request.user)
             qs = SupportTicketService.apply_filters(qs, request.GET)
 
-            response = HttpResponse(content_type="text/csv")
+            response = StreamingHttpResponse(_csv_ticket_rows(qs), content_type="text/csv")
             response["Content-Disposition"] = 'attachment; filename="tickets.csv"'
-
-            writer = csv.writer(response)
-            writer.writerow(
-                [
-                    "Ticket ID",
-                    "Subject",
-                    "Asset",
-                    "Priority",
-                    "Status",
-                    "Assigned To",
-                    "Created At",
-                ]
-            )
-
-            for ticket in qs:
-                writer.writerow(
-                    [
-                        ticket.ticket_id,
-                        ticket.subject,
-                        ticket.asset.name if ticket.asset else "",
-                        ticket.priority,
-                        ticket.status,
-                        (
-                            ticket.assigned_to.get_full_name()
-                            if ticket.assigned_to
-                            else "Unassigned"
-                        ),
-                        ticket.created_at,
-                    ]
-                )
-
             return response
         except Exception:
             logger.exception("Error exporting tickets CSV")
             return HttpResponse(status=500)
+
 
     # ------------------------------------------------------------------
     # Asset search (JSON API)
@@ -732,15 +704,77 @@ class SupportTicketService:
     @staticmethod
     def _save_attachments(ticket, files, user):
         """Persist a list of uploaded files as ``TicketAttachment`` records."""
+        SupportTicketService.validate_attachments(files)
         created = []
-        for f in files:
-            created.append(
-                TicketAttachment.objects.create(
-                    ticket=ticket,
-                    file=f,
-                    file_name=f.name,
-                    file_size=f.size,
-                    uploaded_by=user,
+        if not files:
+            return created
+
+        with transaction.atomic():
+            for f in files:
+                created.append(
+                    TicketAttachment.objects.create(
+                        ticket=ticket,
+                        file=f,
+                        file_name=f.name,
+                        file_size=f.size,
+                        uploaded_by=user,
+                    )
                 )
-            )
+            if created:
+                file_names = ", ".join(att.file_name for att in created)
+                count = len(created)
+                user_name = user.get_full_name() if hasattr(user, "get_full_name") and user.get_full_name() else getattr(user, "username", "User")
+                desc = (
+                    f"{count} attachment(s) uploaded by {user_name}: {file_names}"
+                    if count > 1
+                    else f"Attachment uploaded by {user_name}: {file_names}"
+                )
+                TicketActivity.objects.create(
+                    ticket=ticket,
+                    activity_type="attachment_added",
+                    description=desc,
+                    performed_by=user,
+                )
         return created
+
+
+def _safe_csv_cell(value):
+    """Prefix cells starting with formula characters to prevent Excel/Sheets injection."""
+    text = "" if value is None else str(value)
+    if text and text[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + text
+    return text
+
+
+def _csv_ticket_rows(qs):
+    """Yield CSV rows with safe cells for formula injection prevention."""
+    class Echo:
+        def write(self, value):
+            return value
+
+    writer = csv.writer(Echo())
+    yield writer.writerow(
+        [
+            _safe_csv_cell("Ticket ID"),
+            _safe_csv_cell("Subject"),
+            _safe_csv_cell("Asset"),
+            _safe_csv_cell("Priority"),
+            _safe_csv_cell("Status"),
+            _safe_csv_cell("Assigned To"),
+            _safe_csv_cell("Created At"),
+        ]
+    )
+    for ticket in qs:
+        yield writer.writerow(
+            [
+                _safe_csv_cell(ticket.ticket_id),
+                _safe_csv_cell(ticket.subject),
+                _safe_csv_cell(ticket.asset.name if ticket.asset else ""),
+                _safe_csv_cell(ticket.priority),
+                _safe_csv_cell(ticket.status),
+                _safe_csv_cell(
+                    ticket.assigned_to.get_full_name() if ticket.assigned_to else "Unassigned"
+                ),
+                _safe_csv_cell(ticket.created_at),
+            ]
+        )

@@ -493,9 +493,13 @@ document.addEventListener('DOMContentLoaded', function () {
             Array.from(this.files).forEach(function (file) {
                 const row = document.createElement('div');
                 row.className = 'py-1';
-                row.innerHTML = '<i class="bi bi-file-earmark me-2 text-primary"></i>' +
-                    file.name + ' <span class="text-muted small ms-1">(' +
-                    Math.max(1, Math.round(file.size / 1024)) + ' KB)</span>';
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-file-earmark me-2 text-primary';
+                const name = document.createTextNode(file.name);
+                const size = document.createElement('span');
+                size.className = 'text-muted small ms-1';
+                size.textContent = '(' + Math.max(1, Math.round(file.size / 1024)) + ' KB)';
+                row.append(icon, name, size);
                 uploadList.appendChild(row);
             });
         } else {

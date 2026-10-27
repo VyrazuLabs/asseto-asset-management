@@ -1607,9 +1607,15 @@ body.theme-dark .modal-body .form-control {
     gap: 1rem;
 }
 
+.doc-card-wrapper {
+    max-width: 300px;
+    flex: 1;
+}
+
 .doc-card {
     display: flex;
     align-items: center;
+    width: 100%;
     background-color: #F8F9FA;
     border-radius: 12px;
     padding: 0.75rem;
@@ -1659,6 +1665,31 @@ body.theme-dark .modal-body .form-control {
     border: none;
     padding: 0.2rem;
     cursor: pointer;
+}
+
+.doc-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.doc-type-label {
+    font-size: 0.6rem;
+}
+
+.btn-delete-doc {
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 5;
+}
+
+.doc-card-wrapper:hover .btn-delete-doc,
+.doc-card-wrapper:focus-within .btn-delete-doc,
+.btn-delete-doc:focus-visible {
+    opacity: 1;
 }
 
 .doc-empty-state {
