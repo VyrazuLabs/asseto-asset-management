@@ -197,9 +197,9 @@ body.theme-dark #happyCodeText {
         {% for att in attachments %}
         <a href="{{ att.file.url }}" target="_blank" class="doc-card">
             <div class="doc-icon">
-                {% if "pdf" in att.file_name|lower %}
+                {% if att.extension == "pdf" %}
                 <i class="bi bi-file-earmark-pdf text-danger fs-4"></i>
-                {% elif "png" in att.file_name|lower or "jpg" in att.file_name|lower or "jpeg" in att.file_name|lower %}
+                {% elif att.is_image %}
                 <img src="{{ att.file.url }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
                 {% else %}
                 <i class="bi bi-file-earmark text-primary fs-4"></i>

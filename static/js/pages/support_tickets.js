@@ -445,6 +445,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // ── Ticket Detail: Attachment Delete ────────────────────────────────────────
+
+  document.addEventListener('submit', function (e) {
+    const form = e.target.closest('.doc-delete-form');
+    if (!form) return;
+
+    const btn = form.querySelector('.btn-delete-doc');
+    const message = btn ? btn.dataset.confirm : '';
+    if (message && !window.confirm(message)) {
+      e.preventDefault();
+    }
+  });
+
   // ── Initialisation ───────────────────────────────────────────────────────────
 
   const pref = localStorage.getItem('ticket_view_pref');

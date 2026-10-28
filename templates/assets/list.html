@@ -225,6 +225,21 @@
       </div>
 
       <div class="col-auto">
+        <div class="dropdown">
+          <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-label="{{ trans.export }}">
+            <i class="bi bi-download"></i> {{ trans.export }}
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item asset-export-csv" href="{% url 'assets:export_csv' %}">
+                <i class="bi bi-filetype-csv"></i> {{ trans.csv_format }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-auto">
         <a href="{% url 'assets:list' %}" class="btn-reset" title="{{ trans.reset }} all filters">
           <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
         </a>
@@ -585,3 +600,7 @@ document.addEventListener('submit', function(e) {
 </script>
 
 {% endblock %}
+
+{% block script %}
+<script src="{% static 'js/pages/asset_list.js' %}"></script>
+{% endblock script %}

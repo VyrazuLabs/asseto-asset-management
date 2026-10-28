@@ -226,7 +226,13 @@
                     </form>
                     {% else %}{{ unit.serial_no|default:"-" }}{% endif %}
                   </td>
-                  <td>{{ unit.get_status_display }}</td>
+                  <td>
+                    {% if unit.status == "in_stock" %}{{ trans.consumable_unit_status_in_stock }}
+                    {% elif unit.status == "checked_out" %}{{ trans.consumable_unit_status_checked_out }}
+                    {% elif unit.status == "lost" %}{{ trans.consumable_unit_status_lost }}
+                    {% elif unit.status == "disposed" %}{{ trans.consumable_unit_status_disposed }}
+                    {% else %}{{ unit.get_status_display }}{% endif %}
+                  </td>
                   <td>{% if unit.checkout %}{{ unit.checkout.user.get_full_name|default:unit.checkout.user.username }}{% else %}-{% endif %}</td>
                   {% if perms.consumables.edit_consumable %}
                   <td>

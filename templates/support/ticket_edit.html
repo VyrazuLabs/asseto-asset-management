@@ -265,10 +265,13 @@
                   <a href="{{ att.file.url }}" target="_blank" class="text-truncate text-decoration-none text-dark"
                     style="max-width: 150px;">{{ att.file_name }}</a>
                 </div>
-                <button type="button" class="btn btn-outline-danger btn-sm border-0 py-0 px-1" title="{{ trans.delete_attachment }}"
-                  onclick="if(confirm('{{ trans.delete_attachment_confirm }}')) { location.href='{% url 'support:ticket_attachment_delete' att.id %}' }">
+                {% if perms.support.delete_ticket %}
+                <button type="submit" form="delete-attachment-{{ att.id }}"
+                  class="btn btn-outline-danger btn-sm border-0 py-0 px-1" title="{{ trans.delete_attachment }}"
+                  onclick="return confirm('{{ trans.delete_attachment_confirm|escapejs }}')">
                   <i class="bi bi-trash"></i>
                 </button>
+                {% endif %}
               </div>
               {% endfor %}
             </div>
@@ -287,6 +290,15 @@
   </div>{# /row #}
 
 </form>
+
+{# Outside the edit form: nested forms are invalid HTML. Buttons reference these via the form attribute. #}
+{% if perms.support.delete_ticket %}
+{% for att in ticket.attachments.all %}
+<form id="delete-attachment-{{ att.id }}" method="post" action="{% url 'support:ticket_attachment_delete' att.id %}">
+  {% csrf_token %}
+</form>
+{% endfor %}
+{% endif %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

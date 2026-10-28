@@ -1,0 +1,37 @@
+<div class="doc-card-wrapper position-relative d-inline-block w-100">
+    <a href="{{ att.file.url }}" target="_blank" rel="noopener" class="doc-card m-0">
+        <div class="doc-icon">
+            {% if att.extension == "pdf" %}
+            <span class="text-primary fw-bold doc-type-label">{{ trans.pdf_label }}</span>
+            {% elif att.is_image %}
+            <img src="{{ att.file.url }}" alt="Preview" class="doc-icon-img">
+            {% else %}
+            <i class="bi bi-file-text text-secondary fs-5"></i>
+            {% endif %}
+        </div>
+        <div class="doc-info">
+            <div class="doc-name" title="{{ att.file_name }}">{{ att.file_name }}</div>
+            <div class="doc-meta">
+                {% if att.file_size %}{{ att.file_size|filesizeformat }}{% else %}—{% endif %} •
+                {% if att.extension == "pdf" %}{{ trans.pdf_label }}
+                {% elif att.is_image %}{{ trans.image_label }}
+                {% else %}{{ trans.file_label }}{% endif %}
+            </div>
+        </div>
+        <div class="doc-download">
+            <i class="bi bi-download"></i>
+        </div>
+    </a>
+    
+
+    <form method="post" action="{% url 'support:ticket_attachment_delete' att.id %}" class="doc-delete-form">
+        {% csrf_token %}
+        <button type="submit"
+                class="btn-delete-doc position-absolute top-0 end-0 m-1 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center text-danger border-0"
+                data-confirm="{{ trans.delete_attachment_confirm }}"
+                title="{{ trans.delete_attachment }}">
+            <i class="bi bi-trash fs-6"></i>
+        </button>
+    </form>
+
+</div>

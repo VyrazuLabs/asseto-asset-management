@@ -1,6 +1,8 @@
 import uuid
 import random
 import string
+from pathlib import Path
+
 from django.db import models
 from django.conf import settings
 from uuid import uuid4
@@ -138,6 +140,8 @@ class SupportTicket(TimeStampModel, SoftDeleteModel):
 
 
 class TicketAttachment(TimeStampModel):
+    IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "bmp", "webp"}
+
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     ticket = models.ForeignKey(
         SupportTicket, on_delete=models.CASCADE, related_name="attachments"
@@ -148,6 +152,16 @@ class TicketAttachment(TimeStampModel):
     uploaded_by = models.ForeignKey(
         "authentication.User", on_delete=models.SET_NULL, null=True
     )
+
+    @property
+    def extension(self):
+        """Return the real final extension of the stored file."""
+        name = self.file.name or self.file_name
+        return Path(name).suffix.lower().lstrip(".")
+
+    @property
+    def is_image(self):
+        return self.extension in self.IMAGE_EXTENSIONS
 
     def __str__(self):
         return self.file_name
