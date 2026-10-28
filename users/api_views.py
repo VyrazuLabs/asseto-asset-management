@@ -157,11 +157,9 @@ class UserList(APIView):
     def get(self, request):
         try:
             # user_list=User.undeleted_objects.all().exclude(pk=request.user.id).order_by("-created_at")
-            user_list = (
-                User.undeleted_objects.filter(is_superuser=False, is_active=True)
-                .exclude(pk=request.user.id)
-                .order_by("-created_at")
-            )
+            user_list = User.undeleted_objects.filter(
+                organization=request.user.organization
+            ).order_by("-created_at")
             data = user_data(request, user_list)
             page = int(request.GET.get("page", 1))
             paginated_data = add_pagination(data, page=page)
@@ -345,13 +343,17 @@ class UserSearch(APIView):
         role = serializer.validated_data.get("role", None)
         status = serializer.validated_data.get("status", None)
         try:
-            get_searched_user = User.undeleted_objects.filter(
-                Q(full_name__icontains=search_text)
-                | Q(email__icontains=search_text)
-                | Q(role__related_name__icontains=search_text)
-                | Q(department__name__icontains=search_text)
-                | Q(is_active__icontains=search_text)
-            ).order_by("-created_at")
+            get_searched_user = (
+                User.undeleted_objects.filter(organization=request.user.organization)
+                .filter(
+                    Q(full_name__icontains=search_text)
+                    | Q(email__icontains=search_text)
+                    | Q(role__related_name__icontains=search_text)
+                    | Q(department__name__icontains=search_text)
+                    | Q(is_active__icontains=search_text)
+                )
+                .order_by("-created_at")
+            )
 
             if role:
                 get_searched_user = get_searched_user.filter(

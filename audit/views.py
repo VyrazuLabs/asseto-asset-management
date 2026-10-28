@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -30,9 +31,9 @@ def add_audit(request):
     assigned_to = request.POST.get("assigned-to", None)
     tag = request.POST.get("tag", None)
     get_asset = Asset.objects.filter(tag=tag).first()
-    user_list = [
-        assign for assign in User.undeleted_objects.all() if assign is not None
-    ]
+    user_list = list(
+        User.undeleted_objects.filter(organization=request.user.organization)
+    )
     if request.method == "POST":
         errors = {}
         if not condition:
@@ -51,7 +52,9 @@ def add_audit(request):
                     "get_audit": get_audit,
                     "tag": tag,
                     "comments": comments,
-                    "assigned_users": User.undeleted_objects.all(),
+                    "assigned_users": User.undeleted_objects.filter(
+                        organization=request.user.organization
+                    ),
                 },
             )
         form = AuditForm(
@@ -103,14 +106,20 @@ def get_audits_by_id(request, id):
     # Get the asset and its latest audit record
     get_asset = get_object_or_404(Asset, id=id)
     get_audit = Audit.objects.filter(asset__id=id).order_by("-created_at").first()
-    get_assigned_user = AssignAsset.objects.filter(asset__id=id).first()
+    get_assigned_user = (
+        AssignAsset.objects.filter(asset__id=id).select_related("user").first()
+    )
     audit_images = AuditImage.objects.filter(audit=get_audit) if get_audit else []
 
     def _render_form(extra=None):
         if get_assigned_user is None:
             context = {
                 "get_asset": get_asset,
-                "assigned_users": list(User.undeleted_objects.all()),
+                "assigned_users": list(
+                    User.undeleted_objects.filter(
+                        organization=request.user.organization
+                    )
+                ),
             }
         else:
             context = {
@@ -189,14 +198,21 @@ def get_audits_by_id(request, id):
 @login_required
 @permission_required("audit.view_audit", raise_exception=True)
 def audit_list(request):
-    audits = Audit.objects.all()
+    audits = Audit.objects.filter(
+        Q(organization=request.user.organization)
+        | Q(organization__isnull=True, asset__organization=request.user.organization)
+    )
     return render(request, "audit/audit_list.html", context={"audits": audits})
 
 
 @login_required
 @permission_required("audit.view_audit", raise_exception=True)
 def asset_audit_history(request, id):
-    audit_list = Audit.objects.filter(asset__id=id).order_by("-created_at")
+    audit_list = Audit.objects.filter(
+        Q(organization=request.user.organization)
+        | Q(organization__isnull=True, asset__organization=request.user.organization),
+        asset__id=id,
+    ).order_by("-created_at")
     paginator = Paginator(audit_list, PAGE_SIZE, orphans=ORPHANS)
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)

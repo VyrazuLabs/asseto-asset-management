@@ -12,6 +12,27 @@ This project follows [Semantic Versioning](https://semver.org/) and the format i
 
 ---
 
+## [v1.8.4] — 2026-10-25
+
+### Security
+- **Python Dependencies Vulnerability Updates** — Upgraded `PyJWT` to `2.15.0` and `virtualenv` to `21.14.13` in `requirements.txt` to patch known security vulnerabilities.
+
+---
+
+## [v1.8.3] — 2026-10-25
+
+### Added
+- **Consumable Unique IDs & Serialized Consumable Units (PR #279)** — Added unique `consumable_id` field to `Consumable` model, introduced `SerializedConsumableUnit` model for granular item serialization, status workflows (`AVAILABLE`, `ALLOCATED`, `DAMAGED`, `DISPOSED`), unit-level checkouts via interactive modal (`templates/consumables/_checkout-modal.html`), management command `backfill_consumable_ids` for existing inventory, and multi-language translation support (`en`, `bn`, `fr`, `hi`).
+
+### Fixed
+- **Logged-in User in Default User List (PR #280 / ASM-55)** — Resolved issue where the currently authenticated user was omitted from default user list responses in `users/api_views.py` and `users/serializers.py`.
+- **Search User List API Query Parameter Handling** — Allowed calling the user search endpoint without mandatory query parameters, falling back gracefully to paginated active user results.
+
+### Security
+- **Python Dependencies Vulnerability Updates** — Upgraded packages in `requirements.txt` including `Django==5.2.17`, `djangorestframework==3.18.2`, `PyJWT==2.14.0`, `pypdf==6.21.2`, `urllib3==2.8.0`, `certifi==2026.10.19`, `pillow==13.0.0`, `virtualenv==21.14.9`, `packaging==26.3`, `black==26.10.1`, and `filelock==4.2.1`.
+
+---
+
 ## [v1.8.2] — 2026-09-25
 
 ### Added
