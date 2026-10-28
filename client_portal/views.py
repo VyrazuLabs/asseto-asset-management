@@ -3,12 +3,14 @@ import csv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count, Value
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 
 from clients.models import Client, ClientContact
 from assets.models import Asset, AssetImage, AssignAsset
+from assets.utils import first_image_map
 from support.models import (
     SupportTicket,
     TicketAttachment,
@@ -161,8 +163,9 @@ def client_portal_dashboard(request):
     show_welcome = request.session.pop("show_welcome_banner", False)
 
     client_assets = Asset.undeleted_objects.filter(client=client)
-    total_assets = client_assets.count()
-    total_value = client_assets.aggregate(total=Sum("price"))["total"] or 0
+    asset_stats = client_assets.aggregate(total=Count("id"), value=Sum("price"))
+    total_assets = asset_stats["total"]
+    total_value = asset_stats["value"] or 0
 
     tickets_qs = _client_ticket_base_qs(client)
     open_tickets = tickets_qs.exclude(status__in=["3", "4"]).count()
@@ -172,16 +175,9 @@ def client_portal_dashboard(request):
         tickets_qs.select_related("asset", "assigned_to").order_by("-created_at")[:5]
     )
     recent_asset_ids = [t.asset_id for t in recent_tickets if t.asset_id]
-    recent_asset_images = {}
-    if recent_asset_ids:
-        for img in AssetImage.objects.filter(asset_id__in=recent_asset_ids).order_by(
-            "-uploaded_at"
-        ):
-            if img.asset_id not in recent_asset_images:
-                recent_asset_images[img.asset_id] = img
+    recent_asset_images = first_image_map(recent_asset_ids)
 
     # Product distribution (matches the "Product Category" field in the add form)
-    cat_data = {}
     cat_colors = [
         "#435ebe",
         "#198754",
@@ -192,14 +188,19 @@ def client_portal_dashboard(request):
         "#fd7e14",
         "#20c997",
     ]
-    for asset in client_assets.select_related("product").iterator():
-        cat_name = asset.product.name if asset.product else "Uncategorized"
-        if cat_name not in cat_data:
-            cat_data[cat_name] = 0
-        cat_data[cat_name] += 1
-
-    cat_labels = list(cat_data.keys())
-    cat_values = list(cat_data.values())
+    # Grouped in the database: one query returns every category count instead
+    # of loading every asset row into Python. Coalesce keeps assets without a
+    # product under "Uncategorized", as the previous loop did.
+    cat_rows = (
+        client_assets.annotate(
+            cat_name=Coalesce("product__name", Value("Uncategorized"))
+        )
+        .values("cat_name")
+        .annotate(cat_count=Count("id"))
+        .order_by("-cat_count", "cat_name")
+    )
+    cat_labels = [row["cat_name"] for row in cat_rows]
+    cat_values = [row["cat_count"] for row in cat_rows]
     cat_colors_used = [cat_colors[i % len(cat_colors)] for i in range(len(cat_labels))]
 
     context = {
@@ -231,7 +232,11 @@ def client_portal_assets(request):
     if not contact:
         return redirect("client_portal:login")
 
-    assets_qs = Asset.undeleted_objects.filter(client=client).order_by("-created_at")
+    assets_qs = (
+        Asset.undeleted_objects.filter(client=client)
+        .select_related("product__product_type", "vendor", "location", "asset_status")
+        .order_by("-created_at")
+    )
 
     # Filters
     search_text = (request.GET.get("search_text") or "").strip()
@@ -261,20 +266,20 @@ def client_portal_assets(request):
 
     # First image per asset
     asset_ids = [a.id for a in page_object]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids).order_by(
-        "-uploaded_at"
-    )
-    asset_images = {}
-    for img in images_qs:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
+    asset_images = first_image_map(asset_ids)
 
-    # Stats
+    # Stats – one aggregate pass instead of four separate queries
     client_assets = Asset.undeleted_objects.filter(client=client)
-    total_assets = client_assets.count()
-    active_count = client_assets.filter(is_assigned=False).count()
-    assigned_count = client_assets.filter(is_assigned=True).count()
-    total_value = client_assets.aggregate(total=Sum("price"))["total"] or 0
+    stats = client_assets.aggregate(
+        total=Count("id"),
+        available=Count("id", filter=Q(is_assigned=False)),
+        assigned=Count("id", filter=Q(is_assigned=True)),
+        value=Sum("price"),
+    )
+    total_assets = stats["total"]
+    active_count = stats["available"]
+    assigned_count = stats["assigned"]
+    total_value = stats["value"] or 0
 
     # Filter dropdown data – only show options related to this client's assets
     client_asset_ids = Asset.undeleted_objects.filter(client=client).values("id")
@@ -329,16 +334,23 @@ def _client_ticket_base_qs(client):
 def _client_ticket_stats(client):
     """Stat card values for the client portal support tickets page."""
     qs = _client_ticket_base_qs(client)
-    return {
-        "total_active": qs.exclude(status__in=["3", "4"]).count(),
-        "pending_parts": qs.filter(status="0", ticket_type="hardware_repair").count(),
-        "overdue_count": qs.filter(estimated_eta__lt=timezone.now())
-        .exclude(status__in=["3", "4"])
-        .count(),
-        "critical_count": qs.filter(priority="3")
-        .exclude(status__in=["3", "4"])
-        .count(),
-    }
+    now = timezone.now()
+    # Single aggregate over the (deduplicated) base queryset — replaces four
+    # separate count queries, each of which re-ran the base filter.
+    return qs.aggregate(
+        total_active=Count("id", distinct=True, filter=~Q(status__in=["3", "4"])),
+        pending_parts=Count(
+            "id", distinct=True, filter=Q(status="0", ticket_type="hardware_repair")
+        ),
+        overdue_count=Count(
+            "id",
+            distinct=True,
+            filter=Q(estimated_eta__lt=now) & ~Q(status__in=["3", "4"]),
+        ),
+        critical_count=Count(
+            "id", distinct=True, filter=Q(priority="3") & ~Q(status__in=["3", "4"])
+        ),
+    )
 
 
 def client_portal_support_tickets(request):
@@ -376,13 +388,7 @@ def client_portal_support_tickets(request):
 
     # First image per asset for tickets
     asset_ids = [t.asset_id for t in page_object if t.asset_id]
-    images_qs = AssetImage.objects.filter(asset_id__in=asset_ids).order_by(
-        "-uploaded_at"
-    )
-    asset_images = {}
-    for img in images_qs:
-        if img.asset_id not in asset_images:
-            asset_images[img.asset_id] = img
+    asset_images = first_image_map(asset_ids)
 
     context = {
         "cp_sidebar": "support",
@@ -478,7 +484,9 @@ def client_portal_export_support_tickets(request):
     if not contact:
         return redirect("client_portal:login")
 
-    tickets_qs = _client_ticket_base_qs(client).order_by("-created_at")
+    tickets_qs = _client_ticket_base_qs(client).select_related(
+        "asset", "assigned_to"
+    ).order_by("-created_at")
 
     search = (request.GET.get("search") or "").strip()
     status = request.GET.get("status")

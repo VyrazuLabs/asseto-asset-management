@@ -6,7 +6,7 @@ from dashboard.models import LicenseType
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.http import HttpResponse
 from license.utils import get_assigned_users
 
@@ -18,10 +18,15 @@ def license_list(request):
     ORPHANS = 1
     licenses = License.undeleted_objects.all().order_by("-created_at")
 
-    # Stats for summary cards
-    total_licenses = licenses.count()
-    total_seats = licenses.aggregate(total=Sum("seats"))["total"] or 0
-    assigned_count = licenses.filter(is_assigned=True).count()
+    # Stats for summary cards — one aggregate instead of three queries
+    license_stats = licenses.aggregate(
+        total=Count("id"),
+        seats=Sum("seats"),
+        assigned=Count("id", filter=Q(is_assigned=True)),
+    )
+    total_licenses = license_stats["total"]
+    total_seats = license_stats["seats"] or 0
+    assigned_count = license_stats["assigned"]
     deleted_count = License.deleted_objects.count()
 
     paginator = Paginator(licenses, PAGE_SIZE, orphans=ORPHANS)

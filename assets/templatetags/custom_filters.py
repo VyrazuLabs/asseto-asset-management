@@ -7,8 +7,7 @@ from configurations.models import LocalizationConfiguration
 from configurations.constants import NAME_FORMATS
 from dateutil.relativedelta import relativedelta
 from audit.utils import get_time_difference
-from audit.models import Audit, AuditImage
-from assets.models import AssetImage
+from audit.models import Audit
 
 register = template.Library()
 
@@ -188,27 +187,4 @@ def next_audit_due(audit_id):
 #     return get_asset_image
 
 
-@register.filter
-def get_img_for_audit(audit):
-    get_audit_image = audit.image
-    get_asset_image = AssetImage.objects.filter(
-        image=get_audit_image,
-    ).first()
-    return get_asset_image.image.url
 
-
-@register.filter
-def audit_image_url(audit):
-    if audit:
-        get_audit_image = (
-            AuditImage.objects.filter(
-                audit=audit,
-            )
-            .order_by("-uploaded_at")
-            .first()
-        )
-        if get_audit_image:
-            return get_audit_image.image.url
-        else:
-            return ""
-    return ""

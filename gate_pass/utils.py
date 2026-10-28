@@ -28,7 +28,13 @@ SEARCH_FIELDS = [
 
 
 def get_gate_pass_list():
-    get_items = GatePass.objects.all().order_by("-created_at")
+    # Join the asset and prefetch its images once: the list template reads
+    # item.asset / item.asset.images.first for every row.
+    get_items = (
+        GatePass.objects.select_related("asset")
+        .prefetch_related("asset__images")
+        .order_by("-created_at")
+    )
     get_inward_pass_count = get_items.filter(movement_type=1, status=1).count()
     get_pending_authorization_count = get_items.filter(status=0).count()
     now = timezone.localtime(timezone.now())
@@ -76,7 +82,12 @@ def search_and_filter_gate_passes(request):
         if value := request.GET.get(param):
             queryset = queryset.filter(**{field: value})
 
-    return queryset.distinct().order_by("-created_at")
+    return (
+        queryset.select_related("asset")
+        .prefetch_related("asset__images")
+        .distinct()
+        .order_by("-created_at")
+    )
 
 
 class GatePassRepository(ABC):

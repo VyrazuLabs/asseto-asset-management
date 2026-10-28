@@ -17,10 +17,15 @@ def get_department_list(request, page_number=None):
         organization=request.user.organization
     )
 
-    # Summary stats
-    total_departments = base_query.count()
-    active_departments = base_query.filter(status=True).count()
-    inactive_departments = base_query.filter(status=False).count()
+    # Summary stats — single scan for total/active/inactive (deleted uses another queryset)
+    department_counts = base_query.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_departments = department_counts["total"]
+    active_departments = department_counts["active"]
+    inactive_departments = department_counts["inactive"]
     deleted_department_count = Department.deleted_objects.filter(
         organization=request.user.organization
     ).count()
@@ -83,10 +88,15 @@ def get_product_type_list(request, page_number=None):
         Q(organization=request.user.organization) | Q(organization=None)
     )
 
-    # Stats
-    total_product_types = base_query.count()
-    active_product_types = base_query.filter(status=True).count()
-    inactive_product_types = base_query.filter(status=False).count()
+    # Stats — single scan for total/active/inactive (deleted uses another queryset)
+    product_type_counts = base_query.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_product_types = product_type_counts["total"]
+    active_product_types = product_type_counts["active"]
+    inactive_product_types = product_type_counts["inactive"]
     deleted_product_types_count = ProductType.deleted_objects.filter(
         can_modify=True
     ).count()
@@ -142,10 +152,15 @@ def get_license_type_list(request, page_number=None):
 
     base_query = LicenseType.undeleted_objects.all()
 
-    # Stats
-    total_license_types = base_query.count()
-    active_license_types = base_query.filter(status=True).count()
-    inactive_license_types = base_query.filter(status=False).count()
+    # Stats — single scan for total/active/inactive (deleted uses another queryset)
+    license_type_counts = base_query.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_license_types = license_type_counts["total"]
+    active_license_types = license_type_counts["active"]
+    inactive_license_types = license_type_counts["inactive"]
     deleted_license_types_count = LicenseType.deleted_objects.count()
 
     # Filtering
@@ -203,10 +218,15 @@ def get_product_category_list(request, page_number=None):
         organization=request.user.organization
     )
 
-    # STATS
-    total_categories = base_query.count()
-    active_categories = base_query.filter(status=True).count()
-    inactive_categories = base_query.filter(status=False).count()
+    # STATS — single scan for total/active/inactive (deleted uses another queryset)
+    category_counts = base_query.aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_categories = category_counts["total"]
+    active_categories = category_counts["active"]
+    inactive_categories = category_counts["inactive"]
     deleted_categories_count = ProductCategory.deleted_objects.filter(
         organization=request.user.organization
     ).count()
@@ -310,16 +330,17 @@ def get_location_list(request, page_number=None):
         item["location"]: item["asset_count"] for item in asset_counts
     }
 
-    # Stats for summary cards
-    total_locations = Location.undeleted_objects.filter(
+    # Stats for summary cards — single scan instead of three separate counts
+    location_counts = Location.undeleted_objects.filter(
         organization=request.user.organization
-    ).count()
-    active_locations = Location.undeleted_objects.filter(
-        organization=request.user.organization, status=True
-    ).count()
-    inactive_locations = Location.undeleted_objects.filter(
-        organization=request.user.organization, status=False
-    ).count()
+    ).aggregate(
+        total=Count("id"),
+        active=Count("id", filter=Q(status=True)),
+        inactive=Count("id", filter=Q(status=False)),
+    )
+    total_locations = location_counts["total"]
+    active_locations = location_counts["active"]
+    inactive_locations = location_counts["inactive"]
 
     stats = {
         "total_locations": total_locations,
