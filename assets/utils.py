@@ -167,6 +167,7 @@ def get_asset_filter_data(request):
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
     client_data = request.POST.get("client-data")
+    product_data = request.POST.get("product")  # product id posted from products list
     product_type = request.POST.get("product_type")  # gets the id of the product type
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
@@ -175,6 +176,7 @@ def filtered_asset(request):
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
+    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(
@@ -206,6 +208,8 @@ def filtered_asset(request):
         filters &= Q(product__product_sub_category_id=category_id)
     if product_type_id:
         filters &= Q(product__product_type_id=product_type_id)
+    if product_id:
+        filters &= Q(product_id=product_id)
     if client_id:
         filters &= Q(client_id=client_id)
     if location_id:
@@ -242,6 +246,8 @@ def filtered_asset(request):
         )
     if client_data:
         assets_qs = assets_qs.filter(client_id=client_data)
+    if product_data:
+        assets_qs = assets_qs.filter(product_id=product_data)
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -340,6 +346,14 @@ def create_asset_list(request, assets_qs):
     location_list = Location.undeleted_objects.filter(org_filter)
     user_list = User.objects.filter(org_filter, is_active=True).select_related("department", "location").order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
+    selected_vendor = None
+    selected_vendor_id = (request.GET.get("vendor") or "").strip()
+    if selected_vendor_id:
+        try:
+            uuid.UUID(selected_vendor_id)
+            selected_vendor = vendor_list.filter(id=selected_vendor_id).first()
+        except (ValueError, TypeError, AttributeError):
+            selected_vendor = None
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
@@ -417,6 +431,7 @@ def create_asset_list(request, assets_qs):
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
+        "selected_vendor": selected_vendor,
         "active_user": active_users,
         "sidebar": "assets",
         "submenu": "list",
@@ -752,6 +767,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
+    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     location_id = request.GET.get("location")
     is_assigned = request.GET.get("is_assigned")
@@ -789,6 +805,9 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
 
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
+
+    if product_id:
+        q &= Q(product_id=product_id)
 
     if client_id:
         q &= Q(client_id=client_id)
@@ -829,7 +848,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     # unfiltered browse view uses regular pagination below.
     any_filter_active = any([
         search_text, vendor_id, status_value, user_id, department_id,
-        product_category_id, product_type_id, client_id, location_id,
+        product_category_id, product_type_id, product_id, client_id, location_id,
         is_assigned,
     ])
 

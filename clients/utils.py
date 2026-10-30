@@ -273,7 +273,13 @@ class ClientService:
 
     @staticmethod
     def update(request, client_id: int):
-        """Update an existing client and replace its contacts."""
+        """Update an existing client and replace its contacts.
+
+        Contacts are upserted by UUID so that existing portal sessions remain
+        valid.  Contacts that are removed from the form are soft-deleted
+        (is_deleted=True) rather than hard-deleted so that OTP records are
+        preserved and any in-flight portal sessions degrade gracefully.
+        """
         client = get_object_or_404(
             Client.undeleted_objects,
             pk=client_id,
@@ -284,35 +290,84 @@ class ClientService:
             client = form.save(commit=False)
             client.updated_by = request.user.id
             client.save()
-            # replace contacts
-            client.contacts.all().delete()
-            contact_names = request.POST.getlist("contact_name[]")
-            contact_emails = request.POST.getlist("contact_email[]")
-            contact_phones = request.POST.getlist("contact_phone[]")
-            contact_roles = request.POST.getlist("contact_role[]")
-            contact_notes = request.POST.getlist("contact_notes[]")
+
+            contact_ids     = request.POST.getlist("contact_id[]")
+            contact_names   = request.POST.getlist("contact_name[]")
+            contact_emails  = request.POST.getlist("contact_email[]")
+            contact_phones  = request.POST.getlist("contact_phone[]")
+            contact_roles   = request.POST.getlist("contact_role[]")
+            contact_notes   = request.POST.getlist("contact_notes[]")
             contact_portal_access = request.POST.getlist("is_portal_active[]")
-            logger.info(f"UPDATE contact_names={contact_names} contact_emails={contact_emails} contact_phones={contact_phones}")
+
+            logger.info(
+                f"UPDATE contact_names={contact_names} "
+                f"contact_emails={contact_emails} "
+                f"contact_phones={contact_phones}"
+            )
+
+            # Track which existing contact UUIDs are still present in the form
+            submitted_ids = set()
+
             for index, raw_name in enumerate(contact_names):
                 contact_name = raw_name.strip()
                 if not contact_name:
                     continue
-                email = contact_emails[index].strip() if index < len(contact_emails) else ""
+
+                email    = contact_emails[index].strip() if index < len(contact_emails) else ""
                 raw_phone = contact_phones[index].strip() if index < len(contact_phones) else ""
-                phone = ClientService._normalize_phone(raw_phone)
-                role_id = contact_roles[index] if index < len(contact_roles) and contact_roles[index] else None
-                notes = contact_notes[index].strip() if index < len(contact_notes) else ""
+                phone    = ClientService._normalize_phone(raw_phone)
+                role_id  = contact_roles[index] if index < len(contact_roles) and contact_roles[index] else None
+                notes    = contact_notes[index].strip() if index < len(contact_notes) else ""
                 is_portal_active = contact_portal_access[index] == "1" if index < len(contact_portal_access) else False
+                existing_id = contact_ids[index].strip() if index < len(contact_ids) else ""
+
                 ClientService._validate_contact(email, phone)
-                ClientContact.objects.create(
-                    client=client,
-                    name=contact_name,
-                    email=email,
-                    phone=phone,
-                    role_id=role_id,
-                    notes=notes,
-                    is_portal_active=is_portal_active,
-                )
+
+                if existing_id:
+                    # Update existing contact in place — UUID stays the same
+                    # so any active portal session continues to work.
+                    try:
+                        contact_obj = ClientContact.objects.get(id=existing_id, client=client)
+                        contact_obj.name            = contact_name
+                        contact_obj.email           = email
+                        contact_obj.phone           = phone
+                        contact_obj.role_id         = role_id
+                        contact_obj.notes           = notes
+                        contact_obj.is_portal_active = is_portal_active
+                        contact_obj.is_deleted      = False  # restore if previously soft-deleted
+                        contact_obj.save()
+                        submitted_ids.add(str(contact_obj.id))
+                    except ClientContact.DoesNotExist:
+                        # UUID provided but not found — treat as new
+                        new_contact = ClientContact.objects.create(
+                            client=client,
+                            name=contact_name,
+                            email=email,
+                            phone=phone,
+                            role_id=role_id,
+                            notes=notes,
+                            is_portal_active=is_portal_active,
+                        )
+                        submitted_ids.add(str(new_contact.id))
+                else:
+                    # No UUID → brand-new contact
+                    new_contact = ClientContact.objects.create(
+                        client=client,
+                        name=contact_name,
+                        email=email,
+                        phone=phone,
+                        role_id=role_id,
+                        notes=notes,
+                        is_portal_active=is_portal_active,
+                    )
+                    submitted_ids.add(str(new_contact.id))
+
+            # Soft-delete contacts that were removed from the form
+            client.contacts.exclude(id__in=submitted_ids).update(
+                is_deleted=True,
+                is_portal_active=False,
+            )
+
         return client
 
     @staticmethod

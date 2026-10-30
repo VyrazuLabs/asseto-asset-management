@@ -27,7 +27,11 @@ from django.core.exceptions import ValidationError
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location
 from vendors.models import Vendor
-from .utils import create_otp_for_contact, verify_otp_for_contact
+from .utils import (
+    create_otp_for_contact,
+    verify_otp_for_contact,
+    otp_remaining_seconds,
+)
 
 # ─── Helper ──────────────────────────────────────────────────────────
 
@@ -38,9 +42,16 @@ def _get_contact_and_client(request):
     if not contact_id:
         return None, None
     try:
-        contact = ClientContact.objects.select_related("client").get(id=contact_id)
+        contact = ClientContact.objects.select_related("client").get(
+            id=contact_id,
+            is_portal_active=True,
+            is_deleted=False,
+            client__is_deleted=False,
+        )
         return contact, contact.client
     except ClientContact.DoesNotExist:
+        for key in ("client_contact_id", "client_id"):
+            request.session.pop(key, None)
         return None, None
 
 
@@ -49,52 +60,59 @@ def _get_contact_and_client(request):
 
 def client_portal_login(request):
     """Step 1: Client enters email → OTP is sent."""
-    # If already logged in, go to dashboard
+    # If already logged in with a still-valid session, go to dashboard
     if request.session.get("client_contact_id"):
-        return redirect("client_portal:dashboard")
+        contact, _ = _get_contact_and_client(request)
+        if contact:
+            return redirect("client_portal:dashboard")
 
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
 
         if not email:
             messages.error(request, "Please enter your email address.")
-            return render(request, "client_portal/login.html")
+            return redirect("client_portal:login")
 
-        # Find contact with portal access
+        # Find the correct contact with portal access for this email.
+        # Use the most recently created one to handle edge cases where
+        # multiple contacts share the same email (e.g. after a re-save).
         contact = (
             ClientContact.objects.filter(
                 email__iexact=email,
                 is_portal_active=True,
                 is_deleted=False,
+                client__is_deleted=False,
             )
             .select_related("client")
+            .order_by("-created_at")  # most recently created first
             .first()
         )
 
         if not contact:
-            # Security note: In some cases, we might not want to reveal if an email exists,
-            # but for a portal like this, a clear error helps legitimate users.
             messages.error(
                 request,
                 "No portal access found for this email. Please contact your administrator.",
             )
-            return render(request, "client_portal/login.html", {"email": email})
+            return redirect("client_portal:login")
 
         # Generate & send OTP
         try:
             create_otp_for_contact(contact)
+            request.session["pending_contact_id"] = str(contact.id)
+            request.session["pending_contact_email"] = contact.email  # use stored email
+            messages.success(request, f"A verification code has been sent to {contact.email}")
+            return redirect("client_portal:verify_otp")
         except Exception as e:
-            # Log the error path here in a real app
             messages.error(
                 request, "Failed to send verification code. Please try again later."
             )
-            return render(request, "client_portal/login.html", {"email": email})
+            return redirect("client_portal:login")
 
-        # Store pending contact in session
-        request.session["pending_contact_id"] = str(contact.id)
-        request.session["pending_contact_email"] = email
-        messages.success(request, f"A verification code has been sent to {email}")
-        return redirect("client_portal:verify_otp")
+    # GET request: clear any stale pending OTP session keys so that
+    # navigating back from the OTP page does not leave ghost state
+    # that would cause a confusing "No portal access" message on refresh.
+    for key in ("pending_contact_id", "pending_contact_email", "last_otp_resend"):
+        request.session.pop(key, None)
 
     return render(request, "client_portal/login.html")
 
@@ -107,7 +125,20 @@ def client_portal_verify_otp(request):
     if not pending_id:
         return redirect("client_portal:login")
 
-    contact = get_object_or_404(ClientContact, id=pending_id)
+    try:
+        contact = ClientContact.objects.get(
+            id=pending_id,
+            is_portal_active=True,
+            is_deleted=False,
+            client__is_deleted=False,
+        )
+    except ClientContact.DoesNotExist:
+        # Stale or invalid pending session — restart login flow
+        for key in ("pending_contact_id", "pending_contact_email"):
+            request.session.pop(key, None)
+        messages.error(request, "Your session has expired. Please log in again.")
+        return redirect("client_portal:login")
+    otp_seconds = otp_remaining_seconds(contact)
 
     if request.method == "POST":
         entered_otp = request.POST.get("otp", "").strip()
@@ -115,7 +146,9 @@ def client_portal_verify_otp(request):
         if not entered_otp:
             messages.error(request, "Please enter the verification code.")
             return render(
-                request, "client_portal/verify-otp.html", {"email": pending_email}
+                request,
+                "client_portal/verify-otp.html",
+                {"email": pending_email, "otp_seconds": otp_seconds},
             )
 
         success, message = verify_otp_for_contact(contact, entered_otp)
@@ -134,7 +167,11 @@ def client_portal_verify_otp(request):
         else:
             messages.error(request, message)
 
-    return render(request, "client_portal/verify-otp.html", {"email": pending_email})
+    return render(
+        request,
+        "client_portal/verify-otp.html",
+        {"email": pending_email, "otp_seconds": otp_seconds},
+    )
 
 
 def client_portal_logout(request):
@@ -149,6 +186,45 @@ def client_portal_logout(request):
         request.session.pop(key, None)
     messages.success(request, "You have been logged out successfully.")
     return redirect("client_portal:login")
+
+
+from datetime import datetime
+
+def client_portal_resend_otp(request):
+    """Resend OTP with cooldown protection."""
+    pending_id = request.session.get("pending_contact_id")
+    if not pending_id:
+        return redirect("client_portal:login")
+
+    # Rate limit: 1 resend per 60 seconds
+    last_resend = request.session.get("last_otp_resend")
+    if last_resend:
+        elapsed = timezone.now() - datetime.fromisoformat(last_resend)
+        if elapsed.total_seconds() < 60:
+            remaining = int(60 - elapsed.total_seconds())
+            messages.warning(request, f"Please wait {remaining}s before requesting another code.")
+            return redirect("client_portal:verify_otp")
+
+    try:
+        contact = ClientContact.objects.get(
+            id=pending_id,
+            is_portal_active=True,
+            is_deleted=False,
+            client__is_deleted=False,
+        )
+    except ClientContact.DoesNotExist:
+        for key in ("pending_contact_id", "pending_contact_email"):
+            request.session.pop(key, None)
+        messages.error(request, "Your session has expired. Please log in again.")
+        return redirect("client_portal:login")
+    try:
+        create_otp_for_contact(contact)
+        request.session["last_otp_resend"] = timezone.now().isoformat()
+        messages.success(request, "A new verification code has been sent.")
+    except Exception:
+        messages.error(request, "Failed to send code. Please try again.")
+    
+    return redirect("client_portal:verify_otp")
 
 
 # ─── Dashboard (Overview) ───────────────────────────────────────────

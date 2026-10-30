@@ -152,6 +152,8 @@
                                 {{ trans.remove }}</button>
                         </div>
                         <div class="form-grid">
+                            {# Hidden field carries the existing contact UUID so the backend can upsert #}
+                            <input type="hidden" name="contact_id[]" value="{{ contact.id }}">
                             <div class="form-group full-width">
                                 <label>{{ trans.contact_name }}</label>
                                 <input type="text" name="contact_name[]" class="form-control"
@@ -207,6 +209,8 @@
                                     class="bi bi-trash"></i> {{ trans.remove }}</button>
                         </div>
                         <div class="form-grid">
+                            {# Empty contact_id means this is a new contact to be created #}
+                            <input type="hidden" name="contact_id[]" value="">
                             <div class="form-group full-width">
                                 <label>{{ trans.contact_name }}</label>
                                 <input type="text" name="contact_name[]" class="form-control"

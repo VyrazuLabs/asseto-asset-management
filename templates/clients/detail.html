@@ -6,6 +6,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/clients.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
 <style>
@@ -412,6 +413,13 @@
               {% endif %}
               {% if contact.phone %}
               <div><a href="tel:{{ contact.phone }}" class="detail-contact-link"><i class="bi bi-telephone"></i> {{ contact.phone }}</a></div>
+              {% endif %}
+              {% if contact.is_portal_active %}
+              <div class="mt-2">
+                <a href="{% url 'client_portal:login' %}" target="_blank" rel="noopener" class="portal-login-btn">
+                  <i class="bi bi-box-arrow-in-right"></i> {{ trans.open_client_portal }}
+                </a>
+              </div>
               {% endif %}
             </div>
           </div>
