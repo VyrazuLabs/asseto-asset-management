@@ -64,6 +64,7 @@ STRINGS = {
     "no_assets_client": "No assets assigned to this client yet",
     "key_contacts": "Key Contacts",
     "access_granted": "Access Granted",
+    "open_client_portal": "Open Client Portal",
     "primary_contact_fallback": "Primary Contact",
     "no_contacts_listed": "No contacts listed",
     "activity_log": "Activity Log",

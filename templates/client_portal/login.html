@@ -23,7 +23,11 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
+                {% if updated_login_page_logo %}
+                <img src="/media{{ updated_login_page_logo }}" alt="Logo" class="login-logo">
+                {% else %}
                 <img src="{% static 'images/asseto-logo.svg' %}" alt="Asseto Logo" class="login-logo">
+                {% endif %}
                 <div class="login-title">Client Portal</div>
                 <div class="login-subtitle">PRECISION LEDGER</div>
             </div>

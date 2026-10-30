@@ -12,16 +12,28 @@ def generate_otp():
 
 
 OTP_EXPIRY_MINUTES = 2
+DEFAULT_BRAND_NAME = "Asseto"
+
+
+def get_organization_name(contact):
+    """Organization name from configurations/add-organization/ for the
+    contact's client, falling back to the default brand name."""
+    organization = getattr(getattr(contact, "client", None), "organization", None)
+    return (getattr(organization, "name", None) or "").strip() or DEFAULT_BRAND_NAME
 
 
 def send_otp_email(contact, otp):
     """Send OTP to the client contact's email address."""
-    subject = "Asseto Client Portal — Your Login Code"
+    org_name = get_organization_name(contact)
+
+    subject = f"Your {org_name} Client Portal login code"
     message = (
         f"Hello {contact.name},\n\n"
-        f"Your one-time login code is: {otp}\n\n"
-        f"This code expires in {OTP_EXPIRY_MINUTES} minute(s). Do not share it with anyone.\n\n"
-        f"— Asseto Team"
+        f"Use this one-time code to sign in to the {org_name} Client Portal:\n\n"
+        f"    {otp}\n\n"
+        f"The code is valid for {OTP_EXPIRY_MINUTES} minutes and can only be used once.\n"
+        f"If you did not request this code, you can safely ignore this email — no one can access your account without it.\n\n"
+        f"— The {org_name} Team"
     )
     # Using fail_silently=False during development to catch email issues
     send_mail(

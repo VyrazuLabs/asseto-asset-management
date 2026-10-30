@@ -64,6 +64,7 @@ STRINGS = {
     "no_assets_client": "Aucun actif assigné à ce client pour le moment",
     "key_contacts": "Contacts clés",
     "access_granted": "Accès accordé",
+    "open_client_portal": "Ouvrir le portail client",
     "primary_contact_fallback": "Contact principal",
     "no_contacts_listed": "Aucun contact répertorié",
     "activity_log": "Journal d'activité",

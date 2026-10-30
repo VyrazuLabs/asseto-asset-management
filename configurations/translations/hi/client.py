@@ -64,6 +64,7 @@ STRINGS = {
     "no_assets_client": "इस ग्राहक को अभी तक कोई संपत्ति आवंटित नहीं की गई है",
     "key_contacts": "प्रमुख संपर्क",
     "access_granted": "पहुंच प्रदान की गई",
+    "open_client_portal": "क्लाइंट पोर्टल खोलें",
     "primary_contact_fallback": "प्राथमिक संपर्क",
     "no_contacts_listed": "कोई संपर्क सूचीबद्ध नहीं है",
     "activity_log": "गतिविधि लॉग",
