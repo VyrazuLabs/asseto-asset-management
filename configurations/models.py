@@ -87,6 +87,55 @@ class SlackConfiguration(models.Model):
     client_secret = models.CharField(max_length=100, null=True, blank=True)
 
 
+class SMSConfiguration(models.Model):
+    PROVIDER_CHOICES = [
+        ("msg91", "MSG91"),
+        ("twilio", "Twilio"),
+        ("sns", "AWS SNS"),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="sms_configurations"
+    )
+    provider = models.CharField(max_length=50, choices=PROVIDER_CHOICES, default="msg91")
+    credentials = models.JSONField(default=dict, blank=True)
+    is_active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("organization", "provider")
+
+    def __str__(self):
+        return f"{self.organization.name} - {self.provider}"
+
+
+class SMSLog(models.Model):
+    STATUS_CHOICES = [
+        ("sent", "Sent"),
+        ("failed", "Failed"),
+        ("pending", "Pending"),
+    ]
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="sms_logs"
+    )
+    provider = models.CharField(max_length=50, default="msg91")
+    recipient = models.CharField(max_length=30)
+    message = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    provider_response = models.JSONField(default=dict, blank=True)
+    entity_type = models.CharField(max_length=50, blank=True, null=True)
+    entity_id = models.CharField(max_length=100, blank=True, null=True)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-sent_at"]
+
+    def __str__(self):
+        return f"{self.provider} SMS to {self.recipient} ({self.status})"
+
+
 class ConfigurationPermission(models.Model):
     """Unmanaged anchor model for Configurations permissions.
 
