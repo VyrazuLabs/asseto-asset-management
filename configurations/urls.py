@@ -4,6 +4,11 @@ from .views.extentions_views import *
 from .views.localization_views import *
 from .views.organizations_views import add_organization
 from .views.tag_configurations_views import *
+from .views.sms_views import (
+    sms_integration,
+    save_sms_configuration,
+    test_sms,
+)
 
 from . import api_views
 
@@ -29,6 +34,10 @@ urlpatterns=[
     path('extension-status/<uuid:id>/', extension_status, name='extension_status'),
     path('add-configurations/',save_slack_configuration,name='save_slack_configuration'),
     
+    path('sms-integration/', sms_integration, name='sms_integration'),
+    path('save-sms-configuration/', save_sms_configuration, name='save_sms_configuration'),
+    path('test-sms/', test_sms, name='test_sms'),
+
     path('add-organization/',add_organization,name='add_organization'),
 
     #for api extension

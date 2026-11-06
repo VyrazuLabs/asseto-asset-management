@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Clean SMS Icon with transparent background -->
+  <path d="M18 22 C18 15.37 23.37 10 30 10 L70 10 C76.63 10 82 15.37 82 22 L82 60 C82 66.63 76.63 72 70 72 L36 72 L20 86 L20 70 C18.78 67.45 18 64.12 18 60 Z" 
+        fill="#435ebe" />
+  <!-- Three dots or message lines inside bubble -->
+  <circle cx="36" cy="41" r="5" fill="#ffffff" />
+  <circle cx="50" cy="41" r="5" fill="#ffffff" />
+  <circle cx="64" cy="41" r="5" fill="#ffffff" />
+</svg>

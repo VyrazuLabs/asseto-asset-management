@@ -1,0 +1,238 @@
+{% extends 'layouts/main-layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-heading">
+    <div class="d-flex justify-content-between">
+        <div class="page-title">
+            <h3 class="page-name">SMS Configuration</h3>
+            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end d-none d-md-block">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'configurations:list_extensions' %}">Extensions</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">SMS</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'configurations:list_extensions' %}" class="btn btn-sm btn-outline-info my-3">
+                Back to Extensions
+            </a>
+        </div>
+    </div>
+</div>
+
+<section class="section">
+    <!-- SMS Configuration Form Card -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="card-title mb-0">Configure SMS Provider</h5>
+            <div class="d-flex align-items-center gap-2">
+                {% if current_config.is_active %}
+                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Active Provider</span>
+                {% elif active_config %}
+                    <span class="badge bg-warning text-dark"><i class="bi bi-pause-circle me-1"></i>Inactive ({{ active_config.provider|upper }} is Active)</span>
+                {% else %}
+                    <span class="badge bg-secondary">Disabled</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <script id="providersData" type="application/json">{{ providers_json|safe }}</script>
+        <script id="allCredentialsData" type="application/json">{{ all_credentials_json|safe }}</script>
+        <script id="providerStatusData" type="application/json">{{ provider_status_json|safe }}</script>
+
+        <form class="form" id="smsConfigForm" action="{% url 'configurations:save_sms_configuration' %}" method="POST"
+              data-was-active="{{ current_config.is_active|yesno:'true,false' }}"
+              data-other-active-provider="{{ active_config.provider|default:'' }}">
+            {% csrf_token %}
+            <input type="hidden" name="provider" id="hiddenProviderInput" value="{{ selected_provider_key }}">
+
+            <div class="card-body p-4">
+                <div class="row">
+                    <!-- Provider Selection Dropdown -->
+                    <div class="col-md-6 col-12 mb-3">
+                        <label for="providerSelect"><b>SMS Provider</b></label>
+                        <select class="form-select mt-1" id="providerSelect" data-no-select2 onchange="switchProvider(this.value)">
+                            <option value="msg91" {% if selected_provider_key == 'msg91' %}selected{% endif %}>
+                                MSG91 (Recommended / DLT Compliant){% if active_config.provider == 'msg91' %} — Active{% endif %}
+                            </option>
+                            <option value="twilio" {% if selected_provider_key == 'twilio' %}selected{% endif %}>
+                                Twilio{% if active_config.provider == 'twilio' %} — Active{% endif %}
+                            </option>
+                        </select>
+                        <small class="text-muted d-block mt-1">Select the provider you bought SMS credits from.</small>
+                    </div>
+
+                    <!-- Status Toggle -->
+                    <div class="col-md-6 col-12 mb-3">
+                        <label><b>Status</b></label>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" role="switch" name="is_active" id="id_is_active"
+                                   {% if current_config.is_active %}checked{% endif %}>
+                            <label class="form-check-label ms-2" for="id_is_active">
+                                Enable SMS service via {{ selected_provider.name }}
+                            </label>
+                        </div>
+                        <small class="text-muted d-block mt-1">When enabled, ticket alerts will be sent automatically.</small>
+                    </div>
+
+                    <!-- Provider Switching Informational Banner -->
+                    {% if active_config and active_config.provider != selected_provider_key %}
+                        <div class="col-12 mb-3">
+                            <div class="alert alert-info py-2 px-3 mb-0 d-flex align-items-center gap-2" role="alert" style="font-size: 0.88rem;">
+                                <i class="bi bi-info-circle-fill fs-5"></i>
+                                <div>
+                                    <strong>{{ active_config.provider|upper }}</strong> is currently the active SMS provider for your organization.
+                                    You can configure and test <strong>{{ selected_provider.name }}</strong> credentials here without interrupting {{ active_config.provider|upper }}.
+                                    Turning the <strong>Status</strong> switch ON will switch your organization's active provider to {{ selected_provider.name }}.
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Helpful Step-by-Step Guide Banner -->
+                    <div class="col-12 mb-4">
+                        <div class="p-3 bg-light border rounded">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                                <strong class="text-dark" id="guideTitle">How to obtain {{ selected_provider.name }} credentials:</strong>
+                                <a id="providerPortalBtn" href="{{ selected_provider.portal_url }}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem;">
+                                    Open {{ selected_provider.name }} Portal <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                </a>
+                            </div>
+                            <ol class="mb-0 ps-3 small text-muted" id="guideList" style="line-height: 1.7;">
+                                {% for step in selected_provider.guide %}
+                                    <li>{{ step|safe }}</li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Fields Container -->
+                    <div class="col-12">
+                        <div id="dynamicFieldsContainer" class="row">
+                            {% for field in selected_provider.fields %}
+                                <div class="col-md-6 col-12 mb-3">
+                                    <label for="field_{{ field.key }}">
+                                        <b>{{ field.label }}</b>
+                                        {% if field.required %}<span class="text-danger">*</span>{% endif %}
+                                    </label>
+
+                                    {% if field.type == 'password' %}
+                                        <div class="input-group mt-1">
+                                            <input type="password"
+                                                   class="form-control"
+                                                   id="field_{{ field.key }}"
+                                                   name="{{ field.key }}"
+                                                   placeholder="{{ field.placeholder }}"
+                                                   value="{% for k, v in display_credentials.items %}{% if k == field.key %}{{ v }}{% endif %}{% endfor %}"
+                                                   {% if field.required %}required{% endif %}>
+                                            <button class="btn btn-outline-secondary" type="button" data-password-toggle="field_{{ field.key }}">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <input type="text"
+                                               class="form-control mt-1"
+                                               id="field_{{ field.key }}"
+                                               name="{{ field.key }}"
+                                               placeholder="{{ field.placeholder }}"
+                                               value="{% for k, v in display_credentials.items %}{% if k == field.key %}{{ v }}{% endif %}{% endfor %}"
+                                               {% if field.maxlength %}maxlength="{{ field.maxlength }}"{% endif %}
+                                               {% if field.required %}required{% endif %}>
+                                    {% endif %}
+
+                                    {% if field.help %}
+                                        <small class="text-muted d-block mt-1">{{ field.help }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Buttons Layout -->
+            <div class="d-flex justify-content-end gap-3 p-4 border-top">
+                <a href="{% url 'configurations:list_extensions' %}" class="btn btn-sm btn-danger" style="width: 100px;">Cancel</a>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#testSmsModal" style="min-width: 100px;">
+                    Test SMS
+                </button>
+                <button type="submit" class="btn btn-sm btn-info" style="width: 100px;">Save</button>
+            </div>
+        </form>
+    </div>
+
+</section>
+
+<!-- Test SMS Modal -->
+<div class="modal fade" id="testSmsModal" data-preserve-content data-test-url="{% url 'configurations:test_sms' %}" tabindex="-1" aria-labelledby="testSmsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testSmsModalLabel">Test SMS Delivery</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="testAlertBox" class="alert d-none mb-3" role="alert"></div>
+
+                <form id="testSmsForm">
+                    <div class="mb-3">
+                        <label for="testProviderSelect" class="form-label"><b>Provider</b></label>
+                        <select class="form-select" id="testProviderSelect" name="provider">
+                            <option value="msg91" {% if selected_provider_key == 'msg91' %}selected{% endif %}>MSG91</option>
+                            <option value="twilio" {% if selected_provider_key == 'twilio' %}selected{% endif %}>Twilio</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="testPhoneInput" class="form-label">
+                            <b>Recipient Mobile Number</b> <span class="text-danger">*</span>
+                        </label>
+                        <input type="tel" class="form-control" id="testPhoneInput" name="phone"
+                               placeholder="e.g. 9876543210 or +919876543210"
+                               pattern="[+]?[0-9]{10,15}" maxlength="16" required>
+                        <small class="text-muted">10–15 digits, optionally starting with + and country code.</small>
+                    </div>
+
+                    <div class="mb-3{% if selected_provider_key == 'msg91' %} d-none{% endif %}" id="testMessageGroup">
+                        <label for="testMessageInput" class="form-label"><b>Message</b></label>
+                        <textarea class="form-control" id="testMessageInput" name="message" rows="2">Asseto Test Alert: SMS Integration is functioning properly.</textarea>
+                    </div>
+
+                    <div class="alert alert-info py-2 px-3 mb-3{% if selected_provider_key != 'msg91' %} d-none{% endif %}" id="msg91TemplateNotice" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill fs-5 text-primary me-2 flex-shrink-0"></i>
+                            <div class="small">
+                                <strong>Pre-Approved DLT Template:</strong> MSG91 fires the template registered with your <strong>Template/Flow ID</strong>.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal" style="width: 100px;">Cancel</button>
+                <button type="button" class="btn btn-sm btn-info" id="sendTestSmsBtn" style="min-width: 100px;">
+                    <span class="spinner-border spinner-border-sm d-none me-1" id="testSpinner" role="status"></span>
+                    <span id="testSendText">Send Test</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    function switchProvider(providerKey) {
+        if (!providerKey) return;
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set("provider", providerKey);
+        window.location.href = newUrl.toString();
+    }
+</script>
+<script src="{% static 'js/pages/sms_integration.js' %}?v=1.4" defer></script>
+{% endblock script %}
+
