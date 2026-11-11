@@ -209,7 +209,11 @@ def filtered_asset(request):
     if product_type_id:
         filters &= Q(product__product_type_id=product_type_id)
     if product_id:
-        filters &= Q(product_id=product_id)
+        try:
+            uuid.UUID(str(product_id))
+            filters &= Q(product_id=product_id)
+        except (ValueError, TypeError, AttributeError):
+            pass
     if client_id:
         filters &= Q(client_id=client_id)
     if location_id:
@@ -247,7 +251,11 @@ def filtered_asset(request):
     if client_data:
         assets_qs = assets_qs.filter(client_id=client_data)
     if product_data:
-        assets_qs = assets_qs.filter(product_id=product_data)
+        try:
+            uuid.UUID(str(product_data))
+            assets_qs = assets_qs.filter(product_id=product_data)
+        except (ValueError, TypeError, AttributeError):
+            pass
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -793,7 +801,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(vendor_id=vendor_id)
 
     if status_value:
-        import uuid
         try:
             uuid.UUID(str(status_value))
             q &= Q(asset_status_id=status_value)
@@ -807,7 +814,11 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(product__product_type_id=product_type_id)
 
     if product_id:
-        q &= Q(product_id=product_id)
+        try:
+            uuid.UUID(str(product_id))
+            q &= Q(product_id=product_id)
+        except (ValueError, TypeError, AttributeError):
+            pass
 
     if client_id:
         q &= Q(client_id=client_id)

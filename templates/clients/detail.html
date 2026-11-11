@@ -389,8 +389,8 @@
         </div>
       </div>
       <div class="detail-card-body">
-        {% if client.contacts.all %}
-        {% for contact in client.contacts.all %}
+        {% if client.active_contacts %}
+        {% for contact in client.active_contacts %}
         <div class="detail-contact-card">
           <div class="d-flex align-items-center mb-2">
             <div class="client-assignee-avatar

@@ -54,5 +54,4 @@ class ClientPortalMiddleware:
 
     @staticmethod
     def _clear_portal_session(request):
-        for key in ("client_contact_id", "client_id"):
-            request.session.pop(key, None)
+        request.session.flush()

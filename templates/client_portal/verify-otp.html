@@ -61,10 +61,14 @@
                     </button>
 
                     <div class="text-center mt-3">
-                        <p class="small text-muted">Didn't receive the code? <a href="{% url 'client_portal:resend_otp' %}"
-                                class="text-decoration-none fw-bold">Resend</a></p>
+                        <p class="small text-muted mb-2">Didn't receive the code?
+                            <button type="submit" form="resendOtpForm" class="btn btn-link p-0 m-0 align-baseline fw-bold text-decoration-none" style="font-size: inherit; color: var(--color-primary, #435ebe);">Resend</button>
+                        </p>
                         <a href="{% url 'client_portal:login' %}" class="small text-decoration-none fw-bold"><i class="bi bi-arrow-left"></i> Back to Login</a>
                     </div>
+                </form>
+                <form id="resendOtpForm" method="POST" action="{% url 'client_portal:resend_otp' %}" style="display: none;">
+                    {% csrf_token %}
                 </form>
 
                 <div class="portal-footer-text">

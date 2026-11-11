@@ -140,8 +140,8 @@
                     </button>
                 </div>
                 <div id="contactsContainer">
-                    {% if client.contacts.all %}
-                    {% for contact in client.contacts.all %}
+                    {% if client.active_contacts %}
+                    {% for contact in client.active_contacts %}
                     <div class="contact-block custom-field-row mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                             <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">

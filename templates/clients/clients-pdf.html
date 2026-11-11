@@ -40,9 +40,9 @@
             <td>{{ client.client_id }}</td>
             <td>{{ client.name }}</td>
             <td>{{ client.industry_name }}</td>
-            <td>{% with contact=client.contacts.first %}{{ contact.name|default:"" }}{% endwith %}</td>
-            <td>{% with contact=client.contacts.first %}{{ contact.email|default:"" }}{% endwith %}</td>
-            <td>{% with contact=client.contacts.first %}{{ contact.phone|default:"" }}{% endwith %}</td>
+            <td>{% with contact=client.active_contacts.first %}{{ contact.name|default:"" }}{% endwith %}</td>
+            <td>{% with contact=client.active_contacts.first %}{{ contact.email|default:"" }}{% endwith %}</td>
+            <td>{% with contact=client.active_contacts.first %}{{ contact.phone|default:"" }}{% endwith %}</td>
             <td>{{ client.asset_count }}</td>
             <td>{{ client.open_tickets_count }}</td>
             <td>{{ client.get_status_display }}</td>

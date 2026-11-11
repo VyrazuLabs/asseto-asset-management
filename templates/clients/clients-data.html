@@ -43,7 +43,7 @@
           {% endif %}
         </td>
         <td>
-          {% with contact=client.contacts.all|first %}
+          {% with contact=client.active_contacts.first %}
           {% if contact %}
             <div class="c-contact-cell">
               <span class="c-contact-name">{{ contact.name }}</span>

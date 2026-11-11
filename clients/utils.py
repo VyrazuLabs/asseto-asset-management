@@ -77,7 +77,7 @@ def export_clients_csv_utils(request):
         )
 
         for client in client_queryset:
-            first_contact = client.contacts.first()
+            first_contact = client.active_contacts.first()
             writer.writerow([
                 client.client_id,
                 client.name,
@@ -363,7 +363,7 @@ class ClientService:
                     submitted_ids.add(str(new_contact.id))
 
             # Soft-delete contacts that were removed from the form
-            client.contacts.exclude(id__in=submitted_ids).update(
+            client.contacts.filter(is_deleted=False).exclude(id__in=submitted_ids).update(
                 is_deleted=True,
                 is_portal_active=False,
             )
@@ -400,8 +400,8 @@ class ClientService:
             client_queryset = client_queryset.filter(
                 Q(name__icontains=search_text)
                 | Q(client_id__icontains=search_text)
-                | Q(contacts__name__icontains=search_text)
-                | Q(contacts__email__icontains=search_text)
+                | Q(contacts__name__icontains=search_text, contacts__is_deleted=False)
+                | Q(contacts__email__icontains=search_text, contacts__is_deleted=False)
                 | Q(rental_type__icontains=search_text)
             ).distinct()
         status_filter = request.GET.get("status", "")

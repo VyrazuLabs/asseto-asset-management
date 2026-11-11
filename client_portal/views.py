@@ -1,4 +1,5 @@
 import csv
+import logging
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -27,11 +28,14 @@ from django.core.exceptions import ValidationError
 from assets.models import AssetStatus
 from dashboard.models import ProductCategory, ProductType, Location
 from vendors.models import Vendor
+from .models import ClientPortalOTP
 from .utils import (
     create_otp_for_contact,
     verify_otp_for_contact,
     otp_remaining_seconds,
 )
+
+logger = logging.getLogger(__name__)
 
 # ─── Helper ──────────────────────────────────────────────────────────
 
@@ -95,6 +99,23 @@ def client_portal_login(request):
             )
             return redirect("client_portal:login")
 
+        # Database-backed rate limit: check if an OTP was sent to this contact within the last 60 seconds
+        latest_otp = (
+            ClientPortalOTP.objects.filter(contact=contact)
+            .order_by("-created_at")
+            .first()
+        )
+        if latest_otp:
+            elapsed = (timezone.now() - latest_otp.created_at).total_seconds()
+            if elapsed < 60:
+                request.session["pending_contact_id"] = str(contact.id)
+                request.session["pending_contact_email"] = contact.email
+                messages.info(
+                    request,
+                    f"A verification code was recently sent to {contact.email}.",
+                )
+                return redirect("client_portal:verify_otp")
+
         # Generate & send OTP
         try:
             create_otp_for_contact(contact)
@@ -103,6 +124,7 @@ def client_portal_login(request):
             messages.success(request, f"A verification code has been sent to {contact.email}")
             return redirect("client_portal:verify_otp")
         except Exception as e:
+            logger.exception("Failed to send verification code to %s: %s", contact.email, e)
             messages.error(
                 request, "Failed to send verification code. Please try again later."
             )
@@ -111,7 +133,7 @@ def client_portal_login(request):
     # GET request: clear any stale pending OTP session keys so that
     # navigating back from the OTP page does not leave ghost state
     # that would cause a confusing "No portal access" message on refresh.
-    for key in ("pending_contact_id", "pending_contact_email", "last_otp_resend"):
+    for key in ("pending_contact_id", "pending_contact_email"):
         request.session.pop(key, None)
 
     return render(request, "client_portal/login.html")
@@ -154,7 +176,9 @@ def client_portal_verify_otp(request):
         success, message = verify_otp_for_contact(contact, entered_otp)
 
         if success:
-            # Login successful — create authenticated session
+            # Login successful — cycle session key to prevent session fixation
+            request.session.cycle_key()
+
             request.session["client_contact_id"] = str(contact.id)
             request.session["client_id"] = str(contact.client_id)
 
@@ -176,34 +200,19 @@ def client_portal_verify_otp(request):
 
 def client_portal_logout(request):
     """Clear client portal session."""
-    keys_to_remove = [
-        "client_contact_id",
-        "client_id",
-        "pending_contact_id",
-        "pending_contact_email",
-    ]
-    for key in keys_to_remove:
-        request.session.pop(key, None)
+    request.session.flush()
     messages.success(request, "You have been logged out successfully.")
     return redirect("client_portal:login")
 
 
-from datetime import datetime
-
 def client_portal_resend_otp(request):
-    """Resend OTP with cooldown protection."""
+    """Resend OTP with database-backed cooldown protection."""
+    if request.method != "POST":
+        return redirect("client_portal:verify_otp")
+
     pending_id = request.session.get("pending_contact_id")
     if not pending_id:
         return redirect("client_portal:login")
-
-    # Rate limit: 1 resend per 60 seconds
-    last_resend = request.session.get("last_otp_resend")
-    if last_resend:
-        elapsed = timezone.now() - datetime.fromisoformat(last_resend)
-        if elapsed.total_seconds() < 60:
-            remaining = int(60 - elapsed.total_seconds())
-            messages.warning(request, f"Please wait {remaining}s before requesting another code.")
-            return redirect("client_portal:verify_otp")
 
     try:
         contact = ClientContact.objects.get(
@@ -217,13 +226,29 @@ def client_portal_resend_otp(request):
             request.session.pop(key, None)
         messages.error(request, "Your session has expired. Please log in again.")
         return redirect("client_portal:login")
+
+    # Database-backed rate limit: 1 resend per 60 seconds
+    latest_otp = (
+        ClientPortalOTP.objects.filter(contact=contact)
+        .order_by("-created_at")
+        .first()
+    )
+    if latest_otp:
+        elapsed = (timezone.now() - latest_otp.created_at).total_seconds()
+        if elapsed < 60:
+            remaining = int(60 - elapsed)
+            messages.warning(
+                request, f"Please wait {remaining}s before requesting another code."
+            )
+            return redirect("client_portal:verify_otp")
+
     try:
         create_otp_for_contact(contact)
-        request.session["last_otp_resend"] = timezone.now().isoformat()
         messages.success(request, "A new verification code has been sent.")
-    except Exception:
+    except Exception as e:
+        logger.exception("Failed to resend verification code to %s: %s", contact.email, e)
         messages.error(request, "Failed to send code. Please try again.")
-    
+
     return redirect("client_portal:verify_otp")
 
 
