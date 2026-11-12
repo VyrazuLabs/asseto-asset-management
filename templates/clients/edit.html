@@ -140,8 +140,8 @@
                     </button>
                 </div>
                 <div id="contactsContainer">
-                    {% if client.contacts.all %}
-                    {% for contact in client.contacts.all %}
+                    {% if client.active_contacts %}
+                    {% for contact in client.active_contacts %}
                     <div class="contact-block custom-field-row mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                             <h6 class="m-0" style="color: var(--color-text); font-weight: 600; font-size: 0.95rem;">
@@ -152,6 +152,8 @@
                                 {{ trans.remove }}</button>
                         </div>
                         <div class="form-grid">
+                            {# Hidden field carries the existing contact UUID so the backend can upsert #}
+                            <input type="hidden" name="contact_id[]" value="{{ contact.id }}">
                             <div class="form-group full-width">
                                 <label>{{ trans.contact_name }}</label>
                                 <input type="text" name="contact_name[]" class="form-control"
@@ -207,6 +209,8 @@
                                     class="bi bi-trash"></i> {{ trans.remove }}</button>
                         </div>
                         <div class="form-grid">
+                            {# Empty contact_id means this is a new contact to be created #}
+                            <input type="hidden" name="contact_id[]" value="">
                             <div class="form-group full-width">
                                 <label>{{ trans.contact_name }}</label>
                                 <input type="text" name="contact_name[]" class="form-control"

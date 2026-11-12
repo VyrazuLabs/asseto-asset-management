@@ -447,6 +447,29 @@
   cursor: default;
 }
 
+/* ── Client Portal Login shortcut (detail page → Key Contacts) ───────────── */
+.portal-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 6px;
+  color: #7c3aed;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.portal-login-btn:hover {
+  background: #7c3aed;
+  color: #fff;
+  border-color: #7c3aed;
+}
+
 /* ── Dark Mode ──────────────────────────────────────────────────────────── */
 body.theme-dark .client-page-header {
   margin-bottom: 2.5rem;
@@ -630,4 +653,16 @@ body.theme-dark .c-page-btn:hover:not(.active):not(.disabled) {
 body.theme-dark .c-page-btn.active {
   background: #4f46e5;
   color: white;
+}
+
+body.theme-dark .portal-login-btn {
+  background: #2a2a45;
+  color: #a5b4fc;
+  border-color: #3b3b60;
+}
+
+body.theme-dark .portal-login-btn:hover {
+  background: #6d5df6;
+  color: #ffffff;
+  border-color: #6d5df6;
 }

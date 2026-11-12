@@ -21,6 +21,7 @@ STRINGS = {
     "phone_no": "Phone No.",
     "actions": "Actions",
     "asset_count": "Asset Count",
+    "view_assets_vendor": "View assets for",
     "no_vendors_found": "No vendors found.",
     "add_first_vendor": "Add your first vendor",
     "vendor_identity": "Vendor Identity",

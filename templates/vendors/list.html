@@ -173,7 +173,10 @@
           <td>
             {% with count=count_array|get_at_index:forloop.counter0 %}
               {% if count %}
-                <span class="count-pill">{{ count }}</span>
+                <a href="{% url 'assets:list' %}?vendor={{ vendors.id }}" class="count-pill"
+                   title="{{ trans.view_assets_vendor }} {{ vendors.name }}">
+                  {{ count }}
+                </a>
               {% else %}
                 <span class="count-pill zero">0</span>
               {% endif %}

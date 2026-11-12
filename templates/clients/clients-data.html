@@ -43,7 +43,7 @@
           {% endif %}
         </td>
         <td>
-          {% with contact=client.contacts.all|first %}
+          {% with contact=client.active_contacts.first %}
           {% if contact %}
             <div class="c-contact-cell">
               <span class="c-contact-name">{{ contact.name }}</span>
@@ -73,7 +73,14 @@
         </td>
         <td class="text-center">
           {% if client.open_tickets_count %}
-            <span class="count-pill">{{ client.open_tickets_count }}</span>
+            {% if perms.support.view_ticket %}
+              <a href="{% url 'support:ticket_list' %}?client={{ client.id }}"
+                 class="count-pill" title="{{ trans.view_tickets_client }} {{ client.name }}">
+                {{ client.open_tickets_count }}
+              </a>
+            {% else %}
+              <span class="count-pill">{{ client.open_tickets_count }}</span>
+            {% endif %}
           {% else %}
             <span class="count-pill zero">0</span>
           {% endif %}

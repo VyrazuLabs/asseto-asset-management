@@ -61,6 +61,7 @@
 
         .sidebar-logo {
             max-width: 140px;
+            height: auto;
             margin-bottom: 0.5rem;
         }
 
@@ -162,7 +163,11 @@
         <!-- Sidebar -->
         <div class="portal-sidebar">
             <div class="sidebar-header">
+                {% if get_logo %}
+                <img src="/media{{ get_logo }}" alt="Logo" class="sidebar-logo">
+                {% else %}
                 <img src="{% static 'images/asseto-logo.svg' %}" alt="Asseto" class="sidebar-logo">
+                {% endif %}
                 <div class="small fw-bold text-uppercase tracking-widest" style="color: #7c8db5;">Client Portal</div>
             </div>
 

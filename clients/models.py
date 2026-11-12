@@ -100,6 +100,10 @@ class Client(TimeStampModel, SoftDeleteModel):
     def industry_name(self):
         return INDUSTRY_MAP.get(self.industry, self.industry or "Not Specified")
 
+    @property
+    def active_contacts(self):
+        return self.contacts.filter(is_deleted=False)
+
 
 class ClientContact(TimeStampModel, SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
