@@ -72,7 +72,7 @@ kombu==5.6.2
 Levenshtein==0.27.1
 librt==0.12.0
 lxml==6.1.0
-msgpack==1.2.1
+msgpack==1.2.3
 mypy==2.1.0
 mypy_extensions==1.1.0
 mysql-connector-python==9.1.0
@@ -101,7 +101,7 @@ pyhanko-certvalidator==0.28.0
 PyJWT==2.15.0
 # PyMySQL==1.1.1
 pyotp==2.9.0
-pypdf==6.21.2
+pypdf==6.21.4
 PyPDF3==1.0.6
 PySocks==1.7.1
 pytest==9.1.1
