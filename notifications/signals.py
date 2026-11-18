@@ -195,3 +195,33 @@ def conn_db(sender, connection, **kwargs):
     expiring_asset(15)
     expiring_asset(7)
     expiring_asset(0)
+
+
+# ==============================================================================
+# Support Ticket SMS Notifications
+# ==============================================================================
+
+@receiver(post_save, sender="support.SupportTicket")
+def support_ticket_sms_notification(sender, instance, created, **kwargs):
+    """
+    Send an SMS to the linked client only when a ticket is newly created.
+
+    The client is resolved with the same logic as the Happy Code flow: the
+    ticket's own client, or the client the ticket's asset is linked to.
+    No SMS is sent on assignment, status changes or any other update.
+    """
+    if not created:
+        return
+
+    try:
+        from configurations.sms_service import SMSService
+
+        SMSService.notify_client_ticket_created(instance)
+
+    except Exception as exc:
+        # Never crash ticket creation if notification dispatch encounters an issue
+        import logging
+        logging.getLogger(__name__).exception(
+            "Error in support_ticket_sms_notification signal: %s", exc
+        )
+

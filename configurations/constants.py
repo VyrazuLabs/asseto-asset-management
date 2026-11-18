@@ -84,6 +84,13 @@ INTEGRATION_CHOICES = [
         ],
     ),
     (1, ["API", ""]),
+    (
+        2,
+        [
+            "SMS",
+            "Configure SMS service to send automated ticket alerts to employees and clients.",
+        ],
+    ),
 ]
 
 DATETIME_CHOICES = [
