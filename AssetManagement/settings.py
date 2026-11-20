@@ -86,6 +86,7 @@ DEV_URL = os.environ.get("DEV_URL") if os.getcwd() == "/app" else None
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -142,6 +143,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "AssetManagement.urls"
 
 WSGI_APPLICATION = "AssetManagement.wsgi.application"
+ASGI_APPLICATION = "AssetManagement.asgi.application"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -327,4 +329,13 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,  # Splits FileField schemas for request/response
     # Other settings like TITLE, VERSION, etc.
     "SWAGGER_OPTIONS": {"persistAuthorization": True},
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }

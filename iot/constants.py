@@ -1,3 +1,10 @@
+UNIT_BY_TYPE = {
+    "temperature": "°C",
+    "humidity": "%",
+    "sound": "dB"
+}
+
+# Existing unit mapper for conversion options
 UNIT_MAPPER = {
     "temperature": [
         "Celsius",
@@ -63,4 +70,7 @@ UNIT_MAPPER = {
         "seconds",
         "minutes",
     ],
+    "sound":[
+        "dB"
+    ]
 }

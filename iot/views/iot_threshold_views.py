@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from iot.forms.sensor_forms import SensorThresholdForm
-from iot.models.device_models import Device
 from iot.models.sensor_models import Sensor, SensorAlarm, SensorThreshold
 from iot.utils.threshold_utils import (
     acknowledge_alarm as _acknowledge_alarm,
@@ -12,7 +11,6 @@ from iot.utils.threshold_utils import (
     create_threshold_rule as _create_threshold_rule,
     delete_threshold_rule as _delete_threshold_rule,
     resolve_alarm as _resolve_alarm,
-    trigger_alarm_for_threshold,
     update_threshold_rule as _update_threshold_rule,
 )
 
@@ -40,20 +38,6 @@ def create_threshold_rule(request):
     messages.error(request, "Failed to create threshold rule. Please fix the errors below.")
     ctx = build_threshold_alarm_context(request, tab="rules", threshold_form=form)
     return render(request, "threshold/threshold-alarms.html", ctx)
-
-
-@login_required()
-def trigger_alarm(request, threshold_id):
-    if request.method != "POST":
-        return redirect("iot:threshold_alarms")
-
-    threshold = get_object_or_404(SensorThreshold, pk=threshold_id)
-    triggered_value = request.POST.get("triggered_value", threshold.value)
-
-    trigger_alarm_for_threshold(threshold, triggered_value)
-
-    messages.success(request, f"Alarm triggered for {threshold.sensor.name}")
-    return redirect("/iot/thresholds-alarms/?tab=alarms")
 
 
 @login_required()

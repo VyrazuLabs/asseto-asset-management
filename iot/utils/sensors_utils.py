@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from common.template_pagination import create_paginated_objects
-from iot.models.sensor_models import Sensor
+from iot.models.sensor_models import Sensor, SesnorData
 
 
 def create_sensor_list(request, query_objects: QuerySet[Sensor]):
@@ -12,9 +12,9 @@ def create_sensor_list(request, query_objects: QuerySet[Sensor]):
 
     if search_text:
         query_objects = query_objects.filter(
-            Q(name__icontains=search_text) |
-            Q(sensor_type__icontains=search_text) |
-            Q(device__name__icontains=search_text)
+            Q(name__icontains=search_text)
+            | Q(sensor_type__icontains=search_text)
+            | Q(device__name__icontains=search_text)
         )
 
     if status_filter == "paired":
@@ -43,10 +43,17 @@ def get_sensor_details(request, id):
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
 
+    latest_reading = (
+        SesnorData.objects.filter(sensor_id=str(sensor.id))
+        .order_by("-timestamp")
+        .first()
+    )
+
     return {
         "sidebar": "iot",
         "submenu": "sensors",
         "sensor": sensor,
         "page_object": page_object,
+        "latest_reading": latest_reading,
         "title": f"Details - {sensor.name}",
     }
