@@ -10,6 +10,15 @@
 <link rel="stylesheet" href="{% static 'css/pages/list-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/pages/assets/assets-detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/sensor-detail.css' %}">
+<style>
+  /* IoT sensor row interaction */
+  .iot-sensor-row:hover { background: var(--color-border, #f1f5f9); }
+  .iot-sensor-row.iot-row-active { background: rgba(79,70,229,.06); }
+  .iot-row-chevron { pointer-events:none; }
+  /* panel separator */
+  #iotSensorLivePanel { border-top: 1px solid var(--color-border, #e5e7eb); padding-top:1.25rem; }
+</style>
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {% endblock css %}
@@ -199,11 +208,17 @@
               <th>SENSOR NAME</th>
               <th>SENSOR TYPE</th>
               <th>STATUS</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {% for sensor in sensors %}
-            <tr>
+            <tr class="iot-sensor-row"
+                data-sensor-id="{{ sensor.id }}"
+                data-sensor-name="{{ sensor.name }}"
+                data-sensor-unit="{{ sensor.unit }}"
+                data-sensor-endpoint="/iot/sensor/{{ sensor.id }}/historical-data"
+                style="cursor:pointer;">
               <td>{{ sensor.device.device_sn }}</td>
               <td>{{ sensor.device.name }}</td>
               <td>{{ sensor.name }}</td>
@@ -217,10 +232,13 @@
                 <span class="sensor-status-warning">Unpaired</span>
                 {% endif %}
               </td>
+              <td class="text-end pe-3">
+                <i class="bi bi-chevron-down iot-row-chevron" style="font-size:0.8rem;color:var(--color-muted,#6b7280);transition:transform .2s;"></i>
+              </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="5" class="text-center text-muted">No sensors associated with this asset</td>
+              <td colspan="6" class="text-center text-muted">No sensors associated with this asset</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -229,72 +247,67 @@
           {% include 'commons/list-pagination.html' with page_object=sensors page_var='sensors_page' %}
         </div>
       </div>
-      <div class="detail-card-body pt-0">
-        <div class="chart-placeholder">
-          <div class="chart-title">24-HOUR TEMPERATURE TREND (SN-001)</div>
-          <svg viewBox="0 0 500 150" class="w-100" style="height: 200px; max-height: 100%;">
-            <!-- Grid lines -->
-            <line x1="0" y1="30" x2="500" y2="30" stroke="#e5e7eb" stroke-width="1" />
-            <line x1="0" y1="60" x2="500" y2="60" stroke="#e5e7eb" stroke-width="1" />
-            <line x1="0" y1="90" x2="500" y2="90" stroke="#e5e7eb" stroke-width="1" />
-            <line x1="0" y1="120" x2="500" y2="120" stroke="#e5e7eb" stroke-width="1" />
-    
-            <!-- Trend line area -->
-            <path
-              d="M 0 75 C 50 90, 100 97.5, 150 67.5 C 200 37.5, 250 22.5, 300 45 C 350 67.5, 400 82.5, 450 90 L 500 97.5 L 500 150 L 0 150 Z"
-              fill="#eff6ff" opacity="0.6" />
-            <!-- Trend line -->
-            <path
-              d="M 0 75 C 50 90, 100 97.5, 150 67.5 C 200 37.5, 250 22.5, 300 45 C 350 67.5, 400 82.5, 450 90 L 500 97.5"
-              fill="none" stroke="#3b82f6" stroke-width="2" />
-    
-            <!-- Data points -->
-            <circle cx="0" cy="75" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="83" cy="87" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="166" cy="60" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="250" cy="27" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="333" cy="52.5" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="416" cy="87" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="500" cy="97.5" r="4" fill="#fff" stroke="#3b82f6" stroke-width="2" />
-    
-            <!-- X-axis labels -->
-            <text x="0" y="142" font-size="10" fill="#6b7280">00:00</text>
-            <text x="83" y="142" font-size="10" fill="#6b7280" text-anchor="middle">04:00</text>
-            <text x="166" y="142" font-size="10" fill="#6b7280" text-anchor="middle">08:00</text>
-            <text x="250" y="142" font-size="10" fill="#6b7280" text-anchor="middle">12:00</text>
-            <text x="333" y="142" font-size="10" fill="#6b7280" text-anchor="middle">16:00</text>
-            <text x="416" y="142" font-size="10" fill="#6b7280" text-anchor="middle">20:00</text>
-            <text x="500" y="142" font-size="10" fill="#6b7280" text-anchor="end">23:50</text>
-    
-            <!-- Y-axis labels -->
-            <text x="0" y="30" font-size="10" fill="#6b7280">30</text>
-            <text x="0" y="60" font-size="10" fill="#6b7280">26</text>
-            <text x="0" y="90" font-size="10" fill="#6b7280">22</text>
-            <text x="0" y="120" font-size="10" fill="#6b7280">18</text>
-            <text x="0" y="142" font-size="10" fill="#6b7280">14</text>
-          </svg>
+
+      {# ── Inline Sensor Live Panel (shown on row click) ── #}
+      <div id="iotSensorLivePanel" class="detail-card-body pt-0" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-broadcast-pin" style="color:var(--color-primary,#4f46e5);font-size:1.1rem;"></i>
+            <span id="iotPanelSensorName" style="font-weight:700;font-size:1rem;"></span>
+          </div>
+          <button type="button" id="iotPanelClose"
+                  style="background:none;border:none;cursor:pointer;color:var(--color-muted,#6b7280);font-size:1.2rem;line-height:1;"
+                  title="Close panel">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
-    
-        <div class="unresolved-alerts">
-          <div class="unresolved-alerts-title">UNRESOLVED ALERTS</div>
-          <div class="alert-card alert-critical">
-            <i class="bi bi-exclamation-circle alert-icon-critical"></i>
-            <div class="alert-content">
-              <div class="alert-header">
-                <span class="alert-title-critical">Critical</span>
-                <span class="alert-time">2h ago</span>
+
+        {# Gauge Card #}
+        <div class="sensor-gauge-card">
+          <div class="card-header-custom sensor-gauge-header" style="display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;border-bottom:1px solid var(--color-border);">
+            <i class="bi bi-speedometer2"></i>
+            <h2 style="margin:0;font-size:0.95rem;font-weight:700;flex-grow:1;"><span>Live Reading</span></h2>
+          </div>
+          <div class="sensor-gauge-body">
+            <div id="iotInlineGauge" class="sensor-gauge-wrap"></div>
+            <div class="sensor-gauge-stats">
+              <div class="sensor-gauge-stat">
+                <span class="label">Minimum</span>
+                <span class="value" id="iotGaugeMin">--</span>
               </div>
-              <p class="alert-desc">High vibration detected on SN-002</p>
+              <div class="sensor-gauge-stat primary">
+                <span class="label">Current</span>
+                <span class="value" id="iotGaugeValue">--</span>
+              </div>
+              <div class="sensor-gauge-stat">
+                <span class="label">Maximum</span>
+                <span class="value" id="iotGaugeMax">--</span>
+              </div>
+              <div class="sensor-gauge-stat">
+                <span class="label">Last Update</span>
+                <span class="value" id="iotGaugeUpdated">--</span>
+              </div>
             </div>
           </div>
-          <div class="alert-card alert-warning">
-            <i class="bi bi-exclamation-triangle alert-icon-warning"></i>
-            <div class="alert-content">
-              <div class="alert-header">
-                <span class="alert-title-warning">Warning</span>
-                <span class="alert-time">5h ago</span>
-              </div>
-              <p class="alert-desc">Temperature threshold approaching</p>
+        </div>
+
+        {# Chart Card #}
+        <div class="sensor-chart-card">
+          <div class="card-header-custom sensor-chart-header" style="display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;border-bottom:1px solid var(--color-border);">
+            <i class="bi bi-graph-up-arrow"></i>
+            <h2 style="margin:0;font-size:0.95rem;font-weight:700;flex-grow:1;"><span>Sensor Readings</span></h2>
+            <div class="sensor-chart-ranges" role="group">
+              <button type="button" class="sensor-chart-range-btn iot-range-btn" data-hours="6">6h</button>
+              <button type="button" class="sensor-chart-range-btn iot-range-btn active" data-hours="24">24h</button>
+              <button type="button" class="sensor-chart-range-btn iot-range-btn" data-hours="48">48h</button>
+              <button type="button" class="sensor-chart-range-btn iot-range-btn" data-hours="168">7d</button>
+            </div>
+          </div>
+          <div class="sensor-chart-body">
+            <div id="iotInlineChart" class="sensor-chart"></div>
+            <div id="iotInlineChartEmpty" class="sensor-chart-empty" hidden>
+              <i class="bi bi-inbox"></i>
+              <p>No sensor readings available for the selected period.</p>
             </div>
           </div>
         </div>
@@ -875,6 +888,335 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- ApexCharts for IoT inline gauge & chart -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+/* ── IoT Sensor Live Panel Controller ───────────────────────────────────── */
+(function () {
+  "use strict";
+
+  var panel       = document.getElementById("iotSensorLivePanel");
+  var panelName   = document.getElementById("iotPanelSensorName");
+  var closeBtn    = document.getElementById("iotPanelClose");
+  var gaugeEl     = document.getElementById("iotInlineGauge");
+  var chartEl     = document.getElementById("iotInlineChart");
+  var chartEmpty  = document.getElementById("iotInlineChartEmpty");
+  var minEl       = document.getElementById("iotGaugeMin");
+  var maxEl       = document.getElementById("iotGaugeMax");
+  var valueEl     = document.getElementById("iotGaugeValue");
+  var updatedEl   = document.getElementById("iotGaugeUpdated");
+
+  var gaugeChart  = null;
+  var areaChart   = null;
+  var activeRow   = null;
+  var wsSocket    = null;
+  var wsReconnect = null;
+  var activeSensorId = null;
+
+  var rangeMin = 0, rangeMax = 100;
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+  function getTheme() {
+    var dark = document.body.classList.contains("theme-dark") ||
+               document.body.classList.contains("dark") ||
+               localStorage.getItem("theme") === "theme-dark";
+    return {
+      mode:       dark ? "dark"    : "light",
+      labelColor: dark ? "#CBD5E1" : "#64748B",
+      gridColor:  dark ? "#2D2D44" : "#E2E8F0",
+      valueColor: dark ? "#FFFFFF" : "#1E293B",
+      trackColor: dark ? "#2D2D44" : "#F1F5F9",
+    };
+  }
+
+  function formatTime(input) {
+    if (!input) return "--";
+    var d = input instanceof Date ? input : new Date(input);
+    if (isNaN(d.getTime())) return "--";
+    return d.toLocaleString([], { month:"short", day:"numeric",
+                                  hour:"2-digit", minute:"2-digit", second:"2-digit" });
+  }
+
+  function valueToPercent(v) {
+    if (rangeMax === rangeMin) return 50;
+    return Math.max(0, Math.min(100, (v - rangeMin) * 100 / (rangeMax - rangeMin)));
+  }
+
+  function padRange(lo, hi, seed) {
+    var base = Math.abs(seed) || 1;
+    var pad  = lo === hi ? base * 0.1 : (hi - lo) * 0.1;
+    return { min: lo - pad, max: hi + pad };
+  }
+
+  // ── Gauge ─────────────────────────────────────────────────────────────────
+  function buildGaugeOptions(unit) {
+    var t = getTheme();
+    return {
+      series: [0],
+      chart: { type:"radialBar", height:300, background:"transparent", fontFamily:"inherit" },
+      colors: ["#4F46E5"],
+      fill: { type:"gradient", gradient:{ shade:"dark", type:"horizontal", shadeIntensity:1,
+              gradientToColors:["#0EA5E9"], inverseColors:true,
+              opacityFrom:1, opacityTo:1, stops:[0,100] } },
+      stroke: { lineCap:"round" },
+      labels: ["Current Reading"],
+      plotOptions: { radialBar: {
+        startAngle:-90, endAngle:90,
+        hollow:{ size:"70%" },
+        track:{ background:t.trackColor, strokeWidth:"97%", margin:5, dropShadow:{enabled:false} },
+        dataLabels:{
+          name:{ show:true, fontSize:"14px", fontWeight:600, color:t.labelColor, offsetY:50 },
+          value:{ show:true, fontSize:"26px", fontWeight:700, color:t.valueColor, offsetY:-10,
+                  formatter: function(val) {
+                    var real = val * (rangeMax - rangeMin) / 100 + rangeMin;
+                    var text = isFinite(real) ? real.toFixed(1) : "--";
+                    return unit ? text + " " + unit : text;
+                  }
+          }
+        }
+      }},
+      theme:{ mode:t.mode }
+    };
+  }
+
+  function renderGauge(value, time, unit) {
+    var pct = valueToPercent(value);
+    if (valueEl)   valueEl.textContent   = isFinite(value) ? value.toFixed(1) + (unit ? " "+unit : "") : "--";
+    if (minEl)     minEl.textContent     = isFinite(rangeMin) ? rangeMin.toFixed(1) + (unit ? " "+unit : "") : "--";
+    if (maxEl)     maxEl.textContent     = isFinite(rangeMax) ? rangeMax.toFixed(1) + (unit ? " "+unit : "") : "--";
+    if (updatedEl) updatedEl.textContent = formatTime(time);
+    if (!gaugeChart) {
+      gaugeChart = new ApexCharts(gaugeEl, buildGaugeOptions(unit));
+      gaugeChart.render();
+    }
+    gaugeChart.updateSeries([pct]);
+  }
+
+  function showGaugeEmpty(unit) {
+    if (valueEl)   valueEl.textContent   = "--";
+    if (minEl)     minEl.textContent     = "--";
+    if (maxEl)     maxEl.textContent     = "--";
+    if (updatedEl) updatedEl.textContent = "--";
+    if (!gaugeChart) {
+      gaugeChart = new ApexCharts(gaugeEl, buildGaugeOptions(unit));
+      gaugeChart.render();
+    }
+    gaugeChart.updateSeries([0]);
+  }
+
+  // ── Area Chart ────────────────────────────────────────────────────────────
+  function xLabelFmt(hours) {
+    if (hours <= 24) return "HH:mm";
+    if (hours <= 48) return "DD MMM HH:mm";
+    return "DD MMM";
+  }
+
+  function buildChartOptions(data, hours, unit, sensorName) {
+    var t = getTheme();
+    return {
+      series:[{ name:sensorName, data:data.map(function(d){
+        return { x: new Date(d.timestamp).getTime(), y: d.value };
+      })}],
+      chart:{ type:"area", height:320, background:"transparent", foreColor:t.labelColor,
+              fontFamily:"inherit", toolbar:{show:false},
+              zoom:{ type:"x", enabled:true, autoScaleYaxis:true },
+              animations:{ speed:500 } },
+      colors:["#4F46E5"],
+      fill:{ type:"gradient", gradient:{ shade:"light", shadeIntensity:1,
+             opacityFrom:0.35, opacityTo:0.05, gradientToColors:["#0EA5E9"], stops:[0,90,100] } },
+      stroke:{ curve:"smooth", width:2.5 },
+      dataLabels:{ enabled:false },
+      grid:{ borderColor:t.gridColor, strokeDashArray:4, padding:{ left:10, right:10 } },
+      xaxis:{ type:"datetime", labels:{ format:xLabelFmt(hours),
+              style:{ colors:t.labelColor, fontSize:"12px" } },
+              axisBorder:{show:false}, axisTicks:{show:false} },
+      yaxis:{ labels:{ style:{ colors:t.labelColor, fontSize:"12px" } },
+              title:{ text:unit, style:{ color:t.labelColor, fontWeight:600 } } },
+      tooltip:{ theme:t.mode, x:{ format:"DD MMM HH:mm" },
+                y:{ formatter:function(v){ return v + " " + unit; } } },
+      legend:{ show:false }
+    };
+  }
+
+  function renderChart(data, hours, unit, sensorName) {
+    chartEmpty.hidden = true;
+    chartEl.hidden    = false;
+    if (areaChart) {
+      areaChart.updateOptions(buildChartOptions(data, hours, unit, sensorName), true);
+      areaChart.updateSeries([{ name:sensorName, data:data.map(function(d){
+        return { x:new Date(d.timestamp).getTime(), y:d.value };
+      })}]);
+    } else {
+      areaChart = new ApexCharts(chartEl, buildChartOptions(data, hours, unit, sensorName));
+      areaChart.render();
+    }
+  }
+
+  function showChartEmpty(unit, sensorName) {
+    chartEmpty.hidden = true;
+    chartEl.hidden    = false;
+    if (areaChart) {
+      areaChart.updateSeries([{ name:sensorName, data:[] }]);
+    } else {
+      areaChart = new ApexCharts(chartEl, buildChartOptions([], 24, unit, sensorName));
+      areaChart.render();
+    }
+  }
+
+  // ── Data loading ──────────────────────────────────────────────────────────
+  function loadSensorData(endpoint, hours, unit, sensorName) {
+    fetch(endpoint + "?hours=" + hours)
+      .then(function(r){ if (!r.ok) throw new Error("fail"); return r.json(); })
+      .then(function(payload) {
+        var data = payload && payload.data ? payload.data : [];
+        if (!data.length) { showChartEmpty(unit, sensorName); return; }
+
+        // set gauge range from history
+        var vals = data.map(function(d){ return parseFloat(d.value); }).filter(isFinite);
+        if (vals.length) {
+          var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+          var p  = padRange(lo, hi, hi);
+          rangeMin = p.min; rangeMax = p.max;
+          var last = data[data.length-1];
+          var t    = last.timestamp ? new Date(last.timestamp * 1000) : null;
+          renderGauge(vals[vals.length-1], t, unit);
+        } else {
+          showGaugeEmpty(unit);
+        }
+        renderChart(data, hours, unit, sensorName);
+      })
+      .catch(function(){
+        showGaugeEmpty(unit);
+        showChartEmpty(unit, sensorName);
+      });
+  }
+
+  // ── WebSocket ─────────────────────────────────────────────────────────────
+  function connectWS(unit) {
+    if (wsSocket) { try { wsSocket.close(); } catch(e){} wsSocket = null; }
+    if (wsReconnect) { clearTimeout(wsReconnect); wsReconnect = null; }
+
+    var scheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+    function open() {
+      wsSocket = new WebSocket(scheme + window.location.host + "/ws/iot/device/random-data");
+      wsSocket.onmessage = function(e) {
+        var msg;
+        try { msg = JSON.parse(e.data); } catch(_){ return; }
+        if (!msg || msg.type !== "sensor_message") return;
+        var sensors = (msg.data || {}).sensors || [];
+        var match = sensors.find(function(s){ return String(s.id) === String(activeSensorId); });
+        if (!match) return;
+        var value = parseFloat(match.value);
+        if (!isFinite(value)) return;
+        if (value < rangeMin) rangeMin = value;
+        if (value > rangeMax) rangeMax = value;
+        renderGauge(value, new Date(), unit);
+      };
+      wsSocket.onclose = function() {
+        wsReconnect = setTimeout(open, 3000);
+      };
+      wsSocket.onerror = function() { if (wsSocket) wsSocket.close(); };
+    }
+    open();
+  }
+
+  function disconnectWS() {
+    if (wsReconnect) { clearTimeout(wsReconnect); wsReconnect = null; }
+    if (wsSocket)    { try { wsSocket.close(); } catch(e){} wsSocket = null; }
+  }
+
+  // ── Panel open / close ────────────────────────────────────────────────────
+  function destroyCharts() {
+    if (gaugeChart) { try { gaugeChart.destroy(); } catch(e){} gaugeChart = null; }
+    if (areaChart)  { try { areaChart.destroy();  } catch(e){} areaChart  = null; }
+  }
+
+  function openPanel(row) {
+    var sensorId   = row.dataset.sensorId;
+    var sensorName = row.dataset.sensorName;
+    var unit       = row.dataset.sensorUnit || "";
+    var endpoint   = row.dataset.sensorEndpoint;
+
+    // If same row clicked again, close
+    if (activeRow === row && panel.style.display !== "none") {
+      closePanel();
+      return;
+    }
+
+    // Deselect previous
+    if (activeRow) {
+      activeRow.classList.remove("iot-row-active");
+      var prev = activeRow.querySelector(".iot-row-chevron");
+      if (prev) prev.style.transform = "";
+    }
+
+    activeRow      = row;
+    activeSensorId = sensorId;
+    rangeMin = 0; rangeMax = 100;
+
+    row.classList.add("iot-row-active");
+    var chev = row.querySelector(".iot-row-chevron");
+    if (chev) chev.style.transform = "rotate(180deg)";
+
+    panelName.textContent = sensorName;
+    panel.style.display = "block";
+
+    // Reset stat labels
+    if (valueEl)   valueEl.textContent   = "--";
+    if (minEl)     minEl.textContent     = "--";
+    if (maxEl)     maxEl.textContent     = "--";
+    if (updatedEl) updatedEl.textContent = "--";
+
+    destroyCharts();
+    gaugeEl.innerHTML = "";
+    chartEl.innerHTML = "";
+
+    var activeHours = 24;
+    loadSensorData(endpoint, activeHours, unit, sensorName);
+    connectWS(unit);
+
+    // Range buttons
+    document.querySelectorAll(".iot-range-btn").forEach(function(btn) {
+      btn.classList.remove("active");
+      if (parseInt(btn.dataset.hours) === activeHours) btn.classList.add("active");
+      btn.onclick = function() {
+        document.querySelectorAll(".iot-range-btn").forEach(function(b){ b.classList.remove("active"); });
+        btn.classList.add("active");
+        activeHours = parseInt(btn.dataset.hours) || 24;
+        loadSensorData(endpoint, activeHours, unit, sensorName);
+      };
+    });
+
+    // scroll into view
+    setTimeout(function(){ panel.scrollIntoView({ behavior:"smooth", block:"nearest" }); }, 100);
+  }
+
+  function closePanel() {
+    panel.style.display = "none";
+    if (activeRow) {
+      activeRow.classList.remove("iot-row-active");
+      var chev = activeRow.querySelector(".iot-row-chevron");
+      if (chev) chev.style.transform = "";
+      activeRow = null;
+    }
+    activeSensorId = null;
+    disconnectWS();
+    destroyCharts();
+    gaugeEl.innerHTML = "";
+    chartEl.innerHTML = "";
+  }
+
+  // ── Wire up rows ──────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".iot-sensor-row").forEach(function(row) {
+      row.addEventListener("click", function() { openPanel(row); });
+    });
+    if (closeBtn) closeBtn.addEventListener("click", closePanel);
+  });
+})();
+</script>
 
 <script>
 $(document).ready(function() {

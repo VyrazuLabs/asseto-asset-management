@@ -2,7 +2,6 @@ from common.template_pagination import create_paginated_objects
 from dashboard.models import Organization
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from iot.helpers.device_helpers import generate_topic
 from iot.models.device_models import Device, DeviceAttachments
 from django.db.models import Q
 
@@ -19,8 +18,7 @@ def add_device_attachment(
             organization=organization,
             device=device,
             attahed_part=cleaned_data["attahed_part"],
-            mqtt_topic=cleaned_data.get("mqtt_topic")
-            or generate_topic(organization.id, cleaned_data["attahed_part"]),
+            mqtt_topic=cleaned_data.get("mqtt_topic"),
             is_enable=cleaned_data.get("is_enable", False),
         )
         attachment.save()

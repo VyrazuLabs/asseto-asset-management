@@ -81,6 +81,174 @@
     text-decoration: underline;
 }
 
+/* ── Sensor Readings Chart ──────────────────────────────────────────────── */
+.sensor-chart-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.sensor-chart-header {
+    gap: 0.75rem;
+}
+
+.sensor-chart-header h2 {
+    flex-grow: 1;
+}
+
+.sensor-chart-ranges {
+    display: inline-flex;
+    gap: 0.3rem;
+    background: var(--color-border);
+    border-radius: 9px;
+    padding: 0.25rem;
+}
+
+.sensor-chart-range-btn {
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sensor-chart-range-btn:hover {
+    color: var(--color-primary);
+}
+
+.sensor-chart-range-btn.active {
+    background: var(--color-card);
+    color: var(--color-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.sensor-chart-body {
+    padding: 1.25rem;
+}
+
+.sensor-chart {
+    min-height: 320px;
+}
+
+.sensor-chart-empty {
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    text-align: center;
+}
+
+.sensor-chart-empty i {
+    font-size: 2.25rem;
+}
+
+.sensor-chart-empty p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ── Live Reading Gauge ────────────────────────────────────────────────── */
+.sensor-gauge-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+
+.sensor-gauge-header {
+    gap: 0.75rem;
+}
+
+.sensor-gauge-body {
+    padding: 1.25rem;
+}
+
+.sensor-gauge-wrap {
+    min-height: 280px;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.sensor-gauge-empty {
+    min-height: 280px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    text-align: center;
+}
+
+.sensor-gauge-empty:not([hidden]) {
+    display: flex;
+}
+
+.sensor-gauge-empty i {
+    font-size: 2.25rem;
+}
+
+.sensor-gauge-empty p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.sensor-gauge-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.sensor-gauge-stat {
+    background: var(--color-border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    text-align: center;
+}
+
+.sensor-gauge-stat .label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+}
+
+.sensor-gauge-stat .value {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+}
+
+.sensor-gauge-stat.primary .label {
+    color: var(--color-primary);
+}
+
+.sensor-gauge-stat.primary .value {
+    color: var(--color-primary);
+}
+
+body.theme-dark .sensor-gauge-stat {
+    background: #2D2D3F;
+}
+
 /* ── Dark Mode ───────────────────────────────────────────────────────────── */
 body.theme-dark .sensor-detail-type {
     background: rgba(129, 140, 248, 0.15);

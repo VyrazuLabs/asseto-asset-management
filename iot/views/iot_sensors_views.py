@@ -1,13 +1,19 @@
+from datetime import timedelta
+from django.utils import timezone
 import paho.mqtt.client as mqtt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 
 from iot.constants import UNIT_MAPPER
 from iot.forms.sensor_forms import SensorForm
-from iot.models.sensor_models import Sensor
-from iot.utils.sensors_utils import create_sensor_list, generate_mqtt_topic, get_sensor_details
+from iot.models.sensor_models import Sensor, SesnorData
+from iot.utils.sensors_utils import (
+    create_sensor_list,
+    generate_mqtt_topic,
+    get_sensor_details,
+)
 
 
 @login_required()
@@ -52,7 +58,9 @@ def edit_sensor(request, id):
     organization = getattr(request.user, "organization", None)
 
     if request.method == "POST":
-        sensor_form = SensorForm(request.POST, instance=sensor, organization=organization)
+        sensor_form = SensorForm(
+            request.POST, instance=sensor, organization=organization
+        )
 
         if sensor_form.is_valid():
             sensor_form.save()
@@ -164,3 +172,38 @@ def check_sensor_heartbeat(request):
     finally:
         client.disconnect()
     return HttpResponse("Done")
+
+
+@login_required()
+def get_sensor_historical_data(request, sensor_id):
+    """API endpoint to fetch historical sensor data for the chart."""
+    try:
+        sensor = get_object_or_404(Sensor, id=sensor_id)
+
+        # Get hours parameter from query string, default to 24 hours
+        hours = int(request.GET.get("hours", 24))
+        hours = min(max(hours, 1), 168)  # Clamp between 1 and 168 hours (1 week)
+
+        since = timezone.now() - timedelta(hours=hours)
+
+        readings = SesnorData.objects.filter(
+            sensor_id=str(sensor.id), timestamp__gte=since
+        ).order_by("timestamp")
+
+        data = [
+            {"timestamp": reading.timestamp.isoformat(), "value": reading.value}
+            for reading in readings
+        ]
+        return JsonResponse(
+            {
+                "sensor_id": str(sensor.id),
+                "sensor_name": sensor.name,
+                "unit": sensor.unit,
+                "sensor_type": sensor.sensor_type,
+                "hours": hours,
+                "data": data,
+            }
+        )
+    except Exception as e:
+        print(e)
+        return JsonResponse({"error": str(e)}, status=500)
