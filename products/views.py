@@ -229,12 +229,16 @@ def search(request, page):
             | Q(product_type__name__icontains=search_text)
         )
     product_list = base_qs.annotate(
-        total_assets=Count("asset"),
+        total_assets=Count(
+            "asset",
+            filter=Q(asset__is_deleted=False)
+            & Q(asset__organization=request.user.organization),
+        ),
         available_assets=Count(
             "asset",
-            filter=Q(
-                asset__is_assigned=False, asset__organization=request.user.organization
-            ),
+            filter=Q(asset__is_assigned=False)
+            & Q(asset__organization=request.user.organization)
+            & Q(asset__is_deleted=False),
         ),
     ).order_by("-created_at")
     paginator = Paginator(product_list, PAGE_SIZE, orphans=ORPHANS)
