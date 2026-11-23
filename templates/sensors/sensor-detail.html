@@ -94,9 +94,79 @@
         </div>
     </div>
 
+    {# ── Live Reading Gauge ─────────────────────────────────────────────────── #}
+    <div class="sensor-gauge-card">
+        <div class="card-header-custom sensor-gauge-header">
+            <i class="bi bi-speedometer2"></i>
+            <h2><span>Live Reading</span></h2>
+        </div>
+        <div class="sensor-gauge-body">
+            <div id="sensorLiveGauge"
+                 class="sensor-gauge-wrap"
+                 data-sensor-id="{{ sensor.id }}"
+                 data-unit="{{ sensor.unit }}"
+                 data-endpoint="{% url 'iot:sensor_historical_data' sensor.id %}"
+                 data-initial-value="{{ latest_reading.value|default_if_none:'' }}"
+                 data-initial-time="{{ latest_reading.timestamp|date:'c'|default_if_none:'' }}"></div>
+            <div id="sensorGaugeEmpty" class="sensor-gauge-empty" hidden>
+                <i class="bi bi-speedometer2"></i>
+                <p>No live readings available yet.</p>
+            </div>
+            <div class="sensor-gauge-stats">
+                <div class="sensor-gauge-stat">
+                    <span class="label">Minimum</span>
+                    <span class="value" id="sensorGaugeMin">--</span>
+                </div>
+                <div class="sensor-gauge-stat primary">
+                    <span class="label">Current</span>
+                    <span class="value" id="sensorGaugeValue">--</span>
+                </div>
+                <div class="sensor-gauge-stat">
+                    <span class="label">Maximum</span>
+                    <span class="value" id="sensorGaugeMax">--</span>
+                </div>
+                <div class="sensor-gauge-stat">
+                    <span class="label">Last Update</span>
+                    <span class="value" id="sensorGaugeUpdated">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Sensor Readings Chart ──────────────────────────────────────────────── #}
+    <div class="sensor-chart-card">
+        <div class="card-header-custom sensor-chart-header">
+            <i class="bi bi-graph-up-arrow"></i>
+            <h2><span>Sensor Readings</span></h2>
+            <div class="sensor-chart-ranges" role="group" aria-label="Select time range">
+                <button type="button" class="sensor-chart-range-btn" data-hours="6">6h</button>
+                <button type="button" class="sensor-chart-range-btn active" data-hours="24">24h</button>
+                <button type="button" class="sensor-chart-range-btn" data-hours="48">48h</button>
+                <button type="button" class="sensor-chart-range-btn" data-hours="168">7d</button>
+            </div>
+        </div>
+        <div class="sensor-chart-body">
+            <div id="sensorHistoricalChart"
+                 class="sensor-chart"
+                 data-endpoint="{% url 'iot:sensor_historical_data' sensor.id %}"
+                 data-unit="{{ sensor.unit }}"
+                 data-sensor-name="{{ sensor.name }}"></div>
+            <div id="sensorChartEmpty" class="sensor-chart-empty" hidden>
+                <i class="bi bi-inbox"></i>
+                <p>No sensor readings available for the selected period.</p>
+            </div>
+        </div>
+    </div>
+
     {# ── History Section ───────────────────────────────────────────────────── #}
     <div class="mt-4">
         {% include 'commons/history.html' %}
     </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{% static 'js/pages/sensor_detail.js' %}" defer></script>
+<script src="{% static 'js/pages/sensor_gauge.js' %}" defer></script>
+{% endblock script %}

@@ -198,7 +198,7 @@
                                                      id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                      <i class="bi bi-bell fs-4"></i>
                                                      <span
-                                                         hx-trigger="load, notificationCountChanged from:body, every 5s"
+                                                         hx-trigger="load, notificationCountChanged from:body"
                                                          hx-get="{% url 'notifications:count' %}"
                                                          hx-target="this"></span>
                                                  </a>

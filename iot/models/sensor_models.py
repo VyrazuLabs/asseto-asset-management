@@ -21,6 +21,7 @@ class Sensor(TimeStampModel, SoftDeleteModel):
         PRESSURE = "pressure", "Pressure"
         FLOW_RATE = "flow_rate", "Flow Rate"
         RUNTIME_HRS = "runtime_hrs", "Runtime Hours"
+        SOUND = "sound", "Sound"
 
     class PairingChoice(models.IntegerChoices):
         UNPAIRED= 0, "unpaired"
@@ -93,3 +94,14 @@ class SensorAlarm(TimeStampModel):
     class Meta:
         db_table="sensor_alarm"
         ordering = ['-created_at']
+
+
+class SesnorData(models.Model):
+    id = models.AutoField(primary_key=True)
+    sensor_id = models.CharField(max_length=255, null=False)
+    value = models.FloatField(null=False)
+    timestamp=models.DateTimeField(null=False)  # the actual numeric reading
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    class Meta:
+        db_table = "sensor_data"
+        ordering = ["-timestamp"]
