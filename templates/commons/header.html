@@ -213,7 +213,7 @@
                                                 <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
                                                     onclick="event.stopPropagation();">
                                                     <span hx-get="{% url 'notifications:data' %}" hx-target="this"
-                                                        hx-trigger="load, notificationListChanged from:body">
+                                                        hx-trigger="load, notificationListChanged from:body, click from:#notificationDropdown">
                                                         <li><a class="dropdown-item">No notification available</a></li>
                                                     </span>
                                                 </ul>
