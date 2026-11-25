@@ -1,12 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.management.utils import get_random_secret_key
+from django.forms import BaseFormSet, formset_factory
 from django.http import HttpResponse
-from django.shortcuts import redirect, render, get_object_or_404
-from django.forms import formset_factory, BaseFormSet
-from iot.forms.device_forms import DeviceForm, DeviceAttachmentsForm, DeviceAttachmentsFormSet
+from django.shortcuts import get_object_or_404, redirect, render
+
+from iot.forms.device_forms import (
+    DeviceAttachmentsForm,
+    DeviceAttachmentsFormSet,
+    DeviceForm,
+)
 from iot.models.device_models import Device, DeviceAttachments
-from iot.utils.device_utils import add_device_attachment, get_device_details, get_sesnors_list
+from iot.utils.device_pairing_cache import mark_device_pairing, mark_device_unpaired
+from iot.utils.device_utils import (
+    add_device_attachment,
+    get_device_details,
+    get_sesnors_list,
+)
 
 
 class BaseEditAttachmentFormSet(BaseFormSet):
@@ -34,7 +44,6 @@ def add_device(request):
         if device_form.is_valid() and attachments_formset.is_valid():
             device = device_form.save(commit=False)
             device.organization = organization
-            device.device_token = get_random_secret_key()
             device.save()
 
             add_device_attachment(organization, device, attachments_formset)
@@ -63,11 +72,17 @@ def edit_device(request, id):
     device = get_object_or_404(Device, id=id, organization=request.user.organization)
     organization = getattr(request.user, "organization", None)
 
-    existing_attachments = list(DeviceAttachments.objects.filter(device=device).order_by('created_at'))
-    EditAttachmentFormSet = formset_factory(DeviceAttachmentsForm, formset=BaseEditAttachmentFormSet, extra=0)
+    existing_attachments = list(
+        DeviceAttachments.objects.filter(device=device).order_by("created_at")
+    )
+    EditAttachmentFormSet = formset_factory(
+        DeviceAttachmentsForm, formset=BaseEditAttachmentFormSet, extra=0
+    )
 
     if request.method == "POST":
-        device_form = DeviceForm(request.POST, instance=device, organization=organization)
+        device_form = DeviceForm(
+            request.POST, instance=device, organization=organization
+        )
         attachments_formset = EditAttachmentFormSet(
             request.POST, organization=organization, instances=existing_attachments
         )
@@ -76,10 +91,13 @@ def edit_device(request, id):
             device_form.save()
 
             kept_ids = []
-            forms_data = list(zip(
-                range(len(existing_attachments)),
-                attachments_formset[:len(existing_attachments)]
-            ))
+            forms_data = list(
+                zip(
+                    range(len(existing_attachments)),
+                    attachments_formset[: len(existing_attachments)],
+                    strict=False,
+                )
+            )
 
             for idx, form in forms_data:
                 if form in attachments_formset.deleted_forms:
@@ -93,7 +111,7 @@ def edit_device(request, id):
                     att.save()
                     kept_ids.append(att.id)
 
-            for form in attachments_formset[len(existing_attachments):]:
+            for form in attachments_formset[len(existing_attachments) :]:
                 cleaned_data = getattr(form, "cleaned_data", None)
                 if not cleaned_data or form in attachments_formset.deleted_forms:
                     continue
@@ -107,7 +125,9 @@ def edit_device(request, id):
                 )
                 kept_ids.append(new_att.id)
 
-            DeviceAttachments.objects.filter(device=device).exclude(id__in=kept_ids).delete()
+            DeviceAttachments.objects.filter(device=device).exclude(
+                id__in=kept_ids
+            ).delete()
 
             messages.success(request, "Device updated successfully")
             return redirect("iot:devices_list")
@@ -128,7 +148,9 @@ def edit_device(request, id):
         ]
 
         attachments_formset = EditAttachmentFormSet(
-            initial=initial_data, organization=organization, instances=existing_attachments
+            initial=initial_data,
+            organization=organization,
+            instances=existing_attachments,
         )
 
     return render(
@@ -150,9 +172,58 @@ def device_details(request, id):
     context = get_device_details(request, id)
     return render(request, "iot_devices/device-detail.html", context)
 
+
 @login_required()
-def paired_device(request):
-    pass
+def paired_device_and_fetched_sesnors(request, device_id):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+
+    device = get_object_or_404(
+        Device,
+        id=device_id,
+        organization=request.user.organization,
+    )
+    device.is_paired = Device.PairingChoice.PAIRING
+    device.save(update_fields=["is_paired"])
+    mark_device_pairing(device_id)
+
+    messages.success(request, f"Device {device.name} is now pairing")
+    return redirect("iot:devices_list")
+
+
+@login_required()
+def unpair_device(request, device_id):
+    if request.method != "POST":
+        return HttpResponse(status=405)
+
+    device = get_object_or_404(
+        Device,
+        id=device_id,
+        organization=request.user.organization,
+    )
+    device.is_paired = Device.PairingChoice.UNPAIRED
+    device.save(update_fields=["is_paired"])
+    mark_device_unpaired(device_id)
+
+    messages.success(request, f"Device {device.name} is now unpaired")
+    return redirect("iot:devices_list")
+
+
+@login_required()
+def device_pairing_status(request, device_id):
+    device = get_object_or_404(
+        Device,
+        id=device_id,
+        organization=request.user.organization,
+    )
+    return render(
+        request,
+        "iot_devices/device-pairing-status.html",
+        {
+            "device_id": device.id.hex,
+            "is_paired": device.is_paired,
+        },
+    )
 
 
 @login_required()

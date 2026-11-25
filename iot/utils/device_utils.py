@@ -1,9 +1,12 @@
+from uuid import UUID
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+
 from common.template_pagination import create_paginated_objects
 from dashboard.models import Organization
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404
 from iot.models.device_models import Device, DeviceAttachments
-from django.db.models import Q
 
 
 def add_device_attachment(
@@ -23,6 +26,7 @@ def add_device_attachment(
         )
         attachment.save()
 
+
 def get_sesnors_list(request):
     try:
         from assets.models import AssetImage
@@ -32,30 +36,39 @@ def get_sesnors_list(request):
         status_filter = (request.GET.get("status") or "").strip()
 
         query_objects = Device.undeleted_objects.values(
-            "id", "name", "device_sn", "asset__name", "asset_id", "is_paired", "created_at"
+            "id", "name", "asset__name", "asset_id", "is_paired", "created_at"
         ).order_by("-created_at")
 
         if organization:
             query_objects = query_objects.filter(organization=organization)
 
         if search_text:
+            id_query = Q()
+            try:
+                id_query = Q(id=UUID(search_text))
+            except (ValueError, TypeError):
+                pass
             query_objects = query_objects.filter(
-                Q(name__icontains=search_text) |
-                Q(device_sn__icontains=search_text) |
-                Q(asset__name__icontains=search_text)
+                Q(name__icontains=search_text)
+                | Q(asset__name__icontains=search_text)
+                | id_query
             )
 
         if status_filter == "paired":
-            query_objects = query_objects.filter(is_paired=True)
+            query_objects = query_objects.filter(is_paired=Device.PairingChoice.PAIRED)
         elif status_filter == "unpaired":
-            query_objects = query_objects.filter(is_paired=False)
+            query_objects = query_objects.filter(
+                is_paired=Device.PairingChoice.UNPAIRED
+            )
 
         page_object = create_paginated_objects(request, query_objects)
+        for device in page_object:
+            device["device_id"] = device["id"].hex
 
         asset_ids = [d["asset_id"] for d in page_object if d.get("asset_id")]
-        images_qs = AssetImage.objects.filter(
-            asset_id__in=asset_ids
-        ).order_by("-uploaded_at")
+        images_qs = AssetImage.objects.filter(asset_id__in=asset_ids).order_by(
+            "-uploaded_at"
+        )
 
         asset_images = {}
         for img in images_qs:
@@ -72,15 +85,11 @@ def get_sesnors_list(request):
         return Exception
 
 
-from iot.models.sensor_models import Sensor
-
-
 def get_device_details(request, id):
     device = get_object_or_404(
         Device.undeleted_objects, pk=id, organization=request.user.organization
     )
     attachments = device.device_attachments.all().order_by("created_at")
-    sensors = Sensor.undeleted_objects.filter(device=device).order_by("-created_at")
 
     history_list = device.history.all()
     paginator = Paginator(history_list, 10, orphans=1)
@@ -89,9 +98,9 @@ def get_device_details(request, id):
 
     return {
         "sidebar": "devices",
+        "device_id": device.id.hex,
         "device": device,
         "attachments": attachments,
-        "sensors": sensors,
         "page_object": page_object,
         "title": f"Details - {device.name}",
     }

@@ -62,13 +62,12 @@
               {% endfor %}
             </div>
 
-            {# Device Serial Number #}
-            <div class="form-group">
-              <label for="{{ form.device_sn.id_for_label }}">
-                Serial Number <span class="required">*</span>
+            <div class="form-group full-width">
+              <label for="{{ form.description.id_for_label }}">
+                Description
               </label>
-              {{ form.device_sn }}
-              {% for error in form.device_sn.errors %}
+              {{ form.description }}
+              {% for error in form.description.errors %}
                 <span class="field-error">{{ error }}</span>
               {% endfor %}
             </div>
@@ -199,8 +198,8 @@
         <div class="device-info-box">
           <i class="bi bi-info-circle-fill"></i>
           <div>
-            <strong>Device Token</strong><br>
-            The device token is auto-generated on creation and cannot be changed.
+            <strong>Device ID</strong><br>
+            The device ID is auto-generated on creation and cannot be changed.
           </div>
         </div>
 

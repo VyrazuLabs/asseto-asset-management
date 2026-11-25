@@ -16,13 +16,13 @@ class DeviceForm(forms.ModelForm):
             }
         ),
     )
-    device_sn = forms.CharField(
-        required=True,
-        widget=forms.TextInput(
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
             attrs={
                 "class": "form-control",
-                "placeholder": "Enter Device Serial Number",
-                "autocomplete": "off",
+                "placeholder": "Enter Device Description",
+                "rows": 3,
             }
         ),
     )
@@ -57,9 +57,10 @@ class DeviceForm(forms.ModelForm):
         model = Device
         fields = [
             "name",
-            "device_sn",
+            "description",
             "asset",
         ]
+
 
 class DeviceAttachmentsForm(forms.ModelForm):
     attahed_part = forms.CharField(

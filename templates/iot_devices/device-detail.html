@@ -46,9 +46,21 @@
                 <span class="value">{{ device.name }}</span>
             </div>
             <div class="info-item">
-                <span class="label">Serial Number</span>
-                <span class="value">
-                    <span class="device-detail-sn">{{ device.device_sn }}</span>
+                <span class="label">Description</span>
+                <span class="value">{{ device.description|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Device ID</span>
+                <span class="value d-flex align-items-center gap-2">
+                    <span class="device-detail-id" id="deviceId">{{ device_id }}</span>
+                    <button type="button"
+                            class="device-detail-copy-btn"
+                            id="copyDeviceId"
+                            data-device-id="{{ device_id }}"
+                            title="Copy device ID"
+                            aria-label="Copy device ID">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
                 </span>
             </div>
             <div class="info-item">
@@ -74,7 +86,7 @@
             <i class="bi bi-plug-fill"></i>
             <h2><span>Device Attachments</span></h2>
             {% if attachments %}
-            <span class="device-detail-sn" style="margin-left: auto;">{{ attachments|length }} attached</span>
+            <span class="device-detail-id" style="margin-left: auto;">{{ attachments|length }} attached</span>
             {% endif %}
         </div>
         {% if attachments %}
@@ -116,58 +128,37 @@
         {% endif %}
     </div>
 
-    {# ── Sensors Card ──────────────────────────────────────────────────────── #}
-    <div class="info-card">
+    {# ── Telemetry Section ─────────────────────────────────────────────────── #}
+    <div class="info-card device-telemetry-card"
+         id="deviceTelemetry"
+         data-device-id="{{ device_id }}"
+         data-is-paired="{{ device.is_paired }}"
+         data-pairing-status-url="{% url 'iot:device_pairing_status' device_id %}">
         <div class="card-header-custom">
-            <i class="bi bi-cpu-fill"></i>
-            <h2><span>Attached Sensors</span></h2>
-            {% if sensors %}
-            <span class="device-detail-sn" style="margin-left: auto;">{{ sensors|length }} sensor{{ sensors|length|pluralize }}</span>
-            {% endif %}
+            <i class="bi bi-activity"></i>
+            <h2><span>Telemetry</span></h2>
+            <span class="device-telemetry-status" id="deviceTelemetryStatus">
+                {% if device.is_paired == 2 %}Connecting…{% else %}Waiting for pairing{% endif %}
+            </span>
         </div>
-        {% if sensors %}
-        <table class="device-detail-attachments-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Sensor Name</th>
-                    <th>Sensor Type</th>
-                    <th>Unit</th>
-                    <th>Pairing Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sensor in sensors %}
-                <tr>
-                    <td data-label="#">{{ forloop.counter }}</td>
-                    <td data-label="Sensor Name" style="font-weight: 600;">{{ sensor.name }}</td>
-                    <td data-label="Sensor Type"><span class="sensor-detail-type">{{ sensor.get_sensor_type_display }}</span></td>
-                    <td data-label="Unit">{{ sensor.unit }}</td>
-                    <td data-label="Pairing Status">
-                        {% if sensor.is_paired %}
-                            <span class="device-detail-status paired">Paired</span>
-                        {% else %}
-                            <span class="device-detail-status unpaired">Unpaired</span>
-                        {% endif %}
-                    </td>
-                    <td data-label="Actions">
-                        <a href="{% url 'iot:sensor_details' sensor.id %}"
-                           class="sensor-action-btn"
-                           title="View sensor details">
-                            <i class="bi bi-eye"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="device-detail-empty">
-            <i class="bi bi-cpu"></i>
-            <p>No sensors attached to this device.</p>
+        <div class="device-telemetry-body" id="deviceTelemetryBody"
+             {% if device.is_paired != 2 %}hidden{% endif %}>
+            <div class="device-telemetry-updated">
+                Last update: <span id="deviceTelemetryUpdated">--</span>
+            </div>
+
+            <div class="device-telemetry-gauges" id="deviceTelemetryGauges"></div>
+
+            <div class="device-telemetry-empty" id="deviceTelemetryEmpty">
+                <i class="bi bi-broadcast"></i>
+                <p>Waiting for live telemetry from <strong>{{ device_id }}</strong>…</p>
+            </div>
         </div>
-        {% endif %}
+        <div class="device-telemetry-empty" id="deviceTelemetryPairingNotice"
+             {% if device.is_paired == 2 %}hidden{% endif %}>
+            <i class="bi bi-link-45deg"></i>
+            <p>Pair the device to view live telemetry.</p>
+        </div>
     </div>
 
     {# ── History Section ───────────────────────────────────────────────────── #}
@@ -176,3 +167,58 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{% static 'js/pages/device_telemetry.js' %}" defer></script>
+<script>
+(function () {
+    "use strict";
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const button = document.getElementById("copyDeviceId");
+        if (!button) return;
+
+        const icon = button.querySelector("i");
+        let resetTimer = null;
+
+        function showCopied() {
+            button.classList.add("copied");
+            button.title = "Copied!";
+            icon.className = "bi bi-check2";
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(function () {
+                button.classList.remove("copied");
+                button.title = "Copy device ID";
+                icon.className = "bi bi-clipboard";
+            }, 1500);
+        }
+
+        function fallbackCopy(value) {
+            const input = document.createElement("textarea");
+            input.value = value;
+            input.setAttribute("readonly", "");
+            input.style.position = "fixed";
+            input.style.opacity = "0";
+            document.body.appendChild(input);
+            input.select();
+            try {
+                if (document.execCommand("copy")) showCopied();
+            } catch (error) {}
+            input.remove();
+        }
+
+        button.addEventListener("click", function () {
+            const value = button.dataset.deviceId || "";
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(value).then(showCopied).catch(function () {
+                    fallbackCopy(value);
+                });
+            } else {
+                fallbackCopy(value);
+            }
+        });
+    });
+})();
+</script>
+{% endblock script %}

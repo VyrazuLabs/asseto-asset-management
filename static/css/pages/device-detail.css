@@ -48,13 +48,34 @@
     background: var(--bs-secondary-color, #adb5bd);
 }
 
-/* ── Serial Number Badge ─────────────────────────────────────────────────── */
-.device-detail-sn {
+/* ── Device ID Badge ─────────────────────────────────────────────────────── */
+.device-detail-id {
     display: inline-block;
     padding: 0.2rem 0.6rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+}
+
+.device-detail-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.device-detail-copy-btn:hover,
+.device-detail-copy-btn.copied {
     background: rgba(79, 70, 229, 0.1);
     color: #4f46e5;
 }
@@ -146,39 +167,115 @@
     opacity: 0.5;
 }
 
-/* ── Sensor Action Button (in sensors table) ─────────────────────────────── */
-.device-detail-attachments-table .sensor-action-btn {
+.device-telemetry-card {
+    margin-bottom: 1.25rem;
+}
+
+.device-telemetry-card .card-header-custom {
+    gap: 0.75rem;
+}
+
+.device-telemetry-status {
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: none;
-    background: rgba(79, 70, 229, 0.08);
-    color: #4f46e5;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-}
-
-.device-detail-attachments-table .sensor-action-btn:hover {
-    background: rgba(79, 70, 229, 0.18);
-}
-
-/* ── Sensor Type Badge (in sensors table) ────────────────────────────────── */
-.sensor-detail-type {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(79, 70, 229, 0.1);
-    color: #4f46e5;
+    background: rgba(108, 117, 125, 0.12);
+    color: var(--color-muted);
+}
+
+.device-telemetry-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.device-telemetry-status.live {
+    background: rgba(22, 163, 74, 0.12);
+    color: #16a34a;
+}
+
+.device-telemetry-body {
+    padding: 1.25rem;
+}
+
+.device-telemetry-updated {
+    margin: 0 0 1rem;
+    font-size: 0.78rem;
+    color: var(--color-muted);
+}
+
+.device-telemetry-gauges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.device-telemetry-gauges:empty {
+    display: none;
+}
+
+.device-telemetry-gauge-card {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 0.75rem;
+    overflow: hidden;
+}
+
+.device-telemetry-gauge-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+}
+
+.device-telemetry-gauge {
+    min-height: 220px;
+}
+
+.device-telemetry-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    color: var(--color-muted);
+    text-align: center;
+}
+
+.device-telemetry-empty:not([hidden]) {
+    display: flex;
+}
+
+.device-telemetry-empty i {
+    font-size: 2rem;
+    opacity: 0.6;
+}
+
+.device-telemetry-empty p {
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 /* ── Dark Mode ───────────────────────────────────────────────────────────── */
-body.theme-dark .device-detail-sn {
+body.theme-dark .device-detail-id {
+    background: rgba(129, 140, 248, 0.15);
+    color: #a5b4fc;
+}
+
+body.theme-dark .device-detail-copy-btn:hover,
+body.theme-dark .device-detail-copy-btn.copied {
     background: rgba(129, 140, 248, 0.15);
     color: #a5b4fc;
 }
@@ -221,18 +318,14 @@ body.theme-dark .device-detail-empty {
     color: #9CA3AF;
 }
 
-body.theme-dark .device-detail-attachments-table .sensor-action-btn {
-    background: rgba(129, 140, 248, 0.15);
-    color: #a5b4fc;
+body.theme-dark .device-telemetry-status {
+    background: rgba(156, 163, 175, 0.15);
+    color: #9ca3af;
 }
 
-body.theme-dark .device-detail-attachments-table .sensor-action-btn:hover {
-    background: rgba(129, 140, 248, 0.25);
-}
-
-body.theme-dark .sensor-detail-type {
-    background: rgba(129, 140, 248, 0.15);
-    color: #a5b4fc;
+body.theme-dark .device-telemetry-status.live {
+    background: rgba(110, 231, 183, 0.15);
+    color: #6ee7b7;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */

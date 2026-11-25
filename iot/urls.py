@@ -3,12 +3,14 @@ from django.urls import path
 from iot.views.iot_device_views import (
     add_device,
     device_details,
+    device_pairing_status,
     devices_list,
     edit_device,
+    paired_device_and_fetched_sesnors,
     search_devices,
+    unpair_device,
 )
 from iot.views.iot_sensors_views import (
-    check_sensor_heartbeat,
     create_sensor_device,
     edit_sensor,
     get_sensor_historical_data,
@@ -35,12 +37,26 @@ urlpatterns = [
     path("sensor-details/<uuid:id>", sensor_details, name="sensor_details"),
     path("sensors-list", sensors_list, name="sensors_list"),
     path("sensors-search/<int:page>", search_sensors, name="sensors_search"),
-    path("sensor/heartbeat", check_sensor_heartbeat, name="sensor_heartbeat"),
-    # -------------------------- Sesnors Urls----------------------------#
+    # -------------------------- Device Urls----------------------------#
     path("add-device", add_device, name="add_device"),
     path("edit-device/<uuid:id>", edit_device, name="edit_device"),
     path("details/<uuid:id>", device_details, name="device_details"),
     path("devices-list", devices_list, name="devices_list"),
+    path(
+        "devices/<str:device_id>/paired",
+        paired_device_and_fetched_sesnors,
+        name="pair_device",
+    ),
+    path(
+        "devices/<str:device_id>/pairing-status",
+        device_pairing_status,
+        name="device_pairing_status",
+    ),
+    path(
+        "devices/<str:device_id>/unpaired",
+        unpair_device,
+        name="unpair_device",
+    ),
     path(
         "sensor/<str:sensor_id>/historical-data",
         get_sensor_historical_data,

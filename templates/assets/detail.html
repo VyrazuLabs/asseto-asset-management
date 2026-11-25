@@ -203,7 +203,7 @@
         <table class="detail-specs-table">
           <thead>
             <tr>
-              <th>SERIAL NO.</th>
+              <th>DEVICE ID</th>
               <th>DEVICE NAME</th>
               <th>SENSOR NAME</th>
               <th>SENSOR TYPE</th>
@@ -219,7 +219,7 @@
                 data-sensor-unit="{{ sensor.unit }}"
                 data-sensor-endpoint="/iot/sensor/{{ sensor.id }}/historical-data"
                 style="cursor:pointer;">
-              <td>{{ sensor.device.device_sn }}</td>
+              <td>{{ sensor.device.id.hex }}</td>
               <td>{{ sensor.device.name }}</td>
               <td>{{ sensor.name }}</td>
               <td>{{ sensor.get_sensor_type_display }}</td>
