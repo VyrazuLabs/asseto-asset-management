@@ -2,7 +2,8 @@ import threading
 
 from iot.mqtt_client import subscribe_and_listen
 
-SENSOR_TOPIC: list = ["sensor/+/temparature-reading" , "sensor/+/sound-readings"]
+SENSOR_TOPIC: list = "device/+/sensor/reading"
+DEVICE_HEARTBEAT_TOPIC: str = "device/+/+/heartbeat"
 
 
 def start_sensor_stream():
@@ -47,3 +48,21 @@ def start_sensor_stream():
     print(f"[Sensor Stream] Listening to {SENSOR_TOPIC}")
     print("[Sensor Stream] WebSocket worker started")
     print("[Sensor Stream] DB persistence worker started")
+
+
+def start_device_heartbeat_stream():
+    from iot.device_heartbeat_worker import device_heartbeat_worker
+
+    heartbeat_queue = subscribe_and_listen(DEVICE_HEARTBEAT_TOPIC, include_topic=True)
+
+    heartbeat_worker = threading.Thread(
+        target=device_heartbeat_worker,
+        args=(heartbeat_queue,),
+        daemon=True,
+        name="device-heartbeat-worker",
+    )
+
+    heartbeat_worker.start()
+
+    print(f"[Device Heartbeat Stream] Listening to {DEVICE_HEARTBEAT_TOPIC}")
+    print("[Device Heartbeat Stream] Worker started")

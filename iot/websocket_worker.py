@@ -22,21 +22,9 @@ def sensor_websocket_worker(message_queue: queue.Queue):
 
         print(f"[WS Worker] Recieved: {data}")
 
-        from iot.constants import UNIT_BY_TYPE
-        from iot.helpers import get_sensor_value
+        from iot.helpers import transform_telemetry_payload
 
-        transformed = {
-            "sensors": [
-                {
-                    "id": sensor["id"],
-                    "type": sensor["type"],
-                    "value": get_sensor_value(sensor),
-                    "unit": UNIT_BY_TYPE.get(sensor.get("type"), ""),
-                    "humidity": sensor.get("humidity"),
-                }
-                for sensor in data.get("sensors", [])
-            ]
-        }
+        transformed = transform_telemetry_payload(data)
 
         # Evaluate each sensor reading against all its thresholds, skipping missing values
         for sensor in transformed["sensors"]:

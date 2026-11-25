@@ -133,47 +133,6 @@ def search_sensors(request, page):
         return HttpResponse(status=500)
     return render(request, "sensors/sensors-data.html", context)
 
-
-@login_required()
-def check_sensor_heartbeat(request):
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-    try:
-        # VERSION2 on_connect requires 5 params: client, userdata, flags, reason_code, properties
-        def on_connect(client, userdata, flags, reason_code, properties):
-            print("Connect with result code", str(reason_code))
-
-            client.subscribe([("sensor/+/heartbeat", 0), ("devices/+/heartbeat", 1)])
-            print("Subscribed to sensor/+/heartbeat and devices/+/heartbeat")
-
-        def on_message(client, userdata, message):
-            parts = message.topic.split("/")
-            device_id = parts[1]
-
-            print(f"Message: {message.payload.decode()}, device id: {device_id}")
-
-        def on_subscribe(client, userdata, mid, reason_code_list, properties):
-            # Since we subscribed only for a single channel, reason_code_list contains
-            # a single entry
-            if reason_code_list[0].is_failure:
-                print(f"Broker rejected you subscription: {reason_code_list[0]}")
-            else:
-                print(f"Broker granted the following QoS: {reason_code_list[0].value}")
-
-        client.on_connect = on_connect
-        client.on_message = on_message
-        client.on_subscribe = on_subscribe
-        client.connect("localhost", 1883, 60)
-        # Start the network loop in a background thread so MQTT events
-        # (including CONNACK → on_connect) are actually processed.
-        client.loop_start()
-    except Exception as e:
-        print(str(e))
-
-    finally:
-        client.disconnect()
-    return HttpResponse("Done")
-
-
 @login_required()
 def get_sensor_historical_data(request, sensor_id):
     """API endpoint to fetch historical sensor data for the chart."""

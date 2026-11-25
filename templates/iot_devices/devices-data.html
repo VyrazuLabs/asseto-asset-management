@@ -12,7 +12,7 @@
   </td>
 
   <td>
-    <span class="device-sn-badge">{{ device.device_sn }}</span>
+    <span class="device-id-badge">{{ device.device_id }}</span>
   </td>
 
   <td>
@@ -32,11 +32,7 @@
   </td>
 
   <td>
-    {% if device.is_paired %}
-      <span class="device-status-active">Paired</span>
-    {% else %}
-      <span class="device-status-inactive">Unpaired</span>
-    {% endif %}
+    {% include 'iot_devices/device-pairing-status.html' with device_id=device.device_id is_paired=device.is_paired %}
   </td>
 
   <td class="text-muted" style="font-size: 0.8rem; white-space: nowrap;">
@@ -64,6 +60,35 @@
               id="device-delete-{{ device.id }}">
         <i class="bi bi-trash3"></i>
       </button>
+
+      <span id="device-pairing-actions-{{ device.device_id }}" class="d-inline-flex align-items-center gap-1"
+            data-pair-url="{% url 'iot:pair_device' device.device_id %}"
+            data-unpair-url="{% url 'iot:unpair_device' device.device_id %}">
+        {% if device.is_paired == 1 %}
+        <button type="button" class="btn btn-sm btn-primary py-0 px-2" disabled>
+          <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+          Pairing
+        </button>
+        {% elif device.is_paired != 2 %}
+        <form method="post" action="{% url 'iot:pair_device' device.device_id %}" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-primary py-0 px-2"
+                  title="Mark device as pairing">
+            Pair
+          </button>
+        </form>
+        {% endif %}
+
+        {% if device.is_paired != 0 %}
+        <form method="post" action="{% url 'iot:unpair_device' device.device_id %}" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-secondary py-0 px-2"
+                  title="Mark device as unpaired">
+            Unpair
+          </button>
+        </form>
+        {% endif %}
+      </span>
     </div>
   </td>
 </tr>

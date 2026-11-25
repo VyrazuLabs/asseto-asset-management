@@ -35,7 +35,7 @@
     <div class="col">
       <div class="filter-label">Search Devices</div>
       <input name="search_text" type="search" autocomplete="off"
-        placeholder="Search by name, serial number..."
+        placeholder="Search by name, device ID..."
         value="{{ search_text|default:'' }}"
         hx-get="{% url 'iot:devices_search' page_object.number %}"
         hx-trigger="keyup changed delay:400ms, search"
@@ -72,7 +72,7 @@
         <tr>
           <th>#</th>
           <th>Device Name</th>
-          <th>Serial No.</th>
+          <th>Device ID</th>
           <th>Linked Asset</th>
           <th>Status</th>
           <th>Created</th>
@@ -106,3 +106,111 @@
 </div>
 
 {% endblock content %}
+
+{% block script %}
+<script>
+(function () {
+  const POLL_INTERVAL = 2000;
+  const POLL_TIMEOUT = 30000;
+  const pollers = Object.create(null);
+
+  function getCsrfToken() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    if (match) return match[1];
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || "";
+  }
+
+  function updateActionButtons(deviceId, isPairedState) {
+    const actionsContainer = document.getElementById("device-pairing-actions-" + deviceId);
+    if (!actionsContainer) return;
+
+    const csrfToken = getCsrfToken();
+    const pairUrl = actionsContainer.dataset.pairUrl;
+    const unpairUrl = actionsContainer.dataset.unpairUrl;
+
+    if (String(isPairedState) === "2") {
+      actionsContainer.innerHTML = `
+        <form method="post" action="${unpairUrl}" class="d-inline">
+          <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+          <button type="submit" class="btn btn-sm btn-secondary py-0 px-2"
+                  title="Mark device as unpaired">
+            Unpair
+          </button>
+        </form>
+      `;
+    } else if (String(isPairedState) === "0") {
+      actionsContainer.innerHTML = `
+        <form method="post" action="${pairUrl}" class="d-inline">
+          <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+          <button type="submit" class="btn btn-sm btn-primary py-0 px-2"
+                  title="Mark device as pairing">
+            Pair
+          </button>
+        </form>
+      `;
+    }
+  }
+
+  function stopPolling(deviceId, current) {
+    if (pollers[deviceId]) {
+      clearInterval(pollers[deviceId]);
+      delete pollers[deviceId];
+    }
+    if (current) {
+      current.dataset.pairingActive = "false";
+      current.innerHTML = '<span class="device-status-inactive">Pairing timed out</span>';
+      updateActionButtons(deviceId, 0);
+    }
+  }
+
+  function startPolling(element) {
+    const deviceId = element.dataset.pairingDeviceId;
+    const url = element.dataset.pairingStatusUrl;
+    if (!deviceId || !url || pollers[deviceId]) return;
+
+    const startedAt = Date.now();
+    pollers[deviceId] = setInterval(function () {
+      const current = document.getElementById("device-pairing-status-" + deviceId);
+      if (!current || current.dataset.pairingActive !== "true") {
+        stopPolling(deviceId, null);
+        return;
+      }
+      if (Date.now() - startedAt >= POLL_TIMEOUT) {
+        stopPolling(deviceId, current);
+        return;
+      }
+      fetch(url)
+        .then(function (response) {
+          if (!response.ok) return null;
+          return response.text();
+        })
+        .then(function (html) {
+          const latest = document.getElementById("device-pairing-status-" + deviceId);
+          if (!latest || !html) return;
+          const template = document.createElement("template");
+          template.innerHTML = html.trim();
+          const replacement = template.content.firstElementChild;
+          if (replacement) {
+            latest.replaceWith(replacement);
+            const pairedState = replacement.dataset.isPaired;
+            if (replacement.dataset.pairingActive !== "true") {
+              stopPolling(deviceId, null);
+              if (pairedState !== undefined) {
+                updateActionButtons(deviceId, pairedState);
+              }
+            }
+          }
+        });
+    }, POLL_INTERVAL);
+  }
+
+  function startAll() {
+    document.querySelectorAll('[data-pairing-active="true"]').forEach(startPolling);
+  }
+
+  document.addEventListener("DOMContentLoaded", startAll);
+  document.body.addEventListener("htmx:afterSwap", startAll);
+  startAll();
+})();
+</script>
+{% endblock script %}

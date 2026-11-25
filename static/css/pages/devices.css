@@ -28,8 +28,8 @@
     flex-shrink: 0;
 }
 
-/* ── Serial number badge ─────────────────────────────────────────────────── */
-.device-sn-badge {
+/* ── Device ID badge ─────────────────────────────────────────────────────── */
+.device-id-badge {
     display: inline-block;
     padding: 0.2rem 0.6rem;
     border-radius: 20px;
@@ -240,8 +240,8 @@ body.theme-dark .device-asset-thumb {
     border-color: var(--color-border);
 }
 
-/* ── Serial number badge ─────────────────────────────────────────────────── */
-body.theme-dark .device-sn-badge {
+/* ── Device ID badge (dark) ──────────────────────────────────────────────── */
+body.theme-dark .device-id-badge {
     background: rgba(129, 140, 248, 0.15);
     color: #a5b4fc;
 }

@@ -1,23 +1,24 @@
-import json
+import os
 import queue
 import threading
-import os
-import paho.mqtt.client as mqtt
 
+import paho.mqtt.client as mqtt
 
 # Single global MQTT client — imported by views, apps.py, etc.
 _mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 _is_connected = False
 
-# Thread-safe dictionary mapping topics -> list of active queues
+# Thread-safe dictionary mapping topics -> list of (queue, include_topic)
 _topic_listeners = {}
 _lock = threading.Lock()
 
 
-def subscribe_and_listen(topics) -> queue.Queue:
+def subscribe_and_listen(topics, include_topic: bool = False) -> queue.Queue:
     """Subscribe to one or more MQTT topics and return a shared queue.
 
     ``topics`` can be a single topic string or a list of topic strings.
+    When ``include_topic`` is true, queued messages are ``(topic, payload)``
+    tuples instead of payload strings.
     If the broker is not connected the subscribe calls are skipped so the
     server can still start; the queue will simply never receive messages.
     """
@@ -30,7 +31,7 @@ def subscribe_and_listen(topics) -> queue.Queue:
         for topic in topics:
             if topic not in _topic_listeners:
                 _topic_listeners[topic] = []
-            _topic_listeners[topic].append(message_queue)
+            _topic_listeners[topic].append((message_queue, include_topic))
 
     if _is_connected:
         for topic in topics:
@@ -45,8 +46,12 @@ def subscribe_and_listen(topics) -> queue.Queue:
 def unsubscribe_listeners(topic: str, message_queue: queue.Queue):
     """Clean up the queue after the view finishes execution."""
     with _lock:
-        if topic in _topic_listeners and message_queue in _topic_listeners[topic]:
-            _topic_listeners[topic].remove(message_queue)
+        if topic in _topic_listeners:
+            _topic_listeners[topic] = [
+                listener
+                for listener in _topic_listeners[topic]
+                if listener[0] is not message_queue
+            ]
             if not _topic_listeners[topic]:
                 del _topic_listeners[topic]
 
@@ -61,12 +66,12 @@ def on_message(client, userdata, message):
     with _lock:
         listeners = []
 
-        for subscribed_topic, queue in _topic_listeners.items():
+        for subscribed_topic, topic_listeners in _topic_listeners.items():
             if mqtt.topic_matches_sub(subscribed_topic, topic):
-                listeners.extend(queue)
+                listeners.extend(topic_listeners)
 
-    for message_queue in listeners:
-        message_queue.put(payload)
+    for message_queue, include_topic in listeners:
+        message_queue.put((topic, payload) if include_topic else payload)
 
 
 def on_subscribe(client, userdata, mid, reason_code_list, properties):

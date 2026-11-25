@@ -1,0 +1,17 @@
+<span id="device-pairing-status-{{ device_id }}"
+      class="{% if is_paired == 2 %}device-status-active{% else %}device-status-inactive{% endif %}"
+      data-pairing-device-id="{{ device_id }}"
+      data-is-paired="{{ is_paired }}"
+      {% if is_paired == 1 %}
+      data-pairing-active="true"
+      data-pairing-status-url="{% url 'iot:device_pairing_status' device_id %}"
+      {% endif %}>
+  {% if is_paired == 2 %}
+    <span class="device-status-active">Paired</span>
+  {% elif is_paired == 1 %}
+    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    Pairing...
+  {% else %}
+    <span class="device-status-inactive">Unpaired</span>
+  {% endif %}
+</span>

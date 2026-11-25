@@ -5,10 +5,29 @@ from django.http import JsonResponse
 from django.utils import timezone
 from audit.models import Audit, AuditImage
 from configurations.models import TagConfiguration
-from configurations.utils import dynamic_display_name, format_datetime, generate_asset_tag, get_currency_and_datetime_format
-from .models import Asset,AssignAsset,AssetImage,AssetStatus,AssetStatusChoice,Location,Vendor,MaintenanceRecord
-from dashboard.models import Department,ProductType,ProductCategory
-from .forms import AssetForm, AssignedAssetForm,ReassignedAssetForm,MaintenanceRecordForm
+from configurations.utils import (
+    dynamic_display_name,
+    format_datetime,
+    generate_asset_tag,
+    get_currency_and_datetime_format,
+)
+from .models import (
+    Asset,
+    AssignAsset,
+    AssetImage,
+    AssetStatus,
+    AssetStatusChoice,
+    Location,
+    Vendor,
+    MaintenanceRecord,
+)
+from dashboard.models import Department, ProductType, ProductCategory
+from .forms import (
+    AssetForm,
+    AssignedAssetForm,
+    ReassignedAssetForm,
+    MaintenanceRecordForm,
+)
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
 from .models import Asset
@@ -426,19 +445,23 @@ def details_of_asset(request, id):
     assetSpecifications = AssetSpecification.objects.filter(asset=asset)
     get_asset_img = get_asset_images(asset)
     asset_barcode = generate_barcode(asset.tag)
-    maintenance_records = MaintenanceRecord.objects.filter(asset=asset).order_by('-created_at')
+    maintenance_records = MaintenanceRecord.objects.filter(asset=asset).order_by(
+        "-created_at"
+    )
     maintenance_form = MaintenanceRecordForm(organization=request.user.organization)
-    
+
     sensors = []
     sensors_page = 1
     sensors_total_pages = 1
     sensors_total_count = 0
     if Device and Sensor and asset:
-        devices = Device.objects.filter(asset=asset, organization=request.user.organization)
-        all_sensors = Sensor.objects.filter(device__in=devices).select_related('device')
+        devices = Device.objects.filter(
+            asset=asset, organization=request.user.organization
+        )
+        all_sensors = Sensor.objects.filter(device__in=devices).select_related("device")
         sensors_total_count = all_sensors.count()
         paginator = Paginator(all_sensors, 5)
-        sensors_page = request.GET.get('sensors_page', 1)
+        sensors_page = request.GET.get("sensors_page", 1)
         try:
             sensors_page = int(sensors_page)
         except (TypeError, ValueError):
@@ -446,11 +469,42 @@ def details_of_asset(request, id):
         sensors_page_obj = paginator.get_page(sensors_page)
         sensors = sensors_page_obj
         sensors_total_pages = paginator.num_pages
-        
-    context=asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records,maintenance_form,sensors,sensors_page,sensors_total_pages,sensors_total_count)
+
+    context = asset_details(
+        request,
+        get_audit_history,
+        get_audit_image,
+        asset,
+        assigned_asset,
+        assetSpecifications,
+        get_asset_img,
+        asset_barcode,
+        maintenance_records,
+        maintenance_form,
+        sensors,
+        sensors_page,
+        sensors_total_pages,
+        sensors_total_count,
+    )
     return context
 
-def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset,assetSpecifications,get_asset_img,asset_barcode,maintenance_records=None,maintenance_form=None,sensors=None,sensors_page=1,sensors_total_pages=1,sensors_total_count=0):
+
+def asset_details(
+    request,
+    get_audit_history,
+    get_audit_image,
+    asset,
+    assigned_asset,
+    assetSpecifications,
+    get_asset_img,
+    asset_barcode,
+    maintenance_records=None,
+    maintenance_form=None,
+    sensors=None,
+    sensors_page=1,
+    sensors_total_pages=1,
+    sensors_total_count=0,
+):
     audit_data = []
     if get_audit_history:
         for audit in get_audit_history:
@@ -491,6 +545,7 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
     page_number = request.GET.get("page")
     page_object = paginator.get_page(page_number)
     from custom_fields.utils import get_definitions_for_module, get_values_for_entity
+
     cf_definitions = get_definitions_for_module(request.user.organization, "asset")
     cf_values = get_values_for_entity(asset.id, cf_definitions)
     organization = request.user.organization
@@ -519,77 +574,113 @@ def asset_details(request,get_audit_history,get_audit_image,asset,assigned_asset
             else ""
         )
 
-
     from authentication.models import User, Technician
-    
+
     maintenance_type_labels = {
-        '1': 'Calibration',
-        '2': 'Breakdown',
-        '3': 'Preventive',
-        '4': 'Repair',
-        '5': 'Other',
+        "1": "Calibration",
+        "2": "Breakdown",
+        "3": "Preventive",
+        "4": "Repair",
+        "5": "Other",
     }
-    
+
     status_labels = {
-        '1': 'New',
-        '2': 'In Progress',
-        '3': 'Completed',
+        "1": "New",
+        "2": "In Progress",
+        "3": "Completed",
     }
-    
+
     technician_map = {}
     # Fetch all users for name resolution, regardless of active status
-    tech_users = User.undeleted_objects.filter(
-        organization=request.user.organization
-    )
+    tech_users = User.undeleted_objects.filter(organization=request.user.organization)
     for u in tech_users:
         display_name = u.reverse_full_name or u.full_name or u.email
         technician_map[str(u.id)] = display_name
 
     # Also map Technician IDs to name resolution
-    for tech in Technician.objects.select_related('user').filter(user__organization=request.user.organization):
-        display_name = tech.user.reverse_full_name or tech.user.full_name or tech.user.email
+    for tech in Technician.objects.select_related("user").filter(
+        user__organization=request.user.organization
+    ):
+        display_name = (
+            tech.user.reverse_full_name or tech.user.full_name or tech.user.email
+        )
         technician_map[str(tech.id)] = display_name
 
     maintenance_history_entries = []
     if maintenance_records:
         for record in maintenance_records:
-            maintenance_history_entries.append({
-                'type': 'created',
-                'timestamp': record.created_at,
-                'user_id': record.created_by,
-                'details': maintenance_type_labels.get(record.maintenance_type, record.maintenance_type),
-            })
+            maintenance_history_entries.append(
+                {
+                    "type": "created",
+                    "timestamp": record.created_at,
+                    "user_id": record.created_by,
+                    "details": maintenance_type_labels.get(
+                        record.maintenance_type, record.maintenance_type
+                    ),
+                }
+            )
             if record.updated_by:
                 try:
-                    history = list(record.history.all().order_by('history_date'))
+                    history = list(record.history.all().order_by("history_date"))
                     prev = None
                     for h in history:
-                        if h.history_type == '~' and prev:
+                        if h.history_type == "~" and prev:
                             changes = []
                             if h.technician != prev.technician:
-                                changes.append('Technician')
+                                changes.append("Technician")
                             if h.status != prev.status:
-                                changes.append('Status')
+                                changes.append("Status")
                             if changes:
-                                maintenance_history_entries.append({
-                                    'type': 'updated',
-                                    'timestamp': h.history_date,
-                                    'user_id': h.updated_by,
-                                    'details': ', '.join(changes),
-                                })
+                                maintenance_history_entries.append(
+                                    {
+                                        "type": "updated",
+                                        "timestamp": h.history_date,
+                                        "user_id": h.updated_by,
+                                        "details": ", ".join(changes),
+                                    }
+                                )
                         prev = h
                 except Exception:
-                    maintenance_history_entries.append({
-                        'type': 'updated',
-                        'timestamp': record.updated_at,
-                        'user_id': record.updated_by,
-                        'details': 'Maintenance',
-                    })
+                    maintenance_history_entries.append(
+                        {
+                            "type": "updated",
+                            "timestamp": record.updated_at,
+                            "user_id": record.updated_by,
+                            "details": "Maintenance",
+                        }
+                    )
 
-    context = {'title': 'Asset Details', 'sidebar': 'assets', 'assigned_user':assigned_user,'assigned_asset':assigned_asset,'asset_barcode':asset_barcode,'asset': asset, 'submenu': 'list', 'page_object': page_object,'arr_size':arr_size,
-               'maintenance_records': maintenance_records, 'maintenance_form': maintenance_form, 'maintenance_type_labels': maintenance_type_labels, 'status_labels': status_labels, 'technician_map': technician_map, 'maintenance_history_entries': maintenance_history_entries,
-               'cf_definitions': cf_definitions, 'cf_values': cf_values, 'get_asset_img': get_asset_img, 'get_audit_image': get_audit_image, 'get_audit_history': get_audit_history, 'audit_data': audit_data, 'assetSpecifications': assetSpecifications, 'get_date_format': get_date_format, 'get_currency': get_currency, 'eol_date': eol_date, 'sensors': sensors,
-               'sensors_page': sensors_page, 'sensors_total_pages': sensors_total_pages, 'sensors_total_count': sensors_total_count}
+    context = {
+        "title": "Asset Details",
+        "sidebar": "assets",
+        "assigned_user": assigned_user,
+        "assigned_asset": assigned_asset,
+        "asset_barcode": asset_barcode,
+        "asset": asset,
+        "submenu": "list",
+        "page_object": page_object,
+        "arr_size": arr_size,
+        "maintenance_records": maintenance_records,
+        "maintenance_form": maintenance_form,
+        "maintenance_type_labels": maintenance_type_labels,
+        "status_labels": status_labels,
+        "technician_map": technician_map,
+        "maintenance_history_entries": maintenance_history_entries,
+        "cf_definitions": cf_definitions,
+        "cf_values": cf_values,
+        "get_asset_img": get_asset_img,
+        "get_audit_image": get_audit_image,
+        "get_audit_history": get_audit_history,
+        "audit_data": audit_data,
+        "assetSpecifications": assetSpecifications,
+        "get_date_format": get_date_format,
+        "get_currency": get_currency,
+        "eol_date": eol_date,
+        "sensors": sensors,
+        "sensors_page": sensors_page,
+        "sensors_total_pages": sensors_total_pages,
+        "sensors_total_count": sensors_total_count,
+    }
 
     return context
 
@@ -606,7 +697,6 @@ def add_asset(request, form):
     # Save images
     for image_file in request.FILES.getlist("image"):
         AssetImage.objects.create(asset=asset, image=image_file)
-
 
     slack_notification(
         request, f"{asset.name}  added successfully", asset.id, asset.tag
@@ -720,7 +810,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     }
     return context
 
-
     pass
 
 
@@ -780,7 +869,6 @@ def delete_asset_images(request, asset):
 def save_new_images(request, asset):
     for img in request.FILES.getlist("image"):
         AssetImage.objects.create(asset=asset, image=img)
-
 
     pass
 
@@ -1038,6 +1126,8 @@ def get_asset_status_list_utils(request, page_number=None):
     }
 
     return page_object, asset_status_asset_count, stats
+
+
 @transaction.atomic
 def add_maintenance_record(request, form, asset):
     record = form.save(commit=False)
@@ -1046,7 +1136,9 @@ def add_maintenance_record(request, form, asset):
     record.service_id = f"MN-{random.randint(10000, 99999)}"
     record.created_by = str(request.user.id)
     record.save()
-    messages.success(request, f"Maintenance record {record.service_id} added successfully.")
+    messages.success(
+        request, f"Maintenance record {record.service_id} added successfully."
+    )
     return record
 
 
