@@ -8028,7 +8028,12 @@ body[data-theme="dark"] {
 }
 
 .notification-dropdown {
-  width: 340px;
+  width: 360px;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13) !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  padding: 0 !important;
 }
 
 .box {
@@ -8042,36 +8047,49 @@ body[data-theme="dark"] {
   border-radius: 5px;
 }
 
-.notification-ul{
-  padding-top: 0px !important;
+.notification-ul {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
-.see-all-notifications{
+/* Legacy fallback - kept for compatibility */
+.see-all-notifications {
     background-color: #435ebe !important;
     color: white !important;
-    padding: 0.375rem 0.75rem;
+    padding: 0.4rem 0.75rem;
     border: none;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    text-decoration: none;
 }
-
 .see-all-notifications:hover {
     background-color: #3b4db4 !important;
     text-decoration: none;
     color: white !important;
 }
-.mark-all-as-read-notification{
-
-  background-color: #9694ff !important;
-  color: white !important;
+.mark-all-as-read-notification {
+  background: rgba(67,94,190,0.12) !important;
+  color: #435ebe !important;
+  border: 1px solid rgba(67,94,190,0.25) !important;
+  border-radius: 8px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 .mark-all-as-read-notification:hover {
-  background-color: #7a77fd !important;
+  background: rgba(67,94,190,0.2) !important;
   text-decoration: none;
-  color: white !important;
+  color: #435ebe !important;
 }
 
 

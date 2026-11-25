@@ -231,6 +231,7 @@ class SupportTicketService:
                     msg_creator=f"Your ticket '{ticket.subject}' has been created successfully.",
                     title_tech=f"New Ticket Assigned: {ticket.ticket_id}",
                     msg_tech=f"You have been assigned ticket '{ticket.subject}'.",
+                    updated_by=request.user,
                 )
             except Exception:
                 logger.exception("Failed to send ticket-created notifications")
@@ -530,7 +531,7 @@ class SupportTicketService:
                 status_map = dict(STATUS_CHOICES)
                 old_label = status_map.get(old_status, old_status)
                 new_label = status_map.get(str(ticket.status), ticket.status)
-                _status_change_notify(ticket, old_label, new_label)
+                _status_change_notify(ticket, old_label, new_label, updated_by=request.user)
             except Exception:
                 logger.exception("Failed to send ticket status-change notifications (update)")
 
@@ -675,7 +676,7 @@ class SupportTicketService:
         )
 
         try:
-            _status_change_notify(ticket, old_label, new_label)
+            _status_change_notify(ticket, old_label, new_label, updated_by=request.user)
         except Exception:
             logger.exception("Failed to send ticket status-change notifications (kanban)")
 
@@ -798,7 +799,13 @@ class SupportTicketService:
 
 
 def _notify_ticket_recipients(
-    ticket, title_creator, msg_creator, title_tech, msg_tech, icon="bi-ticket-fill"
+    ticket,
+    title_creator,
+    msg_creator,
+    title_tech,
+    msg_tech,
+    icon="bi-ticket-fill",
+    updated_by=None,
 ):
     """
     Send in-app notifications to the ticket creator and/or assigned technician.
@@ -822,6 +829,7 @@ def _notify_ticket_recipients(
                 link=link,
                 object_id=str(ticket.id),
                 instance_id=str(ticket.id),
+                updated_by=updated_by,
             )
             notified.add(creator.id)
         except (User.DoesNotExist, ValueError, Exception):
@@ -838,12 +846,13 @@ def _notify_ticket_recipients(
                 link=link,
                 object_id=str(ticket.id),
                 instance_id=str(ticket.id),
+                updated_by=updated_by,
             )
         except Exception:
             pass
 
 
-def _status_change_notify(ticket, old_label, new_label):
+def _status_change_notify(ticket, old_label, new_label, updated_by=None):
     """DRY wrapper for status-change notifications."""
     _notify_ticket_recipients(
         ticket,
@@ -852,6 +861,7 @@ def _status_change_notify(ticket, old_label, new_label):
         title_tech=f"Ticket {ticket.ticket_id} : Status Updated",
         msg_tech=f"Ticket '{ticket.subject}' status changed from '{old_label}' to '{new_label}'.",
         icon="bi-arrow-repeat",
+        updated_by=updated_by,
     )
 
 

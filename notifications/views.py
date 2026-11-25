@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import UserNotification, Notification
+from authentication.models import User
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 import json
@@ -38,22 +39,54 @@ PAGE_SIZE = 10
 ORPHANS = 1
 
 
-@login_required
-def list(request):
-    notifications_list = UserNotification.objects.filter(user=request.user).order_by(
+def _base_queryset(request):
+    return UserNotification.objects.filter(user=request.user).order_by(
         "-notification__created_at"
     )
-    paginator = Paginator(notifications_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = request.GET.get("page")
-    page_object = paginator.get_page(page_number)
+
+
+def _get_page(request, page_number=None):
+    paginator = Paginator(_base_queryset(request), PAGE_SIZE, orphans=ORPHANS)
+    return paginator.get_page(page_number)
+
+
+def _user_names(page_object):
+    """Map Notification.updated_by (a user id) -> display name for a page.
+
+    One extra query per page render instead of a per-row lookup.
+    """
+    import uuid as _uuid
+
+    values = {
+        str(un.notification.updated_by)
+        for un in page_object
+        if un.notification and un.notification.updated_by
+    }
+    ids = []
+    for value in values:
+        try:
+            _uuid.UUID(value)
+            ids.append(value)
+        except (ValueError, AttributeError, TypeError):
+            continue  # legacy rows store a name string directly
+    if not ids:
+        return {}
+    return {
+        str(user.id): (user.full_name or user.username)
+        for user in User.objects.filter(id__in=ids)
+    }
+
+
+@login_required
+def list(request):
+    page_object = _get_page(request, request.GET.get("page"))
 
     context = {
         "sidebar": "notifications",
         "page_object": page_object,
+        "user_names": _user_names(page_object),
         "title": "Notifications",
     }
-    # UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
-    #     notification__instance_id=request.user.id).update(is_seen=True)
     return render(request, "notifications/details.html", context=context)
 
 
@@ -103,15 +136,32 @@ def data(request):
 #         )
 
 
+@login_required
 def mark_all_as_read(request):
-    if request.method == "POST":
-        UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
-            notification__instance_id=request.user.id
-        ).update(is_seen=True)
-        return JsonResponse({"success": True})
-    return JsonResponse(
-        {"success": False}, status=400
-    )  # Method Not Allowed if not POST
+    if request.method != "POST":
+        return JsonResponse(
+            {"success": False}, status=400
+        )  # Method Not Allowed if not POST
+
+    UserNotification.objects.filter(user=request.user, is_seen=False).exclude(
+        notification__instance_id=request.user.id
+    ).update(is_seen=True)
+
+    # HTMX callers (list page + bell dropdown) get the refreshed partial so the
+    # unread dots disappear; the header badge/dropdown refresh via HX-Trigger.
+    if request.headers.get("HX-Request"):
+        page_object = _get_page(request, page_number=request.GET.get("page"))
+        response = render(
+            request,
+            "notifications/notifications-data.html",
+            {"page_object": page_object, "user_names": _user_names(page_object)},
+        )
+        response["HX-Trigger"] = json.dumps(
+            {"notificationCountChanged": None, "notificationListChanged": None}
+        )
+        return response
+
+    return JsonResponse({"success": True})
 
 
 @login_required
@@ -134,29 +184,19 @@ def seen(request, id):
 
 @login_required
 def search(request, page):
-    search_text = request.GET.get("search_text").strip()
+    search_text = (request.GET.get("search_text") or "").strip()
+    notifications_list = _base_queryset(request)
     if search_text:
-        return render(
-            request,
-            "notifications/notifications-data.html",
-            {
-                "page_object": UserNotification.objects.filter(
-                    Q(user=request.user)
-                    & (
-                        Q(notification__notification_title__icontains=search_text)
-                        | Q(notification__notification_text__icontains=search_text)
-                    )
-                ).order_by("-notification__created_at")[:10]
-            },
+        notifications_list = notifications_list.filter(
+            Q(notification__notification_title__icontains=search_text)
+            | Q(notification__notification_text__icontains=search_text)
         )
-    notification_list = UserNotification.objects.filter(user=request.user).order_by(
-        "-notification__created_at"
-    )
-    paginator = Paginator(notification_list, PAGE_SIZE, orphans=ORPHANS)
-    page_number = page
-    page_object = paginator.get_page(page_number)
+    paginator = Paginator(notifications_list, PAGE_SIZE, orphans=ORPHANS)
+    page_object = paginator.get_page(page)
     return render(
-        request, "notifications/notifications-data.html", {"page_object": page_object}
+        request,
+        "notifications/notifications-data.html",
+        {"page_object": page_object, "user_names": _user_names(page_object)},
     )
 
 

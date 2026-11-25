@@ -1,0 +1,317 @@
+/* =============================================================================
+   notification-dropdown.css
+   Bell-icon dropdown panel — loaded globally via header.html
+   ============================================================================= */
+
+/* ── Dropdown panel container ── */
+.notification-dropdown {
+    width: 360px !important;
+    max-height: none !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14) !important;
+    border: 1px solid rgba(0, 0, 0, 0.09) !important;
+    padding: 0 !important;
+}
+
+/* ── Scrollable list ── */
+.notification-dropdown > span {
+    display: contents;
+}
+
+.notification-ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.notif-items-scroll {
+    max-height: 330px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(67, 94, 190, 0.3) transparent;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.notif-items-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+.notif-items-scroll::-webkit-scrollbar-thumb {
+    background: rgba(67, 94, 190, 0.3);
+    border-radius: 4px;
+}
+
+.notif-items-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ── Header row ── */
+.notif-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.notif-dropdown-header .notif-header-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2b2f3a;
+    letter-spacing: 0.01em;
+}
+
+/* ── Individual notification row ── */
+.notif-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 11px 14px !important;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    text-decoration: none !important;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: rgba(67, 94, 190, 0.06); }
+
+/* ── Circular icon badge ── */
+.notif-icon-wrap {
+    flex-shrink: 0 !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 50% !important;
+    background: rgba(67, 94, 190, 0.12) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 1px;
+}
+
+.notif-icon-wrap i {
+    font-size: 0.95rem !important;
+    color: #435ebe !important;
+    line-height: 1 !important;
+}
+
+/* ── Text block ── */
+.notif-body {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.notif-title-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 6px;
+    width: 100%;
+}
+
+.notif-title {
+    font-size: 0.83rem !important;
+    font-weight: 600 !important;
+    color: #2b2f3a !important;
+    line-height: 1.35 !important;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notif-time {
+    font-size: 0.72rem !important;
+    color: #8a93a2 !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 1px;
+}
+
+.notif-text {
+    font-size: 0.78rem !important;
+    color: #6c757d !important;
+    line-height: 1.4 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+/* ── Unread dot ── */
+.notif-unread-dot {
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    border-radius: 50% !important;
+    background: #435ebe !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 0 5px rgba(67, 94, 190, 0.5);
+    align-self: center;
+    display: inline-block;
+}
+
+/* ── Footer ── */
+.notif-footer {
+    padding: 10px 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mark-all-as-read-notification {
+    background: rgba(67, 94, 190, 0.1) !important;
+    color: #435ebe !important;
+    border: 1px solid rgba(67, 94, 190, 0.28) !important;
+    border-radius: 8px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600;
+    padding: 7px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    transition: background 0.15s ease;
+    text-decoration: none !important;
+    cursor: pointer;
+    width: 100%;
+}
+
+.mark-all-as-read-notification:hover {
+    background: rgba(67, 94, 190, 0.2) !important;
+    color: #435ebe !important;
+    text-decoration: none !important;
+}
+
+.see-all-notifications {
+    background: #435ebe !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600;
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    transition: background 0.15s ease;
+    text-decoration: none !important;
+    width: 100%;
+}
+
+.see-all-notifications:hover {
+    background: #3b4db4 !important;
+    color: #fff !important;
+    text-decoration: none !important;
+}
+
+/* ── Empty state ── */
+.notif-empty {
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #8a93a2;
+}
+
+.notif-empty i {
+    font-size: 2rem;
+    opacity: 0.45;
+}
+
+.notif-empty span {
+    font-size: 0.82rem;
+}
+
+/* ══════════════════════════════════════════════════
+   DARK THEME OVERRIDES
+   ══════════════════════════════════════════════════ */
+body.theme-dark .notification-dropdown {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .notif-dropdown-header {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.theme-dark .notif-dropdown-header .notif-header-title {
+    color: #e2e5ef;
+}
+
+body.theme-dark .notif-item {
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .notif-item:hover {
+    background: rgba(150, 148, 255, 0.1);
+}
+
+body.theme-dark .notif-icon-wrap {
+    background: rgba(150, 148, 255, 0.18) !important;
+}
+
+body.theme-dark .notif-icon-wrap i {
+    color: #9694ff !important;
+}
+
+body.theme-dark .notif-title {
+    color: #e2e5ef !important;
+}
+
+body.theme-dark .notif-text {
+    color: #9aa3b2 !important;
+}
+
+body.theme-dark .notif-unread-dot {
+    background: #9694ff !important;
+}
+
+body.theme-dark .notif-footer {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.theme-dark .mark-all-as-read-notification {
+    background: rgba(150, 148, 255, 0.15) !important;
+    color: #9694ff !important;
+    border-color: rgba(150, 148, 255, 0.3) !important;
+}
+
+body.theme-dark .mark-all-as-read-notification:hover {
+    background: rgba(150, 148, 255, 0.25) !important;
+    color: #9694ff !important;
+}
+
+body.theme-dark .see-all-notifications {
+    background: #7a77fd !important;
+}
+
+body.theme-dark .see-all-notifications:hover {
+    background: #6360e0 !important;
+}
+
+body.theme-dark .notif-items-scroll {
+    scrollbar-color: rgba(150, 148, 255, 0.3) transparent;
+}
+
+body.theme-dark .notif-items-scroll::-webkit-scrollbar-thumb {
+    background: rgba(150, 148, 255, 0.3);
+}
+
