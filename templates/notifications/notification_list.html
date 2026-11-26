@@ -8,7 +8,7 @@
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 hx-trigger="click"
                 hx-swap="none"
-                hx-on::after-request="location.href='{{ user_notification.notification.link }}';"
+                onclick="openNotificationLink(this, '{{ user_notification.notification.link|escapejs }}')"
             {% endif %}
         >
             <div class="notif-icon-wrap">
@@ -55,6 +55,19 @@
 {% endif %}
 
 <script>
+    function openNotificationLink(el, url) {
+        if (!url) return;
+        let navigated = false;
+        const go = () => {
+            if (!navigated) {
+                navigated = true;
+                location.href = url;
+            }
+        };
+        el.addEventListener('htmx:afterRequest', go, { once: true });
+        setTimeout(go, 400);
+    }
+
     function removeUnreadDots() {
         document.querySelectorAll('.notif-unread-dot').forEach(dot => dot.remove());
     }

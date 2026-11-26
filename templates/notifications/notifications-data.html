@@ -48,7 +48,7 @@
               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
               hx-trigger="click"
               hx-swap="none"
-              hx-on::after-request="location.href='{{ user_notification.notification.link }}';">
+              onclick="openNotificationLink(this, '{{ user_notification.notification.link|escapejs }}')">
               <i class="bi bi-eye"></i>
             </button>
             {% else %}
@@ -77,3 +77,18 @@
 </div>
 
 {% include 'commons/htmx-pagination.html' with search_url="/notifications/search/" filter_form="#notification-filter-form" target="#notifications-list-section" item_label="notifications" %}
+
+<script>
+  window.openNotificationLink = window.openNotificationLink || function(el, url) {
+    if (!url) return;
+    let navigated = false;
+    const go = () => {
+      if (!navigated) {
+        navigated = true;
+        location.href = url;
+      }
+    };
+    el.addEventListener('htmx:afterRequest', go, { once: true });
+    setTimeout(go, 400);
+  };
+</script>
