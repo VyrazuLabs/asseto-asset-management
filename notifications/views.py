@@ -168,7 +168,7 @@ def mark_all_as_read(request):
 @require_POST
 def seen(request, id):
     if request.method == "POST":
-        UserNotification.objects.filter(pk=id).update(is_seen=True)
+        UserNotification.objects.filter(pk=id, user=request.user).update(is_seen=True)
         return HttpResponse(
             status=204,
             headers={

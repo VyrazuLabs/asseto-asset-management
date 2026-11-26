@@ -533,6 +533,22 @@ class SupportTicketService:
             except Exception:
                 logger.exception("Failed to send ticket status-change notifications (update)")
 
+        # Notify newly assigned technician on reassignment
+        if old_assigned != ticket.assigned_to and ticket.assigned_to:
+            try:
+                NotificationService.send(
+                    user=ticket.assigned_to,
+                    title=f"New Ticket Assigned: {ticket.ticket_id}",
+                    message=f"You have been assigned ticket '{ticket.subject}'.",
+                    icon="bi-ticket-fill",
+                    link=f"/support/tickets/details/{ticket.id}",
+                    object_id=str(ticket.id),
+                    instance_id=str(ticket.id),
+                    updated_by=request.user,
+                )
+            except Exception:
+                logger.exception("Failed to send ticket reassignment notification")
+
         return ticket
 
     # ------------------------------------------------------------------
@@ -830,8 +846,10 @@ def _notify_ticket_recipients(
                 updated_by=updated_by,
             )
             notified.add(creator.id)
-        except (User.DoesNotExist, ValueError, Exception):
-            pass
+        except (User.DoesNotExist, ValueError):
+            logger.warning("Could not resolve creator user %s for ticket %s", creator_id, ticket.id)
+        except Exception:
+            logger.exception("Failed to send notification to ticket creator %s", creator_id)
 
     # Notify assigned technician (skip if same as creator)
     if ticket.assigned_to and ticket.assigned_to.id not in notified:
@@ -847,7 +865,7 @@ def _notify_ticket_recipients(
                 updated_by=updated_by,
             )
         except Exception:
-            pass
+            logger.exception("Failed to send notification to assigned technician %s", ticket.assigned_to.id)
 
 
 def _status_change_notify(ticket, old_label, new_label, updated_by=None):

@@ -1,15 +1,14 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/pages/notification-dropdown.css' %}">
 
 <div class="notif-items-scroll">
     {% for user_notification in notifications %}
         <li class="notif-item"
             {% if user_notification.notification.link %}
-                onclick="location.href='{{ user_notification.notification.link }}';"
                 hx-post="{% url 'notifications:seen' user_notification.id %}"
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 hx-trigger="click"
                 hx-swap="none"
+                hx-on::after-request="location.href='{{ user_notification.notification.link }}';"
             {% endif %}
         >
             <div class="notif-icon-wrap">

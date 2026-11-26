@@ -196,6 +196,7 @@ def get_client_filter_q(client_id, organization):
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
     client_data = request.POST.get("client-data")
+    product_data = request.POST.get("product")  # product id posted from products list
     product_type = request.POST.get("product_type")  # gets the id of the product type
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
@@ -204,6 +205,7 @@ def filtered_asset(request):
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
+    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(
@@ -235,6 +237,12 @@ def filtered_asset(request):
         filters &= Q(product__product_sub_category_id=category_id)
     if product_type_id:
         filters &= Q(product__product_type_id=product_type_id)
+    if product_id:
+        try:
+            uuid.UUID(str(product_id))
+            filters &= Q(product_id=product_id)
+        except (ValueError, TypeError, AttributeError):
+            pass
     if client_id:
         filters &= get_client_filter_q(client_id, request.user.organization)
     if location_id:
@@ -271,6 +279,12 @@ def filtered_asset(request):
         )
     if client_data:
         assets_qs = assets_qs.filter(client_id=client_data)
+    if product_data:
+        try:
+            uuid.UUID(str(product_data))
+            assets_qs = assets_qs.filter(product_id=product_data)
+        except (ValueError, TypeError, AttributeError):
+            pass
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -781,6 +795,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
+    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     location_id = request.GET.get("location")
     is_assigned = request.GET.get("is_assigned")
@@ -806,7 +821,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(vendor_id=vendor_id)
 
     if status_value:
-        import uuid
         try:
             uuid.UUID(str(status_value))
             q &= Q(asset_status_id=status_value)
@@ -819,21 +833,15 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
 
-    if client_id:
+    if product_id:
         try:
-            client_obj = Client.undeleted_objects.filter(id=client_id).first()
-            if client_obj:
-                same_name_ids = list(
-                    Client.undeleted_objects.filter(
-                        organization=request.user.organization,
-                        name__iexact=client_obj.name,
-                    ).values_list("id", flat=True)
-                )
-                q &= Q(client_id__in=same_name_ids)
-            else:
-                q &= Q(client_id=client_id)
-        except Exception:
-            q &= Q(client_id=client_id)
+            uuid.UUID(str(product_id))
+            q &= Q(product_id=product_id)
+        except (ValueError, TypeError, AttributeError):
+            pass
+
+    if client_id:
+        q &= get_client_filter_q(client_id, request.user.organization)
     if location_id:
         q &= Q(location_id=location_id)
     if is_assigned == "true":
@@ -871,7 +879,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     # unfiltered browse view uses regular pagination below.
     any_filter_active = any([
         search_text, vendor_id, status_value, user_id, department_id,
-        product_category_id, product_type_id, client_id, location_id, 
+        product_category_id, product_type_id, product_id, client_id, location_id,
         is_assigned,
     ])
 

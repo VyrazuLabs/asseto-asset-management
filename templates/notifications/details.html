@@ -42,7 +42,7 @@
       <div class="filter-label">Search notifications</div>
       <input name="search_text" type="search" autocomplete="off"
         placeholder="Search by title or description..."
-        hx-get="{% url 'notifications:search' page_object.number %}"
+        hx-get="{% url 'notifications:search' 1 %}"
         hx-trigger="keyup changed delay:400ms, search"
         hx-target="#notifications-list-section"
         hx-swap="innerHTML"

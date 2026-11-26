@@ -33,12 +33,16 @@ def search_utils(request, page):
                     )
                 )
                 .annotate(
-                    total_assets=Count("asset"),
-                    # available_assets=Count('asset', filter=Q(asset__is_assigned=False) and Q(asset__organization=request.user.organization)),
+                    total_assets=Count(
+                        "asset",
+                        filter=Q(asset__is_deleted=False)
+                        & Q(asset__organization=request.user.organization),
+                    ),
                     available_assets=Count(
                         "asset",
                         filter=Q(asset__is_assigned=False)
-                        & Q(asset__organization=request.user.organization),
+                        & Q(asset__organization=request.user.organization)
+                        & Q(asset__is_deleted=False),
                     ),
                 )
                 .order_by("-created_at")
@@ -113,15 +117,14 @@ def product_list(request):
         .annotate(
             total_assets=Count(
                 "asset",
-                filter=Q(asset__is_assigned=True)
-                and Q(asset__organization=request.user.organization)
-                and Q(asset__is_deleted=False),
+                filter=Q(asset__is_deleted=False)
+                & Q(asset__organization=request.user.organization),
             ),
             available_assets=Count(
                 "asset",
-                filter=Q(asset__is_assigned=True)
-                and Q(asset__organization=request.user.organization)
-                and Q(asset__is_deleted=False),
+                filter=Q(asset__is_assigned=False)
+                & Q(asset__organization=request.user.organization)
+                & Q(asset__is_deleted=False),
             ),
         )
         .order_by("-created_at")

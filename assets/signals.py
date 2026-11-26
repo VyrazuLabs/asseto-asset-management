@@ -106,30 +106,12 @@ def asset_notification(sender, instance, created, **kwargs):
                 instance_id=instance.id,
                 object_id=str(instance.id),
             )
-            _send_after_commit(
-                user=admin,
-                title="Asset Status Changed",
-                message=status_msg,
-                icon="bi-arrow-repeat",
-                link=f"/assets/details/{instance.id}",
-                instance_id=instance.id,
-                object_id=str(instance.id),
-            )
         elif notif_type == "unassign":
             _send_after_commit(
                 user=admin,
                 title="Asset Unassigned",
                 message=f"Asset '{instance.name}' has been unassigned.",
                 icon="bi-person-dash",
-                link=f"/assets/details/{instance.id}",
-                instance_id=instance.id,
-                object_id=str(instance.id),
-            )
-            _send_after_commit(
-                user=admin,
-                title="Asset Status Changed",
-                message=status_msg,
-                icon="bi-arrow-repeat",
                 link=f"/assets/details/{instance.id}",
                 instance_id=instance.id,
                 object_id=str(instance.id),
