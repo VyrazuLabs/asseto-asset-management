@@ -161,6 +161,11 @@ class AssignAsset(models.Model):
             ),
         ]
 
+    def __str__(self):
+        asset_name = self.asset.name if self.asset else "Unknown Asset"
+        user_name = str(self.user) if self.user else "Unassigned"
+        return f"{asset_name} -> {user_name}"
+
 class MaintenanceRecord(TimeStampModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='maintenance_records')

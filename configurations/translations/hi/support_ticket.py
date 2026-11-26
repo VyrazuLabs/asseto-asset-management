@@ -7,7 +7,7 @@ STRINGS = {
     "list_view": "सूची दृश्य",
     "kanban_view": "कानबान",
     "total_active": "कुल सक्रिय",
-    "pending_parts": "लंबित पार्ट्स",
+    "open_tickets": "खुला टिकट",
     "overdue": "अतिदेय",
     "critical_alarms": "गंभीर अलार्म",
     "search_label": "खोजें",

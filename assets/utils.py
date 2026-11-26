@@ -164,10 +164,38 @@ def get_asset_filter_data(request):
     }
 
 
+def get_client_filter_q(client_id, organization):
+    """
+    Build a Q filter for client_id scoped to the given organization.
+    Supports matching across same-named clients within the same tenant (for deduped dropdowns)
+    while preventing cross-tenant leakage and avoiding broad exceptions.
+    """
+    if not client_id:
+        return Q()
+
+    try:
+        uuid.UUID(str(client_id))
+    except (ValueError, TypeError, AttributeError):
+        return Q(client__name__icontains=client_id)
+
+    client_obj = Client.undeleted_objects.filter(
+        id=client_id,
+        organization=organization,
+    ).first()
+
+    if client_obj:
+        same_name_client_ids = Client.undeleted_objects.filter(
+            organization=organization,
+            name__iexact=client_obj.name,
+        ).values("id")
+        return Q(client_id__in=same_name_client_ids)
+
+    return Q(client_id=client_id)
+
+
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
     client_data = request.POST.get("client-data")
-    product_data = request.POST.get("product")  # product id posted from products list
     product_type = request.POST.get("product_type")  # gets the id of the product type
     search_text = (request.GET.get("search_text") or "").strip()
     vendor_id = request.GET.get("vendor")
@@ -176,7 +204,6 @@ def filtered_asset(request):
     location_id = request.GET.get("location")
     category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
-    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     # org="4fdbba1a0f1e48bf9ae9c1de5a98e0bd"
     filters = Q(
@@ -208,14 +235,8 @@ def filtered_asset(request):
         filters &= Q(product__product_sub_category_id=category_id)
     if product_type_id:
         filters &= Q(product__product_type_id=product_type_id)
-    if product_id:
-        try:
-            uuid.UUID(str(product_id))
-            filters &= Q(product_id=product_id)
-        except (ValueError, TypeError, AttributeError):
-            pass
     if client_id:
-        filters &= Q(client_id=client_id)
+        filters &= get_client_filter_q(client_id, request.user.organization)
     if location_id:
         filters &= Q(location_id=location_id)
 
@@ -227,7 +248,7 @@ def filtered_asset(request):
 
     assets_qs = Asset.undeleted_objects.filter(filters).select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status').order_by("-created_at")
 
-    # Scoped to assets currently assigned to the requesting user unless
+    # Scoped to assets currently assigned to the requesting user unless 
     # they hold "assets.all_asset" (superusers always pass via Django's
     # has_perm) — without it, a non-superuser saw every asset in the org
     # regardless of who it was assigned to. distinct() guards against
@@ -250,12 +271,6 @@ def filtered_asset(request):
         )
     if client_data:
         assets_qs = assets_qs.filter(client_id=client_data)
-    if product_data:
-        try:
-            uuid.UUID(str(product_data))
-            assets_qs = assets_qs.filter(product_id=product_data)
-        except (ValueError, TypeError, AttributeError):
-            pass
     if department_id:
         assigned_qs = AssignAsset.objects.filter(user__department_id=department_id)
         assets_qs = assets_qs.filter(assignasset__user__department_id=department_id)
@@ -328,40 +343,25 @@ def export_assets_csv_utils(request):
     return response
 
 
-def _build_audit_conditions(org_filter):
-    """Return (asset_conditions_map, list_of_audited_assets) using a DB subquery."""
+def create_asset_list(request, assets_qs):
+    org_filter = Q(organization=None) | Q(organization=request.user.organization)
     visible_asset_subquery = Asset.undeleted_objects.filter(org_filter).values("id")
     audits_for_org = (
         Audit.objects.filter(asset_id__in=visible_asset_subquery)
         .values("asset_id", "condition")
     )
     asset_conditions_map = defaultdict(list)
+    audited_asset_ids = set()
     for row in audits_for_org:
         asset_conditions_map[row["asset_id"]].append(row["condition"])
+        audited_asset_ids.add(row["asset_id"])
 
-    audited_asset_subquery = audits_for_org.values("asset_id")
-    list_of_audited_assets = Asset.undeleted_objects.filter(
-        id__in=audited_asset_subquery
-    )
-    return asset_conditions_map, list_of_audited_assets
-
-
-def create_asset_list(request, assets_qs):
-    org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
+    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
     product_category_list = ProductCategory.undeleted_objects.filter(org_filter)
     department_list = Department.undeleted_objects.filter(org_filter)
     location_list = Location.undeleted_objects.filter(org_filter)
-    user_list = User.objects.filter(org_filter, is_active=True).select_related("department", "location").order_by("-created_at")
+    user_list = User.objects.filter(org_filter, is_active=True).order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
-    selected_vendor = None
-    selected_vendor_id = (request.GET.get("vendor") or "").strip()
-    if selected_vendor_id:
-        try:
-            uuid.UUID(selected_vendor_id)
-            selected_vendor = vendor_list.filter(id=selected_vendor_id).first()
-        except (ValueError, TypeError, AttributeError):
-            selected_vendor = None
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
@@ -439,7 +439,6 @@ def create_asset_list(request, assets_qs):
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
-        "selected_vendor": selected_vendor,
         "active_user": active_users,
         "sidebar": "assets",
         "submenu": "list",
@@ -500,12 +499,6 @@ def assign_asset_in_form(request, form):
     messages.success(request, "Asset assigned to user successfully")
     slack_notification(
         request, f"{asset.name}  assigned successfully to user", asset.id, asset.tag
-    )
-    notifications_call(
-        user=request.user,
-        entity_type=2,
-        notification_text=f"{asset.name}  assigned successfully to user",
-        notification_title="Asset Assigned",
     )
 
 
@@ -762,7 +755,20 @@ def add_asset(request, form):
 
 def search_asset(request):
     org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
+    visible_asset_ids = list(
+        Asset.undeleted_objects.filter(org_filter).values_list("id", flat=True)
+    )
+    audits_for_org = (
+        Audit.objects.filter(asset_id__in=visible_asset_ids)
+        .values("asset_id", "condition")
+    )
+    asset_conditions_map = defaultdict(list)
+    audited_asset_ids = set()
+    for row in audits_for_org:
+        asset_conditions_map[row["asset_id"]].append(row["condition"])
+        audited_asset_ids.add(row["asset_id"])
+
+    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
     context = search_with_filters(request, list_of_audited_assets, asset_conditions_map)
     return context
 
@@ -775,7 +781,6 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     department_id = request.GET.get("department")
     product_category_id = request.GET.get("category")
     product_type_id = request.GET.get("product_type")
-    product_id = request.GET.get("product")
     client_id = request.GET.get("client")
     location_id = request.GET.get("location")
     is_assigned = request.GET.get("is_assigned")
@@ -801,6 +806,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
         q &= Q(vendor_id=vendor_id)
 
     if status_value:
+        import uuid
         try:
             uuid.UUID(str(status_value))
             q &= Q(asset_status_id=status_value)
@@ -813,15 +819,21 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     if product_type_id:
         q &= Q(product__product_type_id=product_type_id)
 
-    if product_id:
-        try:
-            uuid.UUID(str(product_id))
-            q &= Q(product_id=product_id)
-        except (ValueError, TypeError, AttributeError):
-            pass
-
     if client_id:
-        q &= Q(client_id=client_id)
+        try:
+            client_obj = Client.undeleted_objects.filter(id=client_id).first()
+            if client_obj:
+                same_name_ids = list(
+                    Client.undeleted_objects.filter(
+                        organization=request.user.organization,
+                        name__iexact=client_obj.name,
+                    ).values_list("id", flat=True)
+                )
+                q &= Q(client_id__in=same_name_ids)
+            else:
+                q &= Q(client_id=client_id)
+        except Exception:
+            q &= Q(client_id=client_id)
     if location_id:
         q &= Q(location_id=location_id)
     if is_assigned == "true":
@@ -859,7 +871,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
     # unfiltered browse view uses regular pagination below.
     any_filter_active = any([
         search_text, vendor_id, status_value, user_id, department_id,
-        product_category_id, product_type_id, product_id, client_id, location_id,
+        product_category_id, product_type_id, client_id, location_id, 
         is_assigned,
     ])
 
@@ -1161,6 +1173,7 @@ def get_asset_status_list_utils(request, page_number=None):
     total_statuses = status_counts["total"]
     active_statuses = status_counts["active"]
     inactive_statuses = status_counts["inactive"]
+
     deleted_statuses_count = AssetStatus.deleted_objects.filter(
         Q(organization=None, can_modify=True)
         | Q(organization=request.user.organization, can_modify=True)

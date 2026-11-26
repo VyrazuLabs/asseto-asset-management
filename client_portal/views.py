@@ -440,16 +440,14 @@ def _client_ticket_stats(client):
     # separate count queries, each of which re-ran the base filter.
     return qs.aggregate(
         total_active=Count("id", distinct=True, filter=~Q(status__in=["3", "4"])),
-        pending_parts=Count(
-            "id", distinct=True, filter=Q(status="0", ticket_type="hardware_repair")
-        ),
+        open_tickets=Count("id", distinct=True, filter=Q(status="0")),
         overdue_count=Count(
             "id",
             distinct=True,
             filter=Q(estimated_eta__lt=now) & ~Q(status__in=["3", "4"]),
         ),
         critical_count=Count(
-            "id", distinct=True, filter=Q(priority="3") & ~Q(status__in=["3", "4"])
+            "id", distinct=True, filter=Q(priority="3") & ~Q(status="4")
         ),
     )
 

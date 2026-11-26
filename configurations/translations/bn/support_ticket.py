@@ -7,7 +7,7 @@ STRINGS = {
     "list_view": "তালিকা দৃশ্য",
     "kanban_view": "কানবান",
     "total_active": "মোট সক্রিয়",
-    "pending_parts": "বকেয়া পার্টস",
+    "open_tickets": "খোলা টিকিট",
     "overdue": "অতিরিক্ত সময়",
     "critical_alarms": "গুরুত্বপূর্ণ অ্যালার্ম",
     "search_label": "অনুসন্ধান",

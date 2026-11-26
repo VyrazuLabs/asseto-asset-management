@@ -59,6 +59,9 @@ def save_old_status(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Asset)
 def notify_admin_on_status_change(sender, instance, created, **kwargs):
+    # Superseded by assets.signals.asset_notification (detail-page links,
+    # org-scoped admins). Keeping both doubled every notification.
+    return
     if not created and hasattr(instance, "_old_status"):
         old_status = instance._old_status
         new_status = instance.asset_status
@@ -86,6 +89,9 @@ def notify_admin_on_asset_created(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Asset)
 def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
+    # Superseded by assets.signals.asset_notification (detail-page links,
+    # org-scoped admins). Keeping both doubled every notification.
+    return
     if not created and hasattr(instance, "_old_status"):
 
         old_status = instance._old_status
@@ -111,44 +117,16 @@ def notify_admin_on_asset_updated(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=AssignAsset)
 def asset_notifications(sender, instance, created, **kwargs):
-
-    admins = User.objects.filter(is_superuser=True)
-
-    if created:
-        for admin in admins:
-            NotificationService.send(
-                user=admin, title="Asset Created", message=f"{instance} created"
-            )
-        return
-
-    # status change
-    if hasattr(instance, "_old_status"):
-        if instance._old_status != instance.asset_status:
-            for admin in admins:
-                NotificationService.send(
-                    user=admin,
-                    title="Status Changed",
-                    message=f"{instance} status changed",
-                )
-            return
-
-    # general update
-    for admin in admins:
-        NotificationService.send(
-            user=admin, title="Asset Updated", message=f"{instance} updated"
-        )
+    # Superseded by assets.signals (properly-linked, org-scoped notifications).
+    # Keeping this receiver active caused duplicate, un-clickable
+    # "AssignAsset object (...) created/updated" notifications.
+    return
 
 
 @receiver(post_delete, sender=AssignAsset)
 def asset_delete_notification(sender, instance, *args, **kwargs):
-    # send_email(instance.user.email,notifications_title='Deleted Asset',notification_text=f'{instance.asset.name} is Deleted.')
-    NotificationService.send(
-        user=instance.previous_user,
-        title="Asset Deleted",
-        message=f"{instance.asset.name} has been deleted.",
-        icon="bi-gear-fill",
-        instance_id=instance.id,
-    )
+    # Superseded by assets.signals (unassign notifications are handled on Asset).
+    return
 
 
 @receiver(post_init, sender=AssignAsset)

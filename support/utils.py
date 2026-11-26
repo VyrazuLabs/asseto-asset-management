@@ -81,11 +81,9 @@ class SupportTicketService:
             qs = SupportTicketService.filter_by_client(qs, params.get("client"))
         return {
             "total_active": qs.exclude(status="4").count(),
-            "pending_parts": qs.filter(
-                status="0", ticket_type="hardware_repair"
-            ).count(),
+            "open_tickets": qs.filter(status="0").count(),
             "overdue_count": qs.filter(status="0", estimated_eta__lt=now()).count(),
-            "critical_count": qs.filter(priority__in=["3", "2"], status="0").count(),
+            "critical_count": qs.exclude(status="4").filter(priority="3").count(),
         }
 
     # ------------------------------------------------------------------

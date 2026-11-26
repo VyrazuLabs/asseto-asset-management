@@ -29,73 +29,65 @@
 {% endblock css %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb page-breadcrumb">
-                    <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
-                    <li class="breadcrumb-item active">{{ trans.tickets_breadcrumb }}</li>
-                </ol>
-            </nav>
-            <h1 class="h3 mb-1">{{ trans.maintenance_tickets }}</h1>
-            <p class="text-muted small mb-0">{{ trans.monitoring_active_tickets|format_str:total_active }}</p>
-        </div>
-        <div class="d-flex flex-column align-items-end gap-3">
-            <a href="{% url 'support:ticket_add' %}" class="btn-register"
-               {% if not perms.support.add_ticket %}style="display:none"{% endif %}>
-                <i class="bi bi-plus-lg"></i> {{ trans.create_new_ticket }}
-            </a>
-            <div class="btn-group btn-group-sm view-toggle-group">
-                <button type="button" class="btn btn-primary active" id="list-view-btn" onclick="switchView('list')">
-                    <i class="bi bi-list-task me-1"></i> {{ trans.list_view }}
-                </button>
-                <button type="button" class="btn btn-outline-primary" id="kanban-view-btn"
-                    onclick="switchView('kanban')">
-                    <i class="bi bi-kanban me-1"></i> {{ trans.kanban_view }}
-                </button>
-            </div>
+<div class="list-page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb page-breadcrumb">
+                <li class="breadcrumb-item"><a href="/" class="breadcrumb-link">{{ trans.dashboard }}</a></li>
+                <li class="breadcrumb-item active">{{ trans.tickets_breadcrumb }}</li>
+            </ol>
+        </nav>
+        <h1>{{ trans.maintenance_tickets }}</h1>
+        <p class="page-subtitle">{{ trans.monitoring_active_tickets|format_str:total_active }}</p>
+    </div>
+    <div class="d-flex flex-column align-items-end gap-2 mt-1">
+        <a href="{% url 'support:ticket_add' %}" class="btn-register"
+           {% if not perms.support.add_ticket %}style="display:none"{% endif %}>
+            <i class="bi bi-plus-lg"></i> {{ trans.create_new_ticket }}
+        </a>
+        <div class="btn-group btn-group-sm view-toggle-group">
+            <button type="button" class="btn btn-primary active" id="list-view-btn" onclick="switchView('list')">
+                <i class="bi bi-list-task me-1"></i> {{ trans.list_view }}
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="kanban-view-btn"
+                onclick="switchView('kanban')">
+                <i class="bi bi-kanban me-1"></i> {{ trans.kanban_view }}
+            </button>
         </div>
     </div>
+</div>
 
-    {# ── Stat Cards ────────────────────────────────────────────────────────── #}
-    <div class="ticket-stats-grid" id="list-only-section">
-        <div class="ticket-stat-card">
-            <div class="stat-icon-wrap active">
-                <i class="bi bi-ticket-detailed"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-name">{{ trans.total_active }}</span>
-                <span class="stat-number">{{ total_active|stringformat:"02d" }}</span>
-            </div>
-        </div>
-        <div class="ticket-stat-card">
-            <div class="stat-icon-wrap pending">
-                <i class="bi bi-wrench-adjustable"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-name">{{ trans.pending_parts }}</span>
-                <span class="stat-number">{{ pending_parts|stringformat:"02d" }}</span>
-            </div>
-        </div>
-        <div class="ticket-stat-card">
-            <div class="stat-icon-wrap overdue">
-                <i class="bi bi-calendar-x"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-name">{{ trans.overdue }}</span>
-                <span class="stat-number">{{ overdue_count|stringformat:"02d" }}</span>
-            </div>
-        </div>
-        <div class="ticket-stat-card">
-            <div class="stat-icon-wrap critical">
-                <i class="bi bi-exclamation-triangle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-name">{{ trans.critical_alarms }}</span>
-                <span class="stat-number">{{ critical_count|stringformat:"02d" }}</span>
-            </div>
+{# ── Stat Cards ────────────────────────────────────────────────────────── #}
+<div class="stats-grid" id="list-only-section">
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-ticket-detailed"></i></div>
+        <div>
+            <div class="stat-label">{{ trans.total_active }}</div>
+            <div class="stat-value">{{ total_active|stringformat:"02d" }}</div>
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><i class="bi bi-wrench-adjustable"></i></div>
+        <div>
+            <div class="stat-label">{{ trans.open_tickets }}</div>
+            <div class="stat-value">{{ open_tickets|stringformat:"02d" }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="bi bi-calendar-x"></i></div>
+        <div>
+            <div class="stat-label">{{ trans.overdue }}</div>
+            <div class="stat-value">{{ overdue_count|stringformat:"02d" }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-exclamation-triangle"></i></div>
+        <div>
+            <div class="stat-label">{{ trans.critical_alarms }}</div>
+            <div class="stat-value">{{ critical_count|stringformat:"02d" }}</div>
+        </div>
+    </div>
+</div>
 
     {# ── Filter Bar ─────────────────────────────────────────────────────────── #}
     <div class="filter-card" id="filter-bar-section">
@@ -105,14 +97,14 @@
             <div class="row g-2 align-items-end">
                 <div class="col">
                     <div class="filter-label">{{ trans.search_label }}</div>
-                    <input type="text" name="search" class="form-control"
+                    <input type="search" name="search"
                         placeholder="{{ trans.search_tickets_placeholder }}" autocomplete="off"
                         hx-get="{% url 'support:ticket_search' '1' %}" hx-trigger="keyup changed delay:400ms, search"
                         hx-target="#tickets-list-section" hx-include="#ticket-filter-form">
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.status_label }}</div>
-                    <select name="status" class="form-select" data-no-select2>
+                    <select name="status" class="filter-select-btn" style="min-width: 150px;" data-no-select2>
                         <option value="">{{ trans.all_statuses }}</option>
                         {% for val, label in status_choices %}
                         <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>{{ label }}
@@ -122,7 +114,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.issue_priority }}</div>
-                    <select name="priority" class="form-select" data-no-select2>
+                    <select name="priority" class="filter-select-btn" style="min-width: 150px;" data-no-select2>
                         <option value="">{{ trans.all_priorities }}</option>
                         {% for val, label in priority_choices %}
                         <option value="{{ val }}" {% if request.GET.priority == val %}selected{% endif %}>{{ label }}
@@ -132,7 +124,7 @@
                 </div>
                 <div class="col-auto">
                     <div class="filter-label">{{ trans.ticket_type }}</div>
-                    <select name="ticket_type" class="form-select" data-no-select2>
+                    <select name="ticket_type" class="filter-select-btn" style="min-width: 150px;" data-no-select2>
                         <option value="">{{ trans.all_types_filter }}</option>
                         {% for val, label in ticket_type_choices %}
                         <option value="{{ val }}" {% if request.GET.ticket_type == val %}selected{% endif %}>{{ label }}
@@ -140,10 +132,15 @@
                         {% endfor %}
                     </select>
                 </div>
-<div class="col-auto">
+                <div class="col-auto">
                     <a href="{% url 'support:ticket_export' %}{% if request.GET.client %}?client={{ request.GET.client|urlencode }}{% endif %}" class="btn-export"
                        {% if not perms.support.view_ticket %}style="display:none"{% endif %}>
                         <i class="bi bi-download"></i> {{ trans.export }}
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'support:ticket_list' %}{% if request.GET.client %}?client={{ request.GET.client|urlencode }}{% endif %}" class="btn-reset" title="{{ trans.reset }}">
+                        <i class="bi bi-arrow-counterclockwise"></i> {{ trans.reset }}
                     </a>
                 </div>
             </div>
@@ -152,7 +149,7 @@
 
     <div id="list-view-container">
         {# ── Table Card ────────────────────────────────────────── #}
-        <div class="card border-0 shadow-sm">
+        <div class="table-card">
             <div id="tickets-list-section">
                 {% include 'support/tickets-data.html' %}
             </div>{# /#tickets-list-section #}
@@ -478,5 +475,4 @@
         </div>
       </div>
     </div>
-</div>
 {% endblock content %}
