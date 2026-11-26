@@ -92,7 +92,7 @@ prompt_toolkit==3.0.52
 proto-plus==1.27.2
 protobuf==6.33.6
 psycopg2-binary==2.9.10
-pyasn1==0.6.4
+pyasn1==0.6.5
 pyasn1_modules==0.4.2
 pycparser==2.23
 Pygments==2.20.0
