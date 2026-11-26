@@ -1,9 +1,14 @@
 import base64
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from configurations.constants import INTEGRATION_CHOICES
 from configurations.forms import ClientCredentialsForm
-from configurations.models import Extensions, SlackConfiguration
+from configurations.models import Extensions, SlackConfiguration, SMSConfiguration
+from configurations.sms_providers.registry import get_provider_class
 
 from configurations.utils import hide_last_digits
 
@@ -73,6 +78,15 @@ def list_extensions(request):
     get_api_extension = Extensions.objects.filter(
         entity_name="API", organization=request.user.organization
     ).first()
+
+    get_sms_extension = Extensions.objects.filter(
+        entity_name="SMS", organization=request.user.organization
+    ).first()
+
+    active_sms_config = SMSConfiguration.objects.filter(
+        organization=request.user.organization, is_active=True
+    ).first()
+
     if get_extensions:
         request.session["slack"] = True
     else:
@@ -80,20 +94,102 @@ def list_extensions(request):
     return render(
         request,
         "configurations/list-extensions.html",
-        {"integration_choices": get_extensions, "api_extension": get_api_extension},
+        {
+            "integration_choices": get_extensions,
+            "api_extension": get_api_extension,
+            "sms_extension": get_sms_extension,
+            "active_sms_config": active_sms_config,
+        },
     )
 
 
 @login_required
 @permission_required("configurations.edit_configuration", raise_exception=True)
+@require_POST
 def extension_status(request, id):
+    is_ajax = (
+        request.headers.get("x-requested-with") == "XMLHttpRequest"
+        or request.headers.get("HX-Request") == "true"
+    )
     status = request.POST.get("status", "off")  # will be "on" or "off"
 
-    ext = Extensions.objects.filter(id=id).first()
-    ext.status = 1 if status == "on" else 0
-    ext.save()
+    ext = Extensions.objects.filter(
+        id=id, organization=request.user.organization
+    ).first()
+    if not ext:
+        if is_ajax:
+            return JsonResponse({"success": False, "error": "Extension not found."}, status=404)
+        messages.error(request, "Extension not found.")
+        return redirect("configurations:list_extensions")
 
-    return redirect("configurations:list_extensions")
+    new_status = 1 if status == "on" else 0
+
+    if ext.entity_name == "SMS":
+        if new_status == 1:
+            # Check if an SMS provider is configured with required credentials
+            active_conf = SMSConfiguration.objects.filter(
+                organization=request.user.organization, is_active=True
+            ).first()
+
+            if not active_conf:
+                # Find any registered provider that has valid required credentials
+                configured_conf = None
+                for cfg in SMSConfiguration.objects.filter(organization=request.user.organization):
+                    try:
+                        provider_cls = get_provider_class(cfg.provider)
+                        provider_cls(cfg.credentials or {})
+                        configured_conf = cfg
+                        break
+                    except ValueError:
+                        continue
+
+                if not configured_conf:
+                    err_msg = "Cannot enable SMS: Please configure SMS provider credentials first."
+                    if is_ajax:
+                        return JsonResponse({"success": False, "error": err_msg, "status": 0}, status=400)
+                    messages.error(request, err_msg)
+                    return redirect("configurations:list_extensions")
+
+                with transaction.atomic():
+                    SMSConfiguration.objects.filter(
+                        organization=request.user.organization
+                    ).exclude(pk=configured_conf.pk).update(is_active=False)
+                    configured_conf.is_active = True
+                    configured_conf.save()
+                    ext.status = 1
+                    ext.save()
+                active_conf = configured_conf
+            else:
+                ext.status = 1
+                ext.save()
+
+            msg = f"SMS service enabled via {active_conf.provider.upper()}. Automated notifications will now be sent."
+            if is_ajax:
+                return JsonResponse({"success": True, "status": 1, "message": msg})
+            messages.success(request, msg)
+            return redirect("configurations:list_extensions")
+
+        else:
+            # Disabling SMS
+            with transaction.atomic():
+                ext.status = 0
+                ext.save()
+                SMSConfiguration.objects.filter(
+                    organization=request.user.organization
+                ).update(is_active=False)
+            msg = "SMS service disabled. Automated notifications have stopped."
+            if is_ajax:
+                return JsonResponse({"success": True, "status": 0, "message": msg})
+            messages.success(request, msg)
+            return redirect("configurations:list_extensions")
+
+    else:
+        # Default behavior for other extensions (e.g. Slack)
+        ext.status = new_status
+        ext.save()
+        if is_ajax:
+            return JsonResponse({"success": True, "status": new_status})
+        return redirect("configurations:list_extensions")
 
 
 @login_required

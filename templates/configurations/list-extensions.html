@@ -11,6 +11,22 @@
         text-decoration: none;
     }
 
+    /* Active provider badge — readable on both light and dark themes */
+    .sms-active-badge {
+        background-color: rgba(25, 135, 84, 0.15);
+        border: 1px solid rgba(25, 135, 84, 0.45);
+        color: #146c43;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    body.theme-dark .sms-active-badge {
+        background-color: rgba(25, 135, 84, 0.22);
+        border-color: rgba(117, 183, 152, 0.5);
+        color: #75b798;
+    }
+
     @media (max-width: 576px) {
         .page-name {
             font-size: 1.3rem;
@@ -34,7 +50,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">{{ trans.dashboard }}</a></li>
                     <li class="breadcrumb-item">{{ trans.extensions }}</li>
-                    <li class="breadcrumb-item active">{{ trans.slack }}</li>
+                    <li class="breadcrumb-item active">{{ trans.extensions }}</li>
                 </ol>
             </nav>
         </div>
@@ -49,7 +65,7 @@
 
                     <div
                         class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 p-2 gap-2">
-                        <h4 class="mb-0">{{ integration_choices.entity_name }} {{ trans.configurations }}</h4>
+                        <h5 class="mb-0">{{ integration_choices.entity_name }} {{ trans.configurations }}</h5>
 
                         <div class="d-flex gap-2 align-items-center">
                             <a id="slack-integration-btn-{{ forloop.counter }}"
@@ -89,7 +105,7 @@
 
                     <div
                         class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 p-2 gap-2">
-                        <h4 class="mb-0">{{ trans.api_configurations }}</h4>
+                        <h5 class="mb-0">{{ trans.api_configurations }}</h5>
 
                         <div class="form-check form-switch">
                             <input type="hidden" name="api_status" value="off">
@@ -109,8 +125,120 @@
                 </div>
             </div>
 
+            <!-- SMS CARD -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+            
+                    <div
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 p-2 gap-2">
+                        <h5 class="mb-0">{{ sms_extension.entity_name|default:"SMS" }} {{ trans.configurations }}</h5>
+            
+                        <div class="d-flex gap-2 align-items-center">
+                            <a id="sms-integration-btn" class="btn bg-transparent" href="{% url 'configurations:sms_integration' %}"
+                                title="SMS Settings">
+                                <i class="bi bi-gear"></i>
+                            </a>
+            
+                            {% if sms_extension %}
+                            <div class="form-check form-switch">
+                                <input name="status" id="smsExtensionSwitch" class="form-check-input" type="checkbox" role="switch"
+                                    {% if sms_extension.status == 1 %}checked{% endif %}
+                                    onchange="toggleSmsExtensionStatus(this)">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+            
+                    <div class="p-3 d-flex flex-column flex-sm-row align-items-center gap-3 text-center text-sm-start">
+                        <img src="{% static 'images/sms_logo.svg' %}" class="img-fluid w-10 w-sm-auto"
+                            style="max-height: 75px; object-fit: contain;">
+                        <div>
+                            <span>{{ sms_extension.description }}</span>
+                            {% if active_sms_config %}
+                                <div class="mt-2">
+                                    <span class="badge rounded-pill sms-active-badge px-2 py-1">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Active: {{ active_sms_config.provider|upper }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 </div>
 
+<script>
+    function toggleSmsExtensionStatus(switchElem) {
+        const isEnabling = switchElem.checked;
+
+        if (isEnabling) {
+            const confirmed = confirm(
+                "Are you sure you want to enable SMS service?\n\n" +
+                "Enabling it will send automated notifications for support tickets and alerts via your active SMS provider."
+            );
+            if (!confirmed) {
+                switchElem.checked = false;
+                return;
+            }
+        } else {
+            const confirmed = confirm(
+                "Are you sure you want to disable SMS service?\n\n" +
+                "Disabling it will stop sending automated notifications for support tickets and alerts."
+            );
+            if (!confirmed) {
+                switchElem.checked = true;
+                return;
+            }
+        }
+
+        const formData = new FormData();
+        formData.append('status', isEnabling ? 'on' : 'off');
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        fetch("{% url 'configurations:extension_status' sms_extension.id %}", {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json().catch(() => ({ success: false, error: 'Invalid response from server' })))
+        .then(data => {
+            if (data.success) {
+                switchElem.checked = (data.status === 1);
+                if (typeof Toastify === 'function') {
+                    Toastify({
+                        text: data.message,
+                        duration: 3500,
+                        close: true,
+                    }).showToast();
+                }
+                // Reload after short delay if active provider changed or enabled to update badge
+                setTimeout(() => { window.location.reload(); }, 1200);
+            } else {
+                switchElem.checked = !isEnabling;
+                if (typeof Toastify === 'function') {
+                    Toastify({
+                        text: data.error || "Failed to update SMS status.",
+                        duration: 4000,
+                        close: true,
+                        style: { background: '#d9534f' }
+                    }).showToast();
+                }
+            }
+        })
+        .catch(err => {
+            switchElem.checked = !isEnabling;
+            if (typeof Toastify === 'function') {
+                Toastify({
+                    text: "Network error updating SMS status.",
+                    duration: 3000,
+                    close: true,
+                    style: { background: '#d9534f' }
+                }).showToast();
+            }
+        });
+    }
+</script>
 {% endblock %}
