@@ -178,15 +178,6 @@ body.theme-dark .assets-page-header .page-subtitle {
     text-align: center;
 }
 
-.filter-card .filter-label {
-    font-size: .78rem;
-    font-weight: 700;
-    color: var(--color-muted);
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: .3rem;
-}
-
 /* ── Ticket List Styles ──────────────────────────────────────────────── */
 .ticket-tag-pill {
     display: inline-block;
@@ -279,16 +270,7 @@ body.theme-dark .assets-page-header .page-subtitle {
     color: #111827;
 }
 
-/* Table Elements */
-.status-badge {
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    display: inline-block;
-}
-
+/* Table Elements — base .status-badge comes from list-common.css */
 .status-0 {
     background: #EFF6FF;
     color: #2563EB;
@@ -374,38 +356,7 @@ body.theme-dark .assets-page-header .page-subtitle {
     color: #4B5563;
 }
 
-/* Breadcrumb for List (Backward compatibility) */
-.page-breadcrumb {
-    font-size: .85rem;
-    margin: 0 0 .35rem;
-    padding: 0;
-    background: transparent;
-}
-
-.page-breadcrumb .breadcrumb-link {
-    color: #6B7280;
-    text-decoration: none;
-}
-
-.page-breadcrumb .breadcrumb-item.active {
-    color: #3B82F6;
-}
-
-.btn-register {
-    background: #3B82F6;
-    color: #fff !important;
-    border-radius: 8px !important;
-    padding: 0.5rem 1rem !important;
-    font-weight: 600 !important;
-    text-decoration: none !important;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-register:hover {
-    background: #2563EB;
-}
+/* Breadcrumb, .btn-register: defined in list-common.css — do not redefine here */
 
 /* ── Ticket Edit/Detail Specialized Styles ──────────────────────────────── */
 .timeline-item {
@@ -710,10 +661,17 @@ body.theme-dark .assets-page-header .page-subtitle {
     color: #16a34a;
 }
 
-.view-toggle-group .btn {
-    padding: 0.5rem 1.25rem;
+/* Pin toggle size in both themes.
+   Light: .view-toggle-group .btn (0,2,0) ties with .btn-group-sm > .btn — page CSS wins.
+   Dark:  body.theme-dark .btn-group-sm > .btn (0,3,1) used to beat .view-toggle-group .btn,
+          so dark shrank the buttons; switching back to light restored the larger size. */
+.view-toggle-group .btn,
+body.theme-dark .view-toggle-group .btn,
+body.theme-dark .btn-group.view-toggle-group > .btn {
+    padding: 0.3rem 0.85rem;
+    font-size: 0.875rem;
     font-weight: 700;
-    border-radius: 10px;
+    border-radius: 8px;
 }
 
 #kanban-view-container {
@@ -1832,14 +1790,6 @@ body.theme-dark .btn-back-list:hover {
 
 body.theme-dark .btn-edit-ticket {
     color: white !important;
-}
-
-body.theme-dark .page-breadcrumb .breadcrumb-link {
-    color: #94a3b8;
-}
-
-body.theme-dark .page-breadcrumb .breadcrumb-item.active {
-    color: #a5b4fc;
 }
 
 body.theme-dark h4.fw-bold {

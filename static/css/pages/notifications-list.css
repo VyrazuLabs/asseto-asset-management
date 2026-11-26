@@ -1,0 +1,26 @@
+/* =============================================================================
+   notifications-list.css — Page-specific styles for the notifications list
+   Structure/buttons/pagination come from css/pages/list-common.css
+   ============================================================================= */
+
+.cell-title-cell {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  border-radius: 50%;
+  background: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, .15);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+body.theme-dark .unread-dot {
+  background: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, .18);
+}

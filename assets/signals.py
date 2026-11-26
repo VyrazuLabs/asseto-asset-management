@@ -2,12 +2,12 @@ import structlog
 from django.apps import AppConfig
 from authentication.models import User
 from django.db import transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from .seeders import seed_asset_statuses
 from authentication.models import SeedFlag
 from django.contrib.auth import get_user_model
-from assets.models import Asset
+from assets.models import Asset, AssignAsset
 from notifications.service import NotificationService
 
 User = get_user_model()
@@ -59,66 +59,123 @@ def asset_notification(sender, instance, created, **kwargs):
     if not changed_fields:
         return
 
-    for admin in admins:
+    deleted_change = any(f for f in changed_fields if f[0] == "is_deleted")
+    status_change = any(f for f in changed_fields if f[0] == "asset_status")
+    assigned_entry = next((f for f in changed_fields if f[0] == "is_assigned"), None)
 
-        # Soft delete detection
-        deleted_change = any(f for f in changed_fields if f[0] == "is_deleted")
-        if deleted_change and instance.is_deleted:
+    if deleted_change and instance.is_deleted:
+        notif_type = "deleted"
+    elif assigned_entry:
+        old_assigned, new_assigned = assigned_entry[1], assigned_entry[2]
+        if not old_assigned and new_assigned:
+            notif_type = "assign"
+        elif old_assigned and not new_assigned:
+            notif_type = "unassign"
+        else:
+            notif_type = "generic"
+    elif status_change:
+        notif_type = "status"
+    else:
+        notif_type = "generic"
+
+    status_name = instance.asset_status.name if instance.asset_status else None
+    status_msg = (
+        f"Asset '{instance.name}' status changed to '{status_name}'."
+        if status_name
+        else f"Asset '{instance.name}' status changed."
+    )
+
+    for admin in admins:
+        if notif_type == "deleted":
             _send_after_commit(
                 user=admin,
                 title="Asset Deleted",
                 message=f"Asset '{instance.name}', ({instance.tag}) was deleted.",
                 icon="bi-trash",
-                link=f"/assets/list",
+                link="/assets/list",
                 instance_id=instance.id,
                 object_id=str(instance.id),
             )
-            continue
-
-        # Status change detection
-        status_change = any(f for f in changed_fields if f[0] == "asset_status")
-        if status_change:
+        elif notif_type == "assign":
             _send_after_commit(
                 user=admin,
-                title="Asset Status Changed",
-                message=f"Asset '{instance.name}' status changed.",
-                icon="bi-arrow-repeat",
-                link=f"/assets/details/{instance.id}",
-                instance_id=instance.id,
-                object_id=str(instance.id),
-            )
-            continue
-
-        # Assignment change
-        assigned_change = any(f for f in changed_fields if f[0] == "is_assigned")
-        if assigned_change:
-            status_text = "Assigned" if instance.is_assigned else "Unassigned"
-            _send_after_commit(
-                user=admin,
-                title="Asset Assignment Updated",
-                message=f"Asset '{instance.name}' is now {status_text}.",
+                title="Asset Assigned",
+                message=f"Asset '{instance.name}' has been assigned.",
                 icon="bi-person-check",
                 link=f"/assets/details/{instance.id}",
                 instance_id=instance.id,
                 object_id=str(instance.id),
             )
-            continue
+        elif notif_type == "unassign":
+            _send_after_commit(
+                user=admin,
+                title="Asset Unassigned",
+                message=f"Asset '{instance.name}' has been unassigned.",
+                icon="bi-person-dash",
+                link=f"/assets/details/{instance.id}",
+                instance_id=instance.id,
+                object_id=str(instance.id),
+            )
+        elif notif_type == "status":
+            _send_after_commit(
+                user=admin,
+                title="Asset Status Changed",
+                message=status_msg,
+                icon="bi-arrow-repeat",
+                link=f"/assets/details/{instance.id}",
+                instance_id=instance.id,
+                object_id=str(instance.id),
+            )
+        else:
+            _send_after_commit(
+                user=admin,
+                title="Asset Updated",
+                message=f"Asset '{instance.name}' updated",
+                icon="bi-pencil-square",
+                link=f"/assets/details/{instance.id}",
+                instance_id=instance.id,
+                object_id=str(instance.id),
+            )
+            log.info("asset_updated_notification_sent", asset_id=str(instance.id))
 
-        changes_text = ", ".join(
-            f"{f[0].replace('_', ' ').title()}: '{f[1]}' → '{f[2]}'"
-            for f in changed_fields
+
+@receiver(pre_save, sender=AssignAsset)
+def capture_previous_assignee(sender, instance, **kwargs):
+    """Store previous user_id before AssignAsset save to detect reassignments."""
+    if instance.pk:
+        instance._old_user_id = (
+            AssignAsset.objects.filter(pk=instance.pk)
+            .values_list("user_id", flat=True)
+            .first()
         )
+    else:
+        instance._old_user_id = None
 
+
+@receiver(post_save, sender=AssignAsset)
+def assign_asset_reassignment_notification(sender, instance, created, **kwargs):
+    """Send 1 notification when an existing AssignAsset is reassigned to a new user."""
+    if created or not instance.asset:
+        return
+
+    old_user_id = getattr(instance, "_old_user_id", None)
+    if old_user_id is None or old_user_id == instance.user_id:
+        return
+
+    admins = User.objects.filter(
+        is_superuser=True, organization=instance.asset.organization
+    )
+    user_label = str(instance.user) if instance.user else "a new user"
+    for admin in admins:
         _send_after_commit(
             user=admin,
-            title="Asset Updated",
-            message=f"Asset '{instance.name}' updated",
-            icon="bi-pencil-square",
-            link=f"/assets/details/{instance.id}",
-            instance_id=instance.id,
-            object_id=str(instance.id),
+            title="Asset Reassigned",
+            message=f"Asset '{instance.asset.name}' has been reassigned to {user_label}.",
+            icon="bi-person-check",
+            link=f"/assets/details/{instance.asset.id}",
+            instance_id=instance.asset.id,
+            object_id=str(instance.asset.id),
         )
-        log.info("asset_updated_notification_sent", asset_id=str(instance.id))
 
 
 @receiver(post_save, sender=User)

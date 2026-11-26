@@ -1,10 +1,10 @@
 {% load custom_filters %}
 {% load static %}
 <div class="table-responsive">
-  <table class="table table-hover align-middle mb-0 ticket-table">
-    <thead class="bg-light">
+  <table class="list-table ticket-table">
+    <thead>
       <tr>
-        <th class="ps-4">{{ trans.sl_no }}</th>
+        <th>{{ trans.sl_no }}</th>
         <th>{{ trans.ticket_id }}</th>
         <th>{{ trans.asset_name }}</th>
         <th>{{ trans.subject_label }}</th>
@@ -12,14 +12,14 @@
         <th>{{ trans.status_label }}</th>
         <th>{{ trans.assigned_to }}</th>
         <th>{{ trans.last_activity }}</th>
-        <th class="pe-4 text-end">{{ trans.actions }}</th>
+        <th>{{ trans.actions }}</th>
       </tr>
     </thead>
     <tbody id="ticket-table-body">
       {% for ticket in page_object %}
       <tr>
-        <td class="ps-4 fw-semibold text-muted">
-          {{ page_object.start_index|add:forloop.counter0 }}
+        <td class="table-index-cell">
+          {{ page_object.start_index|add:forloop.counter0|stringformat:"02d" }}
         </td>
         <td class="table-index-cell">
           <span class="ticket-tag-pill">{{ ticket.ticket_id }}</span>
@@ -35,12 +35,12 @@
             {% else %}
             <img src="{% static 'images/No_Image.jpg' %}" alt="No asset" class="rounded me-2" width="32" height="32">
             {% endif %}
-            <span>{{ ticket.asset.name|default:trans.general_label }}</span>
+            <span class="cell-name-main">{{ ticket.asset.name|default:trans.general_label }}</span>
           </div>
         </td>
         <td>
-          <div class="fw-bold">{{ ticket.subject }}</div>
-          <small class="text-muted">{{ ticket.description|truncatechars:50 }}</small>
+          <div class="cell-name-main">{{ ticket.subject }}</div>
+          <div class="cell-name-sub">{{ ticket.description|truncatechars:50 }}</div>
         </td>
         <td>
           <span class="priority-badge priority-{{ ticket.priority }}">
@@ -68,7 +68,7 @@
           {% endif %}
         </td>
         <td>
-          <div class="text-muted small">
+          <div class="cell-name-sub">
             <i class="bi bi-clock-history me-1"></i>
             {{ ticket.updated_at|timesince }} {{ trans.ago }}
           </div>
@@ -86,11 +86,12 @@
       </tr>
       {% empty %}
       <tr>
-        <td colspan="9" class="text-center py-5">
-          <div class="text-muted d-flex flex-column align-items-center">
-            <i class="bi bi-ticket-perforated h1 mb-3"></i>
-            <p>{{ trans.no_tickets_found }}</p>
-            <a href="{% url 'support:ticket_add' %}" class="btn btn-primary btn-sm">{{ trans.create_first_ticket }}</a>
+        <td colspan="9">
+          <div class="table-empty-state">
+            <i class="bi bi-ticket-perforated"></i>
+            <p>{{ trans.no_tickets_found }}<br>
+              <a href="{% url 'support:ticket_add' %}" class="link-primary">{{ trans.create_first_ticket }}</a>
+            </p>
           </div>
         </td>
       </tr>

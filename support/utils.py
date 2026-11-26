@@ -8,6 +8,7 @@ module as dictated by the project rules (DJANGO_DEVELOPMENT_RULES).
 
 import csv
 import logging
+import os
 import uuid
 from itertools import chain
 
@@ -22,6 +23,7 @@ from django.utils.timezone import now
 
 from assets.models import Asset
 from authentication.models import User
+from notifications.service import NotificationService
 
 from .models import (
     SupportTicket,
@@ -79,11 +81,9 @@ class SupportTicketService:
             qs = SupportTicketService.filter_by_client(qs, params.get("client"))
         return {
             "total_active": qs.exclude(status="4").count(),
-            "pending_parts": qs.filter(
-                status="0", ticket_type="hardware_repair"
-            ).count(),
+            "open_tickets": qs.filter(status="0").count(),
             "overdue_count": qs.filter(status="0", estimated_eta__lt=now()).count(),
-            "critical_count": qs.filter(priority__in=["3", "2"], status="0").count(),
+            "critical_count": qs.exclude(status="4").filter(priority="3").count(),
         }
 
     # ------------------------------------------------------------------
@@ -220,7 +220,21 @@ class SupportTicketService:
                     description=(f"Ticket initiated by {request.user.get_full_name()}."),
                     performed_by=request.user,
                 )
-                return ticket
+
+            # Notify creator + technician
+            try:
+                _notify_ticket_recipients(
+                    ticket,
+                    title_creator=f"Ticket Created: {ticket.ticket_id}",
+                    msg_creator=f"Your ticket '{ticket.subject}' has been created successfully.",
+                    title_tech=f"New Ticket Assigned: {ticket.ticket_id}",
+                    msg_tech=f"You have been assigned ticket '{ticket.subject}'.",
+                    updated_by=request.user,
+                )
+            except Exception:
+                logger.exception("Failed to send ticket-created notifications")
+
+            return ticket
         except Exception:
             logger.exception("Error creating support ticket")
             raise
@@ -509,6 +523,32 @@ class SupportTicketService:
                 ticket, request.FILES.getlist("attachments"), request.user
             )
 
+        # Notify creator + technician of status change
+        if old_status != ticket.status:
+            try:
+                status_map = dict(STATUS_CHOICES)
+                old_label = status_map.get(old_status, old_status)
+                new_label = status_map.get(str(ticket.status), ticket.status)
+                _status_change_notify(ticket, old_label, new_label, updated_by=request.user)
+            except Exception:
+                logger.exception("Failed to send ticket status-change notifications (update)")
+
+        # Notify newly assigned technician on reassignment
+        if old_assigned != ticket.assigned_to and ticket.assigned_to:
+            try:
+                NotificationService.send(
+                    user=ticket.assigned_to,
+                    title=f"New Ticket Assigned: {ticket.ticket_id}",
+                    message=f"You have been assigned ticket '{ticket.subject}'.",
+                    icon="bi-ticket-fill",
+                    link=f"/support/tickets/details/{ticket.id}",
+                    object_id=str(ticket.id),
+                    instance_id=str(ticket.id),
+                    updated_by=request.user,
+                )
+            except Exception:
+                logger.exception("Failed to send ticket reassignment notification")
+
         return ticket
 
     # ------------------------------------------------------------------
@@ -640,12 +680,19 @@ class SupportTicketService:
         ticket.save(update_fields=["status", "updated_by"])
 
         status_map = dict(STATUS_CHOICES)
+        old_label = status_map.get(old_status, old_status)
+        new_label = status_map.get(new_status, new_status)
         TicketActivity.objects.create(
             ticket=ticket,
             activity_type="status_changed",
-            description=f"Status changed from {status_map.get(old_status, old_status)} to {status_map.get(new_status, new_status)}.",
+            description=f"Status changed from {old_label} to {new_label}.",
             performed_by=request.user,
         )
+
+        try:
+            _status_change_notify(ticket, old_label, new_label, updated_by=request.user)
+        except Exception:
+            logger.exception("Failed to send ticket status-change notifications (kanban)")
 
         return {"success": True}
 
@@ -763,6 +810,75 @@ class SupportTicketService:
                     performed_by=user,
                 )
         return created
+
+
+def _notify_ticket_recipients(
+    ticket,
+    title_creator,
+    msg_creator,
+    title_tech,
+    msg_tech,
+    icon="bi-ticket-fill",
+    updated_by=None,
+):
+    """
+    Send in-app notifications to the ticket creator and/or assigned technician.
+    Uses the existing NotificationService — same pattern as consumables.
+    Creator and technician are notified separately with role-appropriate messages.
+    If they are the same person, only one notification is sent.
+    """
+    link = f"/support/tickets/details/{ticket.id}"
+    notified = set()
+
+    # Notify creator
+    creator_id = getattr(ticket, "created_by", None)
+    if creator_id:
+        try:
+            creator = User.objects.get(id=creator_id)
+            NotificationService.send(
+                user=creator,
+                title=title_creator,
+                message=msg_creator,
+                icon=icon,
+                link=link,
+                object_id=str(ticket.id),
+                instance_id=str(ticket.id),
+                updated_by=updated_by,
+            )
+            notified.add(creator.id)
+        except (User.DoesNotExist, ValueError):
+            logger.warning("Could not resolve creator user %s for ticket %s", creator_id, ticket.id)
+        except Exception:
+            logger.exception("Failed to send notification to ticket creator %s", creator_id)
+
+    # Notify assigned technician (skip if same as creator)
+    if ticket.assigned_to and ticket.assigned_to.id not in notified:
+        try:
+            NotificationService.send(
+                user=ticket.assigned_to,
+                title=title_tech,
+                message=msg_tech,
+                icon=icon,
+                link=link,
+                object_id=str(ticket.id),
+                instance_id=str(ticket.id),
+                updated_by=updated_by,
+            )
+        except Exception:
+            logger.exception("Failed to send notification to assigned technician %s", ticket.assigned_to.id)
+
+
+def _status_change_notify(ticket, old_label, new_label, updated_by=None):
+    """DRY wrapper for status-change notifications."""
+    _notify_ticket_recipients(
+        ticket,
+        title_creator=f"Ticket {ticket.ticket_id} : Status Updated",
+        msg_creator=f"Your ticket '{ticket.subject}' status changed from '{old_label}' to '{new_label}'.",
+        title_tech=f"Ticket {ticket.ticket_id} : Status Updated",
+        msg_tech=f"Ticket '{ticket.subject}' status changed from '{old_label}' to '{new_label}'.",
+        icon="bi-arrow-repeat",
+        updated_by=updated_by,
+    )
 
 
 def _safe_csv_cell(value):

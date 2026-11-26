@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{% static 'css/shared/iconly.css' %}" />
     <link rel="stylesheet" href="{% static 'css/pages/simple-datatables.css' %}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <link rel="stylesheet" href="{% static 'css/pages/notification-dropdown.css' %}" />
 
     <!-- Select2 (searchable dropdowns) -->
     <link rel="stylesheet" href="{% static 'vendor/select2/css/select2.min.css' %}" />
@@ -212,9 +213,16 @@
                                                  </a>
                                                 <ul class="dropdown-menu dropdown-menu-end notification-dropdown notification-ul"
                                                     onclick="event.stopPropagation();">
+                                                    <li class="notif-dropdown-header">
+                                                        <span class="notif-header-title">Notifications</span>
+                                                        <i class="bi bi-bell"></i>
+                                                    </li>
                                                     <span hx-get="{% url 'notifications:data' %}" hx-target="this"
-                                                        hx-trigger="load, notificationListChanged from:body">
-                                                        <li><a class="dropdown-item">No notification available</a></li>
+                                                        hx-trigger="load, notificationListChanged from:body, click from:#notificationDropdown">
+                                                        <li class="notif-empty">
+                                                            <i class="bi bi-bell"></i>
+                                                            <span>Loading notifications...</span>
+                                                        </li>
                                                     </span>
                                                 </ul>
                                             </li>

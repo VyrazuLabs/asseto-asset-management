@@ -1,102 +1,74 @@
 {% load static %}
-<link rel="stylesheet" href="{% static '/assets/css/main/app-dark.css' %}">
 
-<style>
-    .mark-all-as-read {
-        width: 100%;
-    }
-    .mark-all-as-read .btn {
-        width: 100%;
-        display: block;
-    }
-
-    .notification-list-item .dropdown-item {
-        position: relative;
-    }
-
-    .notification-list-item .notification-title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .notification-list-item .unread-dot {
-        width: 10px;
-        height: 10px;
-        min-width: 10px;
-        background: #435ebe !important;
-        border-radius: 50%;
-        flex-shrink: 0;
-        position: absolute;
-        top: 0.75rem;
-        right: 0.75rem;
-    }
-</style>
-
-{% for user_notification in notifications %}
-    <li class="notification-list-item">
-        <div class="dropdown-item d-flex p-2 alert alert-dismissible show fade xyz" style="cursor: pointer; position: relative;">
-
-            <i class="bi {{user_notification.notification.icon}} fs-3 ps-2 pe-4"></i>
-            <div
-
-                class="justify-content-between px-3"
-                {% if user_notification.notification.link is not None %}
-                    onclick="location.href='{{user_notification.notification.link}}';"
-                    hx-post="{% url 'notifications:seen' user_notification.id %}"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-trigger="click"
-                {% endif %}
-            >
-                <div class="d-flex flex-start gap-2 w-100" style="flex-direction: column;">
-                    <div class="notification-title-row">
-                        <strong class="fs-6 mb-0">{{user_notification.notification.notification_title}}</strong>
-                        {% if not user_notification.is_seen %}<span class="unread-dot"></span>{% endif %}
-                    </div>
-
-                    <small>{{ user_notification.notification.created_at|date:"F j, Y, g:i A" }}</small>
-                </div>
-                <small style="text-wrap: wrap;">{{user_notification.notification.notification_text}}</small>
+<div class="notif-items-scroll">
+    {% for user_notification in notifications %}
+        <li class="notif-item"
+            {% if user_notification.notification.link %}
+                hx-post="{% url 'notifications:seen' user_notification.id %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-trigger="click"
+                hx-swap="none"
+                onclick="openNotificationLink(this, '{{ user_notification.notification.link|escapejs }}')"
+            {% endif %}
+        >
+            <div class="notif-icon-wrap">
+                <i class="bi {{ user_notification.notification.icon|default:'bi-bell' }}"></i>
             </div>
-        </div>
+            <div class="notif-body">
+                <div class="notif-title-row">
+                    <span class="notif-title">{{ user_notification.notification.notification_title|title }}</span>
+                    <span class="notif-time">{{ user_notification.notification.created_at|date:"M d, g:i A" }}</span>
+                </div>
+                <div class="notif-text">{{ user_notification.notification.notification_text }}</div>
+            </div>
+            {% if not user_notification.is_seen %}
+                <span class="notif-unread-dot" title="Unread"></span>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li class="notif-empty">
+            <i class="bi bi-bell-slash"></i>
+            <span>No notifications available</span>
+        </li>
+    {% endfor %}
+</div>
+
+{% if notifications %}
+    <li class="notif-footer">
+        {% with notifications|length as notification_count %}
+            {% if notification_count >= 2 %}
+                <a class="mark-all-as-read-notification"
+                   hx-post="{% url 'notifications:mark_all_as_read' %}"
+                   hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                   hx-trigger="click"
+                   hx-swap="none"
+                   onclick="removeUnreadDots()"
+                   style="cursor: pointer;">
+                    <i class="bi bi-check2-all"></i> Mark all as read
+                </a>
+            {% endif %}
+        {% endwith %}
+        <a href="{% url 'notifications:list' %}" class="see-all-notifications">
+            <i class="bi bi-list-ul"></i> See all Notifications
+        </a>
     </li>
-{% endfor %}
-
-{% if notifications  %}
-    <li>
-        <div class="p-3 d-flex flex-column">
-            {% with notifications|length as notification_count %}
-                {% if notification_count >= 2 %}
-                    <a
-                        class="btn btn-sm align-items-center justify-content-center text-white mb-2 mark-all-as-read-notification"
-                        hx-post="{% url 'notifications:mark_all_as_read' %}"
-                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                        hx-trigger="click"
-                        hx-swap="none"
-                        onclick="removeUnreadDots()"
-                    >
-                        Mark all as read
-                    </a>
-                {% endif %}
-            {% endwith %}
-
-
-            <a
-                href="{% url 'notifications:list' %}"
-                class="btn text-center see-all-notifications btn-sm" >
-                <span>See all Notifications</span>
-            </a>
-
-
-        </div>
-    </li>
-    {% else %}
-     <div class="p-3 d-flex flex-column align-items-center">No notifications are available</div>
 {% endif %}
 
 <script>
+    function openNotificationLink(el, url) {
+        if (!url) return;
+        let navigated = false;
+        const go = () => {
+            if (!navigated) {
+                navigated = true;
+                location.href = url;
+            }
+        };
+        el.addEventListener('htmx:afterRequest', go, { once: true });
+        setTimeout(go, 400);
+    }
+
     function removeUnreadDots() {
-        document.querySelectorAll('.unread-dot').forEach(dot => dot.remove());
+        document.querySelectorAll('.notif-unread-dot').forEach(dot => dot.remove());
     }
 </script>

@@ -7,7 +7,7 @@ STRINGS = {
     "list_view": "Vue liste",
     "kanban_view": "Kanban",
     "total_active": "Total actif",
-    "pending_parts": "Pièces en attente",
+    "open_tickets": "Ticket ouvert",
     "overdue": "En retard",
     "critical_alarms": "Alertes critiques",
     "search_label": "Rechercher",

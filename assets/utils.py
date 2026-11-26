@@ -164,6 +164,35 @@ def get_asset_filter_data(request):
     }
 
 
+def get_client_filter_q(client_id, organization):
+    """
+    Build a Q filter for client_id scoped to the given organization.
+    Supports matching across same-named clients within the same tenant (for deduped dropdowns)
+    while preventing cross-tenant leakage and avoiding broad exceptions.
+    """
+    if not client_id:
+        return Q()
+
+    try:
+        uuid.UUID(str(client_id))
+    except (ValueError, TypeError, AttributeError):
+        return Q(client__name__icontains=client_id)
+
+    client_obj = Client.undeleted_objects.filter(
+        id=client_id,
+        organization=organization,
+    ).first()
+
+    if client_obj:
+        same_name_client_ids = Client.undeleted_objects.filter(
+            organization=organization,
+            name__iexact=client_obj.name,
+        ).values("id")
+        return Q(client_id__in=same_name_client_ids)
+
+    return Q(client_id=client_id)
+
+
 def filtered_asset(request):
     user_data = request.POST.get("user-data")
     client_data = request.POST.get("client-data")
@@ -215,7 +244,7 @@ def filtered_asset(request):
         except (ValueError, TypeError, AttributeError):
             pass
     if client_id:
-        filters &= Q(client_id=client_id)
+        filters &= get_client_filter_q(client_id, request.user.organization)
     if location_id:
         filters &= Q(location_id=location_id)
 
@@ -227,7 +256,7 @@ def filtered_asset(request):
 
     assets_qs = Asset.undeleted_objects.filter(filters).select_related('location', 'product__product_type', 'vendor', 'client', 'asset_status').order_by("-created_at")
 
-    # Scoped to assets currently assigned to the requesting user unless
+    # Scoped to assets currently assigned to the requesting user unless 
     # they hold "assets.all_asset" (superusers always pass via Django's
     # has_perm) — without it, a non-superuser saw every asset in the org
     # regardless of who it was assigned to. distinct() guards against
@@ -328,40 +357,25 @@ def export_assets_csv_utils(request):
     return response
 
 
-def _build_audit_conditions(org_filter):
-    """Return (asset_conditions_map, list_of_audited_assets) using a DB subquery."""
+def create_asset_list(request, assets_qs):
+    org_filter = Q(organization=None) | Q(organization=request.user.organization)
     visible_asset_subquery = Asset.undeleted_objects.filter(org_filter).values("id")
     audits_for_org = (
         Audit.objects.filter(asset_id__in=visible_asset_subquery)
         .values("asset_id", "condition")
     )
     asset_conditions_map = defaultdict(list)
+    audited_asset_ids = set()
     for row in audits_for_org:
         asset_conditions_map[row["asset_id"]].append(row["condition"])
+        audited_asset_ids.add(row["asset_id"])
 
-    audited_asset_subquery = audits_for_org.values("asset_id")
-    list_of_audited_assets = Asset.undeleted_objects.filter(
-        id__in=audited_asset_subquery
-    )
-    return asset_conditions_map, list_of_audited_assets
-
-
-def create_asset_list(request, assets_qs):
-    org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
+    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
     product_category_list = ProductCategory.undeleted_objects.filter(org_filter)
     department_list = Department.undeleted_objects.filter(org_filter)
     location_list = Location.undeleted_objects.filter(org_filter)
-    user_list = User.objects.filter(org_filter, is_active=True).select_related("department", "location").order_by("-created_at")
+    user_list = User.objects.filter(org_filter, is_active=True).order_by("-created_at")
     vendor_list = Vendor.objects.filter(org_filter).order_by("-created_at")
-    selected_vendor = None
-    selected_vendor_id = (request.GET.get("vendor") or "").strip()
-    if selected_vendor_id:
-        try:
-            uuid.UUID(selected_vendor_id)
-            selected_vendor = vendor_list.filter(id=selected_vendor_id).first()
-        except (ValueError, TypeError, AttributeError):
-            selected_vendor = None
     asset_status_list = AssetStatus.objects.filter(org_filter)
     product_type_list = ProductType.undeleted_objects.filter(org_filter).order_by("-created_at")
     product_list = Product.undeleted_objects.filter(org_filter).order_by("-created_at")
@@ -439,7 +453,6 @@ def create_asset_list(request, assets_qs):
         "asset_status_list": asset_status_list,
         "user_list": user_list,
         "vendor_list": vendor_list,
-        "selected_vendor": selected_vendor,
         "active_user": active_users,
         "sidebar": "assets",
         "submenu": "list",
@@ -500,12 +513,6 @@ def assign_asset_in_form(request, form):
     messages.success(request, "Asset assigned to user successfully")
     slack_notification(
         request, f"{asset.name}  assigned successfully to user", asset.id, asset.tag
-    )
-    notifications_call(
-        user=request.user,
-        entity_type=2,
-        notification_text=f"{asset.name}  assigned successfully to user",
-        notification_title="Asset Assigned",
     )
 
 
@@ -762,7 +769,20 @@ def add_asset(request, form):
 
 def search_asset(request):
     org_filter = Q(organization=None) | Q(organization=request.user.organization)
-    asset_conditions_map, list_of_audited_assets = _build_audit_conditions(org_filter)
+    visible_asset_ids = list(
+        Asset.undeleted_objects.filter(org_filter).values_list("id", flat=True)
+    )
+    audits_for_org = (
+        Audit.objects.filter(asset_id__in=visible_asset_ids)
+        .values("asset_id", "condition")
+    )
+    asset_conditions_map = defaultdict(list)
+    audited_asset_ids = set()
+    for row in audits_for_org:
+        asset_conditions_map[row["asset_id"]].append(row["condition"])
+        audited_asset_ids.add(row["asset_id"])
+
+    list_of_audited_assets = Asset.undeleted_objects.filter(id__in=audited_asset_ids)
     context = search_with_filters(request, list_of_audited_assets, asset_conditions_map)
     return context
 
@@ -821,7 +841,7 @@ def search_with_filters(request, list_of_audited_assets, asset_conditions_map):
             pass
 
     if client_id:
-        q &= Q(client_id=client_id)
+        q &= get_client_filter_q(client_id, request.user.organization)
     if location_id:
         q &= Q(location_id=location_id)
     if is_assigned == "true":
@@ -1161,6 +1181,7 @@ def get_asset_status_list_utils(request, page_number=None):
     total_statuses = status_counts["total"]
     active_statuses = status_counts["active"]
     inactive_statuses = status_counts["inactive"]
+
     deleted_statuses_count = AssetStatus.deleted_objects.filter(
         Q(organization=None, can_modify=True)
         | Q(organization=request.user.organization, can_modify=True)

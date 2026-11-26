@@ -78,6 +78,8 @@ class NotificationService:
             user_id = user_instance.id if user_instance else None
         else:
             user_id = user_obj  # assume it's already an ID
+        # Store the actor's id; the name is resolved from the User table at render time.
+        updated_by = kwargs.get("updated_by")
         payload = {
             "user": user_id,
             "title": kwargs["title"],
@@ -87,9 +89,9 @@ class NotificationService:
             "object_id": kwargs.get("object_id"),
             "instance_id": kwargs.get("instance_id"),
             "is_superuser": kwargs.get("is_superuser", False),
-            "updated_by": (
-                kwargs.get("updated_by").id if kwargs.get("updated_by") else None
-            ),
+            "updated_by": str(getattr(updated_by, "id", updated_by))
+            if updated_by
+            else None,
         }
 
         # async call
