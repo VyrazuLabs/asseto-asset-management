@@ -189,6 +189,7 @@ class SMSService:
         message: str,
         entity_type: str = "",
         entity_id: str = "",
+        write_log_on_retryable_failure: bool = True,
         **provider_kwargs,
     ) -> dict:
         """
@@ -200,7 +201,7 @@ class SMSService:
             config = SMSConfiguration.objects.get(id=config_id)
         except SMSConfiguration.DoesNotExist:
             logger.error("SMSConfiguration %s not found; SMS aborted.", config_id)
-            return {"success": False, "reason": "Config not found."}
+            return {"success": False, "reason": "Config not found.", "retryable": False}
 
         return cls._send_sync(
             config=config,
@@ -208,6 +209,7 @@ class SMSService:
             message=message,
             entity_type=entity_type,
             entity_id=entity_id,
+            write_log_on_retryable_failure=write_log_on_retryable_failure,
             **provider_kwargs,
         )
 
@@ -220,6 +222,7 @@ class SMSService:
         message: str,
         entity_type: str = "",
         entity_id: str = "",
+        write_log_on_retryable_failure: bool = True,
         **provider_kwargs,
     ) -> dict:
         """
@@ -233,30 +236,35 @@ class SMSService:
             provider = ProviderClass(config.credentials)
         except ValueError as exc:
             logger.error("Provider error for config %s: %s", config.id, exc)
-            return {"success": False, "reason": str(exc)}
+            return {"success": False, "reason": str(exc), "retryable": False}
 
         cleaned_phone = provider.sanitize_phone(to)
         if not cleaned_phone:
             logger.warning("SMS aborted: phone '%s' could not be sanitized.", to)
-            return {"success": False, "reason": "Invalid phone after sanitization."}
+            return {
+                "success": False,
+                "reason": "Invalid phone after sanitization.",
+                "retryable": False,
+            }
 
         # Pass through any extra kwargs the provider's send() understands
         result = provider.send(to=cleaned_phone, message=message, **provider_kwargs)
 
-        # Write audit log
-        try:
-            SMSLog.objects.create(
-                organization=config.organization,
-                provider=config.provider,
-                recipient=cleaned_phone,
-                message=message,
-                status="sent" if result.success else "failed",
-                provider_response=result.raw_response or {},
-                entity_type=entity_type,
-                entity_id=str(entity_id) if entity_id else "",
-            )
-        except Exception as log_exc:
-            logger.error("Failed to write SMSLog: %s", log_exc)
+        should_write_log = result.success or not result.retryable or write_log_on_retryable_failure
+        if should_write_log:
+            try:
+                SMSLog.objects.create(
+                    organization=config.organization,
+                    provider=config.provider,
+                    recipient=cleaned_phone,
+                    message=message,
+                    status="sent" if result.success else "failed",
+                    provider_response=result.raw_response or {},
+                    entity_type=entity_type,
+                    entity_id=str(entity_id) if entity_id else "",
+                )
+            except Exception as log_exc:
+                logger.error("Failed to write SMSLog: %s", log_exc)
 
         logger.info(
             "SMS via %s to %s: %s",
@@ -264,7 +272,12 @@ class SMSService:
             cleaned_phone,
             "sent" if result.success else f"failed — {result.error}",
         )
-        return {"success": result.success, "message_id": result.message_id, "error": result.error}
+        return {
+            "success": result.success,
+            "message_id": result.message_id,
+            "error": result.error,
+            "retryable": result.retryable,
+        }
 
     # ------------------------------------------------------------------
     # High-level helpers (called from signals)

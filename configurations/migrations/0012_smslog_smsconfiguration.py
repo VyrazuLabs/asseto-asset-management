@@ -75,7 +75,6 @@ class Migration(migrations.Migration):
                         choices=[
                             ("msg91", "MSG91"),
                             ("twilio", "Twilio"),
-                            ("sns", "AWS SNS"),
                         ],
                         default="msg91",
                         max_length=50,

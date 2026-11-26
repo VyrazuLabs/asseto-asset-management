@@ -14,13 +14,15 @@ import json
 import logging
 import re
 
-import requests
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from configurations.constants import INTEGRATION_CHOICES
 from configurations.models import Extensions, SMSConfiguration, SMSLog
 from configurations.sms_providers.registry import PROVIDER_REGISTRY, get_provider_class
 
@@ -89,14 +91,35 @@ def _build_providers_metadata() -> dict:
             "portal_url": ui.get("portal_url", ""),
             "description": ui.get("description", ""),
             "guide": ui.get("guide", []),
+            "supports_custom_message": getattr(cls, "SUPPORTS_CUSTOM_MESSAGE", True),
             "fields": cls.credential_fields(),   # ← comes from the provider class
         }
     return result
 
 
+_MASK_SENTINEL = "••••••••"
+
+
 def _mask_secret(value: str) -> str:
-    """Replace a secret string with bullet characters for display."""
-    return "•" * len(value) if value else ""
+    """Replace a secret string with a fixed-length mask so secret length is not leaked."""
+    return _MASK_SENTINEL if value else ""
+
+
+def _is_masked_placeholder(value: str) -> bool:
+    """Return True when the submitted value is purely mask bullet characters."""
+    return bool(value) and set(value) == {"•"}
+
+
+def _sms_integration_redirect(provider_key: str):
+    """Redirect to the SMS integration page for the given provider."""
+    return redirect(f"{reverse('configurations:sms_integration')}?provider={provider_key}")
+
+
+def _default_sms_description() -> str:
+    for _, (entity_name, description) in INTEGRATION_CHOICES:
+        if entity_name == "SMS":
+            return description
+    return "Configure SMS service to send automated ticket alerts to employees and clients."
 
 
 # ---------------------------------------------------------------------------
@@ -116,10 +139,7 @@ def sms_integration(request):
         organization=org,
         entity_name="SMS",
         defaults={
-            "description": (
-                "Configure SMS provider to send instant automated alerts "
-                "for support tickets and tasks."
-            ),
+            "description": _default_sms_description(),
             "status": 0,
             "validity": 0,
         },
@@ -139,15 +159,18 @@ def sms_integration(request):
 
     current_config = existing_configs.get(selected_key)
 
-    # Build masked credential displays for every provider
+    # Build masked credential displays for every provider using field metadata
     all_display_credentials: dict[str, dict] = {}
     provider_status_map: dict[str, bool] = {}
-    for prov_key in providers_meta:
+    for prov_key, prov_meta in providers_meta.items():
         cfg = existing_configs.get(prov_key)
         provider_status_map[prov_key] = bool(cfg and cfg.is_active)
         creds = cfg.credentials if cfg else {}
+        password_keys = {
+            f["key"] for f in prov_meta.get("fields", []) if f.get("type") == "password"
+        }
         all_display_credentials[prov_key] = {
-            k: _mask_secret(str(v)) if ("key" in k or "secret" in k or "token" in k) else v
+            k: _mask_secret(str(v)) if k in password_keys else v
             for k, v in creds.items()
         }
 
@@ -196,19 +219,19 @@ def save_sms_configuration(request):
         submitted = request.POST.get(key, "").strip()
 
         if field["type"] == "password":
-            if "•" in submitted:
+            if _is_masked_placeholder(submitted):
                 # User left the masked placeholder — retain the stored value
                 if old_credentials.get(key):
                     new_credentials[key] = old_credentials[key]
                 elif is_required:
                     messages.error(request, f"Field '{field['label']}' is required.")
-                    return redirect(f"/configurations/sms-integration/?provider={provider_key}")
+                    return _sms_integration_redirect(provider_key)
                 continue
 
             if not submitted:
                 if is_required:
                     messages.error(request, f"Field '{field['label']}' is required.")
-                    return redirect(f"/configurations/sms-integration/?provider={provider_key}")
+                    return _sms_integration_redirect(provider_key)
                 continue  # optional password cleared
 
             new_credentials[key] = submitted
@@ -218,7 +241,7 @@ def save_sms_configuration(request):
         if not submitted:
             if is_required:
                 messages.error(request, f"Field '{field['label']}' is required.")
-                return redirect(f"/configurations/sms-integration/?provider={provider_key}")
+                return _sms_integration_redirect(provider_key)
             continue
 
         new_credentials[key] = submitted
@@ -246,14 +269,17 @@ def save_sms_configuration(request):
                 f"Cannot enable SMS service: missing required credentials "
                 f"({', '.join(missing)}).",
             )
-            return redirect(f"/configurations/sms-integration/?provider={provider_key}")
+            return _sms_integration_redirect(provider_key)
 
-        if other_active:
-            other_active.is_active = False
-            other_active.save()
+        with transaction.atomic():
+            if other_active:
+                SMSConfiguration.objects.filter(organization=org, is_active=True).exclude(
+                    pk=config.pk
+                ).update(is_active=False)
 
-        config.is_active = True
-        Extensions.objects.filter(organization=org, entity_name="SMS").update(status=1)
+            config.is_active = True
+            config.save()
+            Extensions.objects.filter(organization=org, entity_name="SMS").update(status=1)
 
         if other_active:
             messages.success(
@@ -267,10 +293,13 @@ def save_sms_configuration(request):
             )
     else:
         was_active = config.is_active
-        config.is_active = False
+        with transaction.atomic():
+            config.is_active = False
+            config.save()
+            if was_active:
+                Extensions.objects.filter(organization=org, entity_name="SMS").update(status=0)
 
         if was_active:
-            Extensions.objects.filter(organization=org, entity_name="SMS").update(status=0)
             messages.success(
                 request,
                 f"{provider_meta['name']} configuration saved. SMS service disabled.",
@@ -284,8 +313,7 @@ def save_sms_configuration(request):
         else:
             messages.success(request, f"{provider_meta['name']} credentials saved (inactive).")
 
-    config.save()
-    return redirect(f"/configurations/sms-integration/?provider={provider_key}")
+    return _sms_integration_redirect(provider_key)
 
 
 @login_required
@@ -341,7 +369,7 @@ def test_sms(request):
     for field in ProviderClass.credential_fields():
         key = field["key"]
         val = request.POST.get(key, "").strip()
-        if val and "•" not in val:
+        if val and not _is_masked_placeholder(val):
             credentials[key] = val
 
     if not credentials:
@@ -389,9 +417,12 @@ def test_sms(request):
             pass  # network error during pre-flight → proceed to send anyway
 
     # -- Build test message --
-    # MSG91 DLT flows always deliver their registered template body; the message
-    # text is only used for other providers and for the SMSLog record.
-    test_message = "Asseto Test Alert: SMS Integration is functioning properly."
+    # DLT flow providers always deliver their registered template body; the message
+    # text is used for custom-message providers and for the SMSLog record.
+    test_message = (
+        request.POST.get("message", "").strip()
+        or "Asseto Test Alert: SMS Integration is functioning properly."
+    )
 
     # -- Sanitize phone via provider's own formatter --
     normalized_phone = provider.sanitize_phone(cleaned_recipient)

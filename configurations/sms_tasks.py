@@ -14,9 +14,13 @@ from celery import shared_task
 logger = logging.getLogger(__name__)
 
 
+class RetryableSMSError(Exception):
+    """Raised for transient SMS delivery failures that should be retried by Celery."""
+
+
 @shared_task(
     bind=True,
-    autoretry_for=(Exception,),
+    autoretry_for=(RetryableSMSError,),
     retry_backoff=True,          # exponential back-off: 2s, 4s, 8s …
     max_retries=3,
     acks_late=True,              # re-queue if worker dies mid-flight
@@ -30,9 +34,8 @@ def send_sms_task(self, *, config_id: str, to: str, message: str,
     All arguments are JSON-serializable primitives so the task payload is
     broker-safe regardless of serializer settings.
 
-    On failure the task retries up to 3 times with exponential back-off.
-    If all retries exhaust, the final exception is logged and the task is
-    marked FAILURE (SMSLog already has status="failed" from _send_sync).
+    Transient failures (network/5xx) retry up to 3 times with exponential back-off.
+    Permanent failures (bad credentials, 4xx, invalid phone) fail without retrying.
     """
     from configurations.sms_service import SMSService  # noqa: PLC0415 (avoid circular at module level)
 
@@ -41,18 +44,19 @@ def send_sms_task(self, *, config_id: str, to: str, message: str,
         config_id, to, entity_type, entity_id,
     )
 
+    is_last_attempt = self.request.retries >= self.max_retries
     result = SMSService._run_sync_from_config_id(
         config_id=config_id,
         to=to,
         message=message,
         entity_type=entity_type,
         entity_id=entity_id,
+        write_log_on_retryable_failure=is_last_attempt,
         **provider_kwargs,
     )
 
-    if not result.get("success"):
-        # Raise so Celery can retry; _send_sync already wrote a failed SMSLog row.
-        error_msg = result.get("error") or result.get("reason") or "SMS send failed"
-        raise RuntimeError(error_msg)
+    if not result.get("success") and result.get("retryable"):
+        error_msg = result.get("error") or result.get("reason") or "Transient SMS send failure"
+        raise RetryableSMSError(error_msg)
 
     return result

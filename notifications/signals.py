@@ -214,9 +214,10 @@ def support_ticket_sms_notification(sender, instance, created, **kwargs):
         return
 
     try:
+        from django.db import transaction
         from configurations.sms_service import SMSService
 
-        SMSService.notify_client_ticket_created(instance)
+        transaction.on_commit(lambda: SMSService.notify_client_ticket_created(instance))
 
     except Exception as exc:
         # Never crash ticket creation if notification dispatch encounters an issue

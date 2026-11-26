@@ -93,50 +93,87 @@
       const col = document.createElement("div");
       col.className = "col-md-6 col-12 mb-3";
 
+      const label = document.createElement("label");
+      label.setAttribute("for", "field_" + field.key);
+      const labelBold = document.createElement("b");
+      labelBold.textContent = field.label || "";
+      label.appendChild(labelBold);
+      if (field.required) {
+        label.appendChild(document.createTextNode(" "));
+        const reqSpan = document.createElement("span");
+        reqSpan.className = "text-danger";
+        reqSpan.textContent = "*";
+        label.appendChild(reqSpan);
+      }
+      col.appendChild(label);
+
       const val = creds[field.key] || "";
-      let inputHtml = "";
-      if (field.type === "password") {
-        inputHtml = `
-          <div class="input-group mt-1">
-            <input type="password" class="form-control" id="field_${field.key}" name="${field.key}"
-                   placeholder="${field.placeholder || ''}" value="${val}" ${field.required ? "required" : ""}>
-            <button class="btn btn-outline-secondary" type="button" data-password-toggle="field_${field.key}">
-              <i class="bi bi-eye"></i>
-            </button>
-          </div>
-        `;
-      } else {
-        inputHtml = `
-          <input type="text" class="form-control mt-1" id="field_${field.key}" name="${field.key}"
-                 placeholder="${field.placeholder || ''}" value="${val}" ${field.maxlength ? `maxlength="${field.maxlength}"` : ""}
-                 ${field.required ? "required" : ""}>
-        `;
+      const input = document.createElement("input");
+      input.className = "form-control";
+      input.id = "field_" + field.key;
+      input.name = field.key;
+      input.placeholder = field.placeholder || "";
+      input.value = val;
+      if (field.required) {
+        input.required = true;
       }
 
-      col.innerHTML = `
-        <label for="field_${field.key}">
-          <b>${field.label}</b> ${field.required ? '<span class="text-danger">*</span>' : ""}
-        </label>
-        ${inputHtml}
-        ${field.help ? `<small class="text-muted d-block mt-1">${field.help}</small>` : ""}
-      `;
+      if (field.type === "password") {
+        input.type = "password";
+        const group = document.createElement("div");
+        group.className = "input-group mt-1";
+        group.appendChild(input);
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "btn btn-outline-secondary";
+        toggleBtn.type = "button";
+        toggleBtn.dataset.passwordToggle = "field_" + field.key;
+        const icon = document.createElement("i");
+        icon.className = "bi bi-eye";
+        toggleBtn.appendChild(icon);
+        group.appendChild(toggleBtn);
+        col.appendChild(group);
+      } else {
+        input.type = "text";
+        input.className = "form-control mt-1";
+        if (field.maxlength) {
+          input.maxLength = field.maxlength;
+        }
+        col.appendChild(input);
+      }
+
+      if (field.help) {
+        const helpEl = document.createElement("small");
+        helpEl.className = "text-muted d-block mt-1";
+        helpEl.textContent = field.help;
+        col.appendChild(helpEl);
+      }
+
       container.appendChild(col);
     });
   }
 
   /* ─── Provider switching ───────────────────────────────────────────────── */
 
+  function supportsCustomMessage(providerKey) {
+    const provider = config && config.providers && config.providers[providerKey];
+    if (!provider || typeof provider.supports_custom_message === "undefined") {
+      return providerKey !== "msg91";
+    }
+    return Boolean(provider.supports_custom_message);
+  }
+
   function updateTestModalProvider(providerKey) {
     const testMsgGroup = document.getElementById("testMessageGroup");
     const msg91Notice = document.getElementById("msg91TemplateNotice");
     if (!testMsgGroup || !msg91Notice) return;
 
-    if (providerKey === "msg91") {
-      testMsgGroup.classList.add("d-none");
-      msg91Notice.classList.remove("d-none");
-    } else {
+    if (supportsCustomMessage(providerKey)) {
       testMsgGroup.classList.remove("d-none");
       msg91Notice.classList.add("d-none");
+    } else {
+      testMsgGroup.classList.add("d-none");
+      msg91Notice.classList.remove("d-none");
     }
   }
 
@@ -251,9 +288,9 @@
     formData.append("csrfmiddlewaretoken", config.csrfToken);
     formData.append("provider", provider);
     formData.append("phone", phone);
-    // MSG91 always sends the registered DLT template body — a custom message
-    // would be bypassed, so never submit one for that provider.
-    if (provider !== "msg91" && messageInput) {
+    // Template-only providers deliver their registered template body, so only
+    // submit a custom message when the provider supports one.
+    if (supportsCustomMessage(provider) && messageInput) {
       formData.append("message", message);
     }
 
@@ -288,11 +325,19 @@
 
         if (body.success) {
           alertBox.className = "alert alert-success";
-          alertBox.innerHTML = `<strong>Success!</strong> ${body.message}`;
+          alertBox.replaceChildren();
+          const strong = document.createElement("strong");
+          strong.textContent = "Success! ";
+          alertBox.appendChild(strong);
+          alertBox.appendChild(document.createTextNode(body.message || ""));
           alertBox.classList.remove("d-none");
         } else {
           alertBox.className = "alert alert-danger";
-          alertBox.innerHTML = `<strong>Delivery Failed:</strong> ${body.error || "Unknown error"}`;
+          alertBox.replaceChildren();
+          const strong = document.createElement("strong");
+          strong.textContent = "Delivery Failed: ";
+          alertBox.appendChild(strong);
+          alertBox.appendChild(document.createTextNode(body.error || "Unknown error"));
           if (body.details) {
             const wrap = document.createElement("div");
             wrap.className = "mt-2";
@@ -318,7 +363,11 @@
         spinner.classList.add("d-none");
         sendText.innerText = "Send Test";
         alertBox.className = "alert alert-danger";
-        alertBox.innerHTML = `<strong>Request Failed:</strong> ${err.message}`;
+        alertBox.replaceChildren();
+        const strong = document.createElement("strong");
+        strong.textContent = "Request Failed: ";
+        alertBox.appendChild(strong);
+        alertBox.appendChild(document.createTextNode(err.message || "Network error"));
         alertBox.classList.remove("d-none");
       });
   }

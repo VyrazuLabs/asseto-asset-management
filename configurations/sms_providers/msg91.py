@@ -28,6 +28,7 @@ _VALIDATE_URL = "https://control.msg91.com/api/v5/report/sms/logs"
 
 class MSG91Provider(SMSProvider):
     REQUIRED_FIELDS = ["auth_key", "template_id"]
+    SUPPORTS_CUSTOM_MESSAGE = False
 
     # ------------------------------------------------------------------
     # UI metadata
@@ -85,11 +86,11 @@ class MSG91Provider(SMSProvider):
 
     def sanitize_phone(self, phone: str) -> str:
         """MSG91 expects digits only with country code, no leading +.
-        E.g. '9876543210' -> '919876543210'.
+        E.g. '9876543210' -> '919876543210', '9123456789' -> '919123456789'.
         """
         cleaned = "".join(ch for ch in str(phone) if ch.isdigit() or ch == "+")
         cleaned = cleaned.lstrip("+")
-        if len(cleaned) == 10 and not cleaned.startswith("91"):
+        if len(cleaned) == 10:
             cleaned = "91" + cleaned
         return cleaned
 
@@ -182,13 +183,19 @@ class MSG91Provider(SMSProvider):
                 success=False,
                 error=resp_data.get("message") or f"MSG91 HTTP {resp.status_code}",
                 raw_response=resp_data,
+                retryable=resp.status_code == 429 or resp.status_code >= 500,
             )
 
         except requests.exceptions.Timeout:
-            return SMSResult(success=False, error="MSG91 request timed out.", raw_response={})
+            return SMSResult(
+                success=False, error="MSG91 request timed out.", raw_response={}, retryable=True
+            )
+        except requests.exceptions.RequestException as exc:
+            logger.exception("MSG91 network error: %s", exc)
+            return SMSResult(success=False, error=str(exc), raw_response={}, retryable=True)
         except Exception as exc:
             logger.exception("MSG91 send failed: %s", exc)
-            return SMSResult(success=False, error=str(exc), raw_response={})
+            return SMSResult(success=False, error=str(exc), raw_response={}, retryable=False)
 
     def validate_credentials(self) -> tuple[bool, str]:
         """Pre-flight auth check using the report endpoint.

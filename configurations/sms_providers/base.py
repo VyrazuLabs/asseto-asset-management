@@ -28,6 +28,7 @@ class SMSResult:
     message_id: str | None = None
     error: str | None = None
     raw_response: dict = field(default_factory=dict)
+    retryable: bool = False
 
 
 class SMSProvider(ABC):
@@ -47,6 +48,8 @@ class SMSProvider(ABC):
 
     # Subclasses declare which keys must be present in the credentials dict.
     REQUIRED_FIELDS: list[str] = []
+    # Whether the provider sends the arbitrary `message` text (False for DLT template-only providers).
+    SUPPORTS_CUSTOM_MESSAGE: bool = True
 
     def __init__(self, credentials: dict) -> None:
         self._validate(credentials)

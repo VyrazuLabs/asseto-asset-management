@@ -91,7 +91,6 @@ class SMSConfiguration(models.Model):
     PROVIDER_CHOICES = [
         ("msg91", "MSG91"),
         ("twilio", "Twilio"),
-        ("sns", "AWS SNS"),
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(

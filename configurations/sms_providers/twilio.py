@@ -13,6 +13,7 @@ Credentials required (stored in SMSConfiguration.credentials JSON):
 from __future__ import annotations
 
 import logging
+import re
 
 import requests
 
@@ -20,9 +21,17 @@ from .base import SMSProvider, SMSResult
 
 logger = logging.getLogger(__name__)
 
+_ACCOUNT_SID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
 
 class TwilioProvider(SMSProvider):
     REQUIRED_FIELDS = ["account_sid", "auth_token", "from_number"]
+
+    def _validate(self, credentials: dict) -> None:
+        super()._validate(credentials)
+        account_sid = str(credentials.get("account_sid", "")).strip()
+        if not _ACCOUNT_SID_RE.fullmatch(account_sid):
+            raise ValueError("TwilioProvider account_sid contains invalid characters.")
 
     # ------------------------------------------------------------------
     # UI metadata
@@ -103,10 +112,16 @@ class TwilioProvider(SMSProvider):
                 success=False,
                 error=resp_data.get("message") or f"Twilio HTTP {resp.status_code}",
                 raw_response=resp_data,
+                retryable=resp.status_code == 429 or resp.status_code >= 500,
             )
 
         except requests.exceptions.Timeout:
-            return SMSResult(success=False, error="Twilio request timed out.", raw_response={})
+            return SMSResult(
+                success=False, error="Twilio request timed out.", raw_response={}, retryable=True
+            )
+        except requests.exceptions.RequestException as exc:
+            logger.exception("Twilio network error: %s", exc)
+            return SMSResult(success=False, error=str(exc), raw_response={}, retryable=True)
         except Exception as exc:
             logger.exception("Twilio send failed: %s", exc)
-            return SMSResult(success=False, error=str(exc), raw_response={})
+            return SMSResult(success=False, error=str(exc), raw_response={}, retryable=False)

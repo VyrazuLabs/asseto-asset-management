@@ -32,14 +32,3 @@ def get_provider_class(name: str) -> type:
             f"Available providers: {list(PROVIDER_REGISTRY.keys())}"
         )
     return cls
-
-
-def get_all_providers_metadata() -> dict[str, dict]:
-    """
-    Return a dict of provider_key -> credential_fields() for all registered providers.
-    Used by the view to build the config form dynamically without hardcoding.
-    """
-    return {
-        key: {"fields": cls.credential_fields()}
-        for key, cls in PROVIDER_REGISTRY.items()
-    }

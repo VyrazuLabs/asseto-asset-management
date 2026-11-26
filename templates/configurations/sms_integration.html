@@ -53,13 +53,12 @@
                     <!-- Provider Selection Dropdown -->
                     <div class="col-md-6 col-12 mb-3">
                         <label for="providerSelect"><b>SMS Provider</b></label>
-                        <select class="form-select mt-1" id="providerSelect" data-no-select2 onchange="switchProvider(this.value)">
-                            <option value="msg91" {% if selected_provider_key == 'msg91' %}selected{% endif %}>
-                                MSG91 (Recommended / DLT Compliant){% if active_config.provider == 'msg91' %} — Active{% endif %}
-                            </option>
-                            <option value="twilio" {% if selected_provider_key == 'twilio' %}selected{% endif %}>
-                                Twilio{% if active_config.provider == 'twilio' %} — Active{% endif %}
-                            </option>
+                        <select class="form-select mt-1" id="providerSelect" data-no-select2>
+                            {% for key, prov in providers.items %}
+                                <option value="{{ key }}" {% if selected_provider_key == key %}selected{% endif %}>
+                                    {{ prov.name }}{% if prov.badge %} ({{ prov.badge }}){% endif %}{% if active_config.provider == key %} — Active{% endif %}
+                                </option>
+                            {% endfor %}
                         </select>
                         <small class="text-muted d-block mt-1">Select the provider you bought SMS credits from.</small>
                     </div>
@@ -181,8 +180,9 @@
                     <div class="mb-3">
                         <label for="testProviderSelect" class="form-label"><b>Provider</b></label>
                         <select class="form-select" id="testProviderSelect" name="provider">
-                            <option value="msg91" {% if selected_provider_key == 'msg91' %}selected{% endif %}>MSG91</option>
-                            <option value="twilio" {% if selected_provider_key == 'twilio' %}selected{% endif %}>Twilio</option>
+                            {% for key, prov in providers.items %}
+                                <option value="{{ key }}" {% if selected_provider_key == key %}selected{% endif %}>{{ prov.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
@@ -196,12 +196,12 @@
                         <small class="text-muted">10–15 digits, optionally starting with + and country code.</small>
                     </div>
 
-                    <div class="mb-3{% if selected_provider_key == 'msg91' %} d-none{% endif %}" id="testMessageGroup">
+                    <div class="mb-3{% if not selected_provider.supports_custom_message %} d-none{% endif %}" id="testMessageGroup">
                         <label for="testMessageInput" class="form-label"><b>Message</b></label>
                         <textarea class="form-control" id="testMessageInput" name="message" rows="2">Asseto Test Alert: SMS Integration is functioning properly.</textarea>
                     </div>
 
-                    <div class="alert alert-info py-2 px-3 mb-3{% if selected_provider_key != 'msg91' %} d-none{% endif %}" id="msg91TemplateNotice" role="alert">
+                    <div class="alert alert-info py-2 px-3 mb-3{% if selected_provider.supports_custom_message %} d-none{% endif %}" id="msg91TemplateNotice" role="alert">
                         <div class="d-flex align-items-center">
                             <i class="bi bi-info-circle-fill fs-5 text-primary me-2 flex-shrink-0"></i>
                             <div class="small">
@@ -225,14 +225,6 @@
 {% endblock content %}
 
 {% block script %}
-<script>
-    function switchProvider(providerKey) {
-        if (!providerKey) return;
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set("provider", providerKey);
-        window.location.href = newUrl.toString();
-    }
-</script>
-<script src="{% static 'js/pages/sms_integration.js' %}?v=1.4" defer></script>
+<script src="{% static 'js/pages/sms_integration.js' %}?v=1.5" defer></script>
 {% endblock script %}
 
