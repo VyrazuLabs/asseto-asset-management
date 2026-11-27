@@ -33,6 +33,8 @@ from .utils import (
     create_otp_for_contact,
     verify_otp_for_contact,
     otp_remaining_seconds,
+    clear_portal_session,
+    portal_access_denied_reason,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,21 +44,25 @@ logger = logging.getLogger(__name__)
 
 def _get_contact_and_client(request):
     """Fetch the authenticated ClientContact and their Client from session."""
+    cached = getattr(request, "portal_contact", None)
+    if cached is not None:
+        return cached, cached.client
+
     contact_id = request.session.get("client_contact_id")
     if not contact_id:
         return None, None
     try:
-        contact = ClientContact.objects.select_related("client").get(
-            id=contact_id,
-            is_portal_active=True,
-            is_deleted=False,
-            client__is_deleted=False,
+        contact = (
+            ClientContact.objects.select_related("client")
+            .filter(id=contact_id, is_deleted=False, client__is_deleted=False)
+            .first()
         )
-        return contact, contact.client
-    except ClientContact.DoesNotExist:
-        for key in ("client_contact_id", "client_id"):
-            request.session.pop(key, None)
+    except (ValidationError, ValueError):
+        contact = None
+    if contact is None or portal_access_denied_reason(contact):
+        clear_portal_session(request)
         return None, None
+    return contact, contact.client
 
 
 # ─── Authentication Views ────────────────────────────────────────────
@@ -99,6 +105,10 @@ def client_portal_login(request):
             )
             return redirect("client_portal:login")
 
+        if reason := portal_access_denied_reason(contact):
+            messages.error(request, reason)
+            return redirect("client_portal:login")
+
         # Database-backed rate limit: check if an OTP was sent to this contact within the last 60 seconds
         latest_otp = (
             ClientPortalOTP.objects.filter(contact=contact)
@@ -139,26 +149,40 @@ def client_portal_login(request):
     return render(request, "client_portal/login.html")
 
 
-def client_portal_verify_otp(request):
-    """Step 2: Client enters the OTP received via email."""
+def _get_pending_contact(request):
+    """Fetch and validate the contact awaiting OTP verification, or return None."""
     pending_id = request.session.get("pending_contact_id")
-    pending_email = request.session.get("pending_contact_email", "")
-
     if not pending_id:
-        return redirect("client_portal:login")
-
+        return None
     try:
-        contact = ClientContact.objects.get(
-            id=pending_id,
-            is_portal_active=True,
-            is_deleted=False,
-            client__is_deleted=False,
+        contact = (
+            ClientContact.objects.select_related("client")
+            .filter(id=pending_id)
+            .first()
         )
-    except ClientContact.DoesNotExist:
-        # Stale or invalid pending session — restart login flow
+    except (ValidationError, ValueError):
+        contact = None
+
+    reason = portal_access_denied_reason(contact) if contact is not None else None
+    if contact is None or reason:
         for key in ("pending_contact_id", "pending_contact_email"):
             request.session.pop(key, None)
-        messages.error(request, "Your session has expired. Please log in again.")
+        messages.error(
+            request,
+            reason or "Your session has expired. Please log in again.",
+        )
+        return None
+    return contact
+
+
+def client_portal_verify_otp(request):
+    """Step 2: Client enters the OTP received via email."""
+    pending_email = request.session.get("pending_contact_email", "")
+    if not request.session.get("pending_contact_id"):
+        return redirect("client_portal:login")
+
+    contact = _get_pending_contact(request)
+    if not contact:
         return redirect("client_portal:login")
     otp_seconds = otp_remaining_seconds(contact)
 
@@ -199,8 +223,8 @@ def client_portal_verify_otp(request):
 
 
 def client_portal_logout(request):
-    """Clear client portal session."""
-    request.session.flush()
+    """Clear client portal session without touching the main site's login."""
+    clear_portal_session(request)
     messages.success(request, "You have been logged out successfully.")
     return redirect("client_portal:login")
 
@@ -210,21 +234,11 @@ def client_portal_resend_otp(request):
     if request.method != "POST":
         return redirect("client_portal:verify_otp")
 
-    pending_id = request.session.get("pending_contact_id")
-    if not pending_id:
+    if not request.session.get("pending_contact_id"):
         return redirect("client_portal:login")
 
-    try:
-        contact = ClientContact.objects.get(
-            id=pending_id,
-            is_portal_active=True,
-            is_deleted=False,
-            client__is_deleted=False,
-        )
-    except ClientContact.DoesNotExist:
-        for key in ("pending_contact_id", "pending_contact_email"):
-            request.session.pop(key, None)
-        messages.error(request, "Your session has expired. Please log in again.")
+    contact = _get_pending_contact(request)
+    if not contact:
         return redirect("client_portal:login")
 
     # Database-backed rate limit: 1 resend per 60 seconds

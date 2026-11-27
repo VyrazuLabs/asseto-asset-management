@@ -50,7 +50,7 @@
                                 <td>{{page_object.start_index|add:forloop.counter0}}</td>
                                 <td>{{client.client_id}}</td>
                                 <td>{{client.name | title}}</td>
-                                <td>{{client.industry|default:"-"}}</td>
+                                <td>{% if client.industry %}{{ client.industry_name }}{% else %}-{% endif %}</td>
                                 <td>{{client.rental_type}}</td>
                                 <td>{{client.updated_at}}</td>
                                 <td>

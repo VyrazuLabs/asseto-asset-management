@@ -14,6 +14,60 @@ def generate_otp():
 OTP_EXPIRY_MINUTES = 2
 DEFAULT_BRAND_NAME = "Asseto"
 
+PORTAL_SESSION_KEYS = (
+    "client_contact_id",
+    "client_id",
+    "pending_contact_id",
+    "pending_contact_email",
+    "show_welcome_banner",
+)
+
+# Client.status value for a disabled client (clients.models.STATUS_CHOICES "0").
+DISABLED_CLIENT_STATUS = "0"
+
+CLIENT_ACCESS_DISABLED_MSG = (
+    "Your client account has been disabled. Please contact administration."
+)
+PORTAL_ACCESS_REVOKED_MSG = (
+    "Your portal access has been disabled or removed. Please contact administration."
+)
+
+
+def portal_access_denied_reason(contact):
+    """
+    Why ``contact`` may not use the portal right now, or ``None`` if allowed.
+
+    Used by the middleware (every portal request) and by the login/OTP views so
+    that a client whose status is disabled, or whose portal access was removed,
+    is kicked out of the portal with an explanatory error on their next request.
+    """
+    if contact is None or contact.is_deleted:
+        return PORTAL_ACCESS_REVOKED_MSG
+    if not contact.is_portal_active:
+        return PORTAL_ACCESS_REVOKED_MSG
+    client = contact.client
+    if client is None or client.is_deleted or client.status == DISABLED_CLIENT_STATUS:
+        return CLIENT_ACCESS_DISABLED_MSG
+    return None
+
+
+def clear_portal_session(request):
+    """
+    Remove only the client portal's own keys from the session.
+
+    The portal shares the browser's single Django session cookie with the
+    main site (where a staff user may be logged in via django.contrib.auth),
+    so request.session.flush() here would also delete _auth_user_id and log
+    that user out of the main site.
+    """
+    removed = False
+    for key in PORTAL_SESSION_KEYS:
+        if key in request.session:
+            del request.session[key]
+            removed = True
+    if removed:
+        request.session.cycle_key()
+
 
 def get_organization_name(contact):
     """Organization name from configurations/add-organization/ for the
